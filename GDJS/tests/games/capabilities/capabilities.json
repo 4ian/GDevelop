@@ -659,11 +659,38 @@
           "identifier": "https://asset-resources.gdevelop.io/public-resources/3D Animated Characters/bfcac35d635d90e19bbdfd3dd7f51bfb0f8d055f2c44b9a23ebe73d84bc0c196_Femal Witch.glb",
           "name": "Femal Witch.glb"
         }
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "assets/spineboy.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "assets\\spineboy.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "assets/spineboy.atlas",
+        "kind": "atlas",
+        "metadata": "{\"embeddedResourcesMapping\":{\"spineboy.png\":\"assets\\\\spineboy.png\"}}",
+        "name": "assets\\spineboy.atlas",
+        "userAdded": true
+      },
+      {
+        "disablePreload": false,
+        "file": "assets/spineboy.json",
+        "kind": "spine",
+        "metadata": "{\"embeddedResourcesMapping\":{\"spineboy.atlas\":\"assets\\\\spineboy.atlas\"}}",
+        "name": "assets\\spineboy.json",
+        "userAdded": true
       }
     ],
     "resourceFolders": []
   },
   "objects": [],
+  "objectsFolderStructure": {
+    "folderName": "__ROOT"
+  },
   "objectsGroups": [],
   "variables": [],
   "layouts": [
@@ -687,7 +714,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.3,
         "snap": true,
-        "zoomFactor": 0.546875,
+        "zoomFactor": 0.5468750000000006,
         "windowMask": false
       },
       "objectsGroups": [
@@ -699,6 +726,9 @@
             },
             {
               "name": "FemalWitch"
+            },
+            {
+              "name": "Spine"
             }
           ]
         },
@@ -725,8 +755,8 @@
           "name": "RedHero",
           "persistentUuid": "af466afd-f3eb-44c7-80ac-624cd4855459",
           "width": 144,
-          "x": 148,
-          "y": 307,
+          "x": 74,
+          "y": 209,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -1195,8 +1225,8 @@
           "name": "FemalWitch",
           "persistentUuid": "533a81d2-282a-4b64-b419-073f83f54fdb",
           "width": 42.08072282741785,
-          "x": 306,
-          "y": 317,
+          "x": 370,
+          "y": 221,
           "zOrder": 36,
           "numberProperties": [],
           "stringProperties": [],
@@ -1227,7 +1257,7 @@
           "persistentUuid": "374c5d8b-d454-40e0-bdce-8305ce85872d",
           "width": 0,
           "x": 32,
-          "y": 428,
+          "y": 420,
           "zOrder": 38,
           "numberProperties": [],
           "stringProperties": [],
@@ -1257,7 +1287,7 @@
           "persistentUuid": "3fc60ce8-e575-492a-a9ed-da61db648ed2",
           "width": 0,
           "x": 32,
-          "y": 356,
+          "y": 292,
           "zOrder": 40,
           "numberProperties": [],
           "stringProperties": [],
@@ -1272,8 +1302,54 @@
           "persistentUuid": "a01e9d7c-906a-44b7-b228-c07f8096ca0e",
           "width": 0,
           "x": 320,
-          "y": 352,
+          "y": 288,
           "zOrder": 41,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "depth": 0,
+          "height": 172,
+          "layer": "",
+          "name": "Spine",
+          "persistentUuid": "ddaab7c9-bccf-4854-9958-7190d8819a3b",
+          "width": 114,
+          "x": 222,
+          "y": 223,
+          "zOrder": 42,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "AnimationSpineTimeSlider",
+          "persistentUuid": "05c49a4f-a956-4365-9edf-3d7a933d2359",
+          "width": 0,
+          "x": 32,
+          "y": 356,
+          "zOrder": 43,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "name": "AnimationSpineTimeLabel",
+          "persistentUuid": "dbda273a-0934-49be-ba81-2c5ef555d329",
+          "width": 0,
+          "x": 320,
+          "y": 352,
+          "zOrder": 44,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1284,7 +1360,6 @@
           "adaptCollisionMaskAutomatically": true,
           "assetStoreId": "0d91b7b0a2a8562a0172b4d5e9bf3d80340f866a030aa7a5f3baf6157840f1c3",
           "name": "RedHero",
-          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2701,7 +2776,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "ResumeButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -2765,7 +2839,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "PauseButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -2832,7 +2905,6 @@
           "italic": false,
           "name": "PausedLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2854,7 +2926,6 @@
           "italic": false,
           "name": "EndedLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2873,7 +2944,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "RunButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -2937,7 +3007,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "JumpButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -3004,7 +3073,6 @@
           "italic": false,
           "name": "AnimationNameLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3026,7 +3094,6 @@
           "italic": false,
           "name": "AnimationIndexLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3045,7 +3112,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "SpeedScaleSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3115,7 +3181,6 @@
           "italic": false,
           "name": "SpeedScaleLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3134,7 +3199,6 @@
         {
           "assetStoreId": "7f3b0673f7479b4b487bcbadbb3c8b9412a8e6d8694543f9ec3419365ebff3f5",
           "name": "FlipXToggle",
-          "tags": "",
           "type": "SpriteToggleSwitch::SpriteToggleSwitch",
           "variables": [],
           "effects": [],
@@ -3215,7 +3279,6 @@
           "italic": false,
           "name": "FlippedXLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3234,7 +3297,6 @@
         {
           "assetStoreId": "7f3b0673f7479b4b487bcbadbb3c8b9412a8e6d8694543f9ec3419365ebff3f5",
           "name": "FlipYToggle",
-          "tags": "",
           "type": "SpriteToggleSwitch::SpriteToggleSwitch",
           "variables": [],
           "effects": [],
@@ -3315,7 +3377,6 @@
           "italic": false,
           "name": "FlippedYLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3334,7 +3395,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "OpacitySlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3404,7 +3464,6 @@
           "italic": false,
           "name": "OpacityLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3423,7 +3482,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "ScaleSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3490,7 +3548,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "ScaleXSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3557,7 +3614,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "ScaleYSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3627,7 +3683,6 @@
           "italic": false,
           "name": "ScaleLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3649,7 +3704,6 @@
           "italic": false,
           "name": "ScaleXLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3671,7 +3725,6 @@
           "italic": false,
           "name": "ScaleYLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3690,7 +3743,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "WidthSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3756,7 +3808,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "HeightSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -3825,7 +3876,6 @@
           "italic": false,
           "name": "WidthLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3847,7 +3897,6 @@
           "italic": false,
           "name": "HeightLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3866,7 +3915,6 @@
         {
           "assetStoreId": "7f3b0673f7479b4b487bcbadbb3c8b9412a8e6d8694543f9ec3419365ebff3f5",
           "name": "EnableEffectToggle",
-          "tags": "",
           "type": "SpriteToggleSwitch::SpriteToggleSwitch",
           "variables": [],
           "effects": [],
@@ -3945,7 +3993,6 @@
           "italic": false,
           "name": "EnableEffectLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3967,7 +4014,6 @@
           "italic": false,
           "name": "EffectValueLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -3986,7 +4032,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "EffectSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -4056,7 +4101,6 @@
           "italic": false,
           "name": "Animation3DTimeLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4078,7 +4122,6 @@
           "italic": false,
           "name": "Animation2DTimeLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4097,7 +4140,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "Animation3DTimeSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -4164,7 +4206,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "Animation2DTimeSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -4231,7 +4272,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "NextButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -4295,7 +4335,6 @@
         {
           "assetStoreId": "5bae2ae256d7c74d5331f37a8a01ba2a474ec548ce033bf58646cbbbd8222871",
           "name": "FemalWitch",
-          "tags": "",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -4435,8 +4474,288 @@
               }
             ]
           }
+        },
+        {
+          "assetStoreId": "",
+          "name": "Spine",
+          "type": "SpineObject::SpineObject",
+          "variables": [],
+          "effects": [
+            {
+              "effectType": "Outline",
+              "name": "Effect",
+              "doubleParameters": {
+                "padding": 0,
+                "thickness": 2
+              },
+              "stringParameters": {
+                "color": "255;255;255"
+              },
+              "booleanParameters": {}
+            }
+          ],
+          "behaviors": [],
+          "content": {
+            "opacity": 255,
+            "scale": 0.125,
+            "spineResourceName": "assets\\spineboy.json",
+            "animations": [
+              {
+                "loop": true,
+                "name": "walk",
+                "source": "walk"
+              },
+              {
+                "loop": true,
+                "name": "Run",
+                "source": "run"
+              },
+              {
+                "loop": false,
+                "name": "Jump",
+                "source": "jump"
+              },
+              {
+                "loop": true,
+                "name": "Idle",
+                "source": "idle"
+              },
+              {
+                "loop": false,
+                "name": "aim",
+                "source": "aim"
+              },
+              {
+                "loop": false,
+                "name": "death",
+                "source": "death"
+              },
+              {
+                "loop": false,
+                "name": "hit",
+                "source": "hit"
+              },
+              {
+                "loop": false,
+                "name": "shoot",
+                "source": "shoot"
+              }
+            ]
+          }
+        },
+        {
+          "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
+          "name": "AnimationSpineTimeSlider",
+          "type": "PanelSpriteSlider::PanelSpriteSlider",
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "content": {
+            "BarTopPadding": 6,
+            "BarLeftPadding": 6,
+            "BarRightPadding": 6,
+            "BarBottomPadding": 6,
+            "LabelMargin": 6,
+            "MinValue": 0,
+            "MaxValue": 1,
+            "InitialValue": 2,
+            "StepSize": 0
+          },
+          "childrenContent": {
+            "Background": {
+              "bottomMargin": 4,
+              "height": 28,
+              "leftMargin": 2,
+              "rightMargin": 2,
+              "texture": "Square White Slider Border.png",
+              "tiled": false,
+              "topMargin": 4,
+              "width": 265
+            },
+            "FillBar": {
+              "bottomMargin": 2,
+              "height": 16,
+              "leftMargin": 0,
+              "rightMargin": 0,
+              "texture": "Square White Slider Fill Bar.png",
+              "tiled": false,
+              "topMargin": 0,
+              "width": 16
+            },
+            "Label": {
+              "bold": false,
+              "italic": false,
+              "smoothed": true,
+              "underlined": false,
+              "string": "It displays the value when it changes.",
+              "font": "",
+              "textAlignment": "",
+              "characterSize": 20,
+              "color": {
+                "b": 221,
+                "g": 221,
+                "r": 221
+              }
+            },
+            "Thumb": {
+              "bottomMargin": 2,
+              "height": 36,
+              "leftMargin": 1,
+              "rightMargin": 1,
+              "texture": "Square White Slider Thumb.png",
+              "tiled": false,
+              "topMargin": 2,
+              "width": 22
+            }
+          }
+        },
+        {
+          "assetStoreId": "",
+          "bold": false,
+          "italic": false,
+          "name": "AnimationSpineTimeLabel",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "string": "Anim Sp time",
+          "font": "",
+          "textAlignment": "left",
+          "characterSize": 40,
+          "color": {
+            "b": 202,
+            "g": 202,
+            "r": 202
+          }
         }
       ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "RedHero"
+          },
+          {
+            "objectName": "FemalWitch"
+          },
+          {
+            "objectName": "Spine"
+          },
+          {
+            "objectName": "ResumeButton"
+          },
+          {
+            "objectName": "PauseButton"
+          },
+          {
+            "objectName": "PausedLabel"
+          },
+          {
+            "objectName": "EndedLabel"
+          },
+          {
+            "objectName": "RunButton"
+          },
+          {
+            "objectName": "JumpButton"
+          },
+          {
+            "objectName": "AnimationNameLabel"
+          },
+          {
+            "objectName": "AnimationIndexLabel"
+          },
+          {
+            "objectName": "SpeedScaleSlider"
+          },
+          {
+            "objectName": "SpeedScaleLabel"
+          },
+          {
+            "objectName": "FlipXToggle"
+          },
+          {
+            "objectName": "FlippedXLabel"
+          },
+          {
+            "objectName": "FlipYToggle"
+          },
+          {
+            "objectName": "FlippedYLabel"
+          },
+          {
+            "objectName": "OpacitySlider"
+          },
+          {
+            "objectName": "OpacityLabel"
+          },
+          {
+            "objectName": "ScaleSlider"
+          },
+          {
+            "objectName": "ScaleXSlider"
+          },
+          {
+            "objectName": "ScaleYSlider"
+          },
+          {
+            "objectName": "ScaleLabel"
+          },
+          {
+            "objectName": "ScaleXLabel"
+          },
+          {
+            "objectName": "ScaleYLabel"
+          },
+          {
+            "objectName": "WidthSlider"
+          },
+          {
+            "objectName": "HeightSlider"
+          },
+          {
+            "objectName": "WidthLabel"
+          },
+          {
+            "objectName": "HeightLabel"
+          },
+          {
+            "objectName": "EnableEffectToggle"
+          },
+          {
+            "objectName": "EnableEffectLabel"
+          },
+          {
+            "objectName": "EffectValueLabel"
+          },
+          {
+            "objectName": "EffectSlider"
+          },
+          {
+            "objectName": "Animation3DTimeLabel"
+          },
+          {
+            "objectName": "Animation2DTimeLabel"
+          },
+          {
+            "objectName": "AnimationSpineTimeLabel"
+          },
+          {
+            "objectName": "Animation3DTimeSlider"
+          },
+          {
+            "objectName": "Animation2DTimeSlider"
+          },
+          {
+            "objectName": "AnimationSpineTimeSlider"
+          },
+          {
+            "objectName": "NextButton"
+          }
+        ]
+      },
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -4825,6 +5144,34 @@
               "conditions": [
                 {
                   "type": {
+                    "inverted": true,
+                    "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
+                  },
+                  "parameters": [
+                    "Spine",
+                    "Animation"
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "PanelSpriteSlider::PanelSpriteSlider::SetValue"
+                  },
+                  "parameters": [
+                    "AnimationSpineTimeSlider",
+                    "=",
+                    "Spine.Animation::ElapsedTime()",
+                    ""
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
                     "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
                   },
                   "parameters": [
@@ -4888,6 +5235,42 @@
                     "Animation",
                     "=",
                     "Animation3DTimeSlider.Value()"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "value": "AnimatableCapability::AnimatableBehavior::IsAnimationPaused"
+                  },
+                  "parameters": [
+                    "Spine",
+                    "Animation"
+                  ]
+                },
+                {
+                  "type": {
+                    "value": "PanelSpriteSlider::PanelSpriteSlider::IsBeingDragged"
+                  },
+                  "parameters": [
+                    "AnimationSpineTimeSlider",
+                    ""
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "value": "AnimatableCapability::AnimatableBehavior::SetElapsedTime"
+                  },
+                  "parameters": [
+                    "Spine",
+                    "Animation",
+                    "=",
+                    "AnimationSpineTimeSlider.Value()"
                   ]
                 }
               ]
@@ -5181,7 +5564,7 @@
                     "value": "OpacityCapability::OpacityBehavior::SetValue"
                   },
                   "parameters": [
-                    "RedHero",
+                    "Character",
                     "Opacity",
                     "=",
                     "OpacitySlider.Value()"
@@ -5457,7 +5840,7 @@
                     "value": "EffectCapability::EffectBehavior::EnableEffect"
                   },
                   "parameters": [
-                    "RedHero",
+                    "Character",
                     "Effect",
                     "\"Effect\"",
                     "yes"
@@ -5484,7 +5867,7 @@
                     "value": "EffectCapability::EffectBehavior::EnableEffect"
                   },
                   "parameters": [
-                    "RedHero",
+                    "Character",
                     "Effect",
                     "\"Effect\"",
                     "no"
@@ -5511,7 +5894,7 @@
                     "value": "EffectCapability::EffectBehavior::SetEffectDoubleParameter"
                   },
                   "parameters": [
-                    "RedHero",
+                    "Character",
                     "Effect",
                     "\"Effect\"",
                     "\"thickness\"",
@@ -5652,6 +6035,10 @@
         {
           "name": "Scale",
           "type": "ScalableCapability::ScalableBehavior"
+        },
+        {
+          "name": "Text",
+          "type": "TextContainerCapability::TextContainerBehavior"
         }
       ]
     },
@@ -5946,7 +6333,6 @@
         {
           "assetStoreId": "5bae2ae256d7c74d5331f37a8a01ba2a474ec548ce033bf58646cbbbd8222871",
           "name": "FemalWitch",
-          "tags": "",
           "type": "Scene3D::Model3DObject",
           "variables": [],
           "effects": [],
@@ -6090,7 +6476,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "ZSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -6159,7 +6544,6 @@
           "italic": false,
           "name": "ZLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6178,7 +6562,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "RotationXSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -6248,7 +6631,6 @@
           "italic": false,
           "name": "RotationXLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6267,7 +6649,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "RotationYSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -6337,7 +6718,6 @@
           "italic": false,
           "name": "RotationYLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6356,7 +6736,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "ScaleZSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -6426,7 +6805,6 @@
           "italic": false,
           "name": "ScaleZLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6445,7 +6823,6 @@
         {
           "assetStoreId": "bfeeb465a4a164b560a2215e3ff9e78e66123af43cbf7ef1f22d56fca4271c80",
           "name": "DepthSlider",
-          "tags": "",
           "type": "PanelSpriteSlider::PanelSpriteSlider",
           "variables": [],
           "effects": [],
@@ -6514,7 +6891,6 @@
           "italic": false,
           "name": "DepthLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6533,7 +6909,6 @@
         {
           "assetStoreId": "7f3b0673f7479b4b487bcbadbb3c8b9412a8e6d8694543f9ec3419365ebff3f5",
           "name": "FlipZToggle",
-          "tags": "",
           "type": "SpriteToggleSwitch::SpriteToggleSwitch",
           "variables": [],
           "effects": [],
@@ -6614,7 +6989,6 @@
           "italic": false,
           "name": "FlippedZLabel",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -6633,7 +7007,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "TurnXButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -6697,7 +7070,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "TurnYButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -6761,7 +7133,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "TurnZButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -6825,7 +7196,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "NextButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -6887,6 +7257,62 @@
           }
         }
       ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "FemalWitch"
+          },
+          {
+            "objectName": "ZSlider"
+          },
+          {
+            "objectName": "ZLabel"
+          },
+          {
+            "objectName": "RotationXSlider"
+          },
+          {
+            "objectName": "RotationXLabel"
+          },
+          {
+            "objectName": "RotationYSlider"
+          },
+          {
+            "objectName": "RotationYLabel"
+          },
+          {
+            "objectName": "ScaleZSlider"
+          },
+          {
+            "objectName": "ScaleZLabel"
+          },
+          {
+            "objectName": "DepthSlider"
+          },
+          {
+            "objectName": "DepthLabel"
+          },
+          {
+            "objectName": "FlipZToggle"
+          },
+          {
+            "objectName": "FlippedZLabel"
+          },
+          {
+            "objectName": "TurnXButton"
+          },
+          {
+            "objectName": "TurnYButton"
+          },
+          {
+            "objectName": "TurnZButton"
+          },
+          {
+            "objectName": "NextButton"
+          }
+        ]
+      },
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -7544,7 +7970,6 @@
           "italic": false,
           "name": "NewText",
           "smoothed": true,
-          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -7563,7 +7988,6 @@
         {
           "assetStoreId": "",
           "name": "NewBitmapText",
-          "tags": "",
           "type": "BitmapText::BitmapTextObject",
           "variables": [],
           "effects": [],
@@ -7583,7 +8007,6 @@
         {
           "assetStoreId": "",
           "name": "NewTextInput",
-          "tags": "",
           "type": "TextInput::TextInputObject",
           "variables": [],
           "effects": [],
@@ -7607,7 +8030,6 @@
         {
           "assetStoreId": "615de0316452630b9f4f6a39decc82e2449b82c1afd1ff24d6470dad2922177b",
           "name": "NextButton",
-          "tags": "",
           "type": "PanelSpriteButton::PanelSpriteButton",
           "variables": [],
           "effects": [],
@@ -7669,6 +8091,23 @@
           }
         }
       ],
+      "objectsFolderStructure": {
+        "folderName": "__ROOT",
+        "children": [
+          {
+            "objectName": "NewText"
+          },
+          {
+            "objectName": "NewBitmapText"
+          },
+          {
+            "objectName": "NewTextInput"
+          },
+          {
+            "objectName": "NextButton"
+          }
+        ]
+      },
       "events": [
         {
           "type": "BuiltinCommonInstructions::Standard",
@@ -10466,7 +10905,6 @@
               "adaptCollisionMaskAutomatically": false,
               "assetStoreId": "",
               "name": "State",
-              "tags": "",
               "type": "Sprite",
               "updateIfNotVisible": false,
               "variables": [],
@@ -10515,7 +10953,15 @@
                 }
               ]
             }
-          ]
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "State"
+              }
+            ]
+          }
         }
       ]
     },
@@ -14211,7 +14657,6 @@
               "italic": false,
               "name": "Label",
               "smoothed": true,
-              "tags": "",
               "type": "TextObject::Text",
               "underlined": false,
               "variables": [],
@@ -14234,7 +14679,6 @@
               "leftMargin": 0,
               "name": "Thumb",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": false,
               "topMargin": 0,
@@ -14257,7 +14701,6 @@
               "leftMargin": 0,
               "name": "FillBar",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": true,
               "topMargin": 0,
@@ -14283,7 +14726,6 @@
               "leftMargin": 0,
               "name": "Background",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": true,
               "topMargin": 0,
@@ -14304,7 +14746,24 @@
                 }
               ]
             }
-          ]
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Label"
+              },
+              {
+                "objectName": "Thumb"
+              },
+              {
+                "objectName": "FillBar"
+              },
+              {
+                "objectName": "Background"
+              }
+            ]
+          }
         }
       ]
     },
@@ -16885,7 +17344,6 @@
               "italic": false,
               "name": "Label",
               "smoothed": true,
-              "tags": "",
               "type": "TextObject::Text",
               "underlined": false,
               "variables": [],
@@ -16908,7 +17366,6 @@
               "leftMargin": 0,
               "name": "Idle",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": false,
               "topMargin": 0,
@@ -16938,7 +17395,6 @@
               "leftMargin": 0,
               "name": "Hovered",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": false,
               "topMargin": 0,
@@ -16960,7 +17416,6 @@
               "leftMargin": 0,
               "name": "Pressed",
               "rightMargin": 0,
-              "tags": "",
               "texture": "",
               "tiled": false,
               "topMargin": 0,
@@ -16970,7 +17425,24 @@
               "effects": [],
               "behaviors": []
             }
-          ]
+          ],
+          "objectsFolderStructure": {
+            "folderName": "__ROOT",
+            "children": [
+              {
+                "objectName": "Label"
+              },
+              {
+                "objectName": "Idle"
+              },
+              {
+                "objectName": "Hovered"
+              },
+              {
+                "objectName": "Pressed"
+              }
+            ]
+          }
         }
       ]
     }

@@ -305,6 +305,12 @@ const SpineEditor = ({
     <>
       <ScrollView ref={scrollView}>
         <ColumnStackLayout noMargin>
+          <AlertMessage kind="warning">
+            <Trans>
+              You need to own a license of Spine to publish a game with a Spine
+              object.
+            </Trans>
+          </AlertMessage>
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
             propertyName="spineResourceName"

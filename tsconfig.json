@@ -30,6 +30,7 @@
     "jsxFragmentFactory": "Fragment"
   },
   "include": [
+    "GDevelop.js/types.d.ts",
     "GDJS/Runtime/**/*",
     "Extensions/**/*.js",
     "Extensions/**/*.ts",

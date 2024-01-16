@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -176,7 +168,7 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
-      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
+      .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior');
@@ -327,33 +319,33 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
-      object
-        .addAction(
-          'SetBitmapFontAndTextureAtlasResourceName2',
-          _('Bitmap files resources'),
-          _('Change the Bitmap Font and/or the atlas image used by the object.'),
-          _(
-            'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
-          ),
-          '',
-          'res/actions/font24.png',
-          'res/actions/font.png'
-        )
-        .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-        .addParameter(
-          'bitmapFontResource',
-          _('Bitmap font resource name'),
-          '',
-          false
-        )
-        .addParameter(
-          'imageResource',
-          _('Texture atlas resource name'),
-          '',
-          false
-        )
-        .getCodeExtraInformation()
-        .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
+    object
+      .addAction(
+        'SetBitmapFontAndTextureAtlasResourceName2',
+        _('Bitmap files resources'),
+        _('Change the Bitmap Font and/or the atlas image used by the object.'),
+        _(
+          'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
+        ),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter(
+        'bitmapFontResource',
+        _('Bitmap font resource name'),
+        '',
+        false
+      )
+      .addParameter(
+        'imageResource',
+        _('Texture atlas resource name'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
     object
       .addExpressionAndCondition(
@@ -451,10 +443,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -462,9 +451,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'BitmapText::BitmapTextObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -477,9 +464,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 

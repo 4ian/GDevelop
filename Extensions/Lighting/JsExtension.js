@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,29 +13,21 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'Lighting',
-      _('Lights'),
+    extension
+      .setExtensionInformation(
+        'Lighting',
+        _('Lights'),
 
-      'This provides a light object, and a behavior to mark other objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
-      'Harsimran Virk',
-      'MIT'
-    )
-    .setCategory('Visual effect')
-    .setTags("light");
+        'This provides a light object, and a behavior to mark other objects as being obstacles for the lights. This is a great way to create a special atmosphere to your game, along with effects, make it more realistic or to create gameplays based on lights.',
+        'Harsimran Virk',
+        'MIT'
+      )
+      .setCategory('Visual effect')
+      .setTags('light');
 
     const lightObstacleBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -233,16 +226,11 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -255,9 +243,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -296,19 +282,21 @@ module.exports = {
         );
 
         // The icon in the middle.
-        const lightIconSprite = new PIXI.Sprite(PIXI.Texture.from('CppPlatform/Extensions/lightIcon32.png'));
+        const lightIconSprite = new PIXI.Sprite(
+          PIXI.Texture.from('CppPlatform/Extensions/lightIcon32.png')
+        );
         lightIconSprite.anchor.x = 0.5;
         lightIconSprite.anchor.y = 0.5;
 
         // The circle to show the radius of the light.
         const radiusBorderWidth = 2;
         const radiusGraphics = new PIXI.Graphics();
-        radiusGraphics.lineStyle(
-          radiusBorderWidth,
-          color,
-          0.8
+        radiusGraphics.lineStyle(radiusBorderWidth, color, 0.8);
+        radiusGraphics.drawCircle(
+          0,
+          0,
+          Math.max(1, this._radius - radiusBorderWidth)
         );
-        radiusGraphics.drawCircle(0, 0, Math.max(1, this._radius - radiusBorderWidth));
 
         this._pixiObject = new PIXI.Container();
         this._pixiObject.addChild(lightIconSprite);
@@ -326,11 +314,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      static getThumbnail(
-        project,
-        resourcesLoader,
-        objectConfiguration
-      ) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'CppPlatform/Extensions/lightIcon32.png';
       }
 

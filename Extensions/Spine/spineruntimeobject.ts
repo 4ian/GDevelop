@@ -65,12 +65,14 @@ namespace gdjs {
       if (this._animationPaused) {
         if (this._isPausedFrameDirty) {
           this._renderer.updateAnimation(0);
+          this.invalidateHitboxes();
           this._isPausedFrameDirty = false;
         }
         return;
       }
       const elapsedTime = this.getElapsedTime() / 1000;
       this._renderer.updateAnimation(elapsedTime * this._animationSpeedScale);
+      this.invalidateHitboxes();
     }
 
     getRendererObject(): pixi_spine.Spine | PIXI.Container {

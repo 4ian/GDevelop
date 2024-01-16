@@ -631,8 +631,7 @@ module.exports = {
             that._pixiObject.texture.on('error', function () {
               that._pixiObject.texture.off('error', this);
 
-              that._pixiObject.texture =
-                that._pixiResourcesLoader.getInvalidPIXITexture();
+              that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
             });
           }
         }

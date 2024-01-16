@@ -28,8 +28,8 @@
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",
-    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
-    "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
+    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/JsExtension.js\" \"../Extensions/**/*.spec.js\"",
+    "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/JsExtension.js\" \"../Extensions/**/*.spec.js\"",
     "generate-doc": "typedoc --options docs/typedoc.json"
   }
 }

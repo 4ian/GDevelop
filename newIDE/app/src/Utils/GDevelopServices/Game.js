@@ -108,8 +108,8 @@ export type FeaturingType =
 export type GameFeaturing = {|
   gameId: string,
   featuring: FeaturingType,
-  createdAt: number,
-  updatedAt: number,
+  createdAt: number, // in seconds.
+  updatedAt: number, // in seconds.
   expiresAt: number, // in seconds.
 |};
 

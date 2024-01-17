@@ -186,8 +186,11 @@ const getPlanPrices = ({
   );
 };
 
-const PLAN_LOGO_SIZE = 25;
-const PLAN_LOGO_PADDING = 20;
+const GDEVELOP_LOGO_SIZE = 25;
+const GDEVELOP_LOGO_PADDING = 20;
+// The plan logos are bigger than the GDevelop logo because they contain a glow effect,
+// so we increase the size.
+const PLAN_LOGO_SIZE = GDEVELOP_LOGO_SIZE + 2 * GDEVELOP_LOGO_PADDING;
 
 const getPlanIcon = (
   subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems
@@ -198,9 +201,8 @@ const getPlanIcon = (
       return (
         <Silver
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -209,9 +211,8 @@ const getPlanIcon = (
       return (
         <Gold
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -219,9 +220,8 @@ const getPlanIcon = (
       return (
         <Education
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -229,9 +229,8 @@ const getPlanIcon = (
       return (
         <Startup
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -239,9 +238,8 @@ const getPlanIcon = (
       return (
         <Business
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -249,9 +247,9 @@ const getPlanIcon = (
       return (
         <GDevelopGLogo
           style={{
-            width: PLAN_LOGO_SIZE,
-            height: PLAN_LOGO_SIZE,
-            padding: PLAN_LOGO_PADDING,
+            width: GDEVELOP_LOGO_SIZE,
+            height: GDEVELOP_LOGO_SIZE,
+            padding: GDEVELOP_LOGO_PADDING,
           }}
         />
       );

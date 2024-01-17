@@ -50,6 +50,7 @@ class BrowserLoginProvider
   }: {|
     provider: IdentityProvider,
     loginOptions?: ?LoginOptions,
+    signal?: AbortSignal,
   |}) {
     let firebaseProvider = null;
     if (provider === 'google') {

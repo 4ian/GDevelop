@@ -14,6 +14,7 @@ export interface LoginProvider {
   loginOrSignupWithProvider({|
     provider: IdentityProvider,
     loginOptions?: ?LoginOptions,
+    signal?: AbortSignal,
   |}): Promise<void>;
   notifyLogin({|
     connectionId: string,

@@ -47,11 +47,24 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
 
   async loginOrSignupWithProvider({
     provider,
+    signal,
   }: {|
     provider: IdentityProvider,
     loginOptions?: ?LoginOptions,
+    signal?: AbortSignal,
   |}) {
+    if (signal && signal.aborted) {
+      return Promise.reject(
+        new Error('Login or Signup with provider already aborted.')
+      );
+    }
     const promise = new Promise((resolve, reject) => {
+      // Listen for abort event on signal
+      if (signal) {
+        signal.addEventListener('abort', () => {
+          reject(new Error('Login or Signup with provider aborted.'));
+        });
+      }
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {
           const url = new URL(webAppUrl);

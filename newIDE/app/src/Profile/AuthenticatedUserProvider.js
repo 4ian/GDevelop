@@ -123,6 +123,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
+  _abortController: ?AbortController = null;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -765,7 +766,12 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
     this._automaticallyUpdateUserProfile = false;
     try {
-      await authentication.loginWithProvider(provider, this.state.loginOptions);
+      this._abortController = new AbortController();
+      await authentication.loginWithProvider({
+        provider,
+        loginOptions: this.state.loginOptions,
+        signal: this._abortController.signal,
+      });
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false, null);
       this.openCreateAccountDialog(false);
@@ -787,6 +793,13 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     });
     this._automaticallyUpdateUserProfile = true;
+  };
+
+  _cancelLogin = () => {
+    if (this._abortController) {
+      this._abortController.abort();
+      this._abortController = null;
+    }
   };
 
   _doLogin = async (form: LoginForm) => {
@@ -1127,7 +1140,10 @@ export default class AuthenticatedUserProvider extends React.Component<
             {this.state.loginDialogOpen && (
               <LoginDialog
                 authenticatedUser={this.state.authenticatedUser}
-                onClose={() => this.openLoginDialog(false, null)}
+                onClose={() => {
+                  this._cancelLogin();
+                  this.openLoginDialog(false, null);
+                }}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
                 onLoginOnDesktopApp={this._doAllowLoginOnDesktopApp}

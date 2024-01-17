@@ -978,11 +978,19 @@ export class JsonResource extends EmscriptenObject {
   constructor(): void;
 }
 
+export class SpineResource extends EmscriptenObject {
+  constructor(): void;
+}
+
 export class TilemapResource extends EmscriptenObject {
   constructor(): void;
 }
 
 export class TilesetResource extends EmscriptenObject {
+  constructor(): void;
+}
+
+export class AtlasResource extends EmscriptenObject {
   constructor(): void;
 }
 
@@ -2429,6 +2437,29 @@ export class SpriteObject extends EmscriptenObject {
   getUpdateIfNotVisible(): boolean;
   adaptCollisionMaskAutomatically(): boolean;
   setAdaptCollisionMaskAutomatically(adaptCollisionMaskAutomatically: boolean): void;
+}
+
+export class SpineAnimation extends EmscriptenObject {
+  constructor(): void;
+  setName(name: string): void;
+  getName(): string;
+  setSource(name: string): void;
+  getSource(): string;
+  setShouldLoop(shouldLoop: boolean): void;
+  shouldLoop(): boolean;
+}
+
+export class SpineObjectConfiguration extends EmscriptenObject {
+  constructor(): void;
+  addAnimation(animation: SpineAnimation): void;
+  getAnimation(index: number): SpineAnimation;
+  hasAnimationNamed(name: string): boolean;
+  getAnimationsCount(): number;
+  removeAnimation(index: number): void;
+  removeAllAnimations(): void;
+  hasNoAnimations(): boolean;
+  swapAnimations(first: number, second: number): void;
+  moveAnimation(oldIndex: number, newIndex: number): void;
 }
 
 export class TextObject extends EmscriptenObject {

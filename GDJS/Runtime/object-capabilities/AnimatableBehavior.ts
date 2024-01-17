@@ -29,8 +29,6 @@ namespace gdjs {
      */
     setAnimationName(newAnimationName: string): void;
 
-    isCurrentAnimationName(name: string): boolean;
-
     /**
      * Return true if animation has ended.
      * The animation had ended if:
@@ -115,10 +113,6 @@ namespace gdjs {
 
     setAnimationName(newAnimationName: string): void {
       this.object.setAnimationName(newAnimationName);
-    }
-
-    isCurrentAnimationName(name: string): boolean {
-      return this.object.isCurrentAnimationName(name);
     }
 
     hasAnimationEnded(): boolean {

@@ -32,6 +32,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
+import CircularProgress from '../../UI/CircularProgress';
 
 const styles = {
   campaign: {
@@ -119,7 +120,7 @@ const MarketingPlans = ({ game }: Props) => {
           gameFeaturing => gameFeaturing.featuring === 'games-platform-home'
         )[0],
         activeProFeaturing: activeGameFeaturings.filter(
-          gameFeaturing => gameFeaturing.featuring === 'social-newsletter'
+          gameFeaturing => gameFeaturing.featuring === 'socials-newsletter'
         )[0],
         activePremiumFeaturing: activeGameFeaturings.filter(
           gameFeaturing => gameFeaturing.featuring === 'gdevelop-banner'
@@ -219,7 +220,7 @@ const MarketingPlans = ({ game }: Props) => {
           title: t`Featuring already active`,
           message: t`You already have an active ${translatedName} featuring for your game ${
             game.gameName
-          }. We will get in touch with you to get the campaign up!`,
+          }. Check your emails or discord, we will get in touch with you to get the campaign up!`,
         });
         return;
       }
@@ -325,8 +326,12 @@ const MarketingPlans = ({ game }: Props) => {
                 Get ready-made packs to make your game visible to the GDevelop
                 community.{' '}
                 <Link
-                  href="{TODO}"
-                  onClick={() => Window.openExternalURL('{TODO}')}
+                  href="https://wiki.gdevelop.io/gdevelop5/interface/games-dashboard/marketing"
+                  onClick={() =>
+                    Window.openExternalURL(
+                      'https://wiki.gdevelop.io/gdevelop5/interface/games-dashboard/marketing'
+                    )
+                  }
                 >
                   Read more
                 </Link>{' '}
@@ -436,7 +441,15 @@ const MarketingPlans = ({ game }: Props) => {
                         primary={!activeFeaturing}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
-                          activeFeaturing ? (
+                          isLoading ? (
+                            <Column
+                              noMargin
+                              justifyContent="center"
+                              alignItems="center"
+                            >
+                              <CircularProgress size={20} />
+                            </Column>
+                          ) : activeFeaturing ? (
                             activeFeaturing.featuring ===
                             'games-platform-home' ? (
                               <Trans>Extend</Trans>
@@ -448,13 +461,7 @@ const MarketingPlans = ({ game }: Props) => {
                           )
                         }
                         fullWidth
-                        disabled={
-                          isLoading ||
-                          (!!activeFeaturing &&
-                            (activeFeaturing.featuring ===
-                              'social-newsletter' ||
-                              activeFeaturing.featuring === 'gdevelop-banner'))
-                        }
+                        disabled={isLoading}
                       />
                     </ColumnStackLayout>
                   </div>

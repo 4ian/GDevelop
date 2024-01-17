@@ -158,6 +158,15 @@ const CreditsPackagePurchaseDialog = ({
     else onStartPurchase();
   };
 
+  React.useEffect(
+    () => {
+      onWillPurchase();
+    },
+    // Launch the start process directly when the dialog is opened, to avoid an extra click.
+    // eslint-disable-next-line
+    []
+  );
+
   useInterval(
     () => {
       onRefreshLimits();

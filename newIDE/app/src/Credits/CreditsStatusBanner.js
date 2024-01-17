@@ -69,7 +69,7 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
           <>
             <Column>
               <FlatButton
-                label={<Trans>See credit packs</Trans>}
+                label={<Trans>Get credit packs</Trans>}
                 onClick={() => setCreditsPackDialogOpen(true)}
                 primary
               />

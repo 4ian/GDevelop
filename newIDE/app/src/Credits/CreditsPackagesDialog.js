@@ -26,6 +26,8 @@ import { type CreditsPackageListingData } from '../Utils/GDevelopServices/Shop';
 import Coin from './Icons/Coin';
 import TwoCoins from './Icons/TwoCoins';
 import ThreeCoins from './Icons/ThreeCoins';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import AlertMessage from '../UI/AlertMessage';
 
 const styles = {
   creditsPackage: {
@@ -78,6 +80,7 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
     purchasingCreditsPackageListingData,
     setPurchasingCreditsPackageListingData,
   ] = React.useState<?CreditsPackageListingData>(null);
+  const { limits } = React.useContext(AuthenticatedUserContext);
 
   React.useEffect(
     () => {
@@ -104,6 +107,14 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
         >
           <ColumnStackLayout noMargin>
             <CreditsStatusBanner displayPurchaseAction={false} />
+            {limits && limits.credits.userBalance.amount > 0 && (
+              <AlertMessage kind="info">
+                <Trans>
+                  You can use your credits to feature a game! Head down in the
+                  "Manage" section, pick a game and go to the tab "Marketing".
+                </Trans>
+              </AlertMessage>
+            )}
             {error ? (
               <PlaceholderError onRetry={fetchCreditsPackages}>
                 <Trans>
@@ -192,8 +203,12 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
               <Trans>
                 Not sure how many credits you need? Check{' '}
                 <Link
-                  href="{TODO}"
-                  onClick={() => Window.openExternalURL('{TODO}')}
+                  href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                  onClick={() =>
+                    Window.openExternalURL(
+                      'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                    )
+                  }
                 >
                   this guide
                 </Link>{' '}

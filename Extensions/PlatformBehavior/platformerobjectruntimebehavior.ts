@@ -62,7 +62,7 @@ namespace gdjs {
     private _yGrabOffset: any;
     private _xGrabTolerance: any;
 
-    _useLegacyTrajectory: boolean = true;
+    _useLegacyTrajectory: boolean;
 
     _canGoDownFromJumpthru: boolean = false;
 
@@ -355,13 +355,25 @@ namespace gdjs {
 
     private _updateSpeed(timeDelta: float): float {
       const previousSpeed = this._currentSpeed;
-      //Change the speed according to the player's input.
-      // @ts-ignore
-      if (this._leftKey) {
-        this._currentSpeed -= this._acceleration * timeDelta;
-      }
-      if (this._rightKey) {
-        this._currentSpeed += this._acceleration * timeDelta;
+      // Change the speed according to the player's input.
+      // TODO Give priority to the last key for faster reaction time.
+      if (this._leftKey !== this._rightKey) {
+        if (this._leftKey) {
+          if (this._currentSpeed <= 0) {
+            this._currentSpeed -= this._acceleration * timeDelta;
+          } else {
+            // Turn back at least as fast as it would stop.
+            this._currentSpeed -=
+              Math.max(this._acceleration, this._deceleration) * timeDelta;
+          }
+        } else if (this._rightKey) {
+          if (this._currentSpeed >= 0) {
+            this._currentSpeed += this._acceleration * timeDelta;
+          } else {
+            this._currentSpeed +=
+              Math.max(this._acceleration, this._deceleration) * timeDelta;
+          }
+        }
       }
 
       //Take deceleration into account only if no key is pressed.

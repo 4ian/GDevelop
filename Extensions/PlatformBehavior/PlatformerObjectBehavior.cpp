@@ -150,7 +150,6 @@ PlatformerObjectBehavior::GetProperties(
   properties["UseLegacyTrajectory"]
       .SetLabel(_("Use frame rate dependent trajectories (deprecated, it's "
                   "recommended to leave this unchecked)"))
-
       .SetGroup(_("Deprecated options"))
       .SetDeprecated()
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)

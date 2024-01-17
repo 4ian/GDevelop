@@ -371,6 +371,7 @@ const GetStartedSection = ({
                 onForgotPassword={onResetPassword}
                 error={error}
               />
+              {/* TODO: Add button to cancel login with providers */}
             </div>
           </ColumnStackLayout>
           <div style={styles.bottomPageButtonContainer}>

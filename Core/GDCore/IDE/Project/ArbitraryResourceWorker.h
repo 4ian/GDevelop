@@ -96,6 +96,16 @@ public:
    * \brief Expose a 3D model, which is always a reference to a "model3D" resource.
    */
   virtual void ExposeModel3D(gd::String &resourceName);
+  
+  /**
+   * \brief Expose an atlas, which is always a reference to a "atlas" resource.
+   */
+  virtual void ExposeAtlas(gd::String &resourceName);
+
+  /**
+   * \brief Expose an spine, which is always a reference to a "spine" resource.
+   */
+  virtual void ExposeSpine(gd::String &resourceName);
 
   /**
    * \brief Expose a video, which is always a reference to a "video" resource.

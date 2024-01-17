@@ -11,6 +11,7 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    "skipLibCheck": true,
     // Not used (as we don't compile with tsc), but necessary for iterating on Map/Set.
     "downlevelIteration": true,
     // Required by PixiJS, for importing 3rd-party dependencies like EventEmitter3.
@@ -41,6 +42,7 @@
   // Exclude pre-built js code
   "exclude": [
     "GDJS/Runtime/pixi-renderers/pixi.js",
+    "GDJS/Runtime/pixi-renderers/pixi-spine.js",
     "GDJS/Runtime/Cordova",
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",

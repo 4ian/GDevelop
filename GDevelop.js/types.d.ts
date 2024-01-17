@@ -839,9 +839,11 @@ export class PropertyDescriptor extends EmscriptenObject {
   setExtraInfo(info: VectorString): PropertyDescriptor;
   getExtraInfo(): VectorString;
   setHidden(enable: boolean): PropertyDescriptor;
+  isHidden(): boolean;
+  setDeprecated(enable: boolean): PropertyDescriptor;
+  isDeprecated(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
-  isHidden(): boolean;
   serializeTo(element: SerializerElement): void;
   unserializeFrom(element: SerializerElement): void;
   serializeValuesTo(element: SerializerElement): void;
@@ -976,6 +978,10 @@ export class JsonResource extends Resource {
   constructor();
 }
 
+export class SpineResource extends JsonResource {
+  constructor();
+}
+
 export class TilemapResource extends Resource {
   constructor();
 }
@@ -985,6 +991,10 @@ export class TilesetResource extends Resource {
 }
 
 export class Model3DResource extends Resource {
+  constructor();
+}
+
+export class AtlasResource extends Resource {
   constructor();
 }
 
@@ -2474,6 +2484,29 @@ export class Model3DObjectConfiguration extends ObjectConfiguration {
   constructor();
   addAnimation(animation: Model3DAnimation): void;
   getAnimation(index: number): Model3DAnimation;
+  hasAnimationNamed(name: string): boolean;
+  getAnimationsCount(): number;
+  removeAnimation(index: number): void;
+  removeAllAnimations(): void;
+  hasNoAnimations(): boolean;
+  swapAnimations(first: number, second: number): void;
+  moveAnimation(oldIndex: number, newIndex: number): void;
+}
+
+export class SpineAnimation extends EmscriptenObject {
+  constructor();
+  setName(name: string): void;
+  getName(): string;
+  setSource(name: string): void;
+  getSource(): string;
+  setShouldLoop(shouldLoop: boolean): void;
+  shouldLoop(): boolean;
+}
+
+export class SpineObjectConfiguration extends ObjectConfiguration {
+  constructor();
+  addAnimation(animation: SpineAnimation): void;
+  getAnimation(index: number): SpineAnimation;
   hasAnimationNamed(name: string): boolean;
   getAnimationsCount(): number;
   removeAnimation(index: number): void;

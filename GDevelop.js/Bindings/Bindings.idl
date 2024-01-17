@@ -959,9 +959,11 @@ interface PropertyDescriptor {
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
+    boolean IsHidden();
+    [Ref] PropertyDescriptor SetDeprecated(boolean enable);
+    boolean IsDeprecated();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
-    boolean IsHidden();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1119,6 +1121,11 @@ interface JsonResource {
 };
 JsonResource implements Resource;
 
+interface SpineResource {
+    void SpineResource();
+};
+SpineResource implements JsonResource;
+
 interface TilemapResource {
     void TilemapResource();
 };
@@ -1133,6 +1140,11 @@ interface Model3DResource {
     void Model3DResource();
 };
 Model3DResource implements Resource;
+
+interface AtlasResource {
+    void AtlasResource();
+};
+AtlasResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();
@@ -3207,6 +3219,35 @@ interface Model3DObjectConfiguration {
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
 };
 Model3DObjectConfiguration implements ObjectConfiguration;
+
+
+interface SpineAnimation {
+    void SpineAnimation();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    void SetSource([Const] DOMString name);
+    [Const, Ref] DOMString GetSource();
+
+    void SetShouldLoop(boolean shouldLoop);
+    boolean ShouldLoop();
+};
+
+interface SpineObjectConfiguration {
+    void SpineObjectConfiguration();
+
+    void AddAnimation([Const, Ref] SpineAnimation animation);
+    [Ref] SpineAnimation GetAnimation(unsigned long index);
+    boolean HasAnimationNamed([Const] DOMString name);
+    unsigned long GetAnimationsCount();
+    void RemoveAnimation(unsigned long index);
+    void RemoveAllAnimations();
+    boolean HasNoAnimations();
+    void SwapAnimations(unsigned long first, unsigned long second);
+    void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+};
+SpineObjectConfiguration implements ObjectConfiguration;
 
 interface Vector2f {
     void Vector2f();

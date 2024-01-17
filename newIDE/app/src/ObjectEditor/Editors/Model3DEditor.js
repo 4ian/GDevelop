@@ -8,20 +8,11 @@ import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import Checkbox from '../../UI/Checkbox';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Tooltip from '@material-ui/core/Tooltip';
-import { MarkdownText } from '../../UI/MarkdownText';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
-import MeasurementUnitDocumentation from '../../PropertiesEditor/MeasurementUnitDocumentation';
-import { getMeasurementUnitShortLabel } from '../../PropertiesEditor/PropertiesMapToSchema';
 import AlertMessage from '../../UI/AlertMessage';
-import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
-import ResourcesLoader from '../../ResourcesLoader';
 import IconButton from '../../UI/IconButton';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
@@ -39,6 +30,11 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import * as THREE from 'three';
+import {
+  PropertyCheckbox,
+  PropertyField,
+  PropertyResourceSelector,
+} from './PropertyFields';
 
 const gd: libGDevelop = global.gd;
 
@@ -98,147 +94,6 @@ export const hasLight = (layout: ?gd.Layout) => {
     }
   }
   return false;
-};
-
-type PropertyFieldProps = {|
-  objectConfiguration: gdObjectConfiguration,
-  propertyName: string,
-  onChange?: () => void,
-|};
-
-const PropertyField = ({
-  objectConfiguration,
-  propertyName,
-  onChange,
-}: PropertyFieldProps) => {
-  const forceUpdate = useForceUpdate();
-  const properties = objectConfiguration.getProperties();
-
-  const updateProperty = React.useCallback(
-    (value: string) => {
-      const oldValue = objectConfiguration
-        .getProperties()
-        .get(propertyName)
-        .getValue();
-      objectConfiguration.updateProperty(propertyName, value);
-      const newValue = objectConfiguration
-        .getProperties()
-        .get(propertyName)
-        .getValue();
-      if (onChange && newValue !== oldValue) {
-        onChange();
-      }
-      forceUpdate();
-    },
-    [objectConfiguration, propertyName, onChange, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  const measurementUnit = property.getMeasurementUnit();
-  const endAdornment = {
-    label: getMeasurementUnitShortLabel(measurementUnit),
-    tooltipContent: (
-      <MeasurementUnitDocumentation
-        label={measurementUnit.getLabel()}
-        description={measurementUnit.getDescription()}
-        elementsWithWords={measurementUnit.getElementsWithWords()}
-      />
-    ),
-  };
-  return (
-    <Column noMargin expand key={propertyName}>
-      <SemiControlledTextField
-        floatingLabelFixed
-        floatingLabelText={property.getLabel()}
-        onChange={updateProperty}
-        value={property.getValue()}
-        endAdornment={
-          <Tooltip title={endAdornment.tooltipContent}>
-            <InputAdornment position="end">{endAdornment.label}</InputAdornment>
-          </Tooltip>
-        }
-      />
-    </Column>
-  );
-};
-
-const PropertyCheckbox = ({
-  objectConfiguration,
-  propertyName,
-}: PropertyFieldProps) => {
-  const forceUpdate = useForceUpdate();
-  const properties = objectConfiguration.getProperties();
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      forceUpdate();
-    },
-    [objectConfiguration, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  return (
-    <Checkbox
-      checked={property.getValue() === 'true'}
-      label={
-        <React.Fragment>
-          <Line noMargin>{property.getLabel()}</Line>
-          <FormHelperText style={{ display: 'inline' }}>
-            <MarkdownText source={property.getDescription()} />
-          </FormHelperText>
-        </React.Fragment>
-      }
-      onCheck={(_, value) => {
-        onChangeProperty(propertyName, value ? '1' : '0');
-      }}
-    />
-  );
-};
-
-type PropertyResourceSelectorProps = {|
-  objectConfiguration: gdObjectConfiguration,
-  propertyName: string,
-  project: gd.Project,
-  resourceManagementProps: ResourceManagementProps,
-  onChange: (value: string) => void,
-|};
-
-const PropertyResourceSelector = ({
-  objectConfiguration,
-  propertyName,
-  project,
-  resourceManagementProps,
-  onChange,
-}: PropertyResourceSelectorProps) => {
-  const forceUpdate = useForceUpdate();
-  const { current: resourcesLoader } = React.useRef(ResourcesLoader);
-  const properties = objectConfiguration.getProperties();
-
-  const onChangeProperty = React.useCallback(
-    (property: string, value: string) => {
-      objectConfiguration.updateProperty(property, value);
-      onChange(value);
-      forceUpdate();
-    },
-    [objectConfiguration, onChange, forceUpdate]
-  );
-
-  const property = properties.get(propertyName);
-  const extraInfos = property.getExtraInfo();
-  return (
-    <ResourceSelector
-      project={project}
-      // $FlowExpectedError
-      resourceKind={extraInfos.size() > 0 ? extraInfos.at(0) : ''}
-      floatingLabelText={property.getLabel()}
-      resourceManagementProps={resourceManagementProps}
-      initialResourceName={property.getValue()}
-      onChange={value => onChangeProperty(propertyName, value)}
-      resourcesLoader={resourcesLoader}
-      fullWidth
-    />
-  );
 };
 
 const Model3DEditor = ({

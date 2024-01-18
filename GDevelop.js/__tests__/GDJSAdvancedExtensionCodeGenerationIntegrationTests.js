@@ -216,4 +216,121 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         .getAsNumber()
     ).toBe(123);
   });
+
+  it('can generate function returning objects', function () {
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const myObjectA1 = runtimeScene.createObject('MyObjectA');
+    const myObjectA2 = runtimeScene.createObject('MyObjectA');
+    const myObjectB1 = runtimeScene.createObject('MyObjectB');
+    const myObjectB2 = runtimeScene.createObject('MyObjectB');
+    const myObjectB3 = runtimeScene.createObject('MyObjectB');
+
+    const variableA1 = new gdjs.Variable();
+    variableA1.setNumber(1);
+    myObjectA1.getVariables().add('Pick', variableA1);
+    const variableB3 = new gdjs.Variable();
+    variableB3.setNumber(1);
+    myObjectB3.getVariables().add('Pick', variableB3);
+
+    // Run the function passing some objects as parameters.
+    const objectsLists = gdjs.Hashtable.newFrom({
+      MyObjectA: [myObjectA1],
+      MyObjectB: [myObjectB2, myObjectB3],
+      MyObjectC: [],
+    });
+    
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarObjet' },
+            parameters: ["Object","Pick","!=","0"],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetReturnObject' },
+            parameters: ['Object'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { parameterTypes: { Object: 'object' }, logCode: false }
+    );
+    runCompiledEvents(gdjs, runtimeScene, [objectsLists]);
+
+    expect(objectsLists.get('MyObjectA')).toEqual([myObjectA1]);
+    expect(objectsLists.get('MyObjectB')).toEqual([myObjectB3]);
+    expect(objectsLists.get('MyObjectC')).toEqual([]);
+  });
+
+  it('can generate function creating 2 instances and returning only one', function () {
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    const myObjectA1 = runtimeScene.createObject('MyObjectA');
+    const myObjectA2 = runtimeScene.createObject('MyObjectA');
+    const myObjectB1 = runtimeScene.createObject('MyObjectB');
+
+    // According to the parameter type objectListOrEmptyIfJustDeclared,
+    // no instances is passed to the function because the ObjectsLists has not
+    // been filtered before.
+    const objectsLists = gdjs.Hashtable.newFrom({
+      MyObjectA: [],
+      MyObjectB: [],
+      MyObjectC: [],
+    });
+    
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+        ],
+        actions: [
+          {
+            type: { value: 'Create' },
+            parameters: ['', 'Object', '0','0',''],
+          },
+          {
+            type: {'value':'ModVarObjet'},
+            parameters: ['Object','Pick','=','1']
+          },
+          {
+            type: { value: 'Create' },
+            parameters: ['', 'Object', '0','0',''],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [
+          {
+            type: { value: 'VarObjet' },
+            parameters: ['Object','Pick','!=','0'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetReturnObject' },
+            parameters: ['Object'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      { parameterTypes: { Object: 'objectListOrEmptyIfJustDeclared' }, logCode: false }
+    );
+    runCompiledEvents(gdjs, runtimeScene, [objectsLists]);
+
+    expect(objectsLists.get('MyObjectA').length).toBe(1);
+  });
 });

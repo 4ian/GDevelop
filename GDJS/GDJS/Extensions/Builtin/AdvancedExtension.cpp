@@ -99,6 +99,28 @@ AdvancedExtension::AdvancedExtension() {
                "}\n";
       });
 
+  GetAllActions()["SetReturnObject"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction& instruction,
+                                 gd::EventsCodeGenerator& codeGenerator,
+                                 gd::EventsCodeGenerationContext& context) {
+        gd::String objectsPickingCode;
+
+        for (const auto& objectName : codeGenerator.GetObjectsContainersList().ExpandObjectName(
+                 instruction.GetParameter(0).GetPlainString(), context.GetCurrentObject())) {
+          const gd::String& objectNameString = codeGenerator.ConvertToStringExplicit(objectName);
+          const gd::String& objectList = codeGenerator.GetObjectListName(objectName, context);
+          objectsPickingCode += "gdjs.evtTools.object.pickObjects("
+                                "eventsFunctionContext.getObjectsLists(" +
+                                objectNameString + "), " + objectList + ");\n";
+        }
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "  eventsFunctionContext.returnValue = true;\n"
+               + objectsPickingCode +
+               "}\n";
+      });
+
   GetAllConditions()["GetArgumentAsBoolean"]
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,

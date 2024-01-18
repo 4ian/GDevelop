@@ -67,12 +67,14 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       }
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {
+          if (signal && signal.aborted) return;
           const url = new URL(webAppUrl);
           url.searchParams.set('initial-dialog', 'login');
           url.searchParams.set('connection-id', connectionId);
           Window.openExternalURL(url.toString());
         },
         onTokenReceived: async token => {
+          if (signal && signal.aborted) return;
           try {
             await signInWithCustomToken(this.auth, token);
             resolve();
@@ -86,6 +88,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
           }
         },
         onError: error => {
+          if (signal && signal.aborted) return;
           console.error(
             'An error occurred while setting up authentication web socket:',
             error

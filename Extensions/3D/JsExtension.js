@@ -803,7 +803,6 @@ module.exports = {
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -852,7 +851,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -1092,7 +1090,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError
     Cube3DObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -1104,7 +1101,6 @@ module.exports = {
       return false;
     };
 
-    // $FlowExpectedError
     Cube3DObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -1968,39 +1964,25 @@ module.exports = {
     const THREE_ADDONS = objectsRenderingService.THREE_ADDONS;
 
     const materialIndexToFaceIndex = {
-      // $FlowFixMe
       0: 3,
-      // $FlowFixMe
       1: 2,
-      // $FlowFixMe
       2: 5,
-      // $FlowFixMe
       3: 4,
-      // $FlowFixMe
       4: 0,
-      // $FlowFixMe
       5: 1,
     };
 
     const noRepeatTextureVertexIndexToUvMapping = {
-      // $FlowFixMe
       0: [0, 0],
-      // $FlowFixMe
       1: [1, 0],
-      // $FlowFixMe
       2: [0, 1],
-      // $FlowFixMe
       3: [1, 1],
     };
 
     const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
-      // $FlowFixMe
       0: [0, 1],
-      // $FlowFixMe
       1: [0, 0],
-      // $FlowFixMe
       2: [1, 1],
-      // $FlowFixMe
       3: [1, 0],
     };
 
@@ -2097,9 +2079,10 @@ module.exports = {
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
         const instance = this._instance;
 
-        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          objectConfiguration
-        );
+        const textureResourceName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            objectConfiguration
+          );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2111,18 +2094,20 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-          this._associatedObjectConfiguration
-        );
+        const textureName =
+          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+            this._associatedObjectConfiguration
+          );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2380,9 +2365,10 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
-            materialIndexToFaceIndex[materialIndex]
-          ];
+          const shouldRepeatTexture =
+            this._shouldRepeatTextureOnFace[
+              materialIndexToFaceIndex[materialIndex]
+            ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2417,16 +2403,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                 }
               }
               break;
@@ -2456,16 +2439,13 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
                 } else {
-                  [
-                    x,
-                    y,
-                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                    vertexIndex % 4
-                  ];
+                  [x, y] =
+                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                      vertexIndex % 4
+                    ];
                   x = -x;
                   y = -y;
                 }

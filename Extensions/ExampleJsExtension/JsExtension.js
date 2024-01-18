@@ -145,7 +145,6 @@ module.exports = {
     // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
     // saved/loaded to JSON.
     var dummyBehavior = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -162,7 +161,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -179,7 +177,6 @@ module.exports = {
 
       return behaviorProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
       behaviorContent.setBoolAttribute('property2', true);
@@ -207,7 +204,6 @@ module.exports = {
     // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
     // that are called to get and set the properties of the shared data.
     var dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -220,7 +216,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -230,13 +225,11 @@ module.exports = {
 
       return behaviorProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehaviorWithSharedData.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.updateProperty = function (
       sharedContent,
       propertyName,
@@ -249,7 +242,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.getProperties = function (sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
@@ -259,7 +251,6 @@ module.exports = {
 
       return sharedProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute(
         'sharedProperty1',
@@ -294,7 +285,6 @@ module.exports = {
     // Everything that is stored inside the object is in "content" and is automatically
     // saved/loaded to JSON.
     var dummyObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -319,7 +309,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -354,7 +343,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -374,7 +362,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     dummyObject.getInitialInstanceProperties = function (
       content,
       instance,

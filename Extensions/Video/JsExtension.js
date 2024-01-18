@@ -1,5 +1,6 @@
 //@ts-check
 /// <reference path="../JsExtensionTypes.d.ts" />
+
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -34,7 +35,6 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/videoicon16.png');
 
     var videoObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -59,7 +59,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -99,7 +98,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -110,7 +108,6 @@ module.exports = {
     ) {
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -127,6 +124,7 @@ module.exports = {
         _('Video'),
         _('Displays a video.'),
         'JsPlatform/Extensions/videoicon32.png',
+        // @ts-ignore - TODO: Fix videoObject being an ObjectJsImplementation instead of an ObjectConfiguration
         videoObject
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
@@ -631,7 +629,8 @@ module.exports = {
             that._pixiObject.texture.on('error', function () {
               that._pixiObject.texture.off('error', this);
 
-              that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
+              that._pixiObject.texture =
+                that._pixiResourcesLoader.getInvalidPIXITexture();
             });
           }
         }

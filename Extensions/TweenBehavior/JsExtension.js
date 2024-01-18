@@ -593,7 +593,6 @@ module.exports = {
 
     const tweenBehavior = new gd.BehaviorJsImplementation();
 
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -602,13 +601,11 @@ module.exports = {
       return false;
     };
 
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
 
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.initializeContent = function (behaviorContent) {};
 
     const behavior = extension
@@ -622,6 +619,7 @@ module.exports = {
         '',
         'JsPlatform/Extensions/tween_behavior32.png',
         'TweenBehavior',
+        // @ts-ignore - TODO: Fix tweenBehavior being an BehaviorJsImplementation instead of an Behavior
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )

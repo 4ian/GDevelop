@@ -31,7 +31,6 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -86,7 +85,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -224,7 +222,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -243,7 +240,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getInitialInstanceProperties = function (
       content,
       instance,

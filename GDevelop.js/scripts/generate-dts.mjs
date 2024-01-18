@@ -175,7 +175,9 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
 
     if (isAttribute) {
       const attributeName = Parser.readUntil(';');
-      attributes.push(`${attributeName}: ${returnType};`);
+      attributes.push(
+        `${attributeName}${optionalReturn ? '?' : ''}: ${returnType};`
+      );
       continue;
     }
 
@@ -250,7 +252,11 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
   );
 
   interfaces.push(
-    `export class ${interfaceName} extends ${inheritedClass ? inheritedClass[1] : 'EmscriptenObject'} {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${attributes.length ? '\n  ' + attributes.join('\n  ') : ''}
+    `export class ${interfaceName} extends ${
+      inheritedClass ? inheritedClass[1] : 'EmscriptenObject'
+    } {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${
+      attributes.length ? '\n  ' + attributes.join('\n  ') : ''
+    }
 }`
   );
 }

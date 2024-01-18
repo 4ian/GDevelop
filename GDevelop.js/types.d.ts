@@ -1196,7 +1196,7 @@ export class ParameterOptions extends EmscriptenObject {
 }
 
 export class AbstractFunctionMetadata extends EmscriptenObject {
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): AbstractFunctionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): AbstractFunctionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): AbstractFunctionMetadata;
   setDefaultValue(defaultValue: string): AbstractFunctionMetadata;
   setParameterLongDescription(longDescription: string): AbstractFunctionMetadata;
@@ -1239,7 +1239,7 @@ export class InstructionMetadata extends AbstractFunctionMetadata {
   setRelevantForFunctionEventsOnly(): InstructionMetadata;
   setRelevantForAsynchronousFunctionEventsOnly(): InstructionMetadata;
   setRelevantForCustomObjectEventsOnly(): InstructionMetadata;
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): InstructionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): InstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): InstructionMetadata;
   setDefaultValue(defaultValue: string): InstructionMetadata;
   setParameterLongDescription(longDescription: string): InstructionMetadata;
@@ -1285,7 +1285,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
   setRelevantForFunctionEventsOnly(): ExpressionMetadata;
   setRelevantForAsynchronousFunctionEventsOnly(): ExpressionMetadata;
   setRelevantForCustomObjectEventsOnly(): ExpressionMetadata;
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): ExpressionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): ExpressionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): ExpressionMetadata;
   setDefaultValue(defaultValue: string): ExpressionMetadata;
   setParameterLongDescription(longDescription: string): ExpressionMetadata;
@@ -1300,7 +1300,7 @@ export class ExpressionMetadata extends AbstractFunctionMetadata {
 }
 
 export class MultipleInstructionMetadata extends AbstractFunctionMetadata {
-  addParameter(type: string, description: string, optionalObjectType: string, parameterIsOptional: boolean): MultipleInstructionMetadata;
+  addParameter(type: string, description: string, optionalObjectType?: string, parameterIsOptional?: boolean): MultipleInstructionMetadata;
   addCodeOnlyParameter(type: string, supplementaryInformation: string): MultipleInstructionMetadata;
   setDefaultValue(defaultValue: string): MultipleInstructionMetadata;
   setParameterLongDescription(longDescription: string): MultipleInstructionMetadata;

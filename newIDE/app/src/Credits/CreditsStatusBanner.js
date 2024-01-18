@@ -23,7 +23,9 @@ type Props = {|
 
 const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { limits, onRefreshLimits } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [
     creditsPackDialogOpen,
     setCreditsPackDialogOpen,
@@ -32,41 +34,39 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
   // Ensure credits are refreshed when this component is shown.
   React.useEffect(
     () => {
-      authenticatedUser.onRefreshLimits();
+      onRefreshLimits();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [onRefreshLimits]
   );
 
-  if (!authenticatedUser.limits) {
+  if (!limits) {
     return null;
   }
 
   return (
-    <div
-      style={{
-        ...styles.container,
-        backgroundColor: gdevelopTheme.credits.backgroundColor,
-      }}
-    >
-      <ResponsiveLineStackLayout
-        alignItems="center"
-        justifyContent="space-between"
-        noMargin
+    <>
+      <div
+        style={{
+          ...styles.container,
+          backgroundColor: gdevelopTheme.credits.backgroundColor,
+        }}
       >
-        <Column>
-          <LineStackLayout alignItems="flex-end" noMargin>
-            <Coin />
-            <Text noMargin>
-              <Trans>
-                Credits available:{' '}
-                {authenticatedUser.limits.credits.userBalance.amount}
-              </Trans>
-            </Text>
-          </LineStackLayout>
-        </Column>
-        {displayPurchaseAction && (
-          <>
+        <ResponsiveLineStackLayout
+          alignItems="center"
+          justifyContent="space-between"
+          noMargin
+        >
+          <Column>
+            <LineStackLayout alignItems="flex-end" noMargin>
+              <Coin />
+              <Text noMargin>
+                <Trans>
+                  Credits available: {limits.credits.userBalance.amount}
+                </Trans>
+              </Text>
+            </LineStackLayout>
+          </Column>
+          {displayPurchaseAction && (
             <Column>
               <FlatButton
                 label={<Trans>Get credit packs</Trans>}
@@ -74,15 +74,15 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
                 primary
               />
             </Column>
-            {creditsPackDialogOpen && (
-              <CreditsPackagesDialog
-                onClose={() => setCreditsPackDialogOpen(false)}
-              />
-            )}
-          </>
-        )}
-      </ResponsiveLineStackLayout>
-    </div>
+          )}
+        </ResponsiveLineStackLayout>
+      </div>
+      {creditsPackDialogOpen && (
+        <CreditsPackagesDialog
+          onClose={() => setCreditsPackDialogOpen(false)}
+        />
+      )}
+    </>
   );
 };
 

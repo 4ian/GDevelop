@@ -195,8 +195,12 @@ const ProfileDialog = ({ open, onClose }: Props) => {
                       Get perks and cloud benefits when getting closer to your
                       game launch.{' '}
                       <Link
-                        href="{TODO}"
-                        onClick={() => Window.openExternalURL('{TODO}')}
+                        href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                          )
+                        }
                       >
                         Learn more
                       </Link>

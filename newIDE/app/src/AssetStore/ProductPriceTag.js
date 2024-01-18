@@ -31,13 +31,13 @@ export const formatProductPrice = ({
     : null;
   if (appStoreProduct) return appStoreProduct.price;
 
-  const stripePrice = productListingData.prices[0];
-  if (!stripePrice) return '';
+  const price = productListingData.prices[0];
+  if (!price) return '';
 
-  const currencyCode = stripePrice.currency === 'USD' ? '$' : '€';
+  const currencyCode = price.currency === 'USD' ? '$' : '€';
 
   return `${currencyCode} ${i18n
-    .number(stripePrice.value / 100, {
+    .number(price.value / 100, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })

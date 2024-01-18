@@ -66,7 +66,7 @@ export const CreditsPackageStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [isLoading, creditsPackageListingDatas]
+    [creditsPackageListingDatas]
   );
 
   React.useEffect(
@@ -76,10 +76,10 @@ export const CreditsPackageStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching credit packages from the store...');
         fetchCreditsPackages();
-      }, 5000);
+      }, 8000);
       return () => clearTimeout(timeoutId);
     },
-    [fetchCreditsPackages, isLoading]
+    [fetchCreditsPackages]
   );
   const CreditsPackageStoreState = React.useMemo(
     () => ({

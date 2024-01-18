@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import {
   ColumnStackLayout,
@@ -154,11 +154,11 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
                               alignItems="flex-end"
                               expand
                             >
-                              <LineStackLayout noMargin alignItems="flex-end">
+                              <Line noMargin alignItems="flex-end">
                                 <Text size="sub-title" noMargin>
                                   {name}
                                 </Text>
-                              </LineStackLayout>
+                              </Line>
                               <Text
                                 size="body-small"
                                 color="secondary"

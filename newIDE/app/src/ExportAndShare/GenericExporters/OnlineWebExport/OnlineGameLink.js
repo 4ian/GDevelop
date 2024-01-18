@@ -344,8 +344,8 @@ const OnlineGameLink = ({
                     )}
                     <AlertMessage kind="info">
                       <Trans>
-                        You can administrate your game and get a marketing plan
-                        from the Manage section on the home page.
+                        You can administrate your game and promote it from the
+                        Manage section on the home page.
                       </Trans>
                     </AlertMessage>
                   </ColumnStackLayout>

@@ -153,7 +153,7 @@ const CreditsPackagePurchaseDialog = ({
   };
 
   const onWillPurchase = () => {
-    // Password is required in dev environment only so that one cannot freely purchase game templates.
+    // Password is required in dev environment only so that one cannot freely purchase credits.
     if (Window.isDev()) setDisplayPasswordPrompt(true);
     else onStartPurchase();
   };
@@ -280,7 +280,7 @@ const CreditsPackagePurchaseDialog = ({
     : {
         subtitle: (
           <Trans>
-            {creditsPackageListingData.name} will be added to your account{' '}
+            {creditsPackageListingData.name} will be added to your account
             {profile.email}.
           </Trans>
         ),
@@ -316,7 +316,7 @@ const CreditsPackagePurchaseDialog = ({
   return (
     <>
       <Dialog
-        title={<Trans>{creditsPackageListingData.name}</Trans>}
+        title={creditsPackageListingData.name}
         maxWidth="sm"
         open
         onRequestClose={onClose}

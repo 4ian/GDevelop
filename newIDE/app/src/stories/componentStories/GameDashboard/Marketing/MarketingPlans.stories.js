@@ -425,7 +425,7 @@ WithOwnedProPlan.parameters = {
       response: [
         {
           gameId: 'complete-game-id',
-          featuring: 'social-newsletter',
+          featuring: 'socials-newsletter',
           createdAt: nowMinusOneDay / 1000,
           updatedAt: nowMinusOneDay / 1000,
           expiresAt: nowPlusOneDay / 1000,

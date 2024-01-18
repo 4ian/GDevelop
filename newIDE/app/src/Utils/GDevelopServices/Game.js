@@ -190,10 +190,23 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
     throw new Error('Unexpected response from the resource endpoint.');
   }
 
-  const [showcasedGames, filters] = await Promise.all([
-    axios.get(gamesShowcaseUrl).then(response => response.data),
-    axios.get(filtersUrl).then(response => response.data),
+  const responsesData = await Promise.all([
+    axios
+      .get(gamesShowcaseUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    axios
+      .get(filtersUrl)
+      .then(response => response.data)
+      .catch(e => e),
   ]);
+
+  if (responsesData.some(data => !data || data instanceof Error)) {
+    throw new Error('Unexpected response from the assets endpoints.');
+  }
+
+  const showcasedGames = responsesData[0];
+  const filters = responsesData[1];
 
   return {
     showcasedGames,

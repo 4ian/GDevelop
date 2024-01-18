@@ -9,10 +9,11 @@ const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
-type StripePrice = {|
+type StripeAndPaypalPrice = {|
   value: number,
-  name: 'default',
+  name: string,
   stripePriceId: string,
+  currency?: 'USD' | 'EUR',
 |};
 
 type ProductListingData = {|
@@ -30,8 +31,8 @@ type ProductListingData = {|
   includedListableProductIds?: string[],
 |};
 
-type StripeProductAttributes = {|
-  prices: StripePrice[],
+type StripeAndPaypalSellableAttributes = {|
+  prices: StripeAndPaypalPrice[],
   sellerStripeAccountId: string,
   stripeProductId: string,
 |};
@@ -42,14 +43,9 @@ type AppStoreProductAttributes = {|
   appStoreThumbnailUrls?: string[] | null,
 |};
 
-type PaypalProductAttributes = {|
-  paypalProductId: string,
-  paypalPriceInUsd: number,
-|};
-
 export type PrivateAssetPackListingData = {|
   ...ProductListingData,
-  ...StripeProductAttributes,
+  ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
@@ -57,7 +53,7 @@ export type PrivateAssetPackListingData = {|
 
 export type PrivateGameTemplateListingData = {|
   ...ProductListingData,
-  ...StripeProductAttributes,
+  ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
@@ -65,8 +61,8 @@ export type PrivateGameTemplateListingData = {|
 
 export type CreditsPackageListingData = {|
   ...ProductListingData,
-  ...StripeProductAttributes,
-  ...PaypalProductAttributes,
+  ...StripeAndPaypalSellableAttributes,
+  ...AppStoreProductAttributes,
   productType: 'CREDITS_PACKAGE',
   listing: 'CREDITS_PACKAGE',
 |};
@@ -278,6 +274,7 @@ export const getPurchaseCheckoutUrl = ({
   url.searchParams.set('userId', userId);
   url.searchParams.set('customerEmail', userEmail);
   if (password) url.searchParams.set('password', password);
+
   return url.toString();
 };
 

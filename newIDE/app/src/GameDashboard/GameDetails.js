@@ -41,11 +41,13 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
-import { GameMonetization } from './Monetization/GameMonetization';
+import GameMonetization from './Monetization/GameMonetization';
 import RouterContext from '../MainFrame/RouterContext';
 import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
+import MarketingPlans from './Marketing/MarketingPlans';
 
 export type GameDetailsTab =
   | 'details'
@@ -53,7 +55,7 @@ export type GameDetailsTab =
   | 'feedback'
   | 'analytics'
   | 'leaderboards'
-  | 'monetization';
+  | 'marketing';
 
 export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
   {
@@ -77,8 +79,8 @@ export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
     label: <Trans>Leaderboards</Trans>,
   },
   {
-    value: 'monetization',
-    label: <Trans>Monetization</Trans>,
+    value: 'marketing',
+    label: <Trans>Marketing & Ads</Trans>,
   },
 ];
 
@@ -576,8 +578,10 @@ const GameDetails = ({
                 game={game}
               />
             ) : null}
-            {currentTab === 'monetization' ? (
-              <ColumnStackLayout noMargin>
+            {currentTab === 'marketing' ? (
+              <ColumnStackLayout noMargin expand>
+                <CreditsStatusBanner displayPurchaseAction />
+                <MarketingPlans game={game} />
                 <GameMonetization
                   game={game}
                   onGameUpdated={handleGameUpdated}

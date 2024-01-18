@@ -36,7 +36,14 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   description: '5 assets',
   name: 'French Food',
   categories: ['props'],
-  prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
+  prices: [
+    {
+      value: 1500,
+      name: 'default',
+      stripePriceId: 'stripePriceId',
+      currency: 'EUR',
+    },
+  ],
   appStoreProductId: null,
   sellerStripeAccountId: 'sellerStripeProductId',
   stripeProductId: 'stripeProductId',
@@ -124,7 +131,12 @@ export const Default = () => {
           name: 'French Food',
           categories: ['props'],
           prices: [
-            { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
+            {
+              value: 1500,
+              name: 'default',
+              stripePriceId: 'stripePriceId',
+              currency: 'EUR',
+            },
           ],
           appStoreProductId: null,
           sellerStripeAccountId: 'sellerStripeProductId',
@@ -145,7 +157,12 @@ export const Default = () => {
           name: 'French Sounds',
           categories: ['sounds'],
           prices: [
-            { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
+            {
+              value: 1000,
+              name: 'default',
+              stripePriceId: 'stripePriceId',
+              currency: 'EUR',
+            },
           ],
           appStoreProductId: 'fake.product.id',
           sellerStripeAccountId: 'sellerStripeProductId',
@@ -224,7 +241,12 @@ export const ForAlreadyPurchasedAssetPack = () => {
             name: 'French Food',
             categories: ['props'],
             prices: [
-              { value: 1500, name: 'default', stripePriceId: 'stripePriceId' },
+              {
+                value: 1500,
+                name: 'default',
+                stripePriceId: 'stripePriceId',
+                currency: 'EUR',
+              },
             ],
             appStoreProductId: null,
             sellerStripeAccountId: 'sellerStripeProductId',
@@ -245,7 +267,12 @@ export const ForAlreadyPurchasedAssetPack = () => {
             name: 'French Sounds',
             categories: ['sounds'],
             prices: [
-              { value: 1000, name: 'default', stripePriceId: 'stripePriceId' },
+              {
+                value: 1000,
+                name: 'default',
+                stripePriceId: 'stripePriceId',
+                currency: 'EUR',
+              },
             ],
             appStoreProductId: 'fake.product.id',
             sellerStripeAccountId: 'sellerStripeProductId',

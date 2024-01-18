@@ -328,11 +328,11 @@ const OnlineGameLink = ({
               {buildUrl && !isGameLoading ? (
                 <ColumnStackLayout noMargin>
                   <ShareLink url={buildUrl} />
-                  {isBuildPublished && navigator.share && (
-                    <ShareButton url={buildUrl} />
-                  )}
-                  {isBuildPublished && !navigator.share && (
-                    <ColumnStackLayout noMargin expand>
+                  <ColumnStackLayout noMargin expand>
+                    {isBuildPublished && navigator.share && (
+                      <ShareButton url={buildUrl} />
+                    )}
+                    {isBuildPublished && !navigator.share && (
                       <Column
                         expand
                         justifyContent="flex-end"
@@ -341,14 +341,14 @@ const OnlineGameLink = ({
                       >
                         <SocialShareButtons url={buildUrl} />
                       </Column>
-                      <AlertMessage kind="info">
-                        <Trans>
-                          Your game has a page on gd.games. You can administrate
-                          it from the Games Dashboard in GDevelop.
-                        </Trans>
-                      </AlertMessage>
-                    </ColumnStackLayout>
-                  )}
+                    )}
+                    <AlertMessage kind="info">
+                      <Trans>
+                        You can administrate your game and promote it from the
+                        Manage section on the home page.
+                      </Trans>
+                    </AlertMessage>
+                  </ColumnStackLayout>
                   {!isBuildPublished && game && (
                     <AlertMessage kind="info">
                       <Trans>

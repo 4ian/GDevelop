@@ -631,6 +631,9 @@ export function createGdevelopTheme({
         error: styles['ThemeErrorColor'],
         warning: styles['ThemeWarningColor'],
       },
+      credits: {
+        backgroundColor: styles['ThemePrimaryLight'],
+      },
     },
     muiThemeOptions: {
       typography: {

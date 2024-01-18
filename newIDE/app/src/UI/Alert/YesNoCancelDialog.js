@@ -7,6 +7,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import Dialog, { DialogPrimaryButton } from '../Dialog';
 import FlatButton from '../FlatButton';
 import { MarkdownText } from '../MarkdownText';
+import Text from '../Text';
 
 type Props = {|
   open: boolean,
@@ -72,7 +73,9 @@ function YesNoCancelDialog(props: Props) {
           onRequestClose={props.onClickCancel}
           onApply={props.onClickYes}
         >
-          <MarkdownText translatableSource={props.message} isStandaloneText />
+          <Text>
+            <MarkdownText translatableSource={props.message} isStandaloneText />
+          </Text>
         </Dialog>
       )}
     </I18n>

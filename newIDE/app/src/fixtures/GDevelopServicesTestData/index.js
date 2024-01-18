@@ -1283,6 +1283,49 @@ export const limitsReached: Limits = {
   message: undefined,
 };
 
+export const limitsForNoSubscriptionUserWithCredits: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: false,
+      retention: false,
+      sessionsTimeStats: false,
+      platforms: false,
+    },
+    cloudProjects: {
+      maximumCount: 10,
+      canMaximumCountBeIncreased: true,
+      maximumGuestCollaboratorsPerProject: 0,
+    },
+    leaderboards: {
+      maximumCountPerGame: 3,
+      canMaximumCountPerGameBeIncreased: true,
+      themeCustomizationCapabilities: 'NONE',
+      canUseCustomCss: false,
+    },
+  },
+  quotas: {
+    'cordova-build': {
+      current: 0,
+      max: 2,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 0,
+      max: 3,
+      limitReached: false,
+    },
+  },
+  credits: {
+    userBalance: {
+      amount: 1000,
+    },
+    prices: {},
+    purchasableQuantities: {},
+  },
+  message: undefined,
+};
+
 const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
@@ -1487,6 +1530,12 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
       achievementId: 'badge1',
     },
   ],
+};
+
+export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: noSubscription,
+  limits: limitsForNoSubscriptionUserWithCredits,
 };
 
 export const fakeNotAuthenticatedUser: AuthenticatedUser = {

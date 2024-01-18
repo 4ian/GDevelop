@@ -1,5 +1,4 @@
-//@ts-check
-/// <reference path="../JsExtensionTypes.d.ts" />
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,6 +11,13 @@
  *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
+
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
 
 const easingChoices = JSON.stringify([
   'linear',
@@ -51,9 +57,11 @@ const easingChoices = JSON.stringify([
   'easeTo',
 ]);
 
-/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -379,61 +387,57 @@ module.exports = {
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.tweenCameraRotation2');
 
-    extension
-      .addAction(
-        'TweenNumberEffectPropertyTween',
-        _('Tween number effect property'),
-        _(
-          'Tweens a number effect property from its current value to a new one.'
-        ),
-        _(
-          'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
-        ),
-        _('Scene Tweens'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
-      .addParameter('expression', _('To value'), '', false)
-      .addParameter('layer', _('Layer'), '', true)
-      .addParameter('layerEffectName', _('Effect name'))
-      .addParameter('layerEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenNumberEffectPropertyTween');
-
-    extension
-      .addAction(
-        'TweenColorEffectPropertyTween',
-        _('Tween color effect property'),
-        _(
-          'Tweens a color effect property from its current value to a new one.'
-        ),
-        _(
-          'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
-        ),
-        _('Scene Tweens'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
-      .addParameter('color', _('To color'), '', false)
-      .addParameter('layer', _('Layer'), '', true)
-      .addParameter('layerEffectName', _('Effect name'))
-      .addParameter('layerEffectParameterName', _('Property name'))
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenColorEffectPropertyTween');
+      extension
+        .addAction(
+          'TweenNumberEffectPropertyTween',
+          _('Tween number effect property'),
+          _('Tweens a number effect property from its current value to a new one.'),
+          _(
+            'Tween the property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
+          ),
+          _('Scene Tweens'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+        .addParameter('expression', _('To value'), '', false)
+        .addParameter('layer', _('Layer'), '', true)
+        .addParameter("layerEffectName", _("Effect name"))
+        .addParameter("layerEffectParameterName", _("Property name"))
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+        .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+        .setFunctionName('gdjs.evtTools.tween.tweenNumberEffectPropertyTween');
+  
+      extension
+        .addAction(
+          'TweenColorEffectPropertyTween',
+          _('Tween color effect property'),
+          _('Tweens a color effect property from its current value to a new one.'),
+          _(
+            'Tween the color property _PARAM5_ for effect _PARAM4_ of _PARAM3_ to _PARAM2_ with easing _PARAM6_ over _PARAM7_ seconds as _PARAM1_'
+          ),
+          _('Scene Tweens'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('identifier', _('Tween Identifier'), 'sceneTween')
+        .addParameter('color', _('To color'), '', false)
+        .addParameter('layer', _('Layer'), '', true)
+        .addParameter("layerEffectName", _("Effect name"))
+        .addParameter("layerEffectParameterName", _("Property name"))
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/TweenBehavior/TweenManager.js')
+        .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+        .setFunctionName('gdjs.evtTools.tween.tweenColorEffectPropertyTween');
 
     extension
       .addCondition(
@@ -922,37 +926,37 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectPositionZTween');
 
-    behavior
-      .addAction(
-        'AddObjectPositionZTween2',
-        _('Tween object Z position'),
-        _(
-          'Tweens an object Z position (3D objects only) from its current Z position to a new one.'
-        ),
-        _(
-          'Tween the Z position of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
-        ),
-        _('Position'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To Z'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .addParameter(
-        'yesorno',
-        _('Destroy this object when tween finishes'),
-        '',
-        false
-      )
-      .setDefaultValue('no')
-      .getCodeExtraInformation()
-      .setFunctionName('addObjectPositionZTween2');
+      behavior
+        .addAction(
+          'AddObjectPositionZTween2',
+          _('Tween object Z position'),
+          _(
+            'Tweens an object Z position (3D objects only) from its current Z position to a new one.'
+          ),
+          _(
+            'Tween the Z position of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Position'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To Z'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectPositionZTween2');
 
     // deprecated
     behavior
@@ -1107,37 +1111,37 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectDepthTween');
 
-    behavior
-      .addAction(
-        'AddObjectDepthTween2',
-        _('Tween object depth'),
-        _(
-          'Tweens an object depth (suitable 3D objects only) from its current depth to a new one.'
-        ),
-        _(
-          'Tween the depth of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
-        ),
-        _('Size'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To depth'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .addParameter(
-        'yesorno',
-        _('Destroy this object when tween finishes'),
-        '',
-        false
-      )
-      .setDefaultValue('no')
-      .getCodeExtraInformation()
-      .setFunctionName('addObjectDepthTween2');
+      behavior
+        .addAction(
+          'AddObjectDepthTween2',
+          _('Tween object depth'),
+          _(
+            'Tweens an object depth (suitable 3D objects only) from its current depth to a new one.'
+          ),
+          _(
+            'Tween the depth of _PARAM0_ to _PARAM4_ with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Size'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To depth'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectDepthTween2');
 
     // deprecated
     behavior
@@ -1263,69 +1267,65 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('addObjectAngleTween2');
 
-    behavior
-      .addScopedAction(
-        'AddObjectRotationXTween',
-        _('Tween object rotation on X axis'),
-        _(
-          'Tweens an object rotation on X axis from its current angle to a new one.'
-        ),
-        _(
-          'Tween the rotation on X axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
-        ),
-        _('Angle'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .addParameter(
-        'yesorno',
-        _('Destroy this object when tween finishes'),
-        '',
-        false
-      )
-      .setDefaultValue('no')
-      .getCodeExtraInformation()
-      .setFunctionName('addObjectRotationXTween');
+      behavior
+        .addScopedAction(
+          'AddObjectRotationXTween',
+          _('Tween object rotation on X axis'),
+          _('Tweens an object rotation on X axis from its current angle to a new one.'),
+          _(
+            'Tween the rotation on X axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+          ),
+          _('Angle'),
+          'JsPlatform/Extensions/tween_behavior24.png',
+          'JsPlatform/Extensions/tween_behavior32.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+        .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+        .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+        .addParameter('expression', _('To angle (in degrees)'), '', false)
+        .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+        .setDefaultValue('linear')
+        .addParameter('expression', _('Duration (in seconds)'), '', false)
+        .addParameter(
+          'yesorno',
+          _('Destroy this object when tween finishes'),
+          '',
+          false
+        )
+        .setDefaultValue('no')
+        .getCodeExtraInformation()
+        .setFunctionName('addObjectRotationXTween');
 
-    behavior
-      .addScopedAction(
-        'AddObjectRotationYTween',
-        _('Tween object rotation on Y axis'),
-        _(
-          'Tweens an object rotation on Y axis from its current angle to a new one.'
-        ),
-        _(
-          'Tween the rotation on Y axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
-        ),
-        _('Angle'),
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('behavior', _('3D capability'), 'Scene3D::Base3DBehavior')
-      .addParameter('identifier', _('Tween Identifier'), 'objectTween')
-      .addParameter('expression', _('To angle (in degrees)'), '', false)
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
-      .setDefaultValue('linear')
-      .addParameter('expression', _('Duration (in seconds)'), '', false)
-      .addParameter(
-        'yesorno',
-        _('Destroy this object when tween finishes'),
-        '',
-        false
-      )
-      .setDefaultValue('no')
-      .getCodeExtraInformation()
-      .setFunctionName('addObjectRotationYTween');
+        behavior
+          .addScopedAction(
+            'AddObjectRotationYTween',
+            _('Tween object rotation on Y axis'),
+            _('Tweens an object rotation on Y axis from its current angle to a new one.'),
+            _(
+              'Tween the rotation on Y axis of _PARAM0_ to _PARAM4_° with easing _PARAM5_ over _PARAM6_ seconds as _PARAM3_'
+            ),
+            _('Angle'),
+            'JsPlatform/Extensions/tween_behavior24.png',
+            'JsPlatform/Extensions/tween_behavior32.png'
+          )
+          .addParameter('object', _('Object'), '', false)
+          .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+          .addParameter("behavior", _("3D capability"), "Scene3D::Base3DBehavior")
+          .addParameter('identifier', _('Tween Identifier'), 'objectTween')
+          .addParameter('expression', _('To angle (in degrees)'), '', false)
+          .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+          .setDefaultValue('linear')
+          .addParameter('expression', _('Duration (in seconds)'), '', false)
+          .addParameter(
+            'yesorno',
+            _('Destroy this object when tween finishes'),
+            '',
+            false
+          )
+          .setDefaultValue('no')
+          .getCodeExtraInformation()
+          .setFunctionName('addObjectRotationYTween');
 
     // deprecated
     behavior
@@ -1700,9 +1700,7 @@ module.exports = {
       .addScopedAction(
         'AddNumberEffectPropertyTween',
         _('Tween number effect property'),
-        _(
-          'Tweens a number effect property from its current value to a new one.'
-        ),
+        _('Tweens a number effect property from its current value to a new one.'),
         _(
           'Tween the property _PARAM6_ for effect _PARAM5_ of _PARAM0_ to _PARAM4_ with easing _PARAM7_ over _PARAM8_ seconds as _PARAM3_'
         ),
@@ -1712,15 +1710,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter(
-        'behavior',
-        _('Effect capability'),
-        'EffectCapability::EffectBehavior'
-      )
+      .addParameter("behavior", _("Effect capability"), "EffectCapability::EffectBehavior")
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('expression', _('To value'), '', false)
-      .addParameter('objectEffectName', _('Effect name'))
-      .addParameter('objectEffectParameterName', _('Property name'))
+      .addParameter("objectEffectName", _("Effect name"))
+      .addParameter("objectEffectParameterName", _("Property name"))
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
@@ -1738,9 +1732,7 @@ module.exports = {
       .addScopedAction(
         'AddColorEffectPropertyTween',
         _('Tween color effect property'),
-        _(
-          'Tweens a color effect property from its current value to a new one.'
-        ),
+        _('Tweens a color effect property from its current value to a new one.'),
         _(
           'Tween the color property _PARAM6_ for effect _PARAM5_ of _PARAM0_ to _PARAM4_ with easing _PARAM7_ over _PARAM8_ seconds as _PARAM3_'
         ),
@@ -1750,15 +1742,11 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter(
-        'behavior',
-        _('Effect capability'),
-        'EffectCapability::EffectBehavior'
-      )
+      .addParameter("behavior", _("Effect capability"), "EffectCapability::EffectBehavior")
       .addParameter('identifier', _('Tween Identifier'), 'objectTween')
       .addParameter('color', _('To color'), '', false)
-      .addParameter('objectEffectName', _('Effect name'))
-      .addParameter('objectEffectParameterName', _('Property name'))
+      .addParameter("objectEffectName", _("Effect name"))
+      .addParameter("objectEffectParameterName", _("Property name"))
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration (in seconds)'), '', false)
@@ -2100,7 +2088,10 @@ module.exports = {
     return extension;
   },
 
-  runExtensionSanityTests: function (gd, extension) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
 };

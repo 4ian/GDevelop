@@ -21,6 +21,11 @@
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
 
+[include]
+# Type check the declarations of the JavaScript extensions (i.e: JsExtension.js files) with Flow
+# (and actually any file in Extensions containing `// @flow`).
+../../Extensions
+
 [libs]
 ../../GDevelop.js/types
 

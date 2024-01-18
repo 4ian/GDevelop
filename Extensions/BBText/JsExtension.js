@@ -1,5 +1,4 @@
-//@ts-check
-/// <reference path="../JsExtensionTypes.d.ts" />
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -13,9 +12,20 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/** @type {ExtensionModule} */
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
+const stringifyOptions = (options) => '["' + options.join('","') + '"]';
+
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -116,8 +126,7 @@ module.exports = {
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text:
-          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+        text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
         fontSize: 20,
         visible: true,
@@ -214,9 +223,10 @@ module.exports = {
           parameterType === 'string' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -266,9 +276,10 @@ module.exports = {
           parameterType === 'number' ||
           parameterType === 'stringWithSelector'
         ) {
-          const parameterOptions = gd.ParameterOptions.makeNewOptions().setDescription(
-            property.paramLabel
-          );
+          const parameterOptions =
+            gd.ParameterOptions.makeNewOptions().setDescription(
+              property.paramLabel
+            );
           if (property.options) {
             parameterOptions.setTypeExtraInfo(
               stringifyOptions(property.options)
@@ -446,7 +457,10 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (gd, extension) {
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
     return [];
   },
   /**
@@ -454,7 +468,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (objectsEditorService) {
+  registerEditorConfigurations: function (
+    objectsEditorService /*: ObjectsEditorService */
+  ) {
     objectsEditorService.registerEditorConfiguration(
       'BBText::BBText',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -467,7 +483,9 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (objectsRenderingService) {
+  registerInstanceRenderers: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
     const MultiStyleText = objectsRenderingService.requireModule(
@@ -550,9 +568,8 @@ module.exports = {
       this._pixiObject.alpha = opacity / 255;
 
       const color = properties.get('color').getValue();
-      this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(
-        color
-      );
+      this._pixiObject.textStyles.default.fill =
+        objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;

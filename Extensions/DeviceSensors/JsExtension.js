@@ -1,5 +1,4 @@
-//@ts-check
-/// <reference path="../JsExtensionTypes.d.ts" />
+// @flow
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -13,389 +12,450 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/** @type {ExtensionModule} */
+/*::
+// Import types to allow Flow to do static type checking on this file.
+// Extensions declaration are typed using Flow (like the editor), but the files
+// for the game engine are checked with TypeScript annotations.
+import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
+*/
+
 module.exports = {
-  createExtension: function (_, gd) {
+  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
     const extension = new gd.PlatformExtension();
-    extension
-      .setExtensionInformation(
-        'DeviceSensors',
-        _('Device sensors'),
-        _('Allow the game to access the sensors of a mobile device.'),
-        'Matthias Meike',
-        'Open source (MIT License)'
-      )
-      .setExtensionHelpPath('/all-features/device-sensors')
-      .setCategory('Input');
-    extension
-      .addInstructionOrExpressionGroupMetadata(_('Device sensors'))
-      .setIcon('JsPlatform/Extensions/orientation_active32.png');
+    extension.setExtensionInformation(
+      "DeviceSensors",
+      _("Device sensors"),
+      _(
+        "Allow the game to access the sensors of a mobile device."
+      ),
+      "Matthias Meike",
+      "Open source (MIT License)"
+    ).setExtensionHelpPath("/all-features/device-sensors")
+    .setCategory('Input');
+    extension.addInstructionOrExpressionGroupMetadata(_("Device sensors"))
+        .setIcon("JsPlatform/Extensions/orientation_active32.png");
 
     extension
       .addCondition(
-        'OrientationSensorActive',
-        _('Sensor active'),
+        "OrientationSensorActive",
+        _("Sensor active"),
         _(
-          'The condition is true if the device orientation sensor is currently active'
+          "The condition is true if the device orientation sensor is currently active"
         ),
-        _('Orientation sensor is active'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_active32.png',
-        'JsPlatform/Extensions/orientation_active32.png'
+        _("Orientation sensor is active"),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_active32.png",
+        "JsPlatform/Extensions/orientation_active32.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.isActive');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.isActive");
 
-    extension
+      extension
       .addCondition(
-        'OrientationAlpha',
-        _('Compare the value of orientation alpha'),
-        _('Compare the value of orientation alpha. (Range: 0 to 360°)'),
-        _('the orientation alpha'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_alpha32.png',
-        'JsPlatform/Extensions/orientation_alpha32.png'
+        "OrientationAlpha",
+        _("Compare the value of orientation alpha"),
+        _(
+          "Compare the value of orientation alpha. (Range: 0 to 360°)"
+        ),
+        _("the orientation alpha"),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_alpha32.png",
+        "JsPlatform/Extensions/orientation_alpha32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationAlpha');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
-    extension
+      extension
       .addCondition(
-        'OrientationBeta',
-        _('Compare the value of orientation beta'),
-        _('Compare the value of orientation beta. (Range: -180 to 180°)'),
-        _('the orientation beta'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_beta32.png',
-        'JsPlatform/Extensions/orientation_beta32.png'
+        "OrientationBeta",
+        _("Compare the value of orientation beta"),
+        _(
+          "Compare the value of orientation beta. (Range: -180 to 180°)"
+        ),
+        _("the orientation beta"),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_beta32.png",
+        "JsPlatform/Extensions/orientation_beta32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationBeta');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
-    extension
+      extension
       .addCondition(
-        'OrientationGamma',
-        _('Compare the value of orientation gamma'),
-        _('Compare the value of orientation gamma. (Range: -90 to 90°)'),
-        _('the orientation gamma'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_gamma32.png',
-        'JsPlatform/Extensions/orientation_gamma32.png'
+        "OrientationGamma",
+        _("Compare the value of orientation gamma"),
+        _(
+          "Compare the value of orientation gamma. (Range: -90 to 90°)"
+        ),
+        _("the orientation gamma"),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_gamma32.png",
+        "JsPlatform/Extensions/orientation_gamma32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationGamma');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
     extension
       .addAction(
-        'ActivateOrientationListener',
-        _('Activate orientation sensor'),
-        _('Activate the orientation sensor. (remember to turn it off again)'),
-        _('Activate the orientation sensor.'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_active32.png',
-        'JsPlatform/Extensions/orientation_active32.png'
+        "ActivateOrientationListener",
+        _("Activate orientation sensor"),
+        _("Activate the orientation sensor. (remember to turn it off again)"),
+        _("Activate the orientation sensor."),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_active32.png",
+        "JsPlatform/Extensions/orientation_active32.png"
       )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName(
-        'gdjs.deviceSensors.orientation.activateOrientationSensor'
-      );
+        .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.activateOrientationSensor");
 
     extension
       .addAction(
-        'DeactivateOrientationListener',
-        _('Deactivate orientation sensor'),
-        _('Deactivate the orientation sensor.'),
-        _('Deactivate the orientation sensor.'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_inactive32.png',
-        'JsPlatform/Extensions/orientation_inactive32.png'
+        "DeactivateOrientationListener",
+        _("Deactivate orientation sensor"),
+        _("Deactivate the orientation sensor."),
+        _("Deactivate the orientation sensor."),
+        _("Orientation"),
+        "JsPlatform/Extensions/orientation_inactive32.png",
+        "JsPlatform/Extensions/orientation_inactive32.png"
       )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName(
-        'gdjs.deviceSensors.orientation.deactivateOrientationSensor'
-      );
+        .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.deactivateOrientationSensor");
 
     extension
       .addExpression(
-        'OrientationAbsolute',
-        _('Is Absolute'),
-        _('Get if the devices orientation is absolute and not relative'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_absolute16.png'
+        "OrientationAbsolute",
+        _("Is Absolute"),
+        _("Get if the devices orientation is absolute and not relative"),
+        _("Orientation"),
+	"JsPlatform/Extensions/orientation_absolute16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationAbsolute');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAbsolute");
 
     extension
       .addExpression(
-        'OrientationAlpha',
-        _('Alpha value'),
-        _('Get the devices orientation Alpha (compass)'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_alpha16.png'
+        "OrientationAlpha",
+        _("Alpha value"),
+        _("Get the devices orientation Alpha (compass)"),
+        _("Orientation"),
+	"JsPlatform/Extensions/orientation_alpha16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationAlpha');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
     extension
       .addExpression(
-        'OrientationBeta',
-        _('Beta value'),
-        _('Get the devices orientation Beta'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_beta16.png'
+        "OrientationBeta",
+        _("Beta value"),
+        _("Get the devices orientation Beta"),
+        _("Orientation"),
+	"JsPlatform/Extensions/orientation_beta16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationBeta');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
     extension
       .addExpression(
-        'OrientationGamma',
-        _('Gamma value'),
-        _('Get the devices orientation Gamma value'),
-        _('Orientation'),
-        'JsPlatform/Extensions/orientation_gamma16.png'
+        "OrientationGamma",
+        _("Gamma value"),
+        _("Get the devices orientation Gamma value"),
+        _("Orientation"),
+	"JsPlatform/Extensions/orientation_gamma16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.orientation.getOrientationGamma');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
-    extension
+      extension
       .addCondition(
-        'MotionSensorActive',
-        _('Sensor active'),
+        "MotionSensorActive",
+        _("Sensor active"),
         _(
-          'The condition is true if the device motion sensor is currently active'
+          "The condition is true if the device motion sensor is currently active"
         ),
-        _('Motion sensor is active'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_active32.png',
-        'JsPlatform/Extensions/motion_active32.png'
+        _("Motion sensor is active"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_active32.png",
+        "JsPlatform/Extensions/motion_active32.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.isActive');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.isActive");
 
-    extension
+      extension
       .addCondition(
-        'RotationAlpha',
-        _('Compare the value of rotation alpha'),
+        "RotationAlpha",
+        _("Compare the value of rotation alpha"),
         _(
-          'Compare the value of rotation alpha. (Note: few devices support this sensor)'
+          "Compare the value of rotation alpha. (Note: few devices support this sensor)"
         ),
-        _('the rotation alpha'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_alpha32.png',
-        'JsPlatform/Extensions/motion_rotation_alpha32.png'
+        _("the rotation alpha"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_rotation_alpha32.png",
+        "JsPlatform/Extensions/motion_rotation_alpha32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationAlpha');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationAlpha");
 
-    extension
+      extension
       .addCondition(
-        'RotationBeta',
-        _('Compare the value of rotation beta'),
+        "RotationBeta",
+        _("Compare the value of rotation beta"),
         _(
-          'Compare the value of rotation beta. (Note: few devices support this sensor)'
+          "Compare the value of rotation beta. (Note: few devices support this sensor)"
         ),
-        _('the rotation beta'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_beta32.png',
-        'JsPlatform/Extensions/motion_rotation_beta32.png'
+        _("the rotation beta"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_rotation_beta32.png",
+        "JsPlatform/Extensions/motion_rotation_beta32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationBeta');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationBeta");
 
-    extension
+      extension
       .addCondition(
-        'RotationGamma',
-        _('Compare the value of rotation gamma'),
+        "RotationGamma",
+        _("Compare the value of rotation gamma"),
         _(
-          'Compare the value of rotation gamma. (Note: few devices support this sensor)'
+          "Compare the value of rotation gamma. (Note: few devices support this sensor)"
         ),
-        _('the rotation gamma'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_gamma32.png',
-        'JsPlatform/Extensions/motion_rotation_gamma32.png'
+        _("the rotation gamma"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_rotation_gamma32.png",
+        "JsPlatform/Extensions/motion_rotation_gamma32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationGamma');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationGamma");
 
-    extension
+      extension
       .addCondition(
-        'AccelerationX',
-        _('Compare the value of acceleration on X-axis'),
-        _('Compare the value of acceleration on the X-axis (m/s²).'),
-        _('the acceleration X'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_x32.png',
-        'JsPlatform/Extensions/motion_acceleration_x32.png'
+        "AccelerationX",
+        _("Compare the value of acceleration on X-axis"),
+        _(
+          "Compare the value of acceleration on the X-axis (m/s²)."
+        ),
+        _("the acceleration X"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_acceleration_x32.png",
+        "JsPlatform/Extensions/motion_acceleration_x32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationX');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationX");
 
-    extension
+      extension
       .addCondition(
-        'AccelerationY',
-        _('Compare the value of acceleration on Y-axis'),
-        _('Compare the value of acceleration on the Y-axis (m/s²).'),
-        _('the acceleration Y'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_y32.png',
-        'JsPlatform/Extensions/motion_acceleration_y32.png'
+        "AccelerationY",
+        _("Compare the value of acceleration on Y-axis"),
+        _(
+          "Compare the value of acceleration on the Y-axis (m/s²)."
+        ),
+        _("the acceleration Y"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_acceleration_y32.png",
+        "JsPlatform/Extensions/motion_acceleration_y32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationY');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationY");
 
-    extension
+      extension
       .addCondition(
-        'AccelerationZ',
-        _('Compare the value of acceleration on Z-axis'),
-        _('Compare the value of acceleration on the Z-axis (m/s²).'),
-        _('the acceleration Z'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_z32.png',
-        'JsPlatform/Extensions/motion_acceleration_z32.png'
+        "AccelerationZ",
+        _("Compare the value of acceleration on Z-axis"),
+        _(
+          "Compare the value of acceleration on the Z-axis (m/s²)."
+        ),
+        _("the acceleration Z"),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_acceleration_z32.png",
+        "JsPlatform/Extensions/motion_acceleration_z32.png"
       )
-      .addParameter('relationalOperator', _('Sign of the test'), 'number')
-      .addParameter('expression', _('Value (m/s²)'))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
+      .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationZ');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationZ");
 
     extension
       .addAction(
-        'ActivateMotionListener',
-        _('Activate motion sensor'),
-        _('Activate the motion sensor. (remember to turn it off again)'),
-        _('Activate the motion sensor.'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_active32.png',
-        'JsPlatform/Extensions/motion_active32.png'
+        "ActivateMotionListener",
+        _("Activate motion sensor"),
+        _("Activate the motion sensor. (remember to turn it off again)"),
+        _("Activate the motion sensor."),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_active32.png",
+        "JsPlatform/Extensions/motion_active32.png"
       )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.activateMotionSensor');
+        .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.activateMotionSensor");
 
     extension
       .addAction(
-        'DeactivateMotionListener',
-        _('Deactivate motion sensor'),
-        _('Deactivate the motion sensor.'),
-        _('Deactivate the motion sensor.'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_inactive32.png',
-        'JsPlatform/Extensions/motion_inactive32.png'
+        "DeactivateMotionListener",
+        _("Deactivate motion sensor"),
+        _("Deactivate the motion sensor."),
+        _("Deactivate the motion sensor."),
+        _("Motion"),
+        "JsPlatform/Extensions/motion_inactive32.png",
+        "JsPlatform/Extensions/motion_inactive32.png"
       )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.deactivateMotionSensor');
+        .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.deactivateMotionSensor");
 
     extension
       .addExpression(
-        'RotationAlpha',
-        _('Alpha value'),
-        _('Get the devices rotation Alpha'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_alpha16.png'
+        "RotationAlpha",
+        _("Alpha value"),
+        _("Get the devices rotation Alpha"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_rotation_alpha16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationAlpha');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationAlpha");
 
     extension
       .addExpression(
-        'RotationBeta',
-        _('Beta value'),
-        _('Get the devices rotation Beta'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_beta16.png'
+        "RotationBeta",
+        _("Beta value"),
+        _("Get the devices rotation Beta"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_rotation_beta16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationBeta');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationBeta");
 
     extension
       .addExpression(
-        'RotationGamma',
-        _('Gamma value'),
-        _('Get the devices rotation Gamma'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_rotation_gamma16.png'
+        "RotationGamma",
+        _("Gamma value"),
+        _("Get the devices rotation Gamma"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_rotation_gamma16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getRotationGamma');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getRotationGamma");
 
-    extension
+      extension
       .addExpression(
-        'AccelerationX',
-        _('Acceleration X value'),
-        _('Get the devices acceleration on the X-axis (m/s²)'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_x16.png'
+        "AccelerationX",
+        _("Acceleration X value"),
+        _("Get the devices acceleration on the X-axis (m/s²)"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_acceleration_x16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationX');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationX");
 
-    extension
+      extension
       .addExpression(
-        'AccelerationY',
-        _('Acceleration Y value'),
-        _('Get the devices acceleration on the Y-axis (m/s²)'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_y16.png'
+        "AccelerationY",
+        _("Acceleration Y value"),
+        _("Get the devices acceleration on the Y-axis (m/s²)"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_acceleration_y16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationY');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationY");
 
-    extension
+      extension
       .addExpression(
-        'AccelerationZ',
-        _('Acceleration Z value'),
-        _('Get the devices acceleration on the Z-axis (m/s²)'),
-        _('Motion'),
-        'JsPlatform/Extensions/motion_acceleration_z16.png'
+        "AccelerationZ",
+        _("Acceleration Z value"),
+        _("Get the devices acceleration on the Z-axis (m/s²)"),
+        _("Motion"),
+	"JsPlatform/Extensions/motion_acceleration_z16.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/DeviceSensors/devicesensortools.js')
-      .setFunctionName('gdjs.deviceSensors.motion.getAccelerationZ');
+      .setIncludeFile(
+        "Extensions/DeviceSensors/devicesensortools.js"
+      )
+      .setFunctionName("gdjs.deviceSensors.motion.getAccelerationZ");
 
     return extension;
   },
-  runExtensionSanityTests: function (gd, extension) {
-    return [];
-  },
+  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) { return []; },
 };

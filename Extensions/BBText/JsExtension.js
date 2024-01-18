@@ -13,6 +13,8 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
+const stringifyOptions = (options) => '["' + options.join('","') + '"]';
+
 /** @type {ExtensionModule} */
 module.exports = {
   createExtension: function (_, gd) {

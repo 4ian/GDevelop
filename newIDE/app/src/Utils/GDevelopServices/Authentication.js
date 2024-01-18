@@ -238,17 +238,22 @@ export default class Authentication {
     });
   };
 
-  loginWithProvider = (
+  loginWithProvider = ({
+    provider,
+    loginOptions,
+    signal,
+  }: {|
     provider: IdentityProvider,
-    loginOptions?: ?LoginOptions
-  ): Promise<void> => {
+    loginOptions?: ?LoginOptions,
+    signal?: AbortSignal,
+  |}): Promise<void> => {
     const { loginProvider } = this;
     if (!loginProvider) {
       throw new Error('Login provider not set.');
     }
 
     return loginProvider
-      .loginOrSignupWithProvider({ provider, loginOptions })
+      .loginOrSignupWithProvider({ provider, loginOptions, signal })
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })

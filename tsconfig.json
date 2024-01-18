@@ -47,7 +47,6 @@
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
-    "Extensions/**/JsExtension.js",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
     "Extensions/P2P/A_peer.js"
   ]

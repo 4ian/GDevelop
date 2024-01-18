@@ -18,7 +18,6 @@
 /** @type {ExtensionModule} */
 const defineTileMap = function (extension, _, gd) {
   var objectTileMap = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateProperty = function (
     objectContent,
     propertyName,
@@ -59,7 +58,6 @@ const defineTileMap = function (extension, _, gd) {
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -158,7 +156,6 @@ const defineTileMap = function (extension, _, gd) {
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -169,7 +166,6 @@ const defineTileMap = function (extension, _, gd) {
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getInitialInstanceProperties = function (
     content,
     instance,
@@ -604,7 +600,6 @@ const defineCollisionMask = function (
   gd /*: libGDevelop */
 ) {
   var collisionMaskObject = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateProperty = function (
     objectContent,
     propertyName,
@@ -649,7 +644,6 @@ const defineCollisionMask = function (
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -758,7 +752,6 @@ const defineCollisionMask = function (
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -769,7 +762,6 @@ const defineCollisionMask = function (
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getInitialInstanceProperties = function (
     content,
     instance,
@@ -1340,14 +1332,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1584,14 +1576,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-            this._project,
-            tilemapJsonFile
-          );
+          const tileMapJsonData =
+            await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilemapJsonFile
+            );
 
-          const tileMap = TilemapHelper.TileMapManager.identify(
-            tileMapJsonData
-          );
+          const tileMap =
+            TilemapHelper.TileMapManager.identify(tileMapJsonData);
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

@@ -34,7 +34,6 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/bitmapfont32.png');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError
     bitmapTextObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -51,7 +50,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError
     bitmapTextObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -119,8 +117,7 @@ module.exports = {
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text:
-          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+        text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
@@ -132,7 +129,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError
     bitmapTextObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -143,7 +139,6 @@ module.exports = {
     ) {
       return false;
     };
-    // $FlowExpectedError
     bitmapTextObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -704,9 +699,8 @@ module.exports = {
       this._pixiObject.align = align;
 
       const color = properties.get('tint').getValue();
-      this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
-        color
-      );
+      this._pixiObject.tint =
+        objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const scale = properties.get('scale').getValue() || 1;
       this._pixiObject.scale.set(scale);

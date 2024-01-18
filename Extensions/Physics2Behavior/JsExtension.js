@@ -33,7 +33,6 @@ module.exports = {
       .setIcon('res/physics32.png');
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -91,7 +90,6 @@ module.exports = {
       }
       if (propertyName === 'vertices') {
         behaviorContent.addChild('vertices');
-        // $FlowFixMe
         behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
@@ -140,7 +138,6 @@ module.exports = {
         return true;
       }
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -304,7 +301,6 @@ module.exports = {
       return behaviorProperties;
     };
 
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
       behaviorContent.addChild('bullet').setBoolValue(false);
@@ -328,7 +324,6 @@ module.exports = {
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.updateProperty = function (
       sharedContent,
       propertyName,
@@ -361,7 +356,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.getProperties = function (sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
@@ -394,7 +388,6 @@ module.exports = {
 
       return sharedProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('gravityX').setDoubleValue(0);
       behaviorContent.addChild('gravityY').setDoubleValue(9.8);

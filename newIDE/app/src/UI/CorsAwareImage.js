@@ -12,18 +12,50 @@ type Props = {|
   onLoad?: (e: any) => void,
 |};
 
-const addSearchParameterToUrl = (
+export const encodeUrlAndAddEncodedSearchParameter = (
   url: string,
   urlEncodedParameterName: string,
   urlEncodedValue: string
 ) => {
-  if (url.startsWith('data:') || url.startsWith('blob:')) {
-    // blob/data protocol does not support search parameters, which are useless anyway.
-    return url;
+  console.log(url);
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('ftp://')
+  ) {
+    const urlObject = new URL(url);
+    urlObject.searchParams.set(urlEncodedParameterName, urlEncodedValue);
+    return urlObject.toString();
   }
 
-  const separator = url.indexOf('?') === -1 ? '?' : '&';
-  return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+  if (url.startsWith('file://')) {
+    // Local files and folders can contain special characters, which is handled badly when using
+    // new URL() constructor. So we do it manually.
+    const searchParams = url.indexOf('?') === -1 ? '' : url.split('?')[1];
+    const urlWithoutSearchParams = searchParams ? url.split('?')[0] : url;
+    const urlWithoutSearchParamsAndFileProtocol = urlWithoutSearchParams.slice(
+      'file://'.length
+    );
+    const encodedUrlComponents = urlWithoutSearchParamsAndFileProtocol
+      .split('/')
+      .map(component => encodeURIComponent(component));
+    const encodedUrlWithoutSearchParamsAndFileProtocol = encodedUrlComponents.join(
+      '/'
+    );
+    const newSearchParam = urlEncodedParameterName + '=' + urlEncodedValue;
+    const searchParamsWithNewParam = searchParams
+      ? searchParams + '&' + newSearchParam
+      : newSearchParam;
+    return (
+      'file://' +
+      encodedUrlWithoutSearchParamsAndFileProtocol +
+      '?' +
+      searchParamsWithNewParam
+    );
+  }
+
+  // blob/data protocol or static images do not support search parameters, which are useless anyway.
+  return url;
 };
 
 /**
@@ -58,7 +90,7 @@ export const CorsAwareImage = (props: Props) => (
       //
       // Search for "cors-cache-workaround" in the codebase for the same workarounds.
       props.src
-        ? addSearchParameterToUrl(props.src, 'gdUsage', 'img')
+        ? encodeUrlAndAddEncodedSearchParameter(props.src, 'gdUsage', 'img')
         : undefined
     }
   />

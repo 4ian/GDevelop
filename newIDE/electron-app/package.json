@@ -24,7 +24,7 @@
     "adm-zip": "^0.5.10",
     "dotenv": "^8.2.0",
     "electron": "18.2.2",
-    "electron-builder": "^23.6.0",
+    "electron-builder": "^24.9.1",
     "minimist": "^1.2.3",
     "prettier": "1.15.3",
     "shelljs": "0.8.4"

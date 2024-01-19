@@ -1,6 +1,3 @@
-// MIT License
-// Copyright © 2010-2023 three.js authors
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -307,6 +304,7 @@ function mergeAttributes( attributes ) {
 	let TypedArray;
 	let itemSize;
 	let normalized;
+	let gpuType = - 1;
 	let arrayLength = 0;
 
 	for ( let i = 0; i < attributes.length; ++ i ) {
@@ -344,6 +342,14 @@ function mergeAttributes( attributes ) {
 
 		}
 
+		if ( gpuType === - 1 ) gpuType = attribute.gpuType;
+		if ( gpuType !== attribute.gpuType ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.gpuType must be consistent across matching attributes.' );
+			return null;
+
+		}
+
 		arrayLength += attribute.array.length;
 
 	}
@@ -359,7 +365,14 @@ function mergeAttributes( attributes ) {
 
 	}
 
-	return new BufferAttribute( array, itemSize, normalized );
+	const result = new BufferAttribute( array, itemSize, normalized );
+	if ( gpuType !== undefined ) {
+
+		result.gpuType = gpuType;
+
+	}
+
+	return result;
 
 }
 
@@ -542,7 +555,7 @@ export function deinterleaveGeometry( geometry ) {
 }
 
 /**
- * @param {Array<BufferGeometry>} geometry
+ * @param {BufferGeometry} geometry
  * @return {number}
  */
 function estimateBytesUsed( geometry ) {
@@ -618,8 +631,10 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 	}
 
 	// convert the error tolerance to an amount of decimal places to truncate to
-	const decimalShift = Math.log10( 1 / tolerance );
-	const shiftMultiplier = Math.pow( 10, decimalShift );
+	const halfTolerance = tolerance * 0.5;
+	const exponent = Math.log10( 1 / tolerance );
+	const hashMultiplier = Math.pow( 10, exponent );
+	const hashAdditive = halfTolerance * hashMultiplier;
 	for ( let i = 0; i < vertexCount; i ++ ) {
 
 		const index = indices ? indices.getX( i ) : i;
@@ -635,7 +650,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			for ( let k = 0; k < itemSize; k ++ ) {
 
 				// double tilde truncates the decimal value
-				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * shiftMultiplier ) },`;
+				hash += `${ ~ ~ ( attribute[ getters[ k ] ]( index ) * hashMultiplier + hashAdditive ) },`;
 
 			}
 
@@ -1216,14 +1231,21 @@ function mergeGroups( geometry ) {
 }
 
 
-// Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at
-// an angle greater than the crease angle.
+/**
+ * Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+ * non-indexed geometry. Returns the geometry with smooth normals everywhere except
+ * faces that meet at an angle greater than the crease angle.
+ *
+ * @param {BufferGeometry} geometry
+ * @param {number} [creaseAngle]
+ * @return {BufferGeometry}
+ */
 function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
 
 	const creaseDot = Math.cos( creaseAngle );
 	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 
-	// reusable vertors
+	// reusable vectors
 	const verts = [ new Vector3(), new Vector3(), new Vector3() ];
 	const tempVec1 = new Vector3();
 	const tempVec2 = new Vector3();
@@ -1240,7 +1262,9 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	}
 
-	const resultGeometry = geometry.toNonIndexed();
+	// BufferGeometry.toNonIndexed() warns if the geometry is non-indexed
+	// and returns the original geometry
+	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
 	const posAttr = resultGeometry.attributes.position;
 	const vertexMap = {};
 

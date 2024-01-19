@@ -39,6 +39,7 @@ namespace gdjs {
       | THREE.OrthographicCamera
       | null = null;
     private _threeCameraDirty: boolean = false;
+    private _threeEffectComposer: THREE_ADDONS.EffectComposer | null = null;
 
     // For a 2D+3D layer, the 2D rendering is done on the render texture
     // and then must be displayed on a plane in the 3D world:
@@ -138,6 +139,37 @@ namespace gdjs {
       return this._threeCamera;
     }
 
+    getThreeEffectComposer(): THREE_ADDONS.EffectComposer | null {
+      return this._threeEffectComposer;
+    }
+
+    addPostProcessingPass(pass: THREE_ADDONS.Pass) {
+      if (!this._threeEffectComposer) {
+        return;
+      }
+      const game = this._layer.getRuntimeScene().getGame();
+      const index =
+        this._threeEffectComposer.passes.length -
+        (game.getAntialiasingMode() === 'none' ? 1 : 2);
+      this._threeEffectComposer.insertPass(pass, index);
+    }
+
+    removePostProcessingPass(pass: THREE_ADDONS.Pass) {
+      if (!this._threeEffectComposer) {
+        return;
+      }
+      this._threeEffectComposer.removePass(pass);
+    }
+
+    hasPostProcessingPass() {
+      if (!this._threeEffectComposer) {
+        return false;
+      }
+      const game = this._layer.getRuntimeScene().getGame();
+      const emptyCount = game.getAntialiasingMode() === 'none' ? 2 : 3;
+      return this._threeEffectComposer.passes.length > emptyCount;
+    }
+
     /**
      * The sprite, displaying the "render texture" of the layer, to display
      * for a lighting layer.
@@ -203,6 +235,26 @@ namespace gdjs {
             );
           }
           this._threeCamera.rotation.order = 'ZYX';
+
+          const game = this._layer.getRuntimeScene().getGame();
+          const threeRenderer = game.getRenderer().getThreeRenderer();
+          if (threeRenderer) {
+            this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
+              threeRenderer
+            );
+            this._threeEffectComposer.addPass(
+              new THREE_ADDONS.RenderPass(this._threeScene, this._threeCamera)
+            );
+            if (game.getAntialiasingMode() !== 'none') {
+              this._threeEffectComposer.addPass(
+                new THREE_ADDONS.SMAAPass(
+                  game.getGameResolutionWidth(),
+                  game.getGameResolutionHeight()
+                )
+              );
+            }
+            this._threeEffectComposer.addPass(new THREE_ADDONS.OutputPass());
+          }
 
           if (
             this._layer.getRenderingType() ===
@@ -426,6 +478,16 @@ namespace gdjs {
           this._threePlaneMesh.position.y = -this._threeCamera.position.y; // Inverted because the scene is mirrored on Y axis.
           this._threePlaneMesh.rotation.z = -angle;
         }
+      }
+    }
+
+    updateResolution() {
+      if (this._threeEffectComposer) {
+        const game = this._layer.getRuntimeScene().getGame();
+        this._threeEffectComposer.setSize(
+          game.getGameResolutionWidth(),
+          game.getGameResolutionHeight()
+        );
       }
     }
 

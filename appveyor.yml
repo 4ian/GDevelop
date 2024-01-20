@@ -19,20 +19,20 @@ init:
 install:
   # Build GDevelop.js (and run tests to ensure it works).
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-  - cmd: >-
-      cd GDevelop.js
+  # - cmd: >-
+  #     cd GDevelop.js
 
-      npm -v && npm install
+  #     npm -v && npm install
 
-      git clone https://github.com/juj/emsdk.git
+  #     git clone https://github.com/juj/emsdk.git
 
-      cd emsdk
+  #     cd emsdk
 
-      emsdk install 3.1.21
+  #     emsdk install 3.1.21
 
-      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
+  #     CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
 
-      cd ..\..
+  #     cd ..\..
 
   # Build GDevelop IDE.
   # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.

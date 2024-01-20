@@ -39,7 +39,7 @@ install:
   # setuptools will make distutils available again (but we should migrate our packages probably).
   - cmd: >-
       pip install setuptools
-  
+
       cd newIDE\app
 
       npm -v && npm install
@@ -56,9 +56,41 @@ build_script:
   - ps: >-
       cd newIDE\electron-app
 
+      Set-StrictMode -Version 'Latest'
+
+      # Download the SSL.com eSigner helper.
+      # TODO: host it on our own.
+      Invoke-WebRequest -OutFile eSigner_CKA.exe "https://packages.element.io/tools/SSL.COM%20eSigner%20CKA_1.0.4-build-20230221_signed.exe"
+
+      # Install it.
+      New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
+      ./eSigner_CKA.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
+
+      # Disable logger.
+      $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+      $LogConfig[0] = '<log4net threshold="OFF">'
+      $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+
+      # Configure it
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe config -mode product -user "$Env:ESIGNER_USER_NAME" -pass "$Env:ESIGNER_USER_PASSWORD" -totp "$Env:ESIGNER_USER_TOTP" -key "C:\projects\gdevelop\eSignerCKA\master.key" -r
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe unload
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe load
+
+      # Find certificate
+      $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+      echo Certificate: $CodeSigningCert
+
+      # Extract thumbprint and subject name
+      $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
+      $Env:GD_SIGNTOOL_SUBJECT_NAME  = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+      # Build the nsis installer (signed)
       node scripts/build.js --win nsis --publish=never
 
-      Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+      # appx - don't sign it.
+      $Env:GD_SIGNTOOL_THUMBPRINT = ''
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+      node scripts/build.js --skip-app-build --win appx --publish=never
 
       cd ..\..
 

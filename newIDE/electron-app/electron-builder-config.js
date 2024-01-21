@@ -84,7 +84,12 @@ if (
   config.win.certificateSubjectName = process.env.GD_SIGNTOOL_SUBJECT_NAME;
   config.win.certificateSha1 = process.env.GD_SIGNTOOL_THUMBPRINT;
 
-  // TODO: add check for SIGNTOOL_PATH
+  // electron-builder default signtool.exe is not sufficient for some reason.
+  if (!process.env.SIGNTOOL_PATH) {
+    console.error("❌ SIGNTOOL_PATH is not specified - signing won't work with the builtin signtool provided by electron-builder.");
+  } else {
+    console.error("ℹ️ SIGNTOOL_PATH is specified and set to:", process.env.SIGNTOOL_PATH);
+  }
 
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
   config.win.signingHashAlgorithms = ["sha256"];

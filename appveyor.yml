@@ -38,12 +38,46 @@ install:
 
   #     cd ..\..
 
+  # Download and install SSL.com eSigner CKA. 
+  # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
+  #
+  # This is necessary because of "signing to be FIPS-140 compliant". See 
+  # https://github.com/electron-userland/electron-builder/issues/6158
+  # 
+  # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
+  # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
+  - ps: >-
+      # Download and Unzip eSignerCKA Setup
+
+      Set-StrictMode -Version 'Latest'
+
+      Invoke-WebRequest -OutFile eSigner_CKA_Setup.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
+
+      Expand-Archive -Force eSigner_CKA_Setup.zip
+
+      Remove-Item eSigner_CKA_Setup.zip
+
+      Move-Item -Destination "eSigner_CKA_Installer.exe" -Path "eSigner_CKA_*\*.exe"
+      
+      # Install it. See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
+
+      New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
+
+      ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
+      
+      # Disable logger.
+
+      # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+
+      # $LogConfig[0] = '<log4net threshold="OFF">'
+
+      # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+
+
   # Build GDevelop IDE.
   # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
   # setuptools will make distutils available again (but we should migrate our packages probably).
   - cmd: >-
-      dir "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0"
-
       pip install setuptools
 
       cd newIDE\app
@@ -56,35 +90,13 @@ install:
 
       cd ..\..
 
-# Package the app for Windows (and sign it with the certificate set in environment variables).
+# Package the app for Windows (and sign it).
 # Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
   - ps: >-
       cd newIDE\electron-app
 
-      Set-StrictMode -Version 'Latest'
-
-      # Download the SSL.com eSigner helper.
-
-      # TODO: host it on our own.
-
-      Invoke-WebRequest -OutFile eSigner_CKA.exe "https://packages.element.io/tools/SSL.COM%20eSigner%20CKA_1.0.4-build-20230221_signed.exe"
-
-      # Install it.
-
-      New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
-
-      ./eSigner_CKA.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
-
-      # Disable logger.
-
-      # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
-
-      # $LogConfig[0] = '<log4net threshold="OFF">'
-
-      # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
-
-      # Configure it
+      # Prepare certificate. See https://www.ssl.com/how-to/automate-ev-code-signing-with-signtool-or-certutil-esigner/?_gl=1*vuybcy*_gcl_au*MTEwODg1NDM2Mi4xNzA1ODU1NjM4#automated-code-signing
 
       C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe config -mode product -user "$Env:ESIGNER_USER_NAME" -pass "$Env:ESIGNER_USER_PASSWORD" -totp "$Env:ESIGNER_USER_TOTP" -key "C:\projects\gdevelop\eSignerCKA\master.key" -r
 
@@ -92,29 +104,28 @@ build_script:
 
       C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe load
 
-      # Find certificate
+      # Find certificate so we can tell electron-builder which one to use.
 
       $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
 
       echo Certificate: $CodeSigningCert
 
-      # Extract thumbprint and subject name
-
-      # Use a custom signtool path because of the signtool used by electron-builder not working otherwise with SSL.com certificate.
-
-      # $Env:SIGNTOOL_PATH = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe"
+      # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
+      # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
 
       $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+
+      # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
 
       $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
 
       $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
 
-      # Build the nsis installer (signed)
+      # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
 
       node scripts/build.js --win nsis --publish=never
 
-      # appx - don't sign it.
+      # Build the appx (not signed).
 
       $Env:GD_SIGNTOOL_THUMBPRINT = ''
 
@@ -129,19 +140,19 @@ build_script:
       rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
-# test_script:
-#   - cmd: >-
-#       cd GDevelop.js
+test_script:
+  - cmd: >-
+      cd GDevelop.js
 
-#       npm test
+      npm test
 
-#       cd ..
+      cd ..
 
-#       cd newIDE\app
+      cd newIDE\app
 
-#       npm test
+      npm test
 
-#       cd ..\..
+      cd ..\..
 
 artifacts:
   - path: newIDE\electron-app\dist

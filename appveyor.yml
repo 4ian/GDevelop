@@ -94,9 +94,13 @@ build_script:
 
       # Extract thumbprint and subject name
 
+      # Use a custom signtool path because of the signtool used by electron-builder not working otherwise with SSL.com certificate.
+
+      $Env:SIGNTOOL_PATH = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe"
+
       $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
 
-      $Env:GD_SIGNTOOL_SUBJECT_NAME  = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
 
       # Build the nsis installer (signed)
 

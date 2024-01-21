@@ -72,11 +72,11 @@ build_script:
 
       # Disable logger.
 
-      $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+      # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
 
-      $LogConfig[0] = '<log4net threshold="OFF">'
+      # $LogConfig[0] = '<log4net threshold="OFF">'
 
-      $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+      # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
 
       # Configure it
 

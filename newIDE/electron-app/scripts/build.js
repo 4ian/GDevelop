@@ -20,7 +20,11 @@ let electronBuilderArguments = process.argv
   .slice(2)
   .filter(arg => arg !== '--skip-app-build');
 shell.exec(
-  [electronBuilder, electronBuilderArguments.join(' ')].join(' '),
+  [
+    electronBuilder,
+    '--config=electron-builder-config.js',
+    electronBuilderArguments.join(' '),
+  ].join(' '),
   code => {
     if (code !== 0) {
       shell.echo(`❌ Electron build failed with code ${code}.`);

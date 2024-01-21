@@ -20,24 +20,8 @@ cache:
   - '%APPDATA%\npm-cache'               # npm cache
   - newIDE\app\node_modules -> newIDE\app\package-lock.json
   - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
+  - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
 install:
-  # Build GDevelop.js (and run tests to ensure it works).
-  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-  # - cmd: >-
-  #     cd GDevelop.js
-
-  #     npm -v && npm install
-
-  #     git clone https://github.com/juj/emsdk.git
-
-  #     cd emsdk
-
-  #     emsdk install 3.1.21
-
-  #     CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
-
-  #     cd ..\..
-
   # Download and install SSL.com eSigner CKA. 
   # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
   #
@@ -73,6 +57,22 @@ install:
 
       # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
 
+  # Build GDevelop.js (and run tests to ensure it works).
+  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  - cmd: >-
+      cd GDevelop.js
+
+      npm -v && npm install
+
+      git clone https://github.com/juj/emsdk.git
+
+      cd emsdk
+
+      emsdk install 3.1.21
+
+      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
+
+      cd ..\..
 
   # Build GDevelop IDE.
   # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.

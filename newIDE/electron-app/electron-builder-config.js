@@ -86,13 +86,18 @@ if (
 
   // electron-builder default signtool.exe is not sufficient for some reason.
   if (!process.env.SIGNTOOL_PATH) {
-    console.error("❌ SIGNTOOL_PATH is not specified - signing won't work with the builtin signtool provided by electron-builder.");
+    console.error(
+      "❌ SIGNTOOL_PATH is not specified - signing won't work with the builtin signtool provided by electron-builder."
+    );
   } else {
-    console.error("ℹ️ SIGNTOOL_PATH is specified and set to:", process.env.SIGNTOOL_PATH);
+    console.log(
+      'ℹ️ SIGNTOOL_PATH is specified and set to:',
+      process.env.SIGNTOOL_PATH
+    );
   }
 
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
-  config.win.signingHashAlgorithms = ["sha256"];
+  config.win.signingHashAlgorithms = ['sha256'];
   console.log('ℹ️ Set Windows build signing options:', config.win);
 } else {
   console.log('ℹ️ No Windows build signing options set.');

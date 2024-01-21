@@ -84,6 +84,8 @@ if (
   config.win.certificateSubjectName = process.env.GD_SIGNTOOL_SUBJECT_NAME;
   config.win.certificateSha1 = process.env.GD_SIGNTOOL_THUMBPRINT;
 
+  // TODO: add check for SIGNTOOL_PATH
+
   // Seems required, see https://github.com/electron-userland/electron-builder/issues/6158#issuecomment-1587045539.
   config.win.signingHashAlgorithms = ["sha256"];
   console.log('ℹ️ Set Windows build signing options:', config.win);

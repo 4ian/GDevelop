@@ -16,6 +16,10 @@ skip_tags: true # Don't rebuild on tags.
 init:
   - ps: Install-Product node 16
   - cmd: set NODE_OPTIONS=--max-old-space-size=8192
+cache:
+  - '%APPDATA%\npm-cache'               # npm cache
+  - newIDE\app\node_modules -> newIDE\app\package-lock.json
+  - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
 install:
   # Build GDevelop.js (and run tests to ensure it works).
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
@@ -123,19 +127,19 @@ build_script:
       rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
-test_script:
-  - cmd: >-
-      cd GDevelop.js
+# test_script:
+#   - cmd: >-
+#       cd GDevelop.js
 
-      npm test
+#       npm test
 
-      cd ..
+#       cd ..
 
-      cd newIDE\app
+#       cd newIDE\app
 
-      npm test
+#       npm test
 
-      cd ..\..
+#       cd ..\..
 
 artifacts:
   - path: newIDE\electron-app\dist

@@ -114,7 +114,7 @@ build_script:
 
   # Clean dist folder to keep only installers/binaries.
   - cmd: >-
-      DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
+      rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
 test_script:

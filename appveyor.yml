@@ -102,7 +102,9 @@ build_script:
 
       # Use a custom signtool path because of the signtool used by electron-builder not working otherwise with SSL.com certificate.
 
-      $Env:SIGNTOOL_PATH = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x64/signtool.exe"
+      # $Env:SIGNTOOL_PATH = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe"
+
+      $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
 
       $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
 

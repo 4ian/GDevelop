@@ -151,6 +151,12 @@ namespace gdjs {
       // TODO Keep the effects in the same order they are defined
       // because the order matter for the final result.
       // There is the same issue with 2D effects too.
+
+      // The composer contains:
+      // - RenderPass
+      // - inserted passes for effects
+      // - SMAAPass (optionally)
+      // - OutputPass
       const index =
         this._threeEffectComposer.passes.length -
         (game.getAntialiasingMode() === 'none' ? 1 : 2);
@@ -169,6 +175,7 @@ namespace gdjs {
         return false;
       }
       const game = this._layer.getRuntimeScene().getGame();
+      // RenderPass, OutputPass and optionally SMAAPass are default passes.
       const emptyCount = game.getAntialiasingMode() === 'none' ? 2 : 3;
       return this._threeEffectComposer.passes.length > emptyCount;
     }

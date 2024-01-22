@@ -165,7 +165,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                _("Draw a torus on screen"),
                _("Draw at _PARAM1_;_PARAM2_ a torus with "
                "inner radius: _PARAM3_, outer radius: _PARAM4_ and "
-               "with start arc angle: _PARAM5_°, end angle _PARAM6_°"
+               "with start arc angle: _PARAM5_°, end angle _PARAM6_° "
                "with _PARAM0_"),
                _("Drawing"),
                "res/actions/torus24.png",

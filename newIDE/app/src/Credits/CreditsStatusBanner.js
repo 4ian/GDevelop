@@ -14,6 +14,7 @@ const styles = {
   container: {
     borderRadius: 8,
     padding: 8,
+    color: '#FAFAFA',
   },
 };
 
@@ -59,7 +60,7 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
           <Column>
             <LineStackLayout alignItems="flex-end" noMargin>
               <Coin />
-              <Text noMargin>
+              <Text noMargin color="inherit">
                 <Trans>
                   Credits available: {limits.credits.userBalance.amount}
                 </Trans>

@@ -148,6 +148,9 @@ namespace gdjs {
         return;
       }
       const game = this._layer.getRuntimeScene().getGame();
+      // TODO Keep the effects in the same order they are defined
+      // because the order matter for the final result.
+      // There is the same issue with 2D effects too.
       const index =
         this._threeEffectComposer.passes.length -
         (game.getAntialiasingMode() === 'none' ? 1 : 2);

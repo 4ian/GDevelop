@@ -23,6 +23,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
+  sendCancelSubscriptionToChange,
 } from '../../Utils/Analytics/EventSender';
 import {
   type SubscriptionAnalyticsMetadata,
@@ -144,7 +145,10 @@ export default function SubscriptionDialog({
     const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
     if (subscriptionPlanPricingSystem) {
-      sendChoosePlanClicked(subscriptionPlanPricingSystem.planId);
+      sendChoosePlanClicked({
+        planId: subscriptionPlanPricingSystem.planId,
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+      });
     }
     // Subscribing from an account without a subscription
     if (!subscription.planId && subscriptionPlanPricingSystem) {
@@ -235,6 +239,10 @@ export default function SubscriptionDialog({
     } else {
       // Changing the existing subscription by cancelling first.
       setIsChangingSubscription(true);
+      await sendCancelSubscriptionToChange({
+        planId: subscriptionPlanPricingSystem.planId,
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+      });
       try {
         await changeUserSubscription(
           getAuthorizationHeader,

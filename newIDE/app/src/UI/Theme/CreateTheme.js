@@ -633,6 +633,7 @@ export function createGdevelopTheme({
       },
       credits: {
         backgroundColor: styles['ThemePrimaryLight'],
+        color: styles['ThemePrimaryTextContrastColor'],
       },
     },
     muiThemeOptions: {

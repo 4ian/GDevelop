@@ -22,6 +22,12 @@ export type FlatButtonProps = {|
     marginRight?: number,
     margin?: number,
     flexShrink?: 0,
+
+    // Allow in special cases to set color and border color
+    // (when the button is above a background with a fixed color that
+    // does not depend on the theme).
+    +color?: string,
+    +borderColor?: string,
   |},
   target?: '_blank',
   id?: ?string,

@@ -4,6 +4,9 @@
       "color": {
         "value": "#5E81AC"
       },
+      "light": {
+        "value": "#7e9abc"
+      },
       "text-contrast-color": {
         "value": "#fff"
       }

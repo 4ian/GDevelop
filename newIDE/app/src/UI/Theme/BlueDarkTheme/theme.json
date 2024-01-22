@@ -5,6 +5,9 @@
         "value": "#006DEE",
         "comment": "Palette/Blue/60"
       },
+      "light": {
+        "value": "#328af1"
+      },
       "text-contrast-color": {
         "value": "#FFFFFF"
       }

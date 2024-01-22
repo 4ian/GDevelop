@@ -14,7 +14,6 @@ const styles = {
   container: {
     borderRadius: 8,
     padding: 8,
-    color: '#FAFAFA',
   },
 };
 
@@ -50,6 +49,7 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
         style={{
           ...styles.container,
           backgroundColor: gdevelopTheme.credits.backgroundColor,
+          color: gdevelopTheme.credits.color,
         }}
       >
         <ResponsiveLineStackLayout
@@ -72,7 +72,10 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
               <FlatButton
                 label={<Trans>Get credit packs</Trans>}
                 onClick={() => setCreditsPackDialogOpen(true)}
-                primary
+                style={{
+                  color: gdevelopTheme.credits.color,
+                  borderColor: gdevelopTheme.credits.color,
+                }}
               />
             </Column>
           )}

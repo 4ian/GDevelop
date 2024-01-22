@@ -242,6 +242,8 @@ namespace gdjs {
           const game = this._layer.getRuntimeScene().getGame();
           const threeRenderer = game.getRenderer().getThreeRenderer();
           if (threeRenderer) {
+            // When adding more default passes, make sure to update
+            // `addPostProcessingPass` and `hasPostProcessingPass` formulas.
             this._threeEffectComposer = new THREE_ADDONS.EffectComposer(
               threeRenderer
             );

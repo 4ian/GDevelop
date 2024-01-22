@@ -23,6 +23,7 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import {
   sendSubscriptionDialogShown,
   sendChoosePlanClicked,
+  sendCancelSubscriptionToChange,
 } from '../../Utils/Analytics/EventSender';
 import {
   type SubscriptionAnalyticsMetadata,
@@ -139,23 +140,26 @@ export default function SubscriptionDialog({
 
   const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
-    subscriptionPlanPrice: SubscriptionPlanPricingSystem | null
+    subscriptionPlanPricingSystem: SubscriptionPlanPricingSystem | null
   ) => {
     const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
     if (!profile || !subscription) return;
-    if (subscriptionPlanPrice) {
-      sendChoosePlanClicked(subscriptionPlanPrice.planId);
+    if (subscriptionPlanPricingSystem) {
+      sendChoosePlanClicked({
+        planId: subscriptionPlanPricingSystem.planId,
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+      });
     }
     // Subscribing from an account without a subscription
-    if (!subscription.planId && subscriptionPlanPrice) {
+    if (!subscription.planId && subscriptionPlanPricingSystem) {
       setSubscriptionPendingDialogOpen(true);
       const isEducationPlan =
-        subscriptionPlanPrice &&
-        subscriptionPlanPrice.planId === 'gdevelop_education';
+        subscriptionPlanPricingSystem &&
+        subscriptionPlanPricingSystem.planId === 'gdevelop_education';
       const quantity = isEducationPlan ? educationPlanSeatsCount : undefined;
       Window.openExternalURL(
         getRedirectToCheckoutUrl({
-          pricingSystemId: subscriptionPlanPrice.id,
+          pricingSystemId: subscriptionPlanPricingSystem.id,
           userId: profile.id,
           userEmail: profile.email,
           quantity,
@@ -164,7 +168,7 @@ export default function SubscriptionDialog({
       return;
     }
 
-    if (!subscriptionPlanPrice) {
+    if (!subscriptionPlanPricingSystem) {
       // Cancelling the existing subscription.
       const answer = await showConfirmation(
         canCancelAtEndOfPeriod(subscription)
@@ -175,9 +179,14 @@ export default function SubscriptionDialog({
 
       setIsChangingSubscription(true);
       try {
-        await changeUserSubscription(getAuthorizationHeader, profile.id, {
-          planId: null,
-        });
+        await changeUserSubscription(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            planId: null,
+          },
+          { cancelImmediately: false }
+        );
         await authenticatedUser.onRefreshSubscription();
         showAlert({
           title: t`Subscription cancelled`,
@@ -198,7 +207,7 @@ export default function SubscriptionDialog({
       return;
     }
 
-    const { planId } = subscriptionPlanPrice;
+    const { planId } = subscriptionPlanPricingSystem;
     const needToCancelSubscription = !canSeamlesslyChangeSubscription(
       subscription,
       planId
@@ -226,34 +235,23 @@ export default function SubscriptionDialog({
 
     if (!needToCancelSubscription) {
       // Changing the existing subscription without asking for payment details again.
-      setIsChangingSubscription(true);
-      try {
-        await changeUserSubscription(getAuthorizationHeader, profile.id, {
-          planId,
-        });
-        await authenticatedUser.onRefreshSubscription();
-        showAlert({
-          title: t`Subscription updated`,
-          message: t`Congratulations, your new subscription is now active! You can now use the services unlocked with this plan.`,
-        });
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Your subscription could not be updated. Please try again later!`
-          ),
-          rawError,
-          errorId: 'subscription-update-error',
-        });
-      } finally {
-        setIsChangingSubscription(false);
-      }
+      // TODO: When possible, handle cases when a subscription can be updated seamlessly.
     } else {
       // Changing the existing subscription by cancelling first.
       setIsChangingSubscription(true);
+      await sendCancelSubscriptionToChange({
+        planId: subscriptionPlanPricingSystem.planId,
+        pricingSystemId: subscriptionPlanPricingSystem.id,
+      });
       try {
-        await changeUserSubscription(getAuthorizationHeader, profile.id, {
-          planId: null,
-        });
+        await changeUserSubscription(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            planId: null,
+          },
+          { cancelImmediately: true }
+        );
         await authenticatedUser.onRefreshSubscription();
       } catch (rawError) {
         showErrorBox({
@@ -271,7 +269,7 @@ export default function SubscriptionDialog({
       setSubscriptionPendingDialogOpen(true);
       Window.openExternalURL(
         getRedirectToCheckoutUrl({
-          pricingSystemId: subscriptionPlanPrice.id,
+          pricingSystemId: subscriptionPlanPricingSystem.id,
           userId: profile.id,
           userEmail: profile.email,
         })

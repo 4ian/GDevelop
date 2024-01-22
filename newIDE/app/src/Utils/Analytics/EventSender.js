@@ -395,8 +395,18 @@ export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
   recordEvent('showcase-open-game-link', { title, linkType });
 };
 
-export const sendChoosePlanClicked = (planId: string | null) => {
-  recordEvent('choose-plan-click', { planId });
+export const sendChoosePlanClicked = (metadata: {|
+  planId: string | null,
+  pricingSystemId: string | null,
+|}) => {
+  recordEvent('choose-plan-click', metadata);
+};
+
+export const sendCancelSubscriptionToChange = (metadata: {|
+  planId: string,
+  pricingSystemId: string | null,
+|}) => {
+  recordEvent('cancel-subscription-to-change', metadata);
 };
 
 export const sendExternalEditorOpened = (editorName: string) => {

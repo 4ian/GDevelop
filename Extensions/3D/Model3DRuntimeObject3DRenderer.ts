@@ -23,9 +23,8 @@ namespace gdjs {
     }
   };
 
-  const traverseToRemoveMetalnessFromMeshes = (
-    node: THREE.Object3D
-  ) => node.traverse(removeMetalnessFromMesh);
+  const traverseToRemoveMetalnessFromMeshes = (node: THREE.Object3D) =>
+    node.traverse(removeMetalnessFromMesh);
 
   const convertToBasicMaterial = (
     material: THREE.Material
@@ -59,9 +58,8 @@ namespace gdjs {
     }
   };
 
-  const traverseToSetBasicMaterialFromMeshes = (
-    node: THREE.Object3D
-  ) => node.traverse(setBasicMaterialTo);
+  const traverseToSetBasicMaterialFromMeshes = (node: THREE.Object3D) =>
+    node.traverse(setBasicMaterialTo);
 
   class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {
     private _model3DRuntimeObject: gdjs.Model3DRuntimeObject;

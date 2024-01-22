@@ -12,6 +12,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader';
 import { ColorCorrectionShader } from 'three/examples/jsm/shaders/ColorCorrectionShader';
 import { HueSaturationShader } from 'three/examples/jsm/shaders/HueSaturationShader';
+import { ExposureShader } from 'three/examples/jsm/shaders/ExposureShader';
 
 declare global {
   namespace THREE_ADDONS {
@@ -30,6 +31,7 @@ declare global {
       BrightnessContrastShader,
       ColorCorrectionShader,
       HueSaturationShader,
+      ExposureShader,
     };
   }
 }

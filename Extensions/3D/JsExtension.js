@@ -1965,6 +1965,25 @@ module.exports = {
     }
     {
       const effect = extension
+        .addEffect('Exposure')
+        .setFullName(_('Exposure'))
+        .setDescription(
+          _(
+            'Adjust exposure.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ExposureEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure (positive value)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
         .setDescription(

@@ -263,13 +263,18 @@ export const getUserSubscription = async (
 export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  newSubscriptionDetails: {| planId: string | null, stripeToken?: any |}
+  newSubscriptionDetails: {| planId: string | null |},
+  options: {| cancelImmediately: boolean |}
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 
   const response = await apiClient.post(
     '/subscription-v2',
-    newSubscriptionDetails,
+    {
+      ...newSubscriptionDetails,
+      prohibitSeamlessUpdate: true,
+      cancelImmediately: options.cancelImmediately,
+    },
     {
       params: {
         userId,

@@ -9,7 +9,7 @@ namespace gdjs {
     }
   };
 
-  const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>) => {
+  const removeMetalnessFromMesh = (node: THREE.Object3D) => {
     const mesh = node as THREE.Mesh;
     if (!mesh.material) {
       return;
@@ -24,7 +24,7 @@ namespace gdjs {
   };
 
   const traverseToRemoveMetalnessFromMeshes = (
-    node: THREE.Object3D<THREE.Event>
+    node: THREE.Object3D
   ) => node.traverse(removeMetalnessFromMesh);
 
   const convertToBasicMaterial = (
@@ -44,7 +44,7 @@ namespace gdjs {
     return basicMaterial;
   };
 
-  const setBasicMaterialTo = (node: THREE.Object3D<THREE.Event>): void => {
+  const setBasicMaterialTo = (node: THREE.Object3D): void => {
     const mesh = node as THREE.Mesh;
     if (!mesh.material) {
       return;
@@ -60,7 +60,7 @@ namespace gdjs {
   };
 
   const traverseToSetBasicMaterialFromMeshes = (
-    node: THREE.Object3D<THREE.Event>
+    node: THREE.Object3D
   ) => node.traverse(setBasicMaterialTo);
 
   class Model3DRuntimeObject3DRenderer extends gdjs.RuntimeObject3DRenderer {

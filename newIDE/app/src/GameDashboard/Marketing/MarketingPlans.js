@@ -27,7 +27,7 @@ import Premium from './Icons/Premium';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../../UI/Grid';
 import RaisedButton from '../../UI/RaisedButton';
-import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
+import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -384,7 +384,7 @@ const MarketingPlans = ({ game }: Props) => {
                           (bulletPointByLocale, index) => (
                             <Column key={index} expand noMargin>
                               <Line noMargin alignItems="center">
-                                <CheckCircleFilled
+                                <CheckCircle
                                   style={{
                                     ...styles.bulletIcon,
                                     ...(activeFeaturing

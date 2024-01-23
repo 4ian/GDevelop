@@ -125,7 +125,7 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
             ) : !creditsPackageListingDatas ? (
               <PlaceholderLoader />
             ) : (
-              <ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout noColumnMargin>
                 {creditsPackageListingDatas.map(
                   (creditsPackageListingData, index) => {
                     const { id, name, description } = creditsPackageListingData;

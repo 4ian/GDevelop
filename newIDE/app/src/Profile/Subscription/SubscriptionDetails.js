@@ -378,7 +378,7 @@ const SubscriptionDetails = ({
             </ResponsiveLineStackLayout>
           </Paper>
         ) : (
-          <ResponsiveLineStackLayout>
+          <ResponsiveLineStackLayout noColumnMargin>
             {Object.keys(subscriptionOptions).map(key => {
               const { title, description, icon } = subscriptionOptions[key];
               return (

@@ -335,7 +335,7 @@ const MarketingPlans = ({ game }: Props) => {
                 about how they increase your views.
               </Trans>
             </Text>
-            <ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout noColumnMargin>
               {marketingPlans.map(marketingPlan => {
                 const {
                   creditsAmount: packCreditsAmount,

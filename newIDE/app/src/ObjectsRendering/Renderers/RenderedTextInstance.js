@@ -2,6 +2,7 @@
 import RenderedInstance from './RenderedInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
+import { rgbStringToHexNumber } from '../../Utils/ColorTransformer';
 import * as PIXI from 'pixi.js-legacy';
 const gd: libGDevelop = global.gd;
 
@@ -17,10 +18,19 @@ export default class RenderedTextInstance extends RenderedInstance {
   _styleFontDirty: boolean = true;
   _fontName: string = '';
   _fontFamily: string = '';
-  _colorR: number = 0;
-  _colorG: number = 0;
-  _colorB: number = 0;
+  _color: string = '0;0;0';
   _textAlignment: string = 'left';
+
+  _isOutlineEnabled = false;
+  _outlineColor = '255;255;255';
+  _outlineThickness = 2;
+
+  _isShadowEnabled = false;
+  _shadowDistance = 3;
+  _shadowAngle = 90;
+  _shadowColor = '0;0;0';
+  _shadowOpacity = 127;
+  _shadowBlurRadius = 2;
 
   constructor(
     project: gdProject,
@@ -75,7 +85,7 @@ export default class RenderedTextInstance extends RenderedInstance {
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       this._associatedObjectConfiguration
     );
-    this._pixiObject.text = textObjectConfiguration.getString();
+    this._pixiObject.text = textObjectConfiguration.getText();
 
     //Update style, only if needed to avoid destroying text rendering performances
     if (
@@ -83,6 +93,18 @@ export default class RenderedTextInstance extends RenderedInstance {
       textObjectConfiguration.isBold() !== this._isBold ||
       textObjectConfiguration.getCharacterSize() !== this._characterSize ||
       textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
+      textObjectConfiguration.getColor() !== this._color ||
+      textObjectConfiguration.isOutlineEnabled() !== this._isOutlineEnabled ||
+      textObjectConfiguration.getOutlineColor() !== this._outlineColor ||
+      textObjectConfiguration.getOutlineThickness() !==
+        this._outlineThickness ||
+      textObjectConfiguration.isShadowEnabled() !== this._isShadowEnabled ||
+      textObjectConfiguration.getShadowDistance() !== this._shadowDistance ||
+      textObjectConfiguration.getShadowAngle() !== this._shadowAngle ||
+      textObjectConfiguration.getShadowColor() !== this._shadowColor ||
+      textObjectConfiguration.getShadowOpacity() !== this._shadowOpacity ||
+      textObjectConfiguration.getShadowBlurRadius() !==
+        this._shadowBlurRadius ||
       this._instance.hasCustomSize() !== this._wrapping ||
       (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
     ) {
@@ -90,6 +112,19 @@ export default class RenderedTextInstance extends RenderedInstance {
       this._isBold = textObjectConfiguration.isBold();
       this._characterSize = textObjectConfiguration.getCharacterSize();
       this._textAlignment = textObjectConfiguration.getTextAlignment();
+      this._color = textObjectConfiguration.getColor();
+
+      this._isOutlineEnabled = textObjectConfiguration.isOutlineEnabled();
+      this._outlineColor = textObjectConfiguration.getOutlineColor();
+      this._outlineThickness = textObjectConfiguration.getOutlineThickness();
+
+      this._isShadowEnabled = textObjectConfiguration.isShadowEnabled();
+      this._shadowDistance = textObjectConfiguration.getShadowDistance();
+      this._shadowAngle = textObjectConfiguration.getShadowAngle();
+      this._shadowColor = textObjectConfiguration.getShadowColor();
+      this._shadowOpacity = textObjectConfiguration.getShadowOpacity();
+      this._shadowBlurRadius = textObjectConfiguration.getShadowBlurRadius();
+
       this._wrapping = this._instance.hasCustomSize();
       this._wrappingWidth = this.getCustomWidth();
       this._styleFontDirty = true;
@@ -117,36 +152,32 @@ export default class RenderedTextInstance extends RenderedInstance {
     }
 
     if (this._styleFontDirty) {
-      this._pixiObject.style.fontFamily = this._fontFamily || 'Arial';
-      this._pixiObject.style.fontSize = Math.max(1, this._characterSize);
-      this._pixiObject.style.fontStyle = this._isItalic ? 'italic' : 'normal';
-      this._pixiObject.style.fontWeight = this._isBold ? 'bold' : 'normal';
-      this._pixiObject.style.wordWrap = this._wrapping;
-      this._pixiObject.style.wordWrapWidth =
-        this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
-      this._pixiObject.style.breakWords = true;
-      this._pixiObject.style.align = this._textAlignment;
+      const style = this._pixiObject.style;
+      style.fontFamily = this._fontFamily || 'Arial';
+      style.fontSize = Math.max(1, this._characterSize);
+      style.fontStyle = this._isItalic ? 'italic' : 'normal';
+      style.fontWeight = this._isBold ? 'bold' : 'normal';
+      style.fill = rgbStringToHexNumber(this._color);
+      style.wordWrap = this._wrapping;
+      style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
+      style.breakWords = true;
+      style.align = this._textAlignment;
+
+      style.stroke = rgbStringToHexNumber(this._outlineColor);
+      style.strokeThickness = this._isOutlineEnabled
+        ? this._outlineThickness
+        : 0;
+      style.dropShadow = this._isShadowEnabled;
+      style.dropShadowColor = rgbStringToHexNumber(this._shadowColor);
+      style.dropShadowAlpha = this._shadowOpacity / 255;
+      style.dropShadowBlur = this._shadowBlurRadius;
+      style.dropShadowAngle = (this._shadowAngle * Math.PI) / 180;
+      style.dropShadowDistance = this._shadowDistance;
 
       // Manually ask the PIXI object to re-render as we changed a style property
       // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
       this._pixiObject.dirty = true;
       this._styleFontDirty = false;
-    }
-
-    if (
-      textObjectConfiguration.getColorR() !== this._colorR ||
-      textObjectConfiguration.getColorG() !== this._colorG ||
-      textObjectConfiguration.getColorB() !== this._colorB
-    ) {
-      this._colorR = textObjectConfiguration.getColorR();
-      this._colorG = textObjectConfiguration.getColorG();
-      this._colorB = textObjectConfiguration.getColorB();
-      this._pixiObject.style.fill =
-        'rgb(' + this._colorR + ',' + this._colorG + ',' + this._colorB + ')';
-
-      // Manually ask the PIXI object to re-render as we changed a style property
-      // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
-      this._pixiObject.dirty = true;
     }
 
     if (this._instance.hasCustomSize()) {

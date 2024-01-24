@@ -1,7 +1,5 @@
 // @flow
-import {
-  GDevelopAuthorizationWebSocketApi,
-} from './ApiConfigs';
+import { GDevelopAuthorizationWebSocketApi } from './ApiConfigs';
 
 export const FEATURE_FLAG_SSO_LOGIN = false;
 

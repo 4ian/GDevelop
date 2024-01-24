@@ -1,8 +1,6 @@
 // @flow
 import type { Auth } from 'firebase/auth';
-import type {
-  IdentityProvider,
-} from '../Utils/GDevelopServices/Authentication';
+import type { IdentityProvider } from '../Utils/GDevelopServices/Authentication';
 
 export interface LoginProvider {
   loginWithEmailAndPassword({|

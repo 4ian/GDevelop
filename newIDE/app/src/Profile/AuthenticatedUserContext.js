@@ -8,7 +8,6 @@ import {
   type ForgotPasswordForm,
   type AuthError,
   type IdentityProvider,
-  type LoginOptions,
 } from '../Utils/GDevelopServices/Authentication';
 import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
@@ -56,7 +55,7 @@ export type AuthenticatedUser = {|
     options: {| throwError: boolean |}
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: (?LoginOptions) => void,
+  onOpenLoginDialog: () => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
   onOpenCreateAccountDialog: () => void,

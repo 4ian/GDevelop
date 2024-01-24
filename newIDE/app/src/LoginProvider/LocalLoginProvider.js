@@ -1,15 +1,14 @@
 // @flow
-
 import {
   signInWithEmailAndPassword,
   type Auth,
-  signInWithCustomToken,
+  signInWithCredential,
+  GoogleAuthProvider,
+  OAuthProvider,
+  GithubAuthProvider,
 } from 'firebase/auth';
 import type { LoginProvider, FirebaseBasedLoginProvider } from '.';
-import type {
-  IdentityProvider,
-  LoginOptions,
-} from '../Utils/GDevelopServices/Authentication';
+import type { IdentityProvider } from '../Utils/GDevelopServices/Authentication';
 import {
   setupAuthenticationWebSocket,
   terminateWebSocket,
@@ -18,9 +17,7 @@ import Window from '../Utils/Window';
 
 const isDev = Window.isDev();
 
-const webAppUrl = isDev
-  ? 'http://editor-local.gdevelop.io:3000'
-  : 'https://editor.gdevelop.io';
+const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   auth: Auth;
@@ -34,7 +31,6 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   }: {|
     email: string,
     password: string,
-    loginOptions?: ?LoginOptions,
   |}) {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
@@ -50,7 +46,6 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
     signal,
   }: {|
     provider: IdentityProvider,
-    loginOptions?: ?LoginOptions,
     signal?: AbortSignal,
   |}) {
     if (signal && signal.aborted) {
@@ -68,23 +63,38 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {
           if (signal && signal.aborted) return;
-          const url = new URL(webAppUrl);
-          url.searchParams.set('initial-dialog', 'login');
+          const url = new URL(authenticationPortalUrl);
           url.searchParams.set('connection-id', connectionId);
+          url.searchParams.set('env', isDev ? 'dev' : 'live');
           Window.openExternalURL(url.toString());
         },
-        onTokenReceived: async token => {
+        onTokenReceived: async ({
+          provider,
+          data,
+        }: {|
+          provider: 'apple' | 'google' | 'github',
+          data: any,
+        |}) => {
           if (signal && signal.aborted) return;
           try {
-            await signInWithCustomToken(this.auth, token);
+            const credential =
+              provider === 'google'
+                ? GoogleAuthProvider.credential(data.credential)
+                : provider === 'github'
+                ? GithubAuthProvider.credential(data.accessToken)
+                : new OAuthProvider('apple.com').credential({
+                    idToken: data.id_token,
+                    rawNonce: data.raw_nonce,
+                  });
+            await signInWithCredential(this.auth, credential);
             resolve();
             terminateWebSocket();
           } catch (error) {
             console.error(
-              'An error occurred while logging in with custom token:',
+              'An error occurred while logging in with token:',
               error
             );
-            reject();
+            reject(new Error('An error occurred while logging in with token.'));
           }
         },
         onError: error => {
@@ -93,15 +103,20 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
             'An error occurred while setting up authentication web socket:',
             error
           );
-          reject();
+          reject(
+            new Error(
+              'An error occurred while setting up authentication web socket.'
+            )
+          );
+        },
+        onTimeout: () => {
+          if (signal && signal.aborted) return;
+          console.error('Connection to authorization websocket timed out.');
+          reject(new Error('Connection to authorization websocket timed out.'));
         },
       });
     });
     return promise;
-  }
-
-  async notifyLogin(options: {| connectionId: string |}): Promise<void> {
-    console.warn('notifyLogin not implemented in LocalLoginProvider.');
   }
 }
 

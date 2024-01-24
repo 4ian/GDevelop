@@ -57,13 +57,26 @@ class BrowserLoginProvider
     }
     const promise = new Promise((resolve, reject) => {
       // Listen for abort event on signal
-      let authWindow;
       if (signal) {
         signal.addEventListener('abort', () => {
           terminateWebSocket();
           reject(new Error('Login or Signup with provider aborted.'));
         });
       }
+      const width = 400;
+      const height = 600;
+      const left = window.screenX + window.innerWidth / 2 - width / 2;
+      const top = window.screenY + window.innerHeight / 2 - height / 2;
+
+      const authWindow = window.open(
+        'about:blank',
+        null,
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      authWindow.document.write(
+        // TODO: Adapt style to authentication portal background and font.
+        '<div style="height: 100vh; display: flex; justify-content: center; align-items: center;">Loading</div>'
+      );
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {
           if (signal && signal.aborted) return;
@@ -71,16 +84,9 @@ class BrowserLoginProvider
           url.searchParams.set('connection-id', connectionId);
           url.searchParams.set('provider', provider);
           url.searchParams.set('env', isDev ? 'dev' : 'live');
-          const width = 400;
-          const height = 600;
-          const left = window.screenX + window.innerWidth / 2 - width / 2;
-          const top = window.screenY + window.innerHeight / 2 - height / 2;
 
-          authWindow = window.open(
-            url.toString(),
-            null,
-            `width=${width},height=${height},left=${left},top=${top}`
-          );
+          if (!authWindow) throw new Error('Popup could not be found.');
+          authWindow.location = url.toString();
         },
         onTokenReceived: async ({
           provider,

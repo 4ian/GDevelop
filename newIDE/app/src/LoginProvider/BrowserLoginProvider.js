@@ -93,9 +93,9 @@ class BrowserLoginProvider
                     nonce: data.raw_nonce,
                   });
             await signInWithCredential(this.auth, credential);
-
             if (authWindow) {
-              if (authWindow.opener) authWindow.opener.focus();
+              // TODO: Find a way to refocus main window, through authWindow.opener for instance.
+              // It doesn't work on Chrome at the time this comment is added.
               authWindow.close();
             }
             resolve();

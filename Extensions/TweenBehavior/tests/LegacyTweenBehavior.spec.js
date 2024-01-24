@@ -139,7 +139,7 @@ describe('gdjs.TweenRuntimeBehavior', () => {
         outlineThickness: 2,
         outlineColor: '255;255;255',
         isShadowEnabled: false,
-        shadowColor: '0;0;',
+        shadowColor: '0;0;0',
         shadowOpacity: 128,
         shadowDistance: 4,
         shadowAngle: 90,

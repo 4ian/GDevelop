@@ -86,7 +86,6 @@ namespace gdjs {
       textObjectData: TextObjectData
     ) {
       super(instanceContainer, textObjectData);
-      console.log(textObjectData);
       const content = textObjectData.content;
       this._characterSize = Math.max(1, content.characterSize);
       this._fontName = content.font;

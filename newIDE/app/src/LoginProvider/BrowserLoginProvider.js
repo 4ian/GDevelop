@@ -79,7 +79,6 @@ class BrowserLoginProvider
           provider: 'apple' | 'google' | 'github',
           data: any,
         |}) => {
-          console.log(data)
           if (signal && signal.aborted) return;
           try {
             const credential =
@@ -89,7 +88,9 @@ class BrowserLoginProvider
                 ? GithubAuthProvider.credential(data.accessToken)
                 : new OAuthProvider('apple.com').credential({
                     idToken: data.id_token,
-                    rawNonce: data.raw_nonce,
+                    // Typescript types declaration indicates the parameter `rawNonce` should be
+                    // set but it only works with `nonce`.
+                    nonce: data.raw_nonce,
                   });
             await signInWithCredential(this.auth, credential);
 

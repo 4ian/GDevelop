@@ -6,10 +6,19 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   OAuthProvider,
-  signInWithPopup,
+  signInWithCredential,
 } from 'firebase/auth';
 import type { LoginProvider, FirebaseBasedLoginProvider } from '.';
 import type { IdentityProvider } from '../Utils/GDevelopServices/Authentication';
+import {
+  setupAuthenticationWebSocket,
+  terminateWebSocket,
+} from '../Utils/GDevelopServices/Authorization';
+import Window from '../Utils/Window';
+
+const isDev = Window.isDev();
+
+const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class BrowserLoginProvider
   implements LoginProvider, FirebaseBasedLoginProvider {
@@ -36,34 +45,88 @@ class BrowserLoginProvider
 
   async loginOrSignupWithProvider({
     provider,
+    signal,
   }: {|
     provider: IdentityProvider,
     signal?: AbortSignal,
   |}) {
-    let firebaseProvider = null;
-    if (provider === 'google') {
-      firebaseProvider = new GoogleAuthProvider();
-      firebaseProvider.addScope('profile');
-      firebaseProvider.addScope('email');
-    } else if (provider === 'github') {
-      firebaseProvider = new GithubAuthProvider();
-      // No scope needed for GitHub.
-    } else if (provider === 'apple') {
-      firebaseProvider = new OAuthProvider('apple.com');
-      firebaseProvider.addScope('email');
-      firebaseProvider.addScope('name');
+    if (signal && signal.aborted) {
+      return Promise.reject(
+        new Error('Login or Signup with provider already aborted.')
+      );
     }
+    const promise = new Promise((resolve, reject) => {
+      // Listen for abort event on signal
+      let authWindow;
+      if (signal) {
+        signal.addEventListener('abort', () => {
+          reject(new Error('Login or Signup with provider aborted.'));
+        });
+      }
+      setupAuthenticationWebSocket({
+        onConnectionEstablished: connectionId => {
+          if (signal && signal.aborted) return;
+          const url = new URL(authenticationPortalUrl);
+          url.searchParams.set('connection-id', connectionId);
+          url.searchParams.set('provider', provider);
+          url.searchParams.set('env', isDev ? 'dev' : 'live');
+          authWindow = window.open(url.toString());
+        },
+        onTokenReceived: async ({
+          provider,
+          data,
+        }: {|
+          provider: 'apple' | 'google' | 'github',
+          data: any,
+        |}) => {
+          console.log(data)
+          if (signal && signal.aborted) return;
+          try {
+            const credential =
+              provider === 'google'
+                ? GoogleAuthProvider.credential(data.credential)
+                : provider === 'github'
+                ? GithubAuthProvider.credential(data.accessToken)
+                : new OAuthProvider('apple.com').credential({
+                    idToken: data.id_token,
+                    rawNonce: data.raw_nonce,
+                  });
+            await signInWithCredential(this.auth, credential);
 
-    if (!firebaseProvider)
-      throw new Error(`Unknown provider ${provider} for login.`);
-
-    try {
-      await signInWithPopup(this.auth, firebaseProvider);
-      // The user is now stored in `this.auth`.
-    } catch (error) {
-      console.error('Error while login with provider:', error);
-      throw error;
-    }
+            if (authWindow) {
+              if (authWindow.opener) authWindow.opener.focus();
+              authWindow.close();
+            }
+            resolve();
+            terminateWebSocket();
+          } catch (error) {
+            console.error(
+              'An error occurred while logging in with token:',
+              error
+            );
+            reject(new Error('An error occurred while logging in with token.'));
+          }
+        },
+        onError: error => {
+          if (signal && signal.aborted) return;
+          console.error(
+            'An error occurred while setting up authentication web socket:',
+            error
+          );
+          reject(
+            new Error(
+              'An error occurred while setting up authentication web socket.'
+            )
+          );
+        },
+        onTimeout: () => {
+          if (signal && signal.aborted) return;
+          console.error('Connection to authorization websocket timed out.');
+          reject(new Error('Connection to authorization websocket timed out.'));
+        },
+      });
+    });
+    return promise;
   }
 }
 

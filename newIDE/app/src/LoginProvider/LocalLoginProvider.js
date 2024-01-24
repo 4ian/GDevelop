@@ -65,6 +65,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
           if (signal && signal.aborted) return;
           const url = new URL(authenticationPortalUrl);
           url.searchParams.set('connection-id', connectionId);
+          url.searchParams.set('provider', provider);
           url.searchParams.set('env', isDev ? 'dev' : 'live');
           Window.openExternalURL(url.toString());
         },

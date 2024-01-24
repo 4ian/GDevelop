@@ -57,6 +57,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       // Listen for abort event on signal
       if (signal) {
         signal.addEventListener('abort', () => {
+          terminateWebSocket();
           reject(new Error('Login or Signup with provider aborted.'));
         });
       }
@@ -102,6 +103,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
         },
         onError: error => {
           if (signal && signal.aborted) return;
+          terminateWebSocket();
           console.error(
             'An error occurred while setting up authentication web socket:',
             error
@@ -114,6 +116,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
         },
         onTimeout: () => {
           if (signal && signal.aborted) return;
+          terminateWebSocket();
           console.error('Connection to authorization websocket timed out.');
           reject(new Error('Connection to authorization websocket timed out.'));
         },

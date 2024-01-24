@@ -60,6 +60,7 @@ class BrowserLoginProvider
       let authWindow;
       if (signal) {
         signal.addEventListener('abort', () => {
+          terminateWebSocket();
           reject(new Error('Login or Signup with provider aborted.'));
         });
       }
@@ -117,6 +118,7 @@ class BrowserLoginProvider
         },
         onError: error => {
           if (signal && signal.aborted) return;
+          terminateWebSocket();
           console.error(
             'An error occurred while setting up authentication web socket:',
             error
@@ -129,6 +131,7 @@ class BrowserLoginProvider
         },
         onTimeout: () => {
           if (signal && signal.aborted) return;
+          terminateWebSocket();
           console.error('Connection to authorization websocket timed out.');
           reject(new Error('Connection to authorization websocket timed out.'));
         },

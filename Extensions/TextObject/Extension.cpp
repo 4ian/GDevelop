@@ -204,6 +204,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("color", _("Third Color"))
       .AddParameter("color", _("Fourth Color"));
 
+  // Deprecated
   obj.AddAction("SetOutline",
                 _("Outline"),
                 _("Change the outline of the text. A thickness of 0 disables "
@@ -213,20 +214,63 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Effects"),
                 "res/actions/textOutline24.png",
                 "res/actions/textOutline.png")
-
+      .SetHidden()
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("color", _("Color"))
       .AddParameter("expression", _("Thickness"));
 
+  obj.AddScopedAction("SetOutlineEnabled",
+                _("Enable outline"),
+                _("Enable or disable the outline of the text."),
+                _("Enable the outline of _PARAM0_: _PARAM1_"),
+                _("Outline"),
+                "res/actions/textOutline24.png",
+                "res/actions/textOutline.png")
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("yesorno", _("Enable outline"), "", false)
+      .SetDefaultValue("true");
+
+  obj.AddScopedCondition("IsOutlineEnabled",
+                _("Outline enabled"),
+                _("Check if the text outline is enabled."),
+                _("The outline of _PARAM0_ is enabled"),
+                _("Outline"),
+                "res/actions/textOutline24.png",
+                "res/actions/textOutline.png")
+      .AddParameter("object", _("Object"), "Text");
+
+  obj.AddScopedAction("SetOutlineColor",
+                _("Outline color"),
+                _("Change the outline color of the text."),
+                _("Change the text outline color of _PARAM0_ to _PARAM1_"),
+                _("Outline"),
+                "res/actions/textOutline24.png",
+                "res/actions/textOutline.png")
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("color", _("Color"));
+
+  obj.AddExpressionAndConditionAndAction("number", "OutlineThickness",
+                _("Outline thickness"),
+                _("the outline thickness of the text"),
+                _("the text outline thickness"),
+                _("Outline"),
+                "res/actions/textOutline24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Thickness")));
+
+  // Deprecated
   obj.AddAction("SetShadow",
                 _("Text shadow"),
                 _("Change the shadow of the text."),
                 _("Change the shadow of _PARAM0_ to color _PARAM1_ distance "
                   "_PARAM2_ blur _PARAM3_ angle _PARAM4_"),
-                _("Effects/Shadow"),
+                _("Shadow"),
                 "res/actions/textShadow24.png",
                 "res/actions/textShadow.png")
-
+      .SetHidden()
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("color", _("Color"))
       .AddParameter("expression", _("Distance"))
@@ -234,15 +278,81 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Angle"));
 
   obj.AddAction("ShowShadow",
-                _("Show Shadow"),
-                _("Show the shadow of the text."),
-                _("Show the shadow of _PARAM0_: _PARAM1_"),
-                _("Effects/Shadow"),
+                _("Enable shadow"),
+                _("Enable or disable the shadow of the text."),
+                _("Enable the shadow of _PARAM0_: _PARAM1_"),
+                _("Shadow"),
                 "res/actions/textShadow24.png",
                 "res/actions/textShadow.png")
-
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Show the shadow"));
+
+  obj.AddScopedCondition("IsShadowEnabled",
+                _("Shadow enabled"),
+                _("Check if the text shadow is enabled."),
+                _("The shadow of _PARAM0_ is enabled"),
+                _("Shadow"),
+                "res/actions/textShadow24.png",
+                "res/actions/textShadow.png")
+      .AddParameter("object", _("Object"), "Text");
+
+  obj.AddScopedAction("SetShadowColor",
+                _("Shadow color"),
+                _("Change the shadow color of the text."),
+                _("Change the shadow color of _PARAM0_ to _PARAM1_"),
+                _("Shadow"),
+                "res/actions/textShadow24.png",
+                "res/actions/textShadow.png")
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("color", _("Color"));
+
+  obj.AddExpressionAndConditionAndAction("number", "ShadowOpacity",
+                _("Shadow opacity"),
+                _("the shadow opacity of the text"),
+                _("the shadow opacity "),
+                _("Shadow"),
+                "res/actions/textShadow24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0 - 255)")));
+
+  obj.AddExpressionAndConditionAndAction("number", "ShadowDistance",
+                _("Shadow distance"),
+                _("the shadow distance of the text"),
+                _("the shadow distance "),
+                _("Shadow"),
+                "res/actions/textShadow24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Distance")));
+
+  obj.AddExpressionAndConditionAndAction("number", "ShadowAngle",
+                _("Shadow angle"),
+                _("the shadow angle of the text"),
+                _("the shadow angle "),
+                _("Shadow"),
+                "res/actions/textShadow24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")));
+
+  obj.AddExpressionAndConditionAndAction("number", "ShadowBlurRadius",
+                _("Shadow blur radius"),
+                _("the shadow blur radius of the text"),
+                _("the shadow blur radius "),
+                _("Shadow"),
+                "res/actions/textShadow24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Blur radius")));
 
   // Deprecated
   obj.AddAction("Opacity",

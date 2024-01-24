@@ -70,7 +70,16 @@ class BrowserLoginProvider
           url.searchParams.set('connection-id', connectionId);
           url.searchParams.set('provider', provider);
           url.searchParams.set('env', isDev ? 'dev' : 'live');
-          authWindow = window.open(url.toString());
+          const width = 400;
+          const height = 600;
+          const left = window.screenX + window.innerWidth / 2 - width / 2;
+          const top = window.screenY + window.innerHeight / 2 - height / 2;
+
+          authWindow = window.open(
+            url.toString(),
+            null,
+            `width=${width},height=${height},left=${left},top=${top}`
+          );
         },
         onTokenReceived: async ({
           provider,
@@ -94,8 +103,6 @@ class BrowserLoginProvider
                   });
             await signInWithCredential(this.auth, credential);
             if (authWindow) {
-              // TODO: Find a way to refocus main window, through authWindow.opener for instance.
-              // It doesn't work on Chrome at the time this comment is added.
               authWindow.close();
             }
             resolve();

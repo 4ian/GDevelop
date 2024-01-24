@@ -6,9 +6,7 @@ import ReactErrorBoundary from 'react-error-boundary';
 import BugReport from '@material-ui/icons/BugReport';
 import PlaceholderMessage from './PlaceholderMessage';
 import Divider from '@material-ui/core/Divider';
-import RaisedButton from './RaisedButton';
 import { sendErrorMessage } from '../Utils/Analytics/EventSender';
-import Window from '../Utils/Window';
 import Text from './Text';
 import { Line, Spacer } from './Grid';
 import { getIDEVersion, getIDEVersionWithHash } from '../Version';
@@ -20,7 +18,6 @@ import {
 } from '../Utils/Platform';
 import { ColumnStackLayout } from './Layout';
 import AlertMessage from './AlertMessage';
-import Link from './Link';
 import BackgroundText from './BackgroundText';
 import { generateUUID } from 'three/src/math/MathUtils';
 import IconButton from './IconButton';
@@ -205,68 +202,27 @@ export const ErrorFallbackComponent = ({
           )}
         </Line>
         <Divider />
-        <ColumnStackLayout>
-          <AlertMessage kind={isCriticalError ? 'error' : 'warning'}>
-            <Trans>
-              Please <b>backup your game file</b> and save your game to ensure
-              that you don't lose anything.
-            </Trans>
-          </AlertMessage>
-          <Text>
-            <Trans>
-              To help us fix this issue, you can create a{' '}
-              <Link
-                href="https://github.com"
-                onClick={() => Window.openExternalURL('https://github.com')}
-              >
-                GitHub account
-              </Link>{' '}
-              then report the issue with the button below. (ID: {uniqueErrorId})
-            </Trans>
-          </Text>
-          {error && error.stack && (
-            <BackgroundText style={styles.errorMessage}>
-              {error.stack.slice(0, 200)}...
-            </BackgroundText>
-          )}
-          {componentStack && (
-            <BackgroundText style={styles.errorMessage}>
-              {componentStack.slice(0, 200)}...
-            </BackgroundText>
-          )}
-        </ColumnStackLayout>
-        <Line justifyContent="flex-end">
-          <RaisedButton
-            label={<Trans>Report the issue on GitHub</Trans>}
-            primary
-            onClick={() => {
-              const templateFile = '--automatic-crash.yml';
-              const title = 'Crash while using an editor';
-              const errorStack =
-                error && error.stack
-                  ? `${error.stack.slice(0, 600)}...`
-                  : 'No error found';
-              const errorStackAndId = `uniqueErrorId: ${uniqueErrorId}\n\n${errorStack}`;
-              const gdevelopVersion = getIDEVersionWithHash();
-              const platformInfo = `System Version: ${getSystemVersion()}, Arch: ${getArch()}, User Agent: ${getUserAgent()}, Platform: ${getPlatformName()}`;
-              const additionalContext = componentStack
-                ? `${componentStack.slice(0, 600)}...`
-                : 'No component stack found';
-
-              const baseUrl = new URL(
-                'https://github.com/4ian/GDevelop/issues/new'
-              );
-              baseUrl.searchParams.set('template', templateFile);
-              baseUrl.searchParams.set('title', title);
-              baseUrl.searchParams.set('labels', '💥crash');
-              baseUrl.searchParams.set('gdevelop_version', gdevelopVersion);
-              baseUrl.searchParams.set('platform_info', platformInfo);
-              baseUrl.searchParams.set('error_stack', errorStackAndId);
-              baseUrl.searchParams.set('component_stack', additionalContext);
-
-              Window.openExternalURL(baseUrl.href);
-            }}
-          />
+        <Line>
+          <ColumnStackLayout>
+            <AlertMessage kind={isCriticalError ? 'error' : 'warning'}>
+              <Trans>
+                Please <b>backup your game file</b> and save your game to ensure
+                that you don't lose anything. You can try to reload this panel
+                or restart GDevelop.
+              </Trans>
+            </AlertMessage>
+            <BackgroundText>Error ID: {uniqueErrorId}</BackgroundText>
+            {error && error.stack && (
+              <BackgroundText style={styles.errorMessage}>
+                {error.stack.slice(0, 200)}...
+              </BackgroundText>
+            )}
+            {componentStack && (
+              <BackgroundText style={styles.errorMessage}>
+                {componentStack.slice(0, 200)}...
+              </BackgroundText>
+            )}
+          </ColumnStackLayout>
         </Line>
       </ColumnStackLayout>
     </PlaceholderMessage>

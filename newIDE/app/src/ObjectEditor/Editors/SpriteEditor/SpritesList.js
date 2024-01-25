@@ -628,6 +628,8 @@ const SpritesList = ({
             onClick={() => {
               onAddSprite(resourceSources[0]);
             }}
+            // The event-based object editor gives an empty list.
+            disabled={resourceSources.length === 0}
             label={<Trans>Add a sprite</Trans>}
             icon={<Add />}
             primary

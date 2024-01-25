@@ -446,7 +446,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
     const renderGroupMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) =>
         item.isRoot || item.isPlaceholder
-          ? null
+          ? []
           : [
               {
                 label: i18n._(t`Duplicate`),

@@ -39,7 +39,7 @@ import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { PrivateAssetPackTile, PromoBundleAssetPackCard } from '../ShopTiles';
+import { PrivateAssetPackTile, PromoBundleCard } from '../ShopTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
@@ -206,8 +206,8 @@ const PrivateAssetPackInformationPage = ({
       const allTiles = ownedBundlesContainingPack
         .map(bundleContainingPack => {
           return (
-            <PromoBundleAssetPackCard
-              assetPackListingData={bundleContainingPack}
+            <PromoBundleCard
+              productListingData={bundleContainingPack}
               onSelect={() => onAssetPackOpen(bundleContainingPack)}
               owned
               key={bundleContainingPack.id}
@@ -217,8 +217,8 @@ const PrivateAssetPackInformationPage = ({
         .concat(
           notOwnedBundlesContainingPack.map(bundleContainingPack => {
             return (
-              <PromoBundleAssetPackCard
-                assetPackListingData={bundleContainingPack}
+              <PromoBundleCard
+                productListingData={bundleContainingPack}
                 onSelect={() => onAssetPackOpen(bundleContainingPack)}
                 owned={false}
                 key={bundleContainingPack.id}

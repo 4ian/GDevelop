@@ -15,7 +15,7 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, Line } from '../../UI/Grid';
+import { Column, LargeSpacer, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -43,8 +43,9 @@ import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import Chip from '../../UI/Chip';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
-import { PrivateGameTemplateTile } from '../ShopTiles';
+import { PrivateGameTemplateTile, PromoBundleCard } from '../ShopTiles';
 import { GridList } from '@material-ui/core';
+import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
 
 const cellSpacing = 8;
 
@@ -118,6 +119,9 @@ const PrivateGameTemplateInformationPage = ({
   simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateGameTemplateListingData;
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
+  );
   const { receivedGameTemplates, authenticated } = React.useContext(
     AuthenticatedUserContext
   );
@@ -145,6 +149,111 @@ const PrivateGameTemplateInformationPage = ({
     !!receivedGameTemplates.find(
       gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
     );
+
+  const templatesIncludedInBundleTiles = React.useMemo(
+    () => {
+      if (!gameTemplate || !privateGameTemplateListingDatas) return null;
+
+      const includedTemplateIds =
+        privateGameTemplateListingData.includedListableProductIds;
+      if (!includedTemplateIds) return null;
+
+      return includedTemplateIds.map(includedTemplateId => {
+        const includedGameTemplateListingData = privateGameTemplateListingDatas.find(
+          privatePackListingData =>
+            privatePackListingData.id === includedTemplateId
+        );
+        if (!includedGameTemplateListingData) {
+          console.warn(`Included template ${includedTemplateId} not found`);
+          return null;
+        }
+
+        const isPackOwned =
+          !!receivedGameTemplates &&
+          !!receivedGameTemplates.find(
+            pack => pack.id === includedGameTemplateListingData.id
+          );
+        return (
+          <PrivateGameTemplateTile
+            privateGameTemplateListingData={includedGameTemplateListingData}
+            key={includedGameTemplateListingData.id}
+            onSelect={() => onGameTemplateOpen(includedGameTemplateListingData)}
+            owned={isPackOwned}
+          />
+        );
+      });
+    },
+    [
+      gameTemplate,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+      onGameTemplateOpen,
+      privateGameTemplateListingData,
+    ]
+  );
+
+  const bundlesContainingPackTiles = React.useMemo(
+    () => {
+      if (!gameTemplate || !privateGameTemplateListingDatas) return null;
+
+      const bundlesContainingPack = privateGameTemplateListingDatas.filter(
+        privatePackListingData =>
+          privatePackListingData.includedListableProductIds &&
+          privatePackListingData.includedListableProductIds.includes(
+            gameTemplate.id
+          )
+      );
+
+      if (!bundlesContainingPack.length) return null;
+
+      const ownedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !!receivedGameTemplates &&
+          !!receivedGameTemplates.find(
+            pack => pack.id === bundleContainingPack.id
+          )
+      );
+      const notOwnedBundlesContainingPack = bundlesContainingPack.filter(
+        bundleContainingPack =>
+          !ownedBundlesContainingPack.find(
+            ownedBundleContainingPack =>
+              ownedBundleContainingPack.id === bundleContainingPack.id
+          )
+      );
+
+      const allTiles = ownedBundlesContainingPack
+        .map(bundleContainingPack => {
+          return (
+            <PromoBundleCard
+              productListingData={bundleContainingPack}
+              onSelect={() => onGameTemplateOpen(bundleContainingPack)}
+              owned
+              key={bundleContainingPack.id}
+            />
+          );
+        })
+        .concat(
+          notOwnedBundlesContainingPack.map(bundleContainingPack => {
+            return (
+              <PromoBundleCard
+                productListingData={bundleContainingPack}
+                onSelect={() => onGameTemplateOpen(bundleContainingPack)}
+                owned={false}
+                key={bundleContainingPack.id}
+              />
+            );
+          })
+        );
+
+      return allTiles;
+    },
+    [
+      gameTemplate,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+      onGameTemplateOpen,
+    ]
+  );
 
   const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
     () => {
@@ -254,6 +363,13 @@ const PrivateGameTemplateInformationPage = ({
 
   const getBuyButton = i18n => {
     if (errorText) return null;
+    if (
+      isAlreadyReceived &&
+      privateGameTemplateListingData.includedListableProductIds
+    ) {
+      // Template is a bundle and is owned, no button to display.
+      return null;
+    }
 
     const label = !gameTemplate ? (
       <Trans>Loading...</Trans>
@@ -409,21 +525,22 @@ const PrivateGameTemplateInformationPage = ({
                             allowParagraphs
                           />
                         </Text>
-                        {!isAlreadyReceived && (
-                          <Line expand>
-                            <Column noMargin expand>
-                              <FlatButton
-                                primary
-                                label={<Trans>Try it online</Trans>}
-                                onClick={() =>
-                                  Window.openExternalURL(
-                                    gameTemplate.gamePreviewLink
-                                  )
-                                }
-                              />
-                            </Column>
-                          </Line>
-                        )}
+                        {!isAlreadyReceived &&
+                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles cannot be tested.
+                            <Line expand>
+                              <Column noMargin expand>
+                                <FlatButton
+                                  primary
+                                  label={<Trans>Try it online</Trans>}
+                                  onClick={() =>
+                                    Window.openExternalURL(
+                                      gameTemplate.gamePreviewLink
+                                    )
+                                  }
+                                />
+                              </Column>
+                            </Line>
+                          )}
                         <ResponsiveLineStackLayout noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
@@ -508,6 +625,35 @@ const PrivateGameTemplateInformationPage = ({
                     </Paper>
                   </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
+                {bundlesContainingPackTiles &&
+                bundlesContainingPackTiles.length ? (
+                  <>
+                    <ColumnStackLayout noMargin>
+                      <LargeSpacer />
+                      {bundlesContainingPackTiles}
+                      <LargeSpacer />
+                    </ColumnStackLayout>
+                  </>
+                ) : null}
+                {templatesIncludedInBundleTiles && (
+                  <>
+                    <Line>
+                      <Text size="block-title">
+                        <Trans>Included in this bundle</Trans>
+                      </Text>
+                    </Line>
+                    <Line>
+                      <GridList
+                        cols={getTemplateColumns(windowWidth)}
+                        cellHeight="auto"
+                        spacing={cellSpacing / 2}
+                        style={styles.grid}
+                      >
+                        {templatesIncludedInBundleTiles}
+                      </GridList>
+                    </Line>
+                  </>
+                )}
                 {otherTemplatesFromTheSameAuthorTiles &&
                   otherTemplatesFromTheSameAuthorTiles.length > 0 && (
                     <>

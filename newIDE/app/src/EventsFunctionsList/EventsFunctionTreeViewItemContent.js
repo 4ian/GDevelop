@@ -235,7 +235,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       {
         label: i18n._(t`Rename`),
         click: () => this.edit(),
-        enabled: this.canBeRenamed(this.eventsFunction),
+        enabled: this.canBeRenamed(),
         accelerator: 'F2',
       },
       {

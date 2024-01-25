@@ -75,14 +75,15 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     }
 
     SerializerElement assetElement;
-    std::map<gd::String, gd::String> resourcesFileNameMap;
+    std::map<gd::String, std::vector<gd::String>> resourcesFileNameMap;
     ObjectAssetSerializer::SerializeTo(project, object, "My Object",
                                        assetElement, resourcesFileNameMap);
 
     // This mapping is used to copy resource files.
     REQUIRE(resourcesFileNameMap.find("assets/Idle.png") !=
             resourcesFileNameMap.end());
-    REQUIRE(resourcesFileNameMap["assets/Idle.png"] == "Idle.png");
+    REQUIRE(resourcesFileNameMap["assets/Idle.png"].size() == 1);
+    REQUIRE(resourcesFileNameMap["assets/Idle.png"][0] == "Idle.png");
 
     // Check that the project is left untouched.
     REQUIRE(resourceManager.HasResource("assets/Idle.png"));

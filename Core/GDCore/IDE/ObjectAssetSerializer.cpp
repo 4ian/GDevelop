@@ -207,8 +207,8 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
         const gd::String &destinationFile = it->second;
 
         std::vector<gd::String> value;
-        for (auto &&destinationFile : normalizedFileNames[destinationFile]) {
-          value.push_back(destinationFile);
+        for (auto &&normalizedFileName : normalizedFileNames[destinationFile]) {
+          value.push_back(normalizedFileName);
         }
         resourcesFileNameMap[originFile] = value;
       }
@@ -225,6 +225,20 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
           resourcesNameReverseMap[normalizedFileName] =
               oldResourceName;
         }
+      }
+    }
+  }
+  else {
+    for (std::map<gd::String, gd::String>::const_iterator it =
+             cleanedResourcesFileNameMap.begin();
+         it != cleanedResourcesFileNameMap.end(); ++it) {
+      if (!it->first.empty()) {
+        const gd::String &originFile = it->first;
+        const gd::String &destinationFile = it->second;
+
+        std::vector<gd::String> value;
+        value.push_back(destinationFile);
+        resourcesFileNameMap[originFile] = value;
       }
     }
   }

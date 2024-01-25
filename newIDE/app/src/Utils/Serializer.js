@@ -28,16 +28,22 @@ export function serializeToObjectAsset(
   project: gdProject,
   object: gdObject,
   objectFullName: string,
-  resourcesFileNameMap: gdMapStringString
+  resourcesFileNameMap: Map<string, Array<string>>
 ) {
+  const coreResourcesFileNameMap = new gd.MapStringVectorString();
   const serializedElement = new gd.SerializerElement();
   gd.ObjectAssetSerializer.serializeTo(
     project,
     object,
     objectFullName,
     serializedElement,
-    resourcesFileNameMap
+    coreResourcesFileNameMap
   );
+  for (const oldFileName of coreResourcesFileNameMap.keys().toJSArray()) {
+    const newFileNames = coreResourcesFileNameMap.get(oldFileName).toJSArray();
+    resourcesFileNameMap.set(oldFileName, newFileNames);
+  }
+  coreResourcesFileNameMap.delete();
 
   // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
   const objectAsset = JSON.parse(gd.Serializer.toJSON(serializedElement));

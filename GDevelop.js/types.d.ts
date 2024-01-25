@@ -99,6 +99,13 @@ export class MapStringString extends EmscriptenObject {
   keys(): VectorString;
 }
 
+export class MapStringVectorString extends EmscriptenObject {
+  constructor(): void;
+  get(name: string): VectorString;
+  has(name: string): boolean;
+  keys(): VectorString;
+}
+
 export class MapStringBoolean extends EmscriptenObject {
   constructor(): void;
   get(name: string): boolean;
@@ -1127,7 +1134,7 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringVectorString): void;
 }
 
 export class InstructionsList extends EmscriptenObject {

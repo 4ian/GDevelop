@@ -5,6 +5,8 @@
  */
 #include "ObjectAssetSerializer.h"
 
+#include <algorithm>
+
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -37,7 +39,7 @@ ObjectAssetSerializer::GetObjectExtensionName(const gd::Object &object) {
 void ObjectAssetSerializer::SerializeTo(
     gd::Project &project, const gd::Object &object,
     const gd::String &objectFullName, SerializerElement &element,
-    std::map<gd::String, gd::String> &resourcesFileNameMap) {
+    std::map<gd::String, std::vector<gd::String>> &resourcesFileNameMap) {
   auto cleanObject = object.Clone();
   cleanObject->GetVariables().Clear();
   cleanObject->GetEffects().Clear();
@@ -100,11 +102,7 @@ void ObjectAssetSerializer::SerializeTo(
     resourceElement.SetAttribute("kind", resource.GetKind());
     resourceElement.SetAttribute("name", newResourceName);
     auto &oldFilePath = resource.GetFile();
-    resourceElement.SetAttribute("file",
-                                 resourcesFileNameMap.find(oldFilePath) !=
-                                         resourcesFileNameMap.end()
-                                     ? resourcesFileNameMap[oldFilePath]
-                                     : oldFilePath);
+    resourceElement.SetAttribute("file", newResourceName);
   }
 
   SerializerElement &requiredExtensionsElement =
@@ -126,10 +124,11 @@ void ObjectAssetSerializer::SerializeTo(
 void ObjectAssetSerializer::RenameObjectResourceFiles(
     gd::Project &project, gd::Object &object,
     const gd::String &destinationDirectory, const gd::String &objectFullName,
-    std::map<gd::String, gd::String> &resourcesFileNameMap,
+    std::map<gd::String, std::vector<gd::String>> &resourcesFileNameMap,
     std::map<gd::String, gd::String> &resourcesNameReverseMap) {
+  std::map<gd::String, gd::String> cleanedResourcesFileNameMap;
   gd::AssetResourcePathCleaner assetResourcePathCleaner(
-      project.GetResourcesManager(), resourcesFileNameMap,
+      project.GetResourcesManager(), cleanedResourcesFileNameMap,
       resourcesNameReverseMap);
   object.GetConfiguration().ExposeResources(assetResourcePathCleaner);
 
@@ -137,7 +136,9 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
   if (object.GetConfiguration().GetType() == "Sprite") {
     gd::SpriteObject &spriteConfiguration =
         dynamic_cast<gd::SpriteObject &>(object.GetConfiguration());
-    std::map<gd::String, gd::String> normalizedFileNames;
+    /// Resource files may be duplicated because the files names allow the
+    /// asset store script to rebuild the animations.
+    std::map<gd::String, std::vector<gd::String>> normalizedFileNames;
 
     for (std::size_t animationIndex = 0;
          animationIndex < spriteConfiguration.GetAnimationsCount();
@@ -169,10 +170,9 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
         auto &frame = direction.GetSprite(frameIndex);
         auto oldName = frame.GetImageName();
 
-        if (normalizedFileNames.find(oldName) != normalizedFileNames.end()) {
-          gd::LogWarning("The resource \"" + oldName +
-                         "\" is shared by several animations.");
-          continue;
+        if (normalizedFileNames.find(oldName) == normalizedFileNames.end()) {
+          std::vector<gd::String> value;
+          normalizedFileNames[oldName] = value;
         }
 
         gd::String newName = objectFullName;
@@ -193,16 +193,24 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
         newName += extension;
 
         frame.SetImageName(newName);
-        normalizedFileNames[oldName] = newName;
+        auto &newNames = normalizedFileNames[oldName];
+        if (find(newNames.begin(), newNames.end(), newName) == newNames.end()) {
+          newNames.push_back(newName);
+        }
       }
     }
     for (std::map<gd::String, gd::String>::const_iterator it =
-             resourcesFileNameMap.begin();
-         it != resourcesFileNameMap.end(); ++it) {
+             cleanedResourcesFileNameMap.begin();
+         it != cleanedResourcesFileNameMap.end(); ++it) {
       if (!it->first.empty()) {
-        gd::String originFile = it->first;
-        gd::String destinationFile = it->second;
-        resourcesFileNameMap[originFile] = normalizedFileNames[destinationFile];
+        const gd::String &originFile = it->first;
+        const gd::String &destinationFile = it->second;
+
+        std::vector<gd::String> value;
+        for (auto &&destinationFile : normalizedFileNames[destinationFile]) {
+          value.push_back(destinationFile);
+        }
+        resourcesFileNameMap[originFile] = value;
       }
     }
     auto clonedResourcesNameReverseMap = resourcesNameReverseMap;
@@ -211,10 +219,12 @@ void ObjectAssetSerializer::RenameObjectResourceFiles(
              clonedResourcesNameReverseMap.begin();
          it != clonedResourcesNameReverseMap.end(); ++it) {
       if (!it->first.empty()) {
-        gd::String newResourceName = it->first;
-        gd::String oldResourceName = it->second;
-        resourcesNameReverseMap[normalizedFileNames[newResourceName]] =
-            oldResourceName;
+        const gd::String& newResourceName = it->first;
+        const gd::String& oldResourceName = it->second;
+        for (auto&& normalizedFileName : normalizedFileNames[newResourceName]) {
+          resourcesNameReverseMap[normalizedFileName] =
+              oldResourceName;
+        }
       }
     }
   }

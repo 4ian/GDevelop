@@ -239,11 +239,31 @@ const uncapitalize = str => {
 };
 
 /**
+ * Return true when the property exists and should be displayed.
+ *
+ * @param properties The properties
+ * @param name The property name
+ * @param deprecated `true` when only deprecated properties must be displayed
+ * and `false` when only not deprecated ones must be displayed
+ */
+const hasVisibleProperty = (
+  properties: gdMapStringPropertyDescriptor,
+  name: string,
+  deprecated: boolean
+): boolean => {
+  if (!properties.has(name)) {
+    return false;
+  }
+  const property = properties.get(name);
+  return !property.isHidden() && property.isDeprecated() === deprecated;
+};
+
+/**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
  *
- * @param {gdMapStringPropertyDescriptor} properties The properties to use
- * @param {*} getProperties The function called to read again the properties
- * @param {*} onUpdateProperty The function called to update a property of an object
+ * @param properties The properties to use
+ * @param getProperties The function called to read again the properties
+ * @param onUpdateProperty The function called to update a property of an object
  */
 const propertiesMapToSchema = (
   properties: gdMapStringPropertyDescriptor,
@@ -288,7 +308,7 @@ const propertiesMapToSchema = (
             name.replace(keyword, otherKeyword)
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (properties.has(rowPropertyName)) {
+            if (hasVisibleProperty(properties, rowPropertyName, deprecated)) {
               rowPropertyNames.push(rowPropertyName);
             }
           }
@@ -299,7 +319,7 @@ const propertiesMapToSchema = (
             name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (properties.has(rowPropertyName)) {
+            if (hasVisibleProperty(properties, rowPropertyName, deprecated)) {
               rowPropertyNames.push(rowPropertyName);
             }
           }

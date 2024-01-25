@@ -51,7 +51,6 @@ export const Default = () => (
           eventsFunction.setName(newName);
           cb(true);
         }}
-        canRename={() => true}
         forceUpdateEditor={action('force editor update')}
       />
     </FixedHeightFlexContainer>

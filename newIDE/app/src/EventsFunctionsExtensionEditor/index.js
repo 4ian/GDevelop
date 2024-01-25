@@ -1289,11 +1289,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   )
                 }
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
-                canRename={(eventsFunction: gdEventsFunction) => {
-                  return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
-                    eventsFunction.getName()
-                  );
-                }}
                 onRenameEventsFunction={this._makeRenameFreeEventsFunction(
                   i18n
                 )}

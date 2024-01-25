@@ -672,7 +672,9 @@ export default function SpriteEditor({
     <I18n>
       {({ i18n }) => (
         <>
-          {spriteConfiguration.getAnimationsCount() === 0 ? (
+          {spriteConfiguration.getAnimationsCount() === 0 &&
+          // The event-based object editor gives an empty list.
+          imageResourceExternalEditors.length > 0 ? (
             <Column noMargin expand justifyContent="center">
               <EmptyPlaceholder
                 title={<Trans>Add your first animation</Trans>}
@@ -691,16 +693,9 @@ export default function SpriteEditor({
                 onAction={() => {
                   importImages();
                 }}
-                onSecondaryAction={
-                  imageResourceExternalEditors.length
-                    ? () => {
-                        createAnimationWith(
-                          i18n,
-                          imageResourceExternalEditors[0]
-                        );
-                      }
-                    : undefined
-                }
+                onSecondaryAction={() => {
+                  createAnimationWith(i18n, imageResourceExternalEditors[0]);
+                }}
               />
             </Column>
           ) : (

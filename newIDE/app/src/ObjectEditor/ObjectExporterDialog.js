@@ -171,8 +171,10 @@ const zipAssets = async (
             continue;
           }
           const resourceFiles = resourceFileRenamingMap.get(resource.getFile());
-          for (const resourceFile of resourceFiles) {
-            blobFiles.push({ filePath: resourceFile, blob });
+          if (resourceFiles) {
+            for (const resourceFile of resourceFiles) {
+              blobFiles.push({ filePath: resourceFile, blob });
+            }
           }
         }
 

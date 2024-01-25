@@ -176,7 +176,7 @@ export default function SpriteEditor({
     },
     [justAddedAnimationName]
   );
-  const { showConfirmation } = useAlertDialog();
+  const { showDeleteConfirmation } = useAlertDialog();
 
   const draggedAnimationIndex = React.useRef<number | null>(null);
 
@@ -377,7 +377,7 @@ export default function SpriteEditor({
       const message = shouldWarnBecauseLosingCustomCollisionMask
         ? t`Are you sure you want to remove this animation? You will lose the custom collision mask you have set for this object.`
         : t`Are you sure you want to remove this animation?`;
-      const deleteAnswer = await showConfirmation({
+      const deleteAnswer = await showDeleteConfirmation({
         title: t`Remove the animation`,
         message,
         confirmButtonLabel: t`Remove`,
@@ -409,7 +409,7 @@ export default function SpriteEditor({
       forceUpdate,
       onObjectUpdated,
       onSizeUpdated,
-      showConfirmation,
+      showDeleteConfirmation,
       spriteConfiguration,
       onCreateMatchingSpriteCollisionMask,
     ]

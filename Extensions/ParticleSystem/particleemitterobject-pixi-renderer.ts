@@ -18,66 +18,47 @@ namespace gdjs {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
     started: boolean = false;
-    private _particleTexture: PIXI.Texture;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       runtimeObject: gdjs.RuntimeObject,
       objectData: any
     ) {
-      const graphics = new PIXI.Graphics();
-      graphics.lineStyle(0, 0, 0);
-      graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 1);
-      if (objectData.rendererType === 'Point') {
-        graphics.drawCircle(0, 0, objectData.rendererParam1);
-      } else if (objectData.rendererType === 'Line') {
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-
-        // Draw an almost-invisible rectangle in the left hand to force PIXI to take a full texture with our line at the right hand
-        graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 0.001);
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-      } else if (objectData.textureParticleName) {
-        const sprite = new PIXI.Sprite(
-          (instanceContainer
-            .getGame()
-            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-            objectData.textureParticleName
-          )
-        );
-        sprite.width = objectData.rendererParam1;
-        sprite.height = objectData.rendererParam2;
-        graphics.addChild(sprite);
-      } else {
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-      }
-      graphics.endFill();
-
-      // Render the texture from graphics using the PIXI Renderer.
-      // TODO: could be optimized by generating the texture only once per object type,
-      // instead of at each object creation.
       const pixiRenderer = instanceContainer
         .getGame()
         .getRenderer()
         .getPIXIRenderer();
-      this._particleTexture = pixiRenderer
-        ? pixiRenderer.generateTexture(graphics)
-        : PIXI.Texture.WHITE;
-      graphics.destroy();
+      const imageManager = instanceContainer
+        .getGame()
+        .getImageManager() as gdjs.PixiImageManager;
+      let particleTexture: PIXI.Texture = PIXI.Texture.WHITE;
+      if (pixiRenderer) {
+        if (objectData.rendererType === 'Point') {
+          particleTexture = imageManager.getOrCreateDiskTexture(
+            objectData.rendererParam1,
+            pixiRenderer
+          );
+        } else if (objectData.rendererType === 'Line') {
+          particleTexture = imageManager.getOrCreateRectangleTexture(
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        } else if (objectData.textureParticleName) {
+          particleTexture = imageManager.getOrCreateScaledTexture(
+            objectData.textureParticleName,
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        } else {
+          particleTexture = imageManager.getOrCreateRectangleTexture(
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        }
+      }
 
       const configuration = {
         ease: undefined,
@@ -200,7 +181,7 @@ namespace gdjs {
           {
             type: 'textureSingle',
             config: {
-              texture: this._particleTexture,
+              texture: particleTexture,
             },
           },
           {
@@ -432,7 +413,6 @@ namespace gdjs {
 
     destroy(): void {
       this.emitter.destroy();
-      this._particleTexture.destroy();
     }
 
     hasStarted(): boolean {

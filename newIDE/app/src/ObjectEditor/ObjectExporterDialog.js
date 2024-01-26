@@ -156,7 +156,7 @@ const zipAssets = async (
         /**
          * The map from project resource file paths to asset resource file paths.
          */
-        const resourceFileRenamingMap = new gd.MapStringString();
+        const resourceFileRenamingMap = new Map<string, Array<string>>();
         const serializedObject = serializeToObjectAsset(
           project,
           object,
@@ -170,10 +170,13 @@ const zipAssets = async (
           if (!resourceFileRenamingMap.has(resource.getFile())) {
             continue;
           }
-          const resourceFile = resourceFileRenamingMap.get(resource.getFile());
-          blobFiles.push({ filePath: resourceFile, blob });
+          const resourceFiles = resourceFileRenamingMap.get(resource.getFile());
+          if (resourceFiles) {
+            for (const resourceFile of resourceFiles) {
+              blobFiles.push({ filePath: resourceFile, blob });
+            }
+          }
         }
-        resourceFileRenamingMap.delete();
 
         textFiles.push({
           text: JSON.stringify(serializedObject, null, 2),

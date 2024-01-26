@@ -63,6 +63,14 @@ interface MapStringString {
     [Value] VectorString MAP_keys();
 };
 
+interface MapStringVectorString {
+    void MapStringVectorString();
+
+    [Const, Ref] VectorString MAP_get([Const] DOMString name);
+    boolean MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
 interface MapStringBoolean {
     void MapStringBoolean();
 
@@ -1314,7 +1322,7 @@ interface Serializer {
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,
-        [Ref] MapStringString resourcesNewFileNames);
+        [Ref] MapStringVectorString resourcesNewFileNames);
 };
 
 interface InstructionsList {

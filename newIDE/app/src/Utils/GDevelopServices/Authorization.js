@@ -1,8 +1,6 @@
 // @flow
 import { GDevelopAuthorizationWebSocketApi } from './ApiConfigs';
 
-export const FEATURE_FLAG_SSO_LOGIN = false;
-
 let webSocket: ?WebSocket;
 
 export const setupAuthenticationWebSocket = ({

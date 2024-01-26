@@ -19,12 +19,8 @@ import FlatButton from '../UI/FlatButton';
 import Google from '../UI/CustomSvgIcons/Google';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
-import { FEATURE_FLAG_SSO_LOGIN } from '../Utils/GDevelopServices/Authorization';
-import Window from '../Utils/Window';
 import AlertMessage from '../UI/AlertMessage';
 import { accountsAlreadyExistsWithDifferentProviderCopy } from './LoginForm';
-
-const isDev = Window.isDev();
 
 const styles = {
   identityProvidersBlock: {
@@ -131,49 +127,47 @@ const CreateAccountForm = ({
             }}
             disabled={createAccountInProgress}
           />
-          {(isDev || FEATURE_FLAG_SSO_LOGIN) && (
-            <div style={styles.identityProvidersBlock}>
-              <Line noMargin justifyContent="center">
-                <Text size="body2" noMargin>
-                  <Trans>Or continue with</Trans>
-                </Text>
-              </Line>
-              <Line>
-                <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-                  <FlatButton
-                    primary
-                    fullWidth
-                    label="Google"
-                    leftIcon={<Google />}
-                    onClick={() => {
-                      onLoginWithProvider('google');
-                    }}
-                    disabled={createAccountInProgress}
-                  />
-                  <FlatButton
-                    primary
-                    fullWidth
-                    label="GitHub"
-                    leftIcon={<GitHub />}
-                    onClick={() => {
-                      onLoginWithProvider('github');
-                    }}
-                    disabled={createAccountInProgress}
-                  />
-                  <FlatButton
-                    primary
-                    fullWidth
-                    label="Apple"
-                    leftIcon={<Apple />}
-                    onClick={() => {
-                      onLoginWithProvider('apple');
-                    }}
-                    disabled={createAccountInProgress}
-                  />
-                </ResponsiveLineStackLayout>
-              </Line>
-            </div>
-          )}
+          <div style={styles.identityProvidersBlock}>
+            <Line noMargin justifyContent="center">
+              <Text size="body2" noMargin>
+                <Trans>Or continue with</Trans>
+              </Text>
+            </Line>
+            <Line>
+              <ResponsiveLineStackLayout expand noColumnMargin noMargin>
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="Google"
+                  leftIcon={<Google />}
+                  onClick={() => {
+                    onLoginWithProvider('google');
+                  }}
+                  disabled={createAccountInProgress}
+                />
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="GitHub"
+                  leftIcon={<GitHub />}
+                  onClick={() => {
+                    onLoginWithProvider('github');
+                  }}
+                  disabled={createAccountInProgress}
+                />
+                <FlatButton
+                  primary
+                  fullWidth
+                  label="Apple"
+                  leftIcon={<Apple />}
+                  onClick={() => {
+                    onLoginWithProvider('apple');
+                  }}
+                  disabled={createAccountInProgress}
+                />
+              </ResponsiveLineStackLayout>
+            </Line>
+          </div>
         </ColumnStackLayout>
       </Form>
     </Column>

@@ -57,7 +57,7 @@ const useSubscriptionPlans = ({ includeLegacy }: Props) => {
     async () => {
       const results = await Promise.all([
         listSubscriptionPlans({ includeLegacy }),
-        listSubscriptionPlanPricingSystems(),
+        listSubscriptionPlanPricingSystems({ includeLegacy }),
       ]);
       setSubscriptionPlansWithPrices(
         mergeSubscriptionPlansWithPrices(results[0], results[1])

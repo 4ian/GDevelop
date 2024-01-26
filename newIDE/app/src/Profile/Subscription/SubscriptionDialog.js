@@ -100,6 +100,7 @@ type Props = {|
   onClose: Function,
   analyticsMetadata: SubscriptionAnalyticsMetadata,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  userLegacySubscriptionPlanWithPricingSystem: ?SubscriptionPlanWithPricingSystems,
   filter: ?SubscriptionType,
 |};
 
@@ -108,6 +109,7 @@ export default function SubscriptionDialog({
   onClose,
   analyticsMetadata,
   subscriptionPlansWithPricingSystems,
+  userLegacySubscriptionPlanWithPricingSystem,
   filter,
 }: Props) {
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
@@ -350,7 +352,11 @@ export default function SubscriptionDialog({
                     </Trans>
                   </AlertMessage>
                 )}
-                {subscriptionPlansWithPricingSystems
+                {[
+                  userLegacySubscriptionPlanWithPricingSystem,
+                  ...subscriptionPlansWithPricingSystems,
+                ]
+                  .filter(Boolean)
                   .filter(plan => {
                     if (filter === 'individual') {
                       return [

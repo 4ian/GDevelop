@@ -18,13 +18,13 @@ namespace gdjs {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
     started: boolean = false;
+    private _particleTexture: PIXI.Texture;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       runtimeObject: gdjs.RuntimeObject,
       objectData: any
     ) {
-      let texture = null;
       const graphics = new PIXI.Graphics();
       graphics.lineStyle(0, 0, 0);
       graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 1);
@@ -74,8 +74,10 @@ namespace gdjs {
         .getGame()
         .getRenderer()
         .getPIXIRenderer();
-      //@ts-expect-error Pixi has wrong type definitions for this method
-      texture = pixiRenderer.generateTexture(graphics);
+      this._particleTexture = pixiRenderer
+        ? pixiRenderer.generateTexture(graphics)
+        : PIXI.Texture.WHITE;
+      graphics.destroy();
 
       const configuration = {
         ease: undefined,
@@ -198,7 +200,7 @@ namespace gdjs {
           {
             type: 'textureSingle',
             config: {
-              texture: texture,
+              texture: this._particleTexture,
             },
           },
           {
@@ -430,6 +432,7 @@ namespace gdjs {
 
     destroy(): void {
       this.emitter.destroy();
+      this._particleTexture.destroy();
     }
 
     hasStarted(): boolean {

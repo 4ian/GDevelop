@@ -54,40 +54,42 @@ type PrivateGameTemplateStoreState = {|
   },
 |};
 
+export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState = {
+  gameTemplateFilters: null,
+  fetchGameTemplates: () => {},
+  privateGameTemplateListingDatas: null,
+  error: null,
+  shop: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+    setInitialGameTemplateUserFriendlySlug: (
+      initialGameTemplateUserFriendlySlug: string
+    ) => {},
+  },
+  exampleStore: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  },
+};
+
 export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
-  {
-    gameTemplateFilters: null,
-    fetchGameTemplates: () => {},
-    privateGameTemplateListingDatas: null,
-    error: null,
-    shop: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-      setInitialGameTemplateUserFriendlySlug: (
-        initialGameTemplateUserFriendlySlug: string
-      ) => {},
-    },
-    exampleStore: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-    },
-  }
+  initialPrivateGameTemplateStoreState
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|

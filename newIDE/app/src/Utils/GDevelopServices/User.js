@@ -311,12 +311,12 @@ export const getUserPublicProfilesByIds = async (
   return response.data;
 };
 
-export const getUserPublicProfile = (
+export const getUserPublicProfile = async (
   id: string
 ): Promise<UserPublicProfile> => {
-  return apiClient
-    .get(`/user-public-profile/${id}`)
-    .then(response => response.data);
+  const response = await apiClient.get(`/user-public-profile/${id}`);
+
+  return response.data;
 };
 
 export const getUsernameAvailability = async (

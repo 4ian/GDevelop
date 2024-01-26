@@ -434,7 +434,7 @@ const PrivateGameTemplateInformationPage = ({
                           />
                         </Text>
                         {!isAlreadyReceived &&
-                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles cannot be tested.
+                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
                             <Line expand>
                               <Column noMargin expand>
                                 <FlatButton

@@ -54,6 +54,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
   authentication: Authentication,
@@ -771,6 +772,12 @@ export default class AuthenticatedUserProvider extends React.Component<
       this.openCreateAccountDialog(false);
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
+      showErrorBox({
+        rawError: apiCallError,
+        errorId: 'login-with-provider',
+        doNotReport: true,
+        message: `An error occurred while logging in with provider ${provider}. Please check your internet connection or try again later.`,
+      });
       this.setState({
         apiCallError,
         authenticatedUser: {

@@ -74,8 +74,7 @@ class BrowserLoginProvider
         `width=${width},height=${height},left=${left},top=${top}`
       );
       authWindow.document.write(
-        // TODO: Adapt style to authentication portal background and font.
-        '<div style="height: 100vh; display: flex; justify-content: center; align-items: center;">Loading</div>'
+        `<style>body { margin: 0; }</style><div style="height: 100vh; display: flex; justify-content: center; align-items: center; color: #F5F5F7; background-color: #25252E; font-family: 'Verdana', 'Fira Sans', 'Open Sans', 'Lucida Sans'; font-size: 20px">Loading</div>`
       );
       setupAuthenticationWebSocket({
         onConnectionEstablished: connectionId => {

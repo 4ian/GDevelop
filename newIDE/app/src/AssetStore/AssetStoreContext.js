@@ -96,7 +96,7 @@ type AssetStoreState = {|
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
-export const AssetStoreContext = React.createContext<AssetStoreState>({
+export const initialAssetStoreState: AssetStoreState = {
   filters: null,
   publicAssetPacks: null,
   privateAssetPackListingDatas: null,
@@ -157,7 +157,11 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
-});
+};
+
+export const AssetStoreContext = React.createContext<AssetStoreState>(
+  initialAssetStoreState
+);
 
 type AssetStoreStateProviderProps = {|
   onlyAppStorePrivateAssetPacks?: ?boolean,

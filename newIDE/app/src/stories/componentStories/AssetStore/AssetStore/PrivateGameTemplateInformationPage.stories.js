@@ -6,47 +6,48 @@ import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import PrivateAssetPackInformationPage from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationPage';
+import PrivateGameTemplateInformationPage from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import {
   GDevelopAssetApi,
   GDevelopUserApi,
 } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import {
   client as assetApiAxiosClient,
-  type PrivateAssetPack,
+  type PrivateGameTemplate,
 } from '../../../../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServices/Shop';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../../fixtures/GDevelopServicesTestData';
 import {
-  AssetStoreContext,
-  initialAssetStoreState,
-} from '../../../../AssetStore/AssetStoreContext';
+  PrivateGameTemplateStoreContext,
+  initialPrivateGameTemplateStoreState,
+} from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 export default {
-  title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
-  component: PrivateAssetPackInformationPage,
+  title: 'AssetStore/AssetStore/PrivateGameTemplateInformationPage',
+  component: PrivateGameTemplateInformationPage,
   decorators: [paperDecorator, muiDecorator],
 };
 
 const sellerPublicProfile = {
   id: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   username: 'CreatorUserName',
-  description: 'I create asset packs for GDevelop for country-specific food.',
+  description:
+    'I create game templates for GDevelop for country-specific food.',
 };
 
-const privateAssetPack1ListingData: PrivateAssetPackListingData = {
+const privateGameTemplate1ListingData: PrivateGameTemplateListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   isSellerGDevelop: false,
-  productType: 'ASSET_PACK',
+  productType: 'GAME_TEMPLATE',
   thumbnailUrls: [
-    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
   ],
   updatedAt: '2022-09-14T12:43:51.329Z',
   createdAt: '2022-09-14T12:43:51.329Z',
-  listing: 'ASSET_PACK',
-  description: '5 assets',
+  listing: 'GAME_TEMPLATE',
+  description: 'best food ever',
   name: 'French Food',
   categories: ['props'],
   prices: [
@@ -62,18 +63,9 @@ const privateAssetPack1ListingData: PrivateAssetPackListingData = {
   stripeProductId: 'stripeProductId',
 };
 
-const privateAssetPack1: PrivateAssetPack = {
+const privateGameTemplate1: PrivateGameTemplate = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
-  name: 'French Food',
-  content: {
-    sprite: 14,
-    audio: 2,
-    tiled: 1,
-    '9patch': 7,
-    particleEmitter: 2,
-    font: 1,
-    partial: 2,
-  },
+  name: 'French Game',
   previewImageUrls: [
     'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
     'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
@@ -84,22 +76,23 @@ const privateAssetPack1: PrivateAssetPack = {
   ],
   updatedAt: '2022-09-15T08:17:59.977Z',
   createdAt: '2022-09-14T12:27:27.173Z',
-  tag: 'french food',
-  longDescription: 'This is the best asset pack about french food',
+  tag: 'french game',
+  longDescription: 'This is the best game template about french food',
+  gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
-const privateAssetPack2ListingData: PrivateAssetPackListingData = {
+const privateGameTemplate2ListingData: PrivateGameTemplateListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   isSellerGDevelop: false,
-  productType: 'ASSET_PACK',
+  productType: 'GAME_TEMPLATE',
   thumbnailUrls: [
-    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
   ],
   updatedAt: '2022-09-14T12:43:51.329Z',
   createdAt: '2022-09-14T12:43:51.329Z',
-  listing: 'ASSET_PACK',
-  description: '8 assets',
+  listing: 'GAME_TEMPLATE',
+  description: 'best sounds ever',
   name: 'French Sounds',
   categories: ['sounds'],
   prices: [
@@ -115,19 +108,33 @@ const privateAssetPack2ListingData: PrivateAssetPackListingData = {
   stripeProductId: 'stripeProductId',
 };
 
-const privateAssetPackBundleListingData: PrivateAssetPackListingData = {
+const privateGameTemplate2: PrivateGameTemplate = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
+  name: 'French Sounds',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+  ],
+  updatedAt: '2022-09-15T08:17:59.977Z',
+  createdAt: '2022-09-14T12:27:27.173Z',
+  tag: 'french sounds',
+  longDescription: 'This is the best game template about french sounds',
+  gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
+};
+
+const privateGameTemplateBundleListingData: PrivateGameTemplateListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918dabcop234',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   isSellerGDevelop: false,
-  productType: 'ASSET_PACK',
+  productType: 'GAME_TEMPLATE',
   thumbnailUrls: [
-    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
-    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
   ],
   updatedAt: '2022-09-14T12:43:51.329Z',
   createdAt: '2022-09-14T12:43:51.329Z',
-  listing: 'ASSET_PACK',
-  description: '13 assets',
+  listing: 'GAME_TEMPLATE',
+  description: 'best bundle ever',
   name: 'French Bundle',
   categories: ['sounds', 'props'],
   prices: [
@@ -142,23 +149,14 @@ const privateAssetPackBundleListingData: PrivateAssetPackListingData = {
   sellerStripeAccountId: 'sellerStripeProductId',
   stripeProductId: 'stripeProductId',
   includedListableProductIds: [
-    privateAssetPack1ListingData.id,
-    privateAssetPack2ListingData.id,
+    privateGameTemplate1ListingData.id,
+    privateGameTemplate2ListingData.id,
   ],
 };
 
-const privateAssetPackBundle: PrivateAssetPack = {
+const privateGameTemplateBundle: PrivateGameTemplate = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918dabcop234',
-  name: 'French Food and Sounds',
-  content: {
-    sprite: 14,
-    audio: 2,
-    tiled: 1,
-    '9patch': 7,
-    particleEmitter: 2,
-    font: 1,
-    partial: 2,
-  },
+  name: 'French Bundle',
   previewImageUrls: [
     'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
     'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
@@ -169,8 +167,9 @@ const privateAssetPackBundle: PrivateAssetPack = {
   ],
   updatedAt: '2022-09-15T08:17:59.977Z',
   createdAt: '2022-09-14T12:27:27.173Z',
-  tag: 'french food',
-  longDescription: 'This is the best asset pack about french food',
+  tag: 'french bundle',
+  longDescription: 'This is the best bundle about french games',
+  gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
 export const Default = () => {
@@ -178,13 +177,13 @@ export const Default = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -193,11 +192,11 @@ export const Default = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
       }`
     )
-    .reply(200, privateAssetPack1)
+    .reply(200, privateGameTemplate1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -205,27 +204,28 @@ export const Default = () => {
     });
 
   return (
-    <AssetStoreContext.Provider
+    <PrivateGameTemplateStoreContext.Provider
       value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
         ],
       }}
     >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPack1ListingData}
+      <PrivateGameTemplateInformationPage
+        privateGameTemplateListingData={privateGameTemplate1ListingData}
         isPurchaseDialogOpen={false}
         onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
-        privateAssetPackListingDatasFromSameCreator={[
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
+        onGameTemplateOpen={() => action('open game template')()}
+        onCreateWithGameTemplate={() => action('create with game template')()}
+        privateGameTemplateListingDatasFromSameCreator={[
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
         ]}
       />
-    </AssetStoreContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
   );
 };
 
@@ -234,13 +234,13 @@ export const ForABundle = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackBundleListingData.sellerId
+        privateGameTemplateBundleListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackBundleListingData.sellerId
+        privateGameTemplateBundleListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -249,11 +249,11 @@ export const ForABundle = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPackBundleListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplateBundleListingData.id
       }`
     )
-    .reply(200, privateAssetPackBundle)
+    .reply(200, privateGameTemplateBundle)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -261,38 +261,39 @@ export const ForABundle = () => {
     });
 
   return (
-    <AssetStoreContext.Provider
+    <PrivateGameTemplateStoreContext.Provider
       value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
         ],
       }}
     >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPackBundleListingData}
+      <PrivateGameTemplateInformationPage
+        privateGameTemplateListingData={privateGameTemplateBundleListingData}
         isPurchaseDialogOpen={false}
         onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
+        onGameTemplateOpen={() => action('open game template')()}
+        onCreateWithGameTemplate={() => action('create with game template')()}
       />
-    </AssetStoreContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
   );
 };
 
-export const ForAlreadyPurchasedAssetPack = () => {
+export const ForAlreadyPurchasedGameTemplate = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -301,11 +302,11 @@ export const ForAlreadyPurchasedAssetPack = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
       }`
     )
-    .reply(200, privateAssetPack1)
+    .reply(200, privateGameTemplate1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -313,60 +314,50 @@ export const ForAlreadyPurchasedAssetPack = () => {
     });
 
   return (
-    <AssetStoreContext.Provider
+    <PrivateGameTemplateStoreContext.Provider
       value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
         ],
       }}
     >
       <AuthenticatedUserContext.Provider
         value={{
           ...fakeSilverAuthenticatedUserWithCloudProjects,
-          receivedAssetPacks: [
-            {
-              id: privateAssetPack1ListingData.id,
-              // Useless data for the component below.
-              name: privateAssetPack1ListingData.name,
-              createdAt: '2',
-              updatedAt: '2',
-              longDescription: 'longDescription',
-              content: { sprite: 9 },
-              previewImageUrls: [],
-              tag: 'tag',
-            },
-          ],
+          receivedGameTemplates: [privateGameTemplate1],
         }}
       >
-        <PrivateAssetPackInformationPage
-          privateAssetPackListingData={privateAssetPack1ListingData}
+        <PrivateGameTemplateInformationPage
+          privateGameTemplateListingData={privateGameTemplate1ListingData}
           isPurchaseDialogOpen={false}
           onOpenPurchaseDialog={() => action('open purchase dialog')()}
-          onAssetPackOpen={() => action('open asset pack')()}
-          privateAssetPackListingDatasFromSameCreator={[
-            privateAssetPack1ListingData,
-            privateAssetPack2ListingData,
+          onGameTemplateOpen={() => action('open game template')()}
+          onCreateWithGameTemplate={() => action('create with game template')()}
+          privateGameTemplateListingDatasFromSameCreator={[
+            privateGameTemplate1ListingData,
+            privateGameTemplate2ListingData,
           ]}
         />
       </AuthenticatedUserContext.Provider>
-    </AssetStoreContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
   );
 };
-export const WithPurchaseDialogOpen = () => {
+
+export const ForAlreadyPurchasedBundle = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplateBundleListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplateBundleListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -375,11 +366,11 @@ export const WithPurchaseDialogOpen = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplateBundleListingData.id
       }`
     )
-    .reply(200, privateAssetPack1)
+    .reply(200, privateGameTemplateBundle)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -387,23 +378,88 @@ export const WithPurchaseDialogOpen = () => {
     });
 
   return (
-    <AssetStoreContext.Provider
+    <PrivateGameTemplateStoreContext.Provider
       value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
         ],
       }}
     >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPack1ListingData}
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...fakeSilverAuthenticatedUserWithCloudProjects,
+          receivedGameTemplates: [
+            privateGameTemplate1,
+            privateGameTemplate2,
+            privateGameTemplateBundle,
+          ],
+        }}
+      >
+        <PrivateGameTemplateInformationPage
+          privateGameTemplateListingData={privateGameTemplateBundleListingData}
+          isPurchaseDialogOpen={false}
+          onOpenPurchaseDialog={() => action('open purchase dialog')()}
+          onGameTemplateOpen={() => action('open game template')()}
+          onCreateWithGameTemplate={() => action('create with game template')()}
+        />
+      </AuthenticatedUserContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
+  );
+};
+
+export const WithPurchaseDialogOpen = () => {
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateGameTemplate1ListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateGameTemplate1ListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  assetServiceMock
+    .onGet(
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
+      }`
+    )
+    .reply(200, privateGameTemplate1)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <PrivateGameTemplateStoreContext.Provider
+      value={{
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
+        ],
+      }}
+    >
+      <PrivateGameTemplateInformationPage
+        privateGameTemplateListingData={privateGameTemplate1ListingData}
         isPurchaseDialogOpen
         onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
+        onGameTemplateOpen={() => action('open game template')()}
+        onCreateWithGameTemplate={() => action('create with game template')()}
       />
-    </AssetStoreContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
   );
 };
 export const Loading = () => {
@@ -411,13 +467,13 @@ export const Loading = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -428,11 +484,11 @@ export const Loading = () => {
   });
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
       }`
     )
-    .reply(200, privateAssetPack1)
+    .reply(200, privateGameTemplate1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -440,11 +496,12 @@ export const Loading = () => {
     });
 
   return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
+    <PrivateGameTemplateInformationPage
+      privateGameTemplateListingData={privateGameTemplate1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
+      onGameTemplateOpen={() => action('open game template')()}
+      onCreateWithGameTemplate={() => action('create with game template')()}
     />
   );
 };
@@ -454,13 +511,13 @@ export const With404 = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -469,8 +526,8 @@ export const With404 = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
       }`
     )
     .reply(404, null)
@@ -481,11 +538,12 @@ export const With404 = () => {
     });
 
   return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
+    <PrivateGameTemplateInformationPage
+      privateGameTemplateListingData={privateGameTemplate1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
+      onGameTemplateOpen={() => action('open game template')()}
+      onCreateWithGameTemplate={() => action('create with game template')()}
     />
   );
 };
@@ -495,13 +553,13 @@ export const WithUnknownError = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
+        privateGameTemplate1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -510,8 +568,8 @@ export const WithUnknownError = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
+      `${GDevelopAssetApi.baseUrl}/game-template/${
+        privateGameTemplate1ListingData.id
       }`
     )
     .reply(500, 'Internal server error')
@@ -522,11 +580,12 @@ export const WithUnknownError = () => {
     });
 
   return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
+    <PrivateGameTemplateInformationPage
+      privateGameTemplateListingData={privateGameTemplate1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
+      onGameTemplateOpen={() => action('open game template')()}
+      onCreateWithGameTemplate={() => action('create with game template')()}
     />
   );
 };

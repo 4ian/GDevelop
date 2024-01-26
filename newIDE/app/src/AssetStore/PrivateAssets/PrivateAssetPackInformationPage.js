@@ -39,9 +39,13 @@ import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { PrivateAssetPackTile, PromoBundleAssetPackCard } from '../ShopTiles';
 import { AssetStoreContext } from '../AssetStoreContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import {
+  getBundlesContainingProductTiles,
+  getOtherProductsFromSameAuthorTiles,
+  getProductsIncludedInBundleTiles,
+} from '../ProductPageHelper';
 
 const cellSpacing = 8;
 
@@ -136,37 +140,14 @@ const PrivateAssetPackInformationPage = ({
     );
 
   const packsIncludedInBundleTiles = React.useMemo(
-    () => {
-      if (!assetPack || !privateAssetPackListingDatas) return null;
-
-      const includedPackIds =
-        privateAssetPackListingData.includedListableProductIds;
-      if (!includedPackIds) return null;
-
-      return includedPackIds.map(includedPackId => {
-        const includedAssetPackListingData = privateAssetPackListingDatas.find(
-          privatePackListingData => privatePackListingData.id === includedPackId
-        );
-        if (!includedAssetPackListingData) {
-          console.warn(`Included pack ${includedPackId} not found`);
-          return null;
-        }
-
-        const isPackOwned =
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(
-            pack => pack.id === includedAssetPackListingData.id
-          );
-        return (
-          <PrivateAssetPackTile
-            assetPackListingData={includedAssetPackListingData}
-            key={includedAssetPackListingData.id}
-            onSelect={() => onAssetPackOpen(includedAssetPackListingData)}
-            owned={isPackOwned}
-          />
-        );
-      });
-    },
+    () =>
+      getProductsIncludedInBundleTiles({
+        product: assetPack,
+        productListingDatas: privateAssetPackListingDatas,
+        productListingData: privateAssetPackListingData,
+        receivedProducts: receivedAssetPacks,
+        onProductOpen: onAssetPackOpen,
+      }),
     [
       assetPack,
       privateAssetPackListingDatas,
@@ -177,58 +158,13 @@ const PrivateAssetPackInformationPage = ({
   );
 
   const bundlesContainingPackTiles = React.useMemo(
-    () => {
-      if (!assetPack || !privateAssetPackListingDatas) return null;
-
-      const bundlesContainingPack = privateAssetPackListingDatas.filter(
-        privatePackListingData =>
-          privatePackListingData.includedListableProductIds &&
-          privatePackListingData.includedListableProductIds.includes(
-            assetPack.id
-          )
-      );
-
-      if (!bundlesContainingPack.length) return null;
-
-      const ownedBundlesContainingPack = bundlesContainingPack.filter(
-        bundleContainingPack =>
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(pack => pack.id === bundleContainingPack.id)
-      );
-      const notOwnedBundlesContainingPack = bundlesContainingPack.filter(
-        bundleContainingPack =>
-          !ownedBundlesContainingPack.find(
-            ownedBundleContainingPack =>
-              ownedBundleContainingPack.id === bundleContainingPack.id
-          )
-      );
-
-      const allTiles = ownedBundlesContainingPack
-        .map(bundleContainingPack => {
-          return (
-            <PromoBundleAssetPackCard
-              assetPackListingData={bundleContainingPack}
-              onSelect={() => onAssetPackOpen(bundleContainingPack)}
-              owned
-              key={bundleContainingPack.id}
-            />
-          );
-        })
-        .concat(
-          notOwnedBundlesContainingPack.map(bundleContainingPack => {
-            return (
-              <PromoBundleAssetPackCard
-                assetPackListingData={bundleContainingPack}
-                onSelect={() => onAssetPackOpen(bundleContainingPack)}
-                owned={false}
-                key={bundleContainingPack.id}
-              />
-            );
-          })
-        );
-
-      return allTiles;
-    },
+    () =>
+      getBundlesContainingProductTiles({
+        product: assetPack,
+        productListingDatas: privateAssetPackListingDatas,
+        receivedProducts: receivedAssetPacks,
+        onProductOpen: onAssetPackOpen,
+      }),
     [
       assetPack,
       privateAssetPackListingDatas,
@@ -238,40 +174,15 @@ const PrivateAssetPackInformationPage = ({
   );
 
   const otherPacksFromTheSameAuthorTiles = React.useMemo(
-    () => {
-      if (
-        !privateAssetPackListingDatasFromSameCreator ||
-        // Only display packs if there are at least 2. If there is only one,
-        // it means it's the same as the one currently opened.
-        privateAssetPackListingDatasFromSameCreator.length < 2
-      )
-        return null;
-
-      return (
-        privateAssetPackListingDatasFromSameCreator
-          // Do not display the pack currently opened.
-          .filter(
-            assetPackFromSameCreator => assetPackFromSameCreator.id !== id
-          )
-          .map(assetPackFromSameCreator => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackFromSameCreator.id
-              );
-            return (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackFromSameCreator}
-                key={assetPackFromSameCreator.id}
-                onSelect={() => onAssetPackOpen(assetPackFromSameCreator)}
-                owned={isPackOwned}
-              />
-            );
-          })
-      );
-    },
+    () =>
+      getOtherProductsFromSameAuthorTiles({
+        otherProductListingDatasFromSameCreator: privateAssetPackListingDatasFromSameCreator,
+        currentProductListingData: privateAssetPackListingData,
+        receivedProducts: receivedAssetPacks,
+        onProductOpen: onAssetPackOpen,
+      }),
     [
-      id,
+      privateAssetPackListingData,
       privateAssetPackListingDatasFromSameCreator,
       onAssetPackOpen,
       receivedAssetPacks,

@@ -110,6 +110,7 @@ const GetStartedSection = ({
     creatingOrLoggingInAccount,
     onLogin,
     onLoginWithProvider,
+    onCancelLogin,
     onEditProfile,
     onCreateAccount,
     authenticationError,
@@ -274,7 +275,29 @@ const GetStartedSection = ({
           justifyContent="center"
           alignItems="center"
         >
-          <CircularProgress size={40} />
+          <ColumnStackLayout
+            noMargin
+            expand
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CircularProgress size={40} />
+          </ColumnStackLayout>
+          <div style={styles.bottomPageButtonContainer}>
+            <Column>
+              <LineStackLayout
+                expand
+                justifyContent="center"
+                alignItems="center"
+              >
+                <FlatButton
+                  primary
+                  label={<Trans>Cancel</Trans>}
+                  onClick={onCancelLogin}
+                />
+              </LineStackLayout>
+            </Column>
+          </div>
         </ColumnStackLayout>
       </SectionContainer>
     );

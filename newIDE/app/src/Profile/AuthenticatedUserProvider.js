@@ -189,6 +189,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogin: this._doLogin,
         onLoginWithProvider: this._doLoginWithProvider,
+        onCancelLogin: this._cancelLogin,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,

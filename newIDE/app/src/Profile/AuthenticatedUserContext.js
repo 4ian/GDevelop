@@ -44,6 +44,7 @@ export type AuthenticatedUser = {|
   subscription: ?Subscription,
   onLogin: (form: LoginForm) => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
+  onCancelLogin: () => void,
   onLogout: () => Promise<void>,
   onCreateAccount: (
     form: RegisterForm,
@@ -94,6 +95,7 @@ export const initialAuthenticatedUser = {
   authenticationError: null,
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
+  onCancelLogin: () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onEditProfile: async () => {},

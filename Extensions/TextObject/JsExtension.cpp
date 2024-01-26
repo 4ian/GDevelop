@@ -178,7 +178,7 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getShadowBlurRadius");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Text::ShadowBlurRadius"]
         .SetFunctionName("getShadowBlurRadius");
-    GetAllActionsForObject("TextObject::Text")["TextObject::Text::ShadowBlurRadius"]
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowBlurRadius"]
         .SetFunctionName("setShadowBlurRadius")
         .SetGetter("getShadowBlurRadius");
 

@@ -10,12 +10,10 @@ import {
   type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import LoginForm from './LoginForm';
-import type { AuthenticatedUser } from './AuthenticatedUserContext';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
-import { Column, Spacer } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
+import { Column } from '../UI/Grid';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Link from '../UI/Link';
@@ -29,12 +27,9 @@ const styles = {
 };
 
 type Props = {|
-  authenticatedUser: AuthenticatedUser,
   onClose: () => void,
   onGoToCreateAccount: () => void,
   onLogin: (form: LoginFormType) => Promise<void>,
-  onLoginOnDesktopApp: () => Promise<void>,
-  loginOnDesktopAppSuccess?: boolean,
   onLogout: () => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
@@ -43,12 +38,9 @@ type Props = {|
 |};
 
 const LoginDialog = ({
-  authenticatedUser,
   onClose,
   onGoToCreateAccount,
   onLogin,
-  onLoginOnDesktopApp,
-  loginOnDesktopAppSuccess,
   onLogout,
   onLoginWithProvider,
   onForgotPassword,
@@ -60,10 +52,6 @@ const LoginDialog = ({
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const alreadyLoggedInAccountUsernameOrEmail: ?string = authenticatedUser.profile
-    ? authenticatedUser.profile.username || authenticatedUser.profile.email
-    : null;
-
   const doLogin = () => {
     if (loginInProgress) return;
 
@@ -73,89 +61,29 @@ const LoginDialog = ({
     });
   };
 
-  const actions = loginOnDesktopAppSuccess
-    ? [
-        <FlatButton
-          label={<Trans>Close</Trans>}
-          key="cancel"
-          primary={false}
-          onClick={onClose}
-        />,
-      ]
-    : alreadyLoggedInAccountUsernameOrEmail
-    ? undefined
-    : [
-        <FlatButton
-          label={<Trans>Cancel</Trans>}
-          key="cancel"
-          primary={false}
-          onClick={onClose}
-        />,
-        <LeftLoader isLoading={loginInProgress} key="login">
-          <DialogPrimaryButton
-            id="login-button"
-            label={<Trans>Login</Trans>}
-            primary
-            onClick={doLogin}
-            disabled={loginInProgress}
-          />
-        </LeftLoader>,
-      ];
-
-  const secondaryActions =
-    alreadyLoggedInAccountUsernameOrEmail || loginOnDesktopAppSuccess
-      ? undefined
-      : [<HelpButton key="help" helpPagePath={'/interface/profile'} />];
-
-  const dialogContent = loginOnDesktopAppSuccess ? (
-    <ColumnStackLayout
-      noMargin
-      expand
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Text size="title" align="center">
-        <Trans>Success</Trans>
-      </Text>
-      <Text align="center">
-        <Trans>You can now go back to the desktop app.</Trans>
-      </Text>
-    </ColumnStackLayout>
-  ) : alreadyLoggedInAccountUsernameOrEmail ? (
-    <ColumnStackLayout
-      noMargin
-      expand
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Text size="title" align="center">
-        <Trans>Log in</Trans>
-      </Text>
-      <Text align="center">
-        <Trans>
-          You are logged in as {alreadyLoggedInAccountUsernameOrEmail}
-        </Trans>
-      </Text>
-      <RaisedButton
+  const actions = [
+    <FlatButton
+      label={<Trans>Cancel</Trans>}
+      key="cancel"
+      primary={false}
+      onClick={onClose}
+    />,
+    <LeftLoader isLoading={loginInProgress} key="login">
+      <DialogPrimaryButton
+        id="login-button"
+        label={<Trans>Login</Trans>}
         primary
-        label={
-          <Trans>Continue as {alreadyLoggedInAccountUsernameOrEmail}</Trans>
-        }
-        onClick={onLoginOnDesktopApp}
+        onClick={doLogin}
+        disabled={loginInProgress}
       />
-      <Spacer />
-      <Column noMargin alignItems="center">
-        <Text size="body2" noMargin>
-          <Trans>You're not {alreadyLoggedInAccountUsernameOrEmail}?</Trans>
-        </Text>
-        <Link href="" onClick={onLogout} disabled={loginInProgress}>
-          <Text size="body2" noMargin color="inherit">
-            <Trans>Log in with another account</Trans>
-          </Text>
-        </Link>
-      </Column>
-    </ColumnStackLayout>
-  ) : (
+    </LeftLoader>,
+  ];
+
+  const secondaryActions = [
+    <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+  ];
+
+  const dialogContent = (
     <ColumnStackLayout
       noMargin
       expand

@@ -4,11 +4,6 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import LoginDialog from '../../../Profile/LoginDialog';
-import { delay } from '../../../Utils/Delay';
-import {
-  fakeNotAuthenticatedUser,
-  fakeSilverAuthenticatedUser,
-} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Profile/LoginDialog',
@@ -17,11 +12,9 @@ export default {
 };
 
 const defaultProps = {
-  authenticatedUser: fakeNotAuthenticatedUser,
   onClose: action('onClose'),
   onForgotPassword: action('onForgotPassword'),
   onLogin: action('onLogin'),
-  onLoginOnDesktopApp: action('onLoginOnDesktopApp'),
   onLogout: action('onLogout'),
   onLoginWithProvider: action('onLoginWithProvider'),
   onGoToCreateAccount: action('onGoToCreateAccount'),
@@ -30,27 +23,6 @@ const defaultProps = {
 };
 
 export const Default = () => <LoginDialog {...defaultProps} />;
-
-export const AlreadyLoggedIn = () => {
-  const [
-    loginOnDesktopAppSuccess,
-    setLoginOnDesktopAppSuccess,
-  ] = React.useState<boolean>(false);
-
-  const onLoginOnDesktopApp = async () => {
-    action('onLoginOnDesktopApp')();
-    await delay(500);
-    setLoginOnDesktopAppSuccess(true);
-  };
-  return (
-    <LoginDialog
-      {...defaultProps}
-      loginOnDesktopAppSuccess={loginOnDesktopAppSuccess}
-      onLoginOnDesktopApp={onLoginOnDesktopApp}
-      authenticatedUser={fakeSilverAuthenticatedUser}
-    />
-  );
-};
 
 export const WeakPasswordErrorFromBackend = () => (
   <LoginDialog

@@ -20,10 +20,6 @@ import AlertMessage from '../UI/AlertMessage';
 import Google from '../UI/CustomSvgIcons/Google';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
-import { FEATURE_FLAG_SSO_LOGIN } from '../Utils/GDevelopServices/Authorization';
-import Window from '../Utils/Window';
-
-const isDev = Window.isDev();
 
 const styles = {
   identityProvidersBlock: {
@@ -33,6 +29,13 @@ const styles = {
     marginTop: 30,
   },
 };
+
+export const accountsAlreadyExistsWithDifferentProviderCopy = (
+  <Trans>
+    You already have an account for this email address with a different provider
+    (Google, Apple or GitHub). Please try with one of those.
+  </Trans>
+);
 
 type Props = {|
   onLogin: () => void,
@@ -78,10 +81,7 @@ const LoginForm = ({
           <ColumnStackLayout noMargin>
             {accountsExistsWithOtherCredentials && (
               <AlertMessage kind="error">
-                <Trans>
-                  You already have an account with another provider or with an
-                  email/password. Try these instead.
-                </Trans>
+                {accountsAlreadyExistsWithDifferentProviderCopy}
               </AlertMessage>
             )}
             <TextField
@@ -123,49 +123,47 @@ const LoginForm = ({
             </Text>
           </Link>
         </Line>
-        {(isDev || FEATURE_FLAG_SSO_LOGIN) && (
-          <div style={styles.identityProvidersBlock}>
-            <Line noMargin justifyContent="center">
-              <Text size="body2" noMargin>
-                <Trans>Or continue with</Trans>
-              </Text>
-            </Line>
-            <Line>
-              <ResponsiveLineStackLayout expand noColumnMargin noMargin>
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="Google"
-                  leftIcon={<Google />}
-                  onClick={() => {
-                    onLoginWithProvider('google');
-                  }}
-                  disabled={loginInProgress}
-                />
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="GitHub"
-                  leftIcon={<GitHub />}
-                  onClick={() => {
-                    onLoginWithProvider('github');
-                  }}
-                  disabled={loginInProgress}
-                />
-                <FlatButton
-                  primary
-                  fullWidth
-                  label="Apple"
-                  leftIcon={<Apple />}
-                  onClick={() => {
-                    onLoginWithProvider('apple');
-                  }}
-                  disabled={loginInProgress}
-                />
-              </ResponsiveLineStackLayout>
-            </Line>
-          </div>
-        )}
+        <div style={styles.identityProvidersBlock}>
+          <Line noMargin justifyContent="center">
+            <Text size="body2" noMargin>
+              <Trans>Or continue with</Trans>
+            </Text>
+          </Line>
+          <Line>
+            <ResponsiveLineStackLayout expand noColumnMargin noMargin>
+              <FlatButton
+                primary
+                fullWidth
+                label="Google"
+                leftIcon={<Google />}
+                onClick={() => {
+                  onLoginWithProvider('google');
+                }}
+                disabled={loginInProgress}
+              />
+              <FlatButton
+                primary
+                fullWidth
+                label="GitHub"
+                leftIcon={<GitHub />}
+                onClick={() => {
+                  onLoginWithProvider('github');
+                }}
+                disabled={loginInProgress}
+              />
+              <FlatButton
+                primary
+                fullWidth
+                label="Apple"
+                leftIcon={<Apple />}
+                onClick={() => {
+                  onLoginWithProvider('apple');
+                }}
+                disabled={loginInProgress}
+              />
+            </ResponsiveLineStackLayout>
+          </Line>
+        </div>
       </ColumnStackLayout>
       {isForgotPasswordDialogOpen && (
         <ForgotPasswordDialog

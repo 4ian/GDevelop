@@ -17,10 +17,6 @@ import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 
-export type LoginOptions = {|
-  notifyConnection: string,
-|};
-
 export type Profile = {|
   id: string,
   email: string,
@@ -211,13 +207,13 @@ export default class Authentication {
       });
   };
 
-  login = (form: LoginForm, loginOptions?: ?LoginOptions): Promise<void> => {
+  login = (form: LoginForm): Promise<void> => {
     const { loginProvider } = this;
     if (!loginProvider) {
       throw new Error('Login provider not set.');
     }
     return loginProvider
-      .loginWithEmailAndPassword({ ...form, loginOptions })
+      .loginWithEmailAndPassword(form)
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })
@@ -227,24 +223,11 @@ export default class Authentication {
       });
   };
 
-  notifyLogin = (loginOptions: LoginOptions) => {
-    const { loginProvider } = this;
-    if (!loginProvider) {
-      throw new Error('Login provider not set.');
-    }
-
-    return loginProvider.notifyLogin({
-      connectionId: loginOptions.notifyConnection,
-    });
-  };
-
   loginWithProvider = ({
     provider,
-    loginOptions,
     signal,
   }: {|
     provider: IdentityProvider,
-    loginOptions?: ?LoginOptions,
     signal?: AbortSignal,
   |}): Promise<void> => {
     const { loginProvider } = this;
@@ -253,7 +236,7 @@ export default class Authentication {
     }
 
     return loginProvider
-      .loginOrSignupWithProvider({ provider, loginOptions, signal })
+      .loginOrSignupWithProvider({ provider, signal })
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })

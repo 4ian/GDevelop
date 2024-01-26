@@ -82,7 +82,15 @@ namespace gdjs {
       style.dropShadowBlur = this._object._shadowBlur;
       style.dropShadowAngle = gdjs.toRad(this._object._shadowAngle);
       style.dropShadowDistance = this._object._shadowDistance;
-      style.padding = this._object._padding;
+      const dropShadowAngle = gdjs.evtTools.common.mod(
+        style.dropShadowAngle,
+        2 * Math.PI
+      );
+      const extraPaddingForShadow =
+        style.dropShadow && dropShadowAngle > Math.PI / 2
+          ? style.dropShadowDistance
+          : 0;
+      style.padding = this._object._padding + extraPaddingForShadow;
 
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;

@@ -7,6 +7,16 @@ import * as PIXI from 'pixi.js-legacy';
 const gd: libGDevelop = global.gd;
 
 /**
+ * Modulo operation
+ * @param x Dividend value.
+ * @param y Divisor value.
+ * @returns Return the remainder using Euclidean division.
+ */
+const mod = function(x: number, y: number): number {
+  return ((x % y) + y) % y;
+};
+
+/**
  * Renderer for a Text object.
  */
 export default class RenderedTextInstance extends RenderedInstance {
@@ -173,6 +183,12 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.dropShadowBlur = this._shadowBlurRadius;
       style.dropShadowAngle = (this._shadowAngle * Math.PI) / 180;
       style.dropShadowDistance = this._shadowDistance;
+      const dropShadowAngle = mod(style.dropShadowAngle, 2 * Math.PI);
+      const extraPaddingForShadow =
+        style.dropShadow && dropShadowAngle > Math.PI / 2
+          ? style.dropShadowDistance
+          : 0;
+      style.padding = extraPaddingForShadow;
 
       // Manually ask the PIXI object to re-render as we changed a style property
       // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

@@ -25,6 +25,7 @@ import {
 import SubscriptionDialog from '../../../../Profile/Subscription/SubscriptionDialog';
 import { type SubscriptionType } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import AlertProvider from '../../../../UI/Alert/AlertProvider';
+import { getAvailableSubscriptionPlansWithPrices } from '../../../../Utils/UseSubscriptionPlans';
 
 export default {
   title: 'Subscription/SubscriptionDialog',
@@ -38,21 +39,33 @@ const SubscriptionDialogWrapper = ({
 }: {
   authenticatedUser: AuthenticatedUser,
   filter?: ?SubscriptionType,
-}) => (
-  <AlertProvider>
-    <AuthenticatedUserContext.Provider value={authenticatedUser}>
-      <SubscriptionDialog
-        open
-        subscriptionPlansWithPricingSystems={
-          subscriptionPlansWithPricingSystems
-        }
-        onClose={() => action('on close')()}
-        analyticsMetadata={{ reason: 'Debugger' }}
-        filter={filter}
-      />
-    </AuthenticatedUserContext.Provider>
-  </AlertProvider>
-);
+}) => {
+  const { subscription: userSubscription } = authenticatedUser;
+  const userLegacySubscriptionPlanWithPricingSystem = userSubscription
+    ? subscriptionPlansWithPricingSystems.find(
+        planWithPricingSystem =>
+          planWithPricingSystem.id === userSubscription.planId
+      )
+    : null;
+  return (
+    <AlertProvider>
+      <AuthenticatedUserContext.Provider value={authenticatedUser}>
+        <SubscriptionDialog
+          open
+          subscriptionPlansWithPricingSystems={getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )}
+          userLegacySubscriptionPlanWithPricingSystem={
+            userLegacySubscriptionPlanWithPricingSystem
+          }
+          onClose={() => action('on close')()}
+          analyticsMetadata={{ reason: 'Debugger' }}
+          filter={filter}
+        />
+      </AuthenticatedUserContext.Provider>
+    </AlertProvider>
+  );
+};
 
 export const NotAuthenticated = () => (
   <SubscriptionDialogWrapper authenticatedUser={fakeNotAuthenticatedUser} />

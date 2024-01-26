@@ -33,7 +33,7 @@ const styles = {
 export const accountsAlreadyExistsWithDifferentProviderCopy = (
   <Trans>
     You already have an account for this email address with a different provider
-    (Google, Apple or GitHub). Try with one of those.
+    (Google, Apple or GitHub). Please try with one of those.
   </Trans>
 );
 

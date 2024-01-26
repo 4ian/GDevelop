@@ -95,10 +95,10 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
             terminateWebSocket();
           } catch (error) {
             console.error(
-              'An error occurred while logging in with token:',
+              `An error occurred while logging in with ${provider} token:`,
               error
             );
-            reject(new Error('An error occurred while logging in with token.'));
+            reject(error);
           }
         },
         onError: error => {

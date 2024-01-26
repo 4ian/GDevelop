@@ -21,6 +21,8 @@ import Apple from '../UI/CustomSvgIcons/Apple';
 import GitHub from '../UI/CustomSvgIcons/GitHub';
 import { FEATURE_FLAG_SSO_LOGIN } from '../Utils/GDevelopServices/Authorization';
 import Window from '../Utils/Window';
+import AlertMessage from '../UI/AlertMessage';
+import { accountsAlreadyExistsWithDifferentProviderCopy } from './LoginForm';
 
 const isDev = Window.isDev();
 
@@ -70,10 +72,19 @@ const CreateAccountForm = ({
   createAccountInProgress,
   error,
 }: Props) => {
+  const accountsExistsWithOtherCredentials = error
+    ? error.code === 'auth/account-exists-with-different-credential'
+    : false;
+
   return (
     <Column noMargin expand justifyContent="center" alignItems="center">
       <Form onSubmit={onCreateAccount} autoComplete="on" name="createAccount">
         <ColumnStackLayout noMargin>
+          {accountsExistsWithOtherCredentials && (
+            <AlertMessage kind="error">
+              {accountsAlreadyExistsWithDifferentProviderCopy}
+            </AlertMessage>
+          )}
           <UsernameField
             value={username}
             onChange={(e, value) => {

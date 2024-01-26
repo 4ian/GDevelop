@@ -34,6 +34,13 @@ const styles = {
   },
 };
 
+export const accountsAlreadyExistsWithDifferentProviderCopy = (
+  <Trans>
+    You already have an account for this email address with a different provider
+    (Google, Apple or GitHub). Try with one of those.
+  </Trans>
+);
+
 type Props = {|
   onLogin: () => void,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
@@ -78,10 +85,7 @@ const LoginForm = ({
           <ColumnStackLayout noMargin>
             {accountsExistsWithOtherCredentials && (
               <AlertMessage kind="error">
-                <Trans>
-                  You already have an account with another provider or with an
-                  email/password. Try these instead.
-                </Trans>
+                {accountsAlreadyExistsWithDifferentProviderCopy}
               </AlertMessage>
             )}
             <TextField

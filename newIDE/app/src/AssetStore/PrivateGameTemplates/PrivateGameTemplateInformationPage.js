@@ -43,9 +43,13 @@ import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import Chip from '../../UI/Chip';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
-import { PrivateGameTemplateTile, PromoBundleCard } from '../ShopTiles';
 import { GridList } from '@material-ui/core';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
+import {
+  getBundlesContainingProductTiles,
+  getOtherProductsFromSameAuthorTiles,
+  getProductsIncludedInBundleTiles,
+} from '../ProductPageHelper';
 
 const cellSpacing = 8;
 
@@ -151,38 +155,14 @@ const PrivateGameTemplateInformationPage = ({
     );
 
   const templatesIncludedInBundleTiles = React.useMemo(
-    () => {
-      if (!gameTemplate || !privateGameTemplateListingDatas) return null;
-
-      const includedTemplateIds =
-        privateGameTemplateListingData.includedListableProductIds;
-      if (!includedTemplateIds) return null;
-
-      return includedTemplateIds.map(includedTemplateId => {
-        const includedGameTemplateListingData = privateGameTemplateListingDatas.find(
-          privatePackListingData =>
-            privatePackListingData.id === includedTemplateId
-        );
-        if (!includedGameTemplateListingData) {
-          console.warn(`Included template ${includedTemplateId} not found`);
-          return null;
-        }
-
-        const isPackOwned =
-          !!receivedGameTemplates &&
-          !!receivedGameTemplates.find(
-            pack => pack.id === includedGameTemplateListingData.id
-          );
-        return (
-          <PrivateGameTemplateTile
-            privateGameTemplateListingData={includedGameTemplateListingData}
-            key={includedGameTemplateListingData.id}
-            onSelect={() => onGameTemplateOpen(includedGameTemplateListingData)}
-            owned={isPackOwned}
-          />
-        );
-      });
-    },
+    () =>
+      getProductsIncludedInBundleTiles({
+        product: gameTemplate,
+        productListingDatas: privateGameTemplateListingDatas,
+        productListingData: privateGameTemplateListingData,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
     [
       gameTemplate,
       privateGameTemplateListingDatas,
@@ -193,60 +173,13 @@ const PrivateGameTemplateInformationPage = ({
   );
 
   const bundlesContainingPackTiles = React.useMemo(
-    () => {
-      if (!gameTemplate || !privateGameTemplateListingDatas) return null;
-
-      const bundlesContainingPack = privateGameTemplateListingDatas.filter(
-        privatePackListingData =>
-          privatePackListingData.includedListableProductIds &&
-          privatePackListingData.includedListableProductIds.includes(
-            gameTemplate.id
-          )
-      );
-
-      if (!bundlesContainingPack.length) return null;
-
-      const ownedBundlesContainingPack = bundlesContainingPack.filter(
-        bundleContainingPack =>
-          !!receivedGameTemplates &&
-          !!receivedGameTemplates.find(
-            pack => pack.id === bundleContainingPack.id
-          )
-      );
-      const notOwnedBundlesContainingPack = bundlesContainingPack.filter(
-        bundleContainingPack =>
-          !ownedBundlesContainingPack.find(
-            ownedBundleContainingPack =>
-              ownedBundleContainingPack.id === bundleContainingPack.id
-          )
-      );
-
-      const allTiles = ownedBundlesContainingPack
-        .map(bundleContainingPack => {
-          return (
-            <PromoBundleCard
-              productListingData={bundleContainingPack}
-              onSelect={() => onGameTemplateOpen(bundleContainingPack)}
-              owned
-              key={bundleContainingPack.id}
-            />
-          );
-        })
-        .concat(
-          notOwnedBundlesContainingPack.map(bundleContainingPack => {
-            return (
-              <PromoBundleCard
-                productListingData={bundleContainingPack}
-                onSelect={() => onGameTemplateOpen(bundleContainingPack)}
-                owned={false}
-                key={bundleContainingPack.id}
-              />
-            );
-          })
-        );
-
-      return allTiles;
-    },
+    () =>
+      getBundlesContainingProductTiles({
+        product: gameTemplate,
+        productListingDatas: privateGameTemplateListingDatas,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
     [
       gameTemplate,
       privateGameTemplateListingDatas,
@@ -256,43 +189,18 @@ const PrivateGameTemplateInformationPage = ({
   );
 
   const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
-    () => {
-      if (
-        !privateGameTemplateListingDatasFromSameCreator ||
-        // Only display Templates if there are at least 2. If there is only one,
-        // it means it's the same as the one currently opened.
-        privateGameTemplateListingDatasFromSameCreator.length < 2
-      )
-        return null;
-
-      return (
-        privateGameTemplateListingDatasFromSameCreator
-          // Do not display the template currently opened.
-          .filter(
-            gameTemplateFromSameCreator => gameTemplateFromSameCreator.id !== id
-          )
-          .map(gameTemplateFromSameCreator => {
-            const isTemplateOwned =
-              !!receivedGameTemplates &&
-              !!receivedGameTemplates.find(
-                template => template.id === gameTemplateFromSameCreator.id
-              );
-            return (
-              <PrivateGameTemplateTile
-                privateGameTemplateListingData={gameTemplateFromSameCreator}
-                key={gameTemplateFromSameCreator.id}
-                onSelect={() => onGameTemplateOpen(gameTemplateFromSameCreator)}
-                owned={isTemplateOwned}
-              />
-            );
-          })
-      );
-    },
+    () =>
+      getOtherProductsFromSameAuthorTiles({
+        otherProductListingDatasFromSameCreator: privateGameTemplateListingDatasFromSameCreator,
+        currentProductListingData: privateGameTemplateListingData,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
     [
-      id,
       privateGameTemplateListingDatasFromSameCreator,
-      onGameTemplateOpen,
+      privateGameTemplateListingData,
       receivedGameTemplates,
+      onGameTemplateOpen,
     ]
   );
 

@@ -490,6 +490,15 @@ export default function SpriteEditor({
         onlyForStorageProvider === storageProvider.internalName
     );
 
+  const adaptCollisionMaskIfNeeded = React.useCallback(
+    () => {
+      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+        onCreateMatchingSpriteCollisionMask();
+      }
+    },
+    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
+  );
+
   const importImages = React.useCallback(
     async () => {
       const resources = await resourceManagementProps.onChooseResource({
@@ -515,6 +524,7 @@ export default function SpriteEditor({
 
       await resourceManagementProps.onFetchNewlyAddedResources();
 
+      adaptCollisionMaskIfNeeded();
       if (onObjectUpdated) onObjectUpdated();
     },
     [
@@ -522,18 +532,10 @@ export default function SpriteEditor({
       resourceSources,
       addAnimations,
       forceUpdate,
+      adaptCollisionMaskIfNeeded,
       onObjectUpdated,
       project,
     ]
-  );
-
-  const adaptCollisionMaskIfNeeded = React.useCallback(
-    () => {
-      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
-        onCreateMatchingSpriteCollisionMask();
-      }
-    },
-    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
   );
 
   const editDirectionWith = React.useCallback(

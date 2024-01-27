@@ -409,6 +409,7 @@ namespace gdjs {
 
         if (this._threeCamera instanceof THREE.OrthographicCamera) {
           this._threeCamera.zoom = this._layer.getCameraZoom();
+          this._threeCamera.updateProjectionMatrix();
           this._threeCamera.position.z = this._layer.getCameraZ(null);
         } else {
           this._threeCamera.position.z = this._layer.getCameraZ(

@@ -52,178 +52,173 @@ type Props<T> = {|
   onClickMore?: () => void,
   id?: ?string,
 |};
-type State<T> = {|
+type SearchState<T> = {|
   searchText: string,
   searchResults: Array<T>,
 |};
 
-export default class InstructionOrExpressionSelector<
+const InstructionOrExpressionSelector = <
   T: EnumeratedInstructionOrExpressionMetadata
-> extends React.PureComponent<Props<T>, State<T>> {
-  state: State<T> = {
+>({
+  focusOnMount,
+  instructionsInfo,
+  instructionsInfoTree,
+  selectedType,
+  onChoose,
+  iconSize,
+  useSubheaders,
+  searchPlaceholderObjectName,
+  searchPlaceholderIsCondition,
+  helpPagePath,
+  style,
+  onClickMore,
+  id,
+}: Props<T>) => {
+  const searchBarRef = React.useRef<?SearchBarInterface>(null);
+  const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
+  const selectedItemRef = React.useRef<?ListItemRefType>(null);
+  const [searchState, setSearchState] = React.useState<SearchState<T>>({
     searchText: '',
     searchResults: [],
-  };
-  _searchBar: ?SearchBarInterface;
-  _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItemRefType>();
-  searchApi = null;
-
-  initialInstructionTypePath = findInTree(
-    this.props.instructionsInfoTree,
-    this.props.selectedType
+  });
+  const searchApi = React.useMemo(
+    () =>
+      new Fuse(instructionsInfo, {
+        ...sharedFuseConfiguration,
+        keys: [
+          { name: 'displayedName', weight: 2 },
+          { name: 'fullGroupName', weight: 1 },
+        ],
+      }),
+    [instructionsInfo]
+  );
+  const initialInstructionTypePathRef = React.useRef<?(string[])>(
+    findInTree(instructionsInfoTree, selectedType)
   );
 
-  componentDidMount() {
-    if (this._selectedItem.current && this._scrollView.current) {
-      this._scrollView.current.scrollTo(this._selectedItem.current);
+  React.useEffect(() => {
+    if (selectedItemRef.current && scrollViewRef.current) {
+      scrollViewRef.current.scrollTo(selectedItemRef.current);
     }
+  }, []);
 
-    this.searchApi = new Fuse(this.props.instructionsInfo, {
-      ...sharedFuseConfiguration,
-      keys: [
-        { name: 'displayedName', weight: 2 },
-        { name: 'fullGroupName', weight: 1 },
-      ],
-    });
-  }
+  const { searchText } = searchState;
 
-  focus = () => {
-    if (this._searchBar) this._searchBar.focus();
+  const displayedInstructionsList: Array<SearchResult<T>> =
+    !!searchText && searchApi
+      ? searchApi
+          .search(
+            getFuseSearchQueryForMultipleKeys(searchText, [
+              'displayedName',
+              'fullGroupName',
+            ])
+          )
+          .map(result => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          }))
+      : [];
+  const hasResults = !searchText || !!displayedInstructionsList.length;
+
+  const onSubmitSearch = () => {
+    if (!displayedInstructionsList.length) return;
+
+    onChoose(
+      displayedInstructionsList[0].item.type,
+      displayedInstructionsList[0].item
+    );
   };
 
-  render() {
-    const {
-      selectedType,
-      iconSize,
-      instructionsInfoTree,
-      onChoose,
-      searchPlaceholderObjectName,
-      searchPlaceholderIsCondition,
-      useSubheaders,
-      helpPagePath,
-      style,
-      onClickMore,
-      id,
-    } = this.props;
-    const { searchText } = this.state;
-
-    const displayedInstructionsList: Array<SearchResult<T>> =
-      !!searchText && this.searchApi
-        ? this.searchApi
-            .search(
-              getFuseSearchQueryForMultipleKeys(searchText, [
-                'displayedName',
-                'fullGroupName',
-              ])
-            )
-            .map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
-        : [];
-    const hasResults = !searchText || !!displayedInstructionsList.length;
-
-    const onSubmitSearch = () => {
-      if (!displayedInstructionsList.length) return;
-
-      onChoose(
-        displayedInstructionsList[0].item.type,
-        displayedInstructionsList[0].item
-      );
-    };
-
-    return (
-      <div
-        style={{
-          // Important for the component to not take the full height in a dialog,
-          // allowing to let the scrollview do its job.
-          minHeight: 0,
-          ...style,
-        }}
-        id={id}
-      >
-        <SearchBar
-          value={searchText}
-          onChange={searchText =>
-            this.setState({
-              searchText,
-            })
-          }
-          onRequestSearch={onSubmitSearch}
-          placeholder={
-            searchPlaceholderObjectName
-              ? searchPlaceholderIsCondition
-                ? t`Search ${searchPlaceholderObjectName} conditions`
-                : t`Search ${searchPlaceholderObjectName} actions`
-              : undefined
-          }
-          helpPagePath={helpPagePath}
-          ref={searchBar => (this._searchBar = searchBar)}
-          autoFocus={this.props.focusOnMount ? 'desktop' : undefined}
-        />
-        <ScrollView autoHideScrollbar ref={this._scrollView}>
-          {hasResults && (
-            <List>
-              {searchText ? (
-                displayedInstructionsList.map(
-                  ({
-                    item: enumeratedInstructionOrExpressionMetadata,
-                    matches,
-                  }) =>
-                    renderInstructionOrExpressionListItem({
-                      instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
-                      id: getInstructionOrExpressionIdentifier(
+  return (
+    <div
+      style={{
+        // Important for the component to not take the full height in a dialog,
+        // allowing to let the scrollview do its job.
+        minHeight: 0,
+        ...style,
+      }}
+      id={id}
+    >
+      <SearchBar
+        value={searchText}
+        onChange={searchText =>
+          setSearchState(searchState => ({ ...searchState, searchText }))
+        }
+        onRequestSearch={onSubmitSearch}
+        placeholder={
+          searchPlaceholderObjectName
+            ? searchPlaceholderIsCondition
+              ? t`Search ${searchPlaceholderObjectName} conditions`
+              : t`Search ${searchPlaceholderObjectName} actions`
+            : undefined
+        }
+        helpPagePath={helpPagePath}
+        ref={searchBarRef}
+        autoFocus={focusOnMount ? 'desktop' : undefined}
+      />
+      <ScrollView autoHideScrollbar ref={scrollViewRef}>
+        {hasResults && (
+          <List>
+            {searchText ? (
+              displayedInstructionsList.map(
+                ({
+                  item: enumeratedInstructionOrExpressionMetadata,
+                  matches,
+                }) =>
+                  renderInstructionOrExpressionListItem({
+                    instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                    id: getInstructionOrExpressionIdentifier(
+                      enumeratedInstructionOrExpressionMetadata
+                    ),
+                    iconSize: iconSize,
+                    onClick: () =>
+                      onChoose(
+                        enumeratedInstructionOrExpressionMetadata.type,
                         enumeratedInstructionOrExpressionMetadata
                       ),
-                      iconSize: iconSize,
-                      onClick: () =>
-                        onChoose(
-                          enumeratedInstructionOrExpressionMetadata.type,
-                          enumeratedInstructionOrExpressionMetadata
-                        ),
-                      matches,
-                      selectedValue: getInstructionListItemValue(selectedType),
-                    })
-                )
-              ) : (
-                <>
-                  {renderInstructionOrExpressionTree({
-                    instructionTreeNode: instructionsInfoTree,
-                    iconSize,
-                    onChoose,
-                    useSubheaders,
+                    matches,
                     selectedValue: getInstructionListItemValue(selectedType),
-                    initiallyOpenedPath: this.initialInstructionTypePath,
-                    selectedItemRef: this._selectedItem,
-                    getGroupIconSrc,
-                  })}
-                  {onClickMore && (
-                    <ResponsiveLineStackLayout justifyContent="center">
-                      <RaisedButton
-                        primary
-                        icon={<Add />}
-                        onClick={onClickMore}
-                        label={<Trans>Add a new behavior to the object</Trans>}
-                      />
-                    </ResponsiveLineStackLayout>
-                  )}
-                </>
-              )}
-            </List>
-          )}
-          {!hasResults && (
-            <Line>
-              <EmptyMessage>
-                <Trans>
-                  Nothing corresponding to your search. Try browsing the list
-                  instead.
-                </Trans>
-              </EmptyMessage>
-            </Line>
-          )}
-        </ScrollView>
-      </div>
-    );
-  }
-}
+                  })
+              )
+            ) : (
+              <>
+                {renderInstructionOrExpressionTree({
+                  instructionTreeNode: instructionsInfoTree,
+                  iconSize,
+                  onChoose,
+                  useSubheaders,
+                  selectedValue: getInstructionListItemValue(selectedType),
+                  initiallyOpenedPath: initialInstructionTypePathRef.current,
+                  selectedItemRef: selectedItemRef,
+                  getGroupIconSrc,
+                })}
+                {onClickMore && (
+                  <ResponsiveLineStackLayout justifyContent="center">
+                    <RaisedButton
+                      primary
+                      icon={<Add />}
+                      onClick={onClickMore}
+                      label={<Trans>Add a new behavior to the object</Trans>}
+                    />
+                  </ResponsiveLineStackLayout>
+                )}
+              </>
+            )}
+          </List>
+        )}
+        {!hasResults && (
+          <Line>
+            <EmptyMessage>
+              <Trans>
+                Nothing corresponding to your search. Try browsing the list
+                instead.
+              </Trans>
+            </EmptyMessage>
+          </Line>
+        )}
+      </ScrollView>
+    </div>
+  );
+};
+
+export default InstructionOrExpressionSelector;

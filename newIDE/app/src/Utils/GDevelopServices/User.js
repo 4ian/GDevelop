@@ -189,7 +189,7 @@ export const listTeamMembers = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await apiClient.get(`/user`, {
     headers: { Authorization: authorizationHeader },
-    params: { userId, teamId },
+    params: { userId, teamId, memberType: 'basic' },
   });
   return response.data;
 };

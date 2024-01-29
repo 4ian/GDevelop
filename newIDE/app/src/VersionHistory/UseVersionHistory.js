@@ -31,7 +31,7 @@ const getCloudProjectFileMetadataIdentifier = (
 ) => {
   if (
     !fileMetadata ||
-    !storageProviderInternalName === CloudStorageProvider.internalName
+    !(storageProviderInternalName === CloudStorageProvider.internalName)
   )
     return null;
   if (fileMetadata.fileIdentifier.startsWith('http')) {

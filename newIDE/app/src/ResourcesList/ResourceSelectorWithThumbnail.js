@@ -19,6 +19,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   resourceKind: ResourceKind,
   resourceName: string,
+  defaultNewResourceName?: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
@@ -32,6 +33,7 @@ const ResourceSelectorWithThumbnail = ({
   resourceManagementProps,
   resourceKind,
   resourceName,
+  defaultNewResourceName,
   onChange,
   floatingLabelText,
   hintText,
@@ -52,6 +54,7 @@ const ResourceSelectorWithThumbnail = ({
       resourceKind={resourceKind}
       fullWidth
       initialResourceName={resourceName}
+      defaultNewResourceName={defaultNewResourceName}
       onChange={onChange}
       floatingLabelText={floatingLabelText}
       hintText={hintText}

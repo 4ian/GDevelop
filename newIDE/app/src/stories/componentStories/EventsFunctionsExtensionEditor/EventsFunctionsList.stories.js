@@ -47,10 +47,7 @@ export const Default = () => (
           cb({ functionType: 0, name: null })
         }
         onEventsFunctionAdded={action('function added')}
-        onRenameEventsFunction={(eventsFunction, newName, cb) => {
-          eventsFunction.setName(newName);
-          cb(true);
-        }}
+        onRenameEventsFunction={action('function renamed')}
         forceUpdateEditor={action('force editor update')}
       />
     </FixedHeightFlexContainer>

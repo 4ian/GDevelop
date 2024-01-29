@@ -46,6 +46,8 @@ export type EventsFunctionCallbacks = {|
     cb: (boolean) => void
   ) => void,
   onRenameEventsFunction: (
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     newName: string,
     cb: (boolean) => void
@@ -204,6 +206,8 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
     if (this.eventsFunction.getName() === newName) return;
 
     this.props.onRenameEventsFunction(
+      this.props.eventsBasedBehavior,
+      this.props.eventsBasedObject,
       this.eventsFunction,
       newName,
       doRename => {

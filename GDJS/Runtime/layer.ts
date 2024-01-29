@@ -30,6 +30,12 @@ namespace gdjs {
 
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
+      if (this.getCameraType() === gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC) {
+        this._cameraZ =
+          (this._initialCamera3DFarPlaneDistance +
+            this._initialCamera3DNearPlaneDistance) /
+          2;
+      }
 
       // Let the renderer do its final set up:
       this._renderer.onCreated();

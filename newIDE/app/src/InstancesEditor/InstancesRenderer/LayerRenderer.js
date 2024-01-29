@@ -155,7 +155,13 @@ export default class LayerRenderer {
       if (!renderedInstance) return;
 
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
-      if (pixiObject) pixiObject.zOrder = instance.getZOrder();
+      if (pixiObject) {
+        if (renderedInstance instanceof Rendered3DInstance) {
+          pixiObject.zOrder = instance.getZ() + renderedInstance.getDepth();
+        } else {
+          pixiObject.zOrder = instance.getZOrder();
+        }
+      }
 
       try {
         // "Culling" improves rendering performance of large levels

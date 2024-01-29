@@ -28,6 +28,7 @@ export default class ParticleEmitterEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      objectName,
     } = this.props;
     const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
       objectConfiguration
@@ -117,6 +118,7 @@ export default class ParticleEmitterEditor extends React.Component<
             resourceManagementProps={resourceManagementProps}
             resourceKind="image"
             resourceName={particleEmitterConfiguration.getParticleTexture()}
+            defaultNewResourceName={objectName}
             onChange={resourceName => {
               particleEmitterConfiguration.setParticleTexture(resourceName);
               this.forceUpdate();

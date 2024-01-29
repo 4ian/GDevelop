@@ -45,6 +45,7 @@ type Props = {|
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
+  defaultNewResourceName?: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
@@ -63,6 +64,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const {
       project,
       initialResourceName,
+      defaultNewResourceName,
       resourceManagementProps,
       resourcesLoader,
       resourceKind,
@@ -277,7 +279,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
               // Only useful for images:
               singleFrame: true,
               fps: 0,
-              name: resourceName,
+              name: resourceName || defaultNewResourceName,
               isLooping: false,
             },
           });
@@ -310,6 +312,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         }
       },
       [
+        defaultNewResourceName,
         forceUpdate,
         onChange,
         project,

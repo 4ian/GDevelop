@@ -241,13 +241,13 @@ const ExtensionInstallDialog = ({
           />
           <Column expand>
             <Text noMargin size="body2">
-              <Trans>
-                {extensionUpdate && installedExtension
-                  ? `Version ${installedExtension.getVersion()} (${
-                      extensionShortHeader.version
-                    } available)`
-                  : `Version ${extensionShortHeader.version}`}
-              </Trans>
+              {extensionUpdate && installedExtension ? (
+                <Trans>{`Version ${installedExtension.getVersion()} (${
+                  extensionShortHeader.version
+                } available)`}</Trans>
+              ) : (
+                <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
+              )}
             </Text>
             <Line>
               <div style={{ flexWrap: 'wrap' }}>

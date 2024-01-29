@@ -96,12 +96,6 @@ const InstructionOrExpressionSelector = <
     findInTree(instructionsInfoTree, selectedType)
   );
 
-  React.useEffect(() => {
-    if (selectedItemRef.current && scrollViewRef.current) {
-      scrollViewRef.current.scrollTo(selectedItemRef.current);
-    }
-  }, []);
-
   const { searchText } = searchState;
 
   const displayedInstructionsList: Array<SearchResult<T>> =

@@ -158,7 +158,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
       maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody
     >
-      {authenticatedUser.loginState === 'loggingIn' ? (
+      {!isConnected && authenticatedUser.loginState === 'loggingIn' ? (
         <PlaceholderLoader />
       ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
         <Line>

@@ -52,10 +52,6 @@ type Props<T> = {|
   onClickMore?: () => void,
   id?: ?string,
 |};
-type SearchState<T> = {|
-  searchText: string,
-  searchResults: Array<T>,
-|};
 
 const InstructionOrExpressionSelector = <
   T: EnumeratedInstructionOrExpressionMetadata
@@ -77,10 +73,7 @@ const InstructionOrExpressionSelector = <
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
   const scrollViewRef = React.useRef<?ScrollViewInterface>(null);
   const selectedItemRef = React.useRef<?ListItemRefType>(null);
-  const [searchState, setSearchState] = React.useState<SearchState<T>>({
-    searchText: '',
-    searchResults: [],
-  });
+  const [searchText, setSearchText] = React.useState<string>('');
   const searchApi = React.useMemo(
     () =>
       new Fuse(instructionsInfo, {
@@ -95,8 +88,6 @@ const InstructionOrExpressionSelector = <
   const initialInstructionTypePathRef = React.useRef<?(string[])>(
     findInTree(instructionsInfoTree, selectedType)
   );
-
-  const { searchText } = searchState;
 
   const displayedInstructionsList: Array<SearchResult<T>> =
     !!searchText && searchApi
@@ -135,9 +126,7 @@ const InstructionOrExpressionSelector = <
     >
       <SearchBar
         value={searchText}
-        onChange={searchText =>
-          setSearchState(searchState => ({ ...searchState, searchText }))
-        }
+        onChange={setSearchText}
         onRequestSearch={onSubmitSearch}
         placeholder={
           searchPlaceholderObjectName

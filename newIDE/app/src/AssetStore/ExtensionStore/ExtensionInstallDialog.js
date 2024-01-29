@@ -80,7 +80,7 @@ const ExtensionInstallDialog = ({
     ? project.getEventsFunctionsExtension(extensionShortHeader.name)
     : null;
 
-  const isFromStore = isAlreadyInstalled
+  const isFromStore = installedExtension
     ? installedExtension.getOriginName() === 'gdevelop-extension-store'
     : false;
 

@@ -292,7 +292,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _renameEventsFunction = (i18n: I18nType) => (
+  _makeRenameEventsFunction = (i18n: I18nType) => (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
@@ -1320,7 +1320,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   )
                 }
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
-                onRenameEventsFunction={this._renameEventsFunction(i18n)}
+                onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}
                 onEventsFunctionAdded={() => {}}
                 // Behaviors

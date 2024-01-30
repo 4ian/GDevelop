@@ -48,6 +48,7 @@ import {
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
+import CreateNewProjectButton from './CreateNewProjectButton';
 
 const styles = {
   listItem: {
@@ -237,6 +238,13 @@ const BuildSection = ({
             : undefined
         }
       >
+        {projectFiles.length === 0 && (
+          <SectionRow>
+            <Line noMargin>
+              <CreateNewProjectButton onClick={onOpenNewProjectSetupDialog} />
+            </Line>
+          </SectionRow>
+        )}
         <SectionRow>
           <Carousel
             title={<Trans>Game templates</Trans>}

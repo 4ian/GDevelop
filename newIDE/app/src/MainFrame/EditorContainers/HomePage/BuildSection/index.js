@@ -46,6 +46,26 @@ import {
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import CreateNewProjectButton from './CreateNewProjectButton';
+import GridList from '@material-ui/core/GridList';
+import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { PrivateGameTemplateTile } from '../../../../AssetStore/ShopTiles';
+
+const cellSpacing = 2;
+
+const getItemsColumns = (windowWidth: WidthType) => {
+  switch (windowWidth) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 3;
+    case 'large':
+      return 4;
+    case 'xlarge':
+      return 5;
+    default:
+      return 3;
+  }
+};
 
 const styles = {
   listItem: {
@@ -58,6 +78,11 @@ const styles = {
   projectSkeleton: { borderRadius: 6 },
   noProjectsContainer: { padding: 10 },
   refreshIconContainer: { fontSize: 20, display: 'flex', alignItems: 'center' },
+  grid: {
+    margin: 0,
+    // Remove the scroll capability of the grid, the scroll view handles it.
+    overflow: 'unset',
+  },
 };
 
 type Props = {|
@@ -95,6 +120,8 @@ const BuildSection = ({
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
+
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -205,8 +232,35 @@ const BuildSection = ({
     ]
   );
 
-  const shouldDisplaySkeleton =
-    authenticatedUser.loginState === 'loggingIn' && projectFiles.length === 0;
+  const gameTemplateTiles = React.useMemo(
+    () => {
+      if (!privateGameTemplateListingDatas) return [];
+      // Only show game templates if the category is not set or is set to "game-template".
+      return privateGameTemplateListingDatas.map(
+        (privateGameTemplateListingData, index) => (
+          <PrivateGameTemplateTile
+            privateGameTemplateListingData={privateGameTemplateListingData}
+            onSelect={() => {
+              console.log('OnSelect');
+              // onPrivateGameTemplateSelection(privateGameTemplateListingData);
+            }}
+            owned={
+              !!receivedGameTemplates &&
+              !!receivedGameTemplates.find(
+                pack => pack.id === privateGameTemplateListingData.id
+              )
+            }
+            key={privateGameTemplateListingData.id}
+          />
+        )
+      );
+    },
+    [
+      privateGameTemplateListingDatas,
+      // onPrivateGameTemplateSelection,
+      receivedGameTemplates,
+    ]
+  );
 
   return (
     <>
@@ -327,8 +381,8 @@ const BuildSection = ({
                 </PlaceholderError>
               </Line>
             )}
-            <Line>
-              {(projectFiles.length > 0 || shouldDisplaySkeleton) && (
+            {projectFiles.length > 0 && (
+              <Line>
                 <Column noMargin expand>
                   {!isMobile && (
                     <Line justifyContent="space-between">
@@ -369,10 +423,32 @@ const BuildSection = ({
                     ))}
                   </List>
                 </Column>
-              )}
-            </Line>
+              </Line>
+            )}
           </SectionRow>
         )}
+        <SectionRow>
+          <LineStackLayout
+            justifyContent="space-between"
+            alignItems="center"
+            noMargin
+            expand
+          >
+            <Column noMargin>
+              <Text size="section-title">
+                <Trans>Start with a template</Trans>
+              </Text>
+            </Column>
+          </LineStackLayout>
+          <GridList
+            cols={getItemsColumns(windowWidth)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={cellSpacing}
+          >
+            {gameTemplateTiles}
+          </GridList>
+        </SectionRow>
       </SectionContainer>
       <InfoBar
         message={<Trans>Log in to see your cloud projects.</Trans>}

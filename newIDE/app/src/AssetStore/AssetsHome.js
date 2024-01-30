@@ -233,40 +233,39 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               assetPackListingData.categories.includes(openedShopCategory)
           ),
           assetPackRandomOrdering.privateAssetPacks
-        )
-          .forEach(assetPackListingData => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(assetPackListingData);
-                }}
-                owned={isPackOwned}
-                key={assetPackListingData.id}
-              />
+        ).forEach(assetPackListingData => {
+          const isPackOwned =
+            !!receivedAssetPacks &&
+            !!receivedAssetPacks.find(
+              pack => pack.id === assetPackListingData.id
             );
-            if (
-              assetPackListingData.includedListableProductIds &&
-              !!assetPackListingData.includedListableProductIds.length
-            ) {
-              if (isPackOwned) {
-                privateOwnedAssetPackBundleTiles.push(tile);
-              } else {
-                privateAssetPackBundleTiles.push(tile);
-              }
+          const tile = (
+            <PrivateAssetPackTile
+              assetPackListingData={assetPackListingData}
+              onSelect={() => {
+                onPrivateAssetPackSelection(assetPackListingData);
+              }}
+              owned={isPackOwned}
+              key={assetPackListingData.id}
+            />
+          );
+          if (
+            assetPackListingData.includedListableProductIds &&
+            !!assetPackListingData.includedListableProductIds.length
+          ) {
+            if (isPackOwned) {
+              privateOwnedAssetPackBundleTiles.push(tile);
             } else {
-              if (isPackOwned) {
-                privateOwnedAssetPackStandAloneTiles.push(tile);
-              } else {
-                privateAssetPackStandAloneTiles.push(tile);
-              }
+              privateAssetPackBundleTiles.push(tile);
             }
-          });
+          } else {
+            if (isPackOwned) {
+              privateOwnedAssetPackStandAloneTiles.push(tile);
+            } else {
+              privateAssetPackStandAloneTiles.push(tile);
+            }
+          }
+        });
 
         const allBundleTiles = [
           ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.

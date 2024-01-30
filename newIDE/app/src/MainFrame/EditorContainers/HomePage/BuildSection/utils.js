@@ -13,6 +13,7 @@ import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore'
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
+import { shuffleArray } from '../../../../Utils/Random';
 
 export type LastModifiedInfo = {|
   lastModifiedByUsername: ?string,
@@ -128,35 +129,37 @@ export const getExampleAndTemplateItemsForCarousel = ({
   const allItems: Array<CarouselThumbnail> = [];
   const privateGameTemplateItems = [
     ...(privateGameTemplateListingDatas
-      ? privateGameTemplateListingDatas.map(privateGameTemplateListingData => {
-          const isTemplateOwned =
-            !!authenticatedUser.receivedGameTemplates &&
-            !!authenticatedUser.receivedGameTemplates.find(
-              receivedGameTemplate =>
-                receivedGameTemplate.id === privateGameTemplateListingData.id
-            );
-          return {
-            id: privateGameTemplateListingData.id,
-            title: privateGameTemplateListingData.name,
-            thumbnailUrl: privateGameTemplateListingData.thumbnailUrls[0],
-            onClick: () => {
-              sendGameTemplateInformationOpened({
-                gameTemplateName: privateGameTemplateListingData.name,
-                gameTemplateId: privateGameTemplateListingData.id,
-                source: 'homepage',
-              });
-              onSelectPrivateGameTemplateListingData(
-                privateGameTemplateListingData
+      ? shuffleArray(privateGameTemplateListingDatas).map(
+          privateGameTemplateListingData => {
+            const isTemplateOwned =
+              !!authenticatedUser.receivedGameTemplates &&
+              !!authenticatedUser.receivedGameTemplates.find(
+                receivedGameTemplate =>
+                  receivedGameTemplate.id === privateGameTemplateListingData.id
               );
-            },
-            overlayText: getProductPriceOrOwnedLabel({
-              i18n,
-              productListingData: privateGameTemplateListingData,
-              owned: isTemplateOwned,
-            }),
-            overlayTextPosition: 'topLeft',
-          };
-        })
+            return {
+              id: privateGameTemplateListingData.id,
+              title: privateGameTemplateListingData.name,
+              thumbnailUrl: privateGameTemplateListingData.thumbnailUrls[0],
+              onClick: () => {
+                sendGameTemplateInformationOpened({
+                  gameTemplateName: privateGameTemplateListingData.name,
+                  gameTemplateId: privateGameTemplateListingData.id,
+                  source: 'homepage',
+                });
+                onSelectPrivateGameTemplateListingData(
+                  privateGameTemplateListingData
+                );
+              },
+              overlayText: getProductPriceOrOwnedLabel({
+                i18n,
+                productListingData: privateGameTemplateListingData,
+                owned: isTemplateOwned,
+              }),
+              overlayTextPosition: 'topLeft',
+            };
+          }
+        )
       : []),
   ];
 

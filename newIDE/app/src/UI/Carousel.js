@@ -12,12 +12,13 @@ import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import AlertMessage from './AlertMessage';
-import ArrowLeft from './CustomSvgIcons/ArrowLeft';
-import ArrowRight from './CustomSvgIcons/ArrowRight';
 import { Trans } from '@lingui/macro';
 import { CorsAwareImage } from './CorsAwareImage';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import ChevronArrowLeft from './CustomSvgIcons/ChevronArrowLeft';
+import ChevronArrowRight from './CustomSvgIcons/ChevronArrowRight';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 type OverlayTextPosition =
   | 'topLeft'
@@ -73,7 +74,6 @@ const cellSpacing = 12;
 const titleHeight = 24;
 const spacerSize = 4;
 const focusItemBorderWidth = 2;
-const rightArrowMargin = cellSpacing / 2; // Necessary because MUI adds a margin to GridList corresponding to cell spacing
 const skeletonNumber = 6;
 const randomNumbers = Array(skeletonNumber)
   .fill(0)
@@ -104,6 +104,8 @@ const styles = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    borderRadius: 4,
   },
   overlay: {
     position: 'absolute',
@@ -113,6 +115,21 @@ const styles = {
     color: 'white', // Same color for all themes.
   },
 };
+
+const useStylesForArrowButtons = () =>
+  makeStyles(theme =>
+    createStyles({
+      root: {
+        '&:hover': {
+          filter:
+            theme.palette.type === 'dark'
+              ? 'brightness(130%)'
+              : 'brightness(90%)',
+        },
+        transition: 'filter 100ms ease',
+      },
+    })
+  )();
 
 const useStylesForGridList = makeStyles({
   root: {
@@ -199,6 +216,8 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
   ] = React.useState<boolean>(!hideArrows);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const classesForArrowButtons = useStylesForArrowButtons();
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
   const scrollView = React.useRef<?HTMLUListElement>(null);
@@ -359,7 +378,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
   );
 
   const onClickArrow = React.useCallback(
-    (direction: 'left' | 'right') => (): void => {
+    (direction: 'left' | 'right'): void => {
       const scrollViewElement = scrollView.current;
       if (!scrollViewElement) return;
       const newScrollPosition = computeScroll(direction, scrollViewElement);
@@ -380,8 +399,11 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
 
       const isScrollAtStart = scrollViewElement.scrollLeft === 0;
       const isScrollAtEnd =
-        scrollViewElement.scrollLeft ===
-        scrollViewElement.scrollWidth - scrollViewElement.clientWidth;
+        scrollViewElement.scrollLeft >=
+        scrollViewElement.scrollWidth -
+          scrollViewElement.clientWidth -
+          // margin to avoid having the arrow flickering when the tile is scaling on hover.
+          5;
       const shouldToggleLeftArrowVisibility =
         isScrollAtStart === shouldDisplayLeftArrow;
       const shouldToggleRightArrowVisibility =
@@ -485,23 +507,27 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
         </Line>
       </Line>
 
-      <Line noMargin>
-        {!hideArrows && (
+      <div style={{ display: 'flex', position: 'relative' }}>
+        {!hideArrows && shouldDisplayLeftArrow && areItemsSet && (
           <div
+            className={classesForArrowButtons.root}
             style={{
               ...styles.arrowContainer,
+              backgroundColor: gdevelopTheme.paper.backgroundColor.light,
               width: arrowWidth,
+              height: arrowWidth,
+              left: 5,
+              zIndex: 1,
+              top: `calc(50% - ${Math.floor(arrowWidth / 2)}px)`,
             }}
-            onClick={onClickArrow('left')}
+            onClick={() => onClickArrow('left')}
           >
-            {shouldDisplayLeftArrow && areItemsSet && <ArrowLeft />}
+            <ChevronArrowLeft />
           </div>
         )}
         <div
           style={{
-            width: !!hideArrows
-              ? '100%'
-              : `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
+            width: '100%',
           }}
         >
           {error ? (
@@ -555,19 +581,23 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
             </GridList>
           )}
         </div>
-        {!hideArrows && (
+        {!hideArrows && shouldDisplayRightArrow && areItemsSet && (
           <div
+            className={classesForArrowButtons.root}
             style={{
               ...styles.arrowContainer,
+              backgroundColor: gdevelopTheme.paper.backgroundColor.light,
               width: arrowWidth,
-              marginLeft: rightArrowMargin,
+              height: arrowWidth,
+              right: 0,
+              top: `calc(50% - ${Math.floor(arrowWidth / 2)}px)`,
             }}
-            onClick={onClickArrow('right')}
+            onClick={() => onClickArrow('right')}
           >
-            {shouldDisplayRightArrow && areItemsSet && <ArrowRight />}
+            <ChevronArrowRight />
           </div>
         )}
-      </Line>
+      </div>
     </Column>
   );
 };

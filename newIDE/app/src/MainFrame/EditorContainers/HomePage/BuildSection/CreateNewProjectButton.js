@@ -22,16 +22,15 @@ const styles = {
   textContainer: { marginLeft: 25, marginRight: 25 },
 };
 
-const useStyles = (isSelected?: boolean) =>
+const useStyles = () =>
   makeStyles(theme =>
     createStyles({
       root: {
         '&:hover': {
-          filter: isSelected
-            ? undefined
-            : theme.palette.type === 'dark'
-            ? 'brightness(130%)'
-            : 'brightness(90%)',
+          filter:
+            theme.palette.type === 'dark'
+              ? 'brightness(130%)'
+              : 'brightness(90%)',
         },
         transition: 'filter 100ms ease',
       },

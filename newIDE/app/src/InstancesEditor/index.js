@@ -290,7 +290,10 @@ export default class InstancesEditor extends Component<Props> {
     );
     panable(this.backgroundArea);
     this.backgroundArea.addEventListener('mousedown', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y, event)
+      this._onDownBackground(event.data.global.x, event.data.global.y, event)
+    );
+    this.backgroundArea.addEventListener('mouseup', event =>
+      this._onUpBackground(event.data.global.x, event.data.global.y, event)
     );
     this.backgroundArea.addEventListener(
       'rightclick',
@@ -314,7 +317,14 @@ export default class InstancesEditor extends Component<Props> {
         return;
       }
 
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y);
+      this._onDownBackground(event.data.global.x, event.data.global.y);
+    });
+    this.backgroundArea.addEventListener('touchend', event => {
+      if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+        return;
+      }
+
+      this._onUpBackground(event.data.global.x, event.data.global.y);
     });
     this.backgroundArea.addEventListener('globalmousemove', event => {
       const cursorX = event.data.global.x || 0;
@@ -653,7 +663,7 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x: number, y: number, event?: PointerEvent) => {
+  _onDownBackground = (x: number, y: number, event?: PointerEvent) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
@@ -692,8 +702,12 @@ export default class InstancesEditor extends Component<Props> {
       const sceneDeltaY = deltaY / this.getZoomFactor();
 
       this.scrollBy(-sceneDeltaX, -sceneDeltaY);
-    } else {
+      return;
+    }
+
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
       this.selectionRectangle.updateSelectionRectangle(x, y);
+      return;
     }
   };
 
@@ -706,6 +720,12 @@ export default class InstancesEditor extends Component<Props> {
         !layer.getVisibility() || layer.isLocked();
     }
     return layersLocks;
+  };
+
+  _onUpBackground = (x: number, y: number, event?: PointerEvent) => {
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+      this._selectInstanceInsideRectangle();
+    }
   };
 
   _onPanEnd = () => {
@@ -829,7 +849,10 @@ export default class InstancesEditor extends Component<Props> {
           this.props.instancesSelection.getSelectedInstances()
         );
       }
-      return;
+
+      if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+        this._selectInstanceInsideRectangle();
+      }
     }
   };
 

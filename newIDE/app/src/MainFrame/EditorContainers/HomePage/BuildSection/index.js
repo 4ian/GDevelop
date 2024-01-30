@@ -257,139 +257,141 @@ const BuildSection = ({
             hideArrows
           />
         </SectionRow>
-        <SectionRow>
-          <ResponsiveLineStackLayout
-            justifyContent="space-between"
-            alignItems="center"
-            noMargin
-            expand
-          >
-            <Column noMargin>
-              <LineStackLayout noMargin alignItems="center">
-                <Text size="section-title">
-                  <Trans>My projects</Trans>
-                </Text>
-                <IconButton
-                  size="small"
-                  onClick={refreshCloudProjects}
-                  disabled={isRefreshing}
-                  tooltip={t`Refresh cloud projects`}
-                >
-                  <div style={styles.refreshIconContainer}>
-                    <Refresh fontSize="inherit" />
-                  </div>
-                </IconButton>
-              </LineStackLayout>
-            </Column>
-            <Column noMargin>
-              <LineStackLayout noMargin>
-                <RaisedButton
-                  primary
-                  fullWidth={!canOpen}
-                  label={
-                    isMobile ? (
-                      <Trans>Create</Trans>
-                    ) : (
-                      <Trans>Create a project</Trans>
-                    )
-                  }
-                  onClick={onOpenNewProjectSetupDialog}
-                  icon={<Add fontSize="small" />}
-                  id="home-create-project-button"
-                />
-                {canOpen && (
-                  <>
-                    <Text>
-                      <Trans>or</Trans>
-                    </Text>
-                    <Spacer />
-                    <TextButton
-                      primary
-                      label={
-                        isMobile ? (
-                          <Trans>Open</Trans>
-                        ) : (
-                          <Trans>Open a project</Trans>
-                        )
-                      }
-                      onClick={onChooseProject}
-                    />
-                  </>
-                )}
-              </LineStackLayout>
-            </Column>
-          </ResponsiveLineStackLayout>
-          {cloudProjectsFetchingErrorLabel && (
-            <Line>
-              <PlaceholderError onRetry={onCloudProjectsChanged}>
-                <AlertMessage kind="warning">
-                  {cloudProjectsFetchingErrorLabel}
-                </AlertMessage>
-              </PlaceholderError>
-            </Line>
-          )}
-          <Line>
-            {(projectFiles.length > 0 || shouldDisplaySkeleton) && (
-              <Column noMargin expand>
-                {!isMobile && (
-                  <Line justifyContent="space-between">
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>File name</Trans>
-                      </Text>
-                    </Column>
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>Location</Trans>
-                      </Text>
-                    </Column>
-                    <Column expand>
-                      <Text color="secondary">
-                        <Trans>Last edited</Trans>
-                      </Text>
-                    </Column>
-                  </Line>
-                )}
-                <List>
-                  {shouldDisplaySkeleton // Only show skeleton on first load
-                    ? new Array(10).fill(0).map((_, index) => (
-                        <ListItem
-                          style={styles.listItem}
-                          key={`skeleton-${index}`}
-                        >
-                          <Line expand>
-                            <Column expand>
-                              <Skeleton
-                                variant="rect"
-                                height={skeletonLineHeight}
-                                style={styles.projectSkeleton}
-                              />
-                            </Column>
-                          </Line>
-                        </ListItem>
-                      ))
-                    : projectFiles.map(file => (
-                        <ProjectFileListItem
-                          key={file.fileMetadata.fileIdentifier}
-                          file={file}
-                          currentFileMetadata={currentFileMetadata}
-                          storageProviders={storageProviders}
-                          isWindowWidthMediumOrLarger={!isMobile}
-                          onOpenRecentFile={onOpenRecentFile}
-                          lastModifiedInfo={
-                            lastModifiedInfoByProjectId[
-                              file.fileMetadata.fileIdentifier
-                            ]
-                          }
-                          onManageGame={onManageGame}
-                          canManageGame={canManageGame}
-                        />
-                      ))}
-                </List>
+        {projectFiles.length > 0 && (
+          <SectionRow>
+            <ResponsiveLineStackLayout
+              justifyContent="space-between"
+              alignItems="center"
+              noMargin
+              expand
+            >
+              <Column noMargin>
+                <LineStackLayout noMargin alignItems="center">
+                  <Text size="section-title">
+                    <Trans>My projects</Trans>
+                  </Text>
+                  <IconButton
+                    size="small"
+                    onClick={refreshCloudProjects}
+                    disabled={isRefreshing}
+                    tooltip={t`Refresh cloud projects`}
+                  >
+                    <div style={styles.refreshIconContainer}>
+                      <Refresh fontSize="inherit" />
+                    </div>
+                  </IconButton>
+                </LineStackLayout>
               </Column>
+              <Column noMargin>
+                <LineStackLayout noMargin>
+                  <RaisedButton
+                    primary
+                    fullWidth={!canOpen}
+                    label={
+                      isMobile ? (
+                        <Trans>Create</Trans>
+                      ) : (
+                        <Trans>Create a project</Trans>
+                      )
+                    }
+                    onClick={onOpenNewProjectSetupDialog}
+                    icon={<Add fontSize="small" />}
+                    id="home-create-project-button"
+                  />
+                  {canOpen && (
+                    <>
+                      <Text>
+                        <Trans>or</Trans>
+                      </Text>
+                      <Spacer />
+                      <TextButton
+                        primary
+                        label={
+                          isMobile ? (
+                            <Trans>Open</Trans>
+                          ) : (
+                            <Trans>Open a project</Trans>
+                          )
+                        }
+                        onClick={onChooseProject}
+                      />
+                    </>
+                  )}
+                </LineStackLayout>
+              </Column>
+            </ResponsiveLineStackLayout>
+            {cloudProjectsFetchingErrorLabel && (
+              <Line>
+                <PlaceholderError onRetry={onCloudProjectsChanged}>
+                  <AlertMessage kind="warning">
+                    {cloudProjectsFetchingErrorLabel}
+                  </AlertMessage>
+                </PlaceholderError>
+              </Line>
             )}
-          </Line>
-        </SectionRow>
+            <Line>
+              {(projectFiles.length > 0 || shouldDisplaySkeleton) && (
+                <Column noMargin expand>
+                  {!isMobile && (
+                    <Line justifyContent="space-between">
+                      <Column expand>
+                        <Text color="secondary">
+                          <Trans>File name</Trans>
+                        </Text>
+                      </Column>
+                      <Column expand>
+                        <Text color="secondary">
+                          <Trans>Location</Trans>
+                        </Text>
+                      </Column>
+                      <Column expand>
+                        <Text color="secondary">
+                          <Trans>Last edited</Trans>
+                        </Text>
+                      </Column>
+                    </Line>
+                  )}
+                  <List>
+                    {shouldDisplaySkeleton // Only show skeleton on first load
+                      ? new Array(10).fill(0).map((_, index) => (
+                          <ListItem
+                            style={styles.listItem}
+                            key={`skeleton-${index}`}
+                          >
+                            <Line expand>
+                              <Column expand>
+                                <Skeleton
+                                  variant="rect"
+                                  height={skeletonLineHeight}
+                                  style={styles.projectSkeleton}
+                                />
+                              </Column>
+                            </Line>
+                          </ListItem>
+                        ))
+                      : projectFiles.map(file => (
+                          <ProjectFileListItem
+                            key={file.fileMetadata.fileIdentifier}
+                            file={file}
+                            currentFileMetadata={currentFileMetadata}
+                            storageProviders={storageProviders}
+                            isWindowWidthMediumOrLarger={!isMobile}
+                            onOpenRecentFile={onOpenRecentFile}
+                            lastModifiedInfo={
+                              lastModifiedInfoByProjectId[
+                                file.fileMetadata.fileIdentifier
+                              ]
+                            }
+                            onManageGame={onManageGame}
+                            canManageGame={canManageGame}
+                          />
+                        ))}
+                  </List>
+                </Column>
+              )}
+            </Line>
+          </SectionRow>
+        )}
       </SectionContainer>
       <InfoBar
         message={<Trans>Log in to see your cloud projects.</Trans>}

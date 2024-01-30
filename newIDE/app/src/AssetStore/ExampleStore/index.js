@@ -213,7 +213,7 @@ export const ExampleStore = ({
       exampleShortHeadersSearchResults,
       privateGameTemplateListingDatasSearchResults,
       searchText,
-      tagsHandler
+      tagsHandler,
     ]
   );
 

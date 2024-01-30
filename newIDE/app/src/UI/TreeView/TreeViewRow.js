@@ -171,14 +171,6 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     [onSelect, node, onOpen]
   );
 
-  const selectAndOpenContextMenu = React.useCallback(
-    (event: MouseEvent) => {
-      onClick(event);
-      openContextMenu(event);
-    },
-    [onClick, openContextMenu]
-  );
-
   const setIsStayingOver = React.useCallback(
     (active: boolean, canDrop: boolean) => {
       // Do not open folder if cannot drop into it. It's implied that if it
@@ -403,7 +395,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 onDoubleClick={
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
-                onContextMenu={selectAndOpenContextMenu}
+                onContextMenu={openContextMenu}
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}

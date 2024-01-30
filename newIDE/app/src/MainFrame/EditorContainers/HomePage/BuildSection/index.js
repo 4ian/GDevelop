@@ -3,7 +3,6 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
@@ -31,7 +30,6 @@ import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/Example
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Add from '../../../../UI/CustomSvgIcons/Add';
-import Skeleton from '@material-ui/lab/Skeleton';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
 import IconButton from '../../../../UI/IconButton';
@@ -43,7 +41,6 @@ import ProjectFileListItem from './ProjectFileListItem';
 import {
   getExampleAndTemplateItemsForCarousel,
   getLastModifiedInfoByProjectId,
-  getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
@@ -186,8 +183,6 @@ const BuildSection = ({
     if (!b.fileMetadata.lastModifiedDate) return -1;
     return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
   });
-
-  const skeletonLineHeight = getProjectLineHeight(windowWidth);
 
   // Show a premium game template every 3 examples.
   const examplesAndTemplatesToDisplay = React.useMemo(
@@ -352,40 +347,23 @@ const BuildSection = ({
                     </Line>
                   )}
                   <List>
-                    {shouldDisplaySkeleton // Only show skeleton on first load
-                      ? new Array(10).fill(0).map((_, index) => (
-                          <ListItem
-                            style={styles.listItem}
-                            key={`skeleton-${index}`}
-                          >
-                            <Line expand>
-                              <Column expand>
-                                <Skeleton
-                                  variant="rect"
-                                  height={skeletonLineHeight}
-                                  style={styles.projectSkeleton}
-                                />
-                              </Column>
-                            </Line>
-                          </ListItem>
-                        ))
-                      : projectFiles.map(file => (
-                          <ProjectFileListItem
-                            key={file.fileMetadata.fileIdentifier}
-                            file={file}
-                            currentFileMetadata={currentFileMetadata}
-                            storageProviders={storageProviders}
-                            isWindowWidthMediumOrLarger={!isMobile}
-                            onOpenRecentFile={onOpenRecentFile}
-                            lastModifiedInfo={
-                              lastModifiedInfoByProjectId[
-                                file.fileMetadata.fileIdentifier
-                              ]
-                            }
-                            onManageGame={onManageGame}
-                            canManageGame={canManageGame}
-                          />
-                        ))}
+                    {projectFiles.map(file => (
+                      <ProjectFileListItem
+                        key={file.fileMetadata.fileIdentifier}
+                        file={file}
+                        currentFileMetadata={currentFileMetadata}
+                        storageProviders={storageProviders}
+                        isWindowWidthMediumOrLarger={!isMobile}
+                        onOpenRecentFile={onOpenRecentFile}
+                        lastModifiedInfo={
+                          lastModifiedInfoByProjectId[
+                            file.fileMetadata.fileIdentifier
+                          ]
+                        }
+                        onManageGame={onManageGame}
+                        canManageGame={canManageGame}
+                      />
+                    ))}
                   </List>
                 </Column>
               )}

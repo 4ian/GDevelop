@@ -14,6 +14,7 @@ import {
   terminateWebSocket,
 } from '../Utils/GDevelopServices/Authorization';
 import Window from '../Utils/Window';
+import { UserCancellationError } from './Utils';
 
 const isDev = Window.isDev();
 
@@ -50,7 +51,9 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
   |}) {
     if (signal && signal.aborted) {
       return Promise.reject(
-        new Error('Login or Signup with provider already aborted.')
+        new UserCancellationError(
+          'Login or Signup with provider already aborted.'
+        )
       );
     }
     const promise = new Promise((resolve, reject) => {
@@ -58,7 +61,11 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
       if (signal) {
         signal.addEventListener('abort', () => {
           terminateWebSocket();
-          reject(new Error('Login or Signup with provider aborted.'));
+          reject(
+            new UserCancellationError(
+              'Login or Signup with provider already aborted.'
+            )
+          );
         });
       }
       setupAuthenticationWebSocket({

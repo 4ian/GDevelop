@@ -32,8 +32,6 @@ import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import Skeleton from '@material-ui/lab/Skeleton';
-import BackgroundText from '../../../../UI/BackgroundText';
-import Paper from '../../../../UI/Paper';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
 import IconButton from '../../../../UI/IconButton';
@@ -211,6 +209,9 @@ const BuildSection = ({
     ]
   );
 
+  const shouldDisplaySkeleton =
+    authenticatedUser.loginState === 'loggingIn' && projectFiles.length === 0;
+
   return (
     <>
       <SectionContainer
@@ -320,83 +321,65 @@ const BuildSection = ({
             </Line>
           )}
           <Line>
-            <Column noMargin expand>
-              {!isMobile && (
-                <Line justifyContent="space-between">
-                  <Column expand>
-                    <Text color="secondary">
-                      <Trans>File name</Trans>
-                    </Text>
-                  </Column>
-                  <Column expand>
-                    <Text color="secondary">
-                      <Trans>Location</Trans>
-                    </Text>
-                  </Column>
-                  <Column expand>
-                    <Text color="secondary">
-                      <Trans>Last edited</Trans>
-                    </Text>
-                  </Column>
-                </Line>
-              )}
-              <List>
-                {authenticatedUser.loginState === 'loggingIn' &&
-                projectFiles.length === 0 ? ( // Only show skeleton on first load
-                  new Array(10).fill(0).map((_, index) => (
-                    <ListItem style={styles.listItem} key={`skeleton-${index}`}>
-                      <Line expand>
-                        <Column expand>
-                          <Skeleton
-                            variant="rect"
-                            height={skeletonLineHeight}
-                            style={styles.projectSkeleton}
-                          />
-                        </Column>
-                      </Line>
-                    </ListItem>
-                  ))
-                ) : projectFiles.length > 0 ? (
-                  projectFiles.map(file => (
-                    <ProjectFileListItem
-                      key={file.fileMetadata.fileIdentifier}
-                      file={file}
-                      currentFileMetadata={currentFileMetadata}
-                      storageProviders={storageProviders}
-                      isWindowWidthMediumOrLarger={!isMobile}
-                      onOpenRecentFile={onOpenRecentFile}
-                      lastModifiedInfo={
-                        lastModifiedInfoByProjectId[
-                          file.fileMetadata.fileIdentifier
-                        ]
-                      }
-                      onManageGame={onManageGame}
-                      canManageGame={canManageGame}
-                    />
-                  ))
-                ) : (
-                  <ListItem style={styles.listItem}>
+            {(projectFiles.length > 0 || shouldDisplaySkeleton) && (
+              <Column noMargin expand>
+                {!isMobile && (
+                  <Line justifyContent="space-between">
                     <Column expand>
-                      <Paper
-                        variant="outlined"
-                        background="dark"
-                        style={styles.noProjectsContainer}
-                      >
-                        <BackgroundText>
-                          <Trans>No projects yet.</Trans>
-                        </BackgroundText>
-                        <BackgroundText>
-                          <Trans>
-                            Create your first project using one of our templates
-                            or start from scratch.
-                          </Trans>
-                        </BackgroundText>
-                      </Paper>
+                      <Text color="secondary">
+                        <Trans>File name</Trans>
+                      </Text>
                     </Column>
-                  </ListItem>
+                    <Column expand>
+                      <Text color="secondary">
+                        <Trans>Location</Trans>
+                      </Text>
+                    </Column>
+                    <Column expand>
+                      <Text color="secondary">
+                        <Trans>Last edited</Trans>
+                      </Text>
+                    </Column>
+                  </Line>
                 )}
-              </List>
-            </Column>
+                <List>
+                  {shouldDisplaySkeleton // Only show skeleton on first load
+                    ? new Array(10).fill(0).map((_, index) => (
+                        <ListItem
+                          style={styles.listItem}
+                          key={`skeleton-${index}`}
+                        >
+                          <Line expand>
+                            <Column expand>
+                              <Skeleton
+                                variant="rect"
+                                height={skeletonLineHeight}
+                                style={styles.projectSkeleton}
+                              />
+                            </Column>
+                          </Line>
+                        </ListItem>
+                      ))
+                    : projectFiles.map(file => (
+                        <ProjectFileListItem
+                          key={file.fileMetadata.fileIdentifier}
+                          file={file}
+                          currentFileMetadata={currentFileMetadata}
+                          storageProviders={storageProviders}
+                          isWindowWidthMediumOrLarger={!isMobile}
+                          onOpenRecentFile={onOpenRecentFile}
+                          lastModifiedInfo={
+                            lastModifiedInfoByProjectId[
+                              file.fileMetadata.fileIdentifier
+                            ]
+                          }
+                          onManageGame={onManageGame}
+                          canManageGame={canManageGame}
+                        />
+                      ))}
+                </List>
+              </Column>
+            )}
           </Line>
         </SectionRow>
       </SectionContainer>

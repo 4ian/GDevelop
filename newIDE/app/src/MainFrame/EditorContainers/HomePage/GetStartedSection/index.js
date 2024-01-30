@@ -104,6 +104,10 @@ const GetStartedSection = ({
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [
+    isLoggingInUsingProvider,
+    setIsLoggingInUsingProvider,
+  ] = React.useState<boolean>(false);
   const {
     profile,
     onResetPassword,
@@ -203,6 +207,18 @@ const GetStartedSection = ({
     }
   };
 
+  const loginWithProvider = React.useCallback(
+    async provider => {
+      try {
+        setIsLoggingInUsingProvider(true);
+        await onLoginWithProvider(provider);
+      } finally {
+        setIsLoggingInUsingProvider(false);
+      }
+    },
+    [onLoginWithProvider]
+  );
+
   React.useEffect(
     () => {
       if (step === 'welcome' && profile && profile.survey) {
@@ -283,21 +299,23 @@ const GetStartedSection = ({
           >
             <CircularProgress size={40} />
           </ColumnStackLayout>
-          <div style={styles.bottomPageButtonContainer}>
-            <Column>
-              <LineStackLayout
-                expand
-                justifyContent="center"
-                alignItems="center"
-              >
-                <FlatButton
-                  primary
-                  label={<Trans>Cancel</Trans>}
-                  onClick={onCancelLogin}
-                />
-              </LineStackLayout>
-            </Column>
-          </div>
+          {isLoggingInUsingProvider && (
+            <div style={styles.bottomPageButtonContainer}>
+              <Column>
+                <LineStackLayout
+                  expand
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <FlatButton
+                    primary
+                    label={<Trans>Cancel</Trans>}
+                    onClick={onCancelLogin}
+                  />
+                </LineStackLayout>
+              </Column>
+            </div>
+          )}
         </ColumnStackLayout>
       </SectionContainer>
     );
@@ -389,7 +407,7 @@ const GetStartedSection = ({
                 password={password}
                 onChangePassword={setPassword}
                 onLogin={doLogin}
-                onLoginWithProvider={onLoginWithProvider}
+                onLoginWithProvider={loginWithProvider}
                 loginInProgress={creatingOrLoggingInAccount}
                 onForgotPassword={onResetPassword}
                 error={error}
@@ -450,7 +468,7 @@ const GetStartedSection = ({
               <CreateAccountForm
                 email={email}
                 onChangeEmail={setEmail}
-                onLoginWithProvider={onLoginWithProvider}
+                onLoginWithProvider={loginWithProvider}
                 password={password}
                 onChangePassword={setPassword}
                 username={username}

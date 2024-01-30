@@ -236,7 +236,10 @@ const BuildSection = ({
         {projectFiles.length === 0 && (
           <SectionRow>
             <Line noMargin>
-              <CreateNewProjectButton onClick={onOpenNewProjectSetupDialog} />
+              <CreateNewProjectButton
+                onClick={onOpenNewProjectSetupDialog}
+                fullWidth={isMobile}
+              />
             </Line>
           </SectionRow>
         )}

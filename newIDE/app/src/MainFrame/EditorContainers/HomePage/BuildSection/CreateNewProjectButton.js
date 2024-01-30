@@ -40,6 +40,7 @@ const useStyles = (isSelected?: boolean) =>
 
 type Props = {|
   onClick: () => void,
+  fullWidth?: boolean,
 |};
 
 const CreateNewProjectButton = (props: Props) => {
@@ -48,7 +49,11 @@ const CreateNewProjectButton = (props: Props) => {
   const classes = useStyles();
   return (
     <ButtonBase
-      style={{ ...styles.button, borderColor: muiTheme.palette.text.primary }}
+      style={{
+        ...styles.button,
+        width: props.fullWidth ? '100%' : undefined,
+        borderColor: muiTheme.palette.text.primary,
+      }}
       classes={classes}
       onClick={props.onClick}
     >

@@ -1630,6 +1630,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
+                      shouldSelectUponContextMenuOpening
                     />
                   )}
                 </AutoSizer>

@@ -512,6 +512,7 @@ export const Default = () => {
                     onMoveSelectionToItem={action('Drop selection on item')}
                     canMoveSelectionToItem={() => Math.random() > 0.2}
                     reactDndType="demo"
+                    shouldSelectUponContextMenuOpening
                   />
                 </Column>
               </Line>

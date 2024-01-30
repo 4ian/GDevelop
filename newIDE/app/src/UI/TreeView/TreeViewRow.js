@@ -133,6 +133,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
+    shouldSelectUponContextMenuOpening,
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
@@ -169,6 +170,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
     },
     [onSelect, node, onOpen]
+  );
+
+  const selectAndOpenContextMenu = React.useCallback(
+    (event: MouseEvent) => {
+      onClick(event);
+      openContextMenu(event);
+    },
+    [onClick, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(
@@ -395,7 +404,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 onDoubleClick={
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
-                onContextMenu={openContextMenu}
+                onContextMenu={
+                  shouldSelectUponContextMenuOpening
+                    ? selectAndOpenContextMenu
+                    : openContextMenu
+                }
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}

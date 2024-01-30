@@ -55,6 +55,8 @@ const styles = {
   },
 };
 
+const epsilon = 1 / (1 << 16);
+
 const removeTrailingZeroes = (value: string) => {
   for (let index = value.length - 1; index > 0; index--) {
     if (value.charAt(index) === '.') {
@@ -179,6 +181,17 @@ const Model3DEditor = ({
     [gltf]
   );
 
+  const [originLocation, setOriginLocation] = React.useState<string>(() =>
+    properties.get('originLocation').getValue()
+  );
+  const onOriginLocationChange = React.useCallback(
+    (event, index: number, newValue: string) => {
+      onChangeProperty('originLocation', newValue);
+      setOriginLocation(newValue);
+    },
+    [onChangeProperty]
+  );
+
   const [rotationX, setRotationX] = React.useState<number>(
     () => parseFloat(properties.get('rotationX').getValue()) || 0
   );
@@ -211,13 +224,23 @@ const Model3DEditor = ({
       );
       model3D.updateMatrixWorld(true);
       const boundingBox = new THREE.Box3().setFromObject(model3D);
+      if (originLocation === 'ModelOrigin') {
+        // Keep the origin as part of the model.
+        // For instance, a model can be 1 face of a cube and we want to keep the
+        // inside as part of the object even if it's just void.
+        // It also avoids to have the origin outside of the object box.
+        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+      }
+      const sizeX = boundingBox.max.x - boundingBox.min.x;
+      const sizeY = boundingBox.max.y - boundingBox.min.y;
+      const sizeZ = boundingBox.max.z - boundingBox.min.z;
       return {
-        x: boundingBox.max.x - boundingBox.min.x,
-        y: boundingBox.max.y - boundingBox.min.y,
-        z: boundingBox.max.z - boundingBox.min.z,
+        x: sizeX < epsilon ? 0 : sizeX,
+        y: sizeY < epsilon ? 0 : sizeY,
+        z: sizeZ < epsilon ? 0 : sizeZ,
       };
     },
-    [model3D, rotationX, rotationY, rotationZ]
+    [model3D, originLocation, rotationX, rotationY, rotationZ]
   );
 
   const [width, setWidth] = React.useState<number>(
@@ -243,9 +266,9 @@ const Model3DEditor = ({
         return null;
       }
       return Math.min(
-        width / modelSize.x,
-        height / modelSize.y,
-        depth / modelSize.z
+        modelSize.x < epsilon ? Number.POSITIVE_INFINITY : width / modelSize.x,
+        modelSize.y < epsilon ? Number.POSITIVE_INFINITY : height / modelSize.y,
+        modelSize.z < epsilon ? Number.POSITIVE_INFINITY : depth / modelSize.z
       );
     },
     [depth, height, modelSize, width]
@@ -549,14 +572,12 @@ const Model3DEditor = ({
           </Text>
           <ResponsiveLineStackLayout expand noColumnMargin>
             <SelectField
-              value={properties.get('originLocation').getValue()}
+              value={originLocation}
               floatingLabelText={properties.get('originLocation').getLabel()}
               helperMarkdownText={properties
                 .get('originLocation')
                 .getDescription()}
-              onChange={(event, index, newValue) => {
-                onChangeProperty('originLocation', newValue);
-              }}
+              onChange={onOriginLocationChange}
               fullWidth
             >
               <SelectOption

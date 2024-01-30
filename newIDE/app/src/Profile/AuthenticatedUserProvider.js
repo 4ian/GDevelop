@@ -55,6 +55,7 @@ import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import { userCancellationErrorName } from '../LoginProvider/Utils';
 
 type Props = {|
   authentication: Authentication,
@@ -772,19 +773,21 @@ export default class AuthenticatedUserProvider extends React.Component<
       this.openCreateAccountDialog(false);
       this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
-      showErrorBox({
-        rawError: apiCallError,
-        errorId: 'login-with-provider',
-        doNotReport: true,
-        message: `An error occurred while logging in with provider ${provider}. Please check your internet connection or try again later.`,
-      });
-      this.setState({
-        apiCallError,
-        authenticatedUser: {
-          ...this.state.authenticatedUser,
-          authenticationError: apiCallError,
-        },
-      });
+      if (apiCallError.name !== userCancellationErrorName) {
+        showErrorBox({
+          rawError: apiCallError,
+          errorId: 'login-with-provider',
+          doNotReport: true,
+          message: `An error occurred while logging in with provider ${provider}. Please check your internet connection or try again later.`,
+        });
+        this.setState({
+          apiCallError,
+          authenticatedUser: {
+            ...this.state.authenticatedUser,
+            authenticationError: apiCallError,
+          },
+        });
+      }
     }
     this.setState({
       loginInProgress: false,

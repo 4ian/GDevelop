@@ -192,6 +192,10 @@ export const ExampleStore = ({
         ? exampleShortHeadersSearchResults.map(({ item }) => item)
         : [];
 
+      if (searchText || tagsHandler.chosenTags.size > 0) {
+        return [...privateGameTemplateItems, ...exampleShortHeaderItems];
+      }
+
       for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
         searchItems.push(exampleShortHeaderItems[i]);
         if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
@@ -208,6 +212,8 @@ export const ExampleStore = ({
     [
       exampleShortHeadersSearchResults,
       privateGameTemplateListingDatasSearchResults,
+      searchText,
+      tagsHandler,
     ]
   );
 

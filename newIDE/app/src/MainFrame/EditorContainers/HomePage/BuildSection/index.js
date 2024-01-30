@@ -252,7 +252,7 @@ const BuildSection = ({
             items={examplesAndTemplatesToDisplay}
             browseAllIcon={<ChevronArrowRight fontSize="small" />}
             roundedImages
-            hideArrows
+            displayArrowsOnDesktop
           />
         </SectionRow>
         {projectFiles.length > 0 && (

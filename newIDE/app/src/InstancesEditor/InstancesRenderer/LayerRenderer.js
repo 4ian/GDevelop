@@ -36,6 +36,7 @@ export default class LayerRenderer {
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
+  onUpInstance: (gdInitialInstance, number, number) => void;
   /**Used for instances culling on rendering */
   viewTopLeft: [number, number];
   /** Used for instances culling on rendering */
@@ -91,6 +92,7 @@ export default class LayerRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+    onUpInstance,
     pixiRenderer,
     showObjectInstancesIn3D,
   }: {
@@ -112,6 +114,7 @@ export default class LayerRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
+    onUpInstance: (gdInitialInstance, number, number) => void,
     pixiRenderer: PIXI.Renderer,
     showObjectInstancesIn3D: boolean,
   }) {
@@ -129,6 +132,7 @@ export default class LayerRenderer {
     this.onMoveInstance = onMoveInstance;
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
+    this.onUpInstance = onUpInstance;
 
     this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
     this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
@@ -409,6 +413,19 @@ export default class LayerRenderer {
         }
       );
       renderedInstance._pixiObject.addEventListener(
+        'mouseup',
+        (event: PIXI.InteractionEvent) => {
+          if (event.data.originalEvent.button === 0) {
+            const viewPoint = event.data.global;
+            const scenePoint = this.viewPosition.toSceneCoordinates(
+              viewPoint.x,
+              viewPoint.y
+            );
+            this.onUpInstance(instance, scenePoint[0], scenePoint[1]);
+          }
+        }
+      );
+      renderedInstance._pixiObject.addEventListener(
         'rightclick',
         interactionEvent => {
           const {
@@ -446,6 +463,18 @@ export default class LayerRenderer {
           viewPoint.y
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+      });
+      renderedInstance._pixiObject.addEventListener('touchend', event => {
+        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+          return null;
+        }
+
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onUpInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.addEventListener('mouseout', () => {
         this.onOutInstance(instance);

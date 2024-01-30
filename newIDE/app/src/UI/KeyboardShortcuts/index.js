@@ -102,6 +102,10 @@ export default class KeyboardShortcuts {
     return this._shiftPressed;
   }
 
+  shouldStartRectangleSelectionInsteadOfSelecting() {
+    return this._shiftPressed;
+  }
+
   shouldNotSnapToGrid() {
     return this._altPressed;
   }

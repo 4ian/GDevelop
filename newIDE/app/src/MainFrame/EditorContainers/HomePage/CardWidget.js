@@ -27,6 +27,7 @@ const useStylesForWidget = (useDefaultDisabledStyle?: boolean) =>
       root: {
         border: `1px solid ${theme.palette.text.primary}`,
         borderBottom: `6px solid ${theme.palette.text.primary}`,
+        transition: 'background-color 100ms ease',
         '&:focus': {
           backgroundColor: theme.palette.action.hover,
         },

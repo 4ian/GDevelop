@@ -174,6 +174,8 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   onSelectExampleShortHeader,
   i18n,
   carouselExclusiveItemsCount,
+  numberOfItemsInCarousel,
+  numberOfItemsInGrid,
 }: {|
   authenticatedUser: AuthenticatedUser,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
@@ -184,6 +186,8 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
   carouselExclusiveItemsCount: number,
+  numberOfItemsInCarousel: number,
+  numberOfItemsInGrid: number,
 |}): {|
   carouselItems: Array<CarouselThumbnail>,
   gridItems: Array<React.Node>,
@@ -201,8 +205,6 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   const gridItems = [];
   const privateGameTemplatePeriodicity =
     carouselExclusiveItemsCount <= 3 ? 2 : 3;
-  const numberOfItemsInCarousel = 12;
-  const numberOfItemsInGrid = 20;
   let exampleIndex = 0;
   let privateGameTemplateIndex = 0;
   for (let i = 0; i < numberOfItemsInGrid + carouselExclusiveItemsCount; ++i) {

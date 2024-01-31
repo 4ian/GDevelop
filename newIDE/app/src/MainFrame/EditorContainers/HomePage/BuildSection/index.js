@@ -218,7 +218,9 @@ const BuildSection = ({
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
-        carouselExclusiveItemsCount: isMobile ? 2 : 5,
+        carouselExclusiveItemsCount: isMobile ? 3 : 5,
+        numberOfItemsInCarousel: isMobile ? 8 : 12,
+        numberOfItemsInGrid: isMobile ? 12 : 20,
       }),
     [
       authenticatedUser,

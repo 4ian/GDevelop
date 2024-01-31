@@ -39,7 +39,7 @@ import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import ProjectFileListItem from './ProjectFileListItem';
 import {
-  getExampleAndTemplateItemsForCarousel,
+  getExampleAndTemplateItemsForBuildSection,
   getLastModifiedInfoByProjectId,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
@@ -48,7 +48,6 @@ import InfoBar from '../../../../UI/Messages/InfoBar';
 import CreateNewProjectButton from './CreateNewProjectButton';
 import GridList from '@material-ui/core/GridList';
 import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { PrivateGameTemplateTile } from '../../../../AssetStore/ShopTiles';
 
 const cellSpacing = 2;
 
@@ -120,7 +119,6 @@ const BuildSection = ({
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
 
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
@@ -211,16 +209,16 @@ const BuildSection = ({
     return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
   });
 
-  // Show a premium game template every 3 examples.
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
-      getExampleAndTemplateItemsForCarousel({
+      getExampleAndTemplateItemsForBuildSection({
         authenticatedUser,
         privateGameTemplateListingDatas,
         exampleShortHeaders,
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
+        carouselExclusiveItemsCount: isMobile ? 2 : 5,
       }),
     [
       authenticatedUser,
@@ -229,36 +227,7 @@ const BuildSection = ({
       onSelectPrivateGameTemplateListingData,
       privateGameTemplateListingDatas,
       i18n,
-    ]
-  );
-
-  const gameTemplateTiles = React.useMemo(
-    () => {
-      if (!privateGameTemplateListingDatas) return [];
-      // Only show game templates if the category is not set or is set to "game-template".
-      return privateGameTemplateListingDatas.map(
-        (privateGameTemplateListingData, index) => (
-          <PrivateGameTemplateTile
-            privateGameTemplateListingData={privateGameTemplateListingData}
-            onSelect={() => {
-              console.log('OnSelect');
-              // onPrivateGameTemplateSelection(privateGameTemplateListingData);
-            }}
-            owned={
-              !!receivedGameTemplates &&
-              !!receivedGameTemplates.find(
-                pack => pack.id === privateGameTemplateListingData.id
-              )
-            }
-            key={privateGameTemplateListingData.id}
-          />
-        )
-      );
-    },
-    [
-      privateGameTemplateListingDatas,
-      // onPrivateGameTemplateSelection,
-      receivedGameTemplates,
+      isMobile,
     ]
   );
 
@@ -303,7 +272,7 @@ const BuildSection = ({
             displayItemTitles={false}
             browseAllLabel={<Trans>Browse all templates</Trans>}
             onBrowseAllClick={onShowAllExamples}
-            items={examplesAndTemplatesToDisplay}
+            items={examplesAndTemplatesToDisplay.carouselItems}
             browseAllIcon={<ChevronArrowRight fontSize="small" />}
             roundedImages
             displayArrowsOnDesktop
@@ -446,7 +415,7 @@ const BuildSection = ({
             cellHeight="auto"
             spacing={cellSpacing}
           >
-            {gameTemplateTiles}
+            {examplesAndTemplatesToDisplay.gridItems}
           </GridList>
         </SectionRow>
       </SectionContainer>

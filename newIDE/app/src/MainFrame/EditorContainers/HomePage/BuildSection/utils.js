@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
 import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
@@ -9,11 +10,14 @@ import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasure
 import { marginsSize } from '../../../../UI/Grid';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
-import { prepareExampleShortHeaders } from '../../../../AssetStore/ExampleStore';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
+import { type PrivateGameTemplate } from '../../../../Utils/GDevelopServices/Asset';
 import { type CarouselThumbnail } from '../../../../UI/Carousel';
-import { shuffleArray } from '../../../../Utils/Random';
+import {
+  ExampleTile,
+  PrivateGameTemplateTile,
+} from '../../../../AssetStore/ShopTiles';
 
 export type LastModifiedInfo = {|
   lastModifiedByUsername: ?string,
@@ -109,13 +113,67 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
     .filter(Boolean);
 };
 
-export const getExampleAndTemplateItemsForCarousel = ({
+const formatGameTemplateListingDataForCarousel = ({
+  gameTemplateListingData,
+  onSelectGameTemplate,
+  i18n,
+  receivedGameTemplates,
+}: {|
+  gameTemplateListingData: PrivateGameTemplateListingData,
+  onSelectGameTemplate: PrivateGameTemplateListingData => void,
+  i18n: I18nType,
+  receivedGameTemplates: ?Array<PrivateGameTemplate>,
+|}): CarouselThumbnail => {
+  const isTemplateOwned =
+    !!receivedGameTemplates &&
+    !!receivedGameTemplates.find(
+      receivedGameTemplate =>
+        receivedGameTemplate.id === gameTemplateListingData.id
+    );
+  return {
+    id: gameTemplateListingData.id,
+    title: gameTemplateListingData.name,
+    thumbnailUrl: gameTemplateListingData.thumbnailUrls[0],
+    onClick: () => {
+      sendGameTemplateInformationOpened({
+        gameTemplateName: gameTemplateListingData.name,
+        gameTemplateId: gameTemplateListingData.id,
+        source: 'homepage',
+      });
+      onSelectGameTemplate(gameTemplateListingData);
+    },
+    overlayText: getProductPriceOrOwnedLabel({
+      i18n,
+      productListingData: gameTemplateListingData,
+      owned: isTemplateOwned,
+    }),
+    overlayTextPosition: 'topLeft',
+  };
+};
+
+const formatExampleShortHeaderForCarousel = ({
+  exampleShortHeader,
+  onSelectExample,
+}: {|
+  exampleShortHeader: ExampleShortHeader,
+  onSelectExample: ExampleShortHeader => void,
+|}) => {
+  return {
+    id: exampleShortHeader.id,
+    title: exampleShortHeader.name,
+    onClick: () => onSelectExample(exampleShortHeader),
+    thumbnailUrl: exampleShortHeader.previewImageUrls[0],
+  };
+};
+
+export const getExampleAndTemplateItemsForBuildSection = ({
   authenticatedUser,
   privateGameTemplateListingDatas,
   exampleShortHeaders,
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   i18n,
+  carouselExclusiveItemsCount,
 }: {|
   authenticatedUser: AuthenticatedUser,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
@@ -125,67 +183,86 @@ export const getExampleAndTemplateItemsForCarousel = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
-|}): Array<CarouselThumbnail> => {
-  const allItems: Array<CarouselThumbnail> = [];
-  const privateGameTemplateItems = [
-    ...(privateGameTemplateListingDatas
-      ? shuffleArray(privateGameTemplateListingDatas).map(
-          privateGameTemplateListingData => {
-            const isTemplateOwned =
-              !!authenticatedUser.receivedGameTemplates &&
-              !!authenticatedUser.receivedGameTemplates.find(
-                receivedGameTemplate =>
-                  receivedGameTemplate.id === privateGameTemplateListingData.id
-              );
-            return {
-              id: privateGameTemplateListingData.id,
-              title: privateGameTemplateListingData.name,
-              thumbnailUrl: privateGameTemplateListingData.thumbnailUrls[0],
-              onClick: () => {
-                sendGameTemplateInformationOpened({
-                  gameTemplateName: privateGameTemplateListingData.name,
-                  gameTemplateId: privateGameTemplateListingData.id,
-                  source: 'homepage',
-                });
-                onSelectPrivateGameTemplateListingData(
-                  privateGameTemplateListingData
-                );
-              },
-              overlayText: getProductPriceOrOwnedLabel({
-                i18n,
-                productListingData: privateGameTemplateListingData,
-                owned: isTemplateOwned,
-              }),
-              overlayTextPosition: 'topLeft',
-            };
-          }
-        )
-      : []),
-  ];
+  carouselExclusiveItemsCount: number,
+|}): {|
+  carouselItems: Array<CarouselThumbnail>,
+  gridItems: Array<React.Node>,
+|} => {
+  if (!exampleShortHeaders || !privateGameTemplateListingDatas) {
+    return { carouselItems: [], gridItems: [] };
+  }
+  const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
+    exampleShortHeader =>
+      !!exampleShortHeader.previewImageUrls &&
+      !!exampleShortHeader.previewImageUrls[0]
+  );
 
-  const exampleShortHeaderItems = [
-    ...(exampleShortHeaders
-      ? prepareExampleShortHeaders(exampleShortHeaders)
-          .map(example => ({
-            id: example.id,
-            title: example.name,
-            onClick: () => onSelectExampleShortHeader(example),
-            thumbnailUrl: example.previewImageUrls[0],
-          }))
-          .filter(exampleShortHeader => !!exampleShortHeader.thumbnailUrl)
-      : []),
-  ];
+  const carouselItems: Array<CarouselThumbnail> = [];
+  const gridItems = [];
+  const privateGameTemplatePeriodicity =
+    carouselExclusiveItemsCount <= 3 ? 2 : 3;
+  const numberOfItemsInCarousel = 12;
+  const numberOfItemsInGrid = 20;
+  let exampleIndex = 0;
+  let privateGameTemplateIndex = 0;
+  for (let i = 0; i < numberOfItemsInGrid + carouselExclusiveItemsCount; ++i) {
+    const shouldAddPrivateGameTemplate =
+      i % privateGameTemplatePeriodicity === privateGameTemplatePeriodicity - 1;
 
-  for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
-    allItems.push(exampleShortHeaderItems[i]);
-    if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
-      const nextPrivateGameTemplateIndex = Math.floor(i / 2);
-      if (nextPrivateGameTemplateIndex < privateGameTemplateItems.length)
-        allItems.push(privateGameTemplateItems[nextPrivateGameTemplateIndex]);
+    if (i < numberOfItemsInCarousel) {
+      carouselItems.push(
+        shouldAddPrivateGameTemplate
+          ? formatGameTemplateListingDataForCarousel({
+              i18n,
+              onSelectGameTemplate: onSelectPrivateGameTemplateListingData,
+              gameTemplateListingData:
+                privateGameTemplateListingDatas[privateGameTemplateIndex],
+              receivedGameTemplates: authenticatedUser.receivedGameTemplates,
+            })
+          : formatExampleShortHeaderForCarousel({
+              exampleShortHeader:
+                exampleShortHeadersWithThumbnails[exampleIndex],
+              onSelectExample: onSelectExampleShortHeader,
+            })
+      );
     }
+    if (i >= carouselExclusiveItemsCount) {
+      if (shouldAddPrivateGameTemplate) {
+        const privateGameTemplateListingData =
+          privateGameTemplateListingDatas[privateGameTemplateIndex];
+        const isTemplateOwned =
+          !!authenticatedUser.receivedGameTemplates &&
+          !!authenticatedUser.receivedGameTemplates.find(
+            receivedGameTemplate =>
+              receivedGameTemplate.id === privateGameTemplateListingData.id
+          );
+        gridItems.push(
+          <PrivateGameTemplateTile
+            privateGameTemplateListingData={privateGameTemplateListingData}
+            onSelect={() => {
+              onSelectPrivateGameTemplateListingData(
+                privateGameTemplateListingData
+              );
+            }}
+            owned={isTemplateOwned}
+            key={privateGameTemplateListingData.id}
+          />
+        );
+      } else {
+        const exampleShortHeader =
+          exampleShortHeadersWithThumbnails[exampleIndex];
+        gridItems.push(
+          <ExampleTile
+            exampleShortHeader={exampleShortHeader}
+            onSelect={() => onSelectExampleShortHeader(exampleShortHeader)}
+            key={exampleShortHeader.name}
+          />
+        );
+      }
+    }
+    if (shouldAddPrivateGameTemplate) privateGameTemplateIndex++;
+    else exampleIndex++;
   }
 
-  const firstItems = allItems.slice(0, 12); // Only show 12 items.
-
-  return firstItems;
+  return { carouselItems, gridItems };
 };

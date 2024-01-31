@@ -724,7 +724,7 @@ export default class InstancesEditor extends Component<Props> {
 
   _onUpBackground = (x: number, y: number, event?: PointerEvent) => {
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
-      this._selectInstanceInsideRectangle();
+      this._selectInstanceInsideSelectionRectangle();
     }
   };
 
@@ -732,11 +732,11 @@ export default class InstancesEditor extends Component<Props> {
     // When a pan is ended, this can be that either the user was making
     // a selection, or that the user was moving the view.
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
-      this._selectInstanceInsideRectangle();
+      this._selectInstanceInsideSelectionRectangle();
     }
   };
 
-  _selectInstanceInsideRectangle = () => {
+  _selectInstanceInsideSelectionRectangle = () => {
     let instancesSelected = this.selectionRectangle.endSelectionRectangle();
 
     this.props.instancesSelection.selectInstances({
@@ -825,6 +825,20 @@ export default class InstancesEditor extends Component<Props> {
       return;
     }
 
+    // MultiSelect is not done here because it's the same modifier as
+    // shouldStartRectangleSelectionInsteadOfSelecting.
+    // It's done in _onUpInstance instead.
+    this.props.instancesSelection.selectInstance({
+      instance,
+      multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+      layersLocks: this._getLayersLocks(),
+    });
+    if (this.props.onInstancesSelected) {
+      this.props.onInstancesSelected(
+        this.props.instancesSelection.getSelectedInstances()
+      );
+    }
+
     this.instancesMover.startMove(sceneX, sceneY);
   };
 
@@ -838,6 +852,11 @@ export default class InstancesEditor extends Component<Props> {
     sceneX: number,
     sceneY: number
   ) => {
+    // Select instances on a click.
+    // - In case of standard selection, it's already done in _onDownInstance
+    // but selecting the same instance twice has no side effect on the
+    // selection.
+    // - For MultiSelect, the selection is not done in _onDownInstance.
     if (!this.hasCursorMovedSinceItIsDown) {
       this.props.instancesSelection.selectInstance({
         instance,
@@ -851,7 +870,7 @@ export default class InstancesEditor extends Component<Props> {
       }
 
       if (this.selectionRectangle.hasStartedSelectionRectangle()) {
-        this._selectInstanceInsideRectangle();
+        this._selectInstanceInsideSelectionRectangle();
       }
     }
   };
@@ -863,7 +882,8 @@ export default class InstancesEditor extends Component<Props> {
   ) => {
     this.fpsLimiter.notifyInteractionHappened();
 
-    const hasCursorMovedSinceItIsDown = this.hasCursorMovedSinceItIsDown;
+    const isMovingForTheFirstTimeSinceItIsDown = !this
+      .hasCursorMovedSinceItIsDown;
     this.hasCursorMovedSinceItIsDown = true;
 
     const sceneDeltaX = deltaX / this.getZoomFactor();
@@ -888,27 +908,16 @@ export default class InstancesEditor extends Component<Props> {
       return;
     }
 
-    if (!hasCursorMovedSinceItIsDown) {
-      // Select the instance that will be moved.
-      this.props.instancesSelection.selectInstance({
-        instance,
-        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersLocks: this._getLayersLocks(),
-      });
-      if (this.props.onInstancesSelected) {
-        this.props.onInstancesSelected(
-          this.props.instancesSelection.getSelectedInstances()
-        );
-      }
-
-      if (this.keyboardShortcuts.shouldCloneInstances()) {
-        const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-        for (var i = 0; i < selectedInstances.length; i++) {
-          const instance = selectedInstances[i];
-          this.props.initialInstances
-            .insertInitialInstance(instance)
-            .resetPersistentUuid();
-        }
+    if (
+      this.keyboardShortcuts.shouldCloneInstances() &&
+      isMovingForTheFirstTimeSinceItIsDown
+    ) {
+      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+      for (let i = 0; i < selectedInstances.length; i++) {
+        const instance = selectedInstances[i];
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
       }
     }
 
@@ -932,7 +941,7 @@ export default class InstancesEditor extends Component<Props> {
     }
 
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
-      this._selectInstanceInsideRectangle();
+      this._selectInstanceInsideSelectionRectangle();
       return;
     }
 

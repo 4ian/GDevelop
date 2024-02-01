@@ -210,7 +210,10 @@ export const getExampleAndTemplateItemsForBuildSection = ({
     const shouldAddPrivateGameTemplate =
       i % privateGameTemplatePeriodicity === privateGameTemplatePeriodicity - 1;
 
+    let privateGameTemplateActuallyAdded = false;
     if (i < numberOfItemsInCarousel) {
+      // There should always be enough private game templates to sparsely fill the carousel.
+      privateGameTemplateActuallyAdded = shouldAddPrivateGameTemplate;
       carouselItems.push(
         shouldAddPrivateGameTemplate
           ? formatGameTemplateListingDataForCarousel({
@@ -231,25 +234,29 @@ export const getExampleAndTemplateItemsForBuildSection = ({
       if (shouldAddPrivateGameTemplate) {
         const privateGameTemplateListingData =
           privateGameTemplateListingDatas[privateGameTemplateIndex];
-        const isTemplateOwned =
-          !!receivedGameTemplates &&
-          !!receivedGameTemplates.find(
-            receivedGameTemplate =>
-              receivedGameTemplate.id === privateGameTemplateListingData.id
+        if (privateGameTemplateListingData) {
+          const isTemplateOwned =
+            !!receivedGameTemplates &&
+            !!receivedGameTemplates.find(
+              receivedGameTemplate =>
+                receivedGameTemplate.id === privateGameTemplateListingData.id
+            );
+          gridItems.push(
+            <PrivateGameTemplateTile
+              privateGameTemplateListingData={privateGameTemplateListingData}
+              onSelect={() => {
+                onSelectPrivateGameTemplateListingData(
+                  privateGameTemplateListingData
+                );
+              }}
+              owned={isTemplateOwned}
+              key={privateGameTemplateListingData.id}
+            />
           );
-        gridItems.push(
-          <PrivateGameTemplateTile
-            privateGameTemplateListingData={privateGameTemplateListingData}
-            onSelect={() => {
-              onSelectPrivateGameTemplateListingData(
-                privateGameTemplateListingData
-              );
-            }}
-            owned={isTemplateOwned}
-            key={privateGameTemplateListingData.id}
-          />
-        );
-      } else {
+          privateGameTemplateActuallyAdded = true;
+        }
+      }
+      if (!privateGameTemplateActuallyAdded) {
         const exampleShortHeader =
           exampleShortHeadersWithThumbnails[exampleIndex];
         gridItems.push(
@@ -261,7 +268,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
         );
       }
     }
-    if (shouldAddPrivateGameTemplate) privateGameTemplateIndex++;
+    if (privateGameTemplateActuallyAdded) privateGameTemplateIndex++;
     else exampleIndex++;
   }
 

@@ -92,7 +92,6 @@ type Props = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenNewProjectSetupDialog: () => void,
-  onShowAllExamples: () => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -109,7 +108,6 @@ const BuildSection = ({
   canOpen,
   onChooseProject,
   onOpenNewProjectSetupDialog,
-  onShowAllExamples,
   onSelectExampleShortHeader,
   onSelectPrivateGameTemplateListingData,
   onOpenRecentFile,
@@ -120,7 +118,10 @@ const BuildSection = ({
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
-
+  const [
+    showAllGameTemplates,
+    setShowAllGameTemplates,
+  ] = React.useState<boolean>(false);
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -222,12 +223,15 @@ const BuildSection = ({
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
-        carouselExclusiveItemsCount: !shouldShowCarousel ? 0 : isMobile ? 3 : 5,
-        numberOfItemsInCarousel: !shouldShowCarousel ? 0 : isMobile ? 8 : 12,
-        numberOfItemsInGrid: isMobile ? 16 : 20,
+        carouselExclusiveItemsCount:
+          !shouldShowCarousel || showAllGameTemplates ? 0 : isMobile ? 3 : 5,
+        numberOfItemsInCarousel:
+          !shouldShowCarousel || showAllGameTemplates ? 0 : isMobile ? 8 : 12,
+        numberOfItemsInGrid: showAllGameTemplates ? 60 : isMobile ? 16 : 20,
       }),
     [
       authenticatedUser.receivedGameTemplates,
+      showAllGameTemplates,
       shouldShowCarousel,
       exampleShortHeaders,
       onSelectExampleShortHeader,
@@ -237,6 +241,26 @@ const BuildSection = ({
       isMobile,
     ]
   );
+
+  if (showAllGameTemplates) {
+    return (
+      <SectionContainer
+        title={<Trans>All templates</Trans>}
+        backAction={() => setShowAllGameTemplates(false)}
+      >
+        <SectionRow>
+          <GridList
+            cols={getItemsColumns(windowWidth)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={cellSpacing}
+          >
+            {examplesAndTemplatesToDisplay.gridItems}
+          </GridList>
+        </SectionRow>
+      </SectionContainer>
+    );
+  }
 
   return (
     <>
@@ -285,10 +309,10 @@ const BuildSection = ({
         {shouldShowCarousel && (
           <SectionRow>
             <Carousel
-              title={<Trans>Game templates</Trans>}
+              title={<Trans>Ready-made games</Trans>}
               displayItemTitles={false}
               browseAllLabel={<Trans>Browse all templates</Trans>}
-              onBrowseAllClick={onShowAllExamples}
+              onBrowseAllClick={() => setShowAllGameTemplates(true)}
               items={examplesAndTemplatesToDisplay.carouselItems}
               browseAllIcon={<ChevronArrowRight fontSize="small" />}
               roundedImages
@@ -415,18 +439,13 @@ const BuildSection = ({
           </SectionRow>
         )}
         <SectionRow>
-          <LineStackLayout
-            justifyContent="space-between"
-            alignItems="center"
-            noMargin
-            expand
-          >
+          <Line alignItems="center" noMargin expand>
             <Column noMargin>
               <Text size="section-title">
                 <Trans>Start with a template</Trans>
               </Text>
             </Column>
-          </LineStackLayout>
+          </Line>
           <GridList
             cols={getItemsColumns(windowWidth)}
             style={styles.grid}

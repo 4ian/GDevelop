@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/User';
-import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 import { type Profile } from '../../../../Utils/GDevelopServices/Authentication';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsStorage';
@@ -167,7 +166,7 @@ const formatExampleShortHeaderForCarousel = ({
 };
 
 export const getExampleAndTemplateItemsForBuildSection = ({
-  authenticatedUser,
+  receivedGameTemplates,
   privateGameTemplateListingDatas,
   exampleShortHeaders,
   onSelectPrivateGameTemplateListingData,
@@ -177,7 +176,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   numberOfItemsInCarousel,
   numberOfItemsInGrid,
 }: {|
-  authenticatedUser: AuthenticatedUser,
+  receivedGameTemplates: ?Array<PrivateGameTemplate>,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
   exampleShortHeaders?: ?Array<ExampleShortHeader>,
   onSelectPrivateGameTemplateListingData: (
@@ -219,7 +218,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
               onSelectGameTemplate: onSelectPrivateGameTemplateListingData,
               gameTemplateListingData:
                 privateGameTemplateListingDatas[privateGameTemplateIndex],
-              receivedGameTemplates: authenticatedUser.receivedGameTemplates,
+              receivedGameTemplates: receivedGameTemplates,
             })
           : formatExampleShortHeaderForCarousel({
               exampleShortHeader:
@@ -233,8 +232,8 @@ export const getExampleAndTemplateItemsForBuildSection = ({
         const privateGameTemplateListingData =
           privateGameTemplateListingDatas[privateGameTemplateIndex];
         const isTemplateOwned =
-          !!authenticatedUser.receivedGameTemplates &&
-          !!authenticatedUser.receivedGameTemplates.find(
+          !!receivedGameTemplates &&
+          !!receivedGameTemplates.find(
             receivedGameTemplate =>
               receivedGameTemplate.id === privateGameTemplateListingData.id
           );

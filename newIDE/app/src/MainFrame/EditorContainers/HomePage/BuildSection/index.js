@@ -209,21 +209,25 @@ const BuildSection = ({
     return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
   });
 
+  const shouldShowCarousel =
+    !!authenticatedUser.authenticated && projectFiles.length > 0;
+
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
       getExampleAndTemplateItemsForBuildSection({
-        authenticatedUser,
+        receivedGameTemplates: authenticatedUser.receivedGameTemplates,
         privateGameTemplateListingDatas,
         exampleShortHeaders,
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
-        carouselExclusiveItemsCount: isMobile ? 3 : 5,
-        numberOfItemsInCarousel: isMobile ? 8 : 12,
-        numberOfItemsInGrid: isMobile ? 12 : 20,
+        carouselExclusiveItemsCount: !shouldShowCarousel ? 0 : isMobile ? 3 : 5,
+        numberOfItemsInCarousel: !shouldShowCarousel ? 0 : isMobile ? 8 : 12,
+        numberOfItemsInGrid: isMobile ? 16 : 20,
       }),
     [
-      authenticatedUser,
+      authenticatedUser.receivedGameTemplates,
+      shouldShowCarousel,
       exampleShortHeaders,
       onSelectExampleShortHeader,
       onSelectPrivateGameTemplateListingData,
@@ -268,18 +272,20 @@ const BuildSection = ({
             </Line>
           </SectionRow>
         )}
-        <SectionRow>
-          <Carousel
-            title={<Trans>Game templates</Trans>}
-            displayItemTitles={false}
-            browseAllLabel={<Trans>Browse all templates</Trans>}
-            onBrowseAllClick={onShowAllExamples}
-            items={examplesAndTemplatesToDisplay.carouselItems}
-            browseAllIcon={<ChevronArrowRight fontSize="small" />}
-            roundedImages
-            displayArrowsOnDesktop
-          />
-        </SectionRow>
+        {shouldShowCarousel && (
+          <SectionRow>
+            <Carousel
+              title={<Trans>Game templates</Trans>}
+              displayItemTitles={false}
+              browseAllLabel={<Trans>Browse all templates</Trans>}
+              onBrowseAllClick={onShowAllExamples}
+              items={examplesAndTemplatesToDisplay.carouselItems}
+              browseAllIcon={<ChevronArrowRight fontSize="small" />}
+              roundedImages
+              displayArrowsOnDesktop
+            />
+          </SectionRow>
+        )}
         {projectFiles.length > 0 && (
           <SectionRow>
             <ResponsiveLineStackLayout

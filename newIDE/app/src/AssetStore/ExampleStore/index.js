@@ -22,37 +22,6 @@ import PrivateGameTemplateListItem from '../PrivateGameTemplates/PrivateGameTemp
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
-// When showing examples, always put the starters first.
-export const prepareExampleShortHeaders = (
-  examples: Array<ExampleShortHeader>
-): Array<ExampleShortHeader> =>
-  examples.sort((example1, example2) => {
-    const isExample1Starter = example1.tags.includes('Starter');
-    const isExample2Starter = example2.tags.includes('Starter');
-    // Don't change starters order.
-    if (isExample1Starter && isExample2Starter) {
-      return 0;
-    }
-    let difference = (isExample2Starter ? 1 : 0) - (isExample1Starter ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-    difference =
-      (example2.tags.includes('game') ? 1 : 0) -
-      (example1.tags.includes('game') ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-    difference =
-      (example2.previewImageUrls.length ? 1 : 0) -
-      (example1.previewImageUrls.length ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-
-    return 0;
-  });
-
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
 ) => item.id;

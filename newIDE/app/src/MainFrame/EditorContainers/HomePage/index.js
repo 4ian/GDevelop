@@ -530,7 +530,6 @@ export const HomePage = React.memo<Props>(
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                      onShowAllExamples={onOpenExampleStore}
                       onSelectExampleShortHeader={
                         onOpenExampleStoreWithExampleShortHeader
                       }

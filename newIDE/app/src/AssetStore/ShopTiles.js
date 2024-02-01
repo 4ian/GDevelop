@@ -10,6 +10,7 @@ import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
 } from '../Utils/GDevelopServices/Shop';
+import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import GridListTile from '@material-ui/core/GridListTile';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -455,6 +456,52 @@ export const PrivateGameTemplateTile = ({
           <Line justifyContent="flex-start" noMargin>
             <Text style={styles.packTitle} size="body2">
               {privateGameTemplateListingData.name}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
+export const ExampleTile = ({
+  exampleShortHeader,
+  onSelect,
+  style,
+}: {|
+  exampleShortHeader: ExampleShortHeader,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper elevation={2} style={styles.paper} background="light">
+        <CorsAwareImage
+          key={exampleShortHeader.name}
+          style={styles.previewImage}
+          src={
+            exampleShortHeader.previewImageUrls
+              ? exampleShortHeader.previewImageUrls[0]
+              : ''
+          }
+          alt={`Preview image of example ${exampleShortHeader.name}`}
+        />
+        <Column>
+          <Line justifyContent="flex-start" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {exampleShortHeader.name}
             </Text>
           </Line>
         </Column>

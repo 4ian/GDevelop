@@ -22,6 +22,7 @@ export const LoadingWithoutTitleSkeleton = () => (
     displayItemTitles={false}
     browseAllLabel={<Trans>Browse all</Trans>}
     browseAllIcon={<ChevronArrowRight fontSize="small" />}
+    displayArrowsOnDesktop
   />
 );
 export const OnlyFewSquareImages = () => {
@@ -65,6 +66,7 @@ export const OnlyFewSquareImages = () => {
       items={items}
       displayItemTitles={false}
       browseAllLink="https://www.youtube.com/c/GDevelopApp/videos"
+      displayArrowsOnDesktop
     />
   );
 };
@@ -171,6 +173,7 @@ export const RoundedImagesWithOverlay = () => {
       onBrowseAllClick={() => action('Browse all button clicked')}
       browseAllIcon={<ChevronArrowRight fontSize="small" />}
       roundedImages
+      displayArrowsOnDesktop
     />
   );
 };
@@ -184,7 +187,6 @@ export const WithoutArrows = () => {
       onBrowseAllClick={() => action('Browse all button clicked')}
       browseAllIcon={<ChevronArrowRight fontSize="small" />}
       roundedImages
-      hideArrows
     />
   );
 };
@@ -196,5 +198,6 @@ export const WithError = () => (
     browseAllLabel={<Trans>Browse all</Trans>}
     error={<Trans>Unexpected error</Trans>}
     browseAllIcon={<ChevronArrowRight fontSize="small" />}
+    displayArrowsOnDesktop
   />
 );

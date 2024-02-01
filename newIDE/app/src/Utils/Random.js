@@ -29,7 +29,7 @@ export const shuffleArrayWith = <T>(
 /**
  * Shuffles array. The result will change only if the app is restarted.
  */
-export const shuffleArray = <T>(array: T[]): T[] => {
+export const shuffleStableArray = <T>(array: T[]): T[] => {
   const randomArray = getStableRandomArray(array.length);
   return shuffleArrayWith(array, randomArray);
 };

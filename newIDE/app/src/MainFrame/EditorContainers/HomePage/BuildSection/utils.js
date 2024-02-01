@@ -175,6 +175,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   carouselExclusiveItemsCount,
   numberOfItemsInCarousel,
   numberOfItemsInGrid,
+  privateGameTemplatesPeriodicity,
 }: {|
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
   privateGameTemplateListingDatas?: ?Array<PrivateGameTemplateListingData>,
@@ -187,6 +188,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   carouselExclusiveItemsCount: number,
   numberOfItemsInCarousel: number,
   numberOfItemsInGrid: number,
+  privateGameTemplatesPeriodicity: number,
 |}): {|
   carouselItems: Array<CarouselThumbnail>,
   gridItems: Array<React.Node>,
@@ -202,13 +204,12 @@ export const getExampleAndTemplateItemsForBuildSection = ({
 
   const carouselItems: Array<CarouselThumbnail> = [];
   const gridItems = [];
-  const privateGameTemplatePeriodicity =
-    carouselExclusiveItemsCount <= 3 ? 2 : 3;
   let exampleIndex = 0;
   let privateGameTemplateIndex = 0;
   for (let i = 0; i < numberOfItemsInGrid + carouselExclusiveItemsCount; ++i) {
     const shouldAddPrivateGameTemplate =
-      i % privateGameTemplatePeriodicity === privateGameTemplatePeriodicity - 1;
+      i % privateGameTemplatesPeriodicity ===
+      privateGameTemplatesPeriodicity - 1;
 
     let privateGameTemplateActuallyAdded = false;
     if (i < numberOfItemsInCarousel) {

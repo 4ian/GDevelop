@@ -228,6 +228,7 @@ const BuildSection = ({
         numberOfItemsInCarousel:
           !shouldShowCarousel || showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates ? 60 : isMobile ? 16 : 20,
+        privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
       }),
     [
       authenticatedUser.receivedGameTemplates,

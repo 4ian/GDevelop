@@ -19,7 +19,6 @@ const styles = {
     display: 'flex',
   },
   buttonBackground: { width: '100%', height: '100%', padding: 20 },
-  textContainer: { marginLeft: 25, marginRight: 25 },
 };
 
 const useStyles = () =>
@@ -64,11 +63,9 @@ const CreateNewProjectButton = (props: Props) => {
             alignItems="center"
           >
             <Add fontSize="large" />
-            <div style={styles.textContainer}>
-              <Text noMargin>
-                <Trans>Create a project</Trans>
-              </Text>
-            </div>
+            <Text noMargin>
+              <Trans>Create a project</Trans>
+            </Text>
           </ColumnStackLayout>
         </Line>
       </Paper>

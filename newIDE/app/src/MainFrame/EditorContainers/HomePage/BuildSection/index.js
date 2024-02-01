@@ -48,6 +48,7 @@ import InfoBar from '../../../../UI/Messages/InfoBar';
 import CreateNewProjectButton from './CreateNewProjectButton';
 import GridList from '@material-ui/core/GridList';
 import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { GridListTile } from '@material-ui/core';
 
 const cellSpacing = 2;
 
@@ -264,12 +265,21 @@ const BuildSection = ({
       >
         {projectFiles.length === 0 && (
           <SectionRow>
-            <Line noMargin>
-              <CreateNewProjectButton
-                onClick={onOpenNewProjectSetupDialog}
-                fullWidth={isMobile}
-              />
-            </Line>
+            <GridList
+              cols={getItemsColumns(windowWidth)}
+              style={styles.grid}
+              cellHeight="auto"
+              spacing={cellSpacing}
+            >
+              <GridListTile>
+                <Line noMargin>
+                  <CreateNewProjectButton
+                    onClick={onOpenNewProjectSetupDialog}
+                    fullWidth
+                  />
+                </Line>
+              </GridListTile>
+            </GridList>
           </SectionRow>
         )}
         {shouldShowCarousel && (

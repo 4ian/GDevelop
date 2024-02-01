@@ -165,6 +165,13 @@ const formatExampleShortHeaderForCarousel = ({
   };
 };
 
+/**
+ * This method allocates examples and private game templates between the
+ * build section carousel and grid.
+ * `numberOfItemsExclusivelyInCarousel` controls the number of items that
+ * should appear in the carousel only. The rest appears in both the carousel
+ * and the grid.
+ */
 export const getExampleAndTemplateItemsForBuildSection = ({
   receivedGameTemplates,
   privateGameTemplateListingDatas,
@@ -172,7 +179,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   onSelectPrivateGameTemplateListingData,
   onSelectExampleShortHeader,
   i18n,
-  carouselExclusiveItemsCount,
+  numberOfItemsExclusivelyInCarousel,
   numberOfItemsInCarousel,
   numberOfItemsInGrid,
   privateGameTemplatesPeriodicity,
@@ -185,7 +192,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   ) => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   i18n: I18nType,
-  carouselExclusiveItemsCount: number,
+  numberOfItemsExclusivelyInCarousel: number,
   numberOfItemsInCarousel: number,
   numberOfItemsInGrid: number,
   privateGameTemplatesPeriodicity: number,
@@ -206,11 +213,19 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   const gridItems = [];
   let exampleIndex = 0;
   let privateGameTemplateIndex = 0;
-  for (let i = 0; i < numberOfItemsInGrid + carouselExclusiveItemsCount; ++i) {
+  for (
+    let i = 0;
+    i < numberOfItemsInGrid + numberOfItemsExclusivelyInCarousel;
+    ++i
+  ) {
     const shouldAddPrivateGameTemplate =
       i % privateGameTemplatesPeriodicity ===
       privateGameTemplatesPeriodicity - 1;
 
+    // At one point, we might run out of private game templates to display while
+    // it is assumed that we have enough examples to display. This boolean is used
+    // to know if we actually could add a private game template. This way, indices
+    // can be increased accordingly.
     let privateGameTemplateActuallyAdded = false;
     if (i < numberOfItemsInCarousel) {
       // There should always be enough private game templates to sparsely fill the carousel.
@@ -231,7 +246,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
             })
       );
     }
-    if (i >= carouselExclusiveItemsCount) {
+    if (i >= numberOfItemsExclusivelyInCarousel) {
       if (shouldAddPrivateGameTemplate) {
         const privateGameTemplateListingData =
           privateGameTemplateListingDatas[privateGameTemplateIndex];

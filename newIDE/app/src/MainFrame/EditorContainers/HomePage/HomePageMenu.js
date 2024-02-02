@@ -17,6 +17,7 @@ import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import HomePageMenuBar from './HomePageMenuBar';
+import type { Profile } from '../../../Utils/GDevelopServices/Authentication';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import GraphsIcon from '../../../UI/CustomSvgIcons/Graphs';
 
@@ -60,8 +61,8 @@ export type HomePageMenuTab = {|
   id: string,
 |};
 
-export const homePageMenuTabs: HomePageMenuTab[] = [
-  {
+const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
+  'get-started': {
     label: <Trans>Get Started</Trans>,
     tab: 'get-started',
     id: 'home-get-started-tab',
@@ -69,7 +70,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <SunIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  build: {
     label: <Trans>Build</Trans>,
     tab: 'build',
     id: 'home-build-tab',
@@ -77,7 +78,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <PickAxeIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  manage: {
     label: <Trans>Manage</Trans>,
     tab: 'manage',
     id: 'home-manage-tab',
@@ -85,7 +86,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <GraphsIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  shop: {
     label: <Trans>Shop</Trans>,
     tab: 'shop',
     id: 'home-shop-tab',
@@ -93,7 +94,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <StoreIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  learn: {
     label: <Trans>Learn</Trans>,
     tab: 'learn',
     id: 'home-learn-tab',
@@ -101,7 +102,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <SchoolIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  play: {
     label: <Trans>Play</Trans>,
     tab: 'play',
     id: 'home-play-tab',
@@ -109,7 +110,7 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <GoogleControllerIcon fontSize={fontSize} color={color} />
     ),
   },
-  {
+  community: {
     label: <Trans>Community</Trans>,
     tab: 'community',
     id: 'home-community-tab',
@@ -117,15 +118,34 @@ export const homePageMenuTabs: HomePageMenuTab[] = [
       <WebIcon fontSize={fontSize} color={color} />
     ),
   },
-];
+  'team-view': {
+    label: <Trans>Classrooms</Trans>,
+    tab: 'team-view',
+    id: 'team-view-tab',
+    getIcon: ({ color, fontSize }) => (
+      <BookLeafIcon fontSize={fontSize} color={color} />
+    ),
+  },
+};
 
-export const teamViewTab: HomePageMenuTab = {
-  label: <Trans>Classrooms</Trans>,
-  tab: 'team-view',
-  id: 'team-view-tab',
-  getIcon: ({ color, fontSize }) => (
-    <BookLeafIcon fontSize={fontSize} color={color} />
-  ),
+export const getTabsToDisplay = ({
+  profile,
+}: {|
+  profile: ?Profile,
+|}): HomePageMenuTab[] => {
+  const displayTeamViewTab = profile && profile.isTeacher;
+  const displayPlayTab = !profile || !profile.isStudent;
+  const tabs = [
+    'get-started',
+    'build',
+    displayTeamViewTab ? 'team-view' : null,
+    'manage',
+    'shop',
+    'learn',
+    displayPlayTab ? 'play' : null,
+    'community',
+  ].filter(Boolean);
+  return tabs.map(tab => homePageMenuTabs[tab]);
 };
 
 type Props = {|
@@ -143,19 +163,12 @@ export const HomePageMenu = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
-  const displayTeamViewTab = profile && profile.isTeacher;
   const [
     isHomePageMenuDrawerOpen,
     setIsHomePageMenuDrawerOpen,
   ] = React.useState(false);
 
-  const tabsToDisplay = displayTeamViewTab
-    ? [
-        ...homePageMenuTabs.slice(0, 2),
-        teamViewTab,
-        ...homePageMenuTabs.slice(2),
-      ]
-    : homePageMenuTabs;
+  const tabsToDisplay = getTabsToDisplay({ profile });
 
   const buttons: {
     label: React.Node,

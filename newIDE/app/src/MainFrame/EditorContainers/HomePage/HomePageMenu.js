@@ -128,7 +128,11 @@ const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
   },
 };
 
-export const getTabsToDisplay = ({ profile }: { profile: ?Profile }): HomePageMenuTab[] => {
+export const getTabsToDisplay = ({
+  profile,
+}: {
+  profile: ?Profile,
+}): HomePageMenuTab[] => {
   const displayTeamViewTab = profile && profile.isTeacher;
   const displayPlayTab = !profile || !profile.isStudent;
   const tabs = [
@@ -141,7 +145,7 @@ export const getTabsToDisplay = ({ profile }: { profile: ?Profile }): HomePageMe
     displayPlayTab ? 'play' : null,
     'community',
   ].filter(Boolean);
-  return tabs.map(tab => homePageMenuTabs[tab])
+  return tabs.map(tab => homePageMenuTabs[tab]);
 };
 
 type Props = {|

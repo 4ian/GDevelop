@@ -18,6 +18,8 @@ declare class gdPropertyDescriptor {
   isHidden(): boolean;
   setDeprecated(enable: boolean): gdPropertyDescriptor;
   isDeprecated(): boolean;
+  setAdvanced(enable: boolean): gdPropertyDescriptor;
+  isAdvanced(): boolean;
   getMeasurementUnit(): gdMeasurementUnit;
   setMeasurementUnit(measurementUnit: gdMeasurementUnit): gdPropertyDescriptor;
   serializeTo(element: gdSerializerElement): void;

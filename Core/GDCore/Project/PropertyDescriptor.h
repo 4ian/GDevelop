@@ -159,6 +159,19 @@ class GD_CORE_API PropertyDescriptor {
    */
   bool IsDeprecated() const { return deprecated; }
 
+  /**
+   * \brief Set if the property is marked as advanced.
+   */
+  PropertyDescriptor& SetAdvanced(bool enable = true) {
+    advanced = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property is marked as advanced.
+   */
+  bool IsAdvanced() const { return advanced; }
+
   /** \name Serialization
    */
   ///@{
@@ -197,6 +210,7 @@ class GD_CORE_API PropertyDescriptor {
                          ///< box.
   bool hidden;
   bool deprecated;
+  bool advanced;
   gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
 };
 

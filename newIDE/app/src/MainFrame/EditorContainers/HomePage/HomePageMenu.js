@@ -130,9 +130,9 @@ const homePageMenuTabs: { [tab: string]: HomePageMenuTab } = {
 
 export const getTabsToDisplay = ({
   profile,
-}: {
+}: {|
   profile: ?Profile,
-}): HomePageMenuTab[] => {
+|}): HomePageMenuTab[] => {
   const displayTeamViewTab = profile && profile.isTeacher;
   const displayPlayTab = !profile || !profile.isStudent;
   const tabs = [

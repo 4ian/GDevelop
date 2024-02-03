@@ -127,7 +127,7 @@ const zipAssets = async (
     options: DownloadResourcesAsBlobsOptionsWithoutProgress
   ) => Promise<void>
 ): Promise<Blob | null> => {
-  const blobFiles: Array<BlobFileDescriptor> = [];
+  const blobFiles = new Map<string, BlobFileDescriptor>();
   const textFiles: Array<TextFileDescriptor> = [];
 
   try {
@@ -173,7 +173,7 @@ const zipAssets = async (
           const resourceFiles = resourceFileRenamingMap.get(resource.getFile());
           if (resourceFiles) {
             for (const resourceFile of resourceFiles) {
-              blobFiles.push({ filePath: resourceFile, blob });
+              blobFiles.set(resourceFile, { filePath: resourceFile, blob });
             }
           }
         }
@@ -187,7 +187,7 @@ const zipAssets = async (
 
     const zippedAssetsBlob = await archiveFiles({
       textFiles,
-      blobFiles,
+      blobFiles: [...blobFiles.values()],
       basePath: '',
       onProgress: (count: number, total: number) => {},
     });

@@ -43,6 +43,7 @@ export default class HighlightedInstance {
   }
 
   setInstance(instance: gdInitialInstance | null) {
+    console.log('setting instance', instance);
     this.isHighlightedInstanceOf3DObject = instance
       ? this.isInstanceOf3DObject(instance)
       : false;

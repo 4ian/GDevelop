@@ -12,7 +12,7 @@ import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { loadPreferencesFromLocalStorage } from '../MainFrame/Preferences/PreferencesProvider';
 import {
   copyAllEmbeddedResourcesToProjectFolder,
   embeddedResourcesParsers,
@@ -27,6 +27,11 @@ import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResource
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
+
+const values = loadPreferencesFromLocalStorage();
+const resourcesImporationBehavior = values.resourcesImporationBehavior;
+
+console.log(resourcesImporationBehavior);
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -143,14 +148,9 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          const answer = Window.showConfirmDialog(
-            i18n._(
-              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-            )
-          );
+          console.log(resourcesImporationBehavior);
 
-          // TODO use the preference "resourcesImporation" here?
-          if (answer) {
+          if (resourcesImporationBehavior === 'import') {
             filePaths = await copyAllToProjectFolder(
               project,
               filePaths,
@@ -161,6 +161,28 @@ const localResourceSources: Array<ResourceSource> = [
               project,
               filesWithEmbeddedResources
             );
+          } else if (resourcesImporationBehavior === 'relative') {
+            return;
+          } else if (resourcesImporationBehavior === 'ask') {
+          } else {
+            const answer = Window.showConfirmDialog(
+              i18n._(
+                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+              )
+            );
+
+            if (answer) {
+              filePaths = await copyAllToProjectFolder(
+                project,
+                filePaths,
+                newToOldFilePaths
+              );
+
+              await copyAllEmbeddedResourcesToProjectFolder(
+                project,
+                filesWithEmbeddedResources
+              );
+            }
           }
         }
 

@@ -109,6 +109,7 @@ const openAndWaitForExternalEditorWindow = async ({
 
     signal.addEventListener('abort', () => {
       reject(new UserCancellationError(''));
+      if (externalEditorClosed) return;
       externalEditorWindow.close();
       onExternalEditorWindowClosed();
     });

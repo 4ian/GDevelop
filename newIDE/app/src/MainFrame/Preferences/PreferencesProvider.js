@@ -135,7 +135,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
-    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(this),
+    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
+      this
+    ),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(

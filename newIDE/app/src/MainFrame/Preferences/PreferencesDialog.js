@@ -228,9 +228,13 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
           <SelectField
-            floatingLabelText={<Trans>Importation of resources in the project</Trans>}
+            floatingLabelText={
+              <Trans>Importation of resources in the project</Trans>
+            }
             value={values.resourcesImporationBehavior}
-            onChange={(e, i, value: string) => setResourcesImporationBehavior(value)}
+            onChange={(e, i, value: string) =>
+              setResourcesImporationBehavior(value)
+            }
             fullWidth
           >
             <SelectOption value="import" label={t`Always import`} />

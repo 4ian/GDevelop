@@ -9,7 +9,7 @@ const electron = optionalRequire('electron');
 export const ExternalEditorOpenedDialog = ({
   onClose,
 }: {|
-  onClose?: () => void,
+  onClose?: () => Promise<void>,
 |}) => {
   if (!!electron) return null;
 

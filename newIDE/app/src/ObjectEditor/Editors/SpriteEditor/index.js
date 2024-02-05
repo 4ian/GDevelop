@@ -136,6 +136,7 @@ export default function SpriteEditor({
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+  const { showConfirmation } = useAlertDialog();
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
@@ -666,6 +667,26 @@ export default function SpriteEditor({
     ]
   );
 
+  const cancelEditingWithExternalEditor = React.useCallback(
+    async () => {
+      const shouldContinue = await showConfirmation({
+        title: t`Cancel editing`,
+        message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
+        confirmButtonLabel: t`Cancel edition`,
+        dismissButtonLabel: t`Continue editing`,
+      });
+      if (!shouldContinue) return;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      } else {
+        console.error(
+          'Cannot cancel editing with external editor, abort controller is missing.'
+        );
+      }
+    },
+    [showConfirmation]
+  );
+
   const createAnimationWith = React.useCallback(
     async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
       addAnimation();
@@ -1058,11 +1079,7 @@ export default function SpriteEditor({
           )}
           {externalEditorOpened && (
             <ExternalEditorOpenedDialog
-              onClose={() => {
-                if (abortControllerRef.current) {
-                  abortControllerRef.current.abort();
-                }
-              }}
+              onClose={cancelEditingWithExternalEditor}
             />
           )}
         </>

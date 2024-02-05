@@ -62,7 +62,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
-    setResourcesImporation,
+    setResourcesImporationBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
@@ -229,8 +229,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </SelectField>
           <SelectField
             floatingLabelText={<Trans>Importation of resources in the project</Trans>}
-            value={values.resourcesImporation}
-            onChange={(e, i, value: string) => setResourcesImporation(value)}
+            value={values.resourcesImporationBehavior}
+            onChange={(e, i, value: string) => setResourcesImporationBehavior(value)}
             fullWidth
           >
             <SelectOption value="import" label={t`Always import`} />

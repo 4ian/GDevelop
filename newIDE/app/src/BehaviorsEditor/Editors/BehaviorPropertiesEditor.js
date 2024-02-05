@@ -8,6 +8,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import { Column, Line } from '../../UI/Grid';
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import FlatButton from '../../UI/FlatButton';
+import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
 
 type Props = BehaviorEditorProps;
@@ -24,7 +25,7 @@ const BehaviorPropertiesEditor = ({
     setShouldShowDeprecatedProperties,
   ] = React.useState<boolean>(false);
 
-  const propertiesSchema = React.useMemo(
+  const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
         behavior.getProperties(),
@@ -32,7 +33,22 @@ const BehaviorPropertiesEditor = ({
         (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
-        object
+        object,
+        'Basic'
+      ),
+    [behavior, object]
+  );
+
+  const advancedPropertiesSchema = React.useMemo(
+    () =>
+      propertiesMapToSchema(
+        behavior.getProperties(),
+        behavior => behavior.getProperties(),
+        (behavior, name, value) => {
+          behavior.updateProperty(name, value);
+        },
+        object,
+        'Advanced'
       ),
     [behavior, object]
   );
@@ -46,19 +62,28 @@ const BehaviorPropertiesEditor = ({
           behavior.updateProperty(name, value);
         },
         object,
-        // Deprecated properties
-        true
+        'Deprecated'
       ),
     [behavior, object]
   );
 
   return (
     <Column expand>
-      {propertiesSchema.length ? (
+      {basicPropertiesSchema.length ? (
         <ColumnStackLayout expand noMargin>
           <PropertiesEditor
             project={project}
-            schema={propertiesSchema}
+            schema={basicPropertiesSchema}
+            instances={[behavior]}
+            onInstancesModified={onBehaviorUpdated}
+            resourceManagementProps={resourceManagementProps}
+          />
+          <Text size="block-title">
+            <Trans>Advanced</Trans>
+          </Text>
+          <PropertiesEditor
+            project={project}
+            schema={advancedPropertiesSchema}
             instances={[behavior]}
             onInstancesModified={onBehaviorUpdated}
             resourceManagementProps={resourceManagementProps}

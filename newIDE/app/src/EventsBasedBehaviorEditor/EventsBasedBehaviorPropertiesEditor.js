@@ -336,12 +336,12 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
 
   const setHidden = React.useCallback(
     (property: gdNamedPropertyDescriptor, enable: boolean) => {
-    property.setHidden(enable);
-    forceUpdate();
-    onPropertiesUpdated && onPropertiesUpdated();
-  },
-  [forceUpdate, onPropertiesUpdated]
-);
+      property.setHidden(enable);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [forceUpdate, onPropertiesUpdated]
+  );
 
   const markAsAdvanced = React.useCallback(
     (property: gdNamedPropertyDescriptor, enable: boolean) => {
@@ -458,24 +458,58 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         alignItems="center"
                                         justifyContent="flex-end"
                                       >
-                                        <InlineCheckbox
-                                          label={
-                                            property.isHidden() ? (
-                                              <Trans>Hidden</Trans>
-                                            ) : (
-                                              <Trans>Visible in editor</Trans>
-                                            )
+                                        <SelectField
+                                          value={
+                                            property.isHidden()
+                                              ? 'Hidden'
+                                              : property.isDeprecated()
+                                              ? 'Deprecated'
+                                              : property.isAdvanced()
+                                              ? 'Advanced'
+                                              : 'Visible'
                                           }
-                                          checked={!property.isHidden()}
-                                          onCheck={(e, checked) => setHidden(property, !checked)}
-                                          checkedIcon={<Visibility />}
-                                          uncheckedIcon={<VisibilityOff />}
-                                          disabled={
-                                            property.getType() === 'Behavior' &&
-                                            // Allow to make it visible just in case.
-                                            !property.isHidden()
-                                          }
-                                        />
+                                          onChange={(e, i, value: string) => {
+                                            if (value === 'Hidden') {
+                                              setHidden(property, true);
+                                              markAsDeprecated(property, false);
+                                              markAsAdvanced(property, false);
+                                            } else if (value === 'Deprecated') {
+                                              setHidden(property, false);
+                                              markAsDeprecated(property, true);
+                                              markAsAdvanced(property, false);
+                                            } else if (value === 'Advanced') {
+                                              setHidden(property, false);
+                                              markAsDeprecated(property, false);
+                                              markAsAdvanced(property, true);
+                                            } else if (value === 'Visible') {
+                                              setHidden(property, false);
+                                              markAsDeprecated(property, false);
+                                              markAsAdvanced(property, false);
+                                            }
+                                          }}
+                                          fullWidth
+                                        >
+                                          <SelectOption
+                                            key="visibility-visible"
+                                            value="Visible"
+                                            label={t`Visible in editor`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-advanced"
+                                            value="Advanced"
+                                            label={t`Advanced`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-deprecated"
+                                            value="Deprecated"
+                                            label={t`Deprecated`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-hidden"
+                                            value="Hidden"
+                                            label={t`Hidden`}
+                                          />
+                                        </SelectField>
                                       </Line>
                                     </ResponsiveLineStackLayout>
                                     <ElementWithMenu
@@ -502,6 +536,17 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         },
                                         { type: 'separator' },
                                         {
+                                          label: i18n._(t`Move up`),
+                                          click: () => moveProperty(i, i - 1),
+                                          enabled: i - 1 >= 0,
+                                        },
+                                        {
+                                          label: i18n._(t`Move down`),
+                                          click: () => moveProperty(i, i + 1),
+                                          enabled:
+                                            i + 1 < properties.getCount(),
+                                        },
+                                        {
                                           label: i18n._(
                                             t`Generate expression and action`
                                           ),
@@ -519,28 +564,6 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             props.eventsBasedBehavior,
                                             property
                                           ),
-                                        },
-                                        {
-                                          label: property.isAdvanced() ? i18n._(t`Mark as not advanced`) : i18n._(t`Mark as advanced`),
-                                          click: () => markAsAdvanced(property, !property.isAdvanced()),
-                                          enabled: !property.isHidden() || property.isAdvanced(),
-                                        },
-                                        {
-                                          label: property.isDeprecated() ? i18n._(t`Mark as not deprecated`) : i18n._(t`Mark as deprecated`),
-                                          click: () => markAsDeprecated(property, !property.isDeprecated()),
-                                          enabled: !property.isHidden() || property.isDeprecated(),
-                                        },
-                                        { type: 'separator' },
-                                        {
-                                          label: i18n._(t`Move up`),
-                                          click: () => moveProperty(i, i - 1),
-                                          enabled: i - 1 >= 0,
-                                        },
-                                        {
-                                          label: i18n._(t`Move down`),
-                                          click: () => moveProperty(i, i + 1),
-                                          enabled:
-                                            i + 1 < properties.getCount(),
                                         },
                                       ]}
                                     />

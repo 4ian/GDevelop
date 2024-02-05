@@ -84,33 +84,38 @@ const StoreSection = ({
           onOpenPrivateGameTemplateListingData
         }
       />
-      <Line justifyContent="flex-end">
-        <RaisedButton
-          primary
-          onClick={() => {
-            if (!project) {
-              return; // TODO: create a project, await, and then show dialog.
-            }
+      {(openedAssetPack || openedAssetShortHeader) && (
+        <Line justifyContent="flex-end">
+          <RaisedButton
+            primary
+            onClick={() => {
+              if (!project) {
+                return; // TODO: create a project, await, and then show dialog.
+              }
 
-            setIsAssetPackDialogInstallOpen(true);
-          }}
-          disabled={!project || !displayedAssetShortHeaders.length}
-          label={
-            project ? (
-              openedAssetShortHeader ||
-              displayedAssetShortHeaders.length === 1 ? (
-                <Trans>Add this asset to the project</Trans>
+              setIsAssetPackDialogInstallOpen(true);
+            }}
+            disabled={!project || !displayedAssetShortHeaders.length}
+            label={
+              project ? (
+                openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                  <Trans>Add this asset to the project</Trans>
+                ) : (
+                  <Trans>Add these assets to the project</Trans>
+                )
+              ) : openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                <Trans>Create a project first to add this asset</Trans>
               ) : (
-                <Trans>Add these assets to the project</Trans>
+                <Trans>
+                  Create a project first to add assets from the asset store
+                </Trans>
               )
-            ) : (
-              <Trans>
-                Create a project first to add assets from the asset store
-              </Trans>
-            )
-          }
-        />
-      </Line>
+            }
+          />
+        </Line>
+      )}
       {project &&
         isAssetPackDialogInstallOpen &&
         !!displayedAssetShortHeaders.length && (

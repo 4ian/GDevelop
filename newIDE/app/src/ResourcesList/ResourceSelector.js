@@ -75,6 +75,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
+    const abortControllerRef = React.useRef<?AbortController>(null);
     const allResourcesNamesRef = React.useRef<Array<string>>([]);
     const [notFoundError, setNotFoundError] = React.useState<boolean>(false);
     const [resourceName, setResourceName] = React.useState<string>(
@@ -262,6 +263,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         i18n: I18nType,
         resourceExternalEditor: ResourceExternalEditor
       ) => {
+        abortControllerRef.current = new AbortController();
+        const { signal } = abortControllerRef.current;
         const resourcesManager = project.getResourcesManager();
         const initialResource = resourcesManager.getResource(resourceName);
 
@@ -282,6 +285,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
               name: resourceName || defaultNewResourceName,
               isLooping: false,
             },
+            signal,
           });
 
           setExternalEditorOpened(false);
@@ -299,16 +303,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
+          if (error.name !== 'UserCancellationError') {
+            console.error(
+              'An exception was thrown when launching or reading resources from the external editor:',
+              error
+            );
+            showErrorBox({
+              message:
+                'There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.',
+              rawError: error,
+              errorId: 'external-editor-error',
+            });
+          }
           setExternalEditorOpened(false);
-          console.error(
-            'An exception was thrown when launching or reading resources from the external editor:',
-            error
-          );
-          showErrorBox({
-            message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-            rawError: error,
-            errorId: 'external-editor-error',
-          });
+        } finally {
+          abortControllerRef.current = null;
         }
       },
       [
@@ -414,7 +423,15 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 }
               />
             ) : null}
-            {externalEditorOpened && <ExternalEditorOpenedDialog />}
+            {externalEditorOpened && (
+              <ExternalEditorOpenedDialog
+                onClose={() => {
+                  if (abortControllerRef.current) {
+                    abortControllerRef.current.abort();
+                  }
+                }}
+              />
+            )}
           </ResponsiveLineStackLayout>
         )}
       </I18n>

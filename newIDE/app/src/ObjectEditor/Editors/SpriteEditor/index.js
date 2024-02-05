@@ -131,6 +131,7 @@ export default function SpriteEditor({
     collisionMasksEditorOpen,
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
+  const abortControllerRef = React.useRef<?AbortController>(null);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
@@ -546,6 +547,8 @@ export default function SpriteEditor({
       animationIndex: number,
       directionIndex: number
     ) => {
+      abortControllerRef.current = new AbortController();
+      const { signal } = abortControllerRef.current;
       const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
         return direction.getSprite(i).getImageName();
       });
@@ -575,6 +578,7 @@ export default function SpriteEditor({
               isLooping: direction.isLooping(),
               existingMetadata: direction.getMetadata(),
             },
+            signal,
           }
         );
 
@@ -632,16 +636,21 @@ export default function SpriteEditor({
           adaptCollisionMaskIfNeeded();
         }
       } catch (error) {
+        if (error.name !== 'UserCancellationError') {
+          console.error(
+            'An exception was thrown when launching or reading resources from the external editor:',
+            error
+          );
+          showErrorBox({
+            message:
+              'There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.',
+            rawError: error,
+            errorId: 'external-editor-error',
+          });
+        }
         setExternalEditorOpened(false);
-        console.error(
-          'An exception was thrown when launching or reading resources from the external editor:',
-          error
-        );
-        showErrorBox({
-          message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-          rawError: error,
-          errorId: 'external-editor-error',
-        });
+      } finally {
+        abortControllerRef.current = null;
       }
     },
     [
@@ -1047,7 +1056,15 @@ export default function SpriteEditor({
               />
             </Dialog>
           )}
-          {externalEditorOpened && <ExternalEditorOpenedDialog />}
+          {externalEditorOpened && (
+            <ExternalEditorOpenedDialog
+              onClose={() => {
+                if (abortControllerRef.current) {
+                  abortControllerRef.current.abort();
+                }
+              }}
+            />
+          )}
         </>
       )}
     </I18n>

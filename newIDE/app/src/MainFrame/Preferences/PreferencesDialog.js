@@ -62,6 +62,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
+    setResourcesImporation,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
@@ -225,6 +226,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="cancel" label={t`Cancel changes`} />
             <SelectOption value="apply" label={t`Apply changes`} />
             <SelectOption value="nothing" label={t`Do nothing`} />
+          </SelectField>
+          <SelectField
+            floatingLabelText={<Trans>Importation of resources in the project</Trans>}
+            value={values.resourcesImporation}
+            onChange={(e, i, value: string) => setResourcesImporation(value)}
+            fullWidth
+          >
+            <SelectOption value="import" label={t`Always import`} />
+            <SelectOption value="relative" label={t`Relative file`} />
+            <SelectOption value="ask" label={t`Always ask`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Updates</Trans>

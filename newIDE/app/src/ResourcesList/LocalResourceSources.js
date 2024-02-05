@@ -12,6 +12,7 @@ import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
   copyAllEmbeddedResourcesToProjectFolder,
   embeddedResourcesParsers,
@@ -148,6 +149,7 @@ const localResourceSources: Array<ResourceSource> = [
             )
           );
 
+          // TODO use the preference "resourcesImporation" here?
           if (answer) {
             filePaths = await copyAllToProjectFolder(
               project,

@@ -135,6 +135,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
+    setResourcesImporation: this._setResourcesImporation.bind(this),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
@@ -807,6 +808,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, backdropClickBehavior },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setResourcesImporation(
+    resourcesImporation: 'import' | 'relative' | 'ask'
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, resourcesImporation },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

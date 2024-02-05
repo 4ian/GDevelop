@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { I18n } from '@lingui/react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import SemiControlledAutoComplete, {
   type DataSource,
@@ -31,6 +31,7 @@ import Edit from '../UI/CustomSvgIcons/Edit';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
 
 const styles = {
   textFieldStyle: { display: 'flex', flex: 1 },
@@ -75,6 +76,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
       null
     );
+    const { showConfirmation } = useAlertDialog();
+    const abortControllerRef = React.useRef<?AbortController>(null);
     const allResourcesNamesRef = React.useRef<Array<string>>([]);
     const [notFoundError, setNotFoundError] = React.useState<boolean>(false);
     const [resourceName, setResourceName] = React.useState<string>(
@@ -262,6 +265,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         i18n: I18nType,
         resourceExternalEditor: ResourceExternalEditor
       ) => {
+        abortControllerRef.current = new AbortController();
+        const { signal } = abortControllerRef.current;
         const resourcesManager = project.getResourcesManager();
         const initialResource = resourcesManager.getResource(resourceName);
 
@@ -282,6 +287,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
               name: resourceName || defaultNewResourceName,
               isLooping: false,
             },
+            signal,
           });
 
           setExternalEditorOpened(false);
@@ -299,16 +305,21 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           triggerResourcesHaveChanged();
           forceUpdate();
         } catch (error) {
+          if (error.name !== 'UserCancellationError') {
+            console.error(
+              'An exception was thrown when launching or reading resources from the external editor:',
+              error
+            );
+            showErrorBox({
+              message:
+                'There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.',
+              rawError: error,
+              errorId: 'external-editor-error',
+            });
+          }
           setExternalEditorOpened(false);
-          console.error(
-            'An exception was thrown when launching or reading resources from the external editor:',
-            error
-          );
-          showErrorBox({
-            message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-            rawError: error,
-            errorId: 'external-editor-error',
-          });
+        } finally {
+          abortControllerRef.current = null;
         }
       },
       [
@@ -321,6 +332,26 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
         resourcesLoader,
         triggerResourcesHaveChanged,
       ]
+    );
+
+    const cancelEditingWithExternalEditor = React.useCallback(
+      async () => {
+        const shouldContinue = await showConfirmation({
+          title: t`Cancel editing`,
+          message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
+          confirmButtonLabel: t`Cancel edition`,
+          dismissButtonLabel: t`Continue editing`,
+        });
+        if (!shouldContinue) return;
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        } else {
+          console.error(
+            'Cannot cancel editing with external editor, abort controller is missing.'
+          );
+        }
+      },
+      [showConfirmation]
     );
 
     const errorText = notFoundError ? (
@@ -414,7 +445,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 }
               />
             ) : null}
-            {externalEditorOpened && <ExternalEditorOpenedDialog />}
+            {externalEditorOpened && (
+              <ExternalEditorOpenedDialog
+                onClose={cancelEditingWithExternalEditor}
+              />
+            )}
           </ResponsiveLineStackLayout>
         )}
       </I18n>

@@ -33,6 +33,7 @@ type AccordionHeadProps = {|
   children: React.Node,
   actions?: Array<React.Node>,
   expandIcon?: React.Node,
+  noMargin?: boolean,
 |};
 
 /**
@@ -41,11 +42,14 @@ type AccordionHeadProps = {|
  */
 export const AccordionHeader = (props: AccordionHeadProps) => {
   return (
-    <Column expand>
+    <Column noMargin={props.noMargin} expand>
       <Line noMargin expand alignItems="center">
         <Column noMargin expand>
           <MUIAccordionSummary
-            style={styles.accordionSummaryWithExpandOnLeft}
+            style={{
+              ...styles.accordionSummaryWithExpandOnLeft,
+              ...props.styles,
+            }}
             expandIcon={
               props.expandIcon || (
                 <IconButton size="small">
@@ -71,6 +75,7 @@ type AccordionBodyProps = {|
 
   // Removes all padding in body container
   disableGutters?: boolean,
+  noMargin?: boolean,
 |};
 
 /**
@@ -80,7 +85,12 @@ type AccordionBodyProps = {|
 export const AccordionBody = (props: AccordionBodyProps) => {
   return (
     <MUIAccordionDetails
-      style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
+      style={{
+        ...(props.disableGutters && styles.bodyRoot),
+        ...(props.noMargin && {
+          padding: `0px`,
+        }),
+      }}
     >
       {props.children}
     </MUIAccordionDetails>
@@ -124,6 +134,7 @@ type AccordionProps = {|
   expanded?: boolean,
   onChange?: (event: any, open: boolean) => void,
   id?: string,
+  noMargin?: boolean,
 |};
 
 /**
@@ -143,9 +154,18 @@ export const Accordion = React.forwardRef<AccordionProps, MUIAccordion>(
         square
         elevation={0}
         style={{
-          border: `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
-          backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
-          marginLeft: 0,
+          ...{
+            border:
+              !props.noMargin &&
+              `1px solid ${gdevelopTheme.toolbar.separatorColor}`,
+            backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
+            marginLeft: 0,
+          },
+          ...(props.noMargin && {
+            border: `0px`,
+            padding: `0px`,
+            margin: `0px`,
+          }),
         }}
         TransitionProps={{ unmountOnExit: !!costlyBody }}
       />

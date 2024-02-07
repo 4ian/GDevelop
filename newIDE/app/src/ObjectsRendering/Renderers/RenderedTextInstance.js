@@ -171,7 +171,7 @@ export default class RenderedTextInstance extends RenderedInstance {
       style.dropShadowColor = rgbStringToHexNumber(this._shadowColor);
       style.dropShadowAlpha = this._shadowOpacity / 255;
       style.dropShadowBlur = this._shadowBlurRadius;
-      style.dropShadowAngle = (this._shadowAngle * Math.PI) / 180;
+      style.dropShadowAngle = RenderedInstance.toRad(this._shadowAngle);
       style.dropShadowDistance = this._shadowDistance;
       const extraPaddingForShadow = style.dropShadow
         ? style.dropShadowDistance + style.dropShadowBlur

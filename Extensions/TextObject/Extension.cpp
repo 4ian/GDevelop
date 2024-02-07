@@ -227,8 +227,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/textOutline24.png",
                 "res/actions/textOutline.png")
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("yesorno", _("Enable outline"), "", false)
-      .SetDefaultValue("true");
+      .AddParameter("yesorno", _("Enable outline"), "", true)
+      .SetDefaultValue("yes");
 
   obj.AddScopedCondition("IsOutlineEnabled",
                 _("Outline enabled"),
@@ -285,7 +285,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 "res/actions/textShadow24.png",
                 "res/actions/textShadow.png")
       .AddParameter("object", _("Object"), "Text")
-      .AddParameter("yesorno", _("Show the shadow"));
+      .AddParameter("yesorno", _("Show the shadow"), "", true)
+      .SetDefaultValue("yes");
 
   obj.AddScopedCondition("IsShadowEnabled",
                 _("Shadow enabled"),

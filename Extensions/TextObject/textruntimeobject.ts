@@ -650,7 +650,7 @@ namespace gdjs {
 
     /**
      * Get the shadow offset angle of the text object.
-     * @return the shadow offset angle
+     * @return the shadow offset angle in degrees
      */
     getShadowAngle(): number {
       return this._shadowAngle;
@@ -658,7 +658,7 @@ namespace gdjs {
 
     /**
      * Set the shadow offset angle of the text object.
-     * @param value the shadow offset angle
+     * @param value the shadow offset angle in degrees
      */
     setShadowAngle(value: float): void {
       this._shadowAngle = value;

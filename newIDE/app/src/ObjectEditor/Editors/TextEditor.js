@@ -204,7 +204,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             this.forceUpdate();
           }}
         />
-        <ResponsiveLineStackLayout noMargin>
+        <ResponsiveLineStackLayout noMargin noColumnMargin>
           <Column noMargin expand>
             <ColorField
               floatingLabelText={<Trans>Color</Trans>}

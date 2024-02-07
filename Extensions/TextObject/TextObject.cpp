@@ -43,8 +43,8 @@ TextObject::~TextObject(){};
 
 void TextObject::DoUnserializeFrom(gd::Project& project,
                                    const gd::SerializerElement& element) {
-
-  // Compatibility with 5.3.187 or older releases.
+  // Compatibility with GD <= 5.3.188
+  // end of compatibility code
   bool isLegacy = !element.HasChild("content");
   auto &content = isLegacy ? element : element.GetChild("content");
 
@@ -58,8 +58,8 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   italic = content.GetBoolAttribute("italic");
   underlined = content.GetBoolAttribute("underlined");
 
+  // Compatibility with GD <= 5.3.188
   if (isLegacy) {
-    // Compatibility with 5.3.187 or older releases.
     SetText(content.GetChild("string", 0, "String").GetValue().GetString());
     SetColor(
         gd::String::From(
@@ -70,7 +70,9 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
         ";" +
         gd::String::From(
             content.GetChild("color", 0, "Color").GetIntAttribute("b", 255)));
-  } else {
+  } else
+  // end of compatibility code
+  {
     SetText(content.GetStringAttribute("text"));
     SetColor(content.GetStringAttribute("color", "0;0;0"));
   
@@ -88,8 +90,9 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
 }
 
 void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
-  // Allow users to rollback to 5.3.187 or older releases without loosing their configuration.
+  // Allow users to rollback to 5.3.188 or older releases without loosing their configuration.
   // TODO Remove this in a few releases.
+  // Compatibility with GD <= 5.3.188
   {
     element.AddChild("string").SetValue(GetText());
     element.AddChild("font").SetValue(GetFontName());
@@ -105,6 +108,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
     element.SetAttribute("italic", italic);
     element.SetAttribute("underlined", underlined);
   }
+  // end of compatibility code
   
   auto& content = element.AddChild("content");
   content.AddChild("text").SetValue(GetText());

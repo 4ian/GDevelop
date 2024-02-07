@@ -123,6 +123,21 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.p2p.onConnection');
 
     extension
+      .addCondition(
+        'ConnectionSucceeded',
+        _('Connection attempt succeeded'),
+        _('Triggers if the last connection attempt was successful.'),
+        _('Connection to peer successful'),
+        '',
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.connectionSucceeded');
+
+    extension
       .addAction(
         'Connect',
         _('Connect to another client'),
@@ -136,7 +151,8 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.connect');
+      .setFunctionName('gdjs.evtTools.p2p.connect')
+      .setAsyncFunctionName('gdjs.evtTools.p2p.connectAsync');
 
     extension
       .addAction(

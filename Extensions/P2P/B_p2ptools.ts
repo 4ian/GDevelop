@@ -126,6 +126,11 @@ namespace gdjs {
       let lastError = '';
 
       /**
+       * Set to true if the last connection attempt succeeded.
+       */
+      let lastConnectionSucessful = false;
+
+      /**
        * List of IDs of peers that just disconnected.
        */
       const disconnectedPeers: string[] = [];
@@ -152,6 +157,9 @@ namespace gdjs {
         peer.on('error', (errorMessage) => {
           error = true;
           lastError = errorMessage.message;
+          if (errorMessage.type === 'peer-unavailable') {
+            lastConnectionSucessful = false;
+          }
         });
         peer.on('connection', (connection) => {
           connection.on('open', () => {
@@ -230,9 +238,61 @@ namespace gdjs {
         if (peer === null) return;
         const connection = peer.connect(id);
         connection.on('open', () => {
+          // See peer.on('error', () => ... for the failure case.
+          lastConnectionSucessful = true;
           _onConnection(connection);
         });
+        connection.on('error', console.error);
       };
+
+      class P2PConnectionTask extends gdjs.AsyncTask {
+        peerConnection: RTCPeerConnection;
+        timeout = 0;
+
+        constructor({ peerConnection }: Peer.DataConnection<NetworkEvent>) {
+          super();
+          this.peerConnection = peerConnection;
+        }
+
+        update(runtimeScene: gdjs.RuntimeScene) {
+          // PeerJS doesn't error when not finding any peer with the good ID,
+          // so if the session establishment stays locked at the same step for 10 seconds,
+          // we assume that this is happening and error out.
+          if (this.peerConnection.signalingState === 'have-local-offer') {
+            this.timeout += runtimeScene.getTimeManager().getElapsedTime();
+            if (this.timeout > 10_000) {
+              lastConnectionSucessful = false;
+              return true;
+            }
+          }
+
+          const connectionAttemptEnded =
+            this.peerConnection.iceConnectionState !== 'new' &&
+            this.peerConnection.iceConnectionState !== 'checking';
+
+          if (connectionAttemptEnded)
+            // Only set it now, so that we can assure that the callback will see the value for this specifc connection attempt.
+            lastConnectionSucessful =
+              this.peerConnection.iceConnectionState === 'connected' ||
+              this.peerConnection.iceConnectionState === 'completed';
+
+          return connectionAttemptEnded;
+        }
+      }
+
+      /**
+       * Connects to another p2p client. Asynchronously resolve once the connection either succeeded or failed.
+       * @param id - The other client's ID.
+       */
+      export const connectAsync = (id: string): AsyncTask => {
+        if (peer === null) return new gdjs.ResolveTask();
+        return new P2PConnectionTask(peer.connect(id));
+      };
+
+      /**
+       * @returns true if the last connection attempt was successful.
+       */
+      export const connectionSucceeded = () => lastConnectionSucessful;
 
       /**
        * Disconnects from another p2p client.

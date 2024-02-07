@@ -44,6 +44,22 @@ const styles = {
     objectFit: 'cover',
     position: 'relative',
   },
+  thumbnailContainer: {
+    position: 'relative',
+  },
+  redeemableContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '4px 8px',
+    backgroundColor: '#FF8569',
+    color: '#1D1D26',
+  },
+  redeemableDiamondIcon: { height: 24 },
   promoImage: {
     width: '20%',
     minWidth: 200,
@@ -241,12 +257,26 @@ export const PrivateAssetPackTile = ({
       onClick={onSelect}
     >
       <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          key={assetPackListingData.name}
-          style={styles.previewImage}
-          src={assetPackListingData.thumbnailUrls[0]}
-          alt={`Preview image of asset pack ${assetPackListingData.name}`}
-        />
+        <div style={styles.thumbnailContainer}>
+          <CorsAwareImage
+            key={assetPackListingData.name}
+            style={styles.previewImage}
+            src={assetPackListingData.thumbnailUrls[0]}
+            alt={`Preview image of asset pack ${assetPackListingData.name}`}
+          />
+          {assetPackListingData.redeemConditions && !owned && (
+            <div style={styles.redeemableContainer}>
+              <img
+                src="res/small-diamond.svg"
+                style={styles.redeemableDiamondIcon}
+                alt="diamond"
+              />
+              <Text color="inherit" noMargin>
+                <Trans>Pack for claim</Trans>
+              </Text>
+            </div>
+          )}
+        </div>
         <div style={styles.priceTagContainer}>
           <ProductPriceTag
             productListingData={assetPackListingData}

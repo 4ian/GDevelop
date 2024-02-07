@@ -38,6 +38,16 @@ type ProductListingData = {|
   includedListableProductIds?: string[],
 |};
 
+type RedeemCondition = {
+  reason: 'subscription',
+  condition: 'gold',
+  usageType: string,
+};
+
+type RedeemableAttributes = {
+  redeemConditions?: RedeemCondition[],
+};
+
 type StripeAndPaypalSellableAttributes = {|
   prices: StripeAndPaypalPrice[],
   sellerStripeAccountId: string,
@@ -59,6 +69,7 @@ export type PrivateAssetPackListingData = {|
   ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
   ...CreditsClaimableAttributes,
+  ...RedeemableAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
 |};

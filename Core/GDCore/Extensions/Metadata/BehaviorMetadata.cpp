@@ -50,8 +50,14 @@ BehaviorMetadata::BehaviorMetadata(
         "BehaviorMetadata is valid for: " + nameWithNamespace);
   }
 
-  if (instance) instance->SetTypeName(nameWithNamespace);
-  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(nameWithNamespace);
+  if (instance) {
+    instance->SetTypeName(nameWithNamespace);
+    instance->InitializeContent();
+  }
+  if (sharedDatasInstance) {
+    sharedDatasInstance->SetTypeName(nameWithNamespace);
+    sharedDatasInstance->InitializeContent();
+  }
 }
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(

@@ -1389,8 +1389,8 @@ interface ParameterOptions {
 interface AbstractFunctionMetadata {
     [Ref] AbstractFunctionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] AbstractFunctionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1440,8 +1440,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] InstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1505,8 +1505,8 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,
-        [Const] DOMString optionalObjectType,
-        boolean parameterIsOptional);
+        [Const] optional DOMString optionalObjectType,
+        optional boolean parameterIsOptional);
     [Ref] ExpressionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1527,8 +1527,8 @@ ExpressionMetadata implements AbstractFunctionMetadata;
 interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] MultipleInstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);

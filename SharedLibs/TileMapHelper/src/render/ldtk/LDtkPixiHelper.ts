@@ -15,7 +15,7 @@ function getAtlasTexture(
     return atlasTextures[tilesetId];
   }
 
-  let texture = null;
+  let texture: Texture | null = null;
 
   const tileset = tilesetCache[tilesetId];
   if (tileset?.relPath) {

@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,28 +13,20 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'Effects',
-      'Effects',
-      'Lots of different effects to be used in your game.',
-      'Various contributors from PixiJS, PixiJS filters and GDevelop',
-      'MIT'
-    )
-    .setCategory('Visual effect')
-    .setExtensionHelpPath('/interface/scene-editor/layer-effects');
+    extension
+      .setExtensionInformation(
+        'Effects',
+        'Effects',
+        'Lots of different effects to be used in your game.',
+        'Various contributors from PixiJS, PixiJS filters and GDevelop',
+        'MIT'
+      )
+      .setCategory('Visual effect')
+      .setExtensionHelpPath('/interface/scene-editor/layer-effects');
 
     // ℹ️ You can declare an effect here. Please order the effects by alphabetical order.
     // This file is for common effects that are well-known/"battle-tested". If you have an
@@ -230,7 +223,11 @@ module.exports = {
     const blurEffect = extension
       .addEffect('Blur')
       .setFullName(_('Blur (Gaussian, slow - prefer to use Kawase blur)'))
-      .setDescription(_('Blur the rendered image. This is slow, so prefer to use Kawase blur in most cases.'))
+      .setDescription(
+        _(
+          'Blur the rendered image. This is slow, so prefer to use Kawase blur in most cases.'
+        )
+      )
       .markAsOnlyWorkingFor2D()
       .addIncludeFile('Extensions/Effects/blur-pixi-filter.js');
     const blurProperties = blurEffect.getProperties();
@@ -728,13 +725,11 @@ module.exports = {
     const hslAdjustmentEffect = extension
       .addEffect('HslAdjustment')
       .setFullName(_('HSL Adjustment'))
-      .setDescription(
-        _(
-          'Adjust hue, saturation and lightness.'
-        )
-      )
+      .setDescription(_('Adjust hue, saturation and lightness.'))
       .markAsOnlyWorkingFor2D()
-      .addIncludeFile('Extensions/Effects/pixi-filters/filter-hsl-adjustment.js')
+      .addIncludeFile(
+        'Extensions/Effects/pixi-filters/filter-hsl-adjustment.js'
+      )
       .addIncludeFile('Extensions/Effects/hsl-adjustment-pixi-filter.js');
     const hslAdjustmentProperties = hslAdjustmentEffect.getProperties();
     hslAdjustmentProperties
@@ -767,7 +762,9 @@ module.exports = {
       .addEffect('KawaseBlur')
       .setFullName(_('Blur (Kawase, fast)'))
       .setDescription(
-        _('Blur the rendered image, with much better performance than Gaussian blur.')
+        _(
+          'Blur the rendered image, with much better performance than Gaussian blur.'
+        )
       )
       .markAsOnlyWorkingFor2D()
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
@@ -816,9 +813,7 @@ module.exports = {
     const motionBlurEffect = extension
       .addEffect('MotionBlur')
       .setFullName(_('Motion Blur'))
-      .setDescription(
-        _('Blur the rendered image to give a feeling of speed.')
-      )
+      .setDescription(_('Blur the rendered image to give a feeling of speed.'))
       .markAsOnlyWorkingFor2D()
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-motion-blur.js')
       .addIncludeFile('Extensions/Effects/motion-blur-pixi-filter.js');
@@ -1174,7 +1169,9 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Elapsed time'))
       .setType('number')
-      .setDescription('It can be set back to 0 to play the shockwave animation again.');
+      .setDescription(
+        'It can be set back to 0 to play the shockwave animation again.'
+      );
     shockwaveEffectProperties
       .getOrCreate('speed')
       .setValue('500')
@@ -1311,10 +1308,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

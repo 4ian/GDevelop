@@ -72,7 +72,6 @@ type AccordionBodyProps = {|
 
   // Removes all padding in body container
   disableGutters?: boolean,
-  noMargin?: boolean,
 |};
 
 /**
@@ -80,14 +79,7 @@ type AccordionBodyProps = {|
  * Based on Material-UI AccordionDetails.
  */
 export const AccordionBody = (props: AccordionBodyProps) => {
-  let style = {};
-  if (props.disableGutters) {
-    Object.assign(style, styles.bodyRoot);
-  }
-  if (props.noMargin) {
-    style.padding = '0px';
-  }
-  return <MUIAccordionDetails style>{props.children}</MUIAccordionDetails>;
+  return <MUIAccordionDetails style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}>{props.children}</MUIAccordionDetails>;
 };
 
 type AccordionActionsProps = {|

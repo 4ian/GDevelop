@@ -129,7 +129,7 @@ const BehaviorPropertiesEditor = ({
                   <Trans>Advanced properties</Trans>
                 </Text>
               </AccordionHeader>
-              <AccordionBody noMargin>
+              <AccordionBody disableGutters>
                 <Column expand noMargin>
                   <PropertiesEditor
                     project={project}

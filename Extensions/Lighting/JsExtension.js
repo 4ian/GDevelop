@@ -262,14 +262,14 @@ module.exports = {
         );
         this._radius = parseFloat(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('radius')
             .getValue()
         );
         if (this._radius <= 0) this._radius = 1;
         const color = objectsRenderingService.rgbOrHexToHexNumber(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('color')
             .getValue()
         );

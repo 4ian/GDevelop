@@ -587,7 +587,7 @@ export class Behavior extends EmscriptenObject {
   isDefaultBehavior(): boolean;
 }
 
-export class BehaviorJsImplementation extends EmscriptenObject {
+export class BehaviorJsImplementation extends Behavior {
   constructor();
   getProperties(behaviorContent: SerializerElement): MapStringPropertyDescriptor;
   updateProperty(behaviorContent: SerializerElement, name: string, value: string): boolean;
@@ -604,7 +604,7 @@ export class BehaviorsSharedData extends EmscriptenObject {
   initializeContent(): void;
 }
 
-export class BehaviorSharedDataJsImplementation extends EmscriptenObject {
+export class BehaviorSharedDataJsImplementation extends BehaviorsSharedData {
   constructor();
   getProperties(behaviorSharedDataContent: SerializerElement): MapStringPropertyDescriptor;
   updateProperty(behaviorSharedDataContent: SerializerElement, name: string, value: string): boolean;
@@ -659,7 +659,7 @@ export class UniquePtrObject extends EmscriptenObject {
   release(): gdObject;
 }
 
-export class ObjectJsImplementation extends EmscriptenObject {
+export class ObjectJsImplementation extends ObjectConfiguration {
   constructor();
   clone(): UniquePtrObjectConfiguration;
   getProperties(): MapStringPropertyDescriptor;
@@ -1077,7 +1077,7 @@ export class InitialInstanceFunctor extends EmscriptenObject {}
 
 export class InitialInstanceJSFunctorWrapper extends EmscriptenObject {}
 
-export class InitialInstanceJSFunctor extends EmscriptenObject {
+export class InitialInstanceJSFunctor extends InitialInstanceJSFunctorWrapper {
   constructor();
   invoke(instance: InitialInstance): void;
 }
@@ -2240,7 +2240,7 @@ export class EventsFunctionsExtension extends EmscriptenObject {
 
 export class AbstractFileSystem extends EmscriptenObject {}
 
-export class AbstractFileSystemJS extends EmscriptenObject {
+export class AbstractFileSystemJS extends AbstractFileSystem {
   constructor();
   mkDir(dir: string): void;
   dirExists(dir: string): void;
@@ -2320,7 +2320,7 @@ export class EventsContextAnalyzer extends EmscriptenObject {
 
 export class ArbitraryResourceWorker extends EmscriptenObject {}
 
-export class ArbitraryResourceWorkerJS extends EmscriptenObject {
+export class ArbitraryResourceWorkerJS extends ArbitraryResourceWorker {
   constructor(resourcesManager: ResourcesManager);
   exposeImage(image: string): void;
   exposeShader(shader: string): void;
@@ -2794,6 +2794,57 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   static isExtensionLifecycleEventsFunction(functionName: string): boolean;
   static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
+
+
+export function asStandardEvent(obj: EmscriptenObject): StandardEvent;
+
+export function asRepeatEvent(obj: EmscriptenObject): RepeatEvent;
+
+export function asWhileEvent(obj: EmscriptenObject): WhileEvent;
+
+export function asForEachEvent(obj: EmscriptenObject): ForEachEvent;
+
+export function asForEachChildVariableEvent(obj: EmscriptenObject): ForEachChildVariableEvent;
+
+export function asCommentEvent(obj: EmscriptenObject): CommentEvent;
+
+export function asGroupEvent(obj: EmscriptenObject): GroupEvent;
+
+export function asLinkEvent(obj: EmscriptenObject): LinkEvent;
+
+export function asJsCodeEvent(obj: EmscriptenObject): JsCodeEvent;
+
+export function asPlatform(obj: EmscriptenObject): Platform;
+
+export function asSpriteConfiguration(obj: EmscriptenObject): SpriteConfiguration;
+
+export function asTiledSpriteConfiguration(obj: EmscriptenObject): TiledSpriteConfiguration;
+
+export function asPanelSpriteConfiguration(obj: EmscriptenObject): PanelSpriteConfiguration;
+
+export function asTextObjectConfiguration(obj: EmscriptenObject): TextObjectConfiguration;
+
+export function asShapePainterConfiguration(obj: EmscriptenObject): ShapePainterConfiguration;
+
+export function asAdMobConfiguration(obj: EmscriptenObject): AdMobConfiguration;
+
+export function asTextEntryObject(obj: EmscriptenObject): TextEntryObject;
+
+export function asParticleEmitterConfiguration(obj: EmscriptenObject): ParticleEmitterConfiguration;
+
+export function asObjectJsImplementation(obj: EmscriptenObject): ObjectJsImplementation;
+
+export function asCustomObjectConfiguration(obj: EmscriptenObject): CustomObjectConfiguration;
+
+export function asModel3DConfiguration(obj: EmscriptenObject): Model3DConfiguration;
+
+export function asSpineConfiguration(obj: EmscriptenObject): SpineConfiguration;
+
+export function asImageResource(obj: EmscriptenObject): ImageResource;
+
+
+export const Object = gd.gdObject;
+export const initializePlatforms = gd.ProjectHelper.prototype.initializePlatforms;
 
 export as namespace gd;
 

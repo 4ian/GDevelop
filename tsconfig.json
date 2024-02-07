@@ -48,6 +48,7 @@
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
+    "SharedLibs/TileMapHelper/**/*",
     "Extensions/P2P/A_peer.js"
   ]
 }

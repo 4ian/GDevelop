@@ -1956,7 +1956,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (ObjectsRenderingService) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const Rendered3DInstance = objectsRenderingService.Rendered3DInstance;
     const PIXI = objectsRenderingService.PIXI;
@@ -2028,6 +2028,11 @@ module.exports = {
     };
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _centerX = 0;
+      /** @type {number} */
+      _centerY = 0;
+
       constructor(
         project,
         layout,
@@ -2044,10 +2049,9 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        /**
-         * Name of the resource that is rendered.
-         * If no face is visible, this will be null.
-         */
+
+        // Name of the resource that is rendered.
+        // If no face is visible, this will be null.
         this._renderedResourceName = undefined;
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
@@ -2077,12 +2081,9 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const instance = this._instance;
-
-        const textureResourceName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            objectConfiguration
-          );
+        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          objectConfiguration
+        );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2094,20 +2095,18 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2365,10 +2364,9 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture =
-            this._shouldRepeatTextureOnFace[
-              materialIndexToFaceIndex[materialIndex]
-            ];
+          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
+            materialIndexToFaceIndex[materialIndex]
+          ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2403,13 +2401,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 }
               }
               break;
@@ -2439,13 +2440,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                   x = -x;
                   y = -y;
                 }

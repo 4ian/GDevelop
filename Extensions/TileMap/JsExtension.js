@@ -15,7 +15,11 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/** @type {ExtensionModule} */
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
 const defineTileMap = function (extension, _, gd) {
   var objectTileMap = new gd.ObjectJsImplementation();
   objectTileMap.updateProperty = function (
@@ -594,11 +598,12 @@ const defineTileMap = function (extension, _, gd) {
     .setFunctionName('setHeight');
 };
 
-const defineCollisionMask = function (
-  extension,
-  _ /*: (string) => string */,
-  gd /*: libGDevelop */
-) {
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
+const defineCollisionMask = function (extension, _, gd) {
   var collisionMaskObject = new gd.ObjectJsImplementation();
   collisionMaskObject.updateProperty = function (
     objectContent,
@@ -1015,6 +1020,7 @@ const defineCollisionMask = function (
     .setFunctionName('setHeight');
 };
 
+/** @type {ExtensionModule} */
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -1213,33 +1219,33 @@ module.exports = {
       updateTileMap() {
         // Get the tileset resource to use
         const tilemapAtlasImage = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapAtlasImage')
           .getValue();
         const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapJsonFile')
           .getValue();
         const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilesetJsonFile')
           .getValue();
         const layerIndex = parseInt(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('layerIndex')
             .getValue(),
           10
         );
         const levelIndex = parseInt(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('levelIndex')
             .getValue(),
           10
         );
         const displayMode = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('displayMode')
           .getValue();
 
@@ -1281,7 +1287,7 @@ module.exports = {
               }
 
               /** @type {TileMapHelper.TileTextureCache} */
-              const textureCache = manager.getOrLoadTextureCache(
+              manager.getOrLoadTextureCache(
                 this._loadTileMapWithCallback.bind(this),
                 (textureName) =>
                   this._pixiResourcesLoader.getPIXITexture(
@@ -1332,14 +1338,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1496,43 +1502,45 @@ module.exports = {
        * This is used to reload the Tilemap
        */
       updateTileMap() {
-        // Get the tileset resource to use
+        // This might become useful in the future
+        /*
         const tilemapAtlasImage = this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('tilemapAtlasImage')
           .getValue();
+        */
         const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapJsonFile')
           .getValue();
         const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilesetJsonFile')
           .getValue();
         const collisionMaskTag = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('collisionMaskTag')
           .getValue();
         const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('outlineColor')
             .getValue()
         );
         const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('fillColor')
             .getValue()
         );
         const outlineOpacity =
-          this._associatedObjectConfiguration
-            .getProperties(this.project)
+          +this._associatedObjectConfiguration
+            .getProperties()
             .get('outlineOpacity')
             .getValue() / 255;
         const fillOpacity =
-          this._associatedObjectConfiguration
-            .getProperties(this.project)
+          +this._associatedObjectConfiguration
+            .getProperties()
             .get('fillOpacity')
             .getValue() / 255;
         const outlineSize = 1;
@@ -1576,14 +1584,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

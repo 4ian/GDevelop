@@ -42,101 +42,137 @@ module.exports = {
         behaviorContent.getChild('bodyType').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'bullet') {
         behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'fixedRotation') {
         behaviorContent
           .getChild('fixedRotation')
           .setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'canSleep') {
         behaviorContent.getChild('canSleep').setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'shape') {
         behaviorContent.getChild('shape').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'shapeDimensionA') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeDimensionA').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionA')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeDimensionB') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeDimensionB').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionB')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeOffsetX') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeOffsetX').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetX')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeOffsetY') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeOffsetY').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetY')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'polygonOrigin') {
         behaviorContent.addChild('polygonOrigin').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'vertices') {
         behaviorContent.addChild('vertices');
         behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
+
       if (propertyName === 'density') {
         behaviorContent
           .getChild('density')
           .setDoubleValue(parseFloat(newValue));
         return true;
       }
+
       if (propertyName === 'friction') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('friction').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'restitution') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('restitution').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('restitution')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'linearDamping') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('linearDamping').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('linearDamping')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'angularDamping') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('angularDamping').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('angularDamping')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'gravityScale') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('gravityScale').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('gravityScale')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'layers') {
         behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
         return true;
       }
+
       if (propertyName === 'masks') {
         behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
         return true;
       }
+
+      return false;
     };
     physics2Behavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
@@ -330,27 +366,30 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'gravityX') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('gravityX').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('gravityX').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'gravityY') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('gravityY').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('gravityY').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'scaleX') {
-        newValue = parseInt(newValue, 10);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('scaleX').setDoubleValue(newValue);
+        const newValueAsNumber = parseInt(newValue, 10);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('scaleX').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'scaleY') {
-        newValue = parseInt(newValue, 10);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('scaleY').setDoubleValue(newValue);
+        const newValueAsNumber = parseInt(newValue, 10);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('scaleY').setDoubleValue(newValueAsNumber);
         return true;
       }
 

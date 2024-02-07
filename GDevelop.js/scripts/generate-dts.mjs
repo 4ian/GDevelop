@@ -9,6 +9,34 @@ const bindingsFile = readFileSync(
   'utf-8'
 );
 
+const castFunctions = [
+  'StandardEvent',
+  'RepeatEvent',
+  'WhileEvent',
+  'ForEachEvent',
+  'ForEachChildVariableEvent',
+  'CommentEvent',
+  'GroupEvent',
+  'LinkEvent',
+  'JsCodeEvent',
+  'Platform',
+
+  'SpriteConfiguration',
+  'TiledSpriteConfiguration',
+  'PanelSpriteConfiguration',
+  'TextObjectConfiguration',
+  'ShapePainterConfiguration',
+  'AdMobConfiguration',
+  'TextEntryObject',
+  'ParticleEmitterConfiguration',
+  'ObjectJsImplementation',
+  'CustomObjectConfiguration',
+  'Model3DConfiguration',
+  'SpineConfiguration',
+
+  'ImageResource',
+];
+
 const PrimitiveTypes = new Map([
   ['DOMString', 'string'],
   ['long', 'number'],
@@ -152,8 +180,13 @@ ${members.join('\n')}
 }
 
 const interfaces = [];
-for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
-  /interface\s+([a-zA-Z0-9]+)\s+{(?:}|(?:\r?\n?([^}]*)\r?\n}))/gm
+for (const [
+  _,
+  implementationName,
+  interfaceName,
+  interfaceCode,
+] of bindingsFile.matchAll(
+  /(?:\[JSImplementation=([a-zA-Z0-9]+)\]\r?\n?)?interface\s+([a-zA-Z0-9]+)\s+{(?:}|(?:\r?\n?([^}]*)\r?\n}))/gm
 )) {
   if (!interfaceCode) {
     interfaces.push(
@@ -247,13 +280,16 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
     );
   }
 
-  const inheritedClass = bindingsFile.match(
+  const explicitlyInheritedClass = bindingsFile.match(
     new RegExp(`(?<![a-zA-Z0-9])${interfaceName} implements ([a-zA-Z0-9]+)`)
   );
+  const inheritedClass =
+    implementationName ||
+    (!!explicitlyInheritedClass && explicitlyInheritedClass[1]);
 
   interfaces.push(
     `export class ${interfaceName} extends ${
-      inheritedClass ? inheritedClass[1] : 'EmscriptenObject'
+      inheritedClass ? inheritedClass : 'EmscriptenObject'
     } {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${
       attributes.length ? '\n  ' + attributes.join('\n  ') : ''
     }
@@ -284,6 +320,17 @@ declare class EmscriptenObject {
 ${enums.join('\n\n')}
 
 ${interfaces.join('\n\n')}
+
+${castFunctions
+  .map(
+    (interfaceName) => `
+export function as${interfaceName}(obj: EmscriptenObject): ${interfaceName};
+`
+  )
+  .join('')}
+
+export const Object = gd.gdObject;
+export const initializePlatforms = gd.ProjectHelper.prototype.initializePlatforms;
 
 export as namespace gd;
 

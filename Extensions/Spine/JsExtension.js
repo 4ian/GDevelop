@@ -213,7 +213,6 @@ module.exports = {
         const animation = configuration.getAnimation(index);
         const source = animation.getSource();
         const shouldLoop = animation.shouldLoop();
-        const scale = this.getScale();
 
         // reset scale to track new animation range
         // if custom size is set it will be reinitialized in update method

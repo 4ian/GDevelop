@@ -148,9 +148,22 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          console.log(resourcesImporationBehavior);
 
-          if (resourcesImporationBehavior === 'import') {
+          let answer: Boolean = null;
+
+          if (resourcesImporationBehavior === 'ask') {
+            answer = Window.showConfirmDialog(
+              i18n._(
+                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+              )
+            );
+          } else if (resourcesImporationBehavior === 'relative') {
+            answer = false;
+          } else if (resourcesImporationBehavior === 'import') {
+            answer = true;
+          }
+
+          if (answer) {
             filePaths = await copyAllToProjectFolder(
               project,
               filePaths,
@@ -161,28 +174,6 @@ const localResourceSources: Array<ResourceSource> = [
               project,
               filesWithEmbeddedResources
             );
-          } else if (resourcesImporationBehavior === 'relative') {
-            return;
-          } else if (resourcesImporationBehavior === 'ask') {
-          } else {
-            const answer = Window.showConfirmDialog(
-              i18n._(
-                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-              )
-            );
-
-            if (answer) {
-              filePaths = await copyAllToProjectFolder(
-                project,
-                filePaths,
-                newToOldFilePaths
-              );
-
-              await copyAllEmbeddedResourcesToProjectFolder(
-                project,
-                filesWithEmbeddedResources
-              );
-            }
           }
         }
 

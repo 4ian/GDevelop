@@ -108,6 +108,7 @@ TopDownMovementBehavior::GetProperties(
   properties["Viewpoint"]
       .SetLabel(_("Viewpoint"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
       .SetValue(viewpointStr)
       .SetType("Choice")
       .AddExtraInfo(_("Top-Down"))
@@ -117,6 +118,7 @@ TopDownMovementBehavior::GetProperties(
   properties["CustomIsometryAngle"]
       .SetLabel(_("Custom isometry angle (between 1deg and 44deg)"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
@@ -126,6 +128,7 @@ TopDownMovementBehavior::GetProperties(
   properties["MovementAngleOffset"]
       .SetLabel(_("Movement angle offset"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(

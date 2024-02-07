@@ -393,7 +393,7 @@ const GetStartedSection = ({
             justifyContent="center"
           >
             <Text size="title" align="center">
-              <Trans>Log in to Gdevelop</Trans>
+              <Trans>Log in to GDevelop</Trans>
             </Text>
             <BackgroundText>
               <Trans>

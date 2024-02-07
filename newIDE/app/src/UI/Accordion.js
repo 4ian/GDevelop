@@ -79,7 +79,13 @@ type AccordionBodyProps = {|
  * Based on Material-UI AccordionDetails.
  */
 export const AccordionBody = (props: AccordionBodyProps) => {
-  return <MUIAccordionDetails style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}>{props.children}</MUIAccordionDetails>;
+  return (
+    <MUIAccordionDetails
+      style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
+    >
+      {props.children}
+    </MUIAccordionDetails>
+  );
 };
 
 type AccordionActionsProps = {|

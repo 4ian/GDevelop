@@ -46,10 +46,7 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
       <Line noMargin expand alignItems="center">
         <Column noMargin expand>
           <MUIAccordionSummary
-            style={{
-              ...styles.accordionSummaryWithExpandOnLeft,
-              ...props.styles,
-            }}
+            style={styles.accordionSummaryWithExpandOnLeft}
             expandIcon={
               props.expandIcon || (
                 <IconButton size="small">
@@ -83,18 +80,14 @@ type AccordionBodyProps = {|
  * Based on Material-UI AccordionDetails.
  */
 export const AccordionBody = (props: AccordionBodyProps) => {
-  return (
-    <MUIAccordionDetails
-      style={{
-        ...(props.disableGutters && styles.bodyRoot),
-        ...(props.noMargin && {
-          padding: `0px`,
-        }),
-      }}
-    >
-      {props.children}
-    </MUIAccordionDetails>
-  );
+  let style = {};
+  if (props.disableGutters) {
+    Object.assign(style, styles.bodyRoot);
+  }
+  if (props.noMargin) {
+    style.padding = '0px';
+  }
+  return <MUIAccordionDetails style>{props.children}</MUIAccordionDetails>;
 };
 
 type AccordionActionsProps = {|

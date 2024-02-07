@@ -352,7 +352,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Extend redeemed subscription'
   | 'Generate project from prompt'
   | 'Version history'
-  | 'Add collaborators on project';
+  | 'Add collaborators on project'
+  | 'Claim asset pack';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

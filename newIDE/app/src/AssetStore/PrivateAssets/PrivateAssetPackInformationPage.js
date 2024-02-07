@@ -3,6 +3,7 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
+  canRedeemProduct,
   type PrivateAssetPackListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import {
@@ -53,6 +54,7 @@ import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import Avatar from '@material-ui/core/Avatar';
+import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 
 const cellSpacing = 8;
 
@@ -115,6 +117,15 @@ const styles = {
     borderRadius: 4,
     color: 'black',
   },
+  redeemConditionsContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '4px 8px',
+    backgroundColor: '#FF8569',
+    color: '#1D1D26',
+  },
+  redeemDiamondIcon: { height: 24 },
 };
 
 type Props = {|
@@ -148,12 +159,16 @@ const PrivateAssetPackInformationPage = ({
     assetPackPurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
+    subscription,
   } = React.useContext(AuthenticatedUserContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
     privateAssetPackListingData.prices[0].usageType
+  );
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
   );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
@@ -401,6 +416,21 @@ const PrivateAssetPackInformationPage = ({
     [assetPack, privateAssetPackListingData, simulateAppStoreProduct]
   );
 
+  const canRedeemAssetPack = canRedeemProduct({
+    redeemConditions: privateAssetPackListingData.redeemConditions,
+    subscription,
+  });
+
+  const showPersonalUsageRedemptionBanner =
+    privateAssetPackListingData.redeemConditions &&
+    privateAssetPackListingData.redeemConditions.some(
+      redeemCondition =>
+        privateAssetPackListingData.redeemConditions[0] &&
+        redeemCondition.usageType === 'personal' &&
+        redeemCondition.reason === 'subscription' &&
+        redeemCondition.condition === 'gold'
+    );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -452,6 +482,47 @@ const PrivateAssetPackInformationPage = ({
                             </Text>
                           </div>
                         )}
+                        {!isAlreadyReceived &&
+                          showPersonalUsageRedemptionBanner && (
+                            <div style={styles.redeemConditionsContainer}>
+                              <Line noMargin alignItems="center">
+                                <img
+                                  src="res/small-diamond.svg"
+                                  style={styles.redeemDiamondIcon}
+                                  alt="diamond"
+                                />
+                                <Text color="inherit" noMargin>
+                                  <Trans>
+                                    Personal license for claim with Gold
+                                    subscription
+                                  </Trans>
+                                </Text>
+                              </Line>
+                              <Spacer />
+                              <div style={{ flexShrink: 0 }}>
+                                <RaisedButton
+                                  primary
+                                  label={
+                                    canRedeemAssetPack ? (
+                                      <Trans>Claim this pack</Trans>
+                                    ) : (
+                                      <Trans>Get a Gold</Trans>
+                                    )
+                                  }
+                                  onClick={
+                                    canRedeemAssetPack
+                                      ? () => console.log('salut')
+                                      : openSubscriptionDialog({
+                                          analyticsMetadata: {
+                                            reason: 'Claim asset pack',
+                                          },
+                                          filter: 'individual',
+                                        })
+                                  }
+                                />
+                              </div>
+                            </div>
+                          )}
                       </LineStackLayout>
                       <LineStackLayout noMargin alignItems="center">
                         <Avatar

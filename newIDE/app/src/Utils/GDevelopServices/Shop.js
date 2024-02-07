@@ -5,6 +5,7 @@ import { GDevelopShopApi } from './ApiConfigs';
 import { isURL } from '../../ResourcesList/ResourceUtils';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { type Subscription } from './Usage';
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -381,4 +382,27 @@ export const buyProductWithCredits = async (
       },
     }
   );
+};
+
+export const canRedeemProduct = ({
+  redeemConditions,
+  subscription,
+}: {|
+  redeemConditions?: RedeemCondition[],
+  subscription?: ?Subscription,
+|}) => {
+  if (!redeemConditions) return false;
+  for (let redeemCondition of redeemConditions) {
+    if (
+      redeemCondition.reason === 'subscription' &&
+      redeemCondition.condition === 'gold'
+    ) {
+      if (
+        subscription &&
+        ['gdevelop_startup', 'gdevelop_gold'].includes(subscription.planId)
+      )
+        return true;
+    }
+  }
+  return false;
 };

@@ -1,6 +1,8 @@
 namespace gdjs {
   type FloatPoint3D = [float, float, float];
 
+  const epsilon = 1 / (1 << 16);
+
   const removeMetalness = (material: THREE.Material): void => {
     //@ts-ignore
     if (material.metalness) {
@@ -158,12 +160,24 @@ namespace gdjs {
       threeObject.updateMatrixWorld(true);
       const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
+      const shouldKeepModelOrigin = !this._model3DRuntimeObject._originPoint;
+      if (shouldKeepModelOrigin) {
+        // Keep the origin as part of the model.
+        // For instance, a model can be 1 face of a cube and we want to keep the
+        // inside as part of the object even if it's just void.
+        // It also avoids to have the origin outside of the object box.
+        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+      }
+
       const modelWidth = boundingBox.max.x - boundingBox.min.x;
       const modelHeight = boundingBox.max.y - boundingBox.min.y;
       const modelDepth = boundingBox.max.z - boundingBox.min.z;
-      this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
-      this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
-      this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+      this._modelOriginPoint[0] =
+        modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
+      this._modelOriginPoint[1] =
+        modelHeight < epsilon ? 0 : -boundingBox.min.y / modelHeight;
+      this._modelOriginPoint[2] =
+        modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth;
 
       // The model is flipped on Y axis.
       this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
@@ -172,19 +186,10 @@ namespace gdjs {
       const centerPoint = this._model3DRuntimeObject._centerPoint;
       if (centerPoint) {
         threeObject.position.set(
-          -(
-            boundingBox.min.x +
-            (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
-          ),
+          -(boundingBox.min.x + modelWidth * centerPoint[0]),
           // The model is flipped on Y axis.
-          -(
-            boundingBox.min.y +
-            (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
-          ),
-          -(
-            boundingBox.min.z +
-            (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
-          )
+          -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
+          -(boundingBox.min.z + modelDepth * centerPoint[2])
         );
       }
 
@@ -197,9 +202,9 @@ namespace gdjs {
       );
 
       // Stretch the model in a 1x1x1 cube.
-      const scaleX = 1 / modelWidth;
-      const scaleY = 1 / modelHeight;
-      const scaleZ = 1 / modelDepth;
+      const scaleX = modelWidth < epsilon ? 1 : 1 / modelWidth;
+      const scaleY = modelHeight < epsilon ? 1 : 1 / modelHeight;
+      const scaleZ = modelDepth < epsilon ? 1 : 1 / modelDepth;
 
       const scaleMatrix = new THREE.Matrix4();
       // Flip on Y because the Y axis is on the opposite side of direct basis.
@@ -210,10 +215,22 @@ namespace gdjs {
 
       if (keepAspectRatio) {
         // Reduce the object dimensions to keep aspect ratio.
-        const widthRatio = originalWidth / modelWidth;
-        const heightRatio = originalHeight / modelHeight;
-        const depthRatio = originalDepth / modelDepth;
-        const scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+        const widthRatio =
+          modelWidth < epsilon
+            ? Number.POSITIVE_INFINITY
+            : originalWidth / modelWidth;
+        const heightRatio =
+          modelHeight < epsilon
+            ? Number.POSITIVE_INFINITY
+            : originalHeight / modelHeight;
+        const depthRatio =
+          modelDepth < epsilon
+            ? Number.POSITIVE_INFINITY
+            : originalDepth / modelDepth;
+        let scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+        if (!Number.isFinite(scaleRatio)) {
+          scaleRatio = 1;
+        }
 
         this._object._setOriginalWidth(scaleRatio * modelWidth);
         this._object._setOriginalHeight(scaleRatio * modelHeight);

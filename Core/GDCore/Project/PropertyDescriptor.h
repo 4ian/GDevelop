@@ -31,14 +31,14 @@ class GD_CORE_API PropertyDescriptor {
    */
   PropertyDescriptor(gd::String propertyValue)
       : currentValue(propertyValue), type("string"), label(""), hidden(false),
-        deprecated(false),
+        deprecated(false), advanced(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
   PropertyDescriptor()
-      : hidden(false), deprecated(false),
+      : hidden(false), deprecated(false), advanced(false),
         measurementUnit(gd::MeasurementUnit::GetUndefined()){};
 
   /**

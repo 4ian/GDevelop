@@ -51,11 +51,3 @@ declare type EventsFunctionContext = {
   /**  Do not use this. Use `runtimeScene.getLayer` instead. */
   getLayer: (layerName: string) => gdjs.Layer;
 };
-
-declare namespace gdjs {
-  var projectData: ProjectData;
-  var runtimeGameOptions: gdjs.RuntimeGameOptions;
-}
-
-/** The global cc object from Cocos2D-Js. */
-declare var cc: any;

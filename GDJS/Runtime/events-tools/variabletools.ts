@@ -219,45 +219,5 @@ namespace gdjs {
           : children[children.length - 1].getAsString();
       };
     }
-
-    export namespace common {
-      /** @deprecated */
-      export const getVariableNumber = gdjs.evtTools.variable.getVariableNumber;
-      /** @deprecated */
-      export const getVariableString = gdjs.evtTools.variable.getVariableString;
-      /** @deprecated */
-      export const getVariableBoolean =
-        gdjs.evtTools.variable.getVariableBoolean;
-      /** @deprecated */
-      export const setVariableBoolean =
-        gdjs.evtTools.variable.setVariableBoolean;
-      /** @deprecated */
-      export const toggleVariableBoolean =
-        gdjs.evtTools.variable.toggleVariableBoolean;
-      /** @deprecated */
-      export const sceneVariableExists =
-        gdjs.evtTools.variable.sceneVariableExists;
-      /** @deprecated */
-      export const globalVariableExists =
-        gdjs.evtTools.variable.globalVariableExists;
-      /** @deprecated */
-      export const variableChildExists =
-        gdjs.evtTools.variable.variableChildExists;
-      /** @deprecated */
-      export const variableRemoveChild =
-        gdjs.evtTools.variable.variableRemoveChild;
-      /** @deprecated */
-      export const variableClearChildren =
-        gdjs.evtTools.variable.variableClearChildren;
-      /** @deprecated */
-      export const variablePushCopy = gdjs.evtTools.variable.variablePushCopy;
-      /** @deprecated */
-      export const valuePush = gdjs.evtTools.variable.valuePush;
-      /** @deprecated */
-      export const variableRemoveAt = gdjs.evtTools.variable.variableRemoveAt;
-      /** @deprecated */
-      export const getVariableChildCount =
-        gdjs.evtTools.variable.getVariableChildCount;
-    }
   }
 }

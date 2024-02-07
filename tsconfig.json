@@ -31,7 +31,8 @@
     "jsxFragmentFactory": "Fragment"
   },
   "include": [
-    "GDJS/Runtime/**/*",
+    //"GDJS/Runtime/**/*",
+    "GDJS/src/**/*",
     "Extensions/**/*.js",
     "Extensions/**/*.ts",
     "GDJS/tests/tests/**/*.js",

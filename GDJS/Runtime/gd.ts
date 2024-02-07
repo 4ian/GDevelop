@@ -11,17 +11,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Engine runtime');
 
-  /**
-   * Contains functions used by events (this is a convention only, functions can actually
-   * be anywhere).
-   * @namespace
-   * @memberOf gdjs
-   */
-  export namespace evtTools {
-    // @ts-ignore - This variable is unused on purpose.
-    const thisIsUnusedButEnsureTheNamespaceIsDeclared = true;
-  }
-
   export const objectsTypes = new Hashtable<typeof gdjs.RuntimeObject>();
   export const behaviorsTypes = new Hashtable<typeof gdjs.RuntimeBehavior>();
 

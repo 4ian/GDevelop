@@ -406,3 +406,24 @@ export const canRedeemProduct = ({
   }
   return false;
 };
+
+export const redeemProduct = async ({
+  product,
+  getAuthorizationHeader,
+}: {|
+  product: ProductListingData,
+  getAuthorizationHeader: () => Promise<string>,
+|}): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/product/${product.id}/action/redeem`,
+    {
+      priceUsageType: 'personal',
+    },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+};

@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
   canRedeemProduct,
+  redeemProduct,
   type PrivateAssetPackListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import {
@@ -259,6 +260,16 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
+  const onRedeemAssetPack = React.useCallback(
+    async () => {
+      await redeemProduct({
+        product: privateAssetPackListingData,
+        getAuthorizationHeader,
+      });
+    },
+    [privateAssetPackListingData, getAuthorizationHeader]
+  );
+
   React.useEffect(
     () => {
       (async () => {
@@ -511,13 +522,14 @@ const PrivateAssetPackInformationPage = ({
                                   }
                                   onClick={
                                     canRedeemAssetPack
-                                      ? () => console.log('salut')
-                                      : openSubscriptionDialog({
-                                          analyticsMetadata: {
-                                            reason: 'Claim asset pack',
-                                          },
-                                          filter: 'individual',
-                                        })
+                                      ? onRedeemAssetPack
+                                      : () =>
+                                          openSubscriptionDialog({
+                                            analyticsMetadata: {
+                                              reason: 'Claim asset pack',
+                                            },
+                                            filter: 'individual',
+                                          })
                                   }
                                 />
                               </div>

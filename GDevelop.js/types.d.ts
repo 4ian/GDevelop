@@ -1477,6 +1477,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
+  getProperties(): MapStringPropertyDescriptor;
+  getSharedProperties(): MapStringPropertyDescriptor;
 }
 
 export class EffectMetadata extends EmscriptenObject {

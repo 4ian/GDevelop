@@ -15,6 +15,9 @@ import IconButton from '../../UI/IconButton';
 import ArrowHeadBottom from '../../UI/CustomSvgIcons/ArrowHeadBottom';
 import ArrowHeadRight from '../../UI/CustomSvgIcons/ArrowHeadRight';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
+import { mapFor } from '../../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
 
@@ -42,6 +45,38 @@ const BehaviorPropertiesEditor = ({
         'Basic'
       ),
     [behavior, object]
+  );
+
+  const areAdvancedPropertiesModified = React.useCallback(
+    () => {
+      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+        gd.JsPlatform.get(),
+        behavior.getTypeName()
+      );
+      if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
+      }
+      const propertiesMetadata = behaviorMetadata.getProperties();
+      const propertiesValues = behavior.getProperties();
+      const propertyNames = propertiesMetadata.keys();
+      let hasFoundModifiedAdvancedProperty = false;
+      mapFor(0, propertyNames.size(), i => {
+        const name = propertyNames.at(i);
+        const property = propertiesMetadata.get(name);
+        const defaultValue = property.getValue();
+        const currentValue = propertiesValues.get(name).getValue();
+
+        // Some boolean properties can be set to an empty string to mean false.
+        const hasDefaultValue =
+          property.getType().toLowerCase() === 'boolean'
+            ? (currentValue === 'true') === (defaultValue === 'true')
+            : currentValue === defaultValue;
+        if (property.isAdvanced() && !hasDefaultValue) {
+          hasFoundModifiedAdvancedProperty = true;
+        }
+      });
+      return hasFoundModifiedAdvancedProperty;
+    },
+    [behavior]
   );
 
   const advancedPropertiesSchema = React.useMemo(
@@ -84,7 +119,7 @@ const BehaviorPropertiesEditor = ({
             resourceManagementProps={resourceManagementProps}
           />
 
-          <Accordion defaultExpanded={true} noMargin>
+          <Accordion defaultExpanded={areAdvancedPropertiesModified()} noMargin>
             <AccordionHeader noMargin>
               <Text size="sub-title">
                 <Trans>Advanced properties</Trans>

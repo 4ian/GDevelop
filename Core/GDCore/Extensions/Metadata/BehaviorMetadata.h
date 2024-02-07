@@ -18,6 +18,7 @@ class BehaviorsSharedData;
 class MultipleInstructionMetadata;
 class InstructionMetadata;
 class ExpressionMetadata;
+class PropertyDescriptor;
 }  // namespace gd
 
 namespace gd {
@@ -303,6 +304,15 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   gd::Behavior& Get() const;
 
   /**
+   * \brief Called when the IDE wants to know about the custom properties of the
+   * behavior.
+   *
+   * \return a std::map with properties names as key.
+   * \see gd::PropertyDescriptor
+   */
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const;
+
+  /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior
    * shared data, if any (nullptr if none).
    * 
@@ -310,6 +320,15 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
    * shared data yet.
    */
   gd::BehaviorsSharedData* GetSharedDataInstance() const;
+
+  /**
+   * \brief Called when the IDE wants to know about the custom shared properties
+   * of the behavior.
+   *
+   * \return a std::map with properties names as key.
+   * \see gd::PropertyDescriptor
+   */
+  std::map<gd::String, gd::PropertyDescriptor> GetSharedProperties() const;
 
   /**
    * \brief Return a reference to a map containing the names of the actions
@@ -357,6 +376,8 @@ class GD_CORE_API BehaviorMetadata : public InstructionOrExpressionContainerMeta
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
+
+  static const std::map<gd::String, gd::PropertyDescriptor> badProperties;
 };
 
 }  // namespace gd

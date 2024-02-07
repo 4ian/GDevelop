@@ -96,7 +96,7 @@ TopDownMovementBehavior::GetProperties(
       .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
-  gd::String viewpointStr = _("Viewpoint");
+  gd::String viewpointStr = _("Top-Down");
   if (viewpoint == "TopDown")
     viewpointStr = _("Top-Down");
   else if (viewpoint == "PixelIsometry")

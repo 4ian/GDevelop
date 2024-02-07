@@ -53,8 +53,6 @@ const BehaviorPropertiesEditor = ({
         gd.JsPlatform.get(),
         behavior.getTypeName()
       );
-      if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
-      }
       const propertiesMetadata = behaviorMetadata.getProperties();
       const propertiesValues = behavior.getProperties();
       const propertyNames = propertiesMetadata.keys();

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 
 import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
@@ -30,6 +31,9 @@ import { ExampleStoreContext } from '../../../../AssetStore/ExampleStore/Example
 import { SubscriptionSuggestionContext } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
 import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import Add from '../../../../UI/CustomSvgIcons/Add';
+import Skeleton from '@material-ui/lab/Skeleton';
+import BackgroundText from '../../../../UI/BackgroundText';
+import Paper from '../../../../UI/Paper';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import AlertMessage from '../../../../UI/AlertMessage';
 import IconButton from '../../../../UI/IconButton';
@@ -41,14 +45,13 @@ import ProjectFileListItem from './ProjectFileListItem';
 import {
   getExampleAndTemplateItemsForBuildSection,
   getLastModifiedInfoByProjectId,
+  getProjectLineHeight,
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
-import CreateNewProjectButton from './CreateNewProjectButton';
 import GridList from '@material-ui/core/GridList';
 import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { GridListTile } from '@material-ui/core';
 
 const cellSpacing = 2;
 
@@ -261,6 +264,8 @@ const BuildSection = ({
     );
   }
 
+  const skeletonLineHeight = getProjectLineHeight(windowWidth);
+
   return (
     <>
       <SectionContainer
@@ -369,7 +374,22 @@ const BuildSection = ({
               </PlaceholderError>
             </Line>
           )}
-          {projectFiles.length > 0 && (
+          {authenticatedUser.loginState === 'loggingIn' &&
+          projectFiles.length === 0 ? ( // Only show skeleton on first load
+            new Array(10).fill(0).map((_, index) => (
+              <ListItem style={styles.listItem} key={`skeleton-${index}`}>
+                <Line expand>
+                  <Column expand>
+                    <Skeleton
+                      variant="rect"
+                      height={skeletonLineHeight}
+                      style={styles.projectSkeleton}
+                    />
+                  </Column>
+                </Line>
+              </ListItem>
+            ))
+          ) : projectFiles.length > 0 ? (
             <Line>
               <Column noMargin expand>
                 {!isMobile && (
@@ -412,6 +432,26 @@ const BuildSection = ({
                 </List>
               </Column>
             </Line>
+          ) : (
+            <ListItem style={styles.listItem}>
+              <Column expand>
+                <Paper
+                  variant="outlined"
+                  background="dark"
+                  style={styles.noProjectsContainer}
+                >
+                  <BackgroundText>
+                    <Trans>No projects yet.</Trans>
+                  </BackgroundText>
+                  <BackgroundText>
+                    <Trans>
+                      Create your first project using one of our templates or
+                      start from scratch.
+                    </Trans>
+                  </BackgroundText>
+                </Paper>
+              </Column>
+            </ListItem>
           )}
         </SectionRow>
         <SectionRow>

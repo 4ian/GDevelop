@@ -12,7 +12,6 @@ import { ResourceStore } from '../AssetStore/ResourceStore';
 import { isPathInProjectFolder, copyAllToProjectFolder } from './ResourceUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
-import { loadPreferencesFromLocalStorage } from '../MainFrame/Preferences/PreferencesProvider';
 import {
   copyAllEmbeddedResourcesToProjectFolder,
   embeddedResourcesParsers,
@@ -27,10 +26,6 @@ import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResource
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
-
-//const values = loadPreferencesFromLocalStorage();
-//const resourcesImporationBehavior = values.resourcesImporationBehavior;
-//console.log(resourcesImporationBehavior);
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -148,9 +143,7 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          console.log('----------: ');
-          console.log(resourcesImporationBehavior); // this is undefined
-          let answer: Boolean = null;
+          let answer: boolean = null;
 
           if (resourcesImporationBehavior === 'relative') {
             answer = false;
@@ -241,7 +234,8 @@ const localResourceSources: Array<ResourceSource> = [
                   getLastUsedPath: props.getLastUsedPath,
                   setLastUsedPath: props.setLastUsedPath,
                   options: props.options,
-                  resourcesImporationBehavior: 'hello world', //props.resourcesImporationBehavior
+                  resourcesImporationBehavior:
+                    props.resourcesImporationBehavior,
                 });
 
                 props.onChooseResources(resources);

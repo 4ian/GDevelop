@@ -436,7 +436,6 @@ const PrivateAssetPackInformationPage = ({
     privateAssetPackListingData.redeemConditions &&
     privateAssetPackListingData.redeemConditions.some(
       redeemCondition =>
-        privateAssetPackListingData.redeemConditions[0] &&
         redeemCondition.usageType === 'personal' &&
         redeemCondition.reason === 'subscription' &&
         redeemCondition.condition === 'gold'

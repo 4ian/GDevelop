@@ -49,6 +49,12 @@ const useExampleOrGameTemplateDialogs = ({
     },
     [setExampleStoreDialogOpen]
   );
+  const openExampleStoreDialog = React.useCallback(
+    () => {
+      setExampleStoreDialogOpen(true);
+    },
+    [setExampleStoreDialogOpen]
+  );
 
   const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
     () => {
@@ -139,9 +145,10 @@ const useExampleOrGameTemplateDialogs = ({
   return {
     selectedExampleShortHeader,
     selectedPrivateGameTemplateListingData,
+    closeExampleStoreDialog,
+    openExampleStoreDialog,
     onSelectExampleShortHeader: setSelectedExampleShortHeader,
     onSelectPrivateGameTemplateListingData: setSelectedPrivateGameTemplateListingData,
-    onOpenExampleStoreDialog: setExampleStoreDialogOpen,
     renderExampleOrGameTemplateDialogs,
   };
 };

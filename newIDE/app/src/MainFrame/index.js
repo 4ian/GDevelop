@@ -506,8 +506,9 @@ const MainFrame = (props: Props) => {
     selectedPrivateGameTemplateListingData,
     onSelectExampleShortHeader,
     onSelectPrivateGameTemplateListingData,
-    onOpenExampleStoreDialog,
     renderExampleOrGameTemplateDialogs,
+    closeExampleStoreDialog,
+    openExampleStoreDialog,
   } = useExampleOrGameTemplateDialogs({
     isProjectOpening,
     onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
@@ -921,7 +922,7 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         currentFileMetadata: fileMetadata,
       }));
-      onOpenExampleStoreDialog(false);
+      closeExampleStoreDialog();
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -962,7 +963,7 @@ const MainFrame = (props: Props) => {
       setState,
       closeProject,
       preferences,
-      onOpenExampleStoreDialog,
+      closeExampleStoreDialog,
       eventsFunctionsExtensionsState,
       getStorageProvider,
       getStorageProviderOperations,
@@ -1158,9 +1159,7 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
       setNewProjectSetupDialogOpen(false);
-      onOpenExampleStoreDialog(false);
-      onSelectExampleShortHeader(null);
-      onSelectPrivateGameTemplateListingData(null);
+      closeExampleStoreDialog();
       findLeaderboardsToReplace(project, oldProjectId);
       openSceneOrProjectManager({
         currentProject: project,
@@ -3001,7 +3000,7 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),
     onInviteCollaborators: () => openShareDialog('invite'),
-    onCreateProject: () => onOpenExampleStoreDialog(true),
+    onCreateProject: openExampleStoreDialog,
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -3234,7 +3233,7 @@ const MainFrame = (props: Props) => {
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenExampleStore: () => onOpenExampleStoreDialog(true),
+                    onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
                     onPreviewPrivateGameTemplateListingData: onSelectPrivateGameTemplateListingData,
                     onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {

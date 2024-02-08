@@ -20,11 +20,6 @@ import CenterTextAlignment from '../../UI/CustomSvgIcons/CenterTextAlignment';
 import RightTextAlignment from '../../UI/CustomSvgIcons/RightTextAlignment';
 import Text from '../../UI/Text';
 import {
-  PropertyCheckbox,
-  PropertyField,
-  PropertyResourceSelector,
-} from './PropertyFields';
-import {
   rgbColorToRGBString,
   rgbStringAndAlphaToRGBColor,
 } from '../../Utils/ColorTransformer';

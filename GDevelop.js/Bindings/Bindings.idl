@@ -970,6 +970,8 @@ interface PropertyDescriptor {
     boolean IsHidden();
     [Ref] PropertyDescriptor SetDeprecated(boolean enable);
     boolean IsDeprecated();
+    [Ref] PropertyDescriptor SetAdvanced(boolean enable);
+    boolean IsAdvanced();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
 
@@ -1856,6 +1858,9 @@ interface BehaviorMetadata {
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
+    
+    [Value] MapStringPropertyDescriptor GetProperties();
+    [Value] MapStringPropertyDescriptor GetSharedProperties();
 };
 
 interface EffectMetadata {

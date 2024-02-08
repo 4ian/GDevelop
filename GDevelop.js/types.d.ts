@@ -849,6 +849,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isHidden(): boolean;
   setDeprecated(enable: boolean): PropertyDescriptor;
   isDeprecated(): boolean;
+  setAdvanced(enable: boolean): PropertyDescriptor;
+  isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;
@@ -1475,6 +1477,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
+  getProperties(): MapStringPropertyDescriptor;
+  getSharedProperties(): MapStringPropertyDescriptor;
 }
 
 export class EffectMetadata extends EmscriptenObject {

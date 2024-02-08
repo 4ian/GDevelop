@@ -13,11 +13,14 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Log.h"
 
 namespace gd {
+
+const std::map<gd::String, gd::PropertyDescriptor> BehaviorMetadata::badProperties;
 
 BehaviorMetadata::BehaviorMetadata(
     const gd::String& extensionNamespace_,
@@ -47,8 +50,14 @@ BehaviorMetadata::BehaviorMetadata(
         "BehaviorMetadata is valid for: " + nameWithNamespace);
   }
 
-  if (instance) instance->SetTypeName(nameWithNamespace);
-  if (sharedDatasInstance) sharedDatasInstance->SetTypeName(nameWithNamespace);
+  if (instance) {
+    instance->SetTypeName(nameWithNamespace);
+    instance->InitializeContent();
+  }
+  if (sharedDatasInstance) {
+    sharedDatasInstance->SetTypeName(nameWithNamespace);
+    sharedDatasInstance->InitializeContent();
+  }
 }
 
 gd::InstructionMetadata& BehaviorMetadata::AddCondition(
@@ -405,8 +414,28 @@ gd::Behavior& BehaviorMetadata::Get() const {
   return *instance;
 }
 
+std::map<gd::String, gd::PropertyDescriptor> BehaviorMetadata::GetProperties() const {
+  if (!instance) {
+    return badProperties;
+  }
+  // TODO Properties should be declared on BehaviorMetadata directly.
+  // - Add 2 `properties` members (one for shared properties)
+  // - Add methods to declare new properties
+  return instance->GetProperties();
+}
+
 gd::BehaviorsSharedData* BehaviorMetadata::GetSharedDataInstance() const { 
   return sharedDatasInstance.get();
+}
+
+std::map<gd::String, gd::PropertyDescriptor> BehaviorMetadata::GetSharedProperties() const {
+  if (!sharedDatasInstance) {
+    return badProperties;
+  }
+  // TODO Properties should be declared on BehaviorMetadata directly.
+  // - Add 2 `properties` members (one for shared properties)
+  // - Add methods to declare new properties
+  return sharedDatasInstance->GetProperties();
 }
 
 const std::vector<gd::String>& BehaviorMetadata::GetRequiredBehaviorTypes() const {

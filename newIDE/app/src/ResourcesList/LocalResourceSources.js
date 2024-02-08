@@ -143,7 +143,7 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          let answer: boolean = null;
+          let answer: boolean;
 
           if (resourcesImporationBehavior === 'relative') {
             answer = false;

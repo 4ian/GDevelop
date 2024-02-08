@@ -401,7 +401,7 @@ export const canRedeemProduct = ({
         requiredPlanIds.includes(subscription.planId) &&
         !subscription.benefitsFromEducationPlan
       )
-        return true;
+        if (!subscription.benefitsFromEducationPlan) return true;
     }
   }
   return false;

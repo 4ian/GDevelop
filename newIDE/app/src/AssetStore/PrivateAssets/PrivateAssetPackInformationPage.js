@@ -509,6 +509,7 @@ const PrivateAssetPackInformationPage = ({
                                 </Text>
                               </Line>
                               <Spacer />
+                              {/* TODO: Do not display for student accounts */}
                               <div style={{ flexShrink: 0 }}>
                                 <RaisedButton
                                   primary

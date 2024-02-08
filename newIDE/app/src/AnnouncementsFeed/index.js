@@ -22,12 +22,14 @@ type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
   canClose?: boolean,
   addMargins?: boolean,
+  hideLoader?: boolean,
 |};
 
 export const AnnouncementsFeed = ({
   level,
   canClose,
   addMargins,
+  hideLoader,
 }: AnnouncementsFeedProps) => {
   const { announcements, error, fetchAnnouncements } = React.useContext(
     AnnouncementsFeedContext
@@ -45,7 +47,7 @@ export const AnnouncementsFeed = ({
       </PlaceholderError>
     );
   } else if (!announcements) {
-    return <PlaceholderLoader />;
+    return hideLoader ? null : <PlaceholderLoader />;
   }
 
   const properLevelAnnouncements = level

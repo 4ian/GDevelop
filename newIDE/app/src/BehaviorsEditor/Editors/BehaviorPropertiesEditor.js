@@ -47,7 +47,7 @@ const BehaviorPropertiesEditor = ({
     [behavior, object]
   );
 
-  const areAdvancedPropertiesModified = React.useCallback(
+  const areAdvancedPropertiesModified = React.useMemo(
     () => {
       const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
         gd.JsPlatform.get(),
@@ -120,10 +120,7 @@ const BehaviorPropertiesEditor = ({
           />
           {(advancedPropertiesSchema.length > 0 ||
             deprecatedPropertiesSchema.length > 0) && (
-            <Accordion
-              defaultExpanded={areAdvancedPropertiesModified()}
-              noMargin
-            >
+            <Accordion defaultExpanded={areAdvancedPropertiesModified} noMargin>
               <AccordionHeader noMargin>
                 <Text size="sub-title">
                   <Trans>Advanced properties</Trans>

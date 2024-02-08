@@ -343,7 +343,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [forceUpdate, onPropertiesUpdated]
   );
 
-  const markAsAdvanced = React.useCallback(
+  const setAdvanced = React.useCallback(
     (property: gdNamedPropertyDescriptor, enable: boolean) => {
       property.setAdvanced(enable);
       forceUpdate();
@@ -352,7 +352,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [forceUpdate, onPropertiesUpdated]
   );
 
-  const markAsDeprecated = React.useCallback(
+  const setDeprecated = React.useCallback(
     (property: gdNamedPropertyDescriptor, enable: boolean) => {
       property.setDeprecated(enable);
       forceUpdate();
@@ -471,20 +471,20 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           onChange={(e, i, value: string) => {
                                             if (value === 'Hidden') {
                                               setHidden(property, true);
-                                              markAsDeprecated(property, false);
-                                              markAsAdvanced(property, false);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, false);
                                             } else if (value === 'Deprecated') {
                                               setHidden(property, false);
-                                              markAsDeprecated(property, true);
-                                              markAsAdvanced(property, false);
+                                              setDeprecated(property, true);
+                                              setAdvanced(property, false);
                                             } else if (value === 'Advanced') {
                                               setHidden(property, false);
-                                              markAsDeprecated(property, false);
-                                              markAsAdvanced(property, true);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, true);
                                             } else if (value === 'Visible') {
                                               setHidden(property, false);
-                                              markAsDeprecated(property, false);
-                                              markAsAdvanced(property, false);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, false);
                                             }
                                           }}
                                           fullWidth

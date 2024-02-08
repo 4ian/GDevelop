@@ -99,8 +99,8 @@ type Props = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenExampleStore: () => void,
-  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
-  onOpenExampleStoreWithPrivateGameTemplateListingData: (
+  onSelectExampleShortHeader: ExampleShortHeader => void,
+  onPreviewPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenPrivateGameTemplateListingData: (
@@ -143,8 +143,8 @@ export const HomePage = React.memo<Props>(
         onOpenRecentFile,
         onOpenNewProjectSetupDialog,
         onOpenExampleStore,
-        onOpenExampleStoreWithExampleShortHeader,
-        onOpenExampleStoreWithPrivateGameTemplateListingData,
+        onSelectExampleShortHeader,
+        onPreviewPrivateGameTemplateListingData,
         onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
         onOpenLanguageDialog,
@@ -495,11 +495,9 @@ export const HomePage = React.memo<Props>(
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                      onSelectExampleShortHeader={
-                        onOpenExampleStoreWithExampleShortHeader
-                      }
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
                       onSelectPrivateGameTemplateListingData={
-                        onOpenExampleStoreWithPrivateGameTemplateListingData
+                        onPreviewPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
                       onManageGame={onManageGame}
@@ -598,11 +596,9 @@ export const renderHomePageContainer = (
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onOpenExampleStore={props.onOpenExampleStore}
-    onOpenExampleStoreWithExampleShortHeader={
-      props.onOpenExampleStoreWithExampleShortHeader
-    }
-    onOpenExampleStoreWithPrivateGameTemplateListingData={
-      props.onOpenExampleStoreWithPrivateGameTemplateListingData
+    onSelectExampleShortHeader={props.onSelectExampleShortHeader}
+    onPreviewPrivateGameTemplateListingData={
+      props.onPreviewPrivateGameTemplateListingData
     }
     onOpenPrivateGameTemplateListingData={
       props.onOpenPrivateGameTemplateListingData

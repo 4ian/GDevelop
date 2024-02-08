@@ -89,7 +89,6 @@ import {
   type ShareDialogWithoutExportsProps,
   type ShareTab,
 } from '../ExportAndShare/ShareDialog';
-import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -130,7 +129,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import useExampleOrGameTemplateDialogs from './UseExampleOrGameTemplateDialogs';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
@@ -181,7 +180,6 @@ import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
-import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
@@ -377,18 +375,7 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    exampleStoreDialogOpen,
-    setExampleStoreDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
-  const [
-    selectedPrivateGameTemplateListingData,
-    setSelectedPrivateGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(null);
+
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
   );
@@ -513,6 +500,17 @@ const MainFrame = (props: Props) => {
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
+  });
+  const {
+    selectedExampleShortHeader,
+    selectedPrivateGameTemplateListingData,
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplateListingData,
+    onOpenExampleStoreDialog,
+    renderExampleOrGameTemplateDialogs,
+  } = useExampleOrGameTemplateDialogs({
+    isProjectOpening,
+    onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
   });
 
   /**
@@ -923,7 +921,7 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         currentFileMetadata: fileMetadata,
       }));
-      setExampleStoreDialogOpen(false);
+      onOpenExampleStoreDialog(false);
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -964,6 +962,7 @@ const MainFrame = (props: Props) => {
       setState,
       closeProject,
       preferences,
+      onOpenExampleStoreDialog,
       eventsFunctionsExtensionsState,
       getStorageProvider,
       getStorageProviderOperations,
@@ -1159,7 +1158,9 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
       setNewProjectSetupDialogOpen(false);
-      await closeExampleStoreDialog();
+      onOpenExampleStoreDialog(false);
+      onSelectExampleShortHeader(null);
+      onSelectPrivateGameTemplateListingData(null);
       findLeaderboardsToReplace(project, oldProjectId);
       openSceneOrProjectManager({
         currentProject: project,
@@ -1920,29 +1921,6 @@ const MainFrame = (props: Props) => {
       currentProject
     );
   };
-
-  const openExampleStoreDialogWithExampleShortHeader = React.useCallback(
-    (exampleShortHeader: ExampleShortHeader) => {
-      setSelectedExampleShortHeader(exampleShortHeader);
-      setExampleStoreDialogOpen(true);
-    },
-    []
-  );
-  const openExampleStoreDialogWithPrivateGameTemplateListingData = React.useCallback(
-    (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
-      setSelectedPrivateGameTemplateListingData(privateGameTemplateListingData);
-      setExampleStoreDialogOpen(true);
-    },
-    []
-  );
-  const closeExampleStoreDialog = React.useCallback(
-    () => {
-      setExampleStoreDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      setSelectedPrivateGameTemplateListingData(null);
-    },
-    [setExampleStoreDialogOpen]
-  );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -3023,7 +3001,7 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),
     onInviteCollaborators: () => openShareDialog('invite'),
-    onCreateProject: () => setExampleStoreDialogOpen(true),
+    onCreateProject: () => onOpenExampleStoreDialog(true),
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -3256,11 +3234,11 @@ const MainFrame = (props: Props) => {
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenExampleStore: () => setExampleStoreDialogOpen(true),
-                    onOpenExampleStoreWithExampleShortHeader: openExampleStoreDialogWithExampleShortHeader,
-                    onOpenExampleStoreWithPrivateGameTemplateListingData: openExampleStoreDialogWithPrivateGameTemplateListingData,
+                    onOpenExampleStore: () => onOpenExampleStoreDialog(true),
+                    onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onPreviewPrivateGameTemplateListingData: onSelectPrivateGameTemplateListingData,
                     onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      setSelectedPrivateGameTemplateListingData(
+                      onSelectPrivateGameTemplateListingData(
                         privateGameTemplateListingData
                       );
                       setNewProjectSetupDialogOpen(true);
@@ -3340,24 +3318,6 @@ const MainFrame = (props: Props) => {
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,
         })}
-      {exampleStoreDialogOpen && (
-        <ExampleStoreDialog
-          open
-          onClose={closeExampleStoreDialog}
-          isProjectOpening={isProjectOpening}
-          selectedExampleShortHeader={selectedExampleShortHeader}
-          selectedPrivateGameTemplateListingData={
-            selectedPrivateGameTemplateListingData
-          }
-          onSelectExampleShortHeader={setSelectedExampleShortHeader}
-          onSelectPrivateGameTemplateListingData={
-            setSelectedPrivateGameTemplateListingData
-          }
-          onOpenNewProjectSetupDialog={() => {
-            setNewProjectSetupDialogOpen(true);
-          }}
-        />
-      )}
       {!!currentProject && platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
           project={currentProject}
@@ -3495,6 +3455,7 @@ const MainFrame = (props: Props) => {
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
+      {renderExampleOrGameTemplateDialogs()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}

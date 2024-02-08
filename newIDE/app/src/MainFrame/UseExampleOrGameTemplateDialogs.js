@@ -7,6 +7,8 @@ import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import PrivateGameTemplateInformationDialog from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationDialog';
 import PrivateGameTemplatePurchaseDialog from '../AssetStore/PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
+import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   isProjectOpening: boolean,
@@ -34,6 +36,11 @@ const useExampleOrGameTemplateDialogs = ({
     setPurchasingGameTemplateListingData,
   ] = React.useState<?PrivateGameTemplateListingData>(null);
 
+  const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
+  );
+
   const closeExampleStoreDialog = React.useCallback(
     () => {
       setExampleStoreDialogOpen(false);
@@ -41,6 +48,37 @@ const useExampleOrGameTemplateDialogs = ({
       setSelectedPrivateGameTemplateListingData(null);
     },
     [setExampleStoreDialogOpen]
+  );
+
+  const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+    () => {
+      if (
+        !selectedPrivateGameTemplateListingData ||
+        !privateGameTemplateListingDatas ||
+        !receivedGameTemplates
+      )
+        return null;
+
+      const receivedGameTemplateIds = receivedGameTemplates.map(
+        template => template.id
+      );
+
+      return privateGameTemplateListingDatas
+        .filter(
+          template =>
+            template.sellerId ===
+              selectedPrivateGameTemplateListingData.sellerId &&
+            !receivedGameTemplateIds.includes(template.sellerId)
+        )
+        .sort((template1, template2) =>
+          template1.name.localeCompare(template2.name)
+        );
+    },
+    [
+      selectedPrivateGameTemplateListingData,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+    ]
   );
 
   const renderExampleOrGameTemplateDialogs = () => {
@@ -84,7 +122,9 @@ const useExampleOrGameTemplateDialogs = ({
               );
             }}
             onClose={() => setSelectedPrivateGameTemplateListingData(null)}
-            privateGameTemplateListingDatasFromSameCreator={[]}
+            privateGameTemplateListingDatasFromSameCreator={
+              privateGameTemplateListingDatasFromSameCreator
+            }
           />
         )}
         {!!purchasingGameTemplateListingData && (

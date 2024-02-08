@@ -10,16 +10,39 @@ import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 import FlatButton from '../../UI/FlatButton';
 import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { ListItem } from '../../UI/List';
-import IconButton from '../../UI/IconButton';
-import ArrowHeadBottom from '../../UI/CustomSvgIcons/ArrowHeadBottom';
-import ArrowHeadRight from '../../UI/CustomSvgIcons/ArrowHeadRight';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
 type Props = BehaviorEditorProps;
+
+const areAdvancedPropertiesModified = (behavior: gdBehavior) => {
+  const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+    gd.JsPlatform.get(),
+    behavior.getTypeName()
+  );
+  const propertiesMetadata = behaviorMetadata.getProperties();
+  const propertiesValues = behavior.getProperties();
+  const propertyNames = propertiesMetadata.keys();
+  let hasFoundModifiedAdvancedProperty = false;
+  mapFor(0, propertyNames.size(), i => {
+    const name = propertyNames.at(i);
+    const property = propertiesMetadata.get(name);
+    const defaultValue = property.getValue();
+    const currentValue = propertiesValues.get(name).getValue();
+
+    // Some boolean properties can be set to an empty string to mean false.
+    const hasDefaultValue =
+      property.getType().toLowerCase() === 'boolean'
+        ? (currentValue === 'true') === (defaultValue === 'true')
+        : currentValue === defaultValue;
+    if (property.isAdvanced() && !hasDefaultValue) {
+      hasFoundModifiedAdvancedProperty = true;
+    }
+  });
+  return hasFoundModifiedAdvancedProperty;
+};
 
 const BehaviorPropertiesEditor = ({
   project,
@@ -47,33 +70,8 @@ const BehaviorPropertiesEditor = ({
     [behavior, object]
   );
 
-  const areAdvancedPropertiesModified = React.useMemo(
-    () => {
-      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-        gd.JsPlatform.get(),
-        behavior.getTypeName()
-      );
-      const propertiesMetadata = behaviorMetadata.getProperties();
-      const propertiesValues = behavior.getProperties();
-      const propertyNames = propertiesMetadata.keys();
-      let hasFoundModifiedAdvancedProperty = false;
-      mapFor(0, propertyNames.size(), i => {
-        const name = propertyNames.at(i);
-        const property = propertiesMetadata.get(name);
-        const defaultValue = property.getValue();
-        const currentValue = propertiesValues.get(name).getValue();
-
-        // Some boolean properties can be set to an empty string to mean false.
-        const hasDefaultValue =
-          property.getType().toLowerCase() === 'boolean'
-            ? (currentValue === 'true') === (defaultValue === 'true')
-            : currentValue === defaultValue;
-        if (property.isAdvanced() && !hasDefaultValue) {
-          hasFoundModifiedAdvancedProperty = true;
-        }
-      });
-      return hasFoundModifiedAdvancedProperty;
-    },
+  const areAdvancedPropertiesExpandedByDefault = React.useMemo(
+    () => areAdvancedPropertiesModified(behavior),
     [behavior]
   );
 
@@ -120,7 +118,10 @@ const BehaviorPropertiesEditor = ({
           />
           {(advancedPropertiesSchema.length > 0 ||
             deprecatedPropertiesSchema.length > 0) && (
-            <Accordion defaultExpanded={areAdvancedPropertiesModified} noMargin>
+            <Accordion
+              defaultExpanded={areAdvancedPropertiesExpandedByDefault}
+              noMargin
+            >
               <AccordionHeader noMargin>
                 <Text size="sub-title">
                   <Trans>Advanced properties</Trans>

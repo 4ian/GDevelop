@@ -211,9 +211,6 @@ const BuildSection = ({
     return b.fileMetadata.lastModifiedDate - a.fileMetadata.lastModifiedDate;
   });
 
-  const shouldShowCarousel =
-    !!authenticatedUser.authenticated && projectFiles.length > 0;
-
   const examplesAndTemplatesToDisplay = React.useMemo(
     () =>
       getExampleAndTemplateItemsForBuildSection({
@@ -223,17 +220,18 @@ const BuildSection = ({
         onSelectPrivateGameTemplateListingData,
         onSelectExampleShortHeader,
         i18n,
-        numberOfItemsExclusivelyInCarousel:
-          !shouldShowCarousel || showAllGameTemplates ? 0 : isMobile ? 3 : 5,
-        numberOfItemsInCarousel:
-          !shouldShowCarousel || showAllGameTemplates ? 0 : isMobile ? 8 : 12,
+        numberOfItemsExclusivelyInCarousel: showAllGameTemplates
+          ? 0
+          : isMobile
+          ? 3
+          : 5,
+        numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates ? 60 : isMobile ? 16 : 20,
         privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
       }),
     [
       authenticatedUser.receivedGameTemplates,
       showAllGameTemplates,
-      shouldShowCarousel,
       exampleShortHeaders,
       onSelectExampleShortHeader,
       onSelectPrivateGameTemplateListingData,
@@ -288,157 +286,134 @@ const BuildSection = ({
             : undefined
         }
       >
-        {projectFiles.length === 0 && (
-          <SectionRow>
-            <GridList
-              cols={getItemsColumns(windowWidth)}
-              style={styles.grid}
-              cellHeight="auto"
-              spacing={cellSpacing}
-            >
-              <GridListTile>
-                <Line noMargin>
-                  <CreateNewProjectButton
-                    onClick={onOpenNewProjectSetupDialog}
-                    fullWidth
-                  />
-                </Line>
-              </GridListTile>
-            </GridList>
-          </SectionRow>
-        )}
-        {shouldShowCarousel && (
-          <SectionRow>
-            <Carousel
-              title={<Trans>Ready-made games</Trans>}
-              displayItemTitles={false}
-              browseAllLabel={<Trans>Browse all templates</Trans>}
-              onBrowseAllClick={() => setShowAllGameTemplates(true)}
-              items={examplesAndTemplatesToDisplay.carouselItems}
-              browseAllIcon={<ChevronArrowRight fontSize="small" />}
-              roundedImages
-              displayArrowsOnDesktop
-            />
-          </SectionRow>
-        )}
-        {projectFiles.length > 0 && (
-          <SectionRow>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              alignItems="center"
-              noMargin
-              expand
-            >
-              <Column noMargin>
-                <LineStackLayout noMargin alignItems="center">
-                  <Text size="section-title">
-                    <Trans>My projects</Trans>
-                  </Text>
-                  <IconButton
-                    size="small"
-                    onClick={refreshCloudProjects}
-                    disabled={isRefreshing}
-                    tooltip={t`Refresh cloud projects`}
-                  >
-                    <div style={styles.refreshIconContainer}>
-                      <Refresh fontSize="inherit" />
-                    </div>
-                  </IconButton>
-                </LineStackLayout>
-              </Column>
-              <Column noMargin>
-                <LineStackLayout noMargin>
-                  <RaisedButton
-                    primary
-                    fullWidth={!canOpen}
-                    label={
-                      isMobile ? (
-                        <Trans>Create</Trans>
-                      ) : (
-                        <Trans>Create a project</Trans>
-                      )
-                    }
-                    onClick={onOpenNewProjectSetupDialog}
-                    icon={<Add fontSize="small" />}
-                    id="home-create-project-button"
-                  />
-                  {canOpen && (
-                    <>
-                      <Text>
-                        <Trans>or</Trans>
+        <SectionRow>
+          <Carousel
+            title={<Trans>Ready-made games</Trans>}
+            displayItemTitles={false}
+            browseAllLabel={<Trans>Browse all templates</Trans>}
+            onBrowseAllClick={() => setShowAllGameTemplates(true)}
+            items={examplesAndTemplatesToDisplay.carouselItems}
+            browseAllIcon={<ChevronArrowRight fontSize="small" />}
+            roundedImages
+            displayArrowsOnDesktop
+          />
+        </SectionRow>
+        <SectionRow>
+          <ResponsiveLineStackLayout
+            justifyContent="space-between"
+            alignItems="center"
+            noMargin
+            expand
+          >
+            <Column noMargin>
+              <LineStackLayout noMargin alignItems="center">
+                <Text size="section-title">
+                  <Trans>My projects</Trans>
+                </Text>
+                <IconButton
+                  size="small"
+                  onClick={refreshCloudProjects}
+                  disabled={isRefreshing}
+                  tooltip={t`Refresh cloud projects`}
+                >
+                  <div style={styles.refreshIconContainer}>
+                    <Refresh fontSize="inherit" />
+                  </div>
+                </IconButton>
+              </LineStackLayout>
+            </Column>
+            <Column noMargin>
+              <LineStackLayout noMargin>
+                <RaisedButton
+                  primary
+                  fullWidth={!canOpen}
+                  label={
+                    isMobile ? (
+                      <Trans>Create</Trans>
+                    ) : (
+                      <Trans>Create a project</Trans>
+                    )
+                  }
+                  onClick={onOpenNewProjectSetupDialog}
+                  icon={<Add fontSize="small" />}
+                  id="home-create-project-button"
+                />
+                {canOpen && (
+                  <>
+                    <Text>
+                      <Trans>or</Trans>
+                    </Text>
+                    <Spacer />
+                    <TextButton
+                      primary
+                      label={
+                        isMobile ? (
+                          <Trans>Open</Trans>
+                        ) : (
+                          <Trans>Open a project</Trans>
+                        )
+                      }
+                      onClick={onChooseProject}
+                    />
+                  </>
+                )}
+              </LineStackLayout>
+            </Column>
+          </ResponsiveLineStackLayout>
+          {cloudProjectsFetchingErrorLabel && (
+            <Line>
+              <PlaceholderError onRetry={onCloudProjectsChanged}>
+                <AlertMessage kind="warning">
+                  {cloudProjectsFetchingErrorLabel}
+                </AlertMessage>
+              </PlaceholderError>
+            </Line>
+          )}
+          {projectFiles.length > 0 && (
+            <Line>
+              <Column noMargin expand>
+                {!isMobile && (
+                  <Line justifyContent="space-between">
+                    <Column expand>
+                      <Text color="secondary">
+                        <Trans>File name</Trans>
                       </Text>
-                      <Spacer />
-                      <TextButton
-                        primary
-                        label={
-                          isMobile ? (
-                            <Trans>Open</Trans>
-                          ) : (
-                            <Trans>Open a project</Trans>
-                          )
-                        }
-                        onClick={onChooseProject}
-                      />
-                    </>
-                  )}
-                </LineStackLayout>
+                    </Column>
+                    <Column expand>
+                      <Text color="secondary">
+                        <Trans>Location</Trans>
+                      </Text>
+                    </Column>
+                    <Column expand>
+                      <Text color="secondary">
+                        <Trans>Last edited</Trans>
+                      </Text>
+                    </Column>
+                  </Line>
+                )}
+                <List>
+                  {projectFiles.map(file => (
+                    <ProjectFileListItem
+                      key={file.fileMetadata.fileIdentifier}
+                      file={file}
+                      currentFileMetadata={currentFileMetadata}
+                      storageProviders={storageProviders}
+                      isWindowWidthMediumOrLarger={!isMobile}
+                      onOpenRecentFile={onOpenRecentFile}
+                      lastModifiedInfo={
+                        lastModifiedInfoByProjectId[
+                          file.fileMetadata.fileIdentifier
+                        ]
+                      }
+                      onManageGame={onManageGame}
+                      canManageGame={canManageGame}
+                    />
+                  ))}
+                </List>
               </Column>
-            </ResponsiveLineStackLayout>
-            {cloudProjectsFetchingErrorLabel && (
-              <Line>
-                <PlaceholderError onRetry={onCloudProjectsChanged}>
-                  <AlertMessage kind="warning">
-                    {cloudProjectsFetchingErrorLabel}
-                  </AlertMessage>
-                </PlaceholderError>
-              </Line>
-            )}
-            {projectFiles.length > 0 && (
-              <Line>
-                <Column noMargin expand>
-                  {!isMobile && (
-                    <Line justifyContent="space-between">
-                      <Column expand>
-                        <Text color="secondary">
-                          <Trans>File name</Trans>
-                        </Text>
-                      </Column>
-                      <Column expand>
-                        <Text color="secondary">
-                          <Trans>Location</Trans>
-                        </Text>
-                      </Column>
-                      <Column expand>
-                        <Text color="secondary">
-                          <Trans>Last edited</Trans>
-                        </Text>
-                      </Column>
-                    </Line>
-                  )}
-                  <List>
-                    {projectFiles.map(file => (
-                      <ProjectFileListItem
-                        key={file.fileMetadata.fileIdentifier}
-                        file={file}
-                        currentFileMetadata={currentFileMetadata}
-                        storageProviders={storageProviders}
-                        isWindowWidthMediumOrLarger={!isMobile}
-                        onOpenRecentFile={onOpenRecentFile}
-                        lastModifiedInfo={
-                          lastModifiedInfoByProjectId[
-                            file.fileMetadata.fileIdentifier
-                          ]
-                        }
-                        onManageGame={onManageGame}
-                        canManageGame={canManageGame}
-                      />
-                    ))}
-                  </List>
-                </Column>
-              </Line>
-            )}
-          </SectionRow>
-        )}
+            </Line>
+          )}
+        </SectionRow>
         <SectionRow>
           <Line alignItems="center" noMargin expand>
             <Column noMargin>

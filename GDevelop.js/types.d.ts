@@ -1526,9 +1526,7 @@ export class PlatformExtension extends EmscriptenObject {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
   addDependency(): DependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: Behavior, sharedDatasInstance: BehaviorsSharedData): BehaviorMetadata;
-  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): BehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: ObjectConfiguration): ObjectMetadata;
-  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): ObjectMetadata;
   addEffect(name: string): EffectMetadata;
   registerProperty(name: string): PropertyDescriptor;
   getFullName(): string;

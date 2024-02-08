@@ -28,10 +28,9 @@ const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
 
-const values = loadPreferencesFromLocalStorage();
-const resourcesImporationBehavior = values.resourcesImporationBehavior;
-
-console.log(resourcesImporationBehavior);
+//const values = loadPreferencesFromLocalStorage();
+//const resourcesImporationBehavior = values.resourcesImporationBehavior;
+//console.log(resourcesImporationBehavior);
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -71,6 +70,7 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath,
         project,
         options,
+        resourcesImporationBehavior,
       }: ChooseResourceProps) => {
         if (!dialog)
           throw new Error('Electron dialog not supported in this environment.');
@@ -148,19 +148,20 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-
+          console.log('----------: ');
+          console.log(resourcesImporationBehavior); // this is undefined
           let answer: Boolean = null;
 
-          if (resourcesImporationBehavior === 'ask') {
+          if (resourcesImporationBehavior === 'relative') {
+            answer = false;
+          } else if (resourcesImporationBehavior === 'import') {
+            answer = true;
+          } else {
             answer = Window.showConfirmDialog(
               i18n._(
                 t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
               )
             );
-          } else if (resourcesImporationBehavior === 'relative') {
-            answer = false;
-          } else if (resourcesImporationBehavior === 'import') {
-            answer = true;
           }
 
           if (answer) {
@@ -240,6 +241,7 @@ const localResourceSources: Array<ResourceSource> = [
                   getLastUsedPath: props.getLastUsedPath,
                   setLastUsedPath: props.setLastUsedPath,
                   options: props.options,
+                  resourcesImporationBehavior: 'hello world', //props.resourcesImporationBehavior
                 });
 
                 props.onChooseResources(resources);

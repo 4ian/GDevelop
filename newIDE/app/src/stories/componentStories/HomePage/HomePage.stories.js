@@ -124,13 +124,11 @@ const WrappedHomePage = ({
                 onChooseProject={() => action('onChooseProject')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
                 onOpenExampleStore={() => action('onOpenExampleStore')()}
-                onOpenExampleStoreWithExampleShortHeader={() =>
-                  action('onOpenExampleStoreWithExampleShortHeader')()
+                onSelectExampleShortHeader={() =>
+                  action('onSelectExampleShortHeader')()
                 }
-                onOpenExampleStoreWithPrivateGameTemplateListingData={() =>
-                  action(
-                    'onOpenExampleStoreWithPrivateGameTemplateListingData'
-                  )()
+                onPreviewPrivateGameTemplateListingData={() =>
+                  action('onPreviewPrivateGameTemplateListingData')()
                 }
                 onOpenPrivateGameTemplateListingData={() =>
                   action('onOpenPrivateGameTemplateListingData')()

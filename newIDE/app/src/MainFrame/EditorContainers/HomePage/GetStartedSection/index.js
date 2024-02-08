@@ -658,7 +658,7 @@ const GetStartedSection = ({
   if (step === 'recommendations' && profile) {
     return (
       <>
-        <AnnouncementsFeed canClose level="urgent" addMargins />
+        <AnnouncementsFeed canClose level="urgent" addMargins hideLoader />
         <SectionContainer
           title={
             profile.username ? (

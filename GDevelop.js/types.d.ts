@@ -2475,8 +2475,8 @@ export class SpineObjectConfiguration extends EmscriptenObject {
 
 export class TextObject extends EmscriptenObject {
   constructor(): void;
-  setString(string: string): void;
-  getString(): string;
+  setText(string: string): void;
+  getText(): string;
   setCharacterSize(size: number): void;
   getCharacterSize(): number;
   setFontName(string: string): void;
@@ -2487,12 +2487,28 @@ export class TextObject extends EmscriptenObject {
   setItalic(enable: boolean): void;
   isUnderlined(): boolean;
   setUnderlined(enable: boolean): void;
-  setColor(r: number, g: number, b: number): void;
-  getColorR(): number;
-  getColorG(): number;
-  getColorB(): number;
+  setColor(color: string): void;
+  getColor(): string;
   setTextAlignment(textAlignment: string): void;
   getTextAlignment(): string;
+  setOutlineEnabled(enable: boolean): void;
+  isOutlineEnabled(): boolean;
+  setOutlineThickness(value: number): void;
+  getOutlineThickness(): number;
+  setOutlineColor(color: string): void;
+  getOutlineColor(): string;
+  setShadowEnabled(enable: boolean): void;
+  isShadowEnabled(): boolean;
+  setShadowColor(color: string): void;
+  getShadowColor(): string;
+  setShadowOpacity(value: number): void;
+  getShadowOpacity(): number;
+  setShadowAngle(value: number): void;
+  getShadowAngle(): number;
+  setShadowDistance(value: number): void;
+  getShadowDistance(): number;
+  setShadowBlurRadius(value: number): void;
+  getShadowBlurRadius(): number;
 }
 
 export class TiledSpriteObject extends EmscriptenObject {

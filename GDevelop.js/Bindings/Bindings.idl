@@ -3286,8 +3286,8 @@ interface VectorVector2f {
 interface TextObject {
     void TextObject();
 
-    void SetString([Const] DOMString string);
-    [Const, Ref] DOMString GetString();
+    void SetText([Const] DOMString string);
+    [Const, Ref] DOMString GetText();
     void SetCharacterSize(double size);
     double GetCharacterSize();
     void SetFontName([Const] DOMString string);
@@ -3298,12 +3298,30 @@ interface TextObject {
     void SetItalic(boolean enable);
     boolean IsUnderlined();
     void SetUnderlined(boolean enable);
-    void SetColor(unsigned long r, unsigned long g, unsigned long b);
-    unsigned long GetColorR();
-    unsigned long GetColorG();
-    unsigned long GetColorB();
+    void SetColor([Const] DOMString color);
+    [Const, Ref] DOMString GetColor();
     void SetTextAlignment([Const] DOMString textAlignment);
     [Const, Ref] DOMString GetTextAlignment();
+
+    void SetOutlineEnabled(boolean enable);
+    boolean IsOutlineEnabled();
+    void SetOutlineThickness(double value);
+    double GetOutlineThickness();
+    void SetOutlineColor([Const] DOMString color);
+    [Const, Ref] DOMString GetOutlineColor();
+
+    void SetShadowEnabled(boolean enable);
+    boolean IsShadowEnabled();
+    void SetShadowColor([Const] DOMString color);
+    [Const, Ref] DOMString GetShadowColor();
+    void SetShadowOpacity(double value);
+    double GetShadowOpacity();
+    void SetShadowAngle(double value);
+    double GetShadowAngle();
+    void SetShadowDistance(double value);
+    double GetShadowDistance();
+    void SetShadowBlurRadius(double value);
+    double GetShadowBlurRadius();
 };
 TextObject implements ObjectConfiguration;
 

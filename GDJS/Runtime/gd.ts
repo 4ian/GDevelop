@@ -68,12 +68,10 @@ namespace gdjs {
   export const hexToRGBColor = function (
     hexString: string
   ): [number, number, number] {
-    var hexNumber = parseInt(hexString.replace('#', ''), 16);
-    return [
-      (hexNumber >> 16) & 0xff,
-      (hexNumber >> 8) & 0xff,
-      hexNumber & 0xff,
-    ];
+    const hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return Number.isFinite(hexNumber)
+      ? [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff]
+      : [0, 0, 0];
   };
 
   /**

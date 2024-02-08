@@ -27,8 +27,6 @@ import {
 } from '../Utils/BrowserArchiver';
 import ResourcesLoader from '../ResourcesLoader';
 
-const gd: libGDevelop = global.gd;
-
 const excludedObjectType = [
   'BBText::BBText',
   'Lighting::LightObject',
@@ -120,9 +118,40 @@ const addSpacesToPascalCase = (pascalCaseName: string): string => {
   return name;
 };
 
+type EnumeratedObject = {| object: gdObject, path: string |};
+
+const enumerateAllObjects = (
+  objectTreeItem: gdObjectFolderOrObject,
+  folderPath: string,
+  allObjects: Array<EnumeratedObject>
+) => {
+  if (objectTreeItem.isFolder()) {
+    mapFor(0, objectTreeItem.getChildrenCount(), i => {
+      enumerateAllObjects(
+        objectTreeItem.getChildAt(i),
+        folderPath + objectTreeItem.getFolderName() + '/',
+        allObjects
+      );
+    });
+  } else {
+    allObjects.push({ object: objectTreeItem.getObject(), path: folderPath });
+  }
+};
+
+const enumerateAllObjectsOfScene = (
+  scene: gdLayout,
+  folderPath: string,
+  allObjects: Array<EnumeratedObject>
+) => {
+  const objectTreeItem = scene.getRootFolder();
+  mapFor(0, objectTreeItem.getChildrenCount(), i => {
+    enumerateAllObjects(objectTreeItem.getChildAt(i), folderPath, allObjects);
+  });
+};
+
 const zipAssets = async (
   project: gdProject,
-  objects: Array<gdObject>,
+  enumeratedObjects: Array<EnumeratedObject>,
   ensureDownloadResourcesAsBlobsIsDone: (
     options: DownloadResourcesAsBlobsOptionsWithoutProgress
   ) => Promise<void>
@@ -132,55 +161,35 @@ const zipAssets = async (
 
   try {
     await Promise.all(
-      objects.map(async object => {
-        const resourcesInUse = new gd.ResourcesInUseHelper(
-          project.getResourcesManager()
+      enumeratedObjects.map(async ({ object, path }) => {
+        const usedResourceNames: Array<string> = [];
+        const serializedObject = serializeToObjectAsset(
+          project,
+          object,
+          addSpacesToPascalCase(object.getName()),
+          usedResourceNames
         );
-        object.getConfiguration().exposeResources(resourcesInUse);
-        const objectResourceNames = resourcesInUse
-          .getAllResources()
-          .toJSArray()
-          .filter(name => name.length > 0);
-        resourcesInUse.delete();
 
         // Download resources to blobs and update the resources.
         const blobByResourceName: Map<string, Blob> = new Map();
         await ensureDownloadResourcesAsBlobsIsDone({
           project,
-          resourceNames: objectResourceNames,
+          resourceNames: usedResourceNames,
           onAddBlobFile: (resourceName: string, blob: Blob) => {
             blobByResourceName.set(resourceName, blob);
           },
         });
 
-        /**
-         * The map from project resource file paths to asset resource file paths.
-         */
-        const resourceFileRenamingMap = new Map<string, Array<string>>();
-        const serializedObject = serializeToObjectAsset(
-          project,
-          object,
-          addSpacesToPascalCase(object.getName()),
-          resourceFileRenamingMap
-        );
-
         const resourcesManager = project.getResourcesManager();
         for (const [resourceName, blob] of blobByResourceName) {
           const resource = resourcesManager.getResource(resourceName);
-          if (!resourceFileRenamingMap.has(resource.getFile())) {
-            continue;
-          }
-          const resourceFiles = resourceFileRenamingMap.get(resource.getFile());
-          if (resourceFiles) {
-            for (const resourceFile of resourceFiles) {
-              blobFiles.set(resourceFile, { filePath: resourceFile, blob });
-            }
-          }
+          const resourceFile = 'resources/' + resource.getFile();
+          blobFiles.set(resourceFile, { filePath: resourceFile, blob });
         }
 
         textFiles.push({
           text: JSON.stringify(serializedObject, null, 2),
-          filePath: addSpacesToPascalCase(object.getName()) + '.asset.json',
+          filePath: 'objects/' + path + object.getName() + '.asset.json',
         });
       })
     );
@@ -208,7 +217,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
+const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
   const [
     zippedSceneAssetsBlob,
     setZippedSceneAssetsBlob,
@@ -230,12 +239,14 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
       (async () => {
         setZippedSceneAssetsBlob(null);
 
-        const objects = mapFor(0, layout.getObjectsCount(), index =>
-          layout.getObjectAt(index)
-        ).filter(object => !excludedObjectType.includes(object.getType()));
+        const enumeratedObjects: Array<EnumeratedObject> = [];
+        enumerateAllObjectsOfScene(scene, '', enumeratedObjects);
+        enumeratedObjects.filter(
+          ({ object }) => !excludedObjectType.includes(object.getType())
+        );
         const zippedLayerAssetsBlob = await zipAssets(
           project,
-          objects,
+          enumeratedObjects,
           ensureDownloadResourcesAsBlobsIsDone
         );
         setZippedSceneAssetsBlob(zippedLayerAssetsBlob);
@@ -245,12 +256,12 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
         setZippedSceneAssetsBlob(null);
       };
     },
-    [project, ensureDownloadResourcesAsBlobsIsDone, layout]
+    [project, ensureDownloadResourcesAsBlobsIsDone, scene]
   );
 
   return (
     <Dialog
-      title={<Trans>Export {layout.getName()} assets</Trans>}
+      title={<Trans>Export {scene.getName()} assets</Trans>}
       secondaryActions={[
         <HelpButton
           key="free-pack-help"
@@ -292,7 +303,7 @@ const ObjectExporterDialog = ({ project, layout, onClose }: Props) => {
                   onClick={() =>
                     openBlobDownloadUrl(
                       blobDownloadUrl,
-                      layout.getName() + '.gdo'
+                      scene.getName() + '.gdo'
                     )
                   }
                   label={<Trans>Export as a pack</Trans>}

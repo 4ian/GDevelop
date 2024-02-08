@@ -12,7 +12,10 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
 } from './PreferencesContext';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource';
+import type {
+  ResourceKind,
+  ResourceImportationBehavior,
+} from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -816,7 +819,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setResourcesImporationBehavior(
-    resourcesImporationBehavior: 'import' | 'relative' | 'ask'
+    resourcesImporationBehavior: ResourceImportationBehavior
   ) {
     this.setState(
       state => ({

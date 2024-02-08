@@ -227,20 +227,30 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="apply" label={t`Apply changes`} />
             <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
-          <SelectField
-            floatingLabelText={
-              <Trans>Importation of resources in the project</Trans>
-            }
-            value={values.resourcesImporationBehavior}
-            onChange={(e, i, value: string) =>
-              setResourcesImporationBehavior(value)
-            }
-            fullWidth
-          >
-            <SelectOption value="import" label={t`Always import`} />
-            <SelectOption value="relative" label={t`Relative file`} />
-            <SelectOption value="ask" label={t`Always ask`} />
-          </SelectField>
+          {!!electron && (
+            <SelectField
+              floatingLabelText={
+                <Trans>
+                  Importing resources outside from the project folder
+                </Trans>
+              }
+              value={values.resourcesImporationBehavior}
+              onChange={(e, i, value: string) =>
+                setResourcesImporationBehavior(value)
+              }
+              fullWidth
+            >
+              <SelectOption
+                value="import"
+                label={t`Copy them into the project folder`}
+              />
+              <SelectOption
+                value="relative"
+                label={t`Keep their original location`}
+              />
+              <SelectOption value="ask" label={t`Ask every time`} />
+            </SelectField>
+          )}
           <Text size="block-title">
             <Trans>Updates</Trans>
           </Text>

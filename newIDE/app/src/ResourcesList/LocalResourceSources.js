@@ -65,6 +65,7 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath,
         project,
         options,
+        resourcesImporationBehavior,
       }: ChooseResourceProps) => {
         if (!dialog)
           throw new Error('Electron dialog not supported in this environment.');
@@ -142,11 +143,19 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          const answer = Window.showConfirmDialog(
-            i18n._(
-              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-            )
-          );
+          let answer: boolean;
+
+          if (resourcesImporationBehavior === 'relative') {
+            answer = false;
+          } else if (resourcesImporationBehavior === 'import') {
+            answer = true;
+          } else {
+            answer = Window.showConfirmDialog(
+              i18n._(
+                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+              )
+            );
+          }
 
           if (answer) {
             filePaths = await copyAllToProjectFolder(
@@ -225,6 +234,8 @@ const localResourceSources: Array<ResourceSource> = [
                   getLastUsedPath: props.getLastUsedPath,
                   setLastUsedPath: props.setLastUsedPath,
                   options: props.options,
+                  resourcesImporationBehavior:
+                    props.resourcesImporationBehavior,
                 });
 
                 props.onChooseResources(resources);

@@ -42,10 +42,16 @@ const useExampleOrGameTemplateDialogs = ({
   );
 
   const closeExampleStoreDialog = React.useCallback(
-    () => {
+    ({
+      deselectExampleAngGameTemplate,
+    }: {|
+      deselectExampleAngGameTemplate: boolean,
+    |}) => {
       setExampleStoreDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      setSelectedPrivateGameTemplateListingData(null);
+      if (deselectExampleAngGameTemplate) {
+        setSelectedExampleShortHeader(null);
+        setSelectedPrivateGameTemplateListingData(null);
+      }
     },
     [setExampleStoreDialogOpen]
   );
@@ -93,7 +99,9 @@ const useExampleOrGameTemplateDialogs = ({
         {exampleStoreDialogOpen && (
           <ExampleStoreDialog
             open
-            onClose={closeExampleStoreDialog}
+            onClose={() =>
+              closeExampleStoreDialog({ deselectExampleAngGameTemplate: true })
+            }
             isProjectOpening={isProjectOpening}
             selectedExampleShortHeader={selectedExampleShortHeader}
             selectedPrivateGameTemplateListingData={

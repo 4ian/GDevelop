@@ -920,7 +920,7 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         currentFileMetadata: fileMetadata,
       }));
-      closeExampleStoreDialog();
+      closeExampleStoreDialog({ deselectExampleAngGameTemplate: false });
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -1157,7 +1157,7 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
       setNewProjectSetupDialogOpen(false);
-      closeExampleStoreDialog();
+      closeExampleStoreDialog({ deselectExampleAngGameTemplate: true });
       findLeaderboardsToReplace(project, oldProjectId);
       openSceneOrProjectManager({
         currentProject: project,

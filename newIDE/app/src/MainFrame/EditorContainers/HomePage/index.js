@@ -242,8 +242,8 @@ export const HomePage = React.memo<Props>(
       );
 
       // Open the store and a pack or game template if asked to do so, either at
-      // app opening, either when the route changes (when requesting for games dashboard
-      // or clicking on an announcement that redirects to the asset store.).
+      // app opening, either when the route changes (when clicking on an announcement
+      // that redirects to the asset store for instance).
       React.useEffect(
         () => {
           if (isShopRequested(routeArguments)) {

@@ -180,10 +180,14 @@ export const ExampleStore = ({
   );
 
   const defaultTags = React.useMemo(
-    () => [
-      ...(exampleFilters ? exampleFilters.defaultTags : []),
-      ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
-    ],
+    () => {
+      const allDefaultTags = [
+        ...(exampleFilters ? exampleFilters.defaultTags : []),
+        ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
+      ];
+      const uniqueTags = new Set(allDefaultTags);
+      return Array.from(uniqueTags);
+    },
     [exampleFilters, gameTemplateFilters]
   );
 

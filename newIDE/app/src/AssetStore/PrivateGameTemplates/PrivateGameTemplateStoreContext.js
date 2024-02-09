@@ -154,18 +154,20 @@ export const PrivateGameTemplateStoreStateProvider = ({
           setPrivateGameTemplateListingDatas(
             fetchedPrivateGameTemplateListingDatas
           );
+          const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            (allCategories, privateGameTemplateListingData) => {
+              return allCategories.concat(
+                privateGameTemplateListingData.categories.map(category =>
+                  capitalize(category)
+                )
+              );
+            },
+            []
+          );
+          const uniqueDefaultTags = Array.from(new Set(defaultTags));
           const gameTemplateFilters: Filters = {
             allTags: [],
-            defaultTags: fetchedPrivateGameTemplateListingDatas.reduce(
-              (allCategories, privateGameTemplateListingData) => {
-                return allCategories.concat(
-                  privateGameTemplateListingData.categories.map(category =>
-                    capitalize(category)
-                  )
-                );
-              },
-              []
-            ),
+            defaultTags: uniqueDefaultTags,
             tagsTree: [],
           };
           setGameTemplateFilters(gameTemplateFilters);

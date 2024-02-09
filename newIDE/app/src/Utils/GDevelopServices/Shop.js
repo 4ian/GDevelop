@@ -393,13 +393,13 @@ export const canRedeemProduct = ({
 |}) => {
   if (!redeemConditions) return false;
   for (let redeemCondition of redeemConditions) {
-    if (
-      redeemCondition.reason === 'subscription' &&
-      redeemCondition.condition === 'gold'
-    ) {
+    if (redeemCondition.reason === 'subscription') {
+      // condition should look like `gdevelop_gold,gdevelop_startup`
+      const requiredPlanIds = redeemCondition.condition.split(',');
       if (
         subscription &&
-        ['gdevelop_startup', 'gdevelop_gold'].includes(subscription.planId)
+        requiredPlanIds.includes(subscription.planId) &&
+        !subscription.benefitsFromEducationPlan
       )
         return true;
     }

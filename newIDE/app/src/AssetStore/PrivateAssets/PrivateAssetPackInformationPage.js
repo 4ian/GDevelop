@@ -438,7 +438,7 @@ const PrivateAssetPackInformationPage = ({
       redeemCondition =>
         redeemCondition.usageType === 'personal' &&
         redeemCondition.reason === 'subscription' &&
-        redeemCondition.condition === 'gold'
+        redeemCondition.condition.includes('gdevelop_gold')
     );
 
   return (

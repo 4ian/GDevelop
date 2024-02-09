@@ -241,10 +241,13 @@ export const HomePage = React.memo<Props>(
         [acknowledgeNewFeature]
       );
 
-      // Open the store and a pack or game template if asked to do so.
+      // Open the store and a pack or game template if asked to do so, either at
+      // app opening, either when the route changes (when requesting for games dashboard
+      // or clicking on an announcement that redirects to the asset store.).
       React.useEffect(
         () => {
           if (isShopRequested(routeArguments)) {
+            setActiveTab('shop');
             if (routeArguments['asset-pack']) {
               setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
             }
@@ -260,6 +263,7 @@ export const HomePage = React.memo<Props>(
               'game-template',
             ]);
           } else if (isGamesDashboardRequested(routeArguments)) {
+            setActiveTab('manage');
             removeRouteArguments(['initial-dialog']);
           }
         },

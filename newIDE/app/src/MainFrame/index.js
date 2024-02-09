@@ -162,7 +162,6 @@ import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import TabsTitlebar from './TabsTitlebar';
-import RouterContext from './RouterContext';
 import {
   useStableUpToDateCallback,
   useStableUpToDateRef,
@@ -690,7 +689,6 @@ const MainFrame = (props: Props) => {
     },
     openProfileDialog,
   });
-  const { navigateToRoute } = React.useContext(RouterContext);
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -2958,7 +2956,6 @@ const MainFrame = (props: Props) => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3009,7 +3006,6 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 

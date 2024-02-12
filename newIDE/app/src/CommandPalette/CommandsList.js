@@ -63,8 +63,7 @@ export type CommandName =
   | 'DELETE_SELECTION'
   | 'SEARCH_EVENTS'
   | 'OPEN_EXTENSION_SETTINGS'
-  | 'OPEN_PROFILE'
-  | 'OPEN_GAMES_DASHBOARD';
+  | 'OPEN_PROFILE';
 
 export const commandAreas = {
   GENERAL: t`General`,
@@ -99,10 +98,6 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROFILE: {
     area: 'IDE',
     displayText: t`Open My Profile`,
-  },
-  OPEN_GAMES_DASHBOARD: {
-    area: 'IDE',
-    displayText: t`Open My Games Dashboard`,
   },
   LAUNCH_NEW_PREVIEW: { area: 'PROJECT', displayText: t`Launch new preview` },
   LAUNCH_DEBUG_PREVIEW: {

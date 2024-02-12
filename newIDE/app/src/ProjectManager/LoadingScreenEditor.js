@@ -258,6 +258,7 @@ export const LoadingScreenEditor = ({
               resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
+              defaultNewResourceName={'LoadingScreenBackground'}
               onChange={newResourceName => {
                 const currentResourceName = loadingScreen.getBackgroundImageResourceName();
                 if (currentResourceName === newResourceName) return;

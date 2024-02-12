@@ -10,6 +10,7 @@ import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
 } from '../Utils/GDevelopServices/Shop';
+import type { ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import GridListTile from '@material-ui/core/GridListTile';
 import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -266,12 +267,14 @@ export const PrivateAssetPackTile = ({
   );
 };
 
-export const PromoBundleAssetPackCard = ({
-  assetPackListingData,
+export const PromoBundleCard = ({
+  productListingData,
   onSelect,
   owned,
 }: {|
-  assetPackListingData: PrivateAssetPackListingData,
+  productListingData:
+    | PrivateAssetPackListingData
+    | PrivateGameTemplateListingData,
   onSelect: () => void,
   owned: boolean,
 |}) => {
@@ -288,35 +291,48 @@ export const PromoBundleAssetPackCard = ({
           >
             <Line expand noMargin>
               <CorsAwareImage
-                key={assetPackListingData.name}
+                key={productListingData.name}
                 style={{
                   ...styles.previewImage,
                   ...styles.promoImage,
                 }}
-                src={assetPackListingData.thumbnailUrls[0]}
-                alt={`Preview image of bundle ${assetPackListingData.name}`}
+                src={productListingData.thumbnailUrls[0]}
+                alt={`Preview image of bundle ${productListingData.name}`}
               />
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
                   {!owned ? (
-                    <Trans>Get {assetPackListingData.description}!</Trans>
-                  ) : (
+                    <Trans>Get {productListingData.description}!</Trans>
+                  ) : productListingData.productType === 'ASSET_PACK' ? (
                     <Trans>You already own this pack!</Trans>
+                  ) : (
+                    <Trans>You already own this template!</Trans>
                   )}
                 </Text>
                 <Text style={styles.packTitle} color="primary" size="body2">
                   {!owned ? (
-                    <Trans>
-                      This pack is included in this bundle for{' '}
-                      {formatProductPrice({
-                        i18n,
-                        productListingData: assetPackListingData,
-                      })}
-                      !
-                    </Trans>
+                    productListingData.productType === 'ASSET_PACK' ? (
+                      <Trans>
+                        This pack is included in this bundle for{' '}
+                        {formatProductPrice({
+                          i18n,
+                          productListingData,
+                        })}
+                        !
+                      </Trans>
+                    ) : (
+                      <Trans>
+                        This template is included in this bundle for{' '}
+                        {formatProductPrice({
+                          i18n,
+                          productListingData,
+                        })}
+                        !
+                      </Trans>
+                    )
                   ) : (
                     <Trans>
-                      It is included in the bundle {assetPackListingData.name}.
+                      It is included in the bundle {productListingData.name}.
                     </Trans>
                   )}
                 </Text>
@@ -440,6 +456,52 @@ export const PrivateGameTemplateTile = ({
           <Line justifyContent="flex-start" noMargin>
             <Text style={styles.packTitle} size="body2">
               {privateGameTemplateListingData.name}
+            </Text>
+          </Line>
+        </Column>
+      </Paper>
+    </GridListTile>
+  );
+};
+
+export const ExampleTile = ({
+  exampleShortHeader,
+  onSelect,
+  style,
+}: {|
+  exampleShortHeader: ExampleShortHeader,
+  onSelect: () => void,
+  /** Props needed so that GridList component can adjust tile size */
+  style?: any,
+|}) => {
+  const classesForGridListItem = useStylesForGridListItem();
+  return (
+    <GridListTile
+      classes={classesForGridListItem}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onSelect();
+        }
+      }}
+      style={style}
+      onClick={onSelect}
+    >
+      <Paper elevation={2} style={styles.paper} background="light">
+        <CorsAwareImage
+          key={exampleShortHeader.name}
+          style={styles.previewImage}
+          src={
+            exampleShortHeader.previewImageUrls
+              ? exampleShortHeader.previewImageUrls[0]
+              : ''
+          }
+          alt={`Preview image of example ${exampleShortHeader.name}`}
+        />
+        <Column>
+          <Line justifyContent="flex-start" noMargin>
+            <Text style={styles.packTitle} size="body2">
+              {exampleShortHeader.name}
             </Text>
           </Line>
         </Column>

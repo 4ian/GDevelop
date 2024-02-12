@@ -342,6 +342,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             resourceManagementProps={resourceManagementProps}
             resourceKind="image"
             resourceName={thumbnailResourceName}
+            defaultNewResourceName={'Thumbnail'}
             onChange={resourceName => {
               this.setState({
                 thumbnailResourceName: resourceName,
@@ -373,6 +374,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={desktopIconResourceNames[index]}
+              defaultNewResourceName={'DesktopIcon' + size}
               onChange={resourceName => {
                 const newIcons = [...desktopIconResourceNames];
                 newIcons[index] = resourceName;
@@ -393,6 +395,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
                 resourceManagementProps={resourceManagementProps}
                 resourceKind="image"
                 resourceName={androidWindowSplashScreenAnimatedIconResourceName}
+                defaultNewResourceName={'AndroidSplashscreenIcon'}
                 onChange={resourceName => {
                   this.setState({
                     androidWindowSplashScreenAnimatedIconResourceName: resourceName,
@@ -412,6 +415,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={androidIconResourceNames[index]}
+              defaultNewResourceName={'AndroidIcon' + size}
               onChange={resourceName => {
                 const newIcons = [...androidIconResourceNames];
                 newIcons[index] = resourceName;
@@ -432,6 +436,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceManagementProps={resourceManagementProps}
               resourceKind="image"
               resourceName={iosIconResourceNames[index]}
+              defaultNewResourceName={'IosIcon' + size}
               onChange={resourceName => {
                 const newIcons = [...iosIconResourceNames];
                 newIcons[index] = resourceName;

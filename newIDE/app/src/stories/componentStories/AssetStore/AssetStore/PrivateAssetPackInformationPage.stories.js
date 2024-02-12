@@ -11,10 +11,17 @@ import {
   GDevelopAssetApi,
   GDevelopUserApi,
 } from '../../../../Utils/GDevelopServices/ApiConfigs';
-import { client as assetApiAxiosClient } from '../../../../Utils/GDevelopServices/Asset';
+import {
+  client as assetApiAxiosClient,
+  type PrivateAssetPack,
+} from '../../../../Utils/GDevelopServices/Asset';
 import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServices/Shop';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  AssetStoreContext,
+  initialAssetStoreState,
+} from '../../../../AssetStore/AssetStoreContext';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
@@ -22,7 +29,13 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-const privateAssetPackListingData: PrivateAssetPackListingData = {
+const sellerPublicProfile = {
+  id: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  username: 'CreatorUserName',
+  description: 'I create asset packs for GDevelop for country-specific food.',
+};
+
+const privateAssetPack1ListingData: PrivateAssetPackListingData = {
   id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
   sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
   isSellerGDevelop: false,
@@ -49,14 +62,94 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   stripeProductId: 'stripeProductId',
 };
 
-const sellerPublicProfile = {
-  id: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
-  username: 'CreatorUserName',
-  description: 'I create asset packs for GDevelop for country-specific food.',
+const privateAssetPack1: PrivateAssetPack = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
+  name: 'French Food',
+  content: {
+    sprite: 14,
+    audio: 2,
+    tiled: 1,
+    '9patch': 7,
+    particleEmitter: 2,
+    font: 1,
+    partial: 2,
+  },
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+    'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+    'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+    'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+    'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+    'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+  ],
+  updatedAt: '2022-09-15T08:17:59.977Z',
+  createdAt: '2022-09-14T12:27:27.173Z',
+  tag: 'french food',
+  longDescription: 'This is the best asset pack about french food',
 };
 
-const privateAssetPackDetails = {
-  id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
+const privateAssetPack2ListingData: PrivateAssetPackListingData = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
+  sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
+  productType: 'ASSET_PACK',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+  ],
+  updatedAt: '2022-09-14T12:43:51.329Z',
+  createdAt: '2022-09-14T12:43:51.329Z',
+  listing: 'ASSET_PACK',
+  description: '8 assets',
+  name: 'French Sounds',
+  categories: ['sounds'],
+  prices: [
+    {
+      value: 1000,
+      name: 'default',
+      stripePriceId: 'stripePriceId',
+      currency: 'EUR',
+    },
+  ],
+  appStoreProductId: 'fake.product.id',
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
+};
+
+const privateAssetPackBundleListingData: PrivateAssetPackListingData = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918dabcop234',
+  sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
+  isSellerGDevelop: false,
+  productType: 'ASSET_PACK',
+  thumbnailUrls: [
+    'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
+    'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
+  ],
+  updatedAt: '2022-09-14T12:43:51.329Z',
+  createdAt: '2022-09-14T12:43:51.329Z',
+  listing: 'ASSET_PACK',
+  description: '13 assets',
+  name: 'French Bundle',
+  categories: ['sounds', 'props'],
+  prices: [
+    {
+      value: 2000,
+      name: 'default',
+      stripePriceId: 'stripePriceId',
+      currency: 'EUR',
+    },
+  ],
+  appStoreProductId: 'fake.product.id',
+  sellerStripeAccountId: 'sellerStripeProductId',
+  stripeProductId: 'stripeProductId',
+  includedListableProductIds: [
+    privateAssetPack1ListingData.id,
+    privateAssetPack2ListingData.id,
+  ],
+};
+
+const privateAssetPackBundle: PrivateAssetPack = {
+  id: '56a50a9e-57ef-4d1d-a3f2-c918dabcop234',
+  name: 'French Food and Sounds',
   content: {
     sprite: 14,
     audio: 2,
@@ -85,13 +178,13 @@ export const Default = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -100,9 +193,11 @@ export const Default = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
-    .reply(200, privateAssetPackDetails)
+    .reply(200, privateAssetPack1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -110,80 +205,94 @@ export const Default = () => {
     });
 
   return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPackListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
-      privateAssetPackListingDatasFromSameCreator={[
-        {
-          id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
-          sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
-          isSellerGDevelop: false,
-          productType: 'ASSET_PACK',
-          thumbnailUrls: [
-            'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
-          ],
-          updatedAt: '2022-09-14T12:43:51.329Z',
-          createdAt: '2022-09-14T12:43:51.329Z',
-          listing: 'ASSET_PACK',
-          description: '5 assets',
-          name: 'French Food',
-          categories: ['props'],
-          prices: [
-            {
-              value: 1500,
-              name: 'default',
-              stripePriceId: 'stripePriceId',
-              currency: 'EUR',
-            },
-          ],
-          appStoreProductId: null,
-          sellerStripeAccountId: 'sellerStripeProductId',
-          stripeProductId: 'stripeProductId',
-        },
-        {
-          id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
-          sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
-          isSellerGDevelop: false,
-          productType: 'ASSET_PACK',
-          thumbnailUrls: [
-            'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
-          ],
-          updatedAt: '2022-09-14T12:43:51.329Z',
-          createdAt: '2022-09-14T12:43:51.329Z',
-          listing: 'ASSET_PACK',
-          description: '8 assets',
-          name: 'French Sounds',
-          categories: ['sounds'],
-          prices: [
-            {
-              value: 1000,
-              name: 'default',
-              stripePriceId: 'stripePriceId',
-              currency: 'EUR',
-            },
-          ],
-          appStoreProductId: 'fake.product.id',
-          sellerStripeAccountId: 'sellerStripeProductId',
-          stripeProductId: 'stripeProductId',
-        },
-      ]}
-    />
+    <AssetStoreContext.Provider
+      value={{
+        ...initialAssetStoreState,
+        privateAssetPackListingDatas: [
+          privateAssetPack1ListingData,
+          privateAssetPack2ListingData,
+          privateAssetPackBundleListingData,
+        ],
+      }}
+    >
+      <PrivateAssetPackInformationPage
+        privateAssetPackListingData={privateAssetPack1ListingData}
+        isPurchaseDialogOpen={false}
+        onOpenPurchaseDialog={() => action('open purchase dialog')()}
+        onAssetPackOpen={() => action('open asset pack')()}
+        privateAssetPackListingDatasFromSameCreator={[
+          privateAssetPack1ListingData,
+          privateAssetPack2ListingData,
+        ]}
+      />
+    </AssetStoreContext.Provider>
   );
 };
+
+export const ForABundle = () => {
+  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
+  axiosMock
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user-public-profile/${
+        privateAssetPackBundleListingData.sellerId
+      }`
+    )
+    .reply(200, sellerPublicProfile)
+    .onGet(
+      `${GDevelopUserApi.baseUrl}/user/${
+        privateAssetPackBundleListingData.sellerId
+      }/badge`
+    )
+    .reply(200, [])
+    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .reply(200, []);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  assetServiceMock
+    .onGet(
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPackBundleListingData.id
+      }`
+    )
+    .reply(200, privateAssetPackBundle)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+
+  return (
+    <AssetStoreContext.Provider
+      value={{
+        ...initialAssetStoreState,
+        privateAssetPackListingDatas: [
+          privateAssetPack1ListingData,
+          privateAssetPack2ListingData,
+          privateAssetPackBundleListingData,
+        ],
+      }}
+    >
+      <PrivateAssetPackInformationPage
+        privateAssetPackListingData={privateAssetPackBundleListingData}
+        isPurchaseDialogOpen={false}
+        onOpenPurchaseDialog={() => action('open purchase dialog')()}
+        onAssetPackOpen={() => action('open asset pack')()}
+      />
+    </AssetStoreContext.Provider>
+  );
+};
+
 export const ForAlreadyPurchasedAssetPack = () => {
   const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -192,9 +301,11 @@ export const ForAlreadyPurchasedAssetPack = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
-    .reply(200, privateAssetPackDetails)
+    .reply(200, privateAssetPack1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -202,85 +313,46 @@ export const ForAlreadyPurchasedAssetPack = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider
+    <AssetStoreContext.Provider
       value={{
-        ...fakeSilverAuthenticatedUserWithCloudProjects,
-        receivedAssetPacks: [
-          {
-            id: privateAssetPackListingData.id,
-            // Useless data for the component below.
-            name: privateAssetPackListingData.name,
-            createdAt: '2',
-            updatedAt: '2',
-            longDescription: 'longDescription',
-            content: { sprite: 9 },
-            previewImageUrls: [],
-            tag: 'tag',
-          },
+        ...initialAssetStoreState,
+        privateAssetPackListingDatas: [
+          privateAssetPack1ListingData,
+          privateAssetPack2ListingData,
+          privateAssetPackBundleListingData,
         ],
       }}
     >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPackListingData}
-        isPurchaseDialogOpen={false}
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
-        privateAssetPackListingDatasFromSameCreator={[
-          {
-            id: '56a50a9e-57ef-4d1d-a3f2-c918d593a6e2',
-            sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
-            isSellerGDevelop: false,
-            productType: 'ASSET_PACK',
-            thumbnailUrls: [
-              'https://resources.gdevelop-app.com/staging/private-assets/French Food/thumbnail1.png',
-            ],
-            updatedAt: '2022-09-14T12:43:51.329Z',
-            createdAt: '2022-09-14T12:43:51.329Z',
-            listing: 'ASSET_PACK',
-            description: '5 assets',
-            name: 'French Food',
-            categories: ['props'],
-            prices: [
-              {
-                value: 1500,
-                name: 'default',
-                stripePriceId: 'stripePriceId',
-                currency: 'EUR',
-              },
-            ],
-            appStoreProductId: null,
-            sellerStripeAccountId: 'sellerStripeProductId',
-            stripeProductId: 'stripeProductId',
-          },
-          {
-            id: '56a50a9e-57ef-4d1d-a3f2-c918d568ef234',
-            sellerId: 'tVUYpNMz1AfsbzJtxUEpPTuu4Mn1',
-            isSellerGDevelop: false,
-            productType: 'ASSET_PACK',
-            thumbnailUrls: [
-              'https://resources.gdevelop-app.com/staging/private-assets/French Sounds/thumbnail0.png',
-            ],
-            updatedAt: '2022-09-14T12:43:51.329Z',
-            createdAt: '2022-09-14T12:43:51.329Z',
-            listing: 'ASSET_PACK',
-            description: '8 assets',
-            name: 'French Sounds',
-            categories: ['sounds'],
-            prices: [
-              {
-                value: 1000,
-                name: 'default',
-                stripePriceId: 'stripePriceId',
-                currency: 'EUR',
-              },
-            ],
-            appStoreProductId: 'fake.product.id',
-            sellerStripeAccountId: 'sellerStripeProductId',
-            stripeProductId: 'stripeProductId',
-          },
-        ]}
-      />
-    </AuthenticatedUserContext.Provider>
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...fakeSilverAuthenticatedUserWithCloudProjects,
+          receivedAssetPacks: [
+            {
+              id: privateAssetPack1ListingData.id,
+              // Useless data for the component below.
+              name: privateAssetPack1ListingData.name,
+              createdAt: '2',
+              updatedAt: '2',
+              longDescription: 'longDescription',
+              content: { sprite: 9 },
+              previewImageUrls: [],
+              tag: 'tag',
+            },
+          ],
+        }}
+      >
+        <PrivateAssetPackInformationPage
+          privateAssetPackListingData={privateAssetPack1ListingData}
+          isPurchaseDialogOpen={false}
+          onOpenPurchaseDialog={() => action('open purchase dialog')()}
+          onAssetPackOpen={() => action('open asset pack')()}
+          privateAssetPackListingDatasFromSameCreator={[
+            privateAssetPack1ListingData,
+            privateAssetPack2ListingData,
+          ]}
+        />
+      </AuthenticatedUserContext.Provider>
+    </AssetStoreContext.Provider>
   );
 };
 export const WithPurchaseDialogOpen = () => {
@@ -288,13 +360,13 @@ export const WithPurchaseDialogOpen = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -303,9 +375,11 @@ export const WithPurchaseDialogOpen = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
-    .reply(200, privateAssetPackDetails)
+    .reply(200, privateAssetPack1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -313,12 +387,23 @@ export const WithPurchaseDialogOpen = () => {
     });
 
   return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPackListingData}
-      isPurchaseDialogOpen
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
-    />
+    <AssetStoreContext.Provider
+      value={{
+        ...initialAssetStoreState,
+        privateAssetPackListingDatas: [
+          privateAssetPack1ListingData,
+          privateAssetPack2ListingData,
+          privateAssetPackBundleListingData,
+        ],
+      }}
+    >
+      <PrivateAssetPackInformationPage
+        privateAssetPackListingData={privateAssetPack1ListingData}
+        isPurchaseDialogOpen
+        onOpenPurchaseDialog={() => action('open purchase dialog')()}
+        onAssetPackOpen={() => action('open asset pack')()}
+      />
+    </AssetStoreContext.Provider>
   );
 };
 export const Loading = () => {
@@ -326,13 +411,13 @@ export const Loading = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -343,9 +428,11 @@ export const Loading = () => {
   });
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
-    .reply(200, privateAssetPackDetails)
+    .reply(200, privateAssetPack1)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -354,7 +441,7 @@ export const Loading = () => {
 
   return (
     <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPack1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
       onAssetPackOpen={() => action('open asset pack')()}
@@ -367,13 +454,13 @@ export const With404 = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -382,7 +469,9 @@ export const With404 = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
     .reply(404, null)
     .onAny()
@@ -393,7 +482,7 @@ export const With404 = () => {
 
   return (
     <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPack1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
       onAssetPackOpen={() => action('open asset pack')()}
@@ -406,13 +495,13 @@ export const WithUnknownError = () => {
   axiosMock
     .onGet(
       `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }`
     )
     .reply(200, sellerPublicProfile)
     .onGet(
       `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackListingData.sellerId
+        privateAssetPack1ListingData.sellerId
       }/badge`
     )
     .reply(200, [])
@@ -421,7 +510,9 @@ export const WithUnknownError = () => {
   const assetServiceMock = new MockAdapter(assetApiAxiosClient);
   assetServiceMock
     .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${privateAssetPackListingData.id}`
+      `${GDevelopAssetApi.baseUrl}/asset-pack/${
+        privateAssetPack1ListingData.id
+      }`
     )
     .reply(500, 'Internal server error')
     .onAny()
@@ -432,7 +523,7 @@ export const WithUnknownError = () => {
 
   return (
     <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPackListingData}
+      privateAssetPackListingData={privateAssetPack1ListingData}
       isPurchaseDialogOpen={false}
       onOpenPurchaseDialog={() => action('open purchase dialog')()}
       onAssetPackOpen={() => action('open asset pack')()}

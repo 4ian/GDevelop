@@ -47,6 +47,7 @@ declare class libGDevelop {
   VectorVariable: Class<gdVectorVariable>;
   VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   MapStringString: Class<gdMapStringString>;
+  MapStringVectorString: Class<gdMapStringVectorString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
   MapStringVariable: Class<gdMapStringVariable>;

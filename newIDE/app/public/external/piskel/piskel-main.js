@@ -245,13 +245,13 @@ const loadPiskelDataFromGd = externalEditorInput => {
       });
 
       // Compare the imported frames - so as to make the layered Piskel Document
-      // the same as the changes done in Gdevelop without flattening any layers
+      // the same as the changes done in GDevelop without flattening any layers
       let flattenedResourceNames = [];
       externalEditorInput.resources.forEach((resource, frameIndex) => {
         const resourceName = resource.name;
         flattenedResourceNames.push(resourceName);
 
-        // Import any frames that were added in Gdevelop (i.e: frames which can't be found
+        // Import any frames that were added in GDevelop (i.e: frames which can't be found
         // in the saved resource names).
         if (!savedResourceNames.includes(resourceName)) {
           pskl.utils.BlobUtils.dataToBlob(

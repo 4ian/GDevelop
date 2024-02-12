@@ -1387,6 +1387,7 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   receivedAssetShortHeaders: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
+  onCancelLogin: () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onResetPassword: async () => {},

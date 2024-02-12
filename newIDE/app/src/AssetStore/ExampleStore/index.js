@@ -7,7 +7,6 @@ import { ExampleStoreContext } from './ExampleStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import ExampleListItem from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import {
   sendExampleDetailsOpened,
@@ -16,42 +15,9 @@ import {
 import { t } from '@lingui/macro';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
-import PrivateGameTemplatePurchaseDialog from '../PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
-import PrivateGameTemplateInformationDialog from '../PrivateGameTemplates/PrivateGameTemplateInformationDialog';
 import PrivateGameTemplateListItem from '../PrivateGameTemplates/PrivateGameTemplateListItem';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { PrivateGameTemplateStoreContext } from '../PrivateGameTemplates/PrivateGameTemplateStoreContext';
-
-// When showing examples, always put the starters first.
-export const prepareExampleShortHeaders = (
-  examples: Array<ExampleShortHeader>
-): Array<ExampleShortHeader> =>
-  examples.sort((example1, example2) => {
-    const isExample1Starter = example1.tags.includes('Starter');
-    const isExample2Starter = example2.tags.includes('Starter');
-    // Don't change starters order.
-    if (isExample1Starter && isExample2Starter) {
-      return 0;
-    }
-    let difference = (isExample2Starter ? 1 : 0) - (isExample1Starter ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-    difference =
-      (example2.tags.includes('game') ? 1 : 0) -
-      (example1.tags.includes('game') ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-    difference =
-      (example2.previewImageUrls.length ? 1 : 0) -
-      (example1.previewImageUrls.length ? 1 : 0);
-    if (difference) {
-      return difference;
-    }
-
-    return 0;
-  });
 
 const getItemUniqueId = (
   item: ExampleShortHeader | PrivateGameTemplateListingData
@@ -81,10 +47,6 @@ export const ExampleStore = ({
   onSelectPrivateGameTemplateListingData,
 }: Props) => {
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
-  const [
-    purchasingGameTemplateListingData,
-    setPurchasingGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(null);
   const {
     exampleFilters,
     exampleShortHeadersSearchResults,
@@ -192,6 +154,10 @@ export const ExampleStore = ({
         ? exampleShortHeadersSearchResults.map(({ item }) => item)
         : [];
 
+      if (searchText || tagsHandler.chosenTags.size > 0) {
+        return [...privateGameTemplateItems, ...exampleShortHeaderItems];
+      }
+
       for (let i = 0; i < exampleShortHeaderItems.length; ++i) {
         searchItems.push(exampleShortHeaderItems[i]);
         if (i % 2 === 1 && privateGameTemplateItems.length > 0) {
@@ -208,47 +174,21 @@ export const ExampleStore = ({
     [
       exampleShortHeadersSearchResults,
       privateGameTemplateListingDatasSearchResults,
+      searchText,
+      tagsHandler,
     ]
   );
 
   const defaultTags = React.useMemo(
-    () => [
-      ...(exampleFilters ? exampleFilters.defaultTags : []),
-      ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
-    ],
-    [exampleFilters, gameTemplateFilters]
-  );
-
-  const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
     () => {
-      if (
-        !selectedPrivateGameTemplateListingData ||
-        !privateGameTemplateListingDatasSearchResults ||
-        !receivedGameTemplates
-      )
-        return null;
-
-      const receivedGameTemplateIds = receivedGameTemplates.map(
-        template => template.id
-      );
-
-      return privateGameTemplateListingDatasSearchResults
-        .map(({ item }) => item)
-        .filter(
-          template =>
-            template.sellerId ===
-              selectedPrivateGameTemplateListingData.sellerId &&
-            !receivedGameTemplateIds.includes(template.sellerId)
-        )
-        .sort((template1, template2) =>
-          template1.name.localeCompare(template2.name)
-        );
+      const allDefaultTags = [
+        ...(exampleFilters ? exampleFilters.defaultTags : []),
+        ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
+      ];
+      const uniqueTags = new Set(allDefaultTags);
+      return Array.from(uniqueTags);
     },
-    [
-      selectedPrivateGameTemplateListingData,
-      privateGameTemplateListingDatasSearchResults,
-      receivedGameTemplates,
-    ]
+    [exampleFilters, gameTemplateFilters]
   );
 
   return (
@@ -334,39 +274,6 @@ export const ExampleStore = ({
           </Column>
         )}
       </ResponsiveWindowMeasurer>
-      {!!selectedExampleShortHeader && (
-        <ExampleDialog
-          isOpening={isOpening}
-          exampleShortHeader={selectedExampleShortHeader}
-          onOpen={onOpenNewProjectSetupDialog}
-          onClose={() => onSelectExampleShortHeader(null)}
-        />
-      )}
-      {!!selectedPrivateGameTemplateListingData && (
-        <PrivateGameTemplateInformationDialog
-          privateGameTemplateListingData={
-            selectedPrivateGameTemplateListingData
-          }
-          isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
-          onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
-          onGameTemplateOpen={onSelectPrivateGameTemplateListingData}
-          onOpenPurchaseDialog={() => {
-            setPurchasingGameTemplateListingData(
-              selectedPrivateGameTemplateListingData
-            );
-          }}
-          onClose={() => onSelectPrivateGameTemplateListingData(null)}
-          privateGameTemplateListingDatasFromSameCreator={
-            privateGameTemplateListingDatasFromSameCreator
-          }
-        />
-      )}
-      {!!purchasingGameTemplateListingData && (
-        <PrivateGameTemplatePurchaseDialog
-          privateGameTemplateListingData={purchasingGameTemplateListingData}
-          onClose={() => setPurchasingGameTemplateListingData(null)}
-        />
-      )}
     </React.Fragment>
   );
 };

@@ -195,17 +195,19 @@ export const getSubscriptionPlanPricingSystem = async (
   }
 };
 
-export const listSubscriptionPlanPricingSystems = async (
-  subscriptionPlanIds?: ?(string[])
-): Promise<SubscriptionPlanPricingSystem[]> => {
-  const params =
-    subscriptionPlanIds && subscriptionPlanIds.length > 0
-      ? { subscriptionPlanIds: subscriptionPlanIds.join(',') }
-      : undefined;
-  const response = await apiClient.get(
-    '/subscription-plan-pricing-system',
-    params
-  );
+export const listSubscriptionPlanPricingSystems = async (options: {|
+  subscriptionPlanIds?: ?(string[]),
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlanPricingSystem[]> => {
+  const params: {| includeLegacy: string, subscriptionPlanIds?: string |} = {
+    includeLegacy: options.includeLegacy ? 'true' : 'false',
+  };
+  if (options.subscriptionPlanIds && options.subscriptionPlanIds.length > 0) {
+    params.subscriptionPlanIds = options.subscriptionPlanIds.join(',');
+  }
+  const response = await apiClient.get('/subscription-plan-pricing-system', {
+    params,
+  });
   return response.data;
 };
 

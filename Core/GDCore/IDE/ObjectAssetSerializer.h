@@ -40,12 +40,14 @@ public:
    * \param objectFullName The object name with spaces instead of PascalCase.
    * \param element The element where the asset is serialize.
    * \param resourcesFileNameMap The map from project resource file paths to
-   * asset resource file paths.
+   * asset resource file paths. Resource files of Sprite objects may be
+   * duplicated because the files names allow the asset store script to rebuild
+   * the animations.
    */
   static void
   SerializeTo(gd::Project &project, const gd::Object &object,
               const gd::String &objectFullName, SerializerElement &element,
-              std::map<gd::String, gd::String> &resourcesFileNameMap);
+              std::map<gd::String, std::vector<gd::String>> &resourcesFileNameMap);
 
   ~ObjectAssetSerializer(){};
 
@@ -55,7 +57,7 @@ private:
   static void RenameObjectResourceFiles(
       gd::Project &project, gd::Object &object,
       const gd::String &destinationDirectory, const gd::String &objectFullName,
-      std::map<gd::String, gd::String> &resourcesFileNameMap,
+      std::map<gd::String, std::vector<gd::String>> &resourcesFileNameMap,
       std::map<gd::String, gd::String> &resourcesNameReverseMap);
 
   static gd::String GetObjectExtensionName(const gd::Object &object);

@@ -11,10 +11,9 @@ import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import Paper from '../../../UI/Paper';
 import {
-  homePageMenuTabs,
-  teamViewTab,
   type HomeTab,
   type GetIconFunction,
+  getTabsToDisplay,
 } from './HomePageMenu';
 import { Toolbar, ToolbarGroup } from '../../../UI/Toolbar';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -75,15 +74,7 @@ const HomePageMenuBar = ({
   const isMobileOrSmallScreen = isMobile || windowWidth === 'medium';
   const theme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
-  const displayTeamViewTab = profile && profile.isTeacher;
-  const tabsToDisplay = displayTeamViewTab
-    ? [
-        ...homePageMenuTabs.slice(0, 2),
-        teamViewTab,
-        ...homePageMenuTabs.slice(2),
-      ]
-    : homePageMenuTabs;
-
+  const tabsToDisplay = getTabsToDisplay({ profile });
   const buttons: {
     label: React.Node,
     getIcon: GetIconFunction,

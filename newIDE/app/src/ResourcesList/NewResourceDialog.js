@@ -102,6 +102,8 @@ export const NewResourceDialog = ({
             getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
+            resourcesImporationBehavior:
+              preferences.values.resourcesImporationBehavior,
           });
           onChooseResources(resources);
         } catch (error) {
@@ -171,6 +173,8 @@ export const NewResourceDialog = ({
           getLastUsedPath: preferences.getLastUsedPath,
           setLastUsedPath: preferences.setLastUsedPath,
           onChooseResources,
+          resourcesImporationBehavior:
+            preferences.values.resourcesImporationBehavior,
         });
       })}
       {currentTab === 'import' ? (
@@ -188,6 +192,8 @@ export const NewResourceDialog = ({
                   getLastUsedPath: preferences.getLastUsedPath,
                   setLastUsedPath: preferences.setLastUsedPath,
                   onChooseResources,
+                  resourcesImporationBehavior:
+                    preferences.values.resourcesImporationBehavior,
 
                   // Ask the component to try to automatically open the dialog to import file(s),
                   // but only if tabs were not changed, meaning the user navigated out of it already.
@@ -210,6 +216,8 @@ export const NewResourceDialog = ({
                     getLastUsedPath: preferences.getLastUsedPath,
                     setLastUsedPath: preferences.setLastUsedPath,
                     onChooseResources,
+                    resourcesImporationBehavior:
+                      preferences.values.resourcesImporationBehavior,
                   })}
                 </React.Fragment>
               ))}

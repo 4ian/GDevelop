@@ -77,8 +77,8 @@ export type RenderEditorContainerProps = {|
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,
-  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
-  onOpenExampleStoreWithPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onSelectExampleShortHeader: ExampleShortHeader => void,
+  onPreviewPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,

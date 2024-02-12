@@ -99,6 +99,13 @@ export class MapStringString extends EmscriptenObject {
   keys(): VectorString;
 }
 
+export class MapStringVectorString extends EmscriptenObject {
+  constructor(): void;
+  get(name: string): VectorString;
+  has(name: string): boolean;
+  keys(): VectorString;
+}
+
 export class MapStringBoolean extends EmscriptenObject {
   constructor(): void;
   get(name: string): boolean;
@@ -842,6 +849,8 @@ export class PropertyDescriptor extends EmscriptenObject {
   isHidden(): boolean;
   setDeprecated(enable: boolean): PropertyDescriptor;
   isDeprecated(): boolean;
+  setAdvanced(enable: boolean): PropertyDescriptor;
+  isAdvanced(): boolean;
   getMeasurementUnit(): MeasurementUnit;
   setMeasurementUnit(measurementUnit: MeasurementUnit): PropertyDescriptor;
   serializeTo(element: SerializerElement): void;
@@ -1127,7 +1136,7 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringVectorString): void;
 }
 
 export class InstructionsList extends EmscriptenObject {
@@ -1468,6 +1477,8 @@ export class BehaviorMetadata extends EmscriptenObject {
   setHidden(): BehaviorMetadata;
   get(): Behavior;
   getSharedDataInstance(): BehaviorsSharedData;
+  getProperties(): MapStringPropertyDescriptor;
+  getSharedProperties(): MapStringPropertyDescriptor;
 }
 
 export class EffectMetadata extends EmscriptenObject {
@@ -1515,9 +1526,7 @@ export class PlatformExtension extends EmscriptenObject {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): ExpressionMetadata;
   addDependency(): DependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: Behavior, sharedDatasInstance: BehaviorsSharedData): BehaviorMetadata;
-  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): BehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: ObjectConfiguration): ObjectMetadata;
-  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): ObjectMetadata;
   addEffect(name: string): EffectMetadata;
   registerProperty(name: string): PropertyDescriptor;
   getFullName(): string;
@@ -2464,8 +2473,8 @@ export class SpineObjectConfiguration extends EmscriptenObject {
 
 export class TextObject extends EmscriptenObject {
   constructor(): void;
-  setString(string: string): void;
-  getString(): string;
+  setText(string: string): void;
+  getText(): string;
   setCharacterSize(size: number): void;
   getCharacterSize(): number;
   setFontName(string: string): void;
@@ -2476,12 +2485,28 @@ export class TextObject extends EmscriptenObject {
   setItalic(enable: boolean): void;
   isUnderlined(): boolean;
   setUnderlined(enable: boolean): void;
-  setColor(r: number, g: number, b: number): void;
-  getColorR(): number;
-  getColorG(): number;
-  getColorB(): number;
+  setColor(color: string): void;
+  getColor(): string;
   setTextAlignment(textAlignment: string): void;
   getTextAlignment(): string;
+  setOutlineEnabled(enable: boolean): void;
+  isOutlineEnabled(): boolean;
+  setOutlineThickness(value: number): void;
+  getOutlineThickness(): number;
+  setOutlineColor(color: string): void;
+  getOutlineColor(): string;
+  setShadowEnabled(enable: boolean): void;
+  isShadowEnabled(): boolean;
+  setShadowColor(color: string): void;
+  getShadowColor(): string;
+  setShadowOpacity(value: number): void;
+  getShadowOpacity(): number;
+  setShadowAngle(value: number): void;
+  getShadowAngle(): number;
+  setShadowDistance(value: number): void;
+  getShadowDistance(): number;
+  setShadowBlurRadius(value: number): void;
+  getShadowBlurRadius(): number;
 }
 
 export class TiledSpriteObject extends EmscriptenObject {

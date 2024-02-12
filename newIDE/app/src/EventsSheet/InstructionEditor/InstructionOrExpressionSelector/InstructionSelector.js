@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import InstructionOrExpressionSelector from './index';
 import {

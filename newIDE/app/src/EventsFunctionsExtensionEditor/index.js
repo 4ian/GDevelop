@@ -292,7 +292,36 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameFreeEventsFunction = (i18n: I18nType) => (
+  _makeRenameEventsFunction = (i18n: I18nType) => (
+    eventsBasedBehavior: ?gdEventsBasedBehavior,
+    eventsBasedObject: ?gdEventsBasedObject,
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    done: boolean => void
+  ) => {
+    if (eventsBasedBehavior) {
+      this._renameBehaviorEventsFunction(
+        i18n,
+        eventsBasedBehavior,
+        eventsFunction,
+        newName,
+        done
+      );
+    } else if (eventsBasedObject) {
+      this._renameObjectEventsFunction(
+        i18n,
+        eventsBasedObject,
+        eventsFunction,
+        newName,
+        done
+      );
+    } else {
+      this._renameFreeEventsFunction(i18n, eventsFunction, newName, done);
+    }
+  };
+
+  _renameFreeEventsFunction = (
+    i18n: I18nType,
     eventsFunction: gdEventsFunction,
     newName: string,
     done: boolean => void
@@ -329,7 +358,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _makeRenameBehaviorEventsFunction = (i18n: I18nType) => (
+  _renameBehaviorEventsFunction = (
+    i18n: I18nType,
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     newName: string,
@@ -369,7 +399,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _makeRenameObjectEventsFunction = (i18n: I18nType) => (
+  _renameObjectEventsFunction = (
+    i18n: I18nType,
     eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     newName: string,
@@ -1289,14 +1320,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   )
                 }
                 onDeleteEventsFunction={this._onDeleteEventsFunction}
-                canRename={(eventsFunction: gdEventsFunction) => {
-                  return !gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
-                    eventsFunction.getName()
-                  );
-                }}
-                onRenameEventsFunction={this._makeRenameFreeEventsFunction(
-                  i18n
-                )}
+                onRenameEventsFunction={this._makeRenameEventsFunction(i18n)}
                 onAddEventsFunction={this._onAddEventsFunction}
                 onEventsFunctionAdded={() => {}}
                 // Behaviors

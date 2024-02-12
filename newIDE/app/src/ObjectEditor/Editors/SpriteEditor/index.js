@@ -131,10 +131,12 @@ export default function SpriteEditor({
     collisionMasksEditorOpen,
     setCollisionMasksEditorOpen,
   ] = React.useState(false);
+  const abortControllerRef = React.useRef<?AbortController>(null);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+  const { showConfirmation } = useAlertDialog();
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
@@ -176,7 +178,7 @@ export default function SpriteEditor({
     },
     [justAddedAnimationName]
   );
-  const { showConfirmation } = useAlertDialog();
+  const { showDeleteConfirmation } = useAlertDialog();
 
   const draggedAnimationIndex = React.useRef<number | null>(null);
 
@@ -377,7 +379,7 @@ export default function SpriteEditor({
       const message = shouldWarnBecauseLosingCustomCollisionMask
         ? t`Are you sure you want to remove this animation? You will lose the custom collision mask you have set for this object.`
         : t`Are you sure you want to remove this animation?`;
-      const deleteAnswer = await showConfirmation({
+      const deleteAnswer = await showDeleteConfirmation({
         title: t`Remove the animation`,
         message,
         confirmButtonLabel: t`Remove`,
@@ -409,7 +411,7 @@ export default function SpriteEditor({
       forceUpdate,
       onObjectUpdated,
       onSizeUpdated,
-      showConfirmation,
+      showDeleteConfirmation,
       spriteConfiguration,
       onCreateMatchingSpriteCollisionMask,
     ]
@@ -490,6 +492,15 @@ export default function SpriteEditor({
         onlyForStorageProvider === storageProvider.internalName
     );
 
+  const adaptCollisionMaskIfNeeded = React.useCallback(
+    () => {
+      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+        onCreateMatchingSpriteCollisionMask();
+      }
+    },
+    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
+  );
+
   const importImages = React.useCallback(
     async () => {
       const resources = await resourceManagementProps.onChooseResource({
@@ -515,6 +526,7 @@ export default function SpriteEditor({
 
       await resourceManagementProps.onFetchNewlyAddedResources();
 
+      adaptCollisionMaskIfNeeded();
       if (onObjectUpdated) onObjectUpdated();
     },
     [
@@ -522,18 +534,10 @@ export default function SpriteEditor({
       resourceSources,
       addAnimations,
       forceUpdate,
+      adaptCollisionMaskIfNeeded,
       onObjectUpdated,
       project,
     ]
-  );
-
-  const adaptCollisionMaskIfNeeded = React.useCallback(
-    () => {
-      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
-        onCreateMatchingSpriteCollisionMask();
-      }
-    },
-    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
   );
 
   const editDirectionWith = React.useCallback(
@@ -544,6 +548,8 @@ export default function SpriteEditor({
       animationIndex: number,
       directionIndex: number
     ) => {
+      abortControllerRef.current = new AbortController();
+      const { signal } = abortControllerRef.current;
       const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
         return direction.getSprite(i).getImageName();
       });
@@ -573,6 +579,7 @@ export default function SpriteEditor({
               isLooping: direction.isLooping(),
               existingMetadata: direction.getMetadata(),
             },
+            signal,
           }
         );
 
@@ -630,16 +637,21 @@ export default function SpriteEditor({
           adaptCollisionMaskIfNeeded();
         }
       } catch (error) {
+        if (error.name !== 'UserCancellationError') {
+          console.error(
+            'An exception was thrown when launching or reading resources from the external editor:',
+            error
+          );
+          showErrorBox({
+            message:
+              'There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.',
+            rawError: error,
+            errorId: 'external-editor-error',
+          });
+        }
         setExternalEditorOpened(false);
-        console.error(
-          'An exception was thrown when launching or reading resources from the external editor:',
-          error
-        );
-        showErrorBox({
-          message: `There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.`,
-          rawError: error,
-          errorId: 'external-editor-error',
-        });
+      } finally {
+        abortControllerRef.current = null;
       }
     },
     [
@@ -653,6 +665,26 @@ export default function SpriteEditor({
       changeAnimationName,
       adaptCollisionMaskIfNeeded,
     ]
+  );
+
+  const cancelEditingWithExternalEditor = React.useCallback(
+    async () => {
+      const shouldContinue = await showConfirmation({
+        title: t`Cancel editing`,
+        message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
+        confirmButtonLabel: t`Cancel edition`,
+        dismissButtonLabel: t`Continue editing`,
+      });
+      if (!shouldContinue) return;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      } else {
+        console.error(
+          'Cannot cancel editing with external editor, abort controller is missing.'
+        );
+      }
+    },
+    [showConfirmation]
   );
 
   const createAnimationWith = React.useCallback(
@@ -1045,7 +1077,11 @@ export default function SpriteEditor({
               />
             </Dialog>
           )}
-          {externalEditorOpened && <ExternalEditorOpenedDialog />}
+          {externalEditorOpened && (
+            <ExternalEditorOpenedDialog
+              onClose={cancelEditingWithExternalEditor}
+            />
+          )}
         </>
       )}
     </I18n>

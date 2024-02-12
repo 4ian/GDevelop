@@ -54,40 +54,42 @@ type PrivateGameTemplateStoreState = {|
   },
 |};
 
+export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState = {
+  gameTemplateFilters: null,
+  fetchGameTemplates: () => {},
+  privateGameTemplateListingDatas: null,
+  error: null,
+  shop: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+    setInitialGameTemplateUserFriendlySlug: (
+      initialGameTemplateUserFriendlySlug: string
+    ) => {},
+  },
+  exampleStore: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  },
+};
+
 export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
-  {
-    gameTemplateFilters: null,
-    fetchGameTemplates: () => {},
-    privateGameTemplateListingDatas: null,
-    error: null,
-    shop: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-      setInitialGameTemplateUserFriendlySlug: (
-        initialGameTemplateUserFriendlySlug: string
-      ) => {},
-    },
-    exampleStore: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-    },
-  }
+  initialPrivateGameTemplateStoreState
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
@@ -152,18 +154,20 @@ export const PrivateGameTemplateStoreStateProvider = ({
           setPrivateGameTemplateListingDatas(
             fetchedPrivateGameTemplateListingDatas
           );
+          const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            (allCategories, privateGameTemplateListingData) => {
+              return allCategories.concat(
+                privateGameTemplateListingData.categories.map(category =>
+                  capitalize(category)
+                )
+              );
+            },
+            []
+          );
+          const uniqueDefaultTags = Array.from(new Set(defaultTags));
           const gameTemplateFilters: Filters = {
             allTags: [],
-            defaultTags: fetchedPrivateGameTemplateListingDatas.reduce(
-              (allCategories, privateGameTemplateListingData) => {
-                return allCategories.concat(
-                  privateGameTemplateListingData.categories.map(category =>
-                    capitalize(category)
-                  )
-                );
-              },
-              []
-            ),
+            defaultTags: uniqueDefaultTags,
             tagsTree: [],
           };
           setGameTemplateFilters(gameTemplateFilters);

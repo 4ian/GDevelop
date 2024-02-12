@@ -284,6 +284,10 @@ export const ProjectFileListItem = ({
     file: ?FileMetadataAndStorageProviderName
   ): Array<MenuItemTemplate> => {
     if (!file) return [];
+    const isCurrentProjectOpened =
+      !!currentFileMetadata &&
+      currentFileMetadata.fileIdentifier === file.fileMetadata.fileIdentifier;
+
     let actions = [
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
     ];
@@ -293,6 +297,7 @@ export const ProjectFileListItem = ({
           {
             label: i18n._(t`Delete`),
             click: () => onDeleteCloudProject(i18n, file),
+            enabled: !isCurrentProjectOpened,
           },
         ]);
       }

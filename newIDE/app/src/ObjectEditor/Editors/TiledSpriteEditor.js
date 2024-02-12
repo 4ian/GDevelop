@@ -17,6 +17,7 @@ export default class TiledSpriteEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      objectName,
     } = this.props;
     const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
       objectConfiguration
@@ -29,6 +30,7 @@ export default class TiledSpriteEditor extends React.Component<
           resourceManagementProps={resourceManagementProps}
           resourceKind="image"
           resourceName={tiledSpriteConfiguration.getTexture()}
+          defaultNewResourceName={objectName}
           onChange={resourceName => {
             tiledSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();

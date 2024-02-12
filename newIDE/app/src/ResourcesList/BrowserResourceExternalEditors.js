@@ -21,6 +21,7 @@ import {
 } from '../Utils/BlobDownloader';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { displayBlackLoadingScreen } from '../Utils/BrowserExternalWindowUtils';
+import { UserCancellationError } from '../LoginProvider/Utils';
 let nextExternalEditorWindowId = 0;
 
 const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
@@ -29,11 +30,20 @@ const externalEditorIndexHtml: { ['piskel' | 'yarn' | 'jfxr']: string } = {
   jfxr: 'external/jfxr/jfxr-index.html',
 };
 
-const openAndWaitForExternalEditorWindow = async (
+const openAndWaitForExternalEditorWindow = async ({
+  externalEditorWindow,
+  externalEditorName,
+  externalEditorInput,
+  signal,
+}: {|
   externalEditorWindow: any,
-  editorName: 'piskel' | 'yarn' | 'jfxr',
-  externalEditorInput: ExternalEditorInput
-): Promise<?ExternalEditorOutput> => {
+  externalEditorName: 'piskel' | 'yarn' | 'jfxr',
+  externalEditorInput: ExternalEditorInput,
+  signal: AbortSignal,
+|}): Promise<?ExternalEditorOutput> => {
+  if (signal.aborted) {
+    return Promise.reject(new UserCancellationError(''));
+  }
   return new Promise((resolve, reject) => {
     let externalEditorLoaded = false;
     let externalEditorClosed = false;
@@ -53,7 +63,7 @@ const openAndWaitForExternalEditorWindow = async (
 
       const { id, payload } = event.data;
       if (id === `external-editor-ready`) {
-        console.info(`External editor "${editorName}" ready.`);
+        console.info(`External editor "${externalEditorName}" ready.`);
 
         // Some browsers like Safari might not trigger the "load" event, but now we can
         // be sure the editor is loaded: the proof being that we received this message.
@@ -74,7 +84,9 @@ const openAndWaitForExternalEditorWindow = async (
           window.location.origin
         );
       } else if (id === `save-external-editor-output`) {
-        console.info(`Received data from external editor "${editorName}."`);
+        console.info(
+          `Received data from external editor "${externalEditorName}."`
+        );
         // $FlowFixMe - assuming the typing is good.
         externalEditorOutput = payload;
       } else if (event.data.id === 'close') {
@@ -90,13 +102,20 @@ const openAndWaitForExternalEditorWindow = async (
         return;
       }
       externalEditorClosed = true;
-      console.info(`External editor "${editorName}" closed.`);
+      console.info(`External editor "${externalEditorName}" closed.`);
       window.removeEventListener('message', onMessageEvent);
       resolve(externalEditorOutput);
     };
 
+    signal.addEventListener('abort', () => {
+      reject(new UserCancellationError(''));
+      if (externalEditorClosed) return;
+      externalEditorWindow.close();
+      onExternalEditorWindowClosed();
+    });
+
     externalEditorWindow.addEventListener('load', () => {
-      console.info(`External editor "${editorName}" loaded.`);
+      console.info(`External editor "${externalEditorName}" loaded.`);
       externalEditorLoaded = true;
 
       externalEditorWindow.addEventListener('unload', () => {
@@ -110,14 +129,14 @@ const openAndWaitForExternalEditorWindow = async (
     // (though not on Safari), then the editor will send a `external-editor-ready` event
     // (on all browsers), after which we will then be ready to have it open the resources.
     // (see `open-external-editor-input`).
-    externalEditorWindow.location = externalEditorIndexHtml[editorName];
+    externalEditorWindow.location = externalEditorIndexHtml[externalEditorName];
 
     // If the editor is not ready after 10 seconds and not closed, force it to be closed.
     // Something wrong is going on and we don't want to block the user.
     setTimeout(() => {
       if (externalEditorLoaded || externalEditorClosed) return;
       console.info(
-        `External editor "${editorName} not loaded after 10 seconds - closing its window."`
+        `External editor "${externalEditorName} not loaded after 10 seconds - closing its window."`
       );
 
       // The external editor is not loaded after 10 seconds, abort.
@@ -232,7 +251,7 @@ const editWithBrowserExternalEditor = async ({
   resourceKind: ResourceKind,
   options: EditWithExternalEditorOptions,
 |}) => {
-  const { project, resourceNames, resourceManagementProps } = options;
+  const { project, resourceNames, resourceManagementProps, signal } = options;
 
   // Fetch all edited resources as base64 encoded "data urls" (`data:...`).
   const resources = await downloadAndPrepareExternalEditorBase64Resources({
@@ -254,9 +273,7 @@ const editWithBrowserExternalEditor = async ({
 
   sendExternalEditorOpened(externalEditorName);
   const externalEditorOutput: ?ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
-    externalEditorWindow,
-    externalEditorName,
-    externalEditorInput
+    { externalEditorWindow, externalEditorName, externalEditorInput, signal }
   );
   if (!externalEditorOutput) return null; // Changes cancelled.
 

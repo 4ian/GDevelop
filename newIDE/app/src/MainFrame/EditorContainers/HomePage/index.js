@@ -99,8 +99,8 @@ type Props = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenExampleStore: () => void,
-  onOpenExampleStoreWithExampleShortHeader: ExampleShortHeader => void,
-  onOpenExampleStoreWithPrivateGameTemplateListingData: (
+  onSelectExampleShortHeader: ExampleShortHeader => void,
+  onPreviewPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
   onOpenPrivateGameTemplateListingData: (
@@ -143,8 +143,8 @@ export const HomePage = React.memo<Props>(
         onOpenRecentFile,
         onOpenNewProjectSetupDialog,
         onOpenExampleStore,
-        onOpenExampleStoreWithExampleShortHeader,
-        onOpenExampleStoreWithPrivateGameTemplateListingData,
+        onSelectExampleShortHeader,
+        onPreviewPrivateGameTemplateListingData,
         onOpenPrivateGameTemplateListingData,
         onOpenProjectManager,
         onOpenLanguageDialog,
@@ -162,14 +162,11 @@ export const HomePage = React.memo<Props>(
       }: Props,
       ref
     ) => {
-      const {
-        authenticated,
-        onCloudProjectsChanged,
-        loginState,
-      } = React.useContext(AuthenticatedUserContext);
+      const { authenticated, onCloudProjectsChanged } = React.useContext(
+        AuthenticatedUserContext
+      );
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
-      const shouldChangeTabAfterUserLoggedIn = React.useRef<boolean>(true);
       const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
@@ -183,29 +180,33 @@ export const HomePage = React.memo<Props>(
         gameDetailsCurrentTab,
         setGameDetailsCurrentTab,
       ] = React.useState<GameDetailsTab>('details');
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
 
       const windowWidth = useResponsiveWindowWidth();
       const isMobile = windowWidth === 'small';
       const {
         values: { showGetStartedSectionByDefault },
       } = React.useContext(PreferencesContext);
-      const initialTab = showGetStartedSectionByDefault
-        ? 'get-started'
-        : 'build';
-
-      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
-
-      const { routeArguments, removeRouteArguments } = React.useContext(
-        RouterContext
-      );
-      const { setInitialPackUserFriendlySlug } = React.useContext(
-        AssetStoreContext
-      );
       const isShopRequestedAtOpening = React.useRef<boolean>(
         isShopRequested(routeArguments)
       );
       const isGamesDashboardRequestedAtOpening = React.useRef<boolean>(
         isGamesDashboardRequested(routeArguments)
+      );
+      const initialTab = isShopRequestedAtOpening.current
+        ? 'shop'
+        : isGamesDashboardRequestedAtOpening.current
+        ? 'manage'
+        : showGetStartedSectionByDefault
+        ? 'get-started'
+        : 'build';
+
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+
+      const { setInitialPackUserFriendlySlug } = React.useContext(
+        AssetStoreContext
       );
       const [
         displayTooltipDelayed,
@@ -240,7 +241,9 @@ export const HomePage = React.memo<Props>(
         [acknowledgeNewFeature]
       );
 
-      // Open the store and a pack or game template if asked to do so.
+      // Open the store and a pack or game template if asked to do so, either at
+      // app opening, either when the route changes (when clicking on an announcement
+      // that redirects to the asset store for instance).
       React.useEffect(
         () => {
           if (isShopRequested(routeArguments)) {
@@ -270,40 +273,6 @@ export const HomePage = React.memo<Props>(
           setInitialPackUserFriendlySlug,
           setInitialGameTemplateUserFriendlySlug,
         ]
-      );
-
-      // If the user is not authenticated, the GetStarted section is displayed unless
-      // a specific tab is requested via the url.
-      React.useEffect(
-        () => {
-          if (
-            isShopRequestedAtOpening.current ||
-            isGamesDashboardRequestedAtOpening.current
-          )
-            return;
-          if (shouldChangeTabAfterUserLoggedIn.current) {
-            setActiveTab(authenticated ? initialTab : 'get-started');
-          }
-        },
-        // Only the initialTab at component mounting is interesting
-        // and we don't want to change the active tab if initialTab changes.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [authenticated]
-      );
-
-      // This effect makes sure that the tab changing cannot happen once the editor is up
-      // and running (shouldChangeTabAfterUserLoggedIn is never set back to true).
-      // At the time the HomePage is mounting, if there is any firebase data on the device
-      // the authentication is ongoing, with loginState having the value 'loggingIn'.
-      // So once the authentication is over (loginState with value 'done'), the above effect
-      // (that changes the tab) is run prior to this one, the tab is changed
-      // and shouldChangeTabAfterUserLoggedIn is set to false.
-      React.useEffect(
-        () => {
-          if (loginState === 'loggingIn') return;
-          shouldChangeTabAfterUserLoggedIn.current = false;
-        },
-        [loginState]
       );
 
       React.useEffect(
@@ -530,12 +499,9 @@ export const HomePage = React.memo<Props>(
                       canOpen={canOpen}
                       onChooseProject={onChooseProject}
                       onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
-                      onShowAllExamples={onOpenExampleStore}
-                      onSelectExampleShortHeader={
-                        onOpenExampleStoreWithExampleShortHeader
-                      }
+                      onSelectExampleShortHeader={onSelectExampleShortHeader}
                       onSelectPrivateGameTemplateListingData={
-                        onOpenExampleStoreWithPrivateGameTemplateListingData
+                        onPreviewPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
                       onManageGame={onManageGame}
@@ -634,11 +600,9 @@ export const renderHomePageContainer = (
     onChooseProject={props.onChooseProject}
     onOpenRecentFile={props.onOpenRecentFile}
     onOpenExampleStore={props.onOpenExampleStore}
-    onOpenExampleStoreWithExampleShortHeader={
-      props.onOpenExampleStoreWithExampleShortHeader
-    }
-    onOpenExampleStoreWithPrivateGameTemplateListingData={
-      props.onOpenExampleStoreWithPrivateGameTemplateListingData
+    onSelectExampleShortHeader={props.onSelectExampleShortHeader}
+    onPreviewPrivateGameTemplateListingData={
+      props.onPreviewPrivateGameTemplateListingData
     }
     onOpenPrivateGameTemplateListingData={
       props.onOpenPrivateGameTemplateListingData

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
@@ -32,14 +33,13 @@ import {
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
-import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   getAssetPackFromUserFriendlySlug,
   getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { t } from '@lingui/macro';
+import { getStableRandomArray } from '../Utils/Random';
 
 const defaultSearchText = '';
 
@@ -96,7 +96,7 @@ type AssetStoreState = {|
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
-export const AssetStoreContext = React.createContext<AssetStoreState>({
+export const initialAssetStoreState: AssetStoreState = {
   filters: null,
   publicAssetPacks: null,
   privateAssetPackListingDatas: null,
@@ -157,7 +157,11 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
-});
+};
+
+export const AssetStoreContext = React.createContext<AssetStoreState>(
+  initialAssetStoreState
+);
 
 type AssetStoreStateProviderProps = {|
   onlyAppStorePrivateAssetPacks?: ?boolean,
@@ -181,12 +185,6 @@ const getPublicAssetPackSearchTerms = (assetPack: PublicAssetPack) =>
 const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
-
-const getAssetPackRandomOrdering = (length: number): Array<number> => {
-  const array = new Array(length).fill(0).map((_, index) => index);
-
-  return shuffle(array);
-};
 
 export const AssetStoreStateProvider = ({
   onlyAppStorePrivateAssetPacks,
@@ -500,8 +498,8 @@ export const AssetStoreStateProvider = ({
         return;
       }
       setAssetPackRandomOrdering({
-        starterPacks: getAssetPackRandomOrdering(assetPackCount),
-        privateAssetPacks: getAssetPackRandomOrdering(privateAssetPackCount),
+        starterPacks: getStableRandomArray(assetPackCount),
+        privateAssetPacks: getStableRandomArray(privateAssetPackCount),
       });
     },
     [assetPackCount, privateAssetPackCount]

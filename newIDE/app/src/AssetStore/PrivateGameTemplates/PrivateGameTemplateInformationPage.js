@@ -15,7 +15,7 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, Line } from '../../UI/Grid';
+import { Column, LargeSpacer, Line } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -43,8 +43,13 @@ import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import Chip from '../../UI/Chip';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
-import { PrivateGameTemplateTile } from '../ShopTiles';
 import { GridList } from '@material-ui/core';
+import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
+import {
+  getBundlesContainingProductTiles,
+  getOtherProductsFromSameAuthorTiles,
+  getProductsIncludedInBundleTiles,
+} from '../ProductPageHelper';
 
 const cellSpacing = 8;
 
@@ -118,6 +123,9 @@ const PrivateGameTemplateInformationPage = ({
   simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateGameTemplateListingData;
+  const { privateGameTemplateListingDatas } = React.useContext(
+    PrivateGameTemplateStoreContext
+  );
   const { receivedGameTemplates, authenticated } = React.useContext(
     AuthenticatedUserContext
   );
@@ -146,44 +154,53 @@ const PrivateGameTemplateInformationPage = ({
       gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
     );
 
-  const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
-    () => {
-      if (
-        !privateGameTemplateListingDatasFromSameCreator ||
-        // Only display Templates if there are at least 2. If there is only one,
-        // it means it's the same as the one currently opened.
-        privateGameTemplateListingDatasFromSameCreator.length < 2
-      )
-        return null;
-
-      return (
-        privateGameTemplateListingDatasFromSameCreator
-          // Do not display the template currently opened.
-          .filter(
-            gameTemplateFromSameCreator => gameTemplateFromSameCreator.id !== id
-          )
-          .map(gameTemplateFromSameCreator => {
-            const isTemplateOwned =
-              !!receivedGameTemplates &&
-              !!receivedGameTemplates.find(
-                template => template.id === gameTemplateFromSameCreator.id
-              );
-            return (
-              <PrivateGameTemplateTile
-                privateGameTemplateListingData={gameTemplateFromSameCreator}
-                key={gameTemplateFromSameCreator.id}
-                onSelect={() => onGameTemplateOpen(gameTemplateFromSameCreator)}
-                owned={isTemplateOwned}
-              />
-            );
-          })
-      );
-    },
+  const templatesIncludedInBundleTiles = React.useMemo(
+    () =>
+      getProductsIncludedInBundleTiles({
+        product: gameTemplate,
+        productListingDatas: privateGameTemplateListingDatas,
+        productListingData: privateGameTemplateListingData,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
     [
-      id,
-      privateGameTemplateListingDatasFromSameCreator,
-      onGameTemplateOpen,
+      gameTemplate,
+      privateGameTemplateListingDatas,
       receivedGameTemplates,
+      onGameTemplateOpen,
+      privateGameTemplateListingData,
+    ]
+  );
+
+  const bundlesContainingPackTiles = React.useMemo(
+    () =>
+      getBundlesContainingProductTiles({
+        product: gameTemplate,
+        productListingDatas: privateGameTemplateListingDatas,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
+    [
+      gameTemplate,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+      onGameTemplateOpen,
+    ]
+  );
+
+  const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
+    () =>
+      getOtherProductsFromSameAuthorTiles({
+        otherProductListingDatasFromSameCreator: privateGameTemplateListingDatasFromSameCreator,
+        currentProductListingData: privateGameTemplateListingData,
+        receivedProducts: receivedGameTemplates,
+        onProductOpen: onGameTemplateOpen,
+      }),
+    [
+      privateGameTemplateListingDatasFromSameCreator,
+      privateGameTemplateListingData,
+      receivedGameTemplates,
+      onGameTemplateOpen,
     ]
   );
 
@@ -254,6 +271,13 @@ const PrivateGameTemplateInformationPage = ({
 
   const getBuyButton = i18n => {
     if (errorText) return null;
+    if (
+      isAlreadyReceived &&
+      privateGameTemplateListingData.includedListableProductIds
+    ) {
+      // Template is a bundle and is owned, no button to display.
+      return null;
+    }
 
     const label = !gameTemplate ? (
       <Trans>Loading...</Trans>
@@ -409,21 +433,22 @@ const PrivateGameTemplateInformationPage = ({
                             allowParagraphs
                           />
                         </Text>
-                        {!isAlreadyReceived && (
-                          <Line expand>
-                            <Column noMargin expand>
-                              <FlatButton
-                                primary
-                                label={<Trans>Try it online</Trans>}
-                                onClick={() =>
-                                  Window.openExternalURL(
-                                    gameTemplate.gamePreviewLink
-                                  )
-                                }
-                              />
-                            </Column>
-                          </Line>
-                        )}
+                        {!isAlreadyReceived &&
+                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
+                            <Line expand>
+                              <Column noMargin expand>
+                                <FlatButton
+                                  primary
+                                  label={<Trans>Try it online</Trans>}
+                                  onClick={() =>
+                                    Window.openExternalURL(
+                                      gameTemplate.gamePreviewLink
+                                    )
+                                  }
+                                />
+                              </Column>
+                            </Line>
+                          )}
                         <ResponsiveLineStackLayout noColumnMargin>
                           <Column noMargin expand>
                             <Text size="sub-title">
@@ -508,6 +533,35 @@ const PrivateGameTemplateInformationPage = ({
                     </Paper>
                   </ColumnStackLayout>
                 </ResponsiveLineStackLayout>
+                {bundlesContainingPackTiles &&
+                bundlesContainingPackTiles.length ? (
+                  <>
+                    <ColumnStackLayout noMargin>
+                      <LargeSpacer />
+                      {bundlesContainingPackTiles}
+                      <LargeSpacer />
+                    </ColumnStackLayout>
+                  </>
+                ) : null}
+                {templatesIncludedInBundleTiles && (
+                  <>
+                    <Line>
+                      <Text size="block-title">
+                        <Trans>Included in this bundle</Trans>
+                      </Text>
+                    </Line>
+                    <Line>
+                      <GridList
+                        cols={getTemplateColumns(windowWidth)}
+                        cellHeight="auto"
+                        spacing={cellSpacing / 2}
+                        style={styles.grid}
+                      >
+                        {templatesIncludedInBundleTiles}
+                      </GridList>
+                    </Line>
+                  </>
+                )}
                 {otherTemplatesFromTheSameAuthorTiles &&
                   otherTemplatesFromTheSameAuthorTiles.length > 0 && (
                     <>

@@ -19,7 +19,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
       );
-      expect(configuration.getString()).toBe('Hello');
+      expect(configuration.getText()).toBe('Hello');
     };
 
     const serializerElement = new gd.SerializerElement();
@@ -35,7 +35,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
       );
-      configuration.setString('Hello');
+      configuration.setText('Hello');
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);

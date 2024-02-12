@@ -400,9 +400,23 @@ module.exports = {
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
-        'string',
-        gd.ParameterOptions.makeNewOptions().setDescription(_('Input type'))
-      ) // TODO: stringWithSelector?
+        'stringWithSelector',
+        gd.ParameterOptions.makeNewOptions()
+          .setDescription(_('Input type'))
+          .setTypeExtraInfo(
+            JSON.stringify([
+              'text',
+              'text area',
+              'email',
+              'password',
+              'number',
+              'telephone number',
+              'url',
+              'search',
+              'email',
+            ])
+          )
+      )
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 

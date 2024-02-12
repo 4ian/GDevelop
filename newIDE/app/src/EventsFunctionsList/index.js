@@ -29,6 +29,7 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   EventsFunctionTreeViewItemContent,
   getEventsFunctionTreeViewItemId,
+  canFunctionBeRenamed,
   type EventFunctionCommonProps,
   type EventsFunctionCallbacks,
   type EventsFunctionCreationParameters,
@@ -405,7 +406,6 @@ const EventsFunctionsList = React.forwardRef<
       unsavedChanges,
       onSelectEventsFunction,
       onDeleteEventsFunction,
-      canRename,
       onRenameEventsFunction,
       onAddEventsFunction,
       onEventsFunctionAdded,
@@ -567,14 +567,22 @@ const EventsFunctionsList = React.forwardRef<
               eventsBasedBehavior,
               eventsBasedObject
             );
-            if (canRename(eventsFunction)) {
+            if (
+              canFunctionBeRenamed(
+                eventsFunction,
+                eventsBasedBehavior
+                  ? 'behavior'
+                  : eventsBasedObject
+                  ? 'object'
+                  : 'extension'
+              )
+            ) {
               editName(functionItemId);
             }
           }
         );
       },
       [
-        canRename,
         editName,
         eventsFunctionsExtension,
         forceUpdate,
@@ -750,7 +758,6 @@ const EventsFunctionsList = React.forwardRef<
         scrollToItem,
         onSelectEventsFunction,
         onDeleteEventsFunction,
-        canRename,
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,
@@ -772,7 +779,6 @@ const EventsFunctionsList = React.forwardRef<
         scrollToItem,
         onSelectEventsFunction,
         onDeleteEventsFunction,
-        canRename,
         onRenameEventsFunction,
         onAddEventsFunction,
         onEventsFunctionAdded,

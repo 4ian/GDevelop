@@ -1018,7 +1018,8 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
       parameterOptions.SetTypeExtraInfo(typeExtraInfo);
     auto propertyInstructionMetadata =
         entityMetadata.AddExpressionAndConditionAndAction(
-            gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType),
+            gd::ValueTypeMetadata::GetPrimitiveValueType(
+              gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType)),
             expressionName, propertyLabel,
             _("the property value for the <property_name>")
                 .FindAndReplace("<property_name>", uncapitalizedLabel),

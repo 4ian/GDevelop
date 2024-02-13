@@ -719,7 +719,7 @@ describe('MetadataDeclarationHelper', () => {
       .getAllActions()
       .get('MyBehavior::SetPropertyValue');
     expect(action.getParameter(3).getType()).toBe('stringWithSelector');
-    expect(action.getParameter(3).getExtraInfo()).toBe('["Choice A", "Choice B", "Choice C"]');
+    expect(action.getParameter(3).getExtraInfo()).toBe('["Choice A","Choice B","Choice C"]');
 
     expect(
       behaviorMetadata.getAllConditions().has('MyBehavior::PropertyValue')
@@ -728,7 +728,7 @@ describe('MetadataDeclarationHelper', () => {
       .getAllConditions()
       .get('MyBehavior::PropertyValue');
     expect(condition.getParameter(3).getType()).toBe('stringWithSelector');
-    expect(condition.getParameter(3).getExtraInfo()).toBe('["Choice A", "Choice B", "Choice C"]');
+    expect(condition.getParameter(3).getExtraInfo()).toBe('["Choice A","Choice B","Choice C"]');
 
     expect(behaviorMetadata.getAllStrExpressions().has('PropertyValue')).toBe(
       true

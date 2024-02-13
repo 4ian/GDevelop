@@ -965,6 +965,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         addObjectAndBehaviorParameters) {
   auto &propertyType = property.GetType();
 
+  auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
+        + " properties";
+
   auto uncapitalizedLabel =
       UncapitalizeFirstLetter(property.GetLabel()) || property.GetName();
   if (propertyType == "Boolean") {
@@ -1004,7 +1007,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_name>", uncapitalizedLabel),
         _("Toggle property <property_name> of _PARAM0_")
             .FindAndReplace("<property_name>", uncapitalizedLabel),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
     toggleActionMetadata.SetFunctionName(toggleFunctionName);
@@ -1022,7 +1025,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
                 .FindAndReplace("<property_name>", uncapitalizedLabel),
             _("the property value for the <property_name>")
                 .FindAndReplace("<property_name>", uncapitalizedLabel),
-            eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+            group,
             GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(propertyInstructionMetadata);
     propertyInstructionMetadata

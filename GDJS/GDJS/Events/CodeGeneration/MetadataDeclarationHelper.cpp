@@ -935,14 +935,14 @@ gd::String MetadataDeclarationHelper::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
   gd::String stringifiedExtraInfo = "";
   if (property.GetType() == "Choice") {
-    stringifiedExtraInfo += "[";
+    stringifiedExtraInfo += "[\"";
     for (size_t i = 0; i < property.GetExtraInfo().size(); i++) {
       stringifiedExtraInfo += property.GetExtraInfo().at(i);
       if (i < property.GetExtraInfo().size() - 1) {
-        stringifiedExtraInfo += ",";
+        stringifiedExtraInfo += "\", \"";
       }
     }
-    stringifiedExtraInfo += "]";
+    stringifiedExtraInfo += "\"]";
   }
   return stringifiedExtraInfo;
 }

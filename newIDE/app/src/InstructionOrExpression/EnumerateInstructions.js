@@ -468,6 +468,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     .getAllPlatformExtensions();
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
+    const scope = { extension, objectMetadata };
 
     allInstructions = [
       ...allInstructions,

@@ -933,18 +933,15 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
 gd::String MetadataDeclarationHelper::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
-  gd::String stringifiedExtraInfo = "";
-  if (property.GetType() == "Choice") {
-    stringifiedExtraInfo += "[\"";
-    for (size_t i = 0; i < property.GetExtraInfo().size(); i++) {
-      stringifiedExtraInfo += property.GetExtraInfo().at(i);
-      if (i < property.GetExtraInfo().size() - 1) {
-        stringifiedExtraInfo += "\", \"";
-      }
-    }
-    stringifiedExtraInfo += "\"]";
+  if (property.GetType() != "Choice") {
+    return "";
   }
-  return stringifiedExtraInfo;
+  SerializerElement element;
+  element.ConsiderAsArray();
+  for (auto&& value : property.GetExtraInfo()) {
+    element.AddChild("").SetStringValue(value);
+  }
+  return Serializer::ToJSON(element);
 }
 
 gd::String

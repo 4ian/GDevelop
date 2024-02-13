@@ -966,7 +966,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
   auto &propertyType = property.GetType();
 
   auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
-        + " properties";
+        + " " + property.GetGroup() + " properties";
 
   auto uncapitalizedLabel =
       UncapitalizeFirstLetter(property.GetLabel()) || property.GetName();

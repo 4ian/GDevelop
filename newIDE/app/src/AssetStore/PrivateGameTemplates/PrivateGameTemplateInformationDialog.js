@@ -39,6 +39,8 @@ const PrivateGameTemplateInformationDialog = ({
       ]}
       open
       onRequestClose={onClose}
+      minHeight="lg"
+      flexColumnBody
     >
       <PrivateGameTemplateInformationPage
         privateGameTemplateListingData={privateGameTemplateListingData}

@@ -23,11 +23,14 @@ import Link from '../UI/Link';
 import Window from '../Utils/Window';
 import CreditsPackagePurchaseDialog from '../AssetStore/CreditsPackages/CreditsPackagePurchaseDialog';
 import { type CreditsPackageListingData } from '../Utils/GDevelopServices/Shop';
-import Coin from './Icons/Coin';
+import OneCoin from './Icons/OneCoin';
 import TwoCoins from './Icons/TwoCoins';
 import ThreeCoins from './Icons/ThreeCoins';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import FourCoins from './Icons/FourCoins';
+import FiveCoins from './Icons/FiveCoins';
 import AlertMessage from '../UI/AlertMessage';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { getItemsSplitInLines } from './CreditsPackagesHelper';
 
 const styles = {
   creditsPackage: {
@@ -35,6 +38,10 @@ const styles = {
     flex: 1,
     borderRadius: 8,
     padding: 16,
+  },
+  iconStyle: {
+    width: 30,
+    height: 30,
   },
   titleContainer: {
     width: '100%',
@@ -56,20 +63,32 @@ const styles = {
 const getIconFromIndex = (index: number) => {
   switch (index) {
     case 0:
-      return <Coin style={{ width: 15, height: 15 }} />;
+      return <OneCoin style={styles.iconStyle} />;
     case 1:
-      return <TwoCoins style={{ width: 30, height: 30 }} />;
+      return <TwoCoins style={styles.iconStyle} />;
     case 2:
+      return <ThreeCoins style={styles.iconStyle} />;
+    case 3:
+      return <FourCoins style={styles.iconStyle} />;
+    case 4:
     default:
-      return <ThreeCoins style={{ width: 30, height: 30 }} />;
+      return <FiveCoins style={styles.iconStyle} />;
   }
 };
 
-type Props = {
+type Props = {|
   onClose: () => void,
-};
+  suggestedPackage: ?CreditsPackageListingData,
+  missingCredits: ?number,
+  showCalloutTip?: boolean,
+|};
 
-const CreditsPackagesDialog = ({ onClose }: Props) => {
+const CreditsPackagesDialog = ({
+  onClose,
+  suggestedPackage,
+  missingCredits,
+  showCalloutTip,
+}: Props) => {
   const {
     error,
     fetchCreditsPackages,
@@ -80,13 +99,20 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
     purchasingCreditsPackageListingData,
     setPurchasingCreditsPackageListingData,
   ] = React.useState<?CreditsPackageListingData>(null);
-  const { limits } = React.useContext(AuthenticatedUserContext);
+  const windowWidth = useResponsiveWindowWidth();
 
   React.useEffect(
     () => {
       fetchCreditsPackages();
     },
     [fetchCreditsPackages]
+  );
+
+  // Split credit packages on multiple lines to spread them as much as possible.
+  // Logic is different based on the screen size so that it looks ok.
+  const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) = React.useMemo(
+    () => getItemsSplitInLines(creditsPackageListingDatas, windowWidth),
+    [creditsPackageListingDatas, windowWidth]
   );
 
   return (
@@ -107,13 +133,23 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
         >
           <ColumnStackLayout noMargin>
             <CreditsStatusBanner displayPurchaseAction={false} />
-            {limits && limits.credits.userBalance.amount > 0 && (
+            {showCalloutTip && (
               <AlertMessage kind="info">
                 <Trans>
-                  You can use your credits to feature a game! Head down in the
-                  "Manage" section, pick a game and go to the tab "Marketing".
+                  You can use credits to feature a game or purchase asset packs
+                  and game templates in the store!
                 </Trans>
               </AlertMessage>
+            )}
+            {!!missingCredits && (
+              <Column noMargin>
+                <Text size="sub-title">
+                  <Trans>You're {missingCredits} credits short.</Trans>
+                </Text>
+                <Text noMargin>
+                  <Trans>Recharge your account to purchase this item.</Trans>
+                </Text>
+              </Column>
             )}
             {error ? (
               <PlaceholderError onRetry={fetchCreditsPackages}>
@@ -122,82 +158,106 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
                   connection or retry later.
                 </Trans>
               </PlaceholderError>
-            ) : !creditsPackageListingDatas ? (
+            ) : !creditsPackageListingDatasArrays ? (
               <PlaceholderLoader />
             ) : (
-              <ResponsiveLineStackLayout noColumnMargin>
-                {creditsPackageListingDatas.map(
-                  (creditsPackageListingData, index) => {
-                    const { id, name, description } = creditsPackageListingData;
-                    return (
-                      <div
-                        style={{
-                          ...styles.creditsPackage,
-                          border: `1px solid ${
-                            gdevelopTheme.palette.secondary
-                          }`,
-                        }}
-                        key={id}
-                      >
-                        <ColumnStackLayout
-                          alignItems="center"
-                          justifyContent="space-between"
-                          noMargin
-                          expand
-                        >
-                          <div style={styles.titleContainer}>
-                            <div style={styles.iconContainer}>
-                              {getIconFromIndex(index)}
-                            </div>
-                            <LineStackLayout
+              creditsPackageListingDatasArrays.map(
+                creditsPackageListingDatasArray => (
+                  <ResponsiveLineStackLayout noColumnMargin>
+                    {creditsPackageListingDatasArray.map(
+                      (creditsPackageListingData, index) => {
+                        const {
+                          id,
+                          name,
+                          description,
+                        } = creditsPackageListingData;
+                        const shouldSuggestPackage =
+                          !suggestedPackage || suggestedPackage.id === id;
+                        return (
+                          <div
+                            style={{
+                              ...styles.creditsPackage,
+                              border: `1px solid ${
+                                gdevelopTheme.palette.secondary
+                              }`,
+                            }}
+                            key={id}
+                          >
+                            <ColumnStackLayout
+                              alignItems="center"
                               justifyContent="space-between"
-                              alignItems="flex-end"
+                              noMargin
                               expand
                             >
-                              <Line noMargin alignItems="flex-end">
-                                <Text size="sub-title" noMargin>
-                                  {name}
-                                </Text>
-                              </Line>
-                              <Text
-                                size="body-small"
-                                color="secondary"
-                                noMargin
-                              >
-                                {formatProductPrice({
-                                  productListingData: creditsPackageListingData,
-                                  i18n,
-                                })}
-                              </Text>
-                            </LineStackLayout>
-                          </div>
+                              <div style={styles.titleContainer}>
+                                <div style={styles.iconContainer}>
+                                  {getIconFromIndex(index)}
+                                </div>
+                                <LineStackLayout
+                                  justifyContent="space-between"
+                                  alignItems="flex-end"
+                                  expand
+                                >
+                                  <Line noMargin alignItems="flex-end">
+                                    <Text size="sub-title" noMargin>
+                                      {name}
+                                    </Text>
+                                  </Line>
+                                  <Text
+                                    size="body-small"
+                                    color="secondary"
+                                    noMargin
+                                  >
+                                    {formatProductPrice({
+                                      productListingData: creditsPackageListingData,
+                                      usageType: 'default',
+                                      i18n,
+                                    })}
+                                  </Text>
+                                </LineStackLayout>
+                              </div>
 
-                          <Column noMargin alignItems="center" expand>
-                            <Text
-                              size="body-small"
-                              noMargin
-                              color="secondary"
-                              align="left"
-                            >
-                              {description}
-                            </Text>
-                          </Column>
-                          <RaisedButton
-                            primary
-                            onClick={() =>
-                              setPurchasingCreditsPackageListingData(
-                                creditsPackageListingData
-                              )
-                            }
-                            label={<Trans>Purchase</Trans>}
-                            fullWidth
-                          />
-                        </ColumnStackLayout>
-                      </div>
-                    );
-                  }
-                )}
-              </ResponsiveLineStackLayout>
+                              <Column noMargin alignItems="center" expand>
+                                <Text
+                                  size="body-small"
+                                  noMargin
+                                  color="secondary"
+                                  align="left"
+                                >
+                                  {description}
+                                </Text>
+                              </Column>
+                              {shouldSuggestPackage ? (
+                                <RaisedButton
+                                  primary
+                                  onClick={() =>
+                                    setPurchasingCreditsPackageListingData(
+                                      creditsPackageListingData
+                                    )
+                                  }
+                                  label={<Trans>Purchase</Trans>}
+                                  fullWidth
+                                />
+                              ) : (
+                                <FlatButton
+                                  primary
+                                  onClick={() =>
+                                    setPurchasingCreditsPackageListingData(
+                                      creditsPackageListingData
+                                    )
+                                  }
+                                  label={<Trans>Purchase</Trans>}
+                                  fullWidth
+                                />
+                              )}
+                            </ColumnStackLayout>
+                          </div>
+                        );
+                      }
+                    )}
+                  </ResponsiveLineStackLayout>
+                )
+              )
             )}
             <BackgroundText style={styles.backgroundText}>
               <Trans>
@@ -220,6 +280,13 @@ const CreditsPackagesDialog = ({ onClose }: Props) => {
             <CreditsPackagePurchaseDialog
               creditsPackageListingData={purchasingCreditsPackageListingData}
               onClose={() => setPurchasingCreditsPackageListingData(null)}
+              onPurchaseSuccessful={() => {
+                if (suggestedPackage) {
+                  // If a package was suggested, we can close the dialog as the user
+                  // is going through a flow to purchase a product.
+                  onClose();
+                }
+              }}
             />
           )}
         </Dialog>

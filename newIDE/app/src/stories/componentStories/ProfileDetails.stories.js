@@ -47,8 +47,16 @@ const getAssetPacksListingData = (
     prices: [
       {
         value: 599,
-        name: 'default',
+        name: 'commercial_USD',
         stripePriceId: 'stripePriceId',
+        usageType: 'commercial',
+        currency: 'USD',
+      },
+    ],
+    creditPrices: [
+      {
+        amount: 600,
+        usageType: 'commercial',
       },
     ],
     appStoreProductId: null,

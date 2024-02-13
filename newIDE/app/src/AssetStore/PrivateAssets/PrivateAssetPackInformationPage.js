@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
+import { type I18n as I18nType } from '@lingui/core';
+import {
+  buyProductWithCredits,
+  type PrivateAssetPackListingData,
+} from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateAssetPack,
   type PrivateAssetPack,
@@ -16,15 +20,13 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, LargeSpacer, Line } from '../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
 } from '../../Utils/GDevelopServices/User';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
-import Mark from '../../UI/CustomSvgIcons/Mark';
-import Cross from '../../UI/CustomSvgIcons/Cross';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
   useResponsiveWindowWidth,
@@ -33,8 +35,6 @@ import {
 import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
-import Paper from '../../UI/Paper';
-import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import { formatProductPrice } from '../ProductPriceTag';
@@ -45,7 +45,16 @@ import {
   getBundlesContainingProductTiles,
   getOtherProductsFromSameAuthorTiles,
   getProductsIncludedInBundleTiles,
+  getUserProductPurchaseUsageType,
 } from '../ProductPageHelper';
+import FlatButton from '../../UI/FlatButton';
+import Coin from '../../Credits/Icons/Coin';
+import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import SecureCheckout from '../SecureCheckout/SecureCheckout';
+import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
+import HelpIcon from '../../UI/HelpIcon';
+import { Avatar } from '@material-ui/core';
 
 const cellSpacing = 8;
 
@@ -92,6 +101,22 @@ const styles = {
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
   },
+  leftColumnContainer: {
+    flex: 3,
+    minWidth: 0, // This is needed for the container to take the right size.
+  },
+  rightColumnContainer: {
+    flex: 2,
+  },
+  avatar: {
+    width: 20,
+    height: 20,
+  },
+  ownedTag: {
+    padding: '4px 8px',
+    borderRadius: 4,
+    color: 'black',
+  },
 };
 
 type Props = {|
@@ -99,7 +124,12 @@ type Props = {|
   privateAssetPackListingDatasFromSameCreator?: ?Array<PrivateAssetPackListingData>,
   onOpenPurchaseDialog: () => void,
   isPurchaseDialogOpen: boolean,
-  onAssetPackOpen: PrivateAssetPackListingData => void,
+  onAssetPackOpen: (
+    privateAssetPackListingData: PrivateAssetPackListingData,
+    options?: {|
+      forceProductPage?: boolean,
+    |}
+  ) => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -113,8 +143,20 @@ const PrivateAssetPackInformationPage = ({
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
-  const { receivedAssetPacks, authenticated } = React.useContext(
-    AuthenticatedUserContext
+  const {
+    receivedAssetPacks,
+    authenticated,
+    profile,
+    limits,
+    assetPackPurchases,
+    getAuthorizationHeader,
+    onOpenLoginDialog,
+  } = React.useContext(AuthenticatedUserContext);
+  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
+  const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
+    privateAssetPackListingData.prices[0].usageType
   );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
@@ -128,16 +170,29 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
-  const isAlreadyReceived =
-    !!receivedAssetPacks &&
-    !!receivedAssetPacks.find(
-      assetPack => assetPack.id === privateAssetPackListingData.id
-    );
+  const userAssetPackPurchaseUsageType = React.useMemo(
+    () =>
+      getUserProductPurchaseUsageType({
+        productId: privateAssetPackListingData
+          ? privateAssetPackListingData.id
+          : null,
+        receivedProducts: receivedAssetPacks,
+        productPurchases: assetPackPurchases,
+        allProductListingDatas: privateAssetPackListingDatas,
+      }),
+    [
+      assetPackPurchases,
+      privateAssetPackListingData,
+      privateAssetPackListingDatas,
+      receivedAssetPacks,
+    ]
+  );
+  const isAlreadyReceived = !!userAssetPackPurchaseUsageType;
 
   const packsIncludedInBundleTiles = React.useMemo(
     () =>
@@ -146,7 +201,8 @@ const PrivateAssetPackInformationPage = ({
         productListingDatas: privateAssetPackListingDatas,
         productListingData: privateAssetPackListingData,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: onAssetPackOpen,
+        onProductOpen: product =>
+          onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
       assetPack,
@@ -163,7 +219,8 @@ const PrivateAssetPackInformationPage = ({
         product: assetPack,
         productListingDatas: privateAssetPackListingDatas,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: onAssetPackOpen,
+        onProductOpen: product =>
+          onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
       assetPack,
@@ -179,7 +236,8 @@ const PrivateAssetPackInformationPage = ({
         otherProductListingDatasFromSameCreator: privateAssetPackListingDatasFromSameCreator,
         currentProductListingData: privateAssetPackListingData,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: onAssetPackOpen,
+        onProductOpen: product =>
+          onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
       privateAssetPackListingData,
@@ -222,7 +280,7 @@ const PrivateAssetPackInformationPage = ({
         }
       })();
     },
-    [id, sellerId, privateAssetPackListingData.appStoreProductId]
+    [id, sellerId]
   );
 
   const onClickBuy = React.useCallback(
@@ -255,46 +313,147 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
-  const getBuyButton = i18n => {
+  const onPurchaseWithCredits = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!privateAssetPackListingData || !assetPack) return;
+
+      if (!profile || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
+
+      if (isAlreadyReceived) {
+        onAssetPackOpen(privateAssetPackListingData);
+        return;
+      }
+
+      sendAssetPackBuyClicked({
+        assetPackId: assetPack.id,
+        assetPackName: assetPack.name,
+        assetPackTag: assetPack.tag,
+        assetPackKind: 'private',
+      });
+
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const assetPackPriceForUsageType = privateAssetPackListingData.creditPrices.find(
+        price => price.usageType === selectedUsageType
+      );
+      if (!assetPackPriceForUsageType) {
+        console.error(
+          'Unable to find the price for the selected usage type',
+          selectedUsageType
+        );
+        return;
+      }
+      const assetPackCreditsAmount = assetPackPriceForUsageType.amount;
+      if (currentCreditsAmount < assetPackCreditsAmount) {
+        openCreditsPackageDialog({
+          missingCredits: assetPackCreditsAmount - currentCreditsAmount,
+        });
+        return;
+      }
+
+      openCreditsUsageDialog({
+        title: <Trans>Purchase {assetPack.name}</Trans>,
+        message: (
+          <Trans>
+            You are about to use {assetPackCreditsAmount} credits to purchase
+            the asset pack {assetPack.name}. Continue?
+          </Trans>
+        ),
+        onConfirm: () =>
+          buyProductWithCredits(getAuthorizationHeader, {
+            productId: privateAssetPackListingData.id,
+            usageType: selectedUsageType,
+            userId: profile.id,
+          }),
+        successMessage: <Trans>🎉 You can now use your assets!</Trans>,
+      });
+    },
+    [
+      profile,
+      limits,
+      privateAssetPackListingData,
+      assetPack,
+      onAssetPackOpen,
+      isAlreadyReceived,
+      openCreditsPackageDialog,
+      selectedUsageType,
+      openCreditsUsageDialog,
+      getAuthorizationHeader,
+      onOpenLoginDialog,
+    ]
+  );
+
+  const getBuyButtons = i18n => {
     if (errorText) return null;
 
-    const label = !assetPack ? (
-      <Trans>Loading...</Trans>
-    ) : isAlreadyReceived ? (
-      <Trans>Explore assets</Trans>
-    ) : isPurchaseDialogOpen ? (
-      <Trans>Processing...</Trans>
-    ) : (
-      <Trans>
-        Buy for{' '}
-        {formatProductPrice({
-          i18n,
-          productListingData: privateAssetPackListingData,
-        })}
-      </Trans>
+    let creditPrice = privateAssetPackListingData.creditPrices.find(
+      price => price.usageType === selectedUsageType
     );
-
-    const disabled = !assetPack || isPurchaseDialogOpen;
+    if (!creditPrice) {
+      // We're probably switching from one pack to another, and the usage type is not available.
+      // Let's reset it.
+      setSelectedUsageType(privateAssetPackListingData.prices[0].usageType);
+      creditPrice = privateAssetPackListingData.creditPrices.find(
+        price =>
+          price.usageType === privateAssetPackListingData.prices[0].usageType
+      );
+      if (!creditPrice) {
+        console.error('Unable to find a credit price for the asset pack');
+        return null;
+      }
+    }
 
     return (
-      <Column noMargin alignItems="flex-end">
+      <LineStackLayout>
+        <FlatButton
+          key="buy-asset-pack-with-credits"
+          primary
+          label={<Trans>Buy for {creditPrice.amount} credits</Trans>}
+          onClick={onPurchaseWithCredits}
+          id="buy-asset-pack-with-credits"
+          leftIcon={<Coin fontSize="small" />}
+        />
         <RaisedButton
           key="buy-asset-pack"
           primary
-          label={label}
+          label={
+            <Trans>
+              Buy for{' '}
+              {formatProductPrice({
+                i18n,
+                usageType: selectedUsageType,
+                productListingData: privateAssetPackListingData,
+              })}
+            </Trans>
+          }
           onClick={onClickBuy}
-          disabled={disabled}
           id="buy-asset-pack"
         />
         {shouldUseOrSimulateAppStoreProduct &&
           !isAlreadyReceived &&
           !authenticated && (
             <Text size="body-small">
-              <Link onClick={onClickBuy} disabled={disabled} href="">
+              <Link onClick={onClickBuy} href="">
                 <Trans>Restore a previous purchase</Trans>
               </Link>
             </Text>
           )}
+      </LineStackLayout>
+    );
+  };
+
+  const getOpenButton = i18n => {
+    return (
+      <Column noMargin alignItems="flex-end">
+        <RaisedButton
+          primary
+          label={<Trans>Browse assets</Trans>}
+          onClick={() => onAssetPackOpen(privateAssetPackListingData)}
+          id="browse-assets"
+        />
       </Column>
     );
   };
@@ -340,138 +499,110 @@ const PrivateAssetPackInformationPage = ({
           ) : assetPack && sellerPublicProfile ? (
             <Column noOverflowParent expand noMargin>
               <ScrollView autoHideScrollbar style={styles.scrollview}>
-                <Column noMargin alignItems="flex-end">
-                  <Text displayInlineAsSpan size="sub-title">
-                    <Trans>by</Trans>{' '}
-                    <Link
-                      onClick={() => setOpenSellerPublicProfileDialog(true)}
-                      href="#"
-                    >
-                      {sellerPublicProfile.username || ''}
-                    </Link>
-                  </Text>
-                </Column>
-                <ResponsiveLineStackLayout noColumnMargin noMargin>
-                  <Column useFullHeight expand noMargin noOverflowParent>
+                <ResponsiveLineStackLayout
+                  noColumnMargin
+                  noMargin
+                  // Force the columns to wrap on tablets and small screens.
+                  width={windowWidth === 'medium' ? 'small' : undefined}
+                >
+                  <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
                       mediaItems={mediaItems}
                       altTextTemplate={`Asset pack ${name} preview image or sound {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
-                  </Column>
-                  <ColumnStackLayout useFullHeight expand noMargin>
-                    {isAlreadyReceived && (
-                      <Column noMargin expand>
-                        <AlertMessage kind="info">
-                          <Trans>
-                            You already own this asset pack. Explore the assets
-                            to use them in your project.
-                          </Trans>
-                        </AlertMessage>
-                      </Column>
-                    )}
-                    <Paper
-                      variant="outlined"
-                      style={{ padding: isMobileScreen ? 20 : 30 }}
-                      background="medium"
-                    >
-                      <Column noMargin>
-                        <Line
-                          noMargin
-                          expand
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Text noMargin size="block-title">
-                            {formatProductPrice({
-                              i18n,
-                              productListingData: privateAssetPackListingData,
-                            })}
-                          </Text>
-                          {getBuyButton(i18n)}
-                        </Line>
-                        <Text size="body2" displayInlineAsSpan>
-                          <MarkdownText
-                            source={assetPack.longDescription}
-                            allowParagraphs
-                          />
+                  </div>
+                  <div style={styles.rightColumnContainer}>
+                    <ColumnStackLayout>
+                      <LineStackLayout
+                        noMargin
+                        alignItems="center"
+                        justifyContent="space-between"
+                      >
+                        <Text noMargin size="title">
+                          {assetPack.name}
                         </Text>
-                        <ResponsiveLineStackLayout noMargin noColumnMargin>
-                          <Column noMargin expand>
-                            <Text size="sub-title">
-                              <Trans>Content</Trans>
+                        {isAlreadyReceived && (
+                          <div
+                            style={{
+                              ...styles.ownedTag,
+                              backgroundColor:
+                                gdevelopTheme.statusIndicator.success,
+                            }}
+                          >
+                            <Text color="inherit" noMargin>
+                              <Trans>OWNED</Trans>
                             </Text>
-                            {sortedContentType.map(type => {
-                              if (assetPack.content[type]) {
-                                return (
-                                  <li key={type}>
-                                    <Text displayInlineAsSpan noMargin>
-                                      {assetPack.content[type]}{' '}
-                                      {i18n._(
-                                        contentTypeToMessageDescriptor[type]
-                                      )}
-                                    </Text>
-                                  </li>
-                                );
-                              }
-                              return null;
-                            })}
-                          </Column>
-                          <Column noMargin expand>
-                            <Text size="sub-title">
-                              <Trans>Licensing</Trans>
-                            </Text>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Personal projects</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Professional projects</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Mark fontSize="small" />
-                              <Text displayInlineAsSpan noMargin>
-                                <Trans>Asset modification</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <LineStackLayout noMargin alignItems="center">
-                              <Cross
-                                fontSize="small"
-                                style={styles.disabledText}
-                              />
-                              <Text
-                                displayInlineAsSpan
-                                noMargin
-                                style={styles.disabledText}
-                              >
-                                <Trans>Redistribution &amp; reselling</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <Line noMargin>
-                              <Text>
-                                <Link
-                                  onClick={() =>
-                                    Window.openExternalURL(
-                                      'https://gdevelop.io/page/asset-store-license-agreement'
-                                    )
-                                  }
-                                  href="https://gdevelop.io/page/asset-store-license-agreement"
-                                >
-                                  <Trans>See details here</Trans>
-                                </Link>
-                              </Text>
-                            </Line>
-                          </Column>
-                        </ResponsiveLineStackLayout>
-                      </Column>
-                    </Paper>
-                  </ColumnStackLayout>
+                          </div>
+                        )}
+                      </LineStackLayout>
+                      <LineStackLayout noMargin alignItems="center">
+                        <Avatar
+                          src={sellerPublicProfile.iconUrl}
+                          style={styles.avatar}
+                        />
+                        <Text displayInlineAsSpan size="sub-title">
+                          <Link
+                            onClick={() =>
+                              setOpenSellerPublicProfileDialog(true)
+                            }
+                            href="#"
+                          >
+                            {sellerPublicProfile.username || ''}
+                          </Link>
+                        </Text>
+                      </LineStackLayout>
+                      <Line noMargin>
+                        <Text size="sub-title">
+                          <Trans>Licensing</Trans>
+                        </Text>
+                        <HelpIcon
+                          size="small"
+                          helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
+                        />
+                      </Line>
+                      <ProductLicenseOptions
+                        value={selectedUsageType}
+                        onChange={setSelectedUsageType}
+                        product={privateAssetPackListingData}
+                        ownedLicense={userAssetPackPurchaseUsageType}
+                      />
+                      <Spacer />
+                      {isAlreadyReceived ? (
+                        getOpenButton(i18n)
+                      ) : (
+                        <>
+                          <SecureCheckout />
+                          {getBuyButtons(i18n)}
+                        </>
+                      )}
+                    </ColumnStackLayout>
+                  </div>
                 </ResponsiveLineStackLayout>
+                <Column noMargin>
+                  <Text size="body2" displayInlineAsSpan>
+                    <MarkdownText
+                      source={assetPack.longDescription}
+                      allowParagraphs
+                    />
+                  </Text>
+                  <Text size="sub-title">
+                    <Trans>Content</Trans>
+                  </Text>
+                  {sortedContentType.map(type => {
+                    if (assetPack.content[type]) {
+                      return (
+                        <li key={type}>
+                          <Text displayInlineAsSpan noMargin>
+                            {assetPack.content[type]}{' '}
+                            {i18n._(contentTypeToMessageDescriptor[type])}
+                          </Text>
+                        </li>
+                      );
+                    }
+                    return null;
+                  })}
+                </Column>
                 {bundlesContainingPackTiles &&
                 bundlesContainingPackTiles.length ? (
                   <>

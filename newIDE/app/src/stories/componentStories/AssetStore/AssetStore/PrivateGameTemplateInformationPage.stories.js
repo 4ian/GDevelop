@@ -53,9 +53,16 @@ const privateGameTemplate1ListingData: PrivateGameTemplateListingData = {
   prices: [
     {
       value: 1500,
-      name: 'default',
+      name: 'commercial_USD',
       stripePriceId: 'stripePriceId',
-      currency: 'EUR',
+      currency: 'USD',
+      usageType: 'commercial',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 1500,
+      usageType: 'commercial',
     },
   ],
   appStoreProductId: null,
@@ -98,9 +105,16 @@ const privateGameTemplate2ListingData: PrivateGameTemplateListingData = {
   prices: [
     {
       value: 1000,
-      name: 'default',
+      usageType: 'commercial',
       stripePriceId: 'stripePriceId',
-      currency: 'EUR',
+      currency: 'USD',
+      name: 'commercial_USD',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 1000,
+      usageType: 'commercial',
     },
   ],
   appStoreProductId: 'fake.product.id',
@@ -140,9 +154,16 @@ const privateGameTemplateBundleListingData: PrivateGameTemplateListingData = {
   prices: [
     {
       value: 2000,
-      name: 'default',
+      name: 'commercial_USD',
       stripePriceId: 'stripePriceId',
-      currency: 'EUR',
+      currency: 'USD',
+      usageType: 'commercial',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 2000,
+      usageType: 'commercial',
     },
   ],
   appStoreProductId: 'fake.product.id',

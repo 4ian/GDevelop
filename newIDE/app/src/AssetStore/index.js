@@ -350,14 +350,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     // if the user owns it, we set it as the chosen category,
     // otherwise we open the page to buy it.
     const selectPrivateAssetPack = React.useCallback(
-      (privateAssetPackListingData: PrivateAssetPackListingData) => {
+      (
+        privateAssetPackListingData: PrivateAssetPackListingData,
+        options?: {|
+          forceProductPage?: boolean,
+        |}
+      ) => {
         const receivedAssetPack = receivedAssetPacks
           ? receivedAssetPacks.find(
               pack => pack.id === privateAssetPackListingData.id
             )
           : null;
 
-        if (!receivedAssetPack) {
+        if (!receivedAssetPack || (options && options.forceProductPage)) {
           // The user has not received the pack, open the page to buy it.
           sendAssetPackInformationOpened({
             assetPackName: privateAssetPackListingData.name,

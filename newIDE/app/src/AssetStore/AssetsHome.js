@@ -60,15 +60,15 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
 };
 
 export const shopCategories = {
-  'full-game-pack': {
-    title: <Trans>Full Game Packs</Trans>,
-    imageAlt: 'Full game asset packs category',
-    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
-  },
   'game-template': {
-    title: <Trans>Game Templates</Trans>,
+    title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
     imageSource: 'res/shop-categories/Game_Templates.jpeg',
+  },
+  'full-game-pack': {
+    title: <Trans>Full Game Asset Packs</Trans>,
+    imageAlt: 'Full game asset packs category',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,

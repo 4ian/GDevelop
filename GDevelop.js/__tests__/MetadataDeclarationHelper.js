@@ -668,6 +668,77 @@ describe('MetadataDeclarationHelper', () => {
     project.delete();
   });
 
+  it('can create metadata for behavior choices property functions', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventBehavior = eventExtension
+      .getEventsBasedBehaviors()
+      .insertNew('MyBehavior', 0);
+
+    // Required behavior don't generate any instruction.
+    // It covers a mutant from "continue" to "return".
+    const requiredBehavior = eventBehavior
+      .getPropertyDescriptors()
+      .insertNew('RequiredBehavior', 0);
+    requiredBehavior.setType('Behavior');
+
+    const property = eventBehavior
+      .getPropertyDescriptors()
+      .insertNew('Value', 0);
+    property.setLabel('Some value');
+    property.setType('Choice');
+    const choices = new gd.VectorString();
+    choices.push_back("Choice A");
+    choices.push_back("Choice B");
+    choices.push_back("Choice C");
+    property.setExtraInfo(choices);
+
+    const behaviorMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateBehaviorMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventBehavior,
+      behaviorMethodMangledNames
+    );
+    behaviorMethodMangledNames.delete();
+
+    expect(extension.getBehaviorsTypes().size()).toBe(1);
+    expect(extension.getBehaviorsTypes().at(0)).toBe('MyBehavior');
+    const behaviorMetadata = extension.getBehaviorMetadata('MyBehavior');
+
+    expect(
+      behaviorMetadata.getAllActions().has('MyBehavior::SetPropertyValue')
+    ).toBe(true);
+    const action = behaviorMetadata
+      .getAllActions()
+      .get('MyBehavior::SetPropertyValue');
+    expect(action.getParameter(3).getType()).toBe('stringWithSelector');
+    expect(action.getParameter(3).getExtraInfo()).toBe('["Choice A","Choice B","Choice C"]');
+
+    expect(
+      behaviorMetadata.getAllConditions().has('MyBehavior::PropertyValue')
+    ).toBe(true);
+    const condition = behaviorMetadata
+      .getAllConditions()
+      .get('MyBehavior::PropertyValue');
+    expect(condition.getParameter(3).getType()).toBe('stringWithSelector');
+    expect(condition.getParameter(3).getExtraInfo()).toBe('["Choice A","Choice B","Choice C"]');
+
+    expect(behaviorMetadata.getAllStrExpressions().has('PropertyValue')).toBe(
+      true
+    );
+
+    choices.delete();
+    extension.delete();
+    project.delete();
+  });
+
   it('can create metadata for behavior boolean property functions', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();

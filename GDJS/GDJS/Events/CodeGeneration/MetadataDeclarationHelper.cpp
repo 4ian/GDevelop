@@ -933,18 +933,15 @@ MetadataDeclarationHelper::DeclareObjectInstructionMetadata(
 
 gd::String MetadataDeclarationHelper::GetStringifiedExtraInfo(
     const gd::PropertyDescriptor &property) {
-  gd::String stringifiedExtraInfo = "";
-  if (property.GetType() == "Choice") {
-    stringifiedExtraInfo += "[";
-    for (size_t i = 0; i < property.GetExtraInfo().size(); i++) {
-      stringifiedExtraInfo += property.GetExtraInfo().at(i);
-      if (i < property.GetExtraInfo().size() - 1) {
-        stringifiedExtraInfo += ",";
-      }
-    }
-    stringifiedExtraInfo += "]";
+  if (property.GetType() != "Choice") {
+    return "";
   }
-  return stringifiedExtraInfo;
+  SerializerElement element;
+  element.ConsiderAsArray();
+  for (auto&& value : property.GetExtraInfo()) {
+    element.AddChild("").SetStringValue(value);
+  }
+  return Serializer::ToJSON(element);
 }
 
 gd::String
@@ -967,6 +964,9 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
         gd::AbstractFunctionMetadata &instructionOrExpression)>
         addObjectAndBehaviorParameters) {
   auto &propertyType = property.GetType();
+
+  auto group = (eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName())
+        + " " + property.GetGroup() + " properties";
 
   auto uncapitalizedLabel =
       UncapitalizeFirstLetter(property.GetLabel()) || property.GetName();
@@ -1007,7 +1007,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_name>", uncapitalizedLabel),
         _("Toggle property <property_name> of _PARAM0_")
             .FindAndReplace("<property_name>", uncapitalizedLabel),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(toggleActionMetadata);
     toggleActionMetadata.SetFunctionName(toggleFunctionName);
@@ -1018,13 +1018,14 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
       parameterOptions.SetTypeExtraInfo(typeExtraInfo);
     auto propertyInstructionMetadata =
         entityMetadata.AddExpressionAndConditionAndAction(
-            gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType),
+            gd::ValueTypeMetadata::GetPrimitiveValueType(
+              gd::ValueTypeMetadata::ConvertPropertyTypeToValueType(propertyType)),
             expressionName, propertyLabel,
             _("the property value for the <property_name>")
                 .FindAndReplace("<property_name>", uncapitalizedLabel),
             _("the property value for the <property_name>")
                 .FindAndReplace("<property_name>", uncapitalizedLabel),
-            eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+            group,
             GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(propertyInstructionMetadata);
     propertyInstructionMetadata

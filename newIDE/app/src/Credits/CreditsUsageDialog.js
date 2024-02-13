@@ -46,12 +46,10 @@ const CreditsUsageDialog = ({
         setisPurchaseSuccessful(true);
         // We assume that the purchase was successful, so we refresh the purchases and limits,
         // no need to wait for those to complete as they are not critical to the purchase.
-        Promise.all([
-          onRefreshGameTemplatePurchases(),
-          onRefreshAssetPackPurchases(),
-          onPurchaseSuccessful(),
-          onRefreshLimits(),
-        ]);
+        onRefreshGameTemplatePurchases();
+        onRefreshAssetPackPurchases();
+        onPurchaseSuccessful();
+        onRefreshLimits();
       } catch (error) {
         console.error('An error happened while purchasing a product:', error);
         await showAlert({

@@ -41,7 +41,8 @@ import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import { Avatar, GridList } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import GridList from '@material-ui/core/GridList';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
 import {
   getBundlesContainingProductTiles,
@@ -268,10 +269,16 @@ const PrivateGameTemplateInformationPage = ({
       }
 
       try {
+        const price = privateGameTemplateListingData.prices.find(
+          price => price.usageType === selectedUsageType
+        );
+
         sendGameTemplateBuyClicked({
           gameTemplateId: gameTemplate.id,
           gameTemplateName: gameTemplate.name,
           gameTemplateTag: gameTemplate.tag,
+          currency: price ? price.currency : undefined,
+          usageType: selectedUsageType,
         });
 
         onOpenPurchaseDialog();
@@ -285,6 +292,7 @@ const PrivateGameTemplateInformationPage = ({
       privateGameTemplateListingData,
       isAlreadyReceived,
       onCreateWithGameTemplate,
+      selectedUsageType,
     ]
   );
 
@@ -307,6 +315,8 @@ const PrivateGameTemplateInformationPage = ({
         gameTemplateId: gameTemplate.id,
         gameTemplateName: gameTemplate.name,
         gameTemplateTag: gameTemplate.tag,
+        usageType: selectedUsageType,
+        currency: 'CREDITS',
       });
 
       const currentCreditsAmount = limits.credits.userBalance.amount;

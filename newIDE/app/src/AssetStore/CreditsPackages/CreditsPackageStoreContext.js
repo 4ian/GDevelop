@@ -7,6 +7,11 @@ import {
 import CreditsPackagesDialog from '../../Credits/CreditsPackagesDialog';
 import CreditsUsageDialog from '../../Credits/CreditsUsageDialog';
 
+type CreditsPackageDialogOpeningOptions = {|
+  missingCredits?: number,
+  showCalloutTip?: boolean,
+|};
+
 type CreditsUsageDialogOptions = {|
   title: React.Node,
   message: React.Node,
@@ -18,9 +23,7 @@ type CreditsPackageStoreState = {|
   fetchCreditsPackages: () => void,
   creditsPackageListingDatas: ?Array<CreditsPackageListingData>,
   error: ?Error,
-  openCreditsPackageDialog: (
-    options: ?{ missingCredits?: number, showCalloutTip?: boolean }
-  ) => void,
+  openCreditsPackageDialog: (?CreditsPackageDialogOpeningOptions) => void,
   closeCreditsPackageDialog: () => void,
   openCreditsUsageDialog: CreditsUsageDialogOptions => void,
 |};
@@ -60,10 +63,6 @@ export const CreditsPackageStoreStateProvider = ({
   const [missingCredits, setMissingCredits] = React.useState<?number>(null);
   const [showCalloutTip, setShowCalloutTip] = React.useState<boolean>(false);
 
-  const [
-    isCreditsUsageDialogOpen,
-    setIsCreditsUsageDialogOpen,
-  ] = React.useState<boolean>(false);
   const [
     creditsUsageDialogConfig,
     setCreditsUsageDialogConfig,
@@ -120,7 +119,7 @@ export const CreditsPackageStoreStateProvider = ({
   );
 
   const openCreditsPackageDialog = React.useCallback(
-    (options: ?{ missingCredits?: number, showCalloutTip?: boolean }) => {
+    (options: ?CreditsPackageDialogOpeningOptions) => {
       if (!creditsPackageListingDatas) return;
 
       setMissingCredits(
@@ -142,16 +141,15 @@ export const CreditsPackageStoreStateProvider = ({
         const packageCreditsAmount = getCreditsAmountFromId(
           creditsPackageListingData.id
         );
-        const selectedPackageCreditsAmount = creditsPackageListingDataWithShorterPositiveDifferenceInCredits
+        const shortlistedPackageCreditsAmount = creditsPackageListingDataWithShorterPositiveDifferenceInCredits
           ? getCreditsAmountFromId(
               creditsPackageListingDataWithShorterPositiveDifferenceInCredits.id
             )
           : null;
         if (
           packageCreditsAmount > missingCredits &&
-          (!selectedPackageCreditsAmount ||
-            packageCreditsAmount - missingCredits <
-              selectedPackageCreditsAmount - missingCredits)
+          (!shortlistedPackageCreditsAmount ||
+            packageCreditsAmount < shortlistedPackageCreditsAmount)
         ) {
           creditsPackageListingDataWithShorterPositiveDifferenceInCredits = creditsPackageListingData;
         }
@@ -180,7 +178,6 @@ export const CreditsPackageStoreStateProvider = ({
   const openCreditsUsageDialog = React.useCallback(
     (options: CreditsUsageDialogOptions) => {
       setCreditsUsageDialogConfig(options);
-      setIsCreditsUsageDialogOpen(true);
     },
     []
   );
@@ -215,9 +212,9 @@ export const CreditsPackageStoreStateProvider = ({
           showCalloutTip={showCalloutTip}
         />
       )}
-      {isCreditsUsageDialogOpen && creditsUsageDialogConfig && (
+      {creditsUsageDialogConfig && (
         <CreditsUsageDialog
-          onClose={() => setIsCreditsUsageDialogOpen(false)}
+          onClose={() => setCreditsUsageDialogConfig(null)}
           message={creditsUsageDialogConfig.message}
           title={creditsUsageDialogConfig.title}
           onConfirm={creditsUsageDialogConfig.onConfirm}

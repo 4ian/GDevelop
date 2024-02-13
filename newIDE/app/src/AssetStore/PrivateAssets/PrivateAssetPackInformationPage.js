@@ -54,7 +54,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
-import { Avatar } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
 
 const cellSpacing = 8;
 
@@ -292,11 +292,16 @@ const PrivateAssetPackInformationPage = ({
       }
 
       try {
+        const price = privateAssetPackListingData.prices.find(
+          price => price.usageType === selectedUsageType
+        );
         sendAssetPackBuyClicked({
           assetPackId: assetPack.id,
           assetPackName: assetPack.name,
           assetPackTag: assetPack.tag,
           assetPackKind: 'private',
+          usageType: selectedUsageType,
+          currency: price ? price.currency : undefined,
         });
 
         onOpenPurchaseDialog();
@@ -310,6 +315,7 @@ const PrivateAssetPackInformationPage = ({
       privateAssetPackListingData,
       isAlreadyReceived,
       onAssetPackOpen,
+      selectedUsageType,
     ]
   );
 
@@ -333,6 +339,8 @@ const PrivateAssetPackInformationPage = ({
         assetPackName: assetPack.name,
         assetPackTag: assetPack.tag,
         assetPackKind: 'private',
+        currency: 'CREDITS',
+        usageType: selectedUsageType,
       });
 
       const currentCreditsAmount = limits.credits.userBalance.amount;

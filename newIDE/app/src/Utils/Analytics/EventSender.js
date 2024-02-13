@@ -248,6 +248,8 @@ export const sendAssetPackBuyClicked = (options: {|
   assetPackName: string,
   assetPackTag: string,
   assetPackKind: 'public' | 'private' | 'unknown',
+  currency?: string,
+  usageType: string,
 |}) => {
   recordEvent('asset_pack_buy_clicked', options);
 };
@@ -264,6 +266,8 @@ export const sendGameTemplateBuyClicked = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
   gameTemplateTag: string,
+  currency?: string,
+  usageType: string,
 |}) => {
   recordEvent('game_template_buy_clicked', options);
 };

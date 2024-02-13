@@ -861,7 +861,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                     />
                     <div style={styles.openProductContainer}>
                       <FlatButton
-                        label={<Trans>Open product page</Trans>}
+                        label={<Trans>Open in Store</Trans>}
                         onClick={() => {
                           // Ensure this is a private pack and we are on the store.
                           if (

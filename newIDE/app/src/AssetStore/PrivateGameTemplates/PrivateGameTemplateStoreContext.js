@@ -17,6 +17,7 @@ import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetS
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
 import { sendGameTemplateInformationOpened } from '../../Utils/Analytics/EventSender';
+import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -254,7 +255,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching game templates from the store...');
         fetchGameTemplates();
-      }, 5000);
+      }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchGameTemplates, isLoading]

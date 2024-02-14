@@ -6,6 +6,7 @@ import {
 } from '../../Utils/GDevelopServices/Shop';
 import CreditsPackagesDialog from '../../Credits/CreditsPackagesDialog';
 import CreditsUsageDialog from '../../Credits/CreditsUsageDialog';
+import { CREDITS_PACKAGES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 type CreditsPackageDialogOpeningOptions = {|
   missingCredits?: number,
@@ -112,7 +113,7 @@ export const CreditsPackageStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching credit packages from the store...');
         fetchCreditsPackages();
-      }, 8000);
+      }, CREDITS_PACKAGES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchCreditsPackages]

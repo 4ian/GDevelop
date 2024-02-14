@@ -4,6 +4,7 @@ import {
   type Announcement,
   listAllAnnouncements,
 } from '../Utils/GDevelopServices/Announcement';
+import { ANNOUNCEMENTS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 
 type AnnouncementsFeedState = {|
   announcements: ?(Announcement[]),
@@ -68,7 +69,7 @@ export const AnnouncementsFeedStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching announcements from the api...');
         fetchAnnouncements();
-      }, 1000);
+      }, ANNOUNCEMENTS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchAnnouncements, announcements, isLoading]

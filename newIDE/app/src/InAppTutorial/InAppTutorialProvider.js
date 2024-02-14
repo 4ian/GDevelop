@@ -8,6 +8,7 @@ import {
   type InAppTutorialShortHeader,
   type InAppTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
+import { IN_APP_TUTORIALS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 
 type Props = {| children: React.Node |};
 
@@ -78,7 +79,7 @@ const InAppTutorialProvider = (props: Props) => {
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching in-app tutorials...');
         loadInAppTutorials();
-      }, 1000);
+      }, IN_APP_TUTORIALS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [loadInAppTutorials]

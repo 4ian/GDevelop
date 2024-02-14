@@ -4,6 +4,7 @@ import {
   listProductLicenses,
   type ProductLicense,
 } from '../../Utils/GDevelopServices/Shop';
+import { PRODUCT_LICENSES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 type ProductLicenseStoreState = {|
   fetchProductLicenses: ({
@@ -97,7 +98,7 @@ export const ProductLicenseStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching product licenses...');
         fetchProductLicenses();
-      }, 8000);
+      }, PRODUCT_LICENSES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchProductLicenses, assetPackLicenses, gameTemplateLicenses]

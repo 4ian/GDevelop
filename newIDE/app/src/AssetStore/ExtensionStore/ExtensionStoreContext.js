@@ -12,6 +12,7 @@ import {
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { EXTENSIONS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const emptySearchText = '';
 
@@ -138,7 +139,7 @@ export const ExtensionStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching extensions from extension store...');
         fetchExtensionsAndFilters();
-      }, 5000);
+      }, EXTENSIONS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]

@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import {
-  listUserPurchases,
-  type PrivateGameTemplateListingData,
-} from '../../Utils/GDevelopServices/Shop';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
@@ -81,11 +78,12 @@ const PrivateGameTemplatePurchaseDialog = ({
 }: Props) => {
   const {
     profile,
-    getAuthorizationHeader,
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
     receivedGameTemplates,
     onPurchaseSuccessful,
+    onRefreshGameTemplatePurchases,
+    gameTemplatePurchases,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
@@ -172,45 +170,37 @@ const PrivateGameTemplatePurchaseDialog = ({
     []
   );
 
-  const checkUserPurchases = React.useCallback(
-    async () => {
-      if (!profile) return;
-      try {
-        const userPurchases = await listUserPurchases(getAuthorizationHeader, {
-          userId: profile.id,
-          productType: 'game-template',
-          role: 'receiver',
-        });
+  // This effect will be triggered when the game template purchases change,
+  // to check if the user has just bought the product.
+  React.useEffect(
+    () => {
+      const checkIfPurchaseIsDone = async () => {
         if (
-          userPurchases.find(
+          isPurchasing &&
+          gameTemplatePurchases &&
+          gameTemplatePurchases.find(
             userPurchase =>
               userPurchase.productId === privateGameTemplateListingData.id
           )
         ) {
           // We found the purchase, the user has bought the game template.
-          // We do not close the dialog yet, as we need to trigger a refresh of the purchases.
+          // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
         }
-      } catch (error) {
-        console.error('Unable to get the user purchases', error);
-        await showAlert({
-          title: t`An error happened`,
-          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your game template!`,
-        });
-      }
+      };
+      checkIfPurchaseIsDone();
     },
     [
-      profile,
-      getAuthorizationHeader,
+      isPurchasing,
+      gameTemplatePurchases,
       privateGameTemplateListingData,
       onPurchaseSuccessful,
-      showAlert,
     ]
   );
 
   useInterval(
     () => {
-      checkUserPurchases();
+      onRefreshGameTemplatePurchases();
     },
     isPurchasing ? 3900 : null
   );

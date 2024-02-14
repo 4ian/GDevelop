@@ -32,7 +32,7 @@ import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
-import CircularProgress from '../../UI/CircularProgress';
+import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 const styles = {
   campaign: {
@@ -73,14 +73,14 @@ type Props = {|
 |};
 
 const MarketingPlans = ({ game }: Props) => {
-  const {
-    profile,
-    limits,
-    getAuthorizationHeader,
-    onRefreshLimits,
-  } = React.useContext(AuthenticatedUserContext);
+  const { profile, limits, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
+  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showConfirmation, showAlert } = useAlertDialog();
+  const { showAlert } = useAlertDialog();
   const [marketingPlans, setMarketingPlans] = React.useState<
     MarketingPlan[] | null
   >(null);
@@ -93,7 +93,6 @@ const MarketingPlans = ({ game }: Props) => {
   const [gameFeaturingsError, setGameFeaturingsError] = React.useState<?Error>(
     null
   );
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const {
     activeBasicFeaturing,
@@ -224,62 +223,53 @@ const MarketingPlans = ({ game }: Props) => {
 
       const currentCreditsAmount = limits.credits.userBalance.amount;
       if (currentCreditsAmount < packCreditsAmount) {
-        await showAlert({
-          title: t`Get Featuring`,
-          message: t`You do not have enough credits to purchase the ${translatedName} game featuring. You currently have ${currentCreditsAmount} credits.`,
+        openCreditsPackageDialog({
+          missingCredits: packCreditsAmount - currentCreditsAmount,
         });
         return;
       }
 
-      const response = await showConfirmation({
-        title: activeFeaturing ? t`Extend Featuring` : t`Get Featuring`,
-        message: activeFeaturing
-          ? t`You are about to use ${packCreditsAmount} credits to extend the game featuring ${translatedName} for your game ${
-              game.gameName
-            }. Continue?`
-          : t`You are about to use ${packCreditsAmount} credits to purchase the game featuring ${translatedName} for your game ${
-              game.gameName
-            }. Continue?`,
-        confirmButtonLabel: activeFeaturing
-          ? t`Extend featuring`
-          : t`Get featuring`,
+      openCreditsUsageDialog({
+        title: activeFeaturing ? (
+          <Trans>Extend Featuring</Trans>
+        ) : (
+          <Trans>Get Featuring</Trans>
+        ),
+        message: activeFeaturing ? (
+          <Trans>
+            You are about to use {packCreditsAmount} credits to extend the game
+            featuring {translatedName} for your game {game.gameName}. Continue?
+          </Trans>
+        ) : (
+          <Trans>
+            You are about to use {packCreditsAmount} credits to purchase the
+            game featuring {translatedName} for your game {game.gameName}.
+            Continue?
+          </Trans>
+        ),
+        onConfirm: async () => {
+          await buyGameFeaturing(getAuthorizationHeader, {
+            gameId: game.id,
+            usageType: id,
+            userId: profile.id,
+          });
+          await fetchGameFeaturings();
+        },
+        successMessage:
+          marketingPlan.id === 'featuring-basic' ? (
+            <Trans>
+              🎉 Congrats on getting the {translatedName} featuring for your
+              game {game.gameName}! Ensure that your game is public and you have
+              configured a thumbnail for gd.games.
+            </Trans>
+          ) : (
+            <Trans>
+              🎉 Congrats on getting the {translatedName} featuring for your
+              game {game.gameName}. We will get in touch with you to get the
+              campaign up!
+            </Trans>
+          ),
       });
-      if (!response) return;
-
-      try {
-        setIsLoading(true);
-        await buyGameFeaturing(getAuthorizationHeader, {
-          gameId: game.id,
-          usageType: id,
-          userId: profile.id,
-        });
-        // Refresh the game featurings and the credits.
-        await fetchGameFeaturings();
-        await onRefreshLimits();
-        if (marketingPlan.id === 'featuring-basic') {
-          showAlert({
-            title: t`Featuring purchased 🎉`,
-            message: t`Congrats on getting the ${translatedName} featuring for your game ${
-              game.gameName
-            }! Ensure that your game is public and you have configured a thumbnail for gd.games.`,
-          });
-        } else {
-          showAlert({
-            title: t`Featuring purchased 🎉`,
-            message: t`Congrats on getting the ${translatedName} featuring for your game ${
-              game.gameName
-            }. We will get in touch with you to get the campaign up!`,
-          });
-        }
-      } catch {
-        await showAlert({
-          title: t`Could not purchase featuring`,
-          message: t`An error happened while purchasing the featuring. Verify your internet connection or try again later.`,
-        });
-        return;
-      } finally {
-        setIsLoading(false);
-      }
     },
     [
       game,
@@ -287,10 +277,10 @@ const MarketingPlans = ({ game }: Props) => {
       limits,
       profile,
       showAlert,
-      showConfirmation,
       getActiveFeaturing,
       fetchGameFeaturings,
-      onRefreshLimits,
+      openCreditsPackageDialog,
+      openCreditsUsageDialog,
     ]
   );
 
@@ -438,15 +428,7 @@ const MarketingPlans = ({ game }: Props) => {
                         primary={!activeFeaturing}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
-                          isLoading ? (
-                            <Column
-                              noMargin
-                              justifyContent="center"
-                              alignItems="center"
-                            >
-                              <CircularProgress size={20} />
-                            </Column>
-                          ) : activeFeaturing ? (
+                          activeFeaturing ? (
                             activeFeaturing.featuring ===
                             'games-platform-home' ? (
                               <Trans>Extend</Trans>
@@ -458,7 +440,6 @@ const MarketingPlans = ({ game }: Props) => {
                           )
                         }
                         fullWidth
-                        disabled={isLoading}
                       />
                     </ColumnStackLayout>
                   </div>

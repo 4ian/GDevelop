@@ -70,12 +70,14 @@ const PasswordPromptDialog = (props: {
 type Props = {|
   creditsPackageListingData: CreditsPackageListingData,
   onClose: () => void,
+  onCloseWhenPurchaseSuccessful: () => void,
   simulateAppStoreProduct?: boolean,
 |};
 
 const CreditsPackagePurchaseDialog = ({
   creditsPackageListingData,
   onClose,
+  onCloseWhenPurchaseSuccessful,
   simulateAppStoreProduct,
 }: Props) => {
   const {
@@ -301,7 +303,13 @@ const CreditsPackagePurchaseDialog = ({
     <FlatButton
       key="cancel"
       label={purchaseSuccessful ? <Trans>Close</Trans> : <Trans>Cancel</Trans>}
-      onClick={onClose}
+      onClick={() => {
+        if (purchaseSuccessful) {
+          onCloseWhenPurchaseSuccessful();
+        }
+
+        onClose();
+      }}
     />,
     allowPurchase ? (
       <DialogPrimaryButton

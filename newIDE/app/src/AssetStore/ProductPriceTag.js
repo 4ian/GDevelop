@@ -20,18 +20,23 @@ type FormatProps = {|
     | PrivateGameTemplateListingData
     | CreditsPackageListingData,
   i18n: I18nType,
+  usageType?: string,
 |};
 
 export const formatProductPrice = ({
   i18n,
   productListingData,
+  usageType,
 }: FormatProps): string => {
   const appStoreProduct = shouldUseAppStoreProduct()
     ? getAppStoreProduct(productListingData.appStoreProductId)
     : null;
   if (appStoreProduct) return appStoreProduct.price;
 
-  const price = productListingData.prices[0];
+  const price = usageType
+    ? productListingData.prices.find(price => price.usageType === usageType)
+    : // If no usage type is specified, use the first price.
+      productListingData.prices[0];
   if (!price) return '';
 
   const currencyCode = price.currency === 'USD' ? '$' : '€';
@@ -50,17 +55,19 @@ type ProductPriceOrOwnedProps = {|
     | PrivateGameTemplateListingData
     | CreditsPackageListingData,
   i18n: I18nType,
+  usageType?: string,
   owned?: boolean,
 |};
 
 export const getProductPriceOrOwnedLabel = ({
   i18n,
   productListingData,
+  usageType,
   owned,
 }: ProductPriceOrOwnedProps): string => {
   return owned
     ? i18n._(t`✅ Owned`)
-    : formatProductPrice({ i18n, productListingData });
+    : formatProductPrice({ i18n, productListingData, usageType });
 };
 
 type ProductPriceTagProps = {|
@@ -68,6 +75,7 @@ type ProductPriceTagProps = {|
     | PrivateAssetPackListingData
     | PrivateGameTemplateListingData
     | CreditsPackageListingData,
+  usageType?: string,
   /**
    * To be used when the component is over an element for which
    * we don't control the background (e.g. an image).
@@ -78,6 +86,7 @@ type ProductPriceTagProps = {|
 
 const ProductPriceTag = ({
   productListingData,
+  usageType,
   withOverlay,
   owned,
 }: ProductPriceTagProps) => {
@@ -87,6 +96,7 @@ const ProductPriceTag = ({
         const label = getProductPriceOrOwnedLabel({
           i18n,
           productListingData,
+          usageType,
           owned,
         });
 

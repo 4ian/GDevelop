@@ -1385,6 +1385,8 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ],
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
+  gameTemplatePurchases: [],
+  assetPackPurchases: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
   onCancelLogin: () => {},
@@ -1407,6 +1409,12 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshLimits: async () => {
     console.info('This should refresh the limits');
+  },
+  onRefreshGameTemplatePurchases: async () => {
+    console.info('This should refresh the game template purchases');
+  },
+  onRefreshAssetPackPurchases: async () => {
+    console.info('This should refresh the asset pack purchases');
   },
   onPurchaseSuccessful: async () => {
     console.info('This should refresh the assets');
@@ -2463,6 +2471,7 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   createdAt: '2020-01-01',
   thumbnailUrls: [],
   prices: [],
+  creditPrices: [],
   appStoreProductId: 'fake-app-store-product-id',
   includedListableProductIds: [],
   sellerStripeAccountId: 'fake-seller-stripe-account-id',

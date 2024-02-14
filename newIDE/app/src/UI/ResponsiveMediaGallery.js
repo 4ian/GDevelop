@@ -80,7 +80,7 @@ type Props = {|
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ResponseMediaGallery = ({
+const ResponsiveMediaGallery = ({
   mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
@@ -282,4 +282,4 @@ const ResponseMediaGallery = ({
   );
 };
 
-export default ResponseMediaGallery;
+export default ResponsiveMediaGallery;

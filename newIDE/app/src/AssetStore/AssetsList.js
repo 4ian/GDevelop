@@ -50,6 +50,9 @@ import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateG
 import { type AssetStorePageState } from './AssetStoreNavigator';
 import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
+import HelpIcon from '../UI/HelpIcon';
+import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
+import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 
 const ASSETS_DISPLAY_LIMIT = 250;
 
@@ -140,13 +143,24 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  previewImageContainer: {
+    display: 'flex',
+    flex: 0.7,
+    alignItems: 'flex-start',
+  },
   previewImage: {
-    width: 200,
+    width: '100%',
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
-    objectFit: 'cover',
+    objectFit: 'contain',
     position: 'relative',
+  },
+  openProductContainer: {
+    display: 'flex',
+    paddingLeft: 32, // To align with licensing options.
+    marginTop: 8,
+    marginBottom: 8,
   },
 };
 
@@ -214,7 +228,10 @@ type Props = {|
   noResultsPlaceHolder?: React.Node,
   error?: ?Error,
   onPrivateAssetPackSelection?: (
-    privateAssetPackListingData: PrivateAssetPackListingData
+    privateAssetPackListingData: PrivateAssetPackListingData,
+    options?: {|
+      forceProductPage?: boolean,
+    |}
   ) => void,
   onPublicAssetPackSelection?: (assetPack: PublicAssetPack) => void,
   onPrivateGameTemplateSelection?: (
@@ -263,9 +280,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       error: gameTemplateStoreError,
       fetchGameTemplates,
     } = React.useContext(PrivateGameTemplateStoreContext);
-    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
-      AuthenticatedUserContext
-    );
+    const {
+      receivedAssetPacks,
+      receivedGameTemplates,
+      assetPackPurchases,
+    } = React.useContext(AuthenticatedUserContext);
     const [
       authorPublicProfile,
       setAuthorPublicProfile,
@@ -659,6 +678,23 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [openedAssetPack, licenses]
     );
 
+    const privateAssetPackLicense = React.useMemo(
+      () =>
+        getUserProductPurchaseUsageType({
+          productId:
+            openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+          receivedProducts: receivedAssetPacks,
+          productPurchases: assetPackPurchases,
+          allProductListingDatas: allPrivateAssetPackListingDatas,
+        }),
+      [
+        assetPackPurchases,
+        openedAssetPack,
+        allPrivateAssetPackListingDatas,
+        receivedAssetPacks,
+      ]
+    );
+
     return (
       <ScrollView
         ref={scrollView}
@@ -741,7 +777,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Column>
             <ResponsiveLineStackLayout>
               {packMainImageUrl && (
-                <Line>
+                <div style={styles.previewImageContainer}>
                   <CorsAwareImage
                     key={openedAssetPack.name}
                     style={styles.previewImage}
@@ -755,7 +791,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                     alt={`Preview image of asset pack ${openedAssetPack.name}`}
                   />
                   <LargeSpacer />
-                </Line>
+                </div>
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
@@ -807,6 +843,45 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                       {authorPublicProfile.username || ''}
                     </Link>
                   </Text>
+                )}
+                {privateAssetPackLicense && onPrivateAssetPackSelection && (
+                  <Column noMargin>
+                    <Line noMargin>
+                      <Text size="sub-title">
+                        <Trans>Licensing</Trans>
+                      </Text>
+                      <HelpIcon
+                        size="small"
+                        helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
+                      />
+                    </Line>
+                    <OwnedProductLicense
+                      productType="asset-pack"
+                      ownedLicense={privateAssetPackLicense}
+                    />
+                    <div style={styles.openProductContainer}>
+                      <FlatButton
+                        label={<Trans>Open in Store</Trans>}
+                        onClick={() => {
+                          // Ensure this is a private pack and we are on the store.
+                          if (
+                            !openedAssetPack.id ||
+                            !allPrivateAssetPackListingDatas ||
+                            !currentPage
+                          )
+                            return;
+                          const assetPackListingData = allPrivateAssetPackListingDatas.find(
+                            listingData => listingData.id === openedAssetPack.id
+                          );
+                          if (!assetPackListingData) return;
+                          onPrivateAssetPackSelection(assetPackListingData, {
+                            forceProductPage: true,
+                          });
+                        }}
+                        primary
+                      />
+                    </div>
+                  </Column>
                 )}
               </Column>
             </ResponsiveLineStackLayout>

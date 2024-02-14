@@ -56,6 +56,7 @@ import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageP
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
+import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
 
 type Props = {|
   authentication: Authentication,
@@ -208,7 +209,9 @@ export default class AuthenticatedUserProvider extends React.Component<
         },
         onRefreshSubscription: this._fetchUserSubscriptionLimitsAndUsages,
         onRefreshLimits: this._fetchUserLimits,
-        onPurchaseSuccessful: this._fetchUserPurchases,
+        onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
+        onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onPurchaseSuccessful: this._fetchUserProducts,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
           sendEmailAutomatically,
@@ -453,6 +456,38 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading received game templates:', error);
       }
     );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'game-template',
+      role: 'receiver',
+    }).then(
+      gameTemplatePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            gameTemplatePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading game template purchases:', error);
+      }
+    );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'asset-pack',
+      role: 'receiver',
+    }).then(
+      assetPackPurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            assetPackPurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading asset pack purchases:', error);
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -634,7 +669,59 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserPurchases = async () => {
+  _fetchUserGameTemplatePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const gameTemplatePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'game-template',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          gameTemplatePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading game template purchases:', error);
+    }
+  };
+
+  _fetchUserAssetPackPurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const assetPackPurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'asset-pack',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          assetPackPurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading asset pack purchases:', error);
+    }
+  };
+
+  _fetchUserProducts = async () => {
     await Promise.all([
       this._fetchUserAssetPacks(),
       this._fetchUserAssetShortHeaders(),

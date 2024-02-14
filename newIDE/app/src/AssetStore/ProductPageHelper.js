@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   type PrivateAssetPackListingData,
   type PrivateGameTemplateListingData,
+  type Purchase,
 } from '../Utils/GDevelopServices/Shop';
 import {
   type PrivateAssetPack,
@@ -212,4 +213,59 @@ export const getProductsIncludedInBundleTiles = <
       return null;
     })
     .filter(Boolean);
+};
+
+// A product can be purchased directly or as part of a bundle.
+// We consider both the same way for the moment and use either
+// the product purchase usage type or the bundle purchase usage type.
+// In case the user has both, we consider the product purchase as the
+// most important one.
+export const getUserProductPurchaseUsageType = <
+  T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
+  U: PrivateAssetPack | PrivateGameTemplate
+>({
+  productId,
+  receivedProducts,
+  productPurchases,
+  allProductListingDatas,
+}: {|
+  productId: ?string,
+  receivedProducts: ?Array<U>,
+  productPurchases: ?Array<Purchase>,
+  allProductListingDatas: ?Array<T>,
+|}): ?string => {
+  // User is not authenticated or still loading.
+  if (!receivedProducts || !productPurchases || !allProductListingDatas)
+    return null;
+
+  const currentReceivedProduct = receivedProducts.find(
+    receivedProduct => receivedProduct.id === productId
+  );
+  // User does not own the product.
+  if (!currentReceivedProduct) return null;
+
+  const productPurchase = productPurchases.find(
+    productPurchase => productPurchase.productId === currentReceivedProduct.id
+  );
+  if (!productPurchase) {
+    // It is possible the user has the product as part of a bundle.
+    const productBundleListingData = allProductListingDatas.find(
+      productListingData =>
+        productListingData.includedListableProductIds &&
+        productListingData.includedListableProductIds.includes(productId)
+    );
+    if (productBundleListingData) {
+      const receivedProductBundlePurchase = productPurchases.find(
+        productPurchase =>
+          productPurchase.productId === productBundleListingData.id
+      );
+      if (receivedProductBundlePurchase) {
+        return receivedProductBundlePurchase.usageType;
+      }
+    }
+
+    return null;
+  }
+
+  return productPurchase.usageType;
 };

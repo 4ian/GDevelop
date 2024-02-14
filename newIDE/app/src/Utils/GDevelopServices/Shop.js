@@ -4,6 +4,7 @@ import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
 import { isURL } from '../../ResourcesList/ResourceUtils';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -12,8 +13,14 @@ const client = axios.create({
 type StripeAndPaypalPrice = {|
   value: number,
   name: string,
+  usageType: string,
   stripePriceId: string,
-  currency?: 'USD' | 'EUR',
+  currency: 'USD' | 'EUR',
+|};
+
+type CreditPrice = {|
+  amount: number,
+  usageType: string,
 |};
 
 type ProductListingData = {|
@@ -37,6 +44,10 @@ type StripeAndPaypalSellableAttributes = {|
   stripeProductId: string,
 |};
 
+type CreditsClaimableAttributes = {|
+  creditPrices: Array<CreditPrice>,
+|};
+
 type AppStoreProductAttributes = {|
   appStoreProductId: string | null,
   /** The thumbnails to use when on the app store - otherwise, use thumbnailUrls as usual. */
@@ -47,6 +58,7 @@ export type PrivateAssetPackListingData = {|
   ...ProductListingData,
   ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
+  ...CreditsClaimableAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
 |};
@@ -55,6 +67,7 @@ export type PrivateGameTemplateListingData = {|
   ...ProductListingData,
   ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
+  ...CreditsClaimableAttributes,
   productType: 'GAME_TEMPLATE',
   listing: 'GAME_TEMPLATE',
 |};
@@ -67,16 +80,30 @@ export type CreditsPackageListingData = {|
   listing: 'CREDITS_PACKAGE',
 |};
 
-type Purchase = {|
+export type Purchase = {|
   id: string,
+  productType: string,
+  usageType: string,
   productId: string,
   buyerId: string,
   receiverId: string,
   createdAt: string,
   cancelledAt?: string,
   stripeCheckoutSessionId?: string,
+  stripeCustomerId?: string,
   appStoreTransactionId?: string,
+  paypalPayerId?: string,
   paypalOrderId?: string,
+  manualGiftReason?: string,
+  creditsAmount?: number,
+  productType: 'ASSET_PACK' | 'GAME_TEMPLATE' | 'CREDITS_PACKAGE',
+|};
+
+type ProductLicenseType = 'personal' | 'commercial' | 'unlimited';
+export type ProductLicense = {|
+  id: ProductLicenseType,
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
 |};
 
 export const listListedPrivateAssetPacks = async ({
@@ -306,4 +333,53 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
     return tokenForPrivateGameTemplateAuthorization;
   }
   return null;
+};
+
+export const listProductLicenses = async ({
+  productType,
+}: {|
+  productType: 'asset-pack' | 'game-template',
+|}): Promise<ProductLicense[]> => {
+  const response = await client.get('/product-license', {
+    params: {
+      productType,
+    },
+  });
+  const productLicenses = response.data;
+
+  if (!Array.isArray(productLicenses)) {
+    throw new Error('Invalid response from the product licenses API');
+  }
+
+  return productLicenses;
+};
+
+export const buyProductWithCredits = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    productId,
+    usageType,
+    userId,
+  }: {|
+    productId: string,
+    usageType: string,
+    userId: string,
+  |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    `/product/${productId}/action/buy-with-credits`,
+    {
+      usageType: 'product-purchase',
+      priceUsageType: usageType,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 };

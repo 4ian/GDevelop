@@ -7,8 +7,8 @@ import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import CreditsPackagesDialog from './CreditsPackagesDialog';
 import Coin from './Icons/Coin';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 
 const styles = {
   container: {
@@ -26,10 +26,9 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
   const { limits, onRefreshLimits } = React.useContext(
     AuthenticatedUserContext
   );
-  const [
-    creditsPackDialogOpen,
-    setCreditsPackDialogOpen,
-  ] = React.useState<boolean>(false);
+  const { openCreditsPackageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
 
   // Ensure credits are refreshed when this component is shown.
   React.useEffect(
@@ -71,7 +70,9 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
             <Column>
               <FlatButton
                 label={<Trans>Get credit packs</Trans>}
-                onClick={() => setCreditsPackDialogOpen(true)}
+                onClick={() =>
+                  openCreditsPackageDialog({ showCalloutTip: true })
+                }
                 style={{
                   color: gdevelopTheme.credits.color,
                   borderColor: gdevelopTheme.credits.color,
@@ -81,11 +82,6 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
           )}
         </ResponsiveLineStackLayout>
       </div>
-      {creditsPackDialogOpen && (
-        <CreditsPackagesDialog
-          onClose={() => setCreditsPackDialogOpen(false)}
-        />
-      )}
     </>
   );
 };

@@ -37,7 +37,21 @@ const privateAssetPackListingData: PrivateAssetPackListingData = {
   description: '5 assets',
   name: 'French Food',
   categories: ['props'],
-  prices: [{ value: 1500, name: 'default', stripePriceId: 'stripePriceId' }],
+  prices: [
+    {
+      value: 1500,
+      name: 'commercial_USD',
+      stripePriceId: 'stripePriceId',
+      usageType: 'commercial',
+      currency: 'USD',
+    },
+  ],
+  creditPrices: [
+    {
+      amount: 1500,
+      usageType: 'commercial',
+    },
+  ],
   appStoreProductId: null,
   sellerStripeAccountId: 'sellerStripeProductId',
   stripeProductId: 'stripeProductId',

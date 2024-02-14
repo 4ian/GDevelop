@@ -1659,14 +1659,14 @@ const MainFrame = (props: Props) => {
     [hasPreviewsRunning, launchPreview]
   );
 
-  const openLayout = React.useCallback(
+  const getEditorsTabStateWithScene = React.useCallback(
     (
+      editorTabs: EditorTabsState,
       name: string,
       {
-        openEventsEditor = true,
-        openSceneEditor = true,
-      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
-      editorTabs = state.editorTabs
+        openEventsEditor,
+        openSceneEditor,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean }
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
@@ -1681,17 +1681,35 @@ const MainFrame = (props: Props) => {
       const tabsWithSceneEditor = openSceneEditor
         ? openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
-      const tabsWithSceneAndEventsEditors = openEventsEditor
+      return openEventsEditor
         ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
+    },
+    [getEditorOpeningOptions]
+  );
 
+  const openLayout = React.useCallback(
+    (
+      name: string,
+      {
+        openEventsEditor = true,
+        openSceneEditor = true,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
+      editorTabs?: EditorTabsState
+    ): void => {
       setState(state => ({
         ...state,
-        editorTabs: tabsWithSceneAndEventsEditors,
+        editorTabs: getEditorsTabStateWithScene(
+          editorTabs || state.editorTabs,
+          name,
+          {
+            openEventsEditor,
+            openSceneEditor,
+          }
+        ),
       }));
-      return tabsWithSceneAndEventsEditors;
     },
-    [setState, state.editorTabs, getEditorOpeningOptions]
+    [setState, getEditorsTabStateWithScene]
   );
 
   const openExternalEvents = React.useCallback(
@@ -1703,7 +1721,6 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external events', name })
         ),
       }));
-      openProjectManager(false);
     },
     [setState, getEditorOpeningOptions]
   );
@@ -1717,9 +1734,8 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external layout', name })
         ),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openEventsFunctionsExtension = React.useCallback(
@@ -1741,9 +1757,8 @@ const MainFrame = (props: Props) => {
           },
         }),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
@@ -1967,6 +1982,32 @@ const MainFrame = (props: Props) => {
     [openLayout, i18n]
   );
 
+  const getEditorsTabStateWithAllScenes = React.useCallback(
+    (newState: {|
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    |}): EditorTabsState => {
+      const { currentProject, editorTabs } = newState;
+      if (!currentProject) return editorTabs;
+      const layoutsCount = currentProject.getLayoutsCount();
+      if (layoutsCount === 0) return editorTabs;
+
+      let editorTabsWithAllScenes = editorTabs;
+      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+        editorTabsWithAllScenes = getEditorsTabStateWithScene(
+          editorTabsWithAllScenes,
+          currentProject.getLayoutAt(layoutIndex).getName(),
+          {
+            openSceneEditor: true,
+            openEventsEditor: true,
+          }
+        );
+      }
+      return editorTabsWithAllScenes;
+    },
+    [getEditorsTabStateWithScene]
+  );
+
   const openAllScenes = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -1977,23 +2018,16 @@ const MainFrame = (props: Props) => {
       const layoutsCount = currentProject.getLayoutsCount();
       if (layoutsCount === 0) return;
 
-      let editorTabs = state.editorTabs;
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorsTabStateWithAllScenes(newState),
+      }));
 
-      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-        editorTabs = openLayout(
-          currentProject.getLayoutAt(layoutIndex).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      }
       setIsLoadingProject(false);
       setLoaderModalProgress(null, null);
       openProjectManager(false);
     },
-    [openLayout, state.editorTabs]
+    [getEditorsTabStateWithAllScenes, setState]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -3080,10 +3114,7 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onOpenResources={() => {
-              openResources();
-              openProjectManager(false);
-            }}
+            onOpenResources={openResources}
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }

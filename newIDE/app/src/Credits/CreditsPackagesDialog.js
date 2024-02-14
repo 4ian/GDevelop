@@ -162,8 +162,11 @@ const CreditsPackagesDialog = ({
               <PlaceholderLoader />
             ) : (
               creditsPackageListingDatasArrays.map(
-                creditsPackageListingDatasArray => (
-                  <ResponsiveLineStackLayout noColumnMargin>
+                (creditsPackageListingDatasArray, lineIndex) => (
+                  <ResponsiveLineStackLayout
+                    noColumnMargin
+                    key={`line-${lineIndex}`}
+                  >
                     {creditsPackageListingDatasArray.map(
                       (creditsPackageListingData, index) => {
                         const {
@@ -280,7 +283,7 @@ const CreditsPackagesDialog = ({
             <CreditsPackagePurchaseDialog
               creditsPackageListingData={purchasingCreditsPackageListingData}
               onClose={() => setPurchasingCreditsPackageListingData(null)}
-              onPurchaseSuccessful={() => {
+              onCloseWhenPurchaseSuccessful={() => {
                 if (suggestedPackage) {
                   // If a package was suggested, we can close the dialog as the user
                   // is going through a flow to purchase a product.

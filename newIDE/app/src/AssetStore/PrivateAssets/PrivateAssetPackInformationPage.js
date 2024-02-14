@@ -492,49 +492,6 @@ const PrivateAssetPackInformationPage = ({
                             </Text>
                           </div>
                         )}
-                        {!isAlreadyReceived &&
-                          showPersonalUsageRedemptionBanner && (
-                            <div style={styles.redeemConditionsContainer}>
-                              <Line noMargin alignItems="center">
-                                <img
-                                  src="res/small-diamond.svg"
-                                  style={styles.redeemDiamondIcon}
-                                  alt="diamond"
-                                />
-                                <Text color="inherit" noMargin>
-                                  <Trans>
-                                    Personal license for claim with Gold
-                                    subscription
-                                  </Trans>
-                                </Text>
-                              </Line>
-                              <Spacer />
-                              {/* TODO: Do not display for student accounts */}
-                              <div style={{ flexShrink: 0 }}>
-                                <RaisedButton
-                                  primary
-                                  label={
-                                    canRedeemAssetPack ? (
-                                      <Trans>Claim this pack</Trans>
-                                    ) : (
-                                      <Trans>Get a Gold</Trans>
-                                    )
-                                  }
-                                  onClick={
-                                    canRedeemAssetPack
-                                      ? onRedeemAssetPack
-                                      : () =>
-                                          openSubscriptionDialog({
-                                            analyticsMetadata: {
-                                              reason: 'Claim asset pack',
-                                            },
-                                            filter: 'individual',
-                                          })
-                                  }
-                                />
-                              </div>
-                            </div>
-                          )}
                       </LineStackLayout>
                       <LineStackLayout noMargin alignItems="center">
                         <Avatar
@@ -552,6 +509,48 @@ const PrivateAssetPackInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
+                      {!isAlreadyReceived && showPersonalUsageRedemptionBanner && (
+                        <div style={styles.redeemConditionsContainer}>
+                          <Line noMargin alignItems="center">
+                            <img
+                              src="res/small-diamond.svg"
+                              style={styles.redeemDiamondIcon}
+                              alt="diamond"
+                            />
+                            <Text color="inherit" noMargin>
+                              <Trans>
+                                Personal license for claim with Gold
+                                subscription
+                              </Trans>
+                            </Text>
+                          </Line>
+                          <Spacer />
+                          {/* TODO: Do not display for student accounts */}
+                          <div style={{ flexShrink: 0 }}>
+                            <RaisedButton
+                              primary
+                              label={
+                                canRedeemAssetPack ? (
+                                  <Trans>Claim this pack</Trans>
+                                ) : (
+                                  <Trans>Get a Gold</Trans>
+                                )
+                              }
+                              onClick={
+                                canRedeemAssetPack
+                                  ? onRedeemAssetPack
+                                  : () =>
+                                      openSubscriptionDialog({
+                                        analyticsMetadata: {
+                                          reason: 'Claim asset pack',
+                                        },
+                                        filter: 'individual',
+                                      })
+                              }
+                            />
+                          </div>
+                        </div>
+                      )}
                       <Line noMargin>
                         <Text size="sub-title">
                           <Trans>Licensing</Trans>

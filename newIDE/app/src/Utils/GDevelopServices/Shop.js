@@ -433,9 +433,11 @@ export const shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack = ({
 export const redeemPrivateAssetPack = async ({
   privateAssetPackListingData,
   getAuthorizationHeader,
+  userId,
 }: {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   getAuthorizationHeader: () => Promise<string>,
+  userId: string,
 |}): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
   await client.post(
@@ -444,9 +446,8 @@ export const redeemPrivateAssetPack = async ({
       priceUsageType: 'commercial',
     },
     {
-      headers: {
-        Authorization: authorizationHeader,
-      },
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
     }
   );
 };

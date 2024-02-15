@@ -162,6 +162,8 @@ const PrivateAssetPackInformationPage = ({
     getAuthorizationHeader,
     onOpenLoginDialog,
     subscription,
+    onPurchaseSuccessful,
+    onRefreshAssetPackPurchases,
   } = React.useContext(AuthenticatedUserContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
@@ -174,6 +176,9 @@ const PrivateAssetPackInformationPage = ({
   );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
+  const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(
+    false
+  );
   const [
     openSellerPublicProfileDialog,
     setOpenSellerPublicProfileDialog,
@@ -263,12 +268,30 @@ const PrivateAssetPackInformationPage = ({
 
   const onRedeemAssetPack = React.useCallback(
     async () => {
-      await redeemPrivateAssetPack({
-        privateAssetPackListingData,
-        getAuthorizationHeader,
-      });
+      if (!profile || isRedeemingProduct) return;
+      setIsRedeemingProduct(true);
+      try {
+        await redeemPrivateAssetPack({
+          privateAssetPackListingData,
+          getAuthorizationHeader,
+          userId: profile.id,
+        });
+        await Promise.all([
+          onRefreshAssetPackPurchases(),
+          onPurchaseSuccessful(),
+        ]);
+      } finally {
+        setIsRedeemingProduct(false);
+      }
     },
-    [privateAssetPackListingData, getAuthorizationHeader]
+    [
+      privateAssetPackListingData,
+      getAuthorizationHeader,
+      profile,
+      onPurchaseSuccessful,
+      isRedeemingProduct,
+      onRefreshAssetPackPurchases,
+    ]
   );
 
   React.useEffect(
@@ -527,12 +550,15 @@ const PrivateAssetPackInformationPage = ({
                             <RaisedButton
                               primary
                               label={
-                                canRedeemAssetPack ? (
+                                isRedeemingProduct ? (
+                                  <Trans>Please wait</Trans>
+                                ) : canRedeemAssetPack ? (
                                   <Trans>Claim this pack</Trans>
                                 ) : (
                                   <Trans>Get a Gold</Trans>
                                 )
                               }
+                              disabled={isRedeemingProduct}
                               onClick={
                                 canRedeemAssetPack
                                   ? onRedeemAssetPack

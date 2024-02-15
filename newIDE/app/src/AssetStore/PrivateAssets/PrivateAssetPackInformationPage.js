@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   buyProductWithCredits,
   type PrivateAssetPackListingData,
@@ -32,23 +31,22 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import RaisedButton from '../../UI/RaisedButton';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { AssetStoreContext } from '../AssetStoreContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import {
   getBundlesContainingProductTiles,
   getOtherProductsFromSameAuthorTiles,
+  getProductMediaItems,
   getProductsIncludedInBundleTiles,
   getUserProductPurchaseUsageType,
+  OpenProductButton,
+  PurchaseProductButtons,
 } from '../ProductPageHelper';
-import FlatButton from '../../UI/FlatButton';
-import Coin from '../../Credits/Icons/Coin';
 import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import SecureCheckout from '../SecureCheckout/SecureCheckout';
@@ -145,7 +143,6 @@ const PrivateAssetPackInformationPage = ({
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
   const {
     receivedAssetPacks,
-    authenticated,
     profile,
     limits,
     assetPackPurchases,
@@ -319,8 +316,8 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
-  const onPurchaseWithCredits = React.useCallback(
-    async (i18n: I18nType) => {
+  const onClickBuyWithCredits = React.useCallback(
+    async () => {
       if (!privateAssetPackListingData || !assetPack) return;
 
       if (!profile || !limits) {
@@ -394,103 +391,15 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
-  const getBuyButtons = i18n => {
-    if (errorText) return null;
-
-    let creditPrice = privateAssetPackListingData.creditPrices.find(
-      price => price.usageType === selectedUsageType
-    );
-    if (!creditPrice) {
-      // We're probably switching from one pack to another, and the usage type is not available.
-      // Let's reset it.
-      setSelectedUsageType(privateAssetPackListingData.prices[0].usageType);
-      creditPrice = privateAssetPackListingData.creditPrices.find(
-        price =>
-          price.usageType === privateAssetPackListingData.prices[0].usageType
-      );
-      if (!creditPrice) {
-        console.error('Unable to find a credit price for the asset pack');
-        return null;
-      }
-    }
-
-    return (
-      <LineStackLayout>
-        <FlatButton
-          key="buy-asset-pack-with-credits"
-          primary
-          label={<Trans>Buy for {creditPrice.amount} credits</Trans>}
-          onClick={onPurchaseWithCredits}
-          id="buy-asset-pack-with-credits"
-          leftIcon={<Coin fontSize="small" />}
-        />
-        <RaisedButton
-          key="buy-asset-pack"
-          primary
-          label={
-            <Trans>
-              Buy for{' '}
-              {formatProductPrice({
-                i18n,
-                usageType: selectedUsageType,
-                productListingData: privateAssetPackListingData,
-              })}
-            </Trans>
-          }
-          onClick={onClickBuy}
-          id="buy-asset-pack"
-        />
-        {shouldUseOrSimulateAppStoreProduct &&
-          !isAlreadyReceived &&
-          !authenticated && (
-            <Text size="body-small">
-              <Link onClick={onClickBuy} href="">
-                <Trans>Restore a previous purchase</Trans>
-              </Link>
-            </Text>
-          )}
-      </LineStackLayout>
-    );
-  };
-
-  const getOpenButton = i18n => {
-    return (
-      <Column noMargin alignItems="flex-end">
-        <RaisedButton
-          primary
-          label={<Trans>Browse assets</Trans>}
-          onClick={() => onAssetPackOpen(privateAssetPackListingData)}
-          id="browse-assets"
-        />
-      </Column>
-    );
-  };
-
-  const mediaItems = assetPack
-    ? [
-        {
-          kind: 'image',
-          url:
-            (shouldUseOrSimulateAppStoreProduct &&
-              privateAssetPackListingData.appStoreThumbnailUrls &&
-              privateAssetPackListingData.appStoreThumbnailUrls[0]) ||
-            privateAssetPackListingData.thumbnailUrls[0],
-        },
-        ...assetPack.previewImageUrls
-          .map(url => ({
-            kind: 'image',
-            url,
-          }))
-          .concat(
-            assetPack.previewSoundUrls
-              ? assetPack.previewSoundUrls.map(url => ({
-                  kind: 'audio',
-                  url,
-                }))
-              : []
-          ),
-      ]
-    : [];
+  const mediaItems = React.useMemo(
+    () =>
+      getProductMediaItems({
+        product: assetPack,
+        productListingData: privateAssetPackListingData,
+        shouldSimulateAppStoreProduct: simulateAppStoreProduct,
+      }),
+    [assetPack, privateAssetPackListingData, simulateAppStoreProduct]
+  );
 
   return (
     <I18n>
@@ -577,11 +486,30 @@ const PrivateAssetPackInformationPage = ({
                       />
                       <Spacer />
                       {isAlreadyReceived ? (
-                        getOpenButton(i18n)
+                        <OpenProductButton
+                          productListingData={privateAssetPackListingData}
+                          onClick={() =>
+                            onAssetPackOpen(privateAssetPackListingData)
+                          }
+                          label={<Trans>Browse assets</Trans>}
+                        />
                       ) : (
                         <>
-                          <SecureCheckout />
-                          {getBuyButtons(i18n)}
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                          {!errorText && (
+                            <PurchaseProductButtons
+                              i18n={i18n}
+                              productListingData={privateAssetPackListingData}
+                              selectedUsageType={selectedUsageType}
+                              onUsageTypeChange={setSelectedUsageType}
+                              simulateAppStoreProduct={simulateAppStoreProduct}
+                              isAlreadyReceived={isAlreadyReceived}
+                              onClickBuy={onClickBuy}
+                              onClickBuyWithCredits={onClickBuyWithCredits}
+                            />
+                          )}
                         </>
                       )}
                     </ColumnStackLayout>

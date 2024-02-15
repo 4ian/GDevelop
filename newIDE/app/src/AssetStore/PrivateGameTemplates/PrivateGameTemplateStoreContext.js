@@ -94,13 +94,11 @@ export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTe
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
-  onlyAppStorePrivateGameTemplates?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
 export const PrivateGameTemplateStoreStateProvider = ({
-  onlyAppStorePrivateGameTemplates,
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
@@ -138,11 +136,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates(
-            {
-              onlyAppStorePrivateGameTemplates,
-            }
-          );
+          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
 
           console.info(
             `Loaded ${
@@ -183,11 +177,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [
-      isLoading,
-      onlyAppStorePrivateGameTemplates,
-      privateGameTemplateListingDatas,
-    ]
+    [privateGameTemplateListingDatas]
   );
 
   // When the game templates are loaded,
@@ -258,7 +248,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
       }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchGameTemplates, isLoading]
+    [fetchGameTemplates]
   );
 
   const privateGameTemplateListingDatasById = React.useMemo(

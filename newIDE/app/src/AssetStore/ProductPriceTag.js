@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import PriceTag from '../UI/PriceTag';
@@ -13,6 +13,15 @@ import {
   shouldUseAppStoreProduct,
   getAppStoreProduct,
 } from '../Utils/AppStorePurchases';
+import Coin from '../Credits/Icons/Coin';
+import { LineStackLayout } from '../UI/Layout';
+
+const styles = {
+  icon: {
+    width: 12,
+    height: 12,
+  },
+};
 
 type FormatProps = {|
   productListingData:
@@ -21,22 +30,55 @@ type FormatProps = {|
     | CreditsPackageListingData,
   i18n: I18nType,
   usageType?: string,
+  plainText?: boolean,
 |};
 
 export const formatProductPrice = ({
   i18n,
   productListingData,
   usageType,
-}: FormatProps): string => {
-  const appStoreProduct = shouldUseAppStoreProduct()
-    ? getAppStoreProduct(productListingData.appStoreProductId)
-    : null;
-  if (appStoreProduct) return appStoreProduct.price;
+  plainText,
+}: FormatProps): React.Node => {
+  // Only use the app store product if it's a credits package.
+  if (
+    shouldUseAppStoreProduct() &&
+    productListingData.productType === 'CREDITS_PACKAGE'
+  ) {
+    const appStoreProduct = getAppStoreProduct(productListingData.id);
+    return appStoreProduct ? appStoreProduct.price : '';
+  }
 
+  // If we're on mobile, only show credits prices for asset packs & game templates.
+  if (
+    shouldUseAppStoreProduct() &&
+    productListingData.productType !== 'CREDITS_PACKAGE'
+  ) {
+    const creditPrices = productListingData.creditPrices;
+    if (!creditPrices) return '';
+    const creditPrice = usageType
+      ? creditPrices.find(price => price.usageType === usageType)
+      : creditPrices.length > 0
+      ? creditPrices[0]
+      : null;
+
+    if (!creditPrice) return '';
+    return plainText ? (
+      i18n._(t`${creditPrice.amount} credits`)
+    ) : (
+      <LineStackLayout noMargin alignItems="center">
+        <Coin style={styles.icon} />
+        <span>{creditPrice.amount}</span>
+      </LineStackLayout>
+    );
+  }
+
+  const productPrices = productListingData.prices;
   const price = usageType
-    ? productListingData.prices.find(price => price.usageType === usageType)
+    ? productPrices.find(price => price.usageType === usageType)
     : // If no usage type is specified, use the first price.
-      productListingData.prices[0];
+    productPrices.length > 0
+    ? productPrices[0]
+    : null;
   if (!price) return '';
 
   const currencyCode = price.currency === 'USD' ? '$' : '€';
@@ -64,10 +106,15 @@ export const getProductPriceOrOwnedLabel = ({
   productListingData,
   usageType,
   owned,
-}: ProductPriceOrOwnedProps): string => {
-  return owned
-    ? i18n._(t`✅ Owned`)
-    : formatProductPrice({ i18n, productListingData, usageType });
+}: ProductPriceOrOwnedProps): React.Node => {
+  return owned ? (
+    <LineStackLayout noMargin>
+      <span>✅</span>
+      <Trans>Owned</Trans>
+    </LineStackLayout>
+  ) : (
+    formatProductPrice({ i18n, productListingData, usageType })
+  );
 };
 
 type ProductPriceTagProps = {|

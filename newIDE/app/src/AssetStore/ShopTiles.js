@@ -27,6 +27,7 @@ import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 
 const styles = {
   priceTagContainer: {
@@ -289,16 +290,18 @@ export const PromoBundleCard = ({
               border: `2px solid ${gdevelopTheme.palette.secondary}`,
             }}
           >
-            <Line expand noMargin>
-              <CorsAwareImage
-                key={productListingData.name}
-                style={{
-                  ...styles.previewImage,
-                  ...styles.promoImage,
-                }}
-                src={productListingData.thumbnailUrls[0]}
-                alt={`Preview image of bundle ${productListingData.name}`}
-              />
+            <ResponsiveLineStackLayout expand noMargin>
+              <Column alignItems="center" noMargin>
+                <CorsAwareImage
+                  key={productListingData.name}
+                  style={{
+                    ...styles.previewImage,
+                    ...styles.promoImage,
+                  }}
+                  src={productListingData.thumbnailUrls[0]}
+                  alt={`Preview image of bundle ${productListingData.name}`}
+                />
+              </Column>
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
                   {!owned ? (
@@ -309,7 +312,7 @@ export const PromoBundleCard = ({
                     <Trans>You already own this template!</Trans>
                   )}
                 </Text>
-                <Text style={styles.packTitle} color="primary" size="body2">
+                <Text color="primary" size="body2">
                   {!owned ? (
                     productListingData.productType === 'ASSET_PACK' ? (
                       <Trans>
@@ -317,6 +320,7 @@ export const PromoBundleCard = ({
                         {formatProductPrice({
                           i18n,
                           productListingData,
+                          plainText: true,
                         })}
                         !
                       </Trans>
@@ -326,6 +330,7 @@ export const PromoBundleCard = ({
                         {formatProductPrice({
                           i18n,
                           productListingData,
+                          plainText: true,
                         })}
                         !
                       </Trans>
@@ -338,21 +343,23 @@ export const PromoBundleCard = ({
                 </Text>
               </Column>
               <Column justifyContent="center">
-                {!owned ? (
-                  <FlatButton
-                    label={<Trans>See this bundle</Trans>}
-                    onClick={onSelect}
-                    primary
-                  />
-                ) : (
-                  <RaisedButton
-                    label={<Trans>See this bundle</Trans>}
-                    onClick={onSelect}
-                    primary
-                  />
-                )}
+                <Line justifyContent="center">
+                  {!owned ? (
+                    <FlatButton
+                      label={<Trans>See this bundle</Trans>}
+                      onClick={onSelect}
+                      primary
+                    />
+                  ) : (
+                    <RaisedButton
+                      label={<Trans>See this bundle</Trans>}
+                      onClick={onSelect}
+                      primary
+                    />
+                  )}
+                </Line>
               </Column>
-            </Line>
+            </ResponsiveLineStackLayout>
           </div>
         </Line>
       )}

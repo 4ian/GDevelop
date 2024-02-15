@@ -30,7 +30,7 @@ export type CarouselThumbnail = {
   id: string,
   title: string,
   thumbnailUrl: string,
-  overlayText?: string,
+  overlayText?: React.Node,
   overlayTextPosition?: OverlayTextPosition,
   +link?: string,
   +onClick?: () => void,
@@ -163,7 +163,7 @@ const ImageOverlay = ({
   content,
   position,
 }: {|
-  content: string,
+  content: React.Node,
   position: OverlayTextPosition,
 |}) => {
   const positionStyles = {

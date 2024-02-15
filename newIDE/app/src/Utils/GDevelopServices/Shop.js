@@ -106,16 +106,10 @@ export type ProductLicense = {|
   descriptionByLocale: MessageByLocale,
 |};
 
-export const listListedPrivateAssetPacks = async ({
-  onlyAppStorePrivateAssetPacks,
-}: {|
-  onlyAppStorePrivateAssetPacks?: ?boolean,
-|}): Promise<Array<PrivateAssetPackListingData>> => {
-  const response = await client.get('/asset-pack', {
-    params: {
-      withAppStoreProductId: !!onlyAppStorePrivateAssetPacks,
-    },
-  });
+export const listListedPrivateAssetPacks = async (): Promise<
+  Array<PrivateAssetPackListingData>
+> => {
+  const response = await client.get('/asset-pack');
   const assetPacks = response.data;
   if (!Array.isArray(assetPacks)) {
     throw new Error('Invalid response from the asset packs API');
@@ -124,16 +118,10 @@ export const listListedPrivateAssetPacks = async ({
   return assetPacks;
 };
 
-export const listListedPrivateGameTemplates = async ({
-  onlyAppStorePrivateGameTemplates,
-}: {|
-  onlyAppStorePrivateGameTemplates?: ?boolean,
-|}): Promise<Array<PrivateGameTemplateListingData>> => {
-  const response = await client.get('/game-template', {
-    params: {
-      withAppStoreProductId: !!onlyAppStorePrivateGameTemplates,
-    },
-  });
+export const listListedPrivateGameTemplates = async (): Promise<
+  Array<PrivateGameTemplateListingData>
+> => {
+  const response = await client.get('/game-template');
   const gameTemplates = response.data;
   if (!Array.isArray(gameTemplates)) {
     throw new Error('Invalid response from the game templates API');

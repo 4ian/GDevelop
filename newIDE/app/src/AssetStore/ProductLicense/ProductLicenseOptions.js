@@ -56,7 +56,7 @@ const ProductLicenseOptionContent = ({
   onClick?: () => void,
   name: string,
   description: string,
-  formattedPrice?: string,
+  formattedPrice?: React.Node,
   isLicenseOwned: boolean,
 |}) => (
   <ColumnStackLayout noMargin>
@@ -125,7 +125,7 @@ const ProductLicenseOptionButton = ({
   selected: boolean,
   name: string,
   description: string,
-  formattedPrice: string,
+  formattedPrice: React.Node,
   ownedLicense: ?string,
   disabled?: boolean,
 |}) => {

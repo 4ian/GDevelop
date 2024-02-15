@@ -57,6 +57,7 @@ import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import Avatar from '@material-ui/core/Avatar';
 import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const cellSpacing = 8;
 
@@ -154,6 +155,7 @@ const PrivateAssetPackInformationPage = ({
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { showAlert } = useAlertDialog();
   const {
     receivedAssetPacks,
     profile,
@@ -280,6 +282,30 @@ const PrivateAssetPackInformationPage = ({
           onRefreshAssetPackPurchases(),
           onPurchaseSuccessful(),
         ]);
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 402 &&
+          extractedStatusAndCode.code ===
+            'product-redemption/old-redeemed-subscription'
+        ) {
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`The monthly free asset pack perk was not part of your plan at the time you got your subscription to GDevelop. To enjoy this perk, please purchase a new subscription.`,
+          });
+        } else {
+          console.error(
+            'An error occurred when claiming the asset pack:',
+            extractedStatusAndCode
+          );
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`Something wrong happened when claiming the asset pack. Please check your internet connection or try again later.`,
+          });
+        }
       } finally {
         setIsRedeemingProduct(false);
       }
@@ -288,6 +314,7 @@ const PrivateAssetPackInformationPage = ({
       privateAssetPackListingData,
       getAuthorizationHeader,
       profile,
+      showAlert,
       onPurchaseSuccessful,
       isRedeemingProduct,
       onRefreshAssetPackPurchases,

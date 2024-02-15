@@ -46,6 +46,8 @@ const styles = {
   },
   thumbnailContainer: {
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
   },
   redeemableContainer: {
     position: 'absolute',
@@ -67,6 +69,8 @@ const styles = {
   },
   paper: {
     margin: 4,
+    display: 'flex',
+    flexDirection: 'column',
   },
   packTitle: {
     ...textEllipsisStyle,

@@ -28,9 +28,20 @@ const useExampleOrGameTemplateDialogs = ({
     setSelectedExampleShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
   const [
-    selectedPrivateGameTemplateListingData,
-    setSelectedPrivateGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(null);
+    selectedPrivateGameTemplate,
+    setSelectedPrivateGameTemplate,
+  ] = React.useState<?{|
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    /**
+     * At the moment, only MainFrame uses this hook and handles the selected private
+     * game template in both build and store sections in this single variable.
+     * But the store section handles the preview of the game template content (unlike
+     * the build section that needs this hook to open the information dialog) so we
+     * let the possibility to select a game template without opening the dialog
+     * (This selected game template is then used by the NewProjectSetupDialog to use).
+     */
+    openDialog: boolean,
+  |}>(null);
   const [
     purchasingGameTemplateListingData,
     setPurchasingGameTemplateListingData,
@@ -50,7 +61,7 @@ const useExampleOrGameTemplateDialogs = ({
       setExampleStoreDialogOpen(false);
       if (deselectExampleAndGameTemplate) {
         setSelectedExampleShortHeader(null);
-        setSelectedPrivateGameTemplateListingData(null);
+        setSelectedPrivateGameTemplate(null);
       }
     },
     [setExampleStoreDialogOpen]
@@ -65,7 +76,7 @@ const useExampleOrGameTemplateDialogs = ({
   const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
     () => {
       if (
-        !selectedPrivateGameTemplateListingData ||
+        !selectedPrivateGameTemplate ||
         !privateGameTemplateListingDatas ||
         !receivedGameTemplates
       )
@@ -79,7 +90,8 @@ const useExampleOrGameTemplateDialogs = ({
         .filter(
           template =>
             template.sellerId ===
-              selectedPrivateGameTemplateListingData.sellerId &&
+              selectedPrivateGameTemplate.privateGameTemplateListingData
+                .sellerId &&
             !receivedGameTemplateIds.includes(template.sellerId)
         )
         .sort((template1, template2) =>
@@ -87,7 +99,7 @@ const useExampleOrGameTemplateDialogs = ({
         );
     },
     [
-      selectedPrivateGameTemplateListingData,
+      selectedPrivateGameTemplate,
       privateGameTemplateListingDatas,
       receivedGameTemplates,
     ]
@@ -105,11 +117,18 @@ const useExampleOrGameTemplateDialogs = ({
             isProjectOpening={isProjectOpening}
             selectedExampleShortHeader={selectedExampleShortHeader}
             selectedPrivateGameTemplateListingData={
-              selectedPrivateGameTemplateListingData
+              selectedPrivateGameTemplate
+                ? selectedPrivateGameTemplate.privateGameTemplateListingData
+                : null
             }
             onSelectExampleShortHeader={setSelectedExampleShortHeader}
-            onSelectPrivateGameTemplateListingData={
-              setSelectedPrivateGameTemplateListingData
+            onSelectPrivateGameTemplateListingData={privateGameTemplateListingData =>
+              privateGameTemplateListingData
+                ? setSelectedPrivateGameTemplate({
+                    privateGameTemplateListingData,
+                    openDialog: true,
+                  })
+                : setSelectedPrivateGameTemplate(null)
             }
             onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
           />
@@ -122,25 +141,31 @@ const useExampleOrGameTemplateDialogs = ({
             onClose={() => setSelectedExampleShortHeader(null)}
           />
         )}
-        {!!selectedPrivateGameTemplateListingData && (
-          <PrivateGameTemplateInformationDialog
-            privateGameTemplateListingData={
-              selectedPrivateGameTemplateListingData
-            }
-            isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
-            onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
-            onGameTemplateOpen={setSelectedPrivateGameTemplateListingData}
-            onOpenPurchaseDialog={() => {
-              setPurchasingGameTemplateListingData(
-                selectedPrivateGameTemplateListingData
-              );
-            }}
-            onClose={() => setSelectedPrivateGameTemplateListingData(null)}
-            privateGameTemplateListingDatasFromSameCreator={
-              privateGameTemplateListingDatasFromSameCreator
-            }
-          />
-        )}
+        {!!selectedPrivateGameTemplate &&
+          selectedPrivateGameTemplate.openDialog && (
+            <PrivateGameTemplateInformationDialog
+              privateGameTemplateListingData={
+                selectedPrivateGameTemplate.privateGameTemplateListingData
+              }
+              isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
+              onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
+              onGameTemplateOpen={privateGameTemplateListingData =>
+                setSelectedPrivateGameTemplate({
+                  privateGameTemplateListingData,
+                  openDialog: true,
+                })
+              }
+              onOpenPurchaseDialog={() => {
+                setPurchasingGameTemplateListingData(
+                  selectedPrivateGameTemplate.privateGameTemplateListingData
+                );
+              }}
+              onClose={() => setSelectedPrivateGameTemplate(null)}
+              privateGameTemplateListingDatasFromSameCreator={
+                privateGameTemplateListingDatasFromSameCreator
+              }
+            />
+          )}
         {!!purchasingGameTemplateListingData && (
           <PrivateGameTemplatePurchaseDialog
             privateGameTemplateListingData={purchasingGameTemplateListingData}
@@ -152,11 +177,13 @@ const useExampleOrGameTemplateDialogs = ({
   };
   return {
     selectedExampleShortHeader,
-    selectedPrivateGameTemplateListingData,
+    selectedPrivateGameTemplateListingData: selectedPrivateGameTemplate
+      ? selectedPrivateGameTemplate.privateGameTemplateListingData
+      : null,
     closeExampleStoreDialog,
     openExampleStoreDialog,
     onSelectExampleShortHeader: setSelectedExampleShortHeader,
-    onSelectPrivateGameTemplateListingData: setSelectedPrivateGameTemplateListingData,
+    onSelectPrivateGameTemplate: setSelectedPrivateGameTemplate,
     renderExampleOrGameTemplateDialogs,
   };
 };

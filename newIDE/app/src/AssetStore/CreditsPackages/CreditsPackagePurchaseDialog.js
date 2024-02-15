@@ -23,49 +23,7 @@ import {
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import Form from '../../UI/Form';
-import TextField from '../../UI/TextField';
-
-const PasswordPromptDialog = (props: {
-  passwordValue: string,
-  setPasswordValue: (newValue: string) => void,
-  onClose: () => void,
-  onApply: () => Promise<void>,
-}) => (
-  <Dialog
-    open
-    maxWidth="xs"
-    title={<Trans>Store password</Trans>}
-    onApply={props.onApply}
-    onRequestClose={props.onClose}
-    actions={[
-      <FlatButton
-        key="cancel"
-        label={<Trans>Close</Trans>}
-        onClick={props.onClose}
-      />,
-      <DialogPrimaryButton
-        key="continue"
-        primary
-        label={<Trans>Continue</Trans>}
-        onClick={props.onApply}
-      />,
-    ]}
-  >
-    <Form onSubmit={props.onApply} name="store-password">
-      <TextField
-        fullWidth
-        autoFocus="desktopAndMobileDevices"
-        value={props.passwordValue}
-        floatingLabelText={<Trans>Password</Trans>}
-        type="password"
-        onChange={(e, value) => {
-          props.setPasswordValue(value);
-        }}
-      />
-    </Form>
-  </Dialog>
-);
+import PasswordPromptDialog from '../PasswordPromptDialog';
 
 type Props = {|
   creditsPackageListingData: CreditsPackageListingData,

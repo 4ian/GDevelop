@@ -4,8 +4,9 @@ import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
   canRedeemProduct,
-  redeemProduct,
+  redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
+  shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateAssetPack,
@@ -262,8 +263,8 @@ const PrivateAssetPackInformationPage = ({
 
   const onRedeemAssetPack = React.useCallback(
     async () => {
-      await redeemProduct({
-        product: privateAssetPackListingData,
+      await redeemPrivateAssetPack({
+        privateAssetPackListingData,
         getAuthorizationHeader,
       });
     },
@@ -432,14 +433,9 @@ const PrivateAssetPackInformationPage = ({
     subscription,
   });
 
-  const showPersonalUsageRedemptionBanner =
-    privateAssetPackListingData.redeemConditions &&
-    privateAssetPackListingData.redeemConditions.some(
-      redeemCondition =>
-        redeemCondition.usageType === 'personal' &&
-        redeemCondition.reason === 'subscription' &&
-        redeemCondition.condition.includes('gdevelop_gold')
-    );
+  const showPersonalUsageRedemptionBanner = shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack(
+    { subscription, privateAssetPackListingData, isAlreadyReceived }
+  );
 
   return (
     <I18n>
@@ -509,7 +505,7 @@ const PrivateAssetPackInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
-                      {!isAlreadyReceived && showPersonalUsageRedemptionBanner && (
+                      {showPersonalUsageRedemptionBanner && (
                         <div style={styles.redeemConditionsContainer}>
                           <Line noMargin alignItems="center">
                             <img
@@ -518,14 +514,15 @@ const PrivateAssetPackInformationPage = ({
                               alt="diamond"
                             />
                             <Text color="inherit" noMargin>
+                              {/* TODO: If another license is available for give away's,
+                              the logic should be adapted to change the copy of the banner. */}
                               <Trans>
-                                Personal license for claim with Gold
-                                subscription
+                                Single commercial use license for claim with
+                                Gold or Startup subscription
                               </Trans>
                             </Text>
                           </Line>
                           <Spacer />
-                          {/* TODO: Do not display for student accounts */}
                           <div style={{ flexShrink: 0 }}>
                             <RaisedButton
                               primary

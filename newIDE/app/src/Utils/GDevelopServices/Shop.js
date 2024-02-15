@@ -45,9 +45,9 @@ type RedeemCondition = {
   usageType: string,
 };
 
-type RedeemableAttributes = {
+type RedeemableAttributes = {|
   redeemConditions?: RedeemCondition[],
-};
+|};
 
 type StripeAndPaypalSellableAttributes = {|
   prices: StripeAndPaypalPrice[],
@@ -394,31 +394,54 @@ export const canRedeemProduct = ({
   if (!redeemConditions) return false;
   for (let redeemCondition of redeemConditions) {
     if (redeemCondition.reason === 'subscription') {
-      // condition should look like `gdevelop_gold,gdevelop_startup`
+      // Condition should look like `gdevelop_gold,gdevelop_startup`.
       const requiredPlanIds = redeemCondition.condition.split(',');
       if (
         subscription &&
         requiredPlanIds.includes(subscription.planId) &&
         !subscription.benefitsFromEducationPlan
-      )
-        if (!subscription.benefitsFromEducationPlan) return true;
+      ) {
+        return true;
+      }
     }
   }
   return false;
 };
 
-export const redeemProduct = async ({
-  product,
+export const shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack = ({
+  subscription,
+  privateAssetPackListingData,
+  isAlreadyReceived,
+}: {|
+  subscription: ?Subscription,
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  isAlreadyReceived: boolean,
+|}): boolean => {
+  if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
+    return false;
+  if (subscription && subscription.benefitsFromEducationPlan) return false;
+
+  return privateAssetPackListingData.redeemConditions.some(redeemCondition => {
+    return privateAssetPackListingData.prices.some(
+      price =>
+        price.usageType === redeemCondition.usageType &&
+        redeemCondition.reason === 'subscription'
+    );
+  });
+};
+
+export const redeemPrivateAssetPack = async ({
+  privateAssetPackListingData,
   getAuthorizationHeader,
 }: {|
-  product: ProductListingData,
+  privateAssetPackListingData: PrivateAssetPackListingData,
   getAuthorizationHeader: () => Promise<string>,
 |}): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
   await client.post(
-    `/product/${product.id}/action/redeem`,
+    `/product/${privateAssetPackListingData.id}/action/redeem`,
     {
-      priceUsageType: 'personal',
+      priceUsageType: 'commercial',
     },
     {
       headers: {

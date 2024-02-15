@@ -504,7 +504,7 @@ const MainFrame = (props: Props) => {
     selectedExampleShortHeader,
     selectedPrivateGameTemplateListingData,
     onSelectExampleShortHeader,
-    onSelectPrivateGameTemplateListingData,
+    onSelectPrivateGameTemplate,
     renderExampleOrGameTemplateDialogs,
     closeExampleStoreDialog,
     openExampleStoreDialog,
@@ -3231,11 +3231,16 @@ const MainFrame = (props: Props) => {
                     onCloseProject: () => askToCloseProject(),
                     onOpenExampleStore: openExampleStoreDialog,
                     onSelectExampleShortHeader: onSelectExampleShortHeader,
-                    onPreviewPrivateGameTemplateListingData: onSelectPrivateGameTemplateListingData,
+                    onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: true,
+                      }),
                     onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      onSelectPrivateGameTemplateListingData(
-                        privateGameTemplateListingData
-                      );
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: false,
+                      });
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProfile: () => openProfileDialog(true),

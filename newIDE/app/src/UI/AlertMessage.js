@@ -10,6 +10,7 @@ import IconButton from './IconButton';
 import Paper from './Paper';
 import Cross from './CustomSvgIcons/Cross';
 import WarningFilled from './CustomSvgIcons/WarningFilled';
+import SuccessFilled from './CustomSvgIcons/SuccessFilled';
 import ErrorFilled from './CustomSvgIcons/ErrorFilled';
 import SquaredInfo from './CustomSvgIcons/SquaredInfo';
 
@@ -21,7 +22,7 @@ const styles = {
 };
 
 type Props = {|
-  kind?: 'info' | 'warning' | 'error',
+  kind?: 'info' | 'warning' | 'error' | 'valid',
   children: React.Node,
   onHide?: ?() => void,
   hideButtonSize?: 'small',
@@ -59,7 +60,7 @@ const AlertMessage = ({
     borderLeft: `1px solid ${theme.palette.divider}`,
   };
 
-  if (kind === 'error' || kind === 'warning') {
+  if (kind === 'error' || kind === 'warning' || kind === 'valid') {
     paperStyle.borderColor = gdevelopTheme.message[kind];
     if (theme.palette.type === 'light') {
       paperStyle.backgroundColor = lighten(gdevelopTheme.message[kind], 0.9);
@@ -102,6 +103,14 @@ const AlertMessage = ({
                           style={{
                             ...styles.icon,
                             color: gdevelopTheme.message.error,
+                          }}
+                        />
+                      )}
+                      {kind === 'valid' && (
+                        <SuccessFilled
+                          style={{
+                            ...styles.icon,
+                            color: gdevelopTheme.message.valid,
                           }}
                         />
                       )}

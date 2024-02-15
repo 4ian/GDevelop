@@ -33,6 +33,10 @@ const buildTypesConfig = {
     completeDescription:
       'You can download it on your Android phone and install it.',
   },
+  'cordova-ios-build': {
+    estimatedTimeInSeconds: (build: Build) => 150,
+    completeDescription: '',
+  },
   'electron-build': {
     estimatedTimeInSeconds: (build: Build) =>
       90 + 130 * (build.targets ? build.targets.length : 0),
@@ -68,6 +72,16 @@ const downloadButtons = [
   {
     displayName: t`macOS (zip)`,
     key: 'macosZipKey',
+    icon: <Download />,
+  },
+  {
+    displayName: t`IPA for App Store`,
+    key: 'iosAppStoreIpaKey',
+    icon: <Download />,
+  },
+  {
+    displayName: t`IPA for testing on registered devices`,
+    key: 'iosDevelopmentIpaKey',
     icon: <Download />,
   },
   {

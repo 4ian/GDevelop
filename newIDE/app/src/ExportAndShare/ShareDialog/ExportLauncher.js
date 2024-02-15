@@ -455,6 +455,7 @@ export default class ExportLauncher extends Component<Props, State> {
             <Line alignItems="center" justifyContent="center">
               {exportPipeline.renderHeader({
                 project,
+                authenticatedUser,
                 exportState,
                 updateExportState: this._updateExportState,
                 game: this.props.game,

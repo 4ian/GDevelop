@@ -13,6 +13,7 @@ export type ExportPipelineContext<ExportState> = {|
 
 export type HeaderProps<ExportState> = {|
   project: gdProject,
+  authenticatedUser: AuthenticatedUser,
   exportState: ExportState,
   updateExportState: (
     updater: (prevExportState: ExportState) => ExportState

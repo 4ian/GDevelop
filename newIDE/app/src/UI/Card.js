@@ -13,7 +13,7 @@ const styles = {
     flex: 1,
   },
   cardContent: {
-    paddingBottom: 32,
+    paddingBottom: 12,
     paddingTop: 0,
     minWidth: 0,
   },

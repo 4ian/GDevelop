@@ -31,14 +31,14 @@ const CurrentUsageDisplayer = ({
   const remainingBuilds = Math.max(quota.max - quota.current, 0);
   const remainingMultipleMessage = (
     <Trans>
-      You have {remainingBuilds} builds remaining (You have used {quota.current}
-      /{quota.max} in the last 24h).
+      You have {remainingBuilds} builds remaining (you have used {quota.current}{' '}
+      out of {quota.max} in the last 24h).
     </Trans>
   );
   const remainingSingleMessage = (
     <Trans>
-      You have {remainingBuilds} build remaining (You have used {quota.current}/
-      {quota.max} in the last 24h).
+      You have {remainingBuilds} build remaining (you have used {quota.current}{' '}
+      out of {quota.max} in the last 24h).
     </Trans>
   );
 

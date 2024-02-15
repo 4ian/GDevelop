@@ -434,17 +434,21 @@ export const redeemPrivateAssetPack = async ({
   privateAssetPackListingData,
   getAuthorizationHeader,
   userId,
+  password,
 }: {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
+  password: string,
 |}): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
+  const payload: {| priceUsageType: string, password?: string |} = {
+    priceUsageType: 'commercial',
+  };
+  if (password) payload.password = password;
   await client.post(
     `/product/${privateAssetPackListingData.id}/action/redeem`,
-    {
-      priceUsageType: 'commercial',
-    },
+    payload,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

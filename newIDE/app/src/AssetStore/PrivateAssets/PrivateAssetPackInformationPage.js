@@ -58,6 +58,8 @@ import HelpIcon from '../../UI/HelpIcon';
 import Avatar from '@material-ui/core/Avatar';
 import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import PasswordPromptDialog from '../PasswordPromptDialog';
+import Window from '../../Utils/Window';
 
 const cellSpacing = 8;
 
@@ -189,6 +191,11 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
+  const [
+    displayPasswordPrompt,
+    setDisplayPasswordPrompt,
+  ] = React.useState<boolean>(false);
+  const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -268,6 +275,12 @@ const PrivateAssetPackInformationPage = ({
     ]
   );
 
+  const onWillRedeemAssetPack = () => {
+    // Password is required in dev environment only so that one cannot freely claim asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    else onRedeemAssetPack();
+  };
+
   const onRedeemAssetPack = React.useCallback(
     async () => {
       if (!profile || isRedeemingProduct) return;
@@ -277,6 +290,7 @@ const PrivateAssetPackInformationPage = ({
           privateAssetPackListingData,
           getAuthorizationHeader,
           userId: profile.id,
+          password,
         });
         await Promise.all([
           onRefreshAssetPackPurchases(),
@@ -315,6 +329,7 @@ const PrivateAssetPackInformationPage = ({
       getAuthorizationHeader,
       profile,
       showAlert,
+      password,
       onPurchaseSuccessful,
       isRedeemingProduct,
       onRefreshAssetPackPurchases,
@@ -588,7 +603,7 @@ const PrivateAssetPackInformationPage = ({
                               disabled={isRedeemingProduct}
                               onClick={
                                 canRedeemAssetPack
-                                  ? onRedeemAssetPack
+                                  ? onWillRedeemAssetPack
                                   : () =>
                                       openSubscriptionDialog({
                                         analyticsMetadata: {
@@ -731,6 +746,14 @@ const PrivateAssetPackInformationPage = ({
                 onAssetPackOpen(assetPackListingData);
                 setOpenSellerPublicProfileDialog(false);
               }}
+            />
+          )}
+          {displayPasswordPrompt && (
+            <PasswordPromptDialog
+              onApply={onRedeemAssetPack}
+              onClose={() => setDisplayPasswordPrompt(false)}
+              passwordValue={password}
+              setPasswordValue={setPassword}
             />
           )}
         </>

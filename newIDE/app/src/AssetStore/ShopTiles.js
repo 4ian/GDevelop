@@ -21,7 +21,7 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import ProductPriceTag, { formatProductPrice } from './ProductPriceTag';
+import ProductPriceTag, { renderProductPrice } from './ProductPriceTag';
 import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
@@ -74,6 +74,7 @@ const styles = {
   promoImageContainer: {
     display: 'flex',
     flex: 0,
+    justifyContent: 'center',
   },
 };
 
@@ -291,7 +292,7 @@ export const PromoBundleCard = ({
             }}
           >
             <ResponsiveLineStackLayout expand noMargin>
-              <Column alignItems="center" noMargin>
+              <div style={styles.promoImageContainer}>
                 <CorsAwareImage
                   key={productListingData.name}
                   style={{
@@ -301,7 +302,7 @@ export const PromoBundleCard = ({
                   src={productListingData.thumbnailUrls[0]}
                   alt={`Preview image of bundle ${productListingData.name}`}
                 />
-              </Column>
+              </div>
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
                   {!owned ? (
@@ -317,7 +318,7 @@ export const PromoBundleCard = ({
                     productListingData.productType === 'ASSET_PACK' ? (
                       <Trans>
                         This pack is included in this bundle for{' '}
-                        {formatProductPrice({
+                        {renderProductPrice({
                           i18n,
                           productListingData,
                           plainText: true,
@@ -327,7 +328,7 @@ export const PromoBundleCard = ({
                     ) : (
                       <Trans>
                         This template is included in this bundle for{' '}
-                        {formatProductPrice({
+                        {renderProductPrice({
                           i18n,
                           productListingData,
                           plainText: true,

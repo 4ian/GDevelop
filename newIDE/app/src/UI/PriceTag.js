@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import Text from './Text';
 import { makeStyles } from '@material-ui/core';
 
 type Props = {|
@@ -45,13 +44,7 @@ const useStyles = makeStyles(theme => {
 function PriceTag({ label, withOverlay }: Props) {
   const classes = useStyles({ withOverlay });
 
-  return (
-    <div className={classes.container}>
-      <Text noMargin size="sub-title" color="inherit">
-        {label}
-      </Text>
-    </div>
-  );
+  return <div className={classes.container}>{label}</div>;
 }
 
 export default PriceTag;

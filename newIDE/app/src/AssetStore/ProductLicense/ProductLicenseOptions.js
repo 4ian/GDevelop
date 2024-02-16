@@ -17,7 +17,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import { Column, Line } from '../../UI/Grid';
-import { formatProductPrice } from '../ProductPriceTag';
+import { renderProductPrice } from '../ProductPriceTag';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
@@ -77,9 +77,7 @@ const ProductLicenseOptionContent = ({
         <Text noMargin size="sub-title">
           {name}
         </Text>
-        {!isLicenseOwned && formattedPrice && (
-          <Text noMargin>{formattedPrice}</Text>
-        )}
+        {!isLicenseOwned && formattedPrice}
       </LineStackLayout>
     </LineStackLayout>
     <Line expand noMargin>
@@ -234,7 +232,7 @@ const ProductLicenseOptions = ({
                   i18n,
                   license.descriptionByLocale
                 )}
-                formattedPrice={formatProductPrice({
+                formattedPrice={renderProductPrice({
                   i18n,
                   productListingData: product,
                   usageType: license.id,

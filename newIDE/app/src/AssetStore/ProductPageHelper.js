@@ -22,7 +22,7 @@ import RaisedButton from '../UI/RaisedButton';
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import Coin from '../Credits/Icons/Coin';
-import { formatProductPrice } from './ProductPriceTag';
+import { renderProductPrice } from './ProductPriceTag';
 import { Trans } from '@lingui/macro';
 import FlatButton from '../UI/FlatButton';
 import { Column } from '../UI/Grid';
@@ -324,7 +324,7 @@ export const PurchaseProductButtons = <
     }
   }
 
-  const formattedProductPriceText = formatProductPrice({
+  const formattedProductPriceText = renderProductPrice({
     i18n,
     usageType: selectedUsageType,
     productListingData: productListingData,

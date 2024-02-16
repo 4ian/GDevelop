@@ -15,6 +15,7 @@ import {
 } from '../Utils/AppStorePurchases';
 import Coin from '../Credits/Icons/Coin';
 import { LineStackLayout } from '../UI/Layout';
+import Text from '../UI/Text';
 
 const styles = {
   icon: {
@@ -33,7 +34,7 @@ type FormatProps = {|
   plainText?: boolean,
 |};
 
-export const formatProductPrice = ({
+export const renderProductPrice = ({
   i18n,
   productListingData,
   usageType,
@@ -67,7 +68,9 @@ export const formatProductPrice = ({
     ) : (
       <LineStackLayout noMargin alignItems="center">
         <Coin style={styles.icon} />
-        <span>{creditPrice.amount}</span>
+        <Text noMargin size="sub-title" color="inherit">
+          {creditPrice.amount}
+        </Text>
       </LineStackLayout>
     );
   }
@@ -82,13 +85,20 @@ export const formatProductPrice = ({
   if (!price) return '';
 
   const currencyCode = price.currency === 'USD' ? '$' : '€';
-
-  return `${currencyCode} ${i18n
+  const formattedPrice = `${currencyCode} ${i18n
     .number(price.value / 100, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
     .replace(/\D00$/, '')}`;
+
+  return plainText ? (
+    formattedPrice
+  ) : (
+    <Text noMargin size="sub-title" color="inherit">
+      {formattedPrice}
+    </Text>
+  );
 };
 
 type ProductPriceOrOwnedProps = {|
@@ -108,12 +118,16 @@ export const getProductPriceOrOwnedLabel = ({
   owned,
 }: ProductPriceOrOwnedProps): React.Node => {
   return owned ? (
-    <LineStackLayout noMargin>
-      <span>✅</span>
-      <Trans>Owned</Trans>
+    <LineStackLayout noMargin alignItems="center">
+      <Text noMargin size="sub-title">
+        ✅
+      </Text>
+      <Text noMargin size="sub-title" color="inherit">
+        <Trans>Owned</Trans>
+      </Text>
     </LineStackLayout>
   ) : (
-    formatProductPrice({ i18n, productListingData, usageType })
+    renderProductPrice({ i18n, productListingData, usageType })
   );
 };
 

@@ -181,9 +181,7 @@ const ImageOverlay = ({
         ...positionStyles,
       }}
     >
-      <Text noMargin color="inherit" size="sub-title">
-        {content}
-      </Text>
+      {content}
     </div>
   );
 };

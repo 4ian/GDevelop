@@ -17,7 +17,7 @@ import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/Credit
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
-import { formatProductPrice } from '../AssetStore/ProductPriceTag';
+import { renderProductPrice } from '../AssetStore/ProductPriceTag';
 import BackgroundText from '../UI/BackgroundText';
 import Link from '../UI/Link';
 import Window from '../Utils/Window';
@@ -211,7 +211,7 @@ const CreditsPackagesDialog = ({
                                     color="secondary"
                                     noMargin
                                   >
-                                    {formatProductPrice({
+                                    {renderProductPrice({
                                       productListingData: creditsPackageListingData,
                                       usageType: 'default',
                                       i18n,

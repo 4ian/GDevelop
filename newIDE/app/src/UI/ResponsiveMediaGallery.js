@@ -131,15 +131,21 @@ const ResponsiveMediaGallery = ({
   ] = React.useState<number>(0);
 
   const mobileImageWidth =
-    mobileGridClientWidth -
-    30 - // Width kept for user to see that there's an image after or before
-    (horizontalOuterMarginToEatOnMobile || 0);
+    Math.max(
+      mobileGridClientWidth -
+      30 - // Width kept for user to see that there's an image after or before
+        (horizontalOuterMarginToEatOnMobile || 0),
+      0
+    ) || 320; // Set a default width if the component is not yet measured, to avoid layout shift and a scroll to trigger.
 
   React.useEffect(
     () => {
-      setCurrentlyViewedImageIndex(
-        Math.round(mobileGridScrollX / (mobileImageWidth + GRID_SPACING))
-      );
+      if (mobileImageWidth && mobileGridScrollX) {
+        const newCurrentlyViewedImageIndex = Math.round(
+          mobileGridScrollX / (mobileImageWidth + GRID_SPACING)
+        );
+        setCurrentlyViewedImageIndex(newCurrentlyViewedImageIndex);
+      }
     },
     [mobileImageWidth, mobileGridScrollX]
   );

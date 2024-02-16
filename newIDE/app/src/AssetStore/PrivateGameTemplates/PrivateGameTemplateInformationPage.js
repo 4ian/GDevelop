@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import {
   buyProductWithCredits,
   type PrivateGameTemplateListingData,
@@ -31,13 +30,11 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import RaisedButton from '../../UI/RaisedButton';
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
@@ -47,15 +44,17 @@ import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreConte
 import {
   getBundlesContainingProductTiles,
   getOtherProductsFromSameAuthorTiles,
+  getProductMediaItems,
   getProductsIncludedInBundleTiles,
   getUserProductPurchaseUsageType,
+  OpenProductButton,
+  PurchaseProductButtons,
 } from '../ProductPageHelper';
 import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import Coin from '../../Credits/Icons/Coin';
 
 const cellSpacing = 8;
 
@@ -123,7 +122,6 @@ const PrivateGameTemplateInformationPage = ({
   );
   const {
     receivedGameTemplates,
-    authenticated,
     profile,
     limits,
     gameTemplatePurchases,
@@ -296,8 +294,8 @@ const PrivateGameTemplateInformationPage = ({
     ]
   );
 
-  const onPurchaseWithCredits = React.useCallback(
-    async (i18n: I18nType) => {
+  const onClickBuyWithCredits = React.useCallback(
+    async () => {
       if (!privateGameTemplateListingData || !gameTemplate) return;
 
       if (!profile || !limits) {
@@ -370,99 +368,15 @@ const PrivateGameTemplateInformationPage = ({
     ]
   );
 
-  const getBuyButtons = i18n => {
-    if (errorText) return null;
-
-    let creditPrice = privateGameTemplateListingData.creditPrices.find(
-      price => price.usageType === selectedUsageType
-    );
-    if (!creditPrice) {
-      // We're probably switching from one template to another, and the usage type is not available.
-      // Let's reset it.
-      setSelectedUsageType(privateGameTemplateListingData.prices[0].usageType);
-      creditPrice = privateGameTemplateListingData.creditPrices.find(
-        price =>
-          price.usageType === privateGameTemplateListingData.prices[0].usageType
-      );
-      if (!creditPrice) {
-        console.error('Unable to find the price for the game template');
-        return null;
-      }
-    }
-
-    return (
-      <LineStackLayout>
-        <FlatButton
-          primary
-          label={<Trans>Buy for {creditPrice.amount} credits</Trans>}
-          onClick={onPurchaseWithCredits}
-          id="buy-game-template-with-credits"
-          leftIcon={<Coin fontSize="small" />}
-        />
-        <RaisedButton
-          primary
-          label={
-            <Trans>
-              Buy for{' '}
-              {formatProductPrice({
-                i18n,
-                usageType: selectedUsageType,
-                productListingData: privateGameTemplateListingData,
-              })}
-            </Trans>
-          }
-          onClick={onClickBuy}
-          id="buy-game-template"
-        />
-        {shouldUseOrSimulateAppStoreProduct &&
-          !isAlreadyReceived &&
-          !authenticated && (
-            <Text size="body-small">
-              <Link onClick={onClickBuy} href="">
-                <Trans>Restore a previous purchase</Trans>
-              </Link>
-            </Text>
-          )}
-      </LineStackLayout>
-    );
-  };
-
-  const getOpenButton = i18n => {
-    if (privateGameTemplateListingData.includedListableProductIds) {
-      // Template is a bundle and is owned, no button to display.
-      return null;
-    }
-
-    return (
-      <Column noMargin alignItems="flex-end">
-        <RaisedButton
-          primary
-          label={<Trans>Open template</Trans>}
-          onClick={() =>
-            onCreateWithGameTemplate(privateGameTemplateListingData)
-          }
-          id="open-game-template"
-        />
-      </Column>
-    );
-  };
-
-  const mediaItems = gameTemplate
-    ? [
-        {
-          kind: 'image',
-          url:
-            (shouldUseOrSimulateAppStoreProduct &&
-              privateGameTemplateListingData.appStoreThumbnailUrls &&
-              privateGameTemplateListingData.appStoreThumbnailUrls[0]) ||
-            privateGameTemplateListingData.thumbnailUrls[0],
-        },
-        ...gameTemplate.previewImageUrls.map(url => ({
-          kind: 'image',
-          url,
-        })),
-      ]
-    : [];
+  const mediaItems = React.useMemo(
+    () =>
+      getProductMediaItems({
+        product: gameTemplate,
+        productListingData: privateGameTemplateListingData,
+        shouldSimulateAppStoreProduct: simulateAppStoreProduct,
+      }),
+    [gameTemplate, privateGameTemplateListingData, simulateAppStoreProduct]
+  );
 
   return (
     <I18n>
@@ -549,21 +463,44 @@ const PrivateGameTemplateInformationPage = ({
                       />
                       <Spacer />
                       {isAlreadyReceived ? (
-                        getOpenButton(i18n)
+                        <OpenProductButton
+                          productListingData={privateGameTemplateListingData}
+                          onClick={() =>
+                            onCreateWithGameTemplate(
+                              privateGameTemplateListingData
+                            )
+                          }
+                          label={<Trans>Open template</Trans>}
+                        />
                       ) : (
                         <>
-                          <SecureCheckout />
-                          {getBuyButtons(i18n)}
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                          {!errorText && (
+                            <PurchaseProductButtons
+                              i18n={i18n}
+                              productListingData={
+                                privateGameTemplateListingData
+                              }
+                              selectedUsageType={selectedUsageType}
+                              onUsageTypeChange={setSelectedUsageType}
+                              simulateAppStoreProduct={simulateAppStoreProduct}
+                              isAlreadyReceived={isAlreadyReceived}
+                              onClickBuy={onClickBuy}
+                              onClickBuyWithCredits={onClickBuyWithCredits}
+                            />
+                          )}
                         </>
                       )}
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>
-                <Column noMargin>
+                <Column>
                   {!isAlreadyReceived &&
                   !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
                       <Line>
-                        <RaisedButton
+                        <FlatButton
                           primary
                           label={<Trans>Try it online</Trans>}
                           onClick={() =>

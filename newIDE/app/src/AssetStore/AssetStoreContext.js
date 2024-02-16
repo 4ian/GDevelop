@@ -164,7 +164,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>(
 );
 
 type AssetStoreStateProviderProps = {|
-  onlyAppStorePrivateAssetPacks?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
@@ -187,7 +186,6 @@ const getPrivateAssetPackListingDataSearchTerms = (
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
 export const AssetStoreStateProvider = ({
-  onlyAppStorePrivateAssetPacks,
   shopNavigationState,
   children,
 }: AssetStoreStateProviderProps) => {
@@ -312,11 +310,7 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
-          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks(
-            {
-              onlyAppStorePrivateAssetPacks,
-            }
-          );
+          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
 
           console.info(
             `Loaded ${
@@ -340,7 +334,7 @@ export const AssetStoreStateProvider = ({
         }
       })();
     },
-    [environment, onlyAppStorePrivateAssetPacks]
+    [environment]
   );
 
   // When the public assets or the private assets are loaded, regenerate the

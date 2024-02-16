@@ -43,7 +43,6 @@ import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/P
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
-  onlyAppStoreShopItems?: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
@@ -63,7 +62,6 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-  onlyAppStoreShopItems,
 }: Props) => {
   const shopNavigationState = useShopNavigation();
   return (
@@ -102,9 +100,6 @@ const Providers = ({
                                     <SubscriptionSuggestionProvider>
                                       <CommandsContextProvider>
                                         <AssetStoreStateProvider
-                                          onlyAppStorePrivateAssetPacks={
-                                            onlyAppStoreShopItems
-                                          }
                                           shopNavigationState={
                                             shopNavigationState
                                           }
@@ -112,9 +107,6 @@ const Providers = ({
                                           <ResourceStoreStateProvider>
                                             <ExampleStoreStateProvider>
                                               <PrivateGameTemplateStoreStateProvider
-                                                onlyAppStorePrivateGameTemplates={
-                                                  onlyAppStoreShopItems
-                                                }
                                                 shopNavigationState={
                                                   shopNavigationState
                                                 }

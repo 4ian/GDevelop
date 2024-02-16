@@ -154,9 +154,10 @@ namespace gdjs {
             // Render a layer with 3D rendering, and possibly some 2D rendering too.
             const threeScene = runtimeLayerRenderer.getThreeScene();
             const threeCamera = runtimeLayerRenderer.getThreeCamera();
+            const threeEffectComposer = runtimeLayerRenderer.getThreeEffectComposer();
 
             // Render the 3D objects of this layer.
-            if (threeScene && threeCamera) {
+            if (threeScene && threeCamera && threeEffectComposer) {
               // TODO (3D) - optimization: do this at the beginning for all layers that are 2d+3d?
               // So the second pass is clearer (just rendering 2d or 3d layers without doing PixiJS renders in between).
               if (
@@ -218,7 +219,12 @@ namespace gdjs {
               // Clear the depth as each layer is independent and display on top of the previous one,
               // even 3D objects.
               threeRenderer.clearDepth();
-              threeRenderer.render(threeScene, threeCamera);
+              if (runtimeLayerRenderer.hasPostProcessingPass()) {
+                threeEffectComposer.render();
+              } else {
+                threeRenderer.render(threeScene, threeCamera);
+              }
+
               this._layerRenderingMetrics.rendered3DLayersCount++;
 
               lastRenderWas3D = true;

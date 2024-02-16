@@ -576,30 +576,32 @@ const PrivateAssetPackInformationPage = ({
                             </Text>
                           </Line>
                           <Spacer />
-                          <div style={{ flexShrink: 0 }}>
-                            <RaisedButton
-                              primary
-                              label={
-                                isRedeemingProduct ? (
-                                  <Trans>Please wait</Trans>
-                                ) : (
-                                  calloutToGetSubscriptionOrClaimAssetPack.actionLabel
-                                )
-                              }
-                              disabled={isRedeemingProduct}
-                              onClick={
-                                calloutToGetSubscriptionOrClaimAssetPack.canRedeemAssetPack
-                                  ? onWillRedeemAssetPack
-                                  : () =>
-                                      openSubscriptionDialog({
-                                        analyticsMetadata: {
-                                          reason: 'Claim asset pack',
-                                        },
-                                        filter: 'individual',
-                                      })
-                              }
-                            />
-                          </div>
+                          {calloutToGetSubscriptionOrClaimAssetPack.actionLabel && (
+                            <div style={{ flexShrink: 0 }}>
+                              <RaisedButton
+                                primary
+                                label={
+                                  isRedeemingProduct ? (
+                                    <Trans>Please wait</Trans>
+                                  ) : (
+                                    calloutToGetSubscriptionOrClaimAssetPack.actionLabel
+                                  )
+                                }
+                                disabled={isRedeemingProduct}
+                                onClick={
+                                  calloutToGetSubscriptionOrClaimAssetPack.canRedeemAssetPack
+                                    ? onWillRedeemAssetPack
+                                    : () =>
+                                        openSubscriptionDialog({
+                                          analyticsMetadata: {
+                                            reason: 'Claim asset pack',
+                                          },
+                                          filter: 'individual',
+                                        })
+                                }
+                              />
+                            </div>
+                          )}
                         </div>
                       )}
                       <Line noMargin>

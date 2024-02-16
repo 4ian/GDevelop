@@ -436,7 +436,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   isAlreadyReceived: boolean,
 |}): ?{|
   message: React.Node,
-  actionLabel: React.Node,
+  actionLabel: ?React.Node,
   canRedeemAssetPack: boolean,
 |} => {
   if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
@@ -468,14 +468,13 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
     <Trans>Get a Sub</Trans>
   ) : redemptionCheck.canUpgrade ? (
     <Trans>Upgrade</Trans>
-  ) : (
-    <Trans>Get a Sub</Trans>
-  );
+  ) : null;
 
   if (firstApplicableRedeemCondition.usageType === 'commercial') {
     return {
       actionLabel,
       canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
       message: (
         <Trans>
           Single commercial use license for claim with Gold or Startup
@@ -488,6 +487,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
     return {
       actionLabel,
       canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
       message: (
         <Trans>
           Personal license for claim with Gold or Startup subscription
@@ -499,6 +499,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
     return {
       actionLabel,
       canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
       message: (
         <Trans>
           Unlimited commercial use license for claim with Gold or Startup

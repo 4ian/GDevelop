@@ -19,6 +19,7 @@ import {
   fakeGoldAuthenticatedUser,
   fakeSilverAuthenticatedUserWithCloudProjects,
   defaultAuthenticatedUserWithNoSubscription,
+  fakeAuthenticatedUserWithEducationPlan,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import {
   AssetStoreContext,
@@ -385,6 +386,23 @@ export const WithRedeemableAssetPackWithSilverSubscription = () => (
 export const WithRedeemableAssetPackWithGoldSubscription = () => (
   <PrivateAssetPackInformationPageStory
     authenticatedUser={fakeGoldAuthenticatedUser}
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={1000}
+  />
+);
+
+export const WithRedeemableAssetPackWithEducationSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
     privateAssetPackListingData={{
       ...privateAssetPack1ListingData,
       redeemConditions: [

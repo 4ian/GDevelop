@@ -16,6 +16,7 @@ import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServ
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
   fakeAssetPackLicenses,
+  fakeGoldAuthenticatedUser,
   fakeSilverAuthenticatedUserWithCloudProjects,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import {
@@ -23,6 +24,8 @@ import {
   initialAssetStoreState,
 } from '../../../../AssetStore/AssetStoreContext';
 import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
+import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
@@ -206,11 +209,13 @@ const privateAssetPacks = [privateAssetPack1, privateAssetPackBundle];
 const PrivateAssetPackInformationPageStory = ({
   privateAssetPackListingData,
   receivedAssetPacks = [],
+  authenticatedUser = fakeSilverAuthenticatedUserWithCloudProjects,
   delayResponse = 0,
   errorCode,
   errorMessage,
 }: {
   privateAssetPackListingData: PrivateAssetPackListingData,
+  authenticatedUser?: AuthenticatedUser,
   receivedAssetPacks?: Array<PrivateAssetPack>,
   delayResponse?: number,
   errorCode?: number,
@@ -250,6 +255,11 @@ const PrivateAssetPackInformationPageStory = ({
   shopServiceMock
     .onGet('/product-license')
     .reply(200, fakeAssetPackLicenses)
+    .onPost(`/product/${privateAssetPackListingData.id}/action/redeem`)
+    .reply(config => {
+      action('Claim asset pack')();
+      return [200, 'OK'];
+    })
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -265,34 +275,36 @@ const PrivateAssetPackInformationPageStory = ({
     >
       <AuthenticatedUserContext.Provider
         value={{
-          ...fakeSilverAuthenticatedUserWithCloudProjects,
+          ...authenticatedUser,
           receivedAssetPacks,
           assetPackPurchases: receivedAssetPacks.map(privateAssetPack => ({
             id: 'purchase-id',
             productType: 'ASSET_PACK',
             usageType: 'commercial',
             productId: privateAssetPack.id,
-            buyerId: fakeSilverAuthenticatedUserWithCloudProjects.profile
-              ? fakeSilverAuthenticatedUserWithCloudProjects.profile.id
+            buyerId: authenticatedUser.profile
+              ? authenticatedUser.profile.id
               : 'userId',
-            receiverId: fakeSilverAuthenticatedUserWithCloudProjects.profile
-              ? fakeSilverAuthenticatedUserWithCloudProjects.profile.id
+            receiverId: authenticatedUser.profile
+              ? authenticatedUser.profile.id
               : 'userId',
             createdAt: new Date(1707519600000).toString(),
           })),
         }}
       >
-        <ProductLicenseStoreStateProvider>
-          <PrivateAssetPackInformationPage
-            privateAssetPackListingData={privateAssetPackListingData}
-            onOpenPurchaseDialog={() => action('open purchase dialog')()}
-            onAssetPackOpen={() => action('open asset pack')()}
-            privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
-              assetPackListingData =>
-                assetPackListingData.id !== privateAssetPackListingData.id
-            )}
-          />
-        </ProductLicenseStoreStateProvider>
+        <SubscriptionSuggestionProvider>
+          <ProductLicenseStoreStateProvider>
+            <PrivateAssetPackInformationPage
+              privateAssetPackListingData={privateAssetPackListingData}
+              onOpenPurchaseDialog={() => action('open purchase dialog')()}
+              onAssetPackOpen={() => action('open asset pack')()}
+              privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
+                assetPackListingData =>
+                  assetPackListingData.id !== privateAssetPackListingData.id
+              )}
+            />
+          </ProductLicenseStoreStateProvider>
+        </SubscriptionSuggestionProvider>
       </AuthenticatedUserContext.Provider>
     </AssetStoreContext.Provider>
   );
@@ -336,12 +348,46 @@ export const Loading = () => (
   />
 );
 
+export const WithRedeemableAssetPackWithoutSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={0}
+  />
+);
+
+export const WithRedeemableAssetPackWithSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    authenticatedUser={fakeGoldAuthenticatedUser}
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={1000}
+  />
+);
+
 export const With404 = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}
     errorCode={404}
   />
 );
+
 export const WithUnknownError = () => (
   <PrivateAssetPackInformationPageStory
     privateAssetPackListingData={privateAssetPack1ListingData}

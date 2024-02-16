@@ -43,7 +43,7 @@ type ProductListingData = {|
 
 type RedeemCondition = {
   reason: 'subscription',
-  condition: 'gold',
+  condition: string,
   usageType: string,
 };
 

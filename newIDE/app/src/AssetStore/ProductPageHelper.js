@@ -319,7 +319,11 @@ export const PurchaseProductButtons = <
       price => price.usageType === productListingData.prices[0].usageType
     );
     if (!creditPrice) {
-      console.error('Unable to find a credit price for this product');
+      console.error(
+        `Unable to find a credit price for product ${
+          productListingData.id
+        }, usage type ${productListingData.prices[0].usageType}`
+      );
       return null;
     }
   }

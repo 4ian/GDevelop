@@ -6,7 +6,7 @@ import {
   canRedeemProduct,
   redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
-  shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack,
+  getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateAssetPack,
@@ -60,6 +60,7 @@ import { SubscriptionSuggestionContext } from '../../Profile/Subscription/Subscr
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PasswordPromptDialog from '../PasswordPromptDialog';
 import Window from '../../Utils/Window';
+import RaisedButton from '../../UI/RaisedButton';
 
 const cellSpacing = 8;
 
@@ -498,7 +499,7 @@ const PrivateAssetPackInformationPage = ({
     subscription,
   });
 
-  const showPersonalUsageRedemptionBanner = shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack(
+  const calloutToGetSubscriptionOrClaimAssetPack = getCalloutToGetSubscriptionOrClaimAssetPack(
     { subscription, privateAssetPackListingData, isAlreadyReceived }
   );
 
@@ -570,7 +571,7 @@ const PrivateAssetPackInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
-                      {showPersonalUsageRedemptionBanner && (
+                      {calloutToGetSubscriptionOrClaimAssetPack && (
                         <div style={styles.redeemConditionsContainer}>
                           <Line noMargin alignItems="center">
                             <img
@@ -579,12 +580,7 @@ const PrivateAssetPackInformationPage = ({
                               alt="diamond"
                             />
                             <Text color="inherit" noMargin>
-                              {/* TODO: If another license is available for give away's,
-                              the logic should be adapted to change the copy of the banner. */}
-                              <Trans>
-                                Single commercial use license for claim with
-                                Gold or Startup subscription
-                              </Trans>
+                              {calloutToGetSubscriptionOrClaimAssetPack}
                             </Text>
                           </Line>
                           <Spacer />

@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import axios from 'axios';
 import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
@@ -6,6 +7,7 @@ import { isURL } from '../../ResourcesList/ResourceUtils';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Subscription } from './Usage';
+import { Trans } from '@lingui/macro';
 
 const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
@@ -408,7 +410,7 @@ export const canRedeemProduct = ({
   return false;
 };
 
-export const shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack = ({
+export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   subscription,
   privateAssetPackListingData,
   isAlreadyReceived,
@@ -416,18 +418,48 @@ export const shouldDisplayCalloutToGetSubscriptionOrClaimAssetPack = ({
   subscription: ?Subscription,
   privateAssetPackListingData: PrivateAssetPackListingData,
   isAlreadyReceived: boolean,
-|}): boolean => {
+|}): ?React.Node => {
   if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
     return false;
   if (subscription && subscription.benefitsFromEducationPlan) return false;
 
-  return privateAssetPackListingData.redeemConditions.some(redeemCondition => {
-    return privateAssetPackListingData.prices.some(
-      price =>
-        price.usageType === redeemCondition.usageType &&
-        redeemCondition.reason === 'subscription'
+  const applicableRedeemConditions = privateAssetPackListingData.redeemConditions.filter(
+    redeemCondition => {
+      return privateAssetPackListingData.prices.some(
+        price =>
+          price.usageType === redeemCondition.usageType &&
+          redeemCondition.reason === 'subscription'
+      );
+    }
+  );
+
+  // The first redeem condition is the priority one.
+  const firstApplicableRedeemCondition = applicableRedeemConditions[0];
+  if (!firstApplicableRedeemCondition) return null;
+
+  if (firstApplicableRedeemCondition.usageType === 'commercial') {
+    return (
+      <Trans>
+        Single commercial use license for claim with Gold or Startup
+        subscription
+      </Trans>
     );
-  });
+  }
+  if (firstApplicableRedeemCondition.usageType === 'personal') {
+    return (
+      <Trans>
+        Personal license for claim with Gold or Startup subscription
+      </Trans>
+    );
+  }
+  if (firstApplicableRedeemCondition.usageType === 'unlimited') {
+    return (
+      <Trans>
+        Unlimited commercial use license for claim with Gold or Startup
+        subscription
+      </Trans>
+    );
+  }
 };
 
 export const redeemPrivateAssetPack = async ({

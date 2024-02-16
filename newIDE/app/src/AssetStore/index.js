@@ -798,7 +798,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateGameTemplateListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateGameTemplateListingData}
               onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
                   onOpenPrivateGameTemplateListingData(

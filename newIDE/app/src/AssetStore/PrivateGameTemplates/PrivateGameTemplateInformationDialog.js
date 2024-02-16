@@ -48,7 +48,6 @@ const PrivateGameTemplateInformationDialog = ({
           privateGameTemplateListingDatasFromSameCreator
         }
         onOpenPurchaseDialog={onOpenPurchaseDialog}
-        isPurchaseDialogOpen={isPurchaseDialogOpen}
         onGameTemplateOpen={onGameTemplateOpen}
         onCreateWithGameTemplate={onCreateWithGameTemplate}
       />

@@ -276,7 +276,7 @@ export const PrivateAssetPackTile = ({
                 alt="diamond"
               />
               <Text color="inherit" noMargin>
-                <Trans>Pack for claim</Trans>
+                <Trans>Claim this pack</Trans>
               </Text>
             </div>
           )}

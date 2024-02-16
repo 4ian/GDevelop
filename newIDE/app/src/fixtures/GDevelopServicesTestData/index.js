@@ -1326,7 +1326,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
   message: undefined,
 };
 
-const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
+export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
@@ -1443,6 +1443,7 @@ export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser 
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: subscriptionForSilverUser,
   cloudProjects: tenCloudProjects,
 };
 

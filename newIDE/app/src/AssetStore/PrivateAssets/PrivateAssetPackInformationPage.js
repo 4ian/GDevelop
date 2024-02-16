@@ -3,7 +3,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
-  canRedeemProduct,
   redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
   getCalloutToGetSubscriptionOrClaimAssetPack,
@@ -492,11 +491,6 @@ const PrivateAssetPackInformationPage = ({
     [assetPack, privateAssetPackListingData, simulateAppStoreProduct]
   );
 
-  const canRedeemAssetPack = canRedeemProduct({
-    redeemConditions: privateAssetPackListingData.redeemConditions,
-    subscription,
-  });
-
   const calloutToGetSubscriptionOrClaimAssetPack = getCalloutToGetSubscriptionOrClaimAssetPack(
     { subscription, privateAssetPackListingData, isAlreadyReceived }
   );
@@ -578,7 +572,7 @@ const PrivateAssetPackInformationPage = ({
                               alt="diamond"
                             />
                             <Text color="inherit" noMargin>
-                              {calloutToGetSubscriptionOrClaimAssetPack}
+                              {calloutToGetSubscriptionOrClaimAssetPack.message}
                             </Text>
                           </Line>
                           <Spacer />
@@ -588,15 +582,13 @@ const PrivateAssetPackInformationPage = ({
                               label={
                                 isRedeemingProduct ? (
                                   <Trans>Please wait</Trans>
-                                ) : canRedeemAssetPack ? (
-                                  <Trans>Claim this pack</Trans>
                                 ) : (
-                                  <Trans>Get a Gold</Trans>
+                                  calloutToGetSubscriptionOrClaimAssetPack.actionLabel
                                 )
                               }
                               disabled={isRedeemingProduct}
                               onClick={
-                                canRedeemAssetPack
+                                calloutToGetSubscriptionOrClaimAssetPack.canRedeemAssetPack
                                   ? onWillRedeemAssetPack
                                   : () =>
                                       openSubscriptionDialog({

@@ -386,27 +386,44 @@ export const buyProductWithCredits = async (
 };
 
 export const canRedeemProduct = ({
-  redeemConditions,
+  redeemCondition,
   subscription,
 }: {|
-  redeemConditions?: RedeemCondition[],
+  redeemCondition: RedeemCondition,
   subscription?: ?Subscription,
-|}) => {
-  if (!redeemConditions) return false;
-  for (let redeemCondition of redeemConditions) {
-    if (redeemCondition.reason === 'subscription') {
-      // Condition should look like `gdevelop_gold,gdevelop_startup`.
-      const requiredPlanIds = redeemCondition.condition.split(',');
-      if (
-        subscription &&
-        requiredPlanIds.includes(subscription.planId) &&
-        !subscription.benefitsFromEducationPlan
-      ) {
-        return true;
+|}):
+  | {| canRedeem: true |}
+  | {| canRedeem: false |}
+  | {|
+      canRedeem: false,
+      reason?: 'subscription',
+      canUpgrade?: boolean,
+    |} => {
+  if (redeemCondition.reason === 'subscription') {
+    // Condition should look like `gdevelop_gold,gdevelop_startup`.
+    const requiredPlanIds = redeemCondition.condition.split(',');
+    if (subscription && !subscription.benefitsFromEducationPlan) {
+      if (requiredPlanIds.includes(subscription.planId)) {
+        return { canRedeem: true };
+      } else {
+        return {
+          canRedeem: false,
+          canUpgrade: [
+            'gdevelop_indie',
+            'gdevelop_pro',
+            'gdevelop_silver',
+            'gdevelop_gold',
+          ].some(
+            planId =>
+              subscription.planId === planId &&
+              !requiredPlanIds.includes(planId)
+          ),
+        };
       }
     }
   }
-  return false;
+
+  return { canRedeem: false };
 };
 
 export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
@@ -417,10 +434,14 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   subscription: ?Subscription,
   privateAssetPackListingData: PrivateAssetPackListingData,
   isAlreadyReceived: boolean,
-|}): ?React.Node => {
+|}): ?{|
+  message: React.Node,
+  actionLabel: React.Node,
+  canRedeemAssetPack: boolean,
+|} => {
   if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
-    return false;
-  if (subscription && subscription.benefitsFromEducationPlan) return false;
+    return null;
+  if (subscription && subscription.benefitsFromEducationPlan) return null;
 
   const applicableRedeemConditions = privateAssetPackListingData.redeemConditions.filter(
     redeemCondition => {
@@ -436,28 +457,55 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
   const firstApplicableRedeemCondition = applicableRedeemConditions[0];
   if (!firstApplicableRedeemCondition) return null;
 
+  const redemptionCheck = canRedeemProduct({
+    redeemCondition: firstApplicableRedeemCondition,
+    subscription,
+  });
+
+  const actionLabel = redemptionCheck.canRedeem ? (
+    <Trans>Claim this pack</Trans>
+  ) : !subscription || !subscription.planId ? (
+    <Trans>Get a Sub</Trans>
+  ) : redemptionCheck.canUpgrade ? (
+    <Trans>Upgrade</Trans>
+  ) : (
+    <Trans>Get a Sub</Trans>
+  );
+
   if (firstApplicableRedeemCondition.usageType === 'commercial') {
-    return (
-      <Trans>
-        Single commercial use license for claim with Gold or Startup
-        subscription
-      </Trans>
-    );
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      message: (
+        <Trans>
+          Single commercial use license for claim with Gold or Startup
+          subscription
+        </Trans>
+      ),
+    };
   }
   if (firstApplicableRedeemCondition.usageType === 'personal') {
-    return (
-      <Trans>
-        Personal license for claim with Gold or Startup subscription
-      </Trans>
-    );
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      message: (
+        <Trans>
+          Personal license for claim with Gold or Startup subscription
+        </Trans>
+      ),
+    };
   }
   if (firstApplicableRedeemCondition.usageType === 'unlimited') {
-    return (
-      <Trans>
-        Unlimited commercial use license for claim with Gold or Startup
-        subscription
-      </Trans>
-    );
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      message: (
+        <Trans>
+          Unlimited commercial use license for claim with Gold or Startup
+          subscription
+        </Trans>
+      ),
+    };
   }
 };
 

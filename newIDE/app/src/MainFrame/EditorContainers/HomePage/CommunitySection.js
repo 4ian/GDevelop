@@ -14,8 +14,8 @@ import TikTok from '../../../UI/CustomSvgIcons/TikTok';
 import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import ErrorBoundary from '../../../UI/ErrorBoundary';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 
 const styles = {
   list: {
@@ -71,7 +71,7 @@ const CommunitySection = () => {
           <Text size="title">
             <Trans>News and announcements</Trans>
           </Text>
-          <AnnouncementsFeed canClose={false} />
+          <AnnouncementsFeed canClose={false} level="normal" />
           <Text size="title">
             <Trans>Join the conversation</Trans>
           </Text>

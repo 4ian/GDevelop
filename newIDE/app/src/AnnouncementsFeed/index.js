@@ -31,15 +31,17 @@ export const AnnouncementsFeed = ({
   addMargins,
   hideLoader,
 }: AnnouncementsFeedProps) => {
-  const { announcements, error, fetchAnnouncements } = React.useContext(
-    AnnouncementsFeedContext
-  );
+  const {
+    announcements,
+    error,
+    fetchAnnouncementsAndPromotions,
+  } = React.useContext(AnnouncementsFeedContext);
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
   const { navigateToRoute } = React.useContext(RouterContext);
 
   if (error) {
     return (
-      <PlaceholderError onRetry={fetchAnnouncements}>
+      <PlaceholderError onRetry={fetchAnnouncementsAndPromotions}>
         <Trans>
           Can't load the announcements. Verify your internet connection or try
           again later.

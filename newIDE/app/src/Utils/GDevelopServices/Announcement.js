@@ -13,6 +13,16 @@ export type Announcement = {
   buttonLabelByLocale?: MessageByLocale,
 };
 
+export type Promotion = {
+  id: string,
+  imageUrl: string,
+  mobileImageUrl: string,
+  display: 'all' | 'non-native-mobile',
+  type: 'game-template' | 'asset-pack' | 'game',
+  linkUrl?: string,
+  productId?: string,
+};
+
 export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
   const response = await axios.get(
     `${GDevelopReleaseApi.baseUrl}/announcement`
@@ -23,4 +33,14 @@ export const listAllAnnouncements = async (): Promise<Array<Announcement>> => {
   }
 
   return announcements;
+};
+
+export const listAllPromotions = async (): Promise<Array<Promotion>> => {
+  const response = await axios.get(`${GDevelopReleaseApi.baseUrl}/promotion`);
+  const promotions = response.data;
+  if (!Array.isArray(promotions)) {
+    throw new Error('Invalid response from the promotions API');
+  }
+
+  return promotions;
 };

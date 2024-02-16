@@ -2,21 +2,31 @@
 import * as React from 'react';
 import {
   type Announcement,
+  type Promotion,
   listAllAnnouncements,
+  listAllPromotions,
 } from '../Utils/GDevelopServices/Announcement';
 import { ANNOUNCEMENTS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 
+// NOTE: For the moment, we store announcements and promotions in the same context,
+// as previously both were mixed under the announcenments endpoint.
+// This is to allow filtering announcements that are now promotions, in the same request.
+// Once enough users are on the 5.3.190, and promotions are displayed to them,
+// we can split them into 2 contexts.
+
 type AnnouncementsFeedState = {|
   announcements: ?(Announcement[]),
+  promotions: ?(Promotion[]),
   error: ?Error,
-  fetchAnnouncements: () => void,
+  fetchAnnouncementsAndPromotions: () => void,
 |};
 
 export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedState>(
   {
     announcements: null,
+    promotions: null,
     error: null,
-    fetchAnnouncements: () => {},
+    fetchAnnouncementsAndPromotions: () => {},
   }
 );
 
@@ -31,35 +41,43 @@ export const AnnouncementsFeedStateProvider = ({
     null
   );
   const [error, setError] = React.useState<?Error>(null);
+  const [promotions, setPromotions] = React.useState<?(Promotion[])>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchAnnouncements = React.useCallback(
-    () => {
-      if (isLoading.current) return;
+  const fetchAnnouncementsAndPromotions = React.useCallback(() => {
+    if (isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const announcements = await listAllAnnouncements();
+      try {
+        const [fetchedAnnouncements, fetchedPromotions] = await Promise.all([
+          listAllAnnouncements(),
+          listAllPromotions(),
+        ]);
 
-          setAnnouncements(announcements);
-        } catch (error) {
-          console.error(
-            `Unable to load the announcements from the api:`,
-            error
-          );
-          setError(error);
-        }
+        // Logic to remove once promotions are displayed to enough users.
+        // For now, we filter out promotions from the announcements.
+        const filteredAnnouncements = fetchedAnnouncements.filter(
+          announcement =>
+            !fetchedPromotions.find(
+              promotion => promotion.id === announcement.id
+            )
+        );
 
-        isLoading.current = false;
-      })();
-    },
-    [isLoading]
-  );
+        setAnnouncements(filteredAnnouncements);
+        setPromotions(fetchedPromotions);
+      } catch (error) {
+        console.error(`Unable to load the announcements from the api:`, error);
+        setError(error);
+      }
 
-  // Preload the announcements when the app loads.
+      isLoading.current = false;
+    })();
+  }, []);
+
+  // Preload the announcements and promotions when the app loads.
   React.useEffect(
     () => {
       // Don't attempt to load again announcements if they
@@ -68,20 +86,21 @@ export const AnnouncementsFeedStateProvider = ({
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching announcements from the api...');
-        fetchAnnouncements();
+        fetchAnnouncementsAndPromotions();
       }, ANNOUNCEMENTS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchAnnouncements, announcements, isLoading]
+    [fetchAnnouncementsAndPromotions, announcements, isLoading]
   );
 
   const announcementsFeedState = React.useMemo(
     () => ({
       announcements,
+      promotions,
       error,
-      fetchAnnouncements,
+      fetchAnnouncementsAndPromotions,
     }),
-    [announcements, error, fetchAnnouncements]
+    [announcements, promotions, error, fetchAnnouncementsAndPromotions]
   );
 
   return (

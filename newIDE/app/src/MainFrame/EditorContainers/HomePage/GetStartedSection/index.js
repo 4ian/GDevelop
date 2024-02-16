@@ -41,6 +41,7 @@ import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
+import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
@@ -659,6 +660,7 @@ const GetStartedSection = ({
     return (
       <>
         <AnnouncementsFeed canClose level="urgent" addMargins hideLoader />
+        <PromotionsSlideshow />
         <SectionContainer
           title={
             profile.username ? (

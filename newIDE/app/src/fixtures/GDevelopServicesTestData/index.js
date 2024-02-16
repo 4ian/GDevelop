@@ -27,7 +27,10 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
-import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
+import {
+  type Announcement,
+  type Promotion,
+} from '../../Utils/GDevelopServices/Announcement';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export const indieFirebaseUser: FirebaseUser = {
@@ -2781,5 +2784,38 @@ export const fakeAssetPackLicenses = [
       en:
         'Use these assets for unlimited commercial games, on an unlimited number of projects and platforms.',
     },
+  },
+];
+
+export const fakePromotions: Promotion[] = [
+  {
+    id: '123',
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg',
+    productId: '43994a30-c54b-4f5d-baf5-6e1f99b13824',
+    display: 'all',
+    type: 'asset-pack',
+  },
+  {
+    id: 'premium-featuring-bubble-dogs', // TO REMOVE ON 26/02/24
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/Premium_Featuring__Bubble_Dogs.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/Premium_Featuring__Bubble_Dogs_Mobile.jpg',
+    linkUrl: 'https://gd.games/pentogga/bubbledogs',
+    display: 'all',
+    type: 'game',
+  },
+  {
+    id: 'gdevelop-produce-farm-bundle',
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelop_Produce_Farm_Bundle.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/Produce_Farm_Bundle_Mobile.jpg',
+    productId: '30933458-99e6-41b5-a5f6-5bb220e8754f',
+    display: 'all',
+    type: 'asset-pack',
   },
 ];

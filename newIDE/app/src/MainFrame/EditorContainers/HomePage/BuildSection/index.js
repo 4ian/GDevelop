@@ -427,25 +427,27 @@ const BuildSection = ({
             </Column>
           </Line>
         ) : (
-          <ListItem style={styles.listItem}>
-            <Column expand>
-              <Paper
-                variant="outlined"
-                background="dark"
-                style={styles.noProjectsContainer}
-              >
-                <BackgroundText>
-                  <Trans>No projects yet.</Trans>
-                </BackgroundText>
-                <BackgroundText>
-                  <Trans>
-                    Create your first project using one of our templates or
-                    start from scratch.
-                  </Trans>
-                </BackgroundText>
-              </Paper>
-            </Column>
-          </ListItem>
+          <Line>
+            <ListItem style={styles.listItem}>
+              <Column expand>
+                <Paper
+                  variant="outlined"
+                  background="dark"
+                  style={styles.noProjectsContainer}
+                >
+                  <BackgroundText>
+                    <Trans>No projects yet.</Trans>
+                  </BackgroundText>
+                  <BackgroundText>
+                    <Trans>
+                      Create your first project using one of our templates or
+                      start from scratch.
+                    </Trans>
+                  </BackgroundText>
+                </Paper>
+              </Column>
+            </ListItem>
+          </Line>
         )}
       </SectionRow>
       <SectionRow>

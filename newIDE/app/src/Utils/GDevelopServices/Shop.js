@@ -9,7 +9,7 @@ import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Subscription } from './Usage';
 import { Trans } from '@lingui/macro';
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
@@ -96,7 +96,6 @@ export type CreditsPackageListingData = {|
 
 export type Purchase = {|
   id: string,
-  productType: string,
   usageType: string,
   productId: string,
   buyerId: string,

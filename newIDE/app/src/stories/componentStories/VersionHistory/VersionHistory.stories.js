@@ -9,7 +9,7 @@ import paperDecorator from '../../PaperDecorator';
 import VersionHistory from '../../../VersionHistory';
 import MockAdapter from 'axios-mock-adapter';
 import type { OpenedVersionStatus } from '../../../VersionHistory';
-import { apiClient as projectApiAxiosClient } from '../../../Utils/GDevelopServices/User';
+import { client as userApiAxiosClient } from '../../../Utils/GDevelopServices/User';
 import { GDevelopUserApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import { delay } from '../../../Utils/Delay';
 import {
@@ -155,7 +155,7 @@ export const Default = () => {
     openedVersionStatus,
     setOpenedVersionStatus,
   ] = React.useState<?OpenedVersionStatus>(null);
-  const projectServiceMock = new MockAdapter(projectApiAxiosClient, {
+  const projectServiceMock = new MockAdapter(userApiAxiosClient, {
     delayResponse: 1000,
   });
   const latestVersion = versions[0];

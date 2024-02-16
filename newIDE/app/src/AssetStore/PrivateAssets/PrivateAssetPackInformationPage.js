@@ -138,7 +138,6 @@ type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   privateAssetPackListingDatasFromSameCreator?: ?Array<PrivateAssetPackListingData>,
   onOpenPurchaseDialog: () => void,
-  isPurchaseDialogOpen: boolean,
   onAssetPackOpen: (
     privateAssetPackListingData: PrivateAssetPackListingData,
     options?: {|
@@ -152,7 +151,6 @@ const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
   privateAssetPackListingDatasFromSameCreator,
   onOpenPurchaseDialog,
-  isPurchaseDialogOpen,
   onAssetPackOpen,
   simulateAppStoreProduct,
 }: Props) => {

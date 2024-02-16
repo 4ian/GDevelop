@@ -1,12 +1,15 @@
 // @flow
+import * as React from 'react';
 import axios from 'axios';
 import path from 'path-browserify';
 import { GDevelopShopApi } from './ApiConfigs';
 import { isURL } from '../../ResourcesList/ResourceUtils';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { type Subscription } from './Usage';
+import { Trans } from '@lingui/macro';
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: GDevelopShopApi.baseUrl,
 });
 
@@ -38,6 +41,16 @@ type ProductListingData = {|
   includedListableProductIds?: string[],
 |};
 
+type RedeemCondition = {
+  reason: 'subscription',
+  condition: string,
+  usageType: string,
+};
+
+type RedeemableAttributes = {|
+  redeemConditions?: RedeemCondition[],
+|};
+
 type StripeAndPaypalSellableAttributes = {|
   prices: StripeAndPaypalPrice[],
   sellerStripeAccountId: string,
@@ -59,6 +72,7 @@ export type PrivateAssetPackListingData = {|
   ...StripeAndPaypalSellableAttributes,
   ...AppStoreProductAttributes,
   ...CreditsClaimableAttributes,
+  ...RedeemableAttributes,
   productType: 'ASSET_PACK',
   listing: 'ASSET_PACK',
 |};
@@ -82,7 +96,6 @@ export type CreditsPackageListingData = {|
 
 export type Purchase = {|
   id: string,
-  productType: string,
   usageType: string,
   productId: string,
   buyerId: string,
@@ -368,6 +381,157 @@ export const buyProductWithCredits = async (
       headers: {
         Authorization: authorizationHeader,
       },
+    }
+  );
+};
+
+export const canRedeemProduct = ({
+  redeemCondition,
+  subscription,
+}: {|
+  redeemCondition: RedeemCondition,
+  subscription?: ?Subscription,
+|}):
+  | {| canRedeem: true |}
+  | {| canRedeem: false |}
+  | {|
+      canRedeem: false,
+      reason?: 'subscription',
+      canUpgrade?: boolean,
+    |} => {
+  if (redeemCondition.reason === 'subscription') {
+    // Condition should look like `gdevelop_gold,gdevelop_startup`.
+    const requiredPlanIds = redeemCondition.condition.split(',');
+    if (subscription && !subscription.benefitsFromEducationPlan) {
+      if (requiredPlanIds.includes(subscription.planId)) {
+        return { canRedeem: true };
+      } else {
+        return {
+          canRedeem: false,
+          canUpgrade: [
+            'gdevelop_indie',
+            'gdevelop_pro',
+            'gdevelop_silver',
+            'gdevelop_gold',
+          ].some(
+            planId =>
+              subscription.planId === planId &&
+              !requiredPlanIds.includes(planId)
+          ),
+        };
+      }
+    }
+  }
+
+  return { canRedeem: false };
+};
+
+export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
+  subscription,
+  privateAssetPackListingData,
+  isAlreadyReceived,
+}: {|
+  subscription: ?Subscription,
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  isAlreadyReceived: boolean,
+|}): ?{|
+  message: React.Node,
+  actionLabel: ?React.Node,
+  canRedeemAssetPack: boolean,
+|} => {
+  if (isAlreadyReceived || !privateAssetPackListingData.redeemConditions)
+    return null;
+  if (subscription && subscription.benefitsFromEducationPlan) return null;
+
+  const applicableRedeemConditions = privateAssetPackListingData.redeemConditions.filter(
+    redeemCondition => {
+      return privateAssetPackListingData.prices.some(
+        price =>
+          price.usageType === redeemCondition.usageType &&
+          redeemCondition.reason === 'subscription'
+      );
+    }
+  );
+
+  // The first redeem condition is the priority one.
+  const firstApplicableRedeemCondition = applicableRedeemConditions[0];
+  if (!firstApplicableRedeemCondition) return null;
+
+  const redemptionCheck = canRedeemProduct({
+    redeemCondition: firstApplicableRedeemCondition,
+    subscription,
+  });
+
+  const actionLabel = redemptionCheck.canRedeem ? (
+    <Trans>Claim this pack</Trans>
+  ) : !subscription || !subscription.planId ? (
+    <Trans>Get a Sub</Trans>
+  ) : redemptionCheck.canUpgrade ? (
+    <Trans>Upgrade</Trans>
+  ) : null;
+
+  if (firstApplicableRedeemCondition.usageType === 'commercial') {
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
+      message: (
+        <Trans>
+          Single commercial use license for claim with Gold or Startup
+          subscription
+        </Trans>
+      ),
+    };
+  }
+  if (firstApplicableRedeemCondition.usageType === 'personal') {
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
+      message: (
+        <Trans>
+          Personal license for claim with Gold or Startup subscription
+        </Trans>
+      ),
+    };
+  }
+  if (firstApplicableRedeemCondition.usageType === 'unlimited') {
+    return {
+      actionLabel,
+      canRedeemAssetPack: redemptionCheck.canRedeem,
+      // TODO: Adapt message to redeem condition
+      message: (
+        <Trans>
+          Unlimited commercial use license for claim with Gold or Startup
+          subscription
+        </Trans>
+      ),
+    };
+  }
+};
+
+export const redeemPrivateAssetPack = async ({
+  privateAssetPackListingData,
+  getAuthorizationHeader,
+  userId,
+  password,
+}: {|
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  password: string,
+|}): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const payload: {| priceUsageType: string, password?: string |} = {
+    priceUsageType: 'commercial',
+  };
+  if (password) payload.password = password;
+  await client.post(
+    `/product/${privateAssetPackListingData.id}/action/redeem`,
+    payload,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
     }
   );
 };

@@ -1326,7 +1326,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
   message: undefined,
 };
 
-const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
+export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
@@ -1443,6 +1443,7 @@ export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser 
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: subscriptionForSilverUser,
   cloudProjects: tenCloudProjects,
 };
 
@@ -2717,6 +2718,68 @@ export const fakeAnnouncements: Announcement[] = [
     markdownMessageByLocale: {
       en:
         '[![GDevelop Android](https://resources.gdevelop.io/announcements/GDevelop_Android.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+    },
+  },
+];
+
+export const fakeGameTemplateLicenses = [
+  {
+    id: 'personal',
+    nameByLocale: {
+      en: 'Personal',
+    },
+    descriptionByLocale: {
+      en: 'Use this game template for personal non-monetised projects only.',
+    },
+  },
+  {
+    id: 'commercial',
+    nameByLocale: {
+      en: 'Single commercial use',
+    },
+    descriptionByLocale: {
+      en: 'Use this game template for one commercial game only.',
+    },
+  },
+  {
+    id: 'unlimited',
+    nameByLocale: {
+      en: 'Unlimited commercial use',
+    },
+    descriptionByLocale: {
+      en:
+        'Use this game template for unlimited commercial games, on an unlimited number of projects and platforms.',
+    },
+  },
+];
+
+export const fakeAssetPackLicenses = [
+  {
+    id: 'personal',
+    nameByLocale: {
+      en: 'Personal',
+    },
+    descriptionByLocale: {
+      en: 'Use these assets for personal non-monetised projects only.',
+    },
+  },
+  {
+    id: 'commercial',
+    nameByLocale: {
+      en: 'Single commercial use',
+    },
+    descriptionByLocale: {
+      en: 'Use these assets for one commercial game only.',
+    },
+  },
+  {
+    id: 'unlimited',
+    nameByLocale: {
+      en: 'Unlimited commercial use',
+    },
+    descriptionByLocale: {
+      en:
+        'Use these assets for unlimited commercial games, on an unlimited number of projects and platforms.',
     },
   },
 ];

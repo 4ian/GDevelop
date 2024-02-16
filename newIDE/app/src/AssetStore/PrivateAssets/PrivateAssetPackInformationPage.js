@@ -3,7 +3,9 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
+  redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
+  getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateAssetPack,
@@ -53,6 +55,11 @@ import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
 import HelpIcon from '../../UI/HelpIcon';
 import Avatar from '@material-ui/core/Avatar';
+import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import PasswordPromptDialog from '../PasswordPromptDialog';
+import Window from '../../Utils/Window';
+import RaisedButton from '../../UI/RaisedButton';
 
 const cellSpacing = 8;
 
@@ -115,13 +122,21 @@ const styles = {
     borderRadius: 4,
     color: 'black',
   },
+  redeemConditionsContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '4px 8px',
+    backgroundColor: '#FF8569',
+    color: '#1D1D26',
+  },
+  redeemDiamondIcon: { height: 24 },
 };
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
   privateAssetPackListingDatasFromSameCreator?: ?Array<PrivateAssetPackListingData>,
   onOpenPurchaseDialog: () => void,
-  isPurchaseDialogOpen: boolean,
   onAssetPackOpen: (
     privateAssetPackListingData: PrivateAssetPackListingData,
     options?: {|
@@ -135,12 +150,12 @@ const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
   privateAssetPackListingDatasFromSameCreator,
   onOpenPurchaseDialog,
-  isPurchaseDialogOpen,
   onAssetPackOpen,
   simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
   const { privateAssetPackListingDatas } = React.useContext(AssetStoreContext);
+  const { showAlert } = useAlertDialog();
   const {
     receivedAssetPacks,
     profile,
@@ -148,6 +163,9 @@ const PrivateAssetPackInformationPage = ({
     assetPackPurchases,
     getAuthorizationHeader,
     onOpenLoginDialog,
+    subscription,
+    onPurchaseSuccessful,
+    onRefreshAssetPackPurchases,
   } = React.useContext(AuthenticatedUserContext);
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
@@ -155,8 +173,14 @@ const PrivateAssetPackInformationPage = ({
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
     privateAssetPackListingData.prices[0].usageType
   );
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
+  const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(
+    false
+  );
   const [
     openSellerPublicProfileDialog,
     setOpenSellerPublicProfileDialog,
@@ -165,6 +189,11 @@ const PrivateAssetPackInformationPage = ({
     sellerPublicProfile,
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
+  const [
+    displayPasswordPrompt,
+    setDisplayPasswordPrompt,
+  ] = React.useState<boolean>(false);
+  const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -241,6 +270,67 @@ const PrivateAssetPackInformationPage = ({
       privateAssetPackListingDatasFromSameCreator,
       onAssetPackOpen,
       receivedAssetPacks,
+    ]
+  );
+
+  const onWillRedeemAssetPack = () => {
+    // Password is required in dev environment only so that one cannot freely claim asset packs.
+    if (Window.isDev()) setDisplayPasswordPrompt(true);
+    else onRedeemAssetPack();
+  };
+
+  const onRedeemAssetPack = React.useCallback(
+    async () => {
+      if (!profile || isRedeemingProduct) return;
+      setIsRedeemingProduct(true);
+      try {
+        await redeemPrivateAssetPack({
+          privateAssetPackListingData,
+          getAuthorizationHeader,
+          userId: profile.id,
+          password,
+        });
+        await Promise.all([
+          onRefreshAssetPackPurchases(),
+          onPurchaseSuccessful(),
+        ]);
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 402 &&
+          extractedStatusAndCode.code ===
+            'product-redemption/old-redeemed-subscription'
+        ) {
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`The monthly free asset pack perk was not part of your plan at the time you got your subscription to GDevelop. To enjoy this perk, please purchase a new subscription.`,
+          });
+        } else {
+          console.error(
+            'An error occurred when claiming the asset pack:',
+            extractedStatusAndCode
+          );
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`Something wrong happened when claiming the asset pack. Please check your internet connection or try again later.`,
+          });
+        }
+      } finally {
+        setIsRedeemingProduct(false);
+      }
+    },
+    [
+      privateAssetPackListingData,
+      getAuthorizationHeader,
+      profile,
+      showAlert,
+      password,
+      onPurchaseSuccessful,
+      isRedeemingProduct,
+      onRefreshAssetPackPurchases,
     ]
   );
 
@@ -401,6 +491,10 @@ const PrivateAssetPackInformationPage = ({
     [assetPack, privateAssetPackListingData, simulateAppStoreProduct]
   );
 
+  const calloutToGetSubscriptionOrClaimAssetPack = getCalloutToGetSubscriptionOrClaimAssetPack(
+    { subscription, privateAssetPackListingData, isAlreadyReceived }
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -469,6 +563,47 @@ const PrivateAssetPackInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
+                      {calloutToGetSubscriptionOrClaimAssetPack && (
+                        <div style={styles.redeemConditionsContainer}>
+                          <Line noMargin alignItems="center">
+                            <img
+                              src="res/small-diamond.svg"
+                              style={styles.redeemDiamondIcon}
+                              alt="diamond"
+                            />
+                            <Text color="inherit" noMargin>
+                              {calloutToGetSubscriptionOrClaimAssetPack.message}
+                            </Text>
+                          </Line>
+                          <Spacer />
+                          {calloutToGetSubscriptionOrClaimAssetPack.actionLabel && (
+                            <div style={{ flexShrink: 0 }}>
+                              <RaisedButton
+                                primary
+                                label={
+                                  isRedeemingProduct ? (
+                                    <Trans>Please wait</Trans>
+                                  ) : (
+                                    calloutToGetSubscriptionOrClaimAssetPack.actionLabel
+                                  )
+                                }
+                                disabled={isRedeemingProduct}
+                                onClick={
+                                  calloutToGetSubscriptionOrClaimAssetPack.canRedeemAssetPack
+                                    ? onWillRedeemAssetPack
+                                    : () =>
+                                        openSubscriptionDialog({
+                                          analyticsMetadata: {
+                                            reason: 'Claim asset pack',
+                                          },
+                                          filter: 'individual',
+                                        })
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <Line noMargin>
                         <Text size="sub-title">
                           <Trans>Licensing</Trans>
@@ -599,6 +734,14 @@ const PrivateAssetPackInformationPage = ({
                 onAssetPackOpen(assetPackListingData);
                 setOpenSellerPublicProfileDialog(false);
               }}
+            />
+          )}
+          {displayPasswordPrompt && (
+            <PasswordPromptDialog
+              onApply={onRedeemAssetPack}
+              onClose={() => setDisplayPasswordPrompt(false)}
+              passwordValue={password}
+              setPasswordValue={setPassword}
             />
           )}
         </>

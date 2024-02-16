@@ -104,6 +104,7 @@ const useStylesForButtonBase = (selected: boolean) =>
         '&:hover': {
           backgroundColor: theme.palette.action.hover,
         },
+        transition: 'background-color 100ms ease',
       },
     })
   )();

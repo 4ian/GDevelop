@@ -2,26 +2,32 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateAssetPackInformationPage from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationPage';
 import {
-  GDevelopAssetApi,
-  GDevelopUserApi,
-} from '../../../../Utils/GDevelopServices/ApiConfigs';
-import {
   client as assetApiAxiosClient,
   type PrivateAssetPack,
 } from '../../../../Utils/GDevelopServices/Asset';
+import { client as userApiAxiosClient } from '../../../../Utils/GDevelopServices/User';
+import { client as shopApiAxiosClient } from '../../../../Utils/GDevelopServices/Shop';
 import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServices/Shop';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAssetPackLicenses,
+  fakeGoldAuthenticatedUser,
+  fakeSilverAuthenticatedUserWithCloudProjects,
+  defaultAuthenticatedUserWithNoSubscription,
+  fakeAuthenticatedUserWithEducationPlan,
+} from '../../../../fixtures/GDevelopServicesTestData';
 import {
   AssetStoreContext,
   initialAssetStoreState,
 } from '../../../../AssetStore/AssetStoreContext';
+import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
+import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
@@ -194,31 +200,68 @@ const privateAssetPackBundle: PrivateAssetPack = {
   longDescription: 'This is the best asset pack about french food',
 };
 
-export const Default = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
+const allPrivateAssetPackListingData = [
+  privateAssetPack1ListingData,
+  privateAssetPack2ListingData,
+  privateAssetPackBundleListingData,
+];
+
+const privateAssetPacks = [privateAssetPack1, privateAssetPackBundle];
+
+const PrivateAssetPackInformationPageStory = ({
+  privateAssetPackListingData,
+  receivedAssetPacks = [],
+  authenticatedUser = fakeSilverAuthenticatedUserWithCloudProjects,
+  delayResponse = 0,
+  errorCode,
+  errorMessage,
+}: {
+  privateAssetPackListingData: PrivateAssetPackListingData,
+  authenticatedUser?: AuthenticatedUser,
+  receivedAssetPacks?: Array<PrivateAssetPack>,
+  delayResponse?: number,
+  errorCode?: number,
+  errorMessage?: string,
+}) => {
+  const userServiceMock = new MockAdapter(userApiAxiosClient, {
+    delayResponse,
+  });
+  userServiceMock
+    .onGet(`/user-public-profile/${privateAssetPackListingData.sellerId}`)
     .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
+    .onGet(`/user/${privateAssetPackListingData.sellerId}/badge`)
     .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .onGet(`/achievement`)
     .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
+  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
+    delayResponse,
+  });
   assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
+    .onGet(`/asset-pack/${privateAssetPackListingData.id}`)
+    .reply(
+      errorCode || 200,
+      errorCode
+        ? errorMessage || null
+        : privateAssetPacks.find(
+            assetPack => assetPack.id === privateAssetPackListingData.id
+          )
     )
-    .reply(200, privateAssetPack1)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+  const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
+    delayResponse,
+  });
+  shopServiceMock
+    .onGet('/product-license')
+    .reply(200, fakeAssetPackLicenses)
+    .onPost(`/product/${privateAssetPackListingData.id}/action/redeem`)
+    .reply(config => {
+      action('Claim asset pack')();
+      return [200, 'OK'];
+    })
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -229,325 +272,162 @@ export const Default = () => {
     <AssetStoreContext.Provider
       value={{
         ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
-        ],
-      }}
-    >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPack1ListingData}
-        isPurchaseDialogOpen={false}
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
-        privateAssetPackListingDatasFromSameCreator={[
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-        ]}
-      />
-    </AssetStoreContext.Provider>
-  );
-};
-
-export const ForABundle = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPackBundleListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPackBundleListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPackBundleListingData.id
-      }`
-    )
-    .reply(200, privateAssetPackBundle)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <AssetStoreContext.Provider
-      value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
-        ],
-      }}
-    >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPackBundleListingData}
-        isPurchaseDialogOpen={false}
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
-      />
-    </AssetStoreContext.Provider>
-  );
-};
-
-export const ForAlreadyPurchasedAssetPack = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
-    )
-    .reply(200, privateAssetPack1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <AssetStoreContext.Provider
-      value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
-        ],
+        privateAssetPackListingDatas: allPrivateAssetPackListingData,
       }}
     >
       <AuthenticatedUserContext.Provider
         value={{
-          ...fakeSilverAuthenticatedUserWithCloudProjects,
-          receivedAssetPacks: [
-            {
-              id: privateAssetPack1ListingData.id,
-              // Useless data for the component below.
-              name: privateAssetPack1ListingData.name,
-              createdAt: '2',
-              updatedAt: '2',
-              longDescription: 'longDescription',
-              content: { sprite: 9 },
-              previewImageUrls: [],
-              tag: 'tag',
-            },
-          ],
+          ...authenticatedUser,
+          receivedAssetPacks,
+          assetPackPurchases: receivedAssetPacks.map(privateAssetPack => ({
+            id: 'purchase-id',
+            productType: 'ASSET_PACK',
+            usageType: 'commercial',
+            productId: privateAssetPack.id,
+            buyerId: authenticatedUser.profile
+              ? authenticatedUser.profile.id
+              : 'userId',
+            receiverId: authenticatedUser.profile
+              ? authenticatedUser.profile.id
+              : 'userId',
+            createdAt: new Date(1707519600000).toString(),
+          })),
         }}
       >
-        <PrivateAssetPackInformationPage
-          privateAssetPackListingData={privateAssetPack1ListingData}
-          isPurchaseDialogOpen={false}
-          onOpenPurchaseDialog={() => action('open purchase dialog')()}
-          onAssetPackOpen={() => action('open asset pack')()}
-          privateAssetPackListingDatasFromSameCreator={[
-            privateAssetPack1ListingData,
-            privateAssetPack2ListingData,
-          ]}
-        />
+        <SubscriptionSuggestionProvider>
+          <ProductLicenseStoreStateProvider>
+            <PrivateAssetPackInformationPage
+              privateAssetPackListingData={privateAssetPackListingData}
+              onOpenPurchaseDialog={() => action('open purchase dialog')()}
+              onAssetPackOpen={() => action('open asset pack')()}
+              privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
+                assetPackListingData =>
+                  assetPackListingData.id !== privateAssetPackListingData.id
+              )}
+            />
+          </ProductLicenseStoreStateProvider>
+        </SubscriptionSuggestionProvider>
       </AuthenticatedUserContext.Provider>
     </AssetStoreContext.Provider>
   );
 };
-export const WithPurchaseDialogOpen = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
-    )
-    .reply(200, privateAssetPack1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
 
-  return (
-    <AssetStoreContext.Provider
-      value={{
-        ...initialAssetStoreState,
-        privateAssetPackListingDatas: [
-          privateAssetPack1ListingData,
-          privateAssetPack2ListingData,
-          privateAssetPackBundleListingData,
-        ],
-      }}
-    >
-      <PrivateAssetPackInformationPage
-        privateAssetPackListingData={privateAssetPack1ListingData}
-        isPurchaseDialogOpen
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onAssetPackOpen={() => action('open asset pack')()}
-      />
-    </AssetStoreContext.Provider>
-  );
-};
-export const Loading = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 10000 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
-    delayResponse: 10000,
-  });
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
-    )
-    .reply(200, privateAssetPack1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
+export const Default = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPack1ListingData}
+  />
+);
 
-  return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
-    />
-  );
-};
+export const ForABundle = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPackBundleListingData}
+  />
+);
 
-export const With404 = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
-    )
-    .reply(404, null)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
+export const ForAlreadyPurchasedAssetPack = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPack1ListingData}
+    receivedAssetPacks={[
+      {
+        id: privateAssetPack1ListingData.id,
+        // Below is useless data for the component.
+        name: privateAssetPack1ListingData.name,
+        createdAt: '2',
+        updatedAt: '2',
+        longDescription: 'longDescription',
+        content: { sprite: 9 },
+        previewImageUrls: [],
+        tag: 'tag',
+      },
+    ]}
+  />
+);
 
-  return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
-    />
-  );
-};
+export const Loading = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPack1ListingData}
+    delayResponse={10000}
+  />
+);
 
-export const WithUnknownError = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateAssetPack1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateAssetPack1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/asset-pack/${
-        privateAssetPack1ListingData.id
-      }`
-    )
-    .reply(500, 'Internal server error')
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
+export const WithRedeemableAssetPackWithoutSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    authenticatedUser={defaultAuthenticatedUserWithNoSubscription}
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={0}
+  />
+);
 
-  return (
-    <PrivateAssetPackInformationPage
-      privateAssetPackListingData={privateAssetPack1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onAssetPackOpen={() => action('open asset pack')()}
-    />
-  );
-};
+export const WithRedeemableAssetPackWithSilverSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={0}
+  />
+);
+
+export const WithRedeemableAssetPackWithGoldSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    authenticatedUser={fakeGoldAuthenticatedUser}
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={1000}
+  />
+);
+
+export const WithRedeemableAssetPackWithEducationSubscription = () => (
+  <PrivateAssetPackInformationPageStory
+    authenticatedUser={fakeAuthenticatedUserWithEducationPlan}
+    privateAssetPackListingData={{
+      ...privateAssetPack1ListingData,
+      redeemConditions: [
+        {
+          reason: 'subscription',
+          condition: 'gdevelop_gold',
+          usageType: 'commercial',
+        },
+      ],
+    }}
+    delayResponse={1000}
+  />
+);
+
+export const With404 = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPack1ListingData}
+    errorCode={404}
+  />
+);
+
+export const WithUnknownError = () => (
+  <PrivateAssetPackInformationPageStory
+    privateAssetPackListingData={privateAssetPack1ListingData}
+    errorCode={500}
+    errorMessage={'Internal server error'}
+  />
+);

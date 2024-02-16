@@ -783,7 +783,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateAssetPackListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
               privateAssetPackListingDatasFromSameCreator={
                 privateAssetPackListingDatasFromSameCreator
@@ -799,7 +798,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateGameTemplateListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateGameTemplateListingData}
               onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
                   onOpenPrivateGameTemplateListingData(

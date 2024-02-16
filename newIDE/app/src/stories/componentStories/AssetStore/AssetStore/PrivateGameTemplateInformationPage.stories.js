@@ -2,26 +2,32 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
-import axios from 'axios';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateGameTemplateInformationPage from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
+import { client as userApiAxiosClient } from '../../../../Utils/GDevelopServices/User';
 import {
-  GDevelopAssetApi,
-  GDevelopUserApi,
-} from '../../../../Utils/GDevelopServices/ApiConfigs';
+  client as shopApiAxiosClient,
+  type PrivateGameTemplateListingData,
+} from '../../../../Utils/GDevelopServices/Shop';
 import {
   client as assetApiAxiosClient,
   type PrivateGameTemplate,
 } from '../../../../Utils/GDevelopServices/Asset';
-import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
-import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
-import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../../fixtures/GDevelopServicesTestData';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../../../../Profile/AuthenticatedUserContext';
+import {
+  fakeGameTemplateLicenses,
+  fakeSilverAuthenticatedUserWithCloudProjects,
+} from '../../../../fixtures/GDevelopServicesTestData';
 import {
   PrivateGameTemplateStoreContext,
   initialPrivateGameTemplateStoreState,
 } from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
+import { SubscriptionSuggestionProvider } from '../../../../Profile/Subscription/SubscriptionSuggestionContext';
+import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/ProductLicense/ProductLicenseStoreContext';
 
 export default {
   title: 'AssetStore/AssetStore/PrivateGameTemplateInformationPage',
@@ -193,323 +199,67 @@ const privateGameTemplateBundle: PrivateGameTemplate = {
   gamePreviewLink: 'https://gamepreview.gdevelop-app.com',
 };
 
-export const Default = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
+const allPrivateGameTemplateListingData = [
+  privateGameTemplate1ListingData,
+  privateGameTemplate2ListingData,
+  privateGameTemplateBundleListingData,
+];
+
+const gameTemplates = [
+  privateGameTemplate1,
+  privateGameTemplate2,
+  privateGameTemplateBundle,
+];
+
+const PrivateGameTemplateInformationPageStory = ({
+  privateGameTemplateListingData,
+  receivedGameTemplates = [],
+  authenticatedUser = fakeSilverAuthenticatedUserWithCloudProjects,
+  delayResponse = 0,
+  errorCode,
+  errorMessage,
+}: {
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
+  authenticatedUser?: AuthenticatedUser,
+  receivedGameTemplates?: Array<PrivateGameTemplate>,
+  delayResponse?: number,
+  errorCode?: number,
+  errorMessage?: string,
+}) => {
+  const userServiceMock = new MockAdapter(userApiAxiosClient, {
+    delayResponse,
+  });
+  userServiceMock
+    .onGet(`/user-public-profile/${privateGameTemplateListingData.sellerId}`)
     .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
+    .onGet(`/user/${privateGameTemplateListingData.sellerId}/badge`)
     .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
-    )
-    .reply(200, privateGameTemplate1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <PrivateGameTemplateStoreContext.Provider
-      value={{
-        ...initialPrivateGameTemplateStoreState,
-        privateGameTemplateListingDatas: [
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-          privateGameTemplateBundleListingData,
-        ],
-      }}
-    >
-      <PrivateGameTemplateInformationPage
-        privateGameTemplateListingData={privateGameTemplate1ListingData}
-        isPurchaseDialogOpen={false}
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onGameTemplateOpen={() => action('open game template')()}
-        onCreateWithGameTemplate={() => action('create with game template')()}
-        privateGameTemplateListingDatasFromSameCreator={[
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-        ]}
-      />
-    </PrivateGameTemplateStoreContext.Provider>
-  );
-};
-
-export const ForABundle = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplateBundleListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplateBundleListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplateBundleListingData.id
-      }`
-    )
-    .reply(200, privateGameTemplateBundle)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <PrivateGameTemplateStoreContext.Provider
-      value={{
-        ...initialPrivateGameTemplateStoreState,
-        privateGameTemplateListingDatas: [
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-          privateGameTemplateBundleListingData,
-        ],
-      }}
-    >
-      <PrivateGameTemplateInformationPage
-        privateGameTemplateListingData={privateGameTemplateBundleListingData}
-        isPurchaseDialogOpen={false}
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onGameTemplateOpen={() => action('open game template')()}
-        onCreateWithGameTemplate={() => action('create with game template')()}
-      />
-    </PrivateGameTemplateStoreContext.Provider>
-  );
-};
-
-export const ForAlreadyPurchasedGameTemplate = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
-    )
-    .reply(200, privateGameTemplate1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <PrivateGameTemplateStoreContext.Provider
-      value={{
-        ...initialPrivateGameTemplateStoreState,
-        privateGameTemplateListingDatas: [
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-          privateGameTemplateBundleListingData,
-        ],
-      }}
-    >
-      <AuthenticatedUserContext.Provider
-        value={{
-          ...fakeSilverAuthenticatedUserWithCloudProjects,
-          receivedGameTemplates: [privateGameTemplate1],
-        }}
-      >
-        <PrivateGameTemplateInformationPage
-          privateGameTemplateListingData={privateGameTemplate1ListingData}
-          isPurchaseDialogOpen={false}
-          onOpenPurchaseDialog={() => action('open purchase dialog')()}
-          onGameTemplateOpen={() => action('open game template')()}
-          onCreateWithGameTemplate={() => action('create with game template')()}
-          privateGameTemplateListingDatasFromSameCreator={[
-            privateGameTemplate1ListingData,
-            privateGameTemplate2ListingData,
-          ]}
-        />
-      </AuthenticatedUserContext.Provider>
-    </PrivateGameTemplateStoreContext.Provider>
-  );
-};
-
-export const ForAlreadyPurchasedBundle = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplateBundleListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplateBundleListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplateBundleListingData.id
-      }`
-    )
-    .reply(200, privateGameTemplateBundle)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <PrivateGameTemplateStoreContext.Provider
-      value={{
-        ...initialPrivateGameTemplateStoreState,
-        privateGameTemplateListingDatas: [
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-          privateGameTemplateBundleListingData,
-        ],
-      }}
-    >
-      <AuthenticatedUserContext.Provider
-        value={{
-          ...fakeSilverAuthenticatedUserWithCloudProjects,
-          receivedGameTemplates: [
-            privateGameTemplate1,
-            privateGameTemplate2,
-            privateGameTemplateBundle,
-          ],
-        }}
-      >
-        <PrivateGameTemplateInformationPage
-          privateGameTemplateListingData={privateGameTemplateBundleListingData}
-          isPurchaseDialogOpen={false}
-          onOpenPurchaseDialog={() => action('open purchase dialog')()}
-          onGameTemplateOpen={() => action('open game template')()}
-          onCreateWithGameTemplate={() => action('create with game template')()}
-        />
-      </AuthenticatedUserContext.Provider>
-    </PrivateGameTemplateStoreContext.Provider>
-  );
-};
-
-export const WithPurchaseDialogOpen = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
-    )
-    .reply(200, privateGameTemplate1)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
-
-  return (
-    <PrivateGameTemplateStoreContext.Provider
-      value={{
-        ...initialPrivateGameTemplateStoreState,
-        privateGameTemplateListingDatas: [
-          privateGameTemplate1ListingData,
-          privateGameTemplate2ListingData,
-          privateGameTemplateBundleListingData,
-        ],
-      }}
-    >
-      <PrivateGameTemplateInformationPage
-        privateGameTemplateListingData={privateGameTemplate1ListingData}
-        isPurchaseDialogOpen
-        onOpenPurchaseDialog={() => action('open purchase dialog')()}
-        onGameTemplateOpen={() => action('open game template')()}
-        onCreateWithGameTemplate={() => action('create with game template')()}
-      />
-    </PrivateGameTemplateStoreContext.Provider>
-  );
-};
-export const Loading = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 10000 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
+    .onGet(`/achievement`)
     .reply(200, []);
   const assetServiceMock = new MockAdapter(assetApiAxiosClient, {
-    delayResponse: 10000,
+    delayResponse,
   });
   assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
+    .onGet(`/game-template/${privateGameTemplateListingData.id}`)
+    .reply(
+      errorCode || 200,
+      errorCode
+        ? errorMessage || null
+        : gameTemplates.find(
+            assetPack => assetPack.id === privateGameTemplateListingData.id
+          )
     )
-    .reply(200, privateGameTemplate1)
+    .onAny()
+    .reply(config => {
+      console.error(`Unexpected call to ${config.url} (${config.method})`);
+      return [504, null];
+    });
+  const shopServiceMock = new MockAdapter(shopApiAxiosClient, {
+    delayResponse,
+  });
+  shopServiceMock
+    .onGet('/product-license')
+    .reply(200, fakeGameTemplateLicenses)
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -517,96 +267,126 @@ export const Loading = () => {
     });
 
   return (
-    <PrivateGameTemplateInformationPage
-      privateGameTemplateListingData={privateGameTemplate1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onGameTemplateOpen={() => action('open game template')()}
-      onCreateWithGameTemplate={() => action('create with game template')()}
-    />
+    <PrivateGameTemplateStoreContext.Provider
+      value={{
+        ...initialPrivateGameTemplateStoreState,
+        privateGameTemplateListingDatas: [
+          privateGameTemplate1ListingData,
+          privateGameTemplate2ListingData,
+          privateGameTemplateBundleListingData,
+        ],
+      }}
+    >
+      <AuthenticatedUserContext.Provider
+        value={{
+          ...authenticatedUser,
+          receivedGameTemplates,
+          gameTemplatePurchases: receivedGameTemplates.map(
+            privateGameTemplate => ({
+              id: 'purchase-id',
+              productType: 'GAME_TEMPLATE',
+              usageType: 'commercial',
+              productId: privateGameTemplate.id,
+              buyerId: authenticatedUser.profile
+                ? authenticatedUser.profile.id
+                : 'userId',
+              receiverId: authenticatedUser.profile
+                ? authenticatedUser.profile.id
+                : 'userId',
+              createdAt: new Date(1707519600000).toString(),
+            })
+          ),
+        }}
+      >
+        <SubscriptionSuggestionProvider>
+          <ProductLicenseStoreStateProvider>
+            <PrivateGameTemplateInformationPage
+              privateGameTemplateListingData={privateGameTemplateListingData}
+              onOpenPurchaseDialog={() => action('open purchase dialog')()}
+              onGameTemplateOpen={() => action('open game template')()}
+              onCreateWithGameTemplate={() =>
+                action('create with game template')()
+              }
+              privateGameTemplateListingDatasFromSameCreator={allPrivateGameTemplateListingData.filter(
+                gameTemplateListingData =>
+                  gameTemplateListingData.id !==
+                  privateGameTemplateListingData.id
+              )}
+            />
+          </ProductLicenseStoreStateProvider>
+        </SubscriptionSuggestionProvider>
+      </AuthenticatedUserContext.Provider>
+    </PrivateGameTemplateStoreContext.Provider>
   );
 };
 
-export const With404 = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
-    )
-    .reply(404, null)
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
+export const Default = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate1ListingData}
+  />
+);
 
-  return (
-    <PrivateGameTemplateInformationPage
-      privateGameTemplateListingData={privateGameTemplate1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onGameTemplateOpen={() => action('open game template')()}
-      onCreateWithGameTemplate={() => action('create with game template')()}
-    />
-  );
-};
+export const ForABundle = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplateBundleListingData}
+  />
+);
 
-export const WithUnknownError = () => {
-  const axiosMock = new MockAdapter(axios, { delayResponse: 0 });
-  axiosMock
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user-public-profile/${
-        privateGameTemplate1ListingData.sellerId
-      }`
-    )
-    .reply(200, sellerPublicProfile)
-    .onGet(
-      `${GDevelopUserApi.baseUrl}/user/${
-        privateGameTemplate1ListingData.sellerId
-      }/badge`
-    )
-    .reply(200, [])
-    .onGet(`${GDevelopUserApi.baseUrl}/achievement`)
-    .reply(200, []);
-  const assetServiceMock = new MockAdapter(assetApiAxiosClient);
-  assetServiceMock
-    .onGet(
-      `${GDevelopAssetApi.baseUrl}/game-template/${
-        privateGameTemplate1ListingData.id
-      }`
-    )
-    .reply(500, 'Internal server error')
-    .onAny()
-    .reply(config => {
-      console.error(`Unexpected call to ${config.url} (${config.method})`);
-      return [504, null];
-    });
+export const ForAlreadyPurchasedGameTemplate = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate1ListingData}
+    receivedGameTemplates={[
+      {
+        id: privateGameTemplate1ListingData.id,
+        // Below is useless data for the component.
+        name: privateGameTemplate1ListingData.name,
+        createdAt: '2',
+        updatedAt: '2',
+        longDescription: 'longDescription',
+        previewImageUrls: [],
+        tag: 'tag',
+        gamePreviewLink: 'https://gdevelop.io',
+      },
+    ]}
+  />
+);
+export const ForAlreadyPurchasedBundle = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplateBundleListingData}
+    receivedGameTemplates={[
+      {
+        id: privateGameTemplateBundleListingData.id,
+        // Below is useless data for the component.
+        name: privateGameTemplateBundleListingData.name,
+        createdAt: '2',
+        updatedAt: '2',
+        longDescription: 'longDescription',
+        previewImageUrls: [],
+        tag: 'tag',
+        gamePreviewLink: 'https://gdevelop.io',
+      },
+    ]}
+  />
+);
 
-  return (
-    <PrivateGameTemplateInformationPage
-      privateGameTemplateListingData={privateGameTemplate1ListingData}
-      isPurchaseDialogOpen={false}
-      onOpenPurchaseDialog={() => action('open purchase dialog')()}
-      onGameTemplateOpen={() => action('open game template')()}
-      onCreateWithGameTemplate={() => action('create with game template')()}
-    />
-  );
-};
+export const Loading = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate1ListingData}
+    delayResponse={10000}
+  />
+);
+
+export const With404 = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate1ListingData}
+    errorCode={404}
+  />
+);
+
+export const WithUnknownError = () => (
+  <PrivateGameTemplateInformationPageStory
+    privateGameTemplateListingData={privateGameTemplate1ListingData}
+    errorCode={500}
+    errorMessage={'Internal server error'}
+  />
+);

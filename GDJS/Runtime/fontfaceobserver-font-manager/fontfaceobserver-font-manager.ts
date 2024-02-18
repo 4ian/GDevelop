@@ -31,6 +31,10 @@ namespace gdjs {
       return resourceKinds;
     }
 
+    clearCache(): void {
+      // Hot-reload of font is not handled as fonts are unlikely to be edited.
+    }
+
     /**
      * Return the font family associated to the specified font resource name.
      * The font resource must have been loaded before. If that's not the case,

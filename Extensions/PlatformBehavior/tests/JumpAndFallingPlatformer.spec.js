@@ -1,8 +1,11 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
   const epsilon = 1 / (2 << 16);
   describe('(falling)', function () {
+    /** @type {gdjs.RuntimeScene} */
     let runtimeScene;
+    /** @type {gdjs.RuntimeObject} */
     let object;
+    /** @type {gdjs.RuntimeObject} */
     let platform;
 
     beforeEach(function () {
@@ -114,7 +117,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
       // Remove the platform
-      runtimeScene.markObjectForDeletion(platform);
+      platform.deleteFromScene(runtimeScene);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);

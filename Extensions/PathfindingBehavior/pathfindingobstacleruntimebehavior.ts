@@ -7,7 +7,6 @@ namespace gdjs {
   export interface RuntimeInstanceContainer {
     pathfindingObstaclesManager: gdjs.PathfindingObstaclesManager;
   }
-  declare var rbush: any;
 
   /**
    * PathfindingObstaclesManager manages the common objects shared by objects
@@ -18,10 +17,10 @@ namespace gdjs {
    * `gdjs.PathfindingRuntimeBehavior.obstaclesManagers`).
    */
   export class PathfindingObstaclesManager {
-    _obstaclesRBush: any;
+    _obstaclesRBush: RBush<PathfindingObstacleRuntimeBehavior>;
 
     constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
-      this._obstaclesRBush = new rbush();
+      this._obstaclesRBush = new RBush<PathfindingObstacleRuntimeBehavior>();
     }
 
     /**
@@ -60,6 +59,9 @@ namespace gdjs {
     removeObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
+      if (!pathfindingObstacleBehavior.currentRBushAABB) {
+        return;
+      }
       this._obstaclesRBush.remove(pathfindingObstacleBehavior.currentRBushAABB);
     }
 
@@ -74,9 +76,9 @@ namespace gdjs {
       radius: float,
       result: gdjs.PathfindingObstacleRuntimeBehavior[]
     ): void {
-      const searchArea = gdjs.staticObject(
+      const searchArea: SearchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAround
-      );
+      ) as SearchArea;
       // @ts-ignore
       searchArea.minX = x - radius;
       // @ts-ignore
@@ -85,13 +87,8 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles: gdjs.BehaviorRBushAABB<
-        gdjs.PathfindingObstacleRuntimeBehavior
-      >[] = this._obstaclesRBush.search(searchArea);
       result.length = 0;
-      nearbyObstacles.forEach((nearbyObstacle) =>
-        result.push(nearbyObstacle.behavior)
-      );
+      this._obstaclesRBush.search(searchArea, result);
     }
   }
 

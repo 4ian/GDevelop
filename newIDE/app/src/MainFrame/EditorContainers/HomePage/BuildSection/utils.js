@@ -199,9 +199,10 @@ export const getExampleAndTemplateItemsForBuildSection = ({
 |}): {|
   carouselItems: Array<CarouselThumbnail>,
   gridItems: Array<React.Node>,
+  hasReachedEnd: boolean,
 |} => {
   if (!exampleShortHeaders || !privateGameTemplateListingDatas) {
-    return { carouselItems: [], gridItems: [] };
+    return { carouselItems: [], gridItems: [], hasReachedEnd: false };
   }
   const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
     exampleShortHeader =>
@@ -213,6 +214,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
   const gridItems = [];
   let exampleIndex = 0;
   let privateGameTemplateIndex = 0;
+  let hasReachedEnd = false;
   for (
     let i = 0;
     i < numberOfItemsInGrid + numberOfItemsExclusivelyInCarousel;
@@ -286,7 +288,40 @@ export const getExampleAndTemplateItemsForBuildSection = ({
     }
     if (privateGameTemplateActuallyAdded) privateGameTemplateIndex++;
     else exampleIndex++;
+    if (
+      exampleIndex >= exampleShortHeadersWithThumbnails.length &&
+      privateGameTemplateIndex >= privateGameTemplateListingDatas.length
+    ) {
+      hasReachedEnd = true;
+      break;
+    }
   }
 
-  return { carouselItems, gridItems };
+  return { carouselItems, gridItems, hasReachedEnd };
+};
+
+export const getAllGameTemplatesAndExamplesFlaggedAsGameCount = ({
+  privateGameTemplateListingDatas,
+  exampleShortHeaders,
+  columnsCount,
+}: {
+  privateGameTemplateListingDatas: ?(PrivateGameTemplateListingData[]),
+  exampleShortHeaders: ?(ExampleShortHeader[]),
+  columnsCount: number,
+}) => {
+  return (
+    Math.floor(
+      ((privateGameTemplateListingDatas
+        ? privateGameTemplateListingDatas.length
+        : 0) +
+        (exampleShortHeaders
+          ? exampleShortHeaders.filter(
+              exampleShortHeader =>
+                exampleShortHeader.tags.includes('game') ||
+                exampleShortHeader.tags.includes('Starter')
+            ).length
+          : 0)) /
+        columnsCount
+    ) * columnsCount
+  );
 };

@@ -433,7 +433,7 @@ export const HomePage = React.memo<Props>(
       );
 
       const onManageGame = React.useCallback(
-        ({ gameId }: { gameId: string }) => {
+        ({ gameId }: {| gameId: string |}) => {
           if (!games) return;
           const matchingGame = games.find(game => game.id === gameId);
           if (!matchingGame) return;
@@ -444,7 +444,7 @@ export const HomePage = React.memo<Props>(
       );
 
       const canManageGame = React.useCallback(
-        ({ gameId }: { gameId: string }): boolean => {
+        ({ gameId }: {| gameId: string |}): boolean => {
           if (!games) return false;
           const matchingGameIndex = games.findIndex(game => game.id === gameId);
           return matchingGameIndex > -1;

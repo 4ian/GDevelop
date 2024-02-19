@@ -43,6 +43,7 @@ import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import ProjectFileListItem from './ProjectFileListItem';
 import {
+  getAllGameTemplatesAndExamplesFlaggedAsGameCount,
   getExampleAndTemplateItemsForBuildSection,
   getLastModifiedInfoByProjectId,
   getProjectLineHeight,
@@ -52,8 +53,10 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
 import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButton from '../../../../UI/FlatButton';
 
 const cellSpacing = 2;
+const pageSize = 20;
 
 const getItemsColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
@@ -101,8 +104,8 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
-  onManageGame: ({ gameId: string }) => void,
-  canManageGame: ({ gameId: string }) => boolean,
+  onManageGame: ({| gameId: string |}) => void,
+  canManageGame: ({| gameId: string |}) => boolean,
 |};
 
 const BuildSection = ({
@@ -151,6 +154,19 @@ const BuildSection = ({
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
+
+  const columnsCount = getItemsColumns(windowWidth);
+
+  const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
+    () =>
+      getAllGameTemplatesAndExamplesFlaggedAsGameCount({
+        privateGameTemplateListingDatas,
+        exampleShortHeaders,
+        columnsCount,
+      }),
+    [privateGameTemplateListingDatas, exampleShortHeaders, columnsCount]
+  );
 
   let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
     file => file.fileMetadata
@@ -229,7 +245,11 @@ const BuildSection = ({
           ? 3
           : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
-        numberOfItemsInGrid: showAllGameTemplates ? 60 : isMobile ? 16 : 20,
+        numberOfItemsInGrid: showAllGameTemplates
+          ? allGameTemplatesAndExamplesFlaggedAsGameCount + pageIndex * pageSize
+          : isMobile
+          ? 16
+          : 20,
         privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
       }),
     [
@@ -241,6 +261,8 @@ const BuildSection = ({
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
+      pageIndex,
+      allGameTemplatesAndExamplesFlaggedAsGameCount,
     ]
   );
 
@@ -252,13 +274,28 @@ const BuildSection = ({
     >
       <SectionRow>
         <GridList
-          cols={getItemsColumns(windowWidth)}
+          cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}
         >
           {examplesAndTemplatesToDisplay.gridItems}
         </GridList>
+        <Line justifyContent={'center'}>
+          <FlatButton
+            primary
+            disabled={examplesAndTemplatesToDisplay.hasReachedEnd}
+            fullWidth={isMobile}
+            label={
+              examplesAndTemplatesToDisplay.hasReachedEnd ? (
+                <Trans>Browse all examples in the Learn tab</Trans>
+              ) : (
+                <Trans>See more</Trans>
+              )
+            }
+            onClick={() => setPageIndex(_pageIndex => _pageIndex + 1)}
+          />
+        </Line>
       </SectionRow>
     </SectionContainer>
   ) : (
@@ -459,7 +496,7 @@ const BuildSection = ({
           </Column>
         </Line>
         <GridList
-          cols={getItemsColumns(windowWidth)}
+          cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

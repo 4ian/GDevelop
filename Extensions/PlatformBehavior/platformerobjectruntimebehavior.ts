@@ -1698,7 +1698,7 @@ namespace gdjs {
         // the character stays at the wrong place during 1 frame.
         const deltaY =
           ((this._oldHeight - object.getHeight()) *
-            (object.getHeight() - (object.getDrawableY() - object.getY()))) /
+            (object.getHeight() + object.getDrawableY() - object.getY())) /
           object.getHeight();
         object.setY(object.getY() + deltaY);
       }

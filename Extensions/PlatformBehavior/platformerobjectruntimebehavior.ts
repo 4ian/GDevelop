@@ -1692,13 +1692,15 @@ namespace gdjs {
 
     beforeUpdatingObstacles(timeDelta: float) {
       const object = this._behavior.owner;
-      //Stick the object to the floor if its height has changed.
+      // Stick the object to the floor if its height has changed.
       if (this._oldHeight !== object.getHeight()) {
-        object.setY(
-          this._floorLastY -
-            object.getHeight() +
-            (object.getY() - object.getDrawableY())
-        );
+        // TODO This should probably be done after the events because
+        // the character stays at the wrong place during 1 frame.
+        const deltaY =
+          ((this._oldHeight - object.getHeight()) *
+            (object.getHeight() + object.getDrawableY() - object.getY())) /
+          object.getHeight();
+        object.setY(object.getY() + deltaY);
       }
       // Directly follow the floor movement on the Y axis by moving the character.
       // For the X axis, we follow the floor movement using `_requestedDeltaX`

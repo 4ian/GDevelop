@@ -509,6 +509,7 @@ export const HomePage = React.memo<Props>(
                         onPreviewPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
+                      onOpenExampleStore={onOpenExampleStore}
                       onManageGame={onManageGame}
                       canManageGame={canManageGame}
                       storageProviders={storageProviders}

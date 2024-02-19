@@ -25,7 +25,9 @@ export const Default = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed />
@@ -40,7 +42,9 @@ export const WithClosableItems = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed canClose />
@@ -55,7 +59,9 @@ export const ErrorLoadingAnnouncements = () => {
         announcements: null,
         promotions: null,
         error: new Error('Fake error'),
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed />
@@ -70,7 +76,9 @@ export const LoadingAnnouncements = () => {
         announcements: null,
         promotions: null,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed />
@@ -85,7 +93,9 @@ export const DefaultWithMargins = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed addMargins />
@@ -100,7 +110,9 @@ export const OnlyUrgent = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed level="urgent" />

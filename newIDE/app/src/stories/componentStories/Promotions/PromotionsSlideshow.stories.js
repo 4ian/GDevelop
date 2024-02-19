@@ -25,7 +25,9 @@ export const Default = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <PromotionsSlideshow />
@@ -40,7 +42,9 @@ export const ErrorLoadingPromotions = () => {
         announcements: null,
         promotions: null,
         error: new Error('Fake error'),
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <PromotionsSlideshow />
@@ -55,7 +59,9 @@ export const LoadingPromotions = () => {
         announcements: null,
         promotions: null,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <PromotionsSlideshow />
@@ -70,7 +76,9 @@ export const OnlyGame = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <PromotionsSlideshow type="game" />
@@ -85,7 +93,9 @@ export const OnlyAssetPack = () => {
         announcements: fakeAnnouncements,
         promotions: fakePromotions,
         error: null,
-        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <PromotionsSlideshow type="asset-pack" />

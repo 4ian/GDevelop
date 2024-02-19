@@ -9,7 +9,7 @@ import {
 import { ANNOUNCEMENTS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 
 // NOTE: For the moment, we store announcements and promotions in the same context,
-// as previously both were mixed under the announcenments endpoint.
+// as previously both were mixed under the announcements endpoint.
 // This is to allow filtering announcements that are now promotions, in the same request.
 // Once enough users are on the 5.3.190, and promotions are displayed to them,
 // we can split them into 2 contexts.

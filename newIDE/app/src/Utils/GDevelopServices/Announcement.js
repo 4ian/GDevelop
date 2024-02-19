@@ -7,6 +7,7 @@ export type Announcement = {
   id: string,
   titleByLocale: MessageByLocale,
   markdownMessageByLocale: MessageByLocale,
+  mobileMarkdownMessageByLocale?: MessageByLocale,
   type?: 'info' | 'warning',
   level: 'normal' | 'urgent',
   buttonUrl?: string,

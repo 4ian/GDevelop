@@ -2720,7 +2720,11 @@ export const fakeAnnouncements: Announcement[] = [
     },
     markdownMessageByLocale: {
       en:
-        '[![GDevelop Android](https://resources.gdevelop.io/announcements/GDevelop_Android.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+    },
+    mobileMarkdownMessageByLocale: {
+      en:
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
     },
   },
 ];
@@ -2789,7 +2793,7 @@ export const fakeAssetPackLicenses = [
 
 export const fakePromotions: Promotion[] = [
   {
-    id: '123',
+    id: 'gdevelop-mega-pack',
     imageUrl:
       'https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png',
     mobileImageUrl:
@@ -2799,12 +2803,12 @@ export const fakePromotions: Promotion[] = [
     type: 'asset-pack',
   },
   {
-    id: 'premium-featuring-bubble-dogs', // TO REMOVE ON 26/02/24
+    id: 'premium-featuring-bubble-dogs',
     imageUrl:
-      'https://resources.gdevelop.io/announcements/Premium_Featuring__Bubble_Dogs.png',
+      'https://resources.gdevelop.io/announcements/GDevelop_Quiz_Template.png',
     mobileImageUrl:
-      'https://resources.gdevelop.io/announcements/Premium_Featuring__Bubble_Dogs_Mobile.jpg',
-    linkUrl: 'https://gd.games/pentogga/bubbledogs',
+      'https://resources.gdevelop.io/announcements/GDevelop_Quiz_Template_Mobile.jpg',
+    linkUrl: 'https://gd.games/gdevelop',
     display: 'all',
     type: 'game',
   },

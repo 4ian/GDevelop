@@ -10,9 +10,31 @@ import {
 import Measure from 'react-measure';
 import { createStyles, makeStyles } from '@material-ui/core';
 import SlideshowArrow from './SlideshowArrow';
+import { useInterval } from '../../Utils/UseInterval';
 
 const styles = {
+  skeletonContainer: {
+    display: 'flex',
+    flex: 1,
+  },
   itemSkeleton: { borderRadius: 6 },
+  slidesContainer: {
+    display: 'flex',
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    width: `calc(100% - 2*${marginsSize}px)`,
+    margin: marginsSize,
+    borderRadius: 6,
+  },
+  slideImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    borderRadius: 6,
+    transition: 'opacity 0.5s ease-in-out, transform 0.3s ease-in-out',
+  },
 };
 
 const getItemLineHeight = ({
@@ -83,29 +105,27 @@ const Slideshow = ({
     () => {
       if (!items || items.length === 1) return;
 
-      setCurrentSlide(currentSlide === 0 ? items.length - 1 : currentSlide - 1);
+      setCurrentSlide(currentSlide =>
+        currentSlide === 0 ? items.length - 1 : currentSlide - 1
+      );
     },
-    [currentSlide, items]
+    [items]
   );
 
   const handleRightArrowClick = React.useCallback(
     () => {
       if (!items || items.length === 1) return;
 
-      setCurrentSlide(currentSlide === items.length - 1 ? 0 : currentSlide + 1);
+      setCurrentSlide(currentSlide =>
+        currentSlide === items.length - 1 ? 0 : currentSlide + 1
+      );
     },
-    [currentSlide, items]
+    [items]
   );
 
-  React.useEffect(
-    () => {
-      const interval = setInterval(() => {
-        handleRightArrowClick();
-      }, 5000);
-      return () => clearInterval(interval);
-    },
-    [handleRightArrowClick]
-  );
+  useInterval(() => {
+    handleRightArrowClick();
+  }, 5000);
 
   if (!items) {
     // If they're loading, display a skeleton so that it doesn't jump when loaded.
@@ -118,13 +138,7 @@ const Slideshow = ({
       >
         {({ contentRect, measureRef }) => (
           <Paper square background="dark">
-            <div
-              ref={measureRef}
-              style={{
-                display: 'flex',
-                flex: 1,
-              }}
-            >
+            <div ref={measureRef} style={styles.skeletonContainer}>
               <Line expand>
                 <Column expand>
                   <Skeleton
@@ -155,14 +169,8 @@ const Slideshow = ({
           <div
             ref={measureRef}
             style={{
-              display: 'flex',
-              flex: 1,
-              position: 'relative',
-              overflow: 'hidden',
-              width: `calc(100% - 2*${marginsSize}px)`,
+              ...styles.slidesContainer,
               height: itemLineHeight,
-              margin: marginsSize,
-              borderRadius: 6,
             }}
           >
             {items.length > 1 && (
@@ -178,17 +186,11 @@ const Slideshow = ({
                   }
                   alt={`Slideshow item for ${item.id}`}
                   style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
+                    ...styles.slideImage,
                     aspectRatio:
                       windowWidth === 'small'
                         ? itemMobileRatio
                         : itemDesktopRatio,
-                    objectFit: 'contain',
-                    borderRadius: 6,
-                    transition:
-                      'opacity 0.5s ease-in-out, transform 0.3s ease-in-out',
                     ...(index === currentSlide
                       ? { opacity: 1, zIndex: 2 } // Update the opacity for the transition effect.
                       : { opacity: 0, zIndex: 1 }), // Update the z-index so it's on top of the other images, useful for keyboard navigation and hover.

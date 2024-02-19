@@ -296,3 +296,29 @@ export const getExampleAndTemplateItemsForBuildSection = ({
 
   return { carouselItems, gridItems, hasReachedEnd };
 };
+
+export const getAllGameTemplatesAndExamplesFlaggedAsGameCount = ({
+  privateGameTemplateListingDatas,
+  exampleShortHeaders,
+  columnsCount,
+}: {
+  privateGameTemplateListingDatas: ?(PrivateGameTemplateListingData[]),
+  exampleShortHeaders: ?(ExampleShortHeader[]),
+  columnsCount: number,
+}) => {
+  return (
+    Math.floor(
+      ((privateGameTemplateListingDatas
+        ? privateGameTemplateListingDatas.length
+        : 0) +
+        (exampleShortHeaders
+          ? exampleShortHeaders.filter(
+              exampleShortHeader =>
+                exampleShortHeader.tags.includes('game') ||
+                exampleShortHeader.tags.includes('Starter')
+            ).length
+          : 0)) /
+        columnsCount
+    ) * columnsCount
+  );
+};

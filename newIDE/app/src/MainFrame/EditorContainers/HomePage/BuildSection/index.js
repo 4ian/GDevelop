@@ -43,6 +43,7 @@ import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import ProjectFileListItem from './ProjectFileListItem';
 import {
+  getAllGameTemplatesAndExamplesFlaggedAsGameCount,
   getExampleAndTemplateItemsForBuildSection,
   getLastModifiedInfoByProjectId,
   getProjectLineHeight,
@@ -157,21 +158,13 @@ const BuildSection = ({
 
   const columnsCount = getItemsColumns(windowWidth);
 
-  const allGameTemplatesCount = React.useMemo(
+  const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
     () =>
-      Math.floor(
-        ((privateGameTemplateListingDatas
-          ? privateGameTemplateListingDatas.length
-          : 0) +
-          (exampleShortHeaders
-            ? exampleShortHeaders.filter(
-                exampleShortHeader =>
-                  exampleShortHeader.tags.includes('game') ||
-                  exampleShortHeader.tags.includes('Starter')
-              ).length
-            : 0)) /
-          columnsCount
-      ) * columnsCount,
+      getAllGameTemplatesAndExamplesFlaggedAsGameCount({
+        privateGameTemplateListingDatas,
+        exampleShortHeaders,
+        columnsCount,
+      }),
     [privateGameTemplateListingDatas, exampleShortHeaders, columnsCount]
   );
 
@@ -253,7 +246,7 @@ const BuildSection = ({
           : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates
-          ? allGameTemplatesCount + pageIndex * pageSize
+          ? allGameTemplatesAndExamplesFlaggedAsGameCount + pageIndex * pageSize
           : isMobile
           ? 16
           : 20,
@@ -269,7 +262,7 @@ const BuildSection = ({
       i18n,
       isMobile,
       pageIndex,
-      allGameTemplatesCount,
+      allGameTemplatesAndExamplesFlaggedAsGameCount,
     ]
   );
 
@@ -300,7 +293,7 @@ const BuildSection = ({
                 <Trans>See more</Trans>
               )
             }
-            onClick={() => setPageIndex(pageIndex_ => pageIndex_ + 1)}
+            onClick={() => setPageIndex(_pageIndex => _pageIndex + 1)}
           />
         </Line>
       </SectionRow>

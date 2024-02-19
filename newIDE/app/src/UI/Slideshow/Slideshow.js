@@ -81,7 +81,7 @@ const Slideshow = ({
 
   const handleLeftArrowClick = React.useCallback(
     () => {
-      if (!items) return;
+      if (!items || items.length === 1) return;
 
       setCurrentSlide(currentSlide === 0 ? items.length - 1 : currentSlide - 1);
     },
@@ -90,7 +90,7 @@ const Slideshow = ({
 
   const handleRightArrowClick = React.useCallback(
     () => {
-      if (!items) return;
+      if (!items || items.length === 1) return;
 
       setCurrentSlide(currentSlide === items.length - 1 ? 0 : currentSlide + 1);
     },
@@ -165,7 +165,9 @@ const Slideshow = ({
               borderRadius: 6,
             }}
           >
-            <SlideshowArrow onClick={handleLeftArrowClick} position="left" />
+            {items.length > 1 && (
+              <SlideshowArrow onClick={handleLeftArrowClick} position="left" />
+            )}
             {items.map((item, index) => {
               return (
                 <img
@@ -197,7 +199,12 @@ const Slideshow = ({
                 />
               );
             })}
-            <SlideshowArrow onClick={handleRightArrowClick} position="right" />
+            {items.length > 1 && (
+              <SlideshowArrow
+                onClick={handleRightArrowClick}
+                position="right"
+              />
+            )}
           </div>
         </Paper>
       )}

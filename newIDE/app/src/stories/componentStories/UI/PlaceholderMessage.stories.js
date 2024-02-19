@@ -7,7 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import PlaceholderMessage from '../../../UI/PlaceholderMessage';
 
 export default {
-  title: 'PlaceholderMessage',
+  title: 'UI Building Blocks/PlaceholderMessage',
   component: PlaceholderMessage,
   decorators: [paperDecorator, muiDecorator],
 };

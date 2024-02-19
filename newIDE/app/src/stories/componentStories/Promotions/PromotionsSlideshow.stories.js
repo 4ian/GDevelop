@@ -1,0 +1,94 @@
+// @flow
+import * as React from 'react';
+import { action } from '@storybook/addon-actions';
+
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
+
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import {
+  fakeAnnouncements,
+  fakePromotions,
+} from '../../../fixtures/GDevelopServicesTestData';
+
+export default {
+  title: 'PromotionsSlideshow',
+  component: PromotionsSlideshow,
+  decorators: [paperDecorator, muiDecorator],
+};
+
+export const Default = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        promotions: fakePromotions,
+        error: null,
+        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+      }}
+    >
+      <PromotionsSlideshow />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const ErrorLoadingPromotions = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: null,
+        promotions: null,
+        error: new Error('Fake error'),
+        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+      }}
+    >
+      <PromotionsSlideshow />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const LoadingPromotions = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: null,
+        promotions: null,
+        error: null,
+        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+      }}
+    >
+      <PromotionsSlideshow />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const OnlyGame = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        promotions: fakePromotions,
+        error: null,
+        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+      }}
+    >
+      <PromotionsSlideshow type="game" />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const OnlyAssetPack = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        promotions: fakePromotions,
+        error: null,
+        fetchAnnouncementsAndPromotions: action('fetchAnnouncements'),
+      }}
+    >
+      <PromotionsSlideshow type="asset-pack" />
+    </AnnouncementsFeedContext.Provider>
+  );
+};

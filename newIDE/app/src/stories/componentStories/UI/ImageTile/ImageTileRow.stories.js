@@ -14,7 +14,7 @@ import {
 } from './data';
 
 export default {
-  title: 'ImageTile/ImageTileRow',
+  title: 'UI Building Blocks/ImageTile/ImageTileRow',
   component: ImageTileRow,
   decorators: [paperDecorator, muiDecorator],
 };

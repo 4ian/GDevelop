@@ -13,7 +13,7 @@ import {
 } from './data';
 
 export default {
-  title: 'ImageTile/ImageTileGrid',
+  title: 'UI Building Blocks/ImageTile/ImageTileGrid',
   component: ImageTileGrid,
   decorators: [paperDecorator, muiDecorator],
 };

@@ -22,7 +22,6 @@ import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
-import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
@@ -47,6 +46,7 @@ import Text from '../../../UI/Text';
 import Link from '../../../UI/Link';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
 
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
 const isShopRequested = (routeArguments: RouteArguments): boolean =>
@@ -167,7 +167,6 @@ export const HomePage = React.memo<Props>(
       );
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
-      const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
@@ -453,11 +452,9 @@ export const HomePage = React.memo<Props>(
         [games]
       );
 
-      const shouldDisplayAnnouncements =
-        activeTab !== 'community' &&
+      const shouldDisplayAnnouncementsOrPromotions =
         // Get started page displays announcements itself.
-        activeTab !== 'get-started' &&
-        !!announcements;
+        activeTab !== 'get-started';
 
       return (
         <I18n>
@@ -465,8 +462,16 @@ export const HomePage = React.memo<Props>(
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {shouldDisplayAnnouncements && (
-                    <AnnouncementsFeed canClose level="urgent" addMargins />
+                  {shouldDisplayAnnouncementsOrPromotions && (
+                    <>
+                      <AnnouncementsFeed
+                        canClose
+                        level="urgent"
+                        addMargins
+                        hideLoader
+                      />
+                      <PromotionsSlideshow />
+                    </>
                   )}
                   {activeTab === 'manage' && (
                     <ManageSection

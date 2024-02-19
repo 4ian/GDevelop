@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import {
   fakeAnnouncements,
@@ -13,8 +13,8 @@ import {
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
-  title: 'AnnouncementsFeed',
-  component: AnnouncementsFeed,
+  title: 'PromotionsSlideshow',
+  component: PromotionsSlideshow,
   decorators: [paperDecorator, muiDecorator],
 };
 
@@ -30,29 +30,12 @@ export const Default = () => {
         ),
       }}
     >
-      <AnnouncementsFeed />
+      <PromotionsSlideshow />
     </AnnouncementsFeedContext.Provider>
   );
 };
 
-export const WithClosableItems = () => {
-  return (
-    <AnnouncementsFeedContext.Provider
-      value={{
-        announcements: fakeAnnouncements,
-        promotions: fakePromotions,
-        error: null,
-        fetchAnnouncementsAndPromotions: action(
-          'fetchAnnouncementsAndPromotions'
-        ),
-      }}
-    >
-      <AnnouncementsFeed canClose />
-    </AnnouncementsFeedContext.Provider>
-  );
-};
-
-export const ErrorLoadingAnnouncements = () => {
+export const ErrorLoadingPromotions = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -64,12 +47,12 @@ export const ErrorLoadingAnnouncements = () => {
         ),
       }}
     >
-      <AnnouncementsFeed />
+      <PromotionsSlideshow />
     </AnnouncementsFeedContext.Provider>
   );
 };
 
-export const LoadingAnnouncements = () => {
+export const LoadingPromotions = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -81,12 +64,12 @@ export const LoadingAnnouncements = () => {
         ),
       }}
     >
-      <AnnouncementsFeed />
+      <PromotionsSlideshow />
     </AnnouncementsFeedContext.Provider>
   );
 };
 
-export const DefaultWithMargins = () => {
+export const OnlyGame = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -98,12 +81,12 @@ export const DefaultWithMargins = () => {
         ),
       }}
     >
-      <AnnouncementsFeed addMargins />
+      <PromotionsSlideshow type="game" />
     </AnnouncementsFeedContext.Provider>
   );
 };
 
-export const OnlyUrgent = () => {
+export const OnlyAssetPack = () => {
   return (
     <AnnouncementsFeedContext.Provider
       value={{
@@ -115,7 +98,7 @@ export const OnlyUrgent = () => {
         ),
       }}
     >
-      <AnnouncementsFeed level="urgent" />
+      <PromotionsSlideshow type="asset-pack" />
     </AnnouncementsFeedContext.Provider>
   );
 };

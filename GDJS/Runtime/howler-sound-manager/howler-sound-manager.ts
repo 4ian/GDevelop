@@ -487,7 +487,7 @@ namespace gdjs {
     ): HowlerSound {
       // Try to recycle an old sound.
       for (let i = 0, len = arr.length; i < len; ++i) {
-        if (arr[i] !== null && arr[i].stopped()) {
+        if (!arr[i] || arr[i].stopped()) {
           arr[i] = sound;
           return sound;
         }

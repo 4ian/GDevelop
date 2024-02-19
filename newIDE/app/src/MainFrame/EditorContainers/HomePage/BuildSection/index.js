@@ -56,7 +56,6 @@ import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasure
 import FlatButton from '../../../../UI/FlatButton';
 
 const cellSpacing = 2;
-const pageSize = 20;
 
 const getItemsColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
@@ -104,6 +103,7 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
+  onOpenExampleStore: () => void,
   onManageGame: ({| gameId: string |}) => void,
   canManageGame: ({| gameId: string |}) => boolean,
 |};
@@ -119,6 +119,7 @@ const BuildSection = ({
   onOpenRecentFile,
   storageProviders,
   i18n,
+  onOpenExampleStore,
   onManageGame,
   canManageGame,
 }: Props) => {
@@ -154,7 +155,6 @@ const BuildSection = ({
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
-  const [pageIndex, setPageIndex] = React.useState<number>(0);
 
   const columnsCount = getItemsColumns(windowWidth);
 
@@ -246,7 +246,7 @@ const BuildSection = ({
           : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates
-          ? allGameTemplatesAndExamplesFlaggedAsGameCount + pageIndex * pageSize
+          ? allGameTemplatesAndExamplesFlaggedAsGameCount
           : isMobile
           ? 16
           : 20,
@@ -261,7 +261,6 @@ const BuildSection = ({
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
-      pageIndex,
       allGameTemplatesAndExamplesFlaggedAsGameCount,
     ]
   );
@@ -284,16 +283,9 @@ const BuildSection = ({
         <Line justifyContent={'center'}>
           <FlatButton
             primary
-            disabled={examplesAndTemplatesToDisplay.hasReachedEnd}
             fullWidth={isMobile}
-            label={
-              examplesAndTemplatesToDisplay.hasReachedEnd ? (
-                <Trans>Browse all examples in the Learn tab</Trans>
-              ) : (
-                <Trans>See more</Trans>
-              )
-            }
-            onClick={() => setPageIndex(_pageIndex => _pageIndex + 1)}
+            label={<Trans>See more</Trans>}
+            onClick={onOpenExampleStore}
           />
         </Line>
       </SectionRow>

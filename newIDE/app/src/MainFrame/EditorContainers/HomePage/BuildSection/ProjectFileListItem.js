@@ -207,8 +207,8 @@ type ProjectFileListItemProps = {|
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   isWindowWidthMediumOrLarger: boolean,
   hideDeleteContextMenuAction?: boolean,
-  onManageGame?: ({ gameId: string }) => void,
-  canManageGame?: ({ gameId: string }) => boolean,
+  onManageGame?: ({| gameId: string |}) => void,
+  canManageGame?: ({| gameId: string |}) => boolean,
 |};
 
 export const ProjectFileListItem = ({

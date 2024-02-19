@@ -101,8 +101,8 @@ type Props = {|
   ) => void,
   storageProviders: Array<StorageProvider>,
   i18n: I18nType,
-  onManageGame: ({ gameId: string }) => void,
-  canManageGame: ({ gameId: string }) => boolean,
+  onManageGame: ({| gameId: string |}) => void,
+  canManageGame: ({| gameId: string |}) => boolean,
 |};
 
 const BuildSection = ({

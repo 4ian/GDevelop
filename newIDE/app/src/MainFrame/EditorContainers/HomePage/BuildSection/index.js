@@ -152,6 +152,26 @@ const BuildSection = ({
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
 
+  const columnsCount = getItemsColumns(windowWidth);
+
+  const allGameTemplatesCount = React.useMemo(
+    () =>
+      Math.floor(
+        ((privateGameTemplateListingDatas
+          ? privateGameTemplateListingDatas.length
+          : 0) +
+          (exampleShortHeaders
+            ? exampleShortHeaders.filter(
+                exampleShortHeader =>
+                  exampleShortHeader.tags.includes('game') ||
+                  exampleShortHeader.tags.includes('Starter')
+              ).length
+            : 0)) /
+          columnsCount
+      ) * columnsCount,
+    [privateGameTemplateListingDatas, exampleShortHeaders, columnsCount]
+  );
+
   let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
     file => file.fileMetadata
   );
@@ -229,7 +249,11 @@ const BuildSection = ({
           ? 3
           : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
-        numberOfItemsInGrid: showAllGameTemplates ? 60 : isMobile ? 16 : 20,
+        numberOfItemsInGrid: showAllGameTemplates
+          ? allGameTemplatesCount
+          : isMobile
+          ? 16
+          : 20,
         privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
       }),
     [
@@ -241,6 +265,7 @@ const BuildSection = ({
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
+      allGameTemplatesCount,
     ]
   );
 
@@ -252,7 +277,7 @@ const BuildSection = ({
     >
       <SectionRow>
         <GridList
-          cols={getItemsColumns(windowWidth)}
+          cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}
@@ -457,7 +482,7 @@ const BuildSection = ({
           </Column>
         </Line>
         <GridList
-          cols={getItemsColumns(windowWidth)}
+          cols={columnsCount}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

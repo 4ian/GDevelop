@@ -291,8 +291,15 @@ const BuildSection = ({
         <Line justifyContent={'center'}>
           <FlatButton
             primary
+            disabled={examplesAndTemplatesToDisplay.hasReachedEnd}
             fullWidth={isMobile}
-            label={<Trans>See more</Trans>}
+            label={
+              examplesAndTemplatesToDisplay.hasReachedEnd ? (
+                <Trans>Browse all examples in the Learn tab</Trans>
+              ) : (
+                <Trans>See more</Trans>
+              )
+            }
             onClick={() => setPageIndex(pageIndex_ => pageIndex_ + 1)}
           />
         </Line>

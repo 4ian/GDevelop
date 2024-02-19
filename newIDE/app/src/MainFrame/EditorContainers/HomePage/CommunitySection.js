@@ -16,6 +16,7 @@ import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
 import ErrorBoundary from '../../../UI/ErrorBoundary';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 const styles = {
   list: {
@@ -64,13 +65,20 @@ const communityItems = [
 ];
 
 const CommunitySection = () => {
+  const { announcements } = React.useContext(AnnouncementsFeedContext);
+
+  const shouldDisplayAnnouncementsTitle =
+    announcements && announcements.length > 0;
+
   return (
     <SectionContainer title={<Trans>Community</Trans>}>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
-          <Text size="title">
-            <Trans>News and announcements</Trans>
-          </Text>
+          {shouldDisplayAnnouncementsTitle && (
+            <Text size="title">
+              <Trans>News and announcements</Trans>
+            </Text>
+          )}
           <AnnouncementsFeed canClose={false} level="normal" />
           <Text size="title">
             <Trans>Join the conversation</Trans>

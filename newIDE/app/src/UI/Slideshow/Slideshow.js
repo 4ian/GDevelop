@@ -8,7 +8,7 @@ import {
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Measure from 'react-measure';
-import { createStyles, makeStyles } from '@material-ui/core';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import SlideshowArrow from './SlideshowArrow';
 import { useInterval } from '../../Utils/UseInterval';
 

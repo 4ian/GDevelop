@@ -277,10 +277,6 @@ export const getExampleAndTemplateItemsForBuildSection = ({
       if (!privateGameTemplateActuallyAdded) {
         const exampleShortHeader =
           exampleShortHeadersWithThumbnails[exampleIndex];
-        if (!exampleShortHeader) {
-          hasReachedEnd = true;
-          break;
-        }
         gridItems.push(
           <ExampleTile
             exampleShortHeader={exampleShortHeader}
@@ -292,6 +288,13 @@ export const getExampleAndTemplateItemsForBuildSection = ({
     }
     if (privateGameTemplateActuallyAdded) privateGameTemplateIndex++;
     else exampleIndex++;
+    if (
+      exampleIndex >= exampleShortHeadersWithThumbnails.length &&
+      privateGameTemplateIndex >= privateGameTemplateListingDatas.length
+    ) {
+      hasReachedEnd = true;
+      break;
+    }
   }
 
   return { carouselItems, gridItems, hasReachedEnd };

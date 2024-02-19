@@ -52,8 +52,10 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
 import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import FlatButton from '../../../../UI/FlatButton';
 
 const cellSpacing = 2;
+const pageSize = 20;
 
 const getItemsColumns = (windowWidth: WidthType) => {
   switch (windowWidth) {
@@ -151,6 +153,7 @@ const BuildSection = ({
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
+  const [pageIndex, setPageIndex] = React.useState<number>(0);
 
   const columnsCount = getItemsColumns(windowWidth);
 
@@ -250,7 +253,7 @@ const BuildSection = ({
           : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates
-          ? allGameTemplatesCount
+          ? allGameTemplatesCount + pageIndex * pageSize
           : isMobile
           ? 16
           : 20,
@@ -265,6 +268,7 @@ const BuildSection = ({
       privateGameTemplateListingDatas,
       i18n,
       isMobile,
+      pageIndex,
       allGameTemplatesCount,
     ]
   );
@@ -284,6 +288,14 @@ const BuildSection = ({
         >
           {examplesAndTemplatesToDisplay.gridItems}
         </GridList>
+        <Line justifyContent={'center'}>
+          <FlatButton
+            primary
+            fullWidth={isMobile}
+            label={<Trans>See more</Trans>}
+            onClick={() => setPageIndex(pageIndex_ => pageIndex_ + 1)}
+          />
+        </Line>
       </SectionRow>
     </SectionContainer>
   ) : (

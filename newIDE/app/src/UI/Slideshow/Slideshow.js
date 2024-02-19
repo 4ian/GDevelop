@@ -10,7 +10,6 @@ import {
 import Measure from 'react-measure';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import SlideshowArrow from './SlideshowArrow';
-import { useInterval } from '../../Utils/UseInterval';
 
 const styles = {
   skeletonContainer: {
@@ -90,6 +89,7 @@ const Slideshow = ({
   itemMobileRatio,
 }: SlideshowProps) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const itemLineHeight = getItemLineHeight({
     width: windowWidth,
@@ -98,6 +98,10 @@ const Slideshow = ({
     itemMobileRatio,
   });
   const classesForImage = useStylesForImage();
+  const containerRef = React.useRef(null);
+  const [isOverImage, setIsOverImage] = React.useState(false);
+  const outImageTimeoutId = React.useRef(null);
+  const nextSlideTimeoutId = React.useRef(null);
 
   const [currentSlide, setCurrentSlide] = React.useState(0);
 
@@ -105,27 +109,94 @@ const Slideshow = ({
     () => {
       if (!items || items.length === 1) return;
 
-      setCurrentSlide(currentSlide =>
-        currentSlide === 0 ? items.length - 1 : currentSlide - 1
-      );
+      // Clear the timeout to avoid changing the slide while the user
+      // is interacting with the slideshow.
+      if (nextSlideTimeoutId.current) {
+        clearTimeout(nextSlideTimeoutId.current);
+        nextSlideTimeoutId.current = null;
+      }
+
+      setCurrentSlide(currentSlide === 0 ? items.length - 1 : currentSlide - 1);
     },
-    [items]
+    [items, currentSlide]
   );
 
   const handleRightArrowClick = React.useCallback(
     () => {
       if (!items || items.length === 1) return;
 
-      setCurrentSlide(currentSlide =>
-        currentSlide === items.length - 1 ? 0 : currentSlide + 1
-      );
+      // Clear the timeout to avoid changing the slide while the user
+      // is interacting with the slideshow.
+      if (nextSlideTimeoutId.current) {
+        clearTimeout(nextSlideTimeoutId.current);
+        nextSlideTimeoutId.current = null;
+      }
+
+      setCurrentSlide(currentSlide === items.length - 1 ? 0 : currentSlide + 1);
     },
-    [items]
+    [items, currentSlide]
   );
 
-  useInterval(() => {
-    handleRightArrowClick();
-  }, 5000);
+  React.useEffect(
+    () => {
+      nextSlideTimeoutId.current = setTimeout(() => {
+        handleRightArrowClick();
+      }, 5000);
+      return () => {
+        clearTimeout(nextSlideTimeoutId.current);
+        nextSlideTimeoutId.current = null;
+      };
+    },
+    // The function depends on the currentSlide,
+    // which allows to restart the timeout when the slide changes.
+    [handleRightArrowClick]
+  );
+
+  const handleOverImage = React.useCallback(
+    () => {
+      // If the user was going out just before, cancel the timeout.
+      if (outImageTimeoutId.current) {
+        clearTimeout(outImageTimeoutId.current);
+        outImageTimeoutId.current = null;
+      }
+      if (isOverImage) return;
+      setIsOverImage(true);
+    },
+    [isOverImage]
+  );
+
+  const handleOutImage = React.useCallback(
+    () => {
+      // If this event is triggered multiple times, there already is a timeout
+      // so just return.
+      if (!isOverImage || outImageTimeoutId.current) return;
+      outImageTimeoutId.current = setTimeout(() => {
+        setIsOverImage(false);
+      }, 1000);
+      return () => {
+        clearTimeout(outImageTimeoutId.current);
+        outImageTimeoutId.current = null;
+      };
+    },
+    [isOverImage]
+  );
+
+  React.useEffect(
+    () => {
+      const containerElement = containerRef.current;
+      // It's important to wait for the items, so that the listeners are
+      // created when the carousel is actually ready.
+      if (!containerElement || !items) return;
+
+      // Add event listeners on component mount. There is no need to
+      // remove them with a cleanup function because this element
+      // does not change and they will be destroyed when the element is
+      // removed from the DOM.
+      containerElement.addEventListener('mouseover', handleOverImage);
+      containerElement.addEventListener('mouseleave', handleOutImage);
+    },
+    [handleOverImage, handleOutImage, items]
+  );
 
   if (!items) {
     // If they're loading, display a skeleton so that it doesn't jump when loaded.
@@ -167,30 +238,26 @@ const Slideshow = ({
       {({ contentRect, measureRef }) => (
         <Paper square background="dark">
           <div
-            ref={measureRef}
+            ref={ref => {
+              measureRef(ref);
+              containerRef.current = ref;
+            }}
             style={{
               ...styles.slidesContainer,
               height: itemLineHeight,
             }}
           >
-            {items.length > 1 && (
+            {items.length > 1 && (isOverImage || isMobile) && (
               <SlideshowArrow onClick={handleLeftArrowClick} position="left" />
             )}
             {items.map((item, index) => {
               return (
                 <img
-                  src={
-                    windowWidth === 'small'
-                      ? item.mobileImageUrl
-                      : item.imageUrl
-                  }
+                  src={isMobile ? item.mobileImageUrl : item.imageUrl}
                   alt={`Slideshow item for ${item.id}`}
                   style={{
                     ...styles.slideImage,
-                    aspectRatio:
-                      windowWidth === 'small'
-                        ? itemMobileRatio
-                        : itemDesktopRatio,
+                    aspectRatio: isMobile ? itemMobileRatio : itemDesktopRatio,
                     ...(index === currentSlide
                       ? { opacity: 1, zIndex: 2 } // Update the opacity for the transition effect.
                       : { opacity: 0, zIndex: 1 }), // Update the z-index so it's on top of the other images, useful for keyboard navigation and hover.
@@ -201,7 +268,7 @@ const Slideshow = ({
                 />
               );
             })}
-            {items.length > 1 && (
+            {items.length > 1 && (isOverImage || isMobile) && (
               <SlideshowArrow
                 onClick={handleRightArrowClick}
                 position="right"

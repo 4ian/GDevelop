@@ -39,6 +39,14 @@ const styles = {
   },
 };
 
+const shouldGoLeft = (event: SyntheticKeyboardEvent<HTMLLIElement>) => {
+  return event.key === 'ArrowLeft';
+};
+
+const shouldGoRight = (event: SyntheticKeyboardEvent<HTMLLIElement>) => {
+  return event.key === 'ArrowRight';
+};
+
 const getItemLineHeight = ({
   windowWidth,
   componentWidth,
@@ -200,17 +208,15 @@ const Slideshow = ({
     // If they're loading, display a skeleton so that it doesn't jump when loaded.
     return (
       <Paper square background="dark">
-        <div style={styles.skeletonContainer}>
-          <Line expand>
-            <Column expand>
-              <Skeleton
-                variant="rect"
-                height={itemLineHeight}
-                style={styles.itemSkeleton}
-              />
-            </Column>
-          </Line>
-        </div>
+        <Line expand>
+          <Column expand>
+            <Skeleton
+              variant="rect"
+              height={itemLineHeight}
+              style={styles.itemSkeleton}
+            />
+          </Column>
+        </Line>
       </Paper>
     );
   }
@@ -231,10 +237,14 @@ const Slideshow = ({
         onPointerOver={handleOverOrFocusContainer}
         onPointerLeave={handleLeaveOrBlurContainer}
         tabIndex={0}
-        onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        onKeyUp={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
           if (shouldValidate(event)) {
             const item = items[currentSlide];
             if (item && item.onClick) item.onClick();
+          } else if (shouldGoLeft(event)) {
+            handleLeftArrowClick();
+          } else if (shouldGoRight(event)) {
+            handleRightArrowClick();
           }
         }}
         onFocus={handleOverOrFocusContainer}

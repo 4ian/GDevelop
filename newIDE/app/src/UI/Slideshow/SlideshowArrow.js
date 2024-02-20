@@ -70,12 +70,12 @@ const SlideshowArrow = ({
       }}
       onClick={onClick}
       tabIndex={0}
-      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+      onKeyUp={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
         if (shouldValidate(event)) {
           onClick();
+          // Ensure we only trigger the arrow action, not the parent container's action.
+          event.stopPropagation();
         }
-        // Ensure we only trigger the arrow action, not the parent container's action.
-        event.stopPropagation();
       }}
     >
       {position === 'left' ? <ChevronArrowLeft /> : <ChevronArrowRight />}

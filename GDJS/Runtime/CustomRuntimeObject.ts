@@ -26,22 +26,23 @@ namespace gdjs {
       gdjs.Scalable,
       gdjs.Flippable,
       gdjs.OpacityHandler {
+    _renderer: gdjs.CustomObjectRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     /** It contains shallow copies of the children hitboxes */
-    _untransformedHitBoxes: gdjs.Polygon[] = [];
+    private _untransformedHitBoxes: gdjs.Polygon[] = [];
     /** The dimension of this object is calculated from its children AABBs. */
-    _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
-    _scaleX: float = 1;
-    _scaleY: float = 1;
-    _flippedX: boolean = false;
-    _flippedY: boolean = false;
-    opacity: float = 255;
-    _customCenter: FloatPoint | null = null;
-    _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-    _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-    _isLocalTransformationDirty: boolean = true;
+    private _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
+    private _scaleX: float = 1;
+    private _scaleY: float = 1;
+    private _flippedX: boolean = false;
+    private _flippedY: boolean = false;
+    private opacity: float = 255;
+    private _customCenter: FloatPoint | null = null;
+    private _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    private _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    private _isLocalTransformationDirty: boolean = true;
 
     /**
      * @param parent The container the object belongs to
@@ -56,12 +57,22 @@ namespace gdjs {
         parent,
         this
       );
+      this._renderer = this._createRender();
 
       this._instanceContainer.loadFrom(objectData);
       this.getRenderer().reinitialize(this, parent);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
+    }
+
+    protected _createRender() {
+      const parent = this._runtimeScene;
+      return new gdjs.CustomObjectRenderer(
+        this,
+        this._instanceContainer,
+        parent
+      );
     }
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
@@ -145,7 +156,7 @@ namespace gdjs {
     }
 
     getRenderer() {
-      return this._instanceContainer.getRenderer();
+      return this._renderer;
     }
 
     onChildrenLocationChanged() {

@@ -756,6 +756,12 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
         includesFiles,
         "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
   }
+  if (pixiInThreeRenderers) {
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3DRenderer.js");
+  }
 }
 
 void ExporterHelper::RemoveIncludes(bool pixiRenderers,

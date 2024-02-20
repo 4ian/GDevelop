@@ -125,14 +125,18 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          // Update Project::CreateObject when default behavior are added.
+          // Update Project::CreateObject when default behaviors are added.
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
-          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
   if (eventsBasedObject.IsRenderedIn3D()) {
-    objectMetadata.MarkAsRenderedIn3D();
+    objectMetadata
+        .MarkAsRenderedIn3D()
+        .AddDefaultBehavior("Scene3D::Base3DBehavior");
+  }
+  else {
+    objectMetadata.AddDefaultBehavior("OpacityCapability::OpacityBehavior");
   }
 
   // TODO EBO Use full type to identify object to avoid collision.

@@ -28,6 +28,13 @@ namespace gdjs {
     return o.setOpacity && o.getOpacity;
   }
 
+  function is3D(
+    o: gdjs.RuntimeObject
+  ): o is gdjs.RuntimeObject & gdjs.Base3DHandler {
+    //@ts-ignore We are checking if the methods are present.
+    return o.getZ && o.setZ;
+  }
+
   function isColorable(o: gdjs.RuntimeObject): o is IColorable {
     //@ts-ignore We are checking if the methods are present.
     return o.setColor && o.getColor;
@@ -516,7 +523,7 @@ namespace gdjs {
       timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -621,7 +628,7 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -654,7 +661,7 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -811,10 +818,7 @@ namespace gdjs {
       // This action doesn't require 3D capabilities.
       // So, gdjs.RuntimeObject3D may not exist
       // when the 3D extension is not used.
-      const owner3d =
-        gdjs.RuntimeObject3D && owner instanceof gdjs.RuntimeObject3D
-          ? owner
-          : null;
+      const owner3d = is3D(owner) ? owner : null;
 
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {
@@ -1756,7 +1760,7 @@ namespace gdjs {
       timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,

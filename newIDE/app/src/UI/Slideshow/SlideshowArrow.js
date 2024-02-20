@@ -47,16 +47,12 @@ type SlideshowArrowProps = {|
   onClick: () => void,
   position: 'left' | 'right',
   classes: Object,
-  onFocus: () => void,
-  onBlur: () => void,
 |};
 
 const SlideshowArrow = ({
   onClick,
   position,
   classes,
-  onFocus,
-  onBlur,
 }: SlideshowArrowProps) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -81,8 +77,6 @@ const SlideshowArrow = ({
         // Ensure we only trigger the arrow action, not the parent container's action.
         event.stopPropagation();
       }}
-      onFocus={onFocus}
-      onBlur={onBlur}
     >
       {position === 'left' ? <ChevronArrowLeft /> : <ChevronArrowRight />}
     </div>

@@ -110,12 +110,10 @@ const Slideshow = ({
     itemMobileRatio,
   });
   const classesForContainer = useStylesForContainer();
-  const [isOverImage, setIsOverImage] = React.useState(false);
-  const [isFocusingContainer, setIsFocusingContainer] = React.useState(false);
-  const [isFocusingLeftArrow, setIsFocusingLeftArrow] = React.useState(false);
-  const [isFocusingRightArrow, setIsFocusingRightArrow] = React.useState(false);
+  const [isFocusingOrOverContainer, setIsFocusingContainer] = React.useState(
+    false
+  );
   const leftImageRecentlyTimeoutId = React.useRef(null);
-  const blurredImageRecentlyTimeoutId = React.useRef(null);
   const nextSlideTimeoutId = React.useRef(null);
 
   const [currentSlide, setCurrentSlide] = React.useState(0);
@@ -167,33 +165,30 @@ const Slideshow = ({
     [handleRightArrowClick]
   );
 
-  const handleOverImage = React.useCallback(
+  const handleOverOrFocusContainer = React.useCallback(
     () => {
       // If the user was going out just before, cancel the timeout.
       if (leftImageRecentlyTimeoutId.current) {
         clearTimeout(leftImageRecentlyTimeoutId.current);
         leftImageRecentlyTimeoutId.current = null;
       }
-      if (isOverImage) return;
-      setIsOverImage(true);
+      if (isFocusingOrOverContainer) return;
+      setIsFocusingContainer(true);
     },
-    [isOverImage]
+    [isFocusingOrOverContainer]
   );
 
-  const handleOutImage = React.useCallback(
+  const handleLeaveOrBlurContainer = React.useCallback(
     () => {
       // If this event is triggered multiple times, there already is a timeout
       // so just return.
-      if (!isOverImage || leftImageRecentlyTimeoutId.current) return;
+      if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
+        return;
       leftImageRecentlyTimeoutId.current = setTimeout(() => {
-        setIsOverImage(false);
+        setIsFocusingContainer(false);
       }, 1000);
-      return () => {
-        clearTimeout(leftImageRecentlyTimeoutId.current);
-        leftImageRecentlyTimeoutId.current = null;
-      };
     },
-    [isOverImage]
+    [isFocusingOrOverContainer]
   );
 
   if (!items) {
@@ -219,12 +214,7 @@ const Slideshow = ({
 
   const shouldDisplayArrows =
     items.length > 1 &&
-    (isOverImage ||
-      isMobile ||
-      isTouchScreen ||
-      isFocusingContainer ||
-      isFocusingLeftArrow ||
-      isFocusingRightArrow);
+    (isFocusingOrOverContainer || isMobile || isTouchScreen);
 
   return (
     <Paper square background="dark">
@@ -233,8 +223,8 @@ const Slideshow = ({
           ...styles.slidesContainer,
           height: itemLineHeight,
         }}
-        onPointerOver={handleOverImage}
-        onPointerLeave={handleOutImage}
+        onPointerOver={handleOverOrFocusContainer}
+        onPointerLeave={handleLeaveOrBlurContainer}
         tabIndex={0}
         onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
           if (shouldValidate(event)) {
@@ -242,20 +232,8 @@ const Slideshow = ({
             if (item && item.onClick) item.onClick();
           }
         }}
-        onFocus={() => {
-          if (blurredImageRecentlyTimeoutId.current) {
-            clearTimeout(blurredImageRecentlyTimeoutId.current);
-            blurredImageRecentlyTimeoutId.current = null;
-          }
-          setIsFocusingContainer(true);
-        }}
-        onBlur={() => {
-          console.log('blur');
-          blurredImageRecentlyTimeoutId.current = setTimeout(
-            () => setIsFocusingContainer(false),
-            1000
-          );
-        }}
+        onFocus={handleOverOrFocusContainer}
+        onBlur={handleLeaveOrBlurContainer}
         className={classesForContainer.root}
       >
         {shouldDisplayArrows && (
@@ -263,19 +241,6 @@ const Slideshow = ({
             onClick={handleLeftArrowClick}
             position="left"
             classes={classesForArrowButtons}
-            onFocus={() => {
-              if (blurredImageRecentlyTimeoutId.current) {
-                clearTimeout(blurredImageRecentlyTimeoutId.current);
-                blurredImageRecentlyTimeoutId.current = null;
-              }
-              setIsFocusingLeftArrow(true);
-            }}
-            onBlur={() => {
-              blurredImageRecentlyTimeoutId.current = setTimeout(
-                () => setIsFocusingLeftArrow(false),
-                1000
-              );
-            }}
           />
         )}
         {items.map((item, index) => {
@@ -300,19 +265,6 @@ const Slideshow = ({
             onClick={handleRightArrowClick}
             position="right"
             classes={classesForArrowButtons}
-            onFocus={() => {
-              if (blurredImageRecentlyTimeoutId.current) {
-                clearTimeout(blurredImageRecentlyTimeoutId.current);
-                blurredImageRecentlyTimeoutId.current = null;
-              }
-              setIsFocusingRightArrow(true);
-            }}
-            onBlur={() => {
-              blurredImageRecentlyTimeoutId.current = setTimeout(
-                () => setIsFocusingRightArrow(false),
-                1000
-              );
-            }}
           />
         )}
       </div>

@@ -1365,7 +1365,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project, layout } = this.props;
 
     const object = getObjectByName(project, layout, instance.getObjectName());
-    return !!object && object.is3DObject();
+    return (
+      !!object &&
+      gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D()
+    );
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {

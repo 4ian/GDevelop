@@ -275,10 +275,7 @@ namespace gdjs {
           }
           newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
           newObject.setAngle(instanceData.angle);
-          if (
-            gdjs.RuntimeObject3D &&
-            newObject instanceof gdjs.RuntimeObject3D
-          ) {
+          if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(newObject)) {
             if (instanceData.z !== undefined)
               newObject.setZ(instanceData.z + zOffset);
             if (instanceData.rotationX !== undefined)

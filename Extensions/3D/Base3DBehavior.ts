@@ -105,6 +105,15 @@ namespace gdjs {
     isFlippedZ(): boolean;
   }
 
+  export namespace Base3DHandler {
+    export const is3D = (
+      o: gdjs.RuntimeObject
+    ): o is gdjs.RuntimeObject & gdjs.Base3DHandler => {
+      //@ts-ignore We are checking if the methods are present.
+      return o.getZ && o.setZ;
+    };
+  }
+
   /**
    * A behavior that forwards the Base3D interface to its object.
    */

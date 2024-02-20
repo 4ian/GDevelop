@@ -241,7 +241,7 @@ namespace gdjs {
           if (!childInstance.isIncludedInParentCollisionMask()) {
             continue;
           }
-          if (!(childInstance instanceof gdjs.RuntimeObject3D)) {
+          if (!gdjs.Base3DHandler.is3D(childInstance)) {
             continue;
           }
           minZ = Math.min(minZ, childInstance.getAABBMinZ());

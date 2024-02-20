@@ -638,7 +638,6 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  is3DObject(): boolean;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
   getEffects(): EffectsContainer;

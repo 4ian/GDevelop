@@ -41,16 +41,16 @@ const styles = {
 
 const getItemLineHeight = ({
   windowWidth,
-  windowInnerWidth,
+  componentWidth,
   itemDesktopRatio,
   itemMobileRatio,
 }: {
   windowWidth: WidthType,
-  windowInnerWidth: number,
+  componentWidth: number,
   itemDesktopRatio: number,
   itemMobileRatio: number,
 }) => {
-  const containerWidth = windowInnerWidth - 230 - 2 * marginsSize;
+  const containerWidth = componentWidth - 2 * marginsSize;
   const lineHeight =
     windowWidth === 'small'
       ? containerWidth / itemMobileRatio
@@ -86,12 +86,16 @@ type SlideshowProps = {|
   |}>,
   itemDesktopRatio: number,
   itemMobileRatio: number,
+  additionalMarginForWidthCalculation?: number,
 |};
 
 const Slideshow = ({
   items,
   itemDesktopRatio,
   itemMobileRatio,
+  // The slideshow bases its width on the full window width, so if used in a
+  // container, use this prop to calculate the width accurately.
+  additionalMarginForWidthCalculation,
 }: SlideshowProps) => {
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
@@ -105,7 +109,8 @@ const Slideshow = ({
   const isTouchScreen = screenType === 'touch';
   const itemLineHeight = getItemLineHeight({
     windowWidth,
-    windowInnerWidth,
+    componentWidth:
+      windowInnerWidth - (additionalMarginForWidthCalculation || 0),
     itemDesktopRatio,
     itemMobileRatio,
   });

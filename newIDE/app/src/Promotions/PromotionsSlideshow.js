@@ -4,6 +4,11 @@ import { AnnouncementsFeedContext } from '../AnnouncementsFeed/AnnouncementsFeed
 import RouterContext from '../MainFrame/RouterContext';
 import { getOnClick } from './PromotionHelper';
 import Slideshow from '../UI/Slideshow/Slideshow';
+import {
+  homepageDesktopMenuBarWidth,
+  homepageMediumMenuBarWidth,
+} from '../MainFrame/EditorContainers/HomePage/HomePageMenuBar';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const promotionDesktopRatio = 5038 / 459;
 const promotionMobileRatio = 18 / 7;
@@ -15,6 +20,9 @@ type PromotionsSlideshowProps = {|
 const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobile = windowWidth === 'small';
+  const isMediumScreen = windowWidth === 'medium';
 
   const filteredPromotions =
     promotions && type
@@ -40,6 +48,13 @@ const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
       items={slideShowItems}
       itemDesktopRatio={promotionDesktopRatio}
       itemMobileRatio={promotionMobileRatio}
+      additionalMarginForWidthCalculation={
+        isMobile
+          ? 0
+          : isMediumScreen
+          ? homepageMediumMenuBarWidth
+          : homepageDesktopMenuBarWidth
+      }
     />
   );
 };

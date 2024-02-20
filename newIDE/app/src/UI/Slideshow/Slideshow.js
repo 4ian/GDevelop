@@ -7,9 +7,12 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Measure from 'react-measure';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import SlideshowArrow from './SlideshowArrow';
+import SlideshowArrow, { useStylesForArrowButtons } from './SlideshowArrow';
+import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
+import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
+import useOnResize from '../../Utils/UseOnResize';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 
 const styles = {
   skeletonContainer: {
@@ -30,41 +33,43 @@ const styles = {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    objectFit: 'contain',
+    objectFit: 'cover',
     borderRadius: 6,
     transition: 'opacity 0.5s ease-in-out, transform 0.3s ease-in-out',
   },
 };
 
 const getItemLineHeight = ({
-  width,
-  containerWidth,
+  windowWidth,
+  windowInnerWidth,
   itemDesktopRatio,
   itemMobileRatio,
 }: {
-  width: WidthType,
-  containerWidth: ?number,
+  windowWidth: WidthType,
+  windowInnerWidth: number,
   itemDesktopRatio: number,
   itemMobileRatio: number,
 }) => {
-  const defaultContainerWidth = width === 'small' ? 320 : 1024;
-  const containerWidthValue = containerWidth || defaultContainerWidth;
+  const containerWidth = windowInnerWidth - 230 - 2 * marginsSize;
   const lineHeight =
-    width === 'small'
-      ? containerWidthValue / itemMobileRatio
-      : containerWidthValue / itemDesktopRatio;
+    windowWidth === 'small'
+      ? containerWidth / itemMobileRatio
+      : containerWidth / itemDesktopRatio;
 
   return lineHeight;
 };
 
-const useStylesForImage = () =>
+const useStylesForContainer = () =>
   makeStyles(theme =>
     createStyles({
       root: {
-        '&:hover': {
+        '&:hover img': {
           transform: 'scale(1.02)',
         },
         '&:focus': {
+          outline: 'none',
+        },
+        '&:focus img': {
           transform: 'scale(1.02)',
           outline: 'none',
         },
@@ -88,19 +93,29 @@ const Slideshow = ({
   itemDesktopRatio,
   itemMobileRatio,
 }: SlideshowProps) => {
+  // Ensure the component is re-rendered when the window is resized.
+  useOnResize(useForceUpdate());
+  const windowInnerWidth = window.innerWidth;
+
+  const classesForArrowButtons = useStylesForArrowButtons();
+
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
-  const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  const screenType = useScreenType();
+  const isTouchScreen = screenType === 'touch';
   const itemLineHeight = getItemLineHeight({
-    width: windowWidth,
-    containerWidth,
+    windowWidth,
+    windowInnerWidth,
     itemDesktopRatio,
     itemMobileRatio,
   });
-  const classesForImage = useStylesForImage();
-  const containerRef = React.useRef(null);
+  const classesForContainer = useStylesForContainer();
   const [isOverImage, setIsOverImage] = React.useState(false);
-  const outImageTimeoutId = React.useRef(null);
+  const [isFocusingContainer, setIsFocusingContainer] = React.useState(false);
+  const [isFocusingLeftArrow, setIsFocusingLeftArrow] = React.useState(false);
+  const [isFocusingRightArrow, setIsFocusingRightArrow] = React.useState(false);
+  const leftImageRecentlyTimeoutId = React.useRef(null);
+  const blurredImageRecentlyTimeoutId = React.useRef(null);
   const nextSlideTimeoutId = React.useRef(null);
 
   const [currentSlide, setCurrentSlide] = React.useState(0);
@@ -155,9 +170,9 @@ const Slideshow = ({
   const handleOverImage = React.useCallback(
     () => {
       // If the user was going out just before, cancel the timeout.
-      if (outImageTimeoutId.current) {
-        clearTimeout(outImageTimeoutId.current);
-        outImageTimeoutId.current = null;
+      if (leftImageRecentlyTimeoutId.current) {
+        clearTimeout(leftImageRecentlyTimeoutId.current);
+        leftImageRecentlyTimeoutId.current = null;
       }
       if (isOverImage) return;
       setIsOverImage(true);
@@ -169,115 +184,139 @@ const Slideshow = ({
     () => {
       // If this event is triggered multiple times, there already is a timeout
       // so just return.
-      if (!isOverImage || outImageTimeoutId.current) return;
-      outImageTimeoutId.current = setTimeout(() => {
+      if (!isOverImage || leftImageRecentlyTimeoutId.current) return;
+      leftImageRecentlyTimeoutId.current = setTimeout(() => {
         setIsOverImage(false);
       }, 1000);
       return () => {
-        clearTimeout(outImageTimeoutId.current);
-        outImageTimeoutId.current = null;
+        clearTimeout(leftImageRecentlyTimeoutId.current);
+        leftImageRecentlyTimeoutId.current = null;
       };
     },
     [isOverImage]
   );
 
-  React.useEffect(
-    () => {
-      const containerElement = containerRef.current;
-      // It's important to wait for the items, so that the listeners are
-      // created when the carousel is actually ready.
-      if (!containerElement || !items) return;
-
-      // Add event listeners on component mount. There is no need to
-      // remove them with a cleanup function because this element
-      // does not change and they will be destroyed when the element is
-      // removed from the DOM.
-      containerElement.addEventListener('mouseover', handleOverImage);
-      containerElement.addEventListener('mouseleave', handleOutImage);
-    },
-    [handleOverImage, handleOutImage, items]
-  );
-
   if (!items) {
     // If they're loading, display a skeleton so that it doesn't jump when loaded.
     return (
-      <Measure
-        bounds
-        onResize={contentRect => {
-          setContainerWidth(contentRect.bounds.width);
-        }}
-      >
-        {({ contentRect, measureRef }) => (
-          <Paper square background="dark">
-            <div ref={measureRef} style={styles.skeletonContainer}>
-              <Line expand>
-                <Column expand>
-                  <Skeleton
-                    variant="rect"
-                    height={itemLineHeight}
-                    style={styles.itemSkeleton}
-                  />
-                </Column>
-              </Line>
-            </div>
-          </Paper>
-        )}
-      </Measure>
+      <Paper square background="dark">
+        <div style={styles.skeletonContainer}>
+          <Line expand>
+            <Column expand>
+              <Skeleton
+                variant="rect"
+                height={itemLineHeight}
+                style={styles.itemSkeleton}
+              />
+            </Column>
+          </Line>
+        </div>
+      </Paper>
     );
   }
 
   if (!items.length) return null;
 
+  const shouldDisplayArrows =
+    items.length > 1 &&
+    (isOverImage ||
+      isMobile ||
+      isTouchScreen ||
+      isFocusingContainer ||
+      isFocusingLeftArrow ||
+      isFocusingRightArrow);
+
   return (
-    <Measure
-      bounds
-      onResize={contentRect => {
-        setContainerWidth(contentRect.bounds.width + 2 * marginsSize);
-      }}
-    >
-      {({ contentRect, measureRef }) => (
-        <Paper square background="dark">
-          <div
-            ref={ref => {
-              measureRef(ref);
-              containerRef.current = ref;
+    <Paper square background="dark">
+      <div
+        style={{
+          ...styles.slidesContainer,
+          height: itemLineHeight,
+        }}
+        onPointerOver={handleOverImage}
+        onPointerLeave={handleOutImage}
+        tabIndex={0}
+        onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+          if (shouldValidate(event)) {
+            const item = items[currentSlide];
+            if (item && item.onClick) item.onClick();
+          }
+        }}
+        onFocus={() => {
+          if (blurredImageRecentlyTimeoutId.current) {
+            clearTimeout(blurredImageRecentlyTimeoutId.current);
+            blurredImageRecentlyTimeoutId.current = null;
+          }
+          setIsFocusingContainer(true);
+        }}
+        onBlur={() => {
+          console.log('blur');
+          blurredImageRecentlyTimeoutId.current = setTimeout(
+            () => setIsFocusingContainer(false),
+            1000
+          );
+        }}
+        className={classesForContainer.root}
+      >
+        {shouldDisplayArrows && (
+          <SlideshowArrow
+            onClick={handleLeftArrowClick}
+            position="left"
+            classes={classesForArrowButtons}
+            onFocus={() => {
+              if (blurredImageRecentlyTimeoutId.current) {
+                clearTimeout(blurredImageRecentlyTimeoutId.current);
+                blurredImageRecentlyTimeoutId.current = null;
+              }
+              setIsFocusingLeftArrow(true);
             }}
-            style={{
-              ...styles.slidesContainer,
-              height: itemLineHeight,
-            }}
-          >
-            {items.length > 1 && (isOverImage || isMobile) && (
-              <SlideshowArrow onClick={handleLeftArrowClick} position="left" />
-            )}
-            {items.map((item, index) => {
-              return (
-                <img
-                  src={isMobile ? item.mobileImageUrl : item.imageUrl}
-                  alt={`Slideshow item for ${item.id}`}
-                  style={{
-                    ...styles.slideImage,
-                    aspectRatio: isMobile ? itemMobileRatio : itemDesktopRatio,
-                    ...(index === currentSlide
-                      ? { opacity: 1, zIndex: 2 } // Update the opacity for the transition effect.
-                      : { opacity: 0, zIndex: 1 }), // Update the z-index so it's on top of the other images, useful for keyboard navigation and hover.
-                  }}
-                  key={item.id}
-                  onClick={item.onClick}
-                  className={classesForImage.root}
-                />
+            onBlur={() => {
+              blurredImageRecentlyTimeoutId.current = setTimeout(
+                () => setIsFocusingLeftArrow(false),
+                1000
               );
-            })}
-            {items.length > 1 && (isOverImage || isMobile) && (
-              <SlideshowArrow
-                onClick={handleRightArrowClick}
-                position="right"
-              />
-            )}
-          </div>
-        </Paper>
-      )}
-    </Measure>
+            }}
+          />
+        )}
+        {items.map((item, index) => {
+          return (
+            <img
+              src={isMobile ? item.mobileImageUrl : item.imageUrl}
+              alt={`Slideshow item for ${item.id}`}
+              style={{
+                ...styles.slideImage,
+                aspectRatio: isMobile ? itemMobileRatio : itemDesktopRatio,
+                ...(index === currentSlide
+                  ? { opacity: 1, zIndex: 2 } // Update the opacity for the transition effect.
+                  : { opacity: 0, zIndex: 1 }), // Update the z-index so it's on top of the other images, useful for keyboard navigation and hover.
+              }}
+              key={item.id}
+              onClick={item.onClick}
+            />
+          );
+        })}
+        {shouldDisplayArrows && (
+          <SlideshowArrow
+            onClick={handleRightArrowClick}
+            position="right"
+            classes={classesForArrowButtons}
+            onFocus={() => {
+              if (blurredImageRecentlyTimeoutId.current) {
+                clearTimeout(blurredImageRecentlyTimeoutId.current);
+                blurredImageRecentlyTimeoutId.current = null;
+              }
+              setIsFocusingRightArrow(true);
+            }}
+            onBlur={() => {
+              blurredImageRecentlyTimeoutId.current = setTimeout(
+                () => setIsFocusingRightArrow(false),
+                1000
+              );
+            }}
+          />
+        )}
+      </div>
+    </Paper>
   );
 };
 

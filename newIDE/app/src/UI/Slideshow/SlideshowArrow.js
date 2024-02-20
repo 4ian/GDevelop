@@ -4,6 +4,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { createStyles, makeStyles } from '@material-ui/core';
 import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 
 const arrowWidth = 30;
 
@@ -18,7 +19,9 @@ const styles = {
   },
 };
 
-const useStylesForArrowButtons = () =>
+// We create the style outside of this component to avoid it
+// being re-created at each render.
+export const useStylesForArrowButtons = () =>
   makeStyles(theme =>
     createStyles({
       root: {
@@ -28,6 +31,13 @@ const useStylesForArrowButtons = () =>
               ? 'brightness(130%)'
               : 'brightness(90%)',
         },
+        '&:focus': {
+          filter:
+            theme.palette.type === 'dark'
+              ? 'brightness(130%)'
+              : 'brightness(90%)',
+          outline: 'none',
+        },
         transition: 'filter 100ms ease',
       },
     })
@@ -36,15 +46,23 @@ const useStylesForArrowButtons = () =>
 type SlideshowArrowProps = {|
   onClick: () => void,
   position: 'left' | 'right',
+  classes: Object,
+  onFocus: () => void,
+  onBlur: () => void,
 |};
 
-const SlideshowArrow = ({ onClick, position }: SlideshowArrowProps) => {
+const SlideshowArrow = ({
+  onClick,
+  position,
+  classes,
+  onFocus,
+  onBlur,
+}: SlideshowArrowProps) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const classesForArrowButtons = useStylesForArrowButtons();
 
   return (
     <div
-      className={classesForArrowButtons.root}
+      className={classes.root}
       style={{
         ...styles.arrowContainer,
         backgroundColor: gdevelopTheme.paper.backgroundColor.light,
@@ -55,6 +73,16 @@ const SlideshowArrow = ({ onClick, position }: SlideshowArrowProps) => {
         top: `calc(50% - ${Math.floor(arrowWidth / 2)}px)`,
       }}
       onClick={onClick}
+      tabIndex={0}
+      onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
+        if (shouldValidate(event)) {
+          onClick();
+        }
+        // Ensure we only trigger the arrow action, not the parent container's action.
+        event.stopPropagation();
+      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       {position === 'left' ? <ChevronArrowLeft /> : <ChevronArrowRight />}
     </div>

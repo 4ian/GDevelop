@@ -104,12 +104,10 @@ const Slideshow = ({
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const windowInnerWidth = window.innerWidth;
-  const windowInnerHeight = window.innerHeight;
 
   const classesForArrowButtons = useStylesForArrowButtons();
 
-  const { isMobile } = useResponsiveWindowSize();
-  const isLandscape = windowInnerWidth > windowInnerHeight;
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
   const shouldUseMobileImage = isMobile && !isLandscape;
 
   const screenType = useScreenType();

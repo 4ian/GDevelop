@@ -12,7 +12,7 @@ import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import TutorialButton from '../../UI/TutorialButton';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -109,8 +109,7 @@ const ShareDialog = ({
   fileMetadata,
   storageProvider,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     setShareDialogDefaultTab,
     getShareDialogDefaultTab,
@@ -264,22 +263,14 @@ const ShareDialog = ({
               key="tutorial"
               tutorialId="export-to-itch"
               label={
-                isMobileScreen ? (
-                  'Itch.io'
-                ) : (
-                  <Trans>How to export to Itch.io</Trans>
-                )
+                isMobile ? 'Itch.io' : <Trans>How to export to Itch.io</Trans>
               }
             />
           ) : null,
           <TextButton
             key="exports"
             label={
-              isMobileScreen ? (
-                <Trans>Exports</Trans>
-              ) : (
-                <Trans>See all exports</Trans>
-              )
+              isMobile ? <Trans>Exports</Trans> : <Trans>See all exports</Trans>
             }
             onClick={openBuildDialog}
             disabled={isNavigationDisabled || !isOnline}

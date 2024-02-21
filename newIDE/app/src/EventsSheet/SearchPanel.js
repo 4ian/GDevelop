@@ -25,7 +25,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Tabs } from '../UI/Tabs';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cross from '../UI/CustomSvgIcons/Cross';
@@ -61,8 +61,7 @@ const SearchPanel = (
   }: Props,
   ref
 ) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const searchTextField = React.useRef<?TextFieldInterface>(null);
   const replaceTextField = React.useRef<?TextFieldInterface>(null);
 
@@ -194,7 +193,7 @@ const SearchPanel = (
                 },
               ]}
               // Enforce scroll on very small screens, because the tabs have long names.
-              variant={isMobileScreen ? 'scrollable' : undefined}
+              variant={isMobile ? 'scrollable' : undefined}
             />
           </Column>
         </Line>
@@ -313,7 +312,7 @@ const SearchPanel = (
                       setMatchCase(!checked);
                     }}
                   />
-                  {!isMobileScreen && (
+                  {!isMobile && (
                     <Text>
                       <Trans>Search in:</Trans>
                     </Text>

@@ -251,11 +251,7 @@ export const EventsFunctionPropertiesEditor = ({
                   <ResponsiveLineStackLayout
                     alignItems="center"
                     noMargin
-                    width={
-                      containerWidth && containerWidth < 650
-                        ? 'small'
-                        : undefined
-                    }
+                    forceMobileLayout={!!containerWidth && containerWidth < 650}
                   >
                     <Line alignItems="center" noMargin>
                       <SelectField

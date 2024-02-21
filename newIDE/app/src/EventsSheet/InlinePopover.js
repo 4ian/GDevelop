@@ -12,7 +12,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { doesPathContainDialog } from '../UI/MaterialUISpecificUtil';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   popover: {
@@ -51,8 +51,7 @@ type Props = {|
 export default function InlinePopover(props: Props) {
   const startSentinel = React.useRef<?HTMLDivElement>(null);
   const endSentinel = React.useRef<?HTMLDivElement>(null);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   return (
     <ClickAwayListener
@@ -103,9 +102,9 @@ export default function InlinePopover(props: Props) {
           ...styles.popover,
           // On mobile, make it take full screen width, but not too much for large mobile phones.
           // On desktop, make it take a min width, to ensure most fields with translations are well displayed.
-          width: isMobileScreen ? '100%' : 'auto',
-          minWidth: isMobileScreen ? 'auto' : 320,
-          maxWidth: isMobileScreen ? 320 : 600,
+          width: isMobile ? '100%' : 'auto',
+          minWidth: isMobile ? 'auto' : 320,
+          maxWidth: isMobile ? 320 : 600,
         }}
         placement="bottom-start"
         onKeyDown={event => {

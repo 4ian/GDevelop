@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, marginsSize } from '../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
 import VerticalTabButton, {
@@ -74,9 +74,8 @@ const HomePageMenuBar = ({
   onOpenAbout,
   onOpenHomePageMenuDrawer,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const isMobileOrSmallScreen = isMobile || windowWidth === 'medium';
+  const { windowSize, isMobile } = useResponsiveWindowSize();
+  const isMobileOrSmallScreen = isMobile || windowSize === 'medium';
   const theme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
   const tabsToDisplay = getTabsToDisplay({ profile });

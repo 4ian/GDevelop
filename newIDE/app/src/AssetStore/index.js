@@ -28,7 +28,7 @@ import {
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
@@ -132,21 +132,20 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const searchBar = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobileScreen) {
+        if (isMobile) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobileScreen]
+      [isMobile]
     );
 
     const [

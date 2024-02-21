@@ -205,7 +205,7 @@ type ProjectFileListItemProps = {|
   lastModifiedInfo?: LastModifiedInfo | null,
   storageProviders: Array<StorageProvider>,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
-  isWindowWidthMediumOrLarger: boolean,
+  isWindowSizeMediumOrLarger: boolean,
   hideDeleteContextMenuAction?: boolean,
   onManageGame?: ({| gameId: string |}) => void,
   canManageGame?: ({| gameId: string |}) => boolean,
@@ -217,7 +217,7 @@ export const ProjectFileListItem = ({
   lastModifiedInfo, // If null, the project has been modified last by the current user.
   storageProviders,
   onOpenRecentFile,
-  isWindowWidthMediumOrLarger,
+  isWindowSizeMediumOrLarger,
   hideDeleteContextMenuAction,
   onManageGame,
   canManageGame,
@@ -370,7 +370,7 @@ export const ProjectFileListItem = ({
             onContextMenu={event => openContextMenu(event, file)}
             {...longTouchForContextMenuProps}
           >
-            {isWindowWidthMediumOrLarger ? (
+            {isWindowSizeMediumOrLarger ? (
               <LineStackLayout justifyContent="flex-start" expand>
                 <Column expand>
                   <Line noMargin alignItems="center">

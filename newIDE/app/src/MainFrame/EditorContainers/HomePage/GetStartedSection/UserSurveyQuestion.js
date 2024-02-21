@@ -23,15 +23,18 @@ import Paper from '../../../../UI/Paper';
 import InlineCheckbox from '../../../../UI/InlineCheckbox';
 import RaisedButton from '../../../../UI/RaisedButton';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import { isOnlyOneFreeAnswerPossible } from './UserSurvey';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
-const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
-  switch (width) {
+const getColumnsFromWindowSize = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 3 : 1;
     case 'medium':
@@ -368,8 +371,7 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
     ref
   ) => {
     const { text, answers, multi } = questionData;
-    const windowWidth = useResponsiveWindowWidth();
-    const isLandscape = window.innerWidth > window.innerHeight;
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const onlyOneFreeAnswerPossible = isOnlyOneFreeAnswerPossible(answers);
     return (
       <I18n>
@@ -388,7 +390,7 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
               cols={
                 onlyOneFreeAnswerPossible
                   ? 1
-                  : getColumnsFromWidth(windowWidth, isLandscape)
+                  : getColumnsFromWindowSize(windowSize, isLandscape)
               }
               spacing={15}
               cellHeight="auto"

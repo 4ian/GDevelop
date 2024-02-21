@@ -15,7 +15,7 @@ import DropIndicator from './DropIndicator';
 import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
@@ -55,7 +55,7 @@ type Props = {|
   renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
 
   scope: EventsScope,
   resourcesManager: gdResourcesManager,
@@ -93,7 +93,7 @@ export default function InstructionsList({
   disabled,
   renderObjectThumbnail,
   screenType,
-  windowWidth,
+  windowSize,
   scope,
   resourcesManager,
   globalObjectsContainer,
@@ -168,7 +168,7 @@ export default function InstructionsList({
         disabled={disabled}
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
-        windowWidth={windowWidth}
+        windowSize={windowSize}
         scope={scope}
         resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}

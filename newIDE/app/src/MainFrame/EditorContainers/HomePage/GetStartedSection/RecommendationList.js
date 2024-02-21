@@ -14,8 +14,8 @@ import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import { formatTutorialToImageTileComponent } from '../LearnSection';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
@@ -48,10 +48,10 @@ const useStyles = makeStyles({
 });
 
 const getTextTutorialsColumnsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 1;
     case 'medium':
@@ -65,10 +65,10 @@ const getTextTutorialsColumnsFromWidth = (
   }
 };
 const getVideoTutorialsColumnsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 5 : 1;
     case 'medium':
@@ -82,10 +82,10 @@ const getVideoTutorialsColumnsFromWidth = (
   }
 };
 const getTutorialsLimitsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 5 : 3;
     case 'medium':
@@ -125,8 +125,7 @@ type TextTutorialsRowProps = {|
 
 const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
   const classes = useStyles();
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
+  const { isLandscape, windowSize } = useResponsiveWindowSize();
 
   return (
     <>
@@ -141,7 +140,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         </Text>
       </Column>
       <GridList
-        cols={getTextTutorialsColumnsFromWidth(windowWidth, isLandscape)}
+        cols={getTextTutorialsColumnsFromWidth(windowSize, isLandscape)}
         cellHeight="auto"
         spacing={10}
       >
@@ -241,8 +240,8 @@ const RecommendationList = ({
                 items={recommendedVideoTutorials.map(tutorial =>
                   formatTutorialToImageTileComponent(i18n, tutorial)
                 )}
-                getColumnsFromWidth={getVideoTutorialsColumnsFromWidth}
-                getLimitFromWidth={getTutorialsLimitsFromWidth}
+                getColumnsFromWindowSize={getVideoTutorialsColumnsFromWidth}
+                getLimitFromWindowSize={getTutorialsLimitsFromWidth}
               />
             </SectionRow>
           );

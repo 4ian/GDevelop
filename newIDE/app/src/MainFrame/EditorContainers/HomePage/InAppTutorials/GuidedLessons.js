@@ -4,8 +4,8 @@ import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { Column, Line } from '../../../../UI/Grid';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
@@ -36,8 +36,11 @@ import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 import Object3D from './Icons/Object3D';
 
-const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
-  switch (width) {
+const getColumnsFromWindowSize = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 1;
     case 'medium':
@@ -51,7 +54,7 @@ const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('xlarge', true);
+const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -84,8 +87,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
 
   const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
     const tutorialProgress = getTutorialProgress({
@@ -207,7 +209,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
               </Column>
             )}
             <GridList
-              cols={getColumnsFromWidth(windowWidth, isLandscape)}
+              cols={getColumnsFromWindowSize(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}

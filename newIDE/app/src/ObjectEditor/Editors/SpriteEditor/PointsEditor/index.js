@@ -22,7 +22,7 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
@@ -199,11 +199,8 @@ const PointsEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const editorNodes = isMobileScreen
-    ? verticalMosaicNodes
-    : horizontalMosaicNodes;
+  const { isMobile } = useResponsiveWindowSize();
+  const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Column, Line, marginsSize } from '../../UI/Grid';
 import Paper from '../../UI/Paper';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import SlideshowArrow, { useStylesForArrowButtons } from './SlideshowArrow';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
@@ -108,8 +108,7 @@ const Slideshow = ({
 
   const classesForArrowButtons = useStylesForArrowButtons();
 
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const isLandscape = windowInnerWidth > windowInnerHeight;
   const shouldUseMobileImage = isMobile && !isLandscape;
 

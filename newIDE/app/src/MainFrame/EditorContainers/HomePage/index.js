@@ -26,7 +26,7 @@ import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSou
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
@@ -183,8 +183,7 @@ export const HomePage = React.memo<Props>(
         RouterContext
       );
 
-      const windowWidth = useResponsiveWindowWidth();
-      const isMobile = windowWidth === 'small';
+      const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
       } = React.useContext(PreferencesContext);

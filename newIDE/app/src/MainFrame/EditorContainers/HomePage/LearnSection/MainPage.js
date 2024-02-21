@@ -15,8 +15,8 @@ import {
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
@@ -37,10 +37,10 @@ const useStyles = makeStyles({
 });
 
 const getHelpItemsColumnsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 1;
     case 'medium':
@@ -55,10 +55,10 @@ const getHelpItemsColumnsFromWidth = (
 };
 
 const getTutorialsColumnsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 5 : 1;
     case 'medium':
@@ -106,8 +106,8 @@ export const TutorialsRow = ({
           .map(tutorial => formatTutorialToImageTileComponent(i18n, tutorial))}
         onShowAll={() => onSelectCategory(category)}
         showAllIcon={<ChevronArrowRight fontSize="small" />}
-        getColumnsFromWidth={getTutorialsColumnsFromWidth}
-        getLimitFromWidth={getTutorialsColumnsFromWidth}
+        getColumnsFromWindowSize={getTutorialsColumnsFromWidth}
+        getLimitFromWindowSize={getTutorialsColumnsFromWidth}
       />
     )}
   </I18n>
@@ -129,11 +129,8 @@ const MainPage = ({
   selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
-  const isMobile = windowWidth === 'small';
-  const isTabletOrSmallLaptop =
-    windowWidth === 'small' || windowWidth === 'medium';
+  const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
+  const isTabletOrSmallLaptop = windowSize === 'medium';
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -169,7 +166,7 @@ const MainPage = ({
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(windowWidth, isLandscape)}
+            cols={getHelpItemsColumnsFromWidth(windowSize, isLandscape)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}

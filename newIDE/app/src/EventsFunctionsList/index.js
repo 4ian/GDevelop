@@ -24,7 +24,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   EventsFunctionTreeViewItemContent,
@@ -437,8 +437,7 @@ const EventsFunctionsList = React.forwardRef<
     );
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
     const { showDeleteConfirmation } = useAlertDialog();
 
     const forceUpdateList = React.useCallback(
@@ -468,7 +467,7 @@ const EventsFunctionsList = React.forwardRef<
       (itemId: string) => {
         const treeView = treeViewRef.current;
         if (treeView) {
-          if (isMobileScreen) {
+          if (isMobile) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
             treeView.scrollToItemFromId(itemId, 'start');
@@ -476,7 +475,7 @@ const EventsFunctionsList = React.forwardRef<
           treeView.renameItemFromId(itemId);
         }
       },
-      [isMobileScreen]
+      [isMobile]
     );
 
     const addNewEventsFunction = React.useCallback(

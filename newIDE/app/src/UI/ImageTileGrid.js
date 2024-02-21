@@ -6,8 +6,8 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { Column, Line } from './Grid';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from './Reponsive/ResponsiveWindowMeasurer';
 import { CorsAwareImage } from './CorsAwareImage';
 import Text from './Text';
@@ -131,22 +131,27 @@ export type ImageTileComponent = {|
 type ImageTileGridProps = {|
   items: Array<ImageTileComponent>,
   isLoading?: boolean,
-  getColumnsFromWidth: (width: WidthType, isLandscape: boolean) => number,
-  getLimitFromWidth?: (width: WidthType, isLandscape: boolean) => number,
+  getColumnsFromWindowSize: (
+    windowSize: WindowSizeType,
+    isLandscape: boolean
+  ) => number,
+  getLimitFromWindowSize?: (
+    windowSize: WindowSizeType,
+    isLandscape: boolean
+  ) => number,
 |};
 
 const ImageTileGrid = ({
   items,
   isLoading,
-  getColumnsFromWidth,
-  getLimitFromWidth,
+  getColumnsFromWindowSize,
+  getLimitFromWindowSize,
 }: ImageTileGridProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
   const tileClasses = useStylesForTileHover();
-  const MAX_COLUMNS = getColumnsFromWidth('xlarge', isLandscape);
-  const limit = getLimitFromWidth
-    ? getLimitFromWidth(windowWidth, isLandscape)
+  const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', isLandscape);
+  const limit = getLimitFromWindowSize
+    ? getLimitFromWindowSize(windowSize, isLandscape)
     : undefined;
   const itemsToDisplay = limit ? items.slice(0, limit) : items;
   const forceUpdate = useForceUpdate();
@@ -166,7 +171,7 @@ const ImageTileGrid = ({
     [forceUpdate, isMounted]
   );
 
-  const columns = getColumnsFromWidth(windowWidth, isLandscape);
+  const columns = getColumnsFromWindowSize(windowSize, isLandscape);
 
   return (
     <Line noMargin>

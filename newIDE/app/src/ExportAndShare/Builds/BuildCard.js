@@ -26,7 +26,7 @@ import Card from '../../UI/Card';
 
 import BuildProgressAndActions from './BuildProgressAndActions';
 
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   deleteBuild,
   updateBuild,
@@ -139,8 +139,7 @@ export const BuildCard = ({
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const nameInput = React.useRef<?TextFieldInterface>(null);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
@@ -245,7 +244,7 @@ export const BuildCard = ({
             }
             header={
               <Line noMargin alignItems="start" justifyContent="space-between">
-                {!isMobileScreen && <BuildAndCreatedAt build={build} />}
+                {!isMobile && <BuildAndCreatedAt build={build} />}
                 <Column expand noMargin justifyContent="center">
                   <Line noMargin justifyContent="end">
                     {isOnlineBuild ? (
@@ -274,7 +273,7 @@ export const BuildCard = ({
             }
           >
             <Column expand noMargin>
-              {isMobileScreen && <BuildAndCreatedAt build={build} />}
+              {isMobile && <BuildAndCreatedAt build={build} />}
               <Spacer />
               <Line noMargin>
                 {isEditingName ? (

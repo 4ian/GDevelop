@@ -17,7 +17,7 @@ import DragHandle from '../../../../UI/DragHandle';
 import FlatButton from '../../../../UI/FlatButton';
 import { Trans, t } from '@lingui/macro';
 import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ContextMenu, {
   type ContextMenuInterface,
@@ -48,8 +48,7 @@ const TeamMemberRow = ({
   onListUserProjects,
   onDrag,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 

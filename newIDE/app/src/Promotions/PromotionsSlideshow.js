@@ -8,7 +8,7 @@ import {
   homepageDesktopMenuBarWidth,
   homepageMediumMenuBarWidth,
 } from '../MainFrame/EditorContainers/HomePage/HomePageMenuBar';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const promotionDesktopRatio = 5038 / 459;
 const promotionMobileRatio = 18 / 7;
@@ -20,9 +20,8 @@ type PromotionsSlideshowProps = {|
 const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const isMediumScreen = windowWidth === 'medium';
+  const { isMobile, windowSize } = useResponsiveWindowSize();
+  const isMediumScreen = windowSize === 'medium';
 
   const filteredPromotions =
     promotions && type

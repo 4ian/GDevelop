@@ -17,8 +17,8 @@ import {
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import GridList from '@material-ui/core/GridList';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -56,8 +56,8 @@ import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 
 const ASSETS_DISPLAY_LIMIT = 250;
 
-const getAssetSize = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getAssetSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return 80;
     case 'medium':
@@ -70,8 +70,11 @@ const getAssetSize = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType, isLandscape: boolean) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 3 : 1;
     case 'medium':
@@ -86,10 +89,10 @@ const getShopItemsColumns = (windowWidth: WidthType, isLandscape: boolean) => {
 };
 
 const getAssetFoldersColumns = (
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (windowWidth) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 2 : 1;
     case 'medium':
@@ -313,8 +316,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
       [currentPage]
     );
-    const windowWidth = useResponsiveWindowWidth();
-    const isLandscape = window.innerWidth > window.innerHeight;
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       getScrollPosition: () => {
@@ -473,7 +475,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={getAssetSize(windowWidth)}
+            size={getAssetSize(windowSize)}
             key={assetShortHeader.id}
             margin={cellSpacing / 2}
           />
@@ -485,7 +487,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         openedAssetPack,
         selectedFolders,
         pageBreakIndex,
-        windowWidth,
+        windowSize,
         onOpenDetails,
       ]
     );
@@ -736,7 +738,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth, isLandscape)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -752,7 +754,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth, isLandscape)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -768,7 +770,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth, isLandscape)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -927,7 +929,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             <GridList
               style={styles.grid}
               cellHeight="auto"
-              cols={getAssetFoldersColumns(windowWidth, isLandscape)}
+              cols={getAssetFoldersColumns(windowSize, isLandscape)}
               spacing={cellSpacing / 2}
             >
               {folderTiles}

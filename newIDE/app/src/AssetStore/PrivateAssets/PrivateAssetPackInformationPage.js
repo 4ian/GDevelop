@@ -30,8 +30,8 @@ import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
@@ -63,8 +63,8 @@ import RaisedButton from '../../UI/RaisedButton';
 
 const cellSpacing = 8;
 
-const getPackColumns = (windowWidth: WidthType, isLandscape: boolean) => {
-  switch (windowWidth) {
+const getPackColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 2;
     case 'medium':
@@ -195,8 +195,7 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
+  const { isLandscape, windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -515,13 +514,9 @@ const PrivateAssetPackInformationPage = ({
                   noColumnMargin
                   noMargin
                   // Force the columns to wrap on tablets and small screens.
+                  forceMobileLayout={windowSize === 'medium'}
                   // Prevent it to wrap when in landscape mode on small screens.
-                  width={
-                    windowWidth === 'medium' ||
-                    (windowWidth === 'small' && !isLandscape)
-                      ? 'small'
-                      : 'large'
-                  }
+                  noResponsiveLandscape
                 >
                   <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
@@ -700,7 +695,7 @@ const PrivateAssetPackInformationPage = ({
                     </Line>
                     <Line>
                       <GridList
-                        cols={getPackColumns(windowWidth, isLandscape)}
+                        cols={getPackColumns(windowSize, isLandscape)}
                         cellHeight="auto"
                         spacing={cellSpacing / 2}
                         style={styles.grid}
@@ -720,7 +715,7 @@ const PrivateAssetPackInformationPage = ({
                       </Line>
                       <Line>
                         <GridList
-                          cols={getPackColumns(windowWidth, isLandscape)}
+                          cols={getPackColumns(windowSize, isLandscape)}
                           cellHeight="auto"
                           spacing={cellSpacing / 2}
                           style={styles.grid}

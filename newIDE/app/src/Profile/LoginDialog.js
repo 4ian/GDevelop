@@ -18,7 +18,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   formContainer: {
@@ -47,8 +47,7 @@ const LoginDialog = ({
   loginInProgress,
   error,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -108,7 +107,7 @@ const LoginDialog = ({
         style={{
           ...styles.formContainer,
           // Take full width on mobile.
-          width: isMobileScreen ? '95%' : '60%',
+          width: isMobile ? '95%' : '60%',
         }}
       >
         <LoginForm

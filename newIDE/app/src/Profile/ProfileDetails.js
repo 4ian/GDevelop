@@ -22,8 +22,8 @@ import FlatButton from '../UI/FlatButton';
 import Coffee from '../UI/CustomSvgIcons/Coffee';
 import { GridList } from '@material-ui/core';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
@@ -47,10 +47,10 @@ import {
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 const getAssetPackColumnsFromWidth = (
-  width: WidthType,
+  windowSize: WindowSizeType,
   isLandscape: boolean
 ) => {
-  switch (width) {
+  switch (windowSize) {
     case 'small':
       return isLandscape ? 4 : 1;
     case 'medium':
@@ -150,8 +150,7 @@ const ProfileDetails = ({
   const redditUsername = profile ? communityLinks.redditUsername : null;
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
-  const windowWidth = useResponsiveWindowWidth();
-  const isLandscape = window.innerWidth > window.innerHeight;
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
@@ -487,10 +486,7 @@ const ProfileDetails = ({
                 </Line>
                 <Line expand noMargin justifyContent="start">
                   <GridList
-                    cols={getAssetPackColumnsFromWidth(
-                      windowWidth,
-                      isLandscape
-                    )}
+                    cols={getAssetPackColumnsFromWidth(windowSize, isLandscape)}
                     cellHeight="auto"
                     spacing={4}
                     style={styles.grid}

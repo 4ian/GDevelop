@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Spacer, Line, Column, LargeSpacer } from './Grid';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TextFieldWithButtonLayoutProps = {|
   renderTextField: () => React.Node,
@@ -133,7 +133,8 @@ type ResponsiveLineStackLayoutProps = {|
   /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
   noColumnMargin?: boolean,
   /** Do not measure window width in case parent component is in smaller component */
-  width?: 'small' | 'large',
+  forceMobileLayout?: boolean,
+  noResponsiveLandscape?: boolean,
   useLargeSpacer?: boolean,
   children: React.Node,
 |};
@@ -145,14 +146,18 @@ export const ResponsiveLineStackLayout = ({
   expand,
   noMargin,
   noColumnMargin,
-  width,
+  forceMobileLayout,
+  noResponsiveLandscape,
   useLargeSpacer,
   children,
 }: ResponsiveLineStackLayoutProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile, isLandscape } = useResponsiveWindowSize();
+  const assumeMobileScreen = forceMobileLayout || isMobile;
+  const shouldPreventSwitchingToColumn = noResponsiveLandscape && isLandscape;
+  const shouldSwitchToColumn =
+    assumeMobileScreen && !shouldPreventSwitchingToColumn;
 
-  return width === 'small' || (isMobileScreen && width !== 'large') ? (
+  return shouldSwitchToColumn ? (
     <ColumnStackLayout
       id={id}
       noMargin={noMargin || noColumnMargin}

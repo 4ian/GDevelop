@@ -7,8 +7,8 @@ import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
 import ImageTileGrid, { type ImageTileComponent } from './ImageTileGrid';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from './Reponsive/ResponsiveWindowMeasurer';
 
 type ImageTileRowProps = {|
@@ -18,8 +18,14 @@ type ImageTileRowProps = {|
   items: Array<ImageTileComponent>,
   onShowAll?: () => void,
   showAllIcon?: React.Node,
-  getLimitFromWidth: (width: WidthType, isLandscape: boolean) => number,
-  getColumnsFromWidth: (width: WidthType, isLandscape: boolean) => number,
+  getLimitFromWindowSize: (
+    windowSize: WindowSizeType,
+    isLandscape: boolean
+  ) => number,
+  getColumnsFromWindowSize: (
+    windowSize: WindowSizeType,
+    isLandscape: boolean
+  ) => number,
   seeAllLabel?: React.Node,
   margin?: 'dense',
 |};
@@ -31,13 +37,12 @@ const ImageTileRow = ({
   items,
   onShowAll,
   showAllIcon,
-  getLimitFromWidth,
-  getColumnsFromWidth,
+  getLimitFromWindowSize,
+  getColumnsFromWindowSize,
   seeAllLabel,
   margin,
 }: ImageTileRowProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   return (
     <>
@@ -55,7 +60,7 @@ const ImageTileRow = ({
             <FlatButton
               onClick={onShowAll}
               label={
-                isMobileScreen ? (
+                isMobile ? (
                   <Trans>Browse</Trans> // Short label on mobile.
                 ) : (
                   seeAllLabel || <Trans>See all</Trans>
@@ -75,8 +80,8 @@ const ImageTileRow = ({
       <ImageTileGrid
         items={items}
         isLoading={isLoading}
-        getLimitFromWidth={getLimitFromWidth}
-        getColumnsFromWidth={getColumnsFromWidth}
+        getLimitFromWindowSize={getLimitFromWindowSize}
+        getColumnsFromWindowSize={getColumnsFromWindowSize}
       />
     </>
   );

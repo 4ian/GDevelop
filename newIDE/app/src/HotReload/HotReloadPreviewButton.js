@@ -4,7 +4,7 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../UI/CustomSvgIcons/Update';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|
@@ -17,8 +17,7 @@ export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
@@ -27,7 +26,7 @@ export default function HotReloadPreviewButton({
   );
 
   // Hide the text on mobile, to avoid taking too much space.
-  return !isMobileScreen ? (
+  return !isMobile ? (
     <FlatButton
       leftIcon={icon}
       label={label}

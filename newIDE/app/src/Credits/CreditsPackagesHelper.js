@@ -1,15 +1,15 @@
 // @flow
 
-import { type WidthType } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export const getItemsSplitInLines = <Item>(
   items: ?(Item[]),
-  windowWidth: WidthType
+  windowSize: WindowSizeType
 ): ?(Item[][]) => {
   if (!items) return null;
   const itemLines: Item[][] = [];
   // On small laptops and tablets show 3 max.
-  if (windowWidth === 'medium') {
+  if (windowSize === 'medium') {
     for (let i = 0; i < items.length; i += 3) {
       // If there are only 4 lefts, split in 2 and 2.
       if (items.length - i === 4) {

@@ -20,7 +20,7 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -136,8 +136,7 @@ const TooltipBody = ({
   buttonLabel,
   goToNextStep,
 }: TooltipBodyProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const titleAndDescription = (
     <Column noMargin>
       {tooltip.title && (
@@ -160,8 +159,8 @@ const TooltipBody = ({
       style={{
         ...styles.descriptionImage,
         width: tooltip.image.width || '100%',
-        maxWidth: isMobileScreen ? 150 : '100%',
-        maxHeight: isMobileScreen ? 150 : '100%',
+        maxWidth: isMobile ? 150 : '100%',
+        maxHeight: isMobile ? 150 : '100%',
       }}
     />
   );
@@ -171,7 +170,7 @@ const TooltipBody = ({
       <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
     </Column>
   );
-  const imageAndButton = isMobileScreen ? (
+  const imageAndButton = isMobile ? (
     <LineStackLayout noMargin alignItems="center">
       {image}
       {button}
@@ -299,8 +298,7 @@ const InAppTutorialTooltipDisplayer = ({
   endTutorial,
   goToNextStep,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -328,7 +326,7 @@ const InAppTutorialTooltipDisplayer = ({
 
   const classes = useClasses();
   const placement =
-    isMobileScreen && tooltip.mobilePlacement
+    isMobile && tooltip.mobilePlacement
       ? tooltip.mobilePlacement
       : tooltip.placement || 'bottom';
   const backgroundColor =
@@ -360,7 +358,7 @@ const InAppTutorialTooltipDisplayer = ({
       style={{
         zIndex: getDisplayZIndexForHighlighter(anchorElement),
         maxWidth: 'min(90%, 300px)',
-        width: isMobileScreen ? '100%' : undefined,
+        width: isMobile ? '100%' : undefined,
       }}
     >
       {({ TransitionProps }) => (

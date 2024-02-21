@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../../../../UI/Grid';
@@ -98,8 +98,7 @@ const PlanRecommendationRow = ({
   i18n: I18nType,
 |}) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const planToUse =
     recommendationPlanId === 'silver'
       ? 'gdevelop_silver'

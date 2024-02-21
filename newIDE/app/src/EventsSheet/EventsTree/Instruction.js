@@ -28,7 +28,7 @@ import {
   type ScreenType,
   useScreenType,
 } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import {
@@ -101,7 +101,7 @@ type Props = {|
   renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
 
   scope: EventsScope,
   resourcesManager: gdResourcesManager,
@@ -626,7 +626,7 @@ const Instruction = (props: Props) => {
                     disabled={props.disabled}
                     renderObjectThumbnail={props.renderObjectThumbnail}
                     screenType={props.screenType}
-                    windowWidth={props.windowWidth}
+                    windowSize={props.windowSize}
                     scope={props.scope}
                     resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}

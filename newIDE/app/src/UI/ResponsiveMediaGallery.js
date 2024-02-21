@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 
@@ -86,11 +86,10 @@ const ResponsiveMediaGallery = ({
   horizontalOuterMarginToEatOnMobile,
 }: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const mobileExtremeItemsPadding =
-    isMobileScreen && horizontalOuterMarginToEatOnMobile
+    isMobile && horizontalOuterMarginToEatOnMobile
       ? 2 * horizontalOuterMarginToEatOnMobile
       : 0;
 
@@ -107,7 +106,7 @@ const ResponsiveMediaGallery = ({
             paddingRight: mobileExtremeItemsPadding,
           },
         },
-        root: isMobileScreen
+        root: isMobile
           ? {
               scrollbarHeight: 'none' /* For Firefox */,
               '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
@@ -117,7 +116,7 @@ const ResponsiveMediaGallery = ({
             }
           : undefined,
       }),
-    [mobileExtremeItemsPadding, isMobileScreen]
+    [mobileExtremeItemsPadding, isMobile]
   )();
 
   const [
@@ -152,7 +151,7 @@ const ResponsiveMediaGallery = ({
 
   const selectedMedia = mediaItems[selectedMediaIndex];
 
-  if (isMobileScreen) {
+  if (isMobile) {
     return (
       <div
         style={{

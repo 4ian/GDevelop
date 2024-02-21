@@ -11,7 +11,7 @@ import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';
@@ -36,8 +36,7 @@ export const HomePageHeader = ({
   canSave,
   showUserChip,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   return (
     <I18n>
       {({ i18n }) => (
@@ -75,7 +74,7 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && !isNativeMobileApp() && !isMobileScreen && (
+              {!electron && !isNativeMobileApp() && !isMobile && (
                 <FlatButton
                   label={<Trans>Download desktop app</Trans>}
                   onClick={() =>

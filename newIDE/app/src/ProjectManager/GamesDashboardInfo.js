@@ -18,7 +18,7 @@ import Paper from '../UI/Paper';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { ListItem } from '../UI/List';
 import { getProjectManagerItemId } from '.';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const publishingWikiArticle = getHelpLink('/publishing/');
 const gamesDashboardWikiArticle = getHelpLink('/interface/games-dashboard/');
@@ -53,8 +53,7 @@ const GamesDashboardInfo = ({
     shouldDisplayNewFeatureHighlighting,
     acknowledgeNewFeature,
   } = useDisplayNewFeature();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const [
     gameDashboardItemContainer,

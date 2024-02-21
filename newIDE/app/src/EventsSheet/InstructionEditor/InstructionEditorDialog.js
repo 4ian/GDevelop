@@ -141,8 +141,7 @@ const InstructionEditorDialog = ({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
-  const { isMobile, windowSize } = useResponsiveWindowSize();
-  const isMediumScreen = windowSize === 'medium';
+  const { isMobile, windowSize, isMediumScreen } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
   const instructionType: string = instruction.getType();
   const [

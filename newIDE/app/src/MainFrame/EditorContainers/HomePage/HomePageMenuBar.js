@@ -74,8 +74,8 @@ const HomePageMenuBar = ({
   onOpenAbout,
   onOpenHomePageMenuDrawer,
 }: Props) => {
-  const { windowSize, isMobile } = useResponsiveWindowSize();
-  const isMobileOrSmallScreen = isMobile || windowSize === 'medium';
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+  const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const theme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
   const tabsToDisplay = getTabsToDisplay({ profile });

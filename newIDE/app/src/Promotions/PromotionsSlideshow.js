@@ -20,8 +20,7 @@ type PromotionsSlideshowProps = {|
 const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
   const { promotions, error } = React.useContext(AnnouncementsFeedContext);
   const { navigateToRoute } = React.useContext(RouterContext);
-  const { isMobile, windowSize } = useResponsiveWindowSize();
-  const isMediumScreen = windowSize === 'medium';
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
 
   const filteredPromotions =
     promotions && type

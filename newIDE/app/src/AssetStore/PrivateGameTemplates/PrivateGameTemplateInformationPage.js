@@ -148,7 +148,7 @@ const PrivateGameTemplateInformationPage = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const { windowSize, isLandscape } = useResponsiveWindowSize();
+  const { windowSize, isLandscape, isMediumScreen } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -398,7 +398,7 @@ const PrivateGameTemplateInformationPage = ({
                   noColumnMargin
                   noMargin
                   // Force the columns to wrap on tablets and small screens.
-                  forceMobileLayout={windowSize === 'medium'}
+                  forceMobileLayout={isMediumScreen}
                   // Prevent it to wrap when in landscape mode on small screens.
                   noResponsiveLandscape
                 >

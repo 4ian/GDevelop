@@ -4,15 +4,15 @@ const { getItemsSplitInLines } = require('./CreditsPackagesHelper');
 describe('getItemsSplitInLines', () => {
   describe('loading', () => {
     it('returns null if loading', () => {
-      const results = getItemsSplitInLines(null, 'large');
+      const results = getItemsSplitInLines(null, false);
       expect(results).toEqual(null);
     });
   });
   describe('large screen', () => {
-    const windowSize = 'large';
+    const isMediumScreen = false;
     it('works for 3 credit packages', () => {
       const creditPackages = Array(3).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -21,7 +21,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 4 credit packages', () => {
       const creditPackages = Array(4).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -30,7 +30,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 5 credit packages', () => {
       const creditPackages = Array(5).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -40,7 +40,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 6 credit packages', () => {
       const creditPackages = Array(6).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -50,7 +50,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 7 credit packages', () => {
       const creditPackages = Array(7).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -60,10 +60,10 @@ describe('getItemsSplitInLines', () => {
     });
   });
   describe('medium screen', () => {
-    const windowSize = 'medium';
+    const isMediumScreen = true;
     it('works for 3 credit packages', () => {
       const creditPackages = Array(3).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -72,7 +72,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 4 credit packages', () => {
       const creditPackages = Array(4).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -82,7 +82,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 5 credit packages', () => {
       const creditPackages = Array(5).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -92,7 +92,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 6 credit packages', () => {
       const creditPackages = Array(6).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }
@@ -102,7 +102,7 @@ describe('getItemsSplitInLines', () => {
     });
     it('works for 7 credit packages', () => {
       const creditPackages = Array(7).fill({});
-      const results = getItemsSplitInLines(creditPackages, windowSize);
+      const results = getItemsSplitInLines(creditPackages, isMediumScreen);
       if (!results) {
         throw new Error('results should not be null.');
       }

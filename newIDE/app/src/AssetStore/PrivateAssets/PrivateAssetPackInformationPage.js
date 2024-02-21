@@ -195,7 +195,7 @@ const PrivateAssetPackInformationPage = ({
   ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const { isLandscape, windowSize } = useResponsiveWindowSize();
+  const { isLandscape, isMediumScreen, windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -514,7 +514,7 @@ const PrivateAssetPackInformationPage = ({
                   noColumnMargin
                   noMargin
                   // Force the columns to wrap on tablets and small screens.
-                  forceMobileLayout={windowSize === 'medium'}
+                  forceMobileLayout={isMediumScreen}
                   // Prevent it to wrap when in landscape mode on small screens.
                   noResponsiveLandscape
                 >

@@ -129,8 +129,12 @@ const MainPage = ({
   selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
-  const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
-  const isTabletOrSmallLaptop = windowSize === 'medium';
+  const {
+    windowSize,
+    isMobile,
+    isLandscape,
+    isMediumScreen,
+  } = useResponsiveWindowSize();
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -274,7 +278,7 @@ const MainPage = ({
                   primary
                   leftIcon={<Upload />}
                   label={
-                    isTabletOrSmallLaptop ? (
+                    isMediumScreen ? (
                       <Trans>Submit an example</Trans>
                     ) : (
                       <Trans>Submit your project as an example</Trans>
@@ -292,7 +296,7 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    isTabletOrSmallLaptop ? (
+                    isMediumScreen ? (
                       <Trans>Submit a tutorial</Trans>
                     ) : (
                       <Trans>

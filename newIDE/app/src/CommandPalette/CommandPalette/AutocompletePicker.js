@@ -127,8 +127,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
 const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
-  const { windowSize, isMobile } = useResponsiveWindowSize();
-  const isMediumScreen = windowSize === 'medium';
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();

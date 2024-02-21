@@ -99,7 +99,7 @@ const CreditsPackagesDialog = ({
     purchasingCreditsPackageListingData,
     setPurchasingCreditsPackageListingData,
   ] = React.useState<?CreditsPackageListingData>(null);
-  const { windowSize } = useResponsiveWindowSize();
+  const { isMediumScreen } = useResponsiveWindowSize();
 
   React.useEffect(
     () => {
@@ -111,8 +111,8 @@ const CreditsPackagesDialog = ({
   // Split credit packages on multiple lines to spread them as much as possible.
   // Logic is different based on the screen size so that it looks ok.
   const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) = React.useMemo(
-    () => getItemsSplitInLines(creditsPackageListingDatas, windowSize),
-    [creditsPackageListingDatas, windowSize]
+    () => getItemsSplitInLines(creditsPackageListingDatas, isMediumScreen),
+    [creditsPackageListingDatas, isMediumScreen]
   );
 
   return (

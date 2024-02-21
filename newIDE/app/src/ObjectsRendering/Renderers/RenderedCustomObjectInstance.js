@@ -34,6 +34,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
+  _threeObjectPivot: THREE.Group | null;
 
   constructor(
     project: gdProject,
@@ -61,7 +62,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (this._threeGroup) {
       // No Three group means the instance should only be rendered in 2D.
       this._threeObject = new THREE.Group();
+      this._threeObject.rotation.order = 'ZYX';
       this._threeGroup.add(this._threeObject);
+
+      this._threeObjectPivot = new THREE.Group();
+      this._threeObjectPivot.rotation.order = 'ZYX';
+      this._threeObject.add(this._threeObjectPivot);
     }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
@@ -134,7 +140,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         childInstance,
         childObjectConfiguration,
         this._pixiObject,
-        this._threeObject
+        this._threeObjectPivot
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
@@ -212,36 +218,47 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   update() {
     applyChildLayouts(this);
 
-    const width = this.getWidth();
-    const height = this.getHeight();
-    const originX = this._proportionalOriginX * width;
-    const originY = this._proportionalOriginY * height;
-    const centerX = width / 2;
-    const centerY = height / 2;
+    const originX = this.getOriginX();
+    const originY = this.getOriginY();
+    const originZ = this.getOriginZ();
+    const centerX = this.getCenterX();
+    const centerY = this.getCenterY();
+    const centerZ = this.getCenterZ();
 
-    this._pixiObject.pivot.x = centerX;
-    this._pixiObject.pivot.y = centerY;
+    const firstInstance = this.childrenRenderedInstances[0];
+    const is3D = firstInstance && firstInstance instanceof Rendered3DInstance;
+
+    if (is3D) {
+      this._threeObject.position.set(
+        this._instance.getX() + centerX - originX,
+        this._instance.getY() + centerY - originY,
+        this._instance.getZ() + centerZ - originZ
+      );
+      this._threeObjectPivot.position.set(
+        -centerX + originX,
+        -centerY + originY,
+        -centerZ + originZ
+      );
+      this._threeObject.rotation.set(
+        RenderedInstance.toRad(this._instance.getRotationX()),
+        RenderedInstance.toRad(this._instance.getRotationY()),
+        RenderedInstance.toRad(this._instance.getAngle())
+      );
+
+      this._pixiObject.pivot.x = centerX - originX;
+      this._pixiObject.pivot.y = centerY - originY;
+    } else {
+      this._pixiObject.pivot.x = centerX;
+      this._pixiObject.pivot.y = centerY;
+    }
+    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
+    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
+
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );
     this._pixiObject.scale.x = 1;
     this._pixiObject.scale.y = 1;
-    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
-    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
-
-    if (this._threeObject) {
-      this._threeObject.position.set(
-        this._instance.getX(),
-        this._instance.getY(),
-        0
-      );
-      // TODO (3D) Handle rotation center for the three group.
-      // this._threeObject.rotation.set(
-      //   0,
-      //   0,
-      //   RenderedInstance.toRad(this._instance.getAngle())
-      // );
-    }
   }
 
   getDefaultWidth() {
@@ -257,10 +274,46 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   getOriginX(): number {
-    return this._proportionalOriginX * this.getWidth();
+    // When the custom object is rendered with a 3D object,
+    // the transformation logic from the displayed child is used.
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getOriginX()
+      : this._proportionalOriginX * this.getWidth();
   }
 
   getOriginY(): number {
-    return this._proportionalOriginY * this.getHeight();
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getOriginY()
+      : this._proportionalOriginY * this.getHeight();
+  }
+
+  getOriginZ(): number {
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getOriginZ()
+      : 0;
+  }
+
+  getCenterX() {
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getCenterX()
+      : this.getWidth() / 2;
+  }
+
+  getCenterY() {
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getCenterY()
+      : this.getHeight() / 2;
+  }
+
+  getCenterZ() {
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getCenterZ()
+      : 0;
   }
 }

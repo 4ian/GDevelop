@@ -61,13 +61,14 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
 
     if (this._threeGroup) {
       // No Three group means the instance should only be rendered in 2D.
-      this._threeObject = new THREE.Group();
-      this._threeObject.rotation.order = 'ZYX';
-      this._threeGroup.add(this._threeObject);
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      this._threeGroup.add(threeObject);
 
       this._threeObjectPivot = new THREE.Group();
       this._threeObjectPivot.rotation.order = 'ZYX';
-      this._threeObject.add(this._threeObjectPivot);
+      threeObject.add(this._threeObjectPivot);
+      this._threeObject = threeObject
     }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
@@ -228,18 +229,20 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const firstInstance = this.childrenRenderedInstances[0];
     const is3D = firstInstance && firstInstance instanceof Rendered3DInstance;
 
-    if (is3D) {
-      this._threeObject.position.set(
+    const threeObject = this._threeObject;
+    const threeObjectPivot = this._threeObjectPivot;
+    if (threeObject && threeObjectPivot && is3D) {
+      threeObject.position.set(
         this._instance.getX() + centerX - originX,
         this._instance.getY() + centerY - originY,
         this._instance.getZ() + centerZ - originZ
       );
-      this._threeObjectPivot.position.set(
+      threeObjectPivot.position.set(
         -centerX + originX,
         -centerY + originY,
         -centerZ + originZ
       );
-      this._threeObject.rotation.set(
+      threeObject.rotation.set(
         RenderedInstance.toRad(this._instance.getRotationX()),
         RenderedInstance.toRad(this._instance.getRotationY()),
         RenderedInstance.toRad(this._instance.getAngle())

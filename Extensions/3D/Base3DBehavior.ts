@@ -103,6 +103,18 @@ namespace gdjs {
     flipZ(enable: boolean): void;
 
     isFlippedZ(): boolean;
+
+    /**
+     * Return the bottom Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getAABBMinZ(): number;
+
+    /**
+     * Return the top Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getAABBMaxZ(): number;
   }
 
   export namespace Base3DHandler {

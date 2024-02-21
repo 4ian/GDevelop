@@ -133,7 +133,7 @@ type ResponsiveLineStackLayoutProps = {|
   /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
   noColumnMargin?: boolean,
   /** Do not measure window width in case parent component is in smaller component */
-  width?: 'small',
+  width?: 'small' | 'large',
   useLargeSpacer?: boolean,
   children: React.Node,
 |};
@@ -152,7 +152,7 @@ export const ResponsiveLineStackLayout = ({
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
 
-  return width === 'small' || isMobileScreen ? (
+  return width === 'small' || (isMobileScreen && width !== 'large') ? (
     <ColumnStackLayout
       id={id}
       noMargin={noMargin || noColumnMargin}

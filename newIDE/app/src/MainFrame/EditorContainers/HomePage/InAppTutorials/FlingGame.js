@@ -20,10 +20,10 @@ import Building from './Icons/Building';
 import Unboxing from './Icons/Unboxing';
 import Podium from './Icons/Podium';
 
-const getColumnsFromWidth = (width: WidthType) => {
+const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
     case 'large':
     case 'xlarge':
@@ -32,7 +32,7 @@ const getColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('xlarge');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -63,6 +63,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
 
   const getTutorialPartProgress = ({
     tutorialId,
@@ -211,7 +212,9 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         ) : (
           <GridList
             cols={
-              isFlingTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
+              isFlingTutorialComplete
+                ? 1
+                : getColumnsFromWidth(windowWidth, isLandscape)
             }
             style={styles.grid}
             cellHeight="auto"

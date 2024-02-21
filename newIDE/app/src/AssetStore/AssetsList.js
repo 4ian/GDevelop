@@ -70,10 +70,10 @@ const getAssetSize = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
+const getShopItemsColumns = (windowWidth: WidthType, isLandscape: boolean) => {
   switch (windowWidth) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -85,9 +85,13 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getAssetFoldersColumns = (windowWidth: WidthType) => {
+const getAssetFoldersColumns = (
+  windowWidth: WidthType,
+  isLandscape: boolean
+) => {
   switch (windowWidth) {
     case 'small':
+      return isLandscape ? 2 : 1;
     case 'medium':
       return 1;
     case 'large':
@@ -310,6 +314,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [currentPage]
     );
     const windowWidth = useResponsiveWindowWidth();
+    const isLandscape = window.innerWidth > window.innerHeight;
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       getScrollPosition: () => {
@@ -731,7 +736,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowWidth, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -747,7 +752,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowWidth, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -763,7 +768,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowWidth, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -922,7 +927,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             <GridList
               style={styles.grid}
               cellHeight="auto"
-              cols={getAssetFoldersColumns(windowWidth)}
+              cols={getAssetFoldersColumns(windowWidth, isLandscape)}
               spacing={cellSpacing / 2}
             >
               {folderTiles}

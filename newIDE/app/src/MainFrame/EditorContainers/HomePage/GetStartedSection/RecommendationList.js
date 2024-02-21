@@ -47,10 +47,13 @@ const useStyles = makeStyles({
   },
 });
 
-const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
+const getTextTutorialsColumnsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -61,10 +64,13 @@ const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
+const getVideoTutorialsColumnsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 5 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -75,10 +81,13 @@ const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getTutorialsLimitsFromWidth = (width: WidthType) => {
+const getTutorialsLimitsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 3;
+      return isLandscape ? 5 : 3;
     case 'medium':
       return 3;
     case 'large':
@@ -117,6 +126,7 @@ type TextTutorialsRowProps = {|
 const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
   const classes = useStyles();
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
 
   return (
     <>
@@ -131,7 +141,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         </Text>
       </Column>
       <GridList
-        cols={getTextTutorialsColumnsFromWidth(windowWidth)}
+        cols={getTextTutorialsColumnsFromWidth(windowWidth, isLandscape)}
         cellHeight="auto"
         spacing={10}
       >

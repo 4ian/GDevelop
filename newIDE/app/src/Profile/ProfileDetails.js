@@ -46,10 +46,13 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
-const getAssetPackColumnsFromWidth = (width: WidthType) => {
+const getAssetPackColumnsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -148,6 +151,7 @@ const ProfileDetails = ({
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
@@ -483,7 +487,10 @@ const ProfileDetails = ({
                 </Line>
                 <Line expand noMargin justifyContent="start">
                   <GridList
-                    cols={getAssetPackColumnsFromWidth(windowWidth)}
+                    cols={getAssetPackColumnsFromWidth(
+                      windowWidth,
+                      isLandscape
+                    )}
                     cellHeight="auto"
                     spacing={4}
                     style={styles.grid}

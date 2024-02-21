@@ -3,10 +3,7 @@ import * as React from 'react';
 import { Column, Line, marginsSize } from '../../UI/Grid';
 import Paper from '../../UI/Paper';
 import Skeleton from '@material-ui/lab/Skeleton';
-import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import SlideshowArrow, { useStylesForArrowButtons } from './SlideshowArrow';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
@@ -48,21 +45,20 @@ const shouldGoRight = (event: SyntheticKeyboardEvent<HTMLLIElement>) => {
 };
 
 const getItemLineHeight = ({
-  windowWidth,
+  useMobileImage,
   componentWidth,
   itemDesktopRatio,
   itemMobileRatio,
 }: {
-  windowWidth: WidthType,
+  useMobileImage: boolean,
   componentWidth: number,
   itemDesktopRatio: number,
   itemMobileRatio: number,
 }) => {
   const containerWidth = componentWidth - 2 * marginsSize;
-  const lineHeight =
-    windowWidth === 'small'
-      ? containerWidth / itemMobileRatio
-      : containerWidth / itemDesktopRatio;
+  const lineHeight = useMobileImage
+    ? containerWidth / itemMobileRatio
+    : containerWidth / itemDesktopRatio;
 
   return lineHeight;
 };
@@ -108,15 +104,19 @@ const Slideshow = ({
   // Ensure the component is re-rendered when the window is resized.
   useOnResize(useForceUpdate());
   const windowInnerWidth = window.innerWidth;
+  const windowInnerHeight = window.innerHeight;
 
   const classesForArrowButtons = useStylesForArrowButtons();
 
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
+  const isLandscape = windowInnerWidth > windowInnerHeight;
+  const shouldUseMobileImage = isMobile && !isLandscape;
+
   const screenType = useScreenType();
   const isTouchScreen = screenType === 'touch';
   const itemLineHeight = getItemLineHeight({
-    windowWidth,
+    useMobileImage: shouldUseMobileImage,
     componentWidth:
       windowInnerWidth - (additionalMarginForWidthCalculation || 0),
     itemDesktopRatio,
@@ -261,11 +261,13 @@ const Slideshow = ({
         {items.map((item, index) => {
           return (
             <img
-              src={isMobile ? item.mobileImageUrl : item.imageUrl}
+              src={shouldUseMobileImage ? item.mobileImageUrl : item.imageUrl}
               alt={`Slideshow item for ${item.id}`}
               style={{
                 ...styles.slideImage,
-                aspectRatio: isMobile ? itemMobileRatio : itemDesktopRatio,
+                aspectRatio: shouldUseMobileImage
+                  ? itemMobileRatio
+                  : itemDesktopRatio,
                 ...(index === currentSlide
                   ? { opacity: 1, zIndex: 2 } // Update the opacity for the transition effect.
                   : { opacity: 0, zIndex: 1 }), // Update the z-index so it's on top of the other images, useful for keyboard navigation and hover.

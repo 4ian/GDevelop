@@ -57,10 +57,10 @@ import FlatButton from '../../../../UI/FlatButton';
 
 const cellSpacing = 2;
 
-const getItemsColumns = (windowWidth: WidthType) => {
+const getItemsColumns = (windowWidth: WidthType, isLandscape: boolean) => {
   switch (windowWidth) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -151,12 +151,13 @@ const BuildSection = ({
   } = authenticatedUser;
   const windowWidth = useResponsiveWindowWidth();
   const isMobile = windowWidth === 'small';
+  const isLandscape = window.innerWidth > window.innerHeight;
   const [
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
 
-  const columnsCount = getItemsColumns(windowWidth);
+  const columnsCount = getItemsColumns(windowWidth, isLandscape);
 
   const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
     () =>

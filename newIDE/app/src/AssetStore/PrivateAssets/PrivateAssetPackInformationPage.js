@@ -63,10 +63,10 @@ import RaisedButton from '../../UI/RaisedButton';
 
 const cellSpacing = 8;
 
-const getPackColumns = (windowWidth: WidthType) => {
+const getPackColumns = (windowWidth: WidthType, isLandscape: boolean) => {
   switch (windowWidth) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -196,6 +196,7 @@ const PrivateAssetPackInformationPage = ({
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -514,7 +515,13 @@ const PrivateAssetPackInformationPage = ({
                   noColumnMargin
                   noMargin
                   // Force the columns to wrap on tablets and small screens.
-                  width={windowWidth === 'medium' ? 'small' : undefined}
+                  // Prevent it to wrap when in landscape mode on small screens.
+                  width={
+                    windowWidth === 'medium' ||
+                    (windowWidth === 'small' && !isLandscape)
+                      ? 'small'
+                      : 'large'
+                  }
                 >
                   <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
@@ -693,7 +700,7 @@ const PrivateAssetPackInformationPage = ({
                     </Line>
                     <Line>
                       <GridList
-                        cols={getPackColumns(windowWidth)}
+                        cols={getPackColumns(windowWidth, isLandscape)}
                         cellHeight="auto"
                         spacing={cellSpacing / 2}
                         style={styles.grid}
@@ -713,7 +720,7 @@ const PrivateAssetPackInformationPage = ({
                       </Line>
                       <Line>
                         <GridList
-                          cols={getPackColumns(windowWidth)}
+                          cols={getPackColumns(windowWidth, isLandscape)}
                           cellHeight="auto"
                           spacing={cellSpacing / 2}
                           style={styles.grid}

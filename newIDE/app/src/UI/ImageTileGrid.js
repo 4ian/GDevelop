@@ -131,8 +131,8 @@ export type ImageTileComponent = {|
 type ImageTileGridProps = {|
   items: Array<ImageTileComponent>,
   isLoading?: boolean,
-  getColumnsFromWidth: (width: WidthType) => number,
-  getLimitFromWidth?: (width: WidthType) => number,
+  getColumnsFromWidth: (width: WidthType, isLandscape: boolean) => number,
+  getLimitFromWidth?: (width: WidthType, isLandscape: boolean) => number,
 |};
 
 const ImageTileGrid = ({
@@ -142,9 +142,12 @@ const ImageTileGrid = ({
   getLimitFromWidth,
 }: ImageTileGridProps) => {
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
   const tileClasses = useStylesForTileHover();
-  const MAX_COLUMNS = getColumnsFromWidth('xlarge');
-  const limit = getLimitFromWidth ? getLimitFromWidth(windowWidth) : undefined;
+  const MAX_COLUMNS = getColumnsFromWidth('xlarge', isLandscape);
+  const limit = getLimitFromWidth
+    ? getLimitFromWidth(windowWidth, isLandscape)
+    : undefined;
   const itemsToDisplay = limit ? items.slice(0, limit) : items;
   const forceUpdate = useForceUpdate();
   const isMounted = useIsMounted();
@@ -163,7 +166,7 @@ const ImageTileGrid = ({
     [forceUpdate, isMounted]
   );
 
-  const columns = getColumnsFromWidth(windowWidth);
+  const columns = getColumnsFromWidth(windowWidth, isLandscape);
 
   return (
     <Line noMargin>

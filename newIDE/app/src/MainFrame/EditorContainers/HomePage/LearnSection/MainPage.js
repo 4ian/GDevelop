@@ -36,10 +36,13 @@ const useStyles = makeStyles({
   },
 });
 
-const getHelpItemsColumnsFromWidth = (width: WidthType) => {
+const getHelpItemsColumnsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -51,10 +54,13 @@ const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const getTutorialsColumnsFromWidth = (width: WidthType) => {
+const getTutorialsColumnsFromWidth = (
+  width: WidthType,
+  isLandscape: boolean
+) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 5 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -66,7 +72,7 @@ const getTutorialsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge');
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge', true);
 const styles = {
   grid: {
     textAlign: 'center',
@@ -124,6 +130,7 @@ const MainPage = ({
 }: Props) => {
   const classes = useStyles();
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
   const isMobile = windowWidth === 'small';
   const isTabletOrSmallLaptop =
     windowWidth === 'small' || windowWidth === 'medium';
@@ -162,7 +169,7 @@ const MainPage = ({
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(windowWidth)}
+            cols={getHelpItemsColumnsFromWidth(windowWidth, isLandscape)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}

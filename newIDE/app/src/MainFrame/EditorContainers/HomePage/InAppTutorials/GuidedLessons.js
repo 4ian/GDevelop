@@ -36,10 +36,10 @@ import ColoredLinearProgress from '../../../../UI/ColoredLinearProgress';
 import Trophy from '../../../../UI/CustomSvgIcons/Trophy';
 import Object3D from './Icons/Object3D';
 
-const getColumnsFromWidth = (width: WidthType) => {
+const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -51,7 +51,7 @@ const getColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('xlarge');
+const MAX_COLUMNS = getColumnsFromWidth('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -85,6 +85,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const windowWidth = useResponsiveWindowWidth();
+  const isLandscape = window.innerWidth > window.innerHeight;
 
   const getTutorialPartProgress = ({ tutorialId }: { tutorialId: string }) => {
     const tutorialProgress = getTutorialProgress({
@@ -206,7 +207,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
               </Column>
             )}
             <GridList
-              cols={getColumnsFromWidth(windowWidth)}
+              cols={getColumnsFromWidth(windowWidth, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={ITEMS_SPACING * 2}

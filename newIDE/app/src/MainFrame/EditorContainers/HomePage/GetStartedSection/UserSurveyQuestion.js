@@ -30,10 +30,10 @@ import { ColumnStackLayout } from '../../../../UI/Layout';
 import { isOnlyOneFreeAnswerPossible } from './UserSurvey';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
-const getColumnsFromWidth = (width: WidthType) => {
+const getColumnsFromWidth = (width: WidthType, isLandscape: boolean) => {
   switch (width) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -369,6 +369,7 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
   ) => {
     const { text, answers, multi } = questionData;
     const windowWidth = useResponsiveWindowWidth();
+    const isLandscape = window.innerWidth > window.innerHeight;
     const onlyOneFreeAnswerPossible = isOnlyOneFreeAnswerPossible(answers);
     return (
       <I18n>
@@ -385,7 +386,9 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
             ) : null}
             <GridList
               cols={
-                onlyOneFreeAnswerPossible ? 1 : getColumnsFromWidth(windowWidth)
+                onlyOneFreeAnswerPossible
+                  ? 1
+                  : getColumnsFromWidth(windowWidth, isLandscape)
               }
               spacing={15}
               cellHeight="auto"

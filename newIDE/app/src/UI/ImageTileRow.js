@@ -18,8 +18,8 @@ type ImageTileRowProps = {|
   items: Array<ImageTileComponent>,
   onShowAll?: () => void,
   showAllIcon?: React.Node,
-  getLimitFromWidth: (width: WidthType) => number,
-  getColumnsFromWidth: (width: WidthType) => number,
+  getLimitFromWidth: (width: WidthType, isLandscape: boolean) => number,
+  getColumnsFromWidth: (width: WidthType, isLandscape: boolean) => number,
   seeAllLabel?: React.Node,
   margin?: 'dense',
 |};
@@ -38,6 +38,7 @@ const ImageTileRow = ({
 }: ImageTileRowProps) => {
   const windowWidth = useResponsiveWindowWidth();
   const isMobileScreen = windowWidth === 'small';
+
   return (
     <>
       <LineStackLayout

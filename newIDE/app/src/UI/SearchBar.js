@@ -14,7 +14,7 @@ import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 import { useDebounce } from '../Utils/UseDebounce';
 import SearchBarContainer from './SearchBarContainer';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 
 type TagsHandler = {|
   remove: string => void,
@@ -92,8 +92,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         textField.current.blur();
       }
     };
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobile = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     const [isInputFocused, setIsInputFocused] = React.useState(false);
 

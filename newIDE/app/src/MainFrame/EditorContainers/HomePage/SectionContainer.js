@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Column, Line } from '../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
@@ -69,13 +69,12 @@ const SectionContainer = ({
   renderFooter,
   noScroll,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const containerStyle: {|
     paddingTop: number,
     paddingLeft: number,
     paddingRight: number,
-  |} = isMobileScreen ? styles.mobileContainer : styles.desktopContainer;
+  |} = isMobile ? styles.mobileContainer : styles.desktopContainer;
   const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
     ? styles.noScrollContainer
     : styles.scrollContainer;
@@ -124,7 +123,7 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
-          style={isMobileScreen ? styles.mobileFooter : styles.desktopFooter}
+          style={isMobile ? styles.mobileFooter : styles.desktopFooter}
           square
           background="dark"
         >

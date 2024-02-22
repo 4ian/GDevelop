@@ -16,7 +16,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
@@ -128,8 +128,7 @@ const GetStartedSection = ({
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
   const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [step, setStep] = React.useState<
     | 'welcome'
     | 'login'

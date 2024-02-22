@@ -9,7 +9,7 @@ import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { Line, Column, Spacer } from '../../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   LineStackLayout,
   ResponsiveLineStackLayout,
@@ -52,15 +52,15 @@ import {
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
-import type { WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import type { WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from '../../../../UI/FlatButton';
 
 const cellSpacing = 2;
 
-const getItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getItemsColumns = (windowSize: WindowSizeType, isLandscape: boolean) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -149,14 +149,13 @@ const BuildSection = ({
     onCloudProjectsChanged,
     onOpenLoginDialog,
   } = authenticatedUser;
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
   const [
     lastModifiedInfoByProjectId,
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
 
-  const columnsCount = getItemsColumns(windowWidth);
+  const columnsCount = getItemsColumns(windowSize, isLandscape);
 
   const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
     () =>
@@ -265,7 +264,7 @@ const BuildSection = ({
     ]
   );
 
-  const skeletonLineHeight = getProjectLineHeight(windowWidth);
+  const skeletonLineHeight = getProjectLineHeight({ isMobile });
   const pageContent = showAllGameTemplates ? (
     <SectionContainer
       title={<Trans>All templates</Trans>}
@@ -441,7 +440,7 @@ const BuildSection = ({
                     file={file}
                     currentFileMetadata={currentFileMetadata}
                     storageProviders={storageProviders}
-                    isWindowWidthMediumOrLarger={!isMobile}
+                    isWindowSizeMediumOrLarger={!isMobile}
                     onOpenRecentFile={onOpenRecentFile}
                     lastModifiedInfo={
                       lastModifiedInfoByProjectId[

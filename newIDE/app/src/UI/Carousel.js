@@ -8,7 +8,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import AlertMessage from './AlertMessage';
@@ -211,8 +211,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
     isMouseOverContainer,
     setIsMouseOverContainer,
   ] = React.useState<boolean>(false);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { windowSize, isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classesForArrowButtons = useStylesForArrowButtons();
   const classesForGridList = useStylesForGridList();
@@ -250,7 +249,6 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
     [forceUpdate, isMounted]
   );
 
-  const windowSize = useResponsiveWindowWidth();
   const imageHeight = referenceSizesByWindowSize.imageHeight[windowSize];
   const arrowWidth = 30;
   const cellWidth = (16 / 9) * imageHeight;
@@ -493,7 +491,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
               (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
             }
             label={
-              isMobileScreen ? (
+              isMobile ? (
                 <Trans>Browse</Trans> // Short label on mobile.
               ) : (
                 browseAllLabel || <Trans>Browse all</Trans>
@@ -511,7 +509,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
       >
         {displayArrowsOnDesktop &&
           isMouseOverContainer &&
-          !isMobileScreen &&
+          !isMobile &&
           shouldDisplayLeftArrow &&
           areItemsSet && (
             <div
@@ -588,7 +586,7 @@ const Carousel = <ThumbnailType: CarouselThumbnail>({
         </div>
         {displayArrowsOnDesktop &&
           isMouseOverContainer &&
-          !isMobileScreen &&
+          !isMobile &&
           shouldDisplayRightArrow &&
           areItemsSet && (
             <div

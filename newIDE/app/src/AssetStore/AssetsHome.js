@@ -14,8 +14,8 @@ import {
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
@@ -29,10 +29,13 @@ import { shuffleArrayWith } from '../Utils/Random';
 
 const cellSpacing = 2;
 
-const getCategoryColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getCategoryColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -44,10 +47,13 @@ const getCategoryColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -152,7 +158,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     }: Props,
     ref
   ) => {
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
     );
@@ -342,7 +348,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getCategoryColumns(windowWidth)}
+              cols={getCategoryColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -361,7 +367,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -389,7 +395,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Column>
             )}
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -408,7 +414,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </Column>
         )}
         <GridList
-          cols={getShopItemsColumns(windowWidth)}
+          cols={getShopItemsColumns(windowSize, isLandscape)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

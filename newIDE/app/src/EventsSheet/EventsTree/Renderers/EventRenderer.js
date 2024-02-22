@@ -7,7 +7,7 @@ import {
 } from '../../SelectionHandler';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import { type ScreenType } from '../../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WidthType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type EventRendererProps = {
   project: gdProject,
@@ -43,7 +43,7 @@ export type EventRendererProps = {
   renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
   eventsSheetHeight: number,
 
   idPrefix: string,

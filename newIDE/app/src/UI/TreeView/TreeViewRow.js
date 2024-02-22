@@ -128,7 +128,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     canDrop,
     onDrop,
     onEditItem,
-    isMobileScreen,
+    isMobile,
     shouldHideMenuIcon,
     DragSourceAndDropTarget,
     getItemHtmlId,
@@ -390,7 +390,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           const shouldDisplayMenu =
             !shouldHideMenuIcon &&
-            !isMobileScreen &&
+            !isMobile &&
             !node.item.isRoot &&
             !node.item.isPlaceholder;
 

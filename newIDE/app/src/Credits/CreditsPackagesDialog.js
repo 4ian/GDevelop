@@ -29,7 +29,7 @@ import ThreeCoins from './Icons/ThreeCoins';
 import FourCoins from './Icons/FourCoins';
 import FiveCoins from './Icons/FiveCoins';
 import AlertMessage from '../UI/AlertMessage';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { getItemsSplitInLines } from './CreditsPackagesHelper';
 
 const styles = {
@@ -99,7 +99,7 @@ const CreditsPackagesDialog = ({
     purchasingCreditsPackageListingData,
     setPurchasingCreditsPackageListingData,
   ] = React.useState<?CreditsPackageListingData>(null);
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMediumScreen } = useResponsiveWindowSize();
 
   React.useEffect(
     () => {
@@ -111,8 +111,8 @@ const CreditsPackagesDialog = ({
   // Split credit packages on multiple lines to spread them as much as possible.
   // Logic is different based on the screen size so that it looks ok.
   const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) = React.useMemo(
-    () => getItemsSplitInLines(creditsPackageListingDatas, windowWidth),
-    [creditsPackageListingDatas, windowWidth]
+    () => getItemsSplitInLines(creditsPackageListingDatas, isMediumScreen),
+    [creditsPackageListingDatas, isMediumScreen]
   );
 
   return (

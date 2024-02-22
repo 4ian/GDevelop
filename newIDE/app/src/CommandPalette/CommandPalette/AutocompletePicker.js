@@ -27,7 +27,7 @@ import {
   getHitLastHierarchyLevel,
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
 
 const useStyles = makeStyles(theme => ({
@@ -90,8 +90,7 @@ type Props<T> = {|
 type AlgoliaSearchHitItemProps = {| hit: AlgoliaSearchHitType |};
 
 export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const classes = useStyles();
   let secondaryText;
   let removeLastLevel = false;
@@ -109,7 +108,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
       ContainerComponent="div"
       classes={{
         container: classes.listItemContainer,
-        root: isMobileScreen ? classes.rootSmallPadding : null,
+        root: isMobile ? classes.rootSmallPadding : null,
       }}
     >
       <ListItemIcon>
@@ -128,9 +127,7 @@ export const AlgoliaSearchHit = ({ hit }: AlgoliaSearchHitItemProps) => {
 const AutocompletePicker = (
   props: Props<NamedCommand | GoToWikiCommand> | Props<CommandOption>
 ) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const isMediumScreen = windowWidth === 'medium';
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const shouldAutofocusInput = useShouldAutofocusInput();
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
@@ -147,7 +144,7 @@ const AutocompletePicker = (
 
   const getItemHint = React.useCallback(
     (item: Item) => {
-      if (isMobileScreen || isMediumScreen) return null;
+      if (isMobile || isMediumScreen) return null;
       if (item.text) return null;
       else if (item.name) {
         const shortcutString = shortcutMap[item.name];
@@ -160,7 +157,7 @@ const AutocompletePicker = (
         );
       }
     },
-    [shortcutMap, isMobileScreen, isMediumScreen]
+    [shortcutMap, isMobile, isMediumScreen]
   );
 
   const getItemText = React.useCallback(
@@ -194,7 +191,7 @@ const AutocompletePicker = (
           ContainerComponent="div"
           classes={{
             container: classes.listItemContainer,
-            root: isMobileScreen ? classes.rootSmallPadding : null,
+            root: isMobile ? classes.rootSmallPadding : null,
           }}
         >
           <ListItemIcon>{getItemIcon(item)}</ListItemIcon>
@@ -206,7 +203,7 @@ const AutocompletePicker = (
     [
       classes.listItemContainer,
       classes.rootSmallPadding,
-      isMobileScreen,
+      isMobile,
       getItemText,
       getItemHint,
       getItemIcon,

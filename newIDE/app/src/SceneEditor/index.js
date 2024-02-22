@@ -1647,11 +1647,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => {
-          const EditorsDisplay =
-            windowWidth === 'small'
-              ? SwipeableDrawerEditorsDisplay
-              : MosaicEditorsDisplay;
+        {({ isMobile }) => {
+          const EditorsDisplay = isMobile
+            ? SwipeableDrawerEditorsDisplay
+            : MosaicEditorsDisplay;
           return (
             <div
               style={styles.container}

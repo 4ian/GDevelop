@@ -27,8 +27,8 @@ import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
@@ -58,10 +58,13 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const cellSpacing = 8;
 
-const getTemplateColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getTemplateColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -145,7 +148,7 @@ const PrivateGameTemplateInformationPage = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const windowWidth = useResponsiveWindowWidth();
+  const { windowSize, isLandscape, isMediumScreen } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
@@ -395,7 +398,9 @@ const PrivateGameTemplateInformationPage = ({
                   noColumnMargin
                   noMargin
                   // Force the columns to wrap on tablets and small screens.
-                  width={windowWidth === 'medium' ? 'small' : undefined}
+                  forceMobileLayout={isMediumScreen}
+                  // Prevent it to wrap when in landscape mode on small screens.
+                  noResponsiveLandscape
                 >
                   <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
@@ -533,7 +538,7 @@ const PrivateGameTemplateInformationPage = ({
                     </Line>
                     <Line>
                       <GridList
-                        cols={getTemplateColumns(windowWidth)}
+                        cols={getTemplateColumns(windowSize, isLandscape)}
                         cellHeight="auto"
                         spacing={cellSpacing / 2}
                         style={styles.grid}
@@ -553,7 +558,7 @@ const PrivateGameTemplateInformationPage = ({
                       </Line>
                       <Line>
                         <GridList
-                          cols={getTemplateColumns(windowWidth)}
+                          cols={getTemplateColumns(windowSize, isLandscape)}
                           cellHeight="auto"
                           spacing={cellSpacing / 2}
                           style={styles.grid}

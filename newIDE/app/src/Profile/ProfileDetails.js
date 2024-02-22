@@ -22,8 +22,8 @@ import FlatButton from '../UI/FlatButton';
 import Coffee from '../UI/CustomSvgIcons/Coffee';
 import { GridList } from '@material-ui/core';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
@@ -46,10 +46,13 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
-const getAssetPackColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getAssetPackColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -147,7 +150,7 @@ const ProfileDetails = ({
   const redditUsername = profile ? communityLinks.redditUsername : null;
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
-  const windowWidth = useResponsiveWindowWidth();
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
@@ -483,7 +486,7 @@ const ProfileDetails = ({
                 </Line>
                 <Line expand noMargin justifyContent="start">
                   <GridList
-                    cols={getAssetPackColumnsFromWidth(windowWidth)}
+                    cols={getAssetPackColumnsFromWidth(windowSize, isLandscape)}
                     cellHeight="auto"
                     spacing={4}
                     style={styles.grid}

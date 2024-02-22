@@ -21,14 +21,13 @@ import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
-const getStyles = ({ windowWidth }) => {
-  const isMobileScreen = windowWidth === 'small';
+const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
-      width: isMobileScreen ? '95%' : '60%',
+      width: isMobile ? '95%' : '60%',
       marginTop: 20,
     },
   };
@@ -117,8 +116,8 @@ const CreateAccountDialog = ({
   createAccountInProgress,
   error,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const styles = getStyles({ windowWidth });
+  const { isMobile } = useResponsiveWindowSize();
+  const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');

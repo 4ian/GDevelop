@@ -17,7 +17,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { getAnnouncementContent } from './AnnouncementFormatting';
 import RouterContext from '../MainFrame/RouterContext';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
 const styles = {
@@ -61,8 +61,7 @@ export const AnnouncementsFeed = ({
   } = React.useContext(AnnouncementsFeedContext);
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
   const { navigateToRoute } = React.useContext(RouterContext);
-  const windowWith = useResponsiveWindowWidth();
-  const isMobile = windowWith === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const classesForClickableContainer = useStylesForClickableContainer();
 

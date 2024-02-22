@@ -12,21 +12,20 @@ import GameJolt from '../../UI/CustomSvgIcons/GameJolt';
 import Poki from '../../UI/CustomSvgIcons/Poki';
 import CrazyGames from '../../UI/CustomSvgIcons/CrazyGames';
 import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
-const getIconStyle = windowWidth => {
-  const isMobileScreen = windowWidth === 'small';
+const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
   return {
-    height: isMobileScreen ? 30 : 48,
-    width: isMobileScreen ? 30 : 48,
+    height: isMobile ? 30 : 48,
+    width: isMobile ? 30 : 48,
     margin: 10,
   };
 };
 
 export const ExplanationHeader = () => {
-  const windowWidth = useResponsiveWindowWidth();
-  const iconStyle = getIconStyle(windowWidth);
+  const { isMobile } = useResponsiveWindowSize();
+  const iconStyle = getIconStyle({ isMobile });
   return (
     <Column noMargin>
       <DismissableTutorialMessage tutorialId="export-to-itch" />

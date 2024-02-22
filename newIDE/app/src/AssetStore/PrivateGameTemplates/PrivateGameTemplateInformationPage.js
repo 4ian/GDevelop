@@ -36,7 +36,6 @@ import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import Avatar from '@material-ui/core/Avatar';
 import GridList from '@material-ui/core/GridList';
@@ -55,6 +54,8 @@ import HelpIcon from '../../UI/HelpIcon';
 import SecureCheckout from '../SecureCheckout/SecureCheckout';
 import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import RaisedButton from '../../UI/RaisedButton';
+import Play from '../../UI/CustomSvgIcons/Play';
 
 const cellSpacing = 8;
 
@@ -97,6 +98,10 @@ const styles = {
     padding: '4px 8px',
     borderRadius: 4,
     color: 'black',
+  },
+  playIcon: {
+    width: 20,
+    height: 20,
   },
 };
 
@@ -401,6 +406,7 @@ const PrivateGameTemplateInformationPage = ({
                   forceMobileLayout={isMediumScreen}
                   // Prevent it to wrap when in landscape mode on small screens.
                   noResponsiveLandscape
+                  useLargeSpacer
                 >
                   <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
@@ -410,7 +416,7 @@ const PrivateGameTemplateInformationPage = ({
                     />
                   </div>
                   <div style={styles.rightColumnContainer}>
-                    <ColumnStackLayout>
+                    <ColumnStackLayout noMargin>
                       <LineStackLayout
                         noMargin
                         alignItems="center"
@@ -449,15 +455,36 @@ const PrivateGameTemplateInformationPage = ({
                           </Link>
                         </Text>
                       </LineStackLayout>
-                      <Line noMargin>
-                        <Text size="sub-title">
-                          <Trans>Licensing</Trans>
-                        </Text>
-                        <HelpIcon
-                          size="small"
-                          helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
-                        />
-                      </Line>
+                      <LineStackLayout
+                        noMargin
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Line noMargin>
+                          <Text size="sub-title">
+                            <Trans>Licensing</Trans>
+                          </Text>
+                          <HelpIcon
+                            size="small"
+                            helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
+                          />
+                        </Line>
+                        {!isAlreadyReceived &&
+                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
+                            <Column noMargin>
+                              <RaisedButton
+                                primary
+                                label={<Trans>Try it online</Trans>}
+                                onClick={() =>
+                                  Window.openExternalURL(
+                                    gameTemplate.gamePreviewLink
+                                  )
+                                }
+                                icon={<Play style={styles.playIcon} />}
+                              />
+                            </Column>
+                          )}
+                      </LineStackLayout>
                       <ProductLicenseOptions
                         value={selectedUsageType}
                         onChange={setSelectedUsageType}
@@ -499,19 +526,7 @@ const PrivateGameTemplateInformationPage = ({
                     </ColumnStackLayout>
                   </div>
                 </ResponsiveLineStackLayout>
-                <Column>
-                  {!isAlreadyReceived &&
-                  !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
-                      <Line>
-                        <FlatButton
-                          primary
-                          label={<Trans>Try it online</Trans>}
-                          onClick={() =>
-                            Window.openExternalURL(gameTemplate.gamePreviewLink)
-                          }
-                        />
-                      </Line>
-                    )}
+                <Column noMargin>
                   <Text size="body2" displayInlineAsSpan>
                     <MarkdownText
                       source={gameTemplate.longDescription}

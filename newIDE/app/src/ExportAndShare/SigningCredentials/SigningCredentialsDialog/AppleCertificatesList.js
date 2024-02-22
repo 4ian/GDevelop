@@ -164,9 +164,11 @@ export const AppleCertificatesList = ({
                       />
                     )}
                   >
-                    There are no provisioning profile created for this
-                    certificate. Create one in the Apple Developer interface and
-                    add it here.
+                    <Trans>
+                      There are no provisioning profile created for this
+                      certificate. Create one in the Apple Developer interface
+                      and add it here.
+                    </Trans>
                   </AlertMessage>
                 ) : (
                   <List>

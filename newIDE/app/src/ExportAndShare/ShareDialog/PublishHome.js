@@ -398,7 +398,7 @@ const PublishHome = ({
               description={<Trans>Apple App Store</Trans>}
               onClick={() => onChooseSection('ios')}
               disabled={allExportersRequireOnline && !isOnline}
-              id="publish-mobile"
+              id="publish-mobile-ios"
             />
           )}
         </ColumnStackLayout>
@@ -461,7 +461,7 @@ const PublishHome = ({
       {chosenSection === 'android' && !chosenSubSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
-            label={<Trans>Publish for Android</Trans>}
+            label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('android', 'online')}
             description={<Trans>Automated</Trans>}
             onClick={() => onChooseSubSection('online')}
@@ -483,13 +483,13 @@ const PublishHome = ({
       {chosenSection === 'ios' && !chosenSubSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
-            label={<Trans>Publish for iOS</Trans>}
+            label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('ios', 'online')}
             description={<Trans>Automated</Trans>}
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
-            id="publish-mobile-cloud"
+            id="publish-ios-cloud"
           />
           <SectionLine
             label={<Trans>Manual build</Trans>}
@@ -498,7 +498,7 @@ const PublishHome = ({
             onClick={() => onChooseSubSection('offline')}
             small
             disabled={allExportersRequireOnline && !isOnline}
-            id="publish-mobile-manual"
+            id="publish-ios-manual"
           />
         </ColumnStackLayout>
       )}

@@ -39,6 +39,13 @@ export const getBase64FromFile = async (file: File) => {
   });
 };
 
+const styles = {
+  appleIcon: {
+    width: 32,
+    height: 32,
+  },
+};
+
 type Props = {
   authenticatedUser: AuthenticatedUser,
 };
@@ -201,17 +208,10 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
     <ColumnStackLayout noMargin>
       <AlertMessage
         kind="info"
-        renderLeftIcon={() => (
-          <Apple
-            style={{
-              width: 32,
-              height: 32,
-            }}
-          />
-        )}
+        renderLeftIcon={() => <Apple style={styles.appleIcon} />}
         renderRightButton={() => (
           <FlatButton
-            label={'Open Apple Developer'}
+            label={<Trans>Open Apple Developer</Trans>}
             onClick={() =>
               Window.openExternalURL('https://developer.apple.com/account')
             }
@@ -296,13 +296,15 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
 
       {certificateError && (
         <AlertMessage kind="error">
-          An error occured while generating the certificate.
+          <Trans>An error occured while generating the certificate.</Trans>
         </AlertMessage>
       )}
       {wasCertificateGenerated && (
         <AlertMessage kind="valid">
-          The certificate was properly generated. Don't forget to create and
-          upload a provisioning profile associated to it.
+          <Trans>
+            The certificate was properly generated. Don't forget to create and
+            upload a provisioning profile associated to it.
+          </Trans>
         </AlertMessage>
       )}
 
@@ -338,14 +340,18 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
 
       {mobileProvisionError && (
         <AlertMessage kind="error">
-          An error occured while storing the provisioning profile.
+          <Trans>
+            An error occured while storing the provisioning profile.
+          </Trans>
         </AlertMessage>
       )}
       {lastUploadedProvisioningProfileName && (
         <AlertMessage kind="valid">
-          The provisioning profile was properly stored (
-          {lastUploadedProvisioningProfileName}). If you properly uploaded the
-          certificate before, it can now be used.
+          <Trans>
+            The provisioning profile was properly stored (
+            {lastUploadedProvisioningProfileName}). If you properly uploaded the
+            certificate before, it can now be used.
+          </Trans>
         </AlertMessage>
       )}
     </ColumnStackLayout>

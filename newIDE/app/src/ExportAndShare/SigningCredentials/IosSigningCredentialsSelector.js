@@ -42,24 +42,31 @@ const filterSigningCredentialsForTarget = (
       if (
         !targets.includes('iosAppStore') &&
         !targets.includes('iosDevelopment')
-      )
+      ) {
+        // Not an iOS build: Apple certificates are not usable.
         return false;
+      }
 
       if (
         signingCredential.kind === 'development' &&
         !targets.includes('iosDevelopment')
-      )
+      ) {
+        // Not an iOS development build: Apple development certificates are not usable.
         return false;
+      }
       if (
         signingCredential.kind === 'distribution' &&
         !targets.includes('iosAppStore')
-      )
+      ) {
+        // Not an iOS distribution build: Apple distribution certificates are not usable.
         return false;
+      }
 
       return true;
     }
 
     if (signingCredential.type === 'apple-auth-key') {
+      // Apple Auth Keys are only for distribution on App Store Connect.
       return targets.includes('iosAppStore');
     }
 
@@ -398,7 +405,7 @@ export const IosSigningCredentialsSelector = ({
               appleCertificateSigningCredentials
                 ? appleCertificateSigningCredentials.length > 0
                   ? t`Choose a Auth Key`
-                  : t`Add a Auth Key first`
+                  : t`Add an Auth Key first`
                 : t`Loading...`
             }
           >

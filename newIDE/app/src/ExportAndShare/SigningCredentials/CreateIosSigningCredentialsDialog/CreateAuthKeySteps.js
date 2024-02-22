@@ -88,7 +88,7 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
         )}
         renderRightButton={() => (
           <FlatButton
-            label={'Open Apple Developer'}
+            label={<Trans>Open Apple Developer</Trans>}
             onClick={() =>
               Window.openExternalURL('https://developer.apple.com/account')
             }
@@ -107,21 +107,21 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
       />
 
       <SemiControlledTextField
-        floatingLabelText="Name (optional)"
+        floatingLabelText={<Trans>Name (optional)</Trans>}
         value={name}
         onChange={setName}
         fullWidth
       />
       <LineStackLayout>
         <SemiControlledTextField
-          floatingLabelText="API key given by Apple"
+          floatingLabelText={<Trans>API key given by Apple</Trans>}
           hintText="XXXXXXXXXX"
           value={apiKey}
           onChange={setApiKey}
           fullWidth
         />
         <SemiControlledTextField
-          floatingLabelText="API Issuer given by Apple"
+          floatingLabelText={<Trans>API Issuer given by Apple</Trans>}
           hintText="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
           value={apiIssuer}
           onChange={setApiIssuer}
@@ -151,9 +151,7 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
         <LeftLoader isLoading={isAuthKeyLoading}>
           <RaisedButton
             primary
-            disabled={
-              isAuthKeyLoading || (!authKeyFile || !apiIssuer || !apiKey)
-            }
+            disabled={isAuthKeyLoading || !authKeyFile || !apiIssuer || !apiKey}
             onClick={() => {
               onUploadAuthKey();
             }}
@@ -164,14 +162,16 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
 
       {authKeyError && (
         <AlertMessage kind="error">
-          An error occured while storing the auth key.
+          <Trans>An error occured while storing the auth key.</Trans>
         </AlertMessage>
       )}
       {lastUploadedApiKey && (
         <AlertMessage kind="valid">
-          The auth key ${lastUploadedApiKey} was properly stored. It can now be
-          used to automatically upload your app to the app store - verify you've
-          declared an app for it.
+          <Trans>
+            The auth key {lastUploadedApiKey} was properly stored. It can now be
+            used to automatically upload your app to the app store - verify
+            you've declared an app for it.
+          </Trans>
         </AlertMessage>
       )}
     </ColumnStackLayout>

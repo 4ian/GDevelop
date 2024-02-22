@@ -22,13 +22,12 @@ import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 
 const styles = {
   buttonBase: {
-    height: '100%',
-    width: '100%',
     borderRadius: 8,
     padding: 8,
     cursor: 'default',
     overflow: 'hidden',
     boxSizing: 'border-box',
+    margin: 1, // For the outline to be visible.
   },
   contentWrapper: {
     height: '100%',

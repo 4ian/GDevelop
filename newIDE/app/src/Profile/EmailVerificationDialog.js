@@ -52,7 +52,7 @@ export default function EmailVerificationDialog({
         // Ignore any error, will be retried anyway.
       });
     },
-    isVerified ? null : 5000
+    !isVerified && (hasSentEmailManually || !showSendEmailButton) ? 5000 : null
   );
 
   return (

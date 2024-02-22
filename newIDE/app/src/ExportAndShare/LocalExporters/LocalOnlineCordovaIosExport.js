@@ -73,6 +73,8 @@ export const localOnlineCordovaIosExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
+  shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
+
   renderLaunchButtonLabel: () => <Trans>Create package for iOS</Trans>,
 
   prepareExporter: (

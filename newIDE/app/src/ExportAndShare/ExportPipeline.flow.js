@@ -40,6 +40,10 @@ export type ExportPipeline<
 
   renderHeader: (HeaderProps<ExportState>) => React.Node,
 
+  shouldSuggestBumpingVersionNumber?: ({|
+    exportState: ExportState,
+  |}) => boolean,
+
   renderLaunchButtonLabel: () => React.Node,
 
   canLaunchBuild: (

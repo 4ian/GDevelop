@@ -77,6 +77,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
+  shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
+
   renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
 
   prepareExporter: (

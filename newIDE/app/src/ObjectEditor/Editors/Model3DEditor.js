@@ -474,7 +474,9 @@ const Model3DEditor = ({
             propertyName="modelResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={loadGltf}
+            onChange={resourceName => {
+              loadGltf(resourceName);
+            }}
           />
           <SelectField
             value={properties.get('materialType').getValue()}

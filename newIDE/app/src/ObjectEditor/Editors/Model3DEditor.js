@@ -153,18 +153,17 @@ const Model3DEditor = ({
 
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
-    async () => {
-      const modelResourceName = properties.get('modelResourceName').getValue();
+    async (modelResourceName: string) => {
       const newModel3d = await PixiResourcesLoader.get3DModel(
         project,
         modelResourceName
       );
       setGltf(newModel3d);
     },
-    [project, properties]
+    [project]
   );
   if (!gltf) {
-    loadGltf();
+    loadGltf(properties.get('modelResourceName').getValue());
   }
 
   const model3D = React.useMemo<THREE.Object3D | null>(
@@ -475,8 +474,8 @@ const Model3DEditor = ({
             propertyName="modelResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={() => {
-              loadGltf();
+            onChange={resourceName => {
+              loadGltf(resourceName);
             }}
           />
           <SelectField

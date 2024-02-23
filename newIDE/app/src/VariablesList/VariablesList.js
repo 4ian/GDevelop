@@ -284,7 +284,7 @@ const VariableRow = React.memo<VariableRowProps>(
                 <ResponsiveLineStackLayout
                   expand
                   noMargin
-                  width={shouldWrap ? 'small' : undefined}
+                  forceMobileLayout={shouldWrap}
                 >
                   <Line alignItems="center" noMargin expand>
                     {shouldWrap ? null : <Spacer />}

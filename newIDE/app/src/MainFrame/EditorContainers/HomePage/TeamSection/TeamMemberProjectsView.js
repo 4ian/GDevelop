@@ -7,7 +7,7 @@ import { Column, Line } from '../../../../UI/Grid';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import AlertMessage from '../../../../UI/AlertMessage';
 import { List } from '../../../../UI/List';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -58,9 +58,8 @@ const TeamMemberProjectsView = ({
   onRefreshProjects,
   isLoadingProjects,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const skeletonLineHeight = getProjectLineHeight(windowWidth);
+  const { isMobile } = useResponsiveWindowSize();
+  const skeletonLineHeight = getProjectLineHeight({ isMobile });
 
   const fileMetadataAndStorageProviderNames = projects
     ? transformCloudProjectsIntoFileMetadataWithStorageProviderName(
@@ -145,7 +144,7 @@ const TeamMemberProjectsView = ({
                     key={file.fileMetadata.fileIdentifier}
                     onOpenRecentFile={onOpenRecentFile}
                     storageProviders={storageProviders}
-                    isWindowWidthMediumOrLarger={!isMobile}
+                    isWindowSizeMediumOrLarger={!isMobile}
                     hideDeleteContextMenuAction={true}
                   />
                 ))}

@@ -72,6 +72,7 @@ namespace gdjs {
             (this._game.isAntialisingEnabledOnMobile() ||
               !gdjs.evtTools.common.isMobile()),
         });
+        this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),

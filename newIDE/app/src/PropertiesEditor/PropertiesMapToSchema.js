@@ -239,11 +239,46 @@ const uncapitalize = str => {
 };
 
 /**
+ * Return true when the property exists and should be displayed.
+ *
+ * @param properties The properties
+ * @param name The property name
+ * @param visibility `true` when only deprecated properties must be displayed
+ * and `false` when only not deprecated ones must be displayed
+ */
+const isPropertyVisible = (
+  properties: gdMapStringPropertyDescriptor,
+  name: string,
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated'
+): boolean => {
+  if (!properties.has(name)) {
+    return false;
+  }
+  const property = properties.get(name);
+  if (property.isHidden()) {
+    return false;
+  }
+  if (visibility === 'All') {
+    return true;
+  }
+  if (visibility === 'Deprecated') {
+    return property.isDeprecated();
+  }
+  if (visibility === 'Advanced') {
+    return property.isAdvanced();
+  }
+  if (visibility === 'Basic') {
+    return !property.isAdvanced() && !property.isDeprecated();
+  }
+  return true;
+};
+
+/**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
  *
- * @param {gdMapStringPropertyDescriptor} properties The properties to use
- * @param {*} getProperties The function called to read again the properties
- * @param {*} onUpdateProperty The function called to update a property of an object
+ * @param properties The properties to use
+ * @param getProperties The function called to read again the properties
+ * @param onUpdateProperty The function called to update a property of an object
  */
 const propertiesMapToSchema = (
   properties: gdMapStringPropertyDescriptor,
@@ -254,7 +289,7 @@ const propertiesMapToSchema = (
     newValue: string
   ) => void,
   object: ?gdObject,
-  deprecated: boolean = false
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' = 'All'
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -263,8 +298,7 @@ const propertiesMapToSchema = (
   mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
-    if (property.isHidden()) return null;
-    if (property.isDeprecated() !== deprecated) {
+    if (!isPropertyVisible(properties, name, visibility)) {
       return null;
     }
     if (alreadyHandledProperties.has(name)) return null;
@@ -288,7 +322,7 @@ const propertiesMapToSchema = (
             name.replace(keyword, otherKeyword)
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (properties.has(rowPropertyName)) {
+            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
               rowPropertyNames.push(rowPropertyName);
             }
           }
@@ -299,7 +333,7 @@ const propertiesMapToSchema = (
             name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
           );
           for (const rowPropertyName of rowAllPropertyNames) {
-            if (properties.has(rowPropertyName)) {
+            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
               rowPropertyNames.push(rowPropertyName);
             }
           }

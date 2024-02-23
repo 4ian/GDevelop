@@ -962,6 +962,8 @@ interface PropertyDescriptor {
     boolean IsHidden();
     [Ref] PropertyDescriptor SetDeprecated(boolean enable);
     boolean IsDeprecated();
+    [Ref] PropertyDescriptor SetAdvanced(boolean enable);
+    boolean IsAdvanced();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
 
@@ -1314,7 +1316,7 @@ interface Serializer {
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,
-        [Ref] MapStringString resourcesNewFileNames);
+        [Ref] VectorString usedResourceNames);
 };
 
 interface InstructionsList {
@@ -1848,6 +1850,9 @@ interface BehaviorMetadata {
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
+    
+    [Value] MapStringPropertyDescriptor GetProperties();
+    [Value] MapStringPropertyDescriptor GetSharedProperties();
 };
 
 interface EffectMetadata {
@@ -1953,22 +1958,11 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
-    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
-        [Const] DOMString fullname,
-        [Const] DOMString description,
-        [Const] DOMString group,
-        [Const] DOMString icon24x24);
-
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
         ObjectConfiguration instance);
-
-    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
-        [Const] DOMString fullname,
-        [Const] DOMString description,
-        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
@@ -3273,8 +3267,8 @@ interface VectorVector2f {
 interface TextObject {
     void TextObject();
 
-    void SetString([Const] DOMString string);
-    [Const, Ref] DOMString GetString();
+    void SetText([Const] DOMString string);
+    [Const, Ref] DOMString GetText();
     void SetCharacterSize(double size);
     double GetCharacterSize();
     void SetFontName([Const] DOMString string);
@@ -3285,12 +3279,30 @@ interface TextObject {
     void SetItalic(boolean enable);
     boolean IsUnderlined();
     void SetUnderlined(boolean enable);
-    void SetColor(unsigned long r, unsigned long g, unsigned long b);
-    unsigned long GetColorR();
-    unsigned long GetColorG();
-    unsigned long GetColorB();
+    void SetColor([Const] DOMString color);
+    [Const, Ref] DOMString GetColor();
     void SetTextAlignment([Const] DOMString textAlignment);
     [Const, Ref] DOMString GetTextAlignment();
+
+    void SetOutlineEnabled(boolean enable);
+    boolean IsOutlineEnabled();
+    void SetOutlineThickness(double value);
+    double GetOutlineThickness();
+    void SetOutlineColor([Const] DOMString color);
+    [Const, Ref] DOMString GetOutlineColor();
+
+    void SetShadowEnabled(boolean enable);
+    boolean IsShadowEnabled();
+    void SetShadowColor([Const] DOMString color);
+    [Const, Ref] DOMString GetShadowColor();
+    void SetShadowOpacity(double value);
+    double GetShadowOpacity();
+    void SetShadowAngle(double value);
+    double GetShadowAngle();
+    void SetShadowDistance(double value);
+    double GetShadowDistance();
+    void SetShadowBlurRadius(double value);
+    double GetShadowBlurRadius();
 };
 TextObject implements ObjectConfiguration;
 

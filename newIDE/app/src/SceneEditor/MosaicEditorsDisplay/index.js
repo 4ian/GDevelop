@@ -4,7 +4,7 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
@@ -84,8 +84,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     selectedLayer,
     onSelectInstances,
   } = props;
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
@@ -403,7 +402,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   return (
     <EditorMosaic
       editors={editors}
-      limitToOneSecondaryEditor={isMobileScreen}
+      limitToOneSecondaryEditor={isMobile}
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }

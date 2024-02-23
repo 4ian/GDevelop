@@ -248,6 +248,8 @@ export const sendAssetPackBuyClicked = (options: {|
   assetPackName: string,
   assetPackTag: string,
   assetPackKind: 'public' | 'private' | 'unknown',
+  currency?: string,
+  usageType: string,
 |}) => {
   recordEvent('asset_pack_buy_clicked', options);
 };
@@ -264,6 +266,8 @@ export const sendGameTemplateBuyClicked = (options: {|
   gameTemplateId: string,
   gameTemplateName: string,
   gameTemplateTag: string,
+  currency?: string,
+  usageType: string,
 |}) => {
   recordEvent('game_template_buy_clicked', options);
 };
@@ -348,7 +352,9 @@ export type SubscriptionDialogDisplayReason =
   | 'Extend redeemed subscription'
   | 'Generate project from prompt'
   | 'Version history'
-  | 'Add collaborators on project';
+  | 'Add collaborators on project'
+  | 'Claim asset pack'
+  | 'Unlock build type';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,
@@ -395,8 +401,18 @@ export const sendShowcaseGameLinkOpened = (title: string, linkType: string) => {
   recordEvent('showcase-open-game-link', { title, linkType });
 };
 
-export const sendChoosePlanClicked = (planId: string | null) => {
-  recordEvent('choose-plan-click', { planId });
+export const sendChoosePlanClicked = (metadata: {|
+  planId: string | null,
+  pricingSystemId: string | null,
+|}) => {
+  recordEvent('choose-plan-click', metadata);
+};
+
+export const sendCancelSubscriptionToChange = (metadata: {|
+  planId: string,
+  pricingSystemId: string | null,
+|}) => {
+  recordEvent('cancel-subscription-to-change', metadata);
 };
 
 export const sendExternalEditorOpened = (editorName: string) => {

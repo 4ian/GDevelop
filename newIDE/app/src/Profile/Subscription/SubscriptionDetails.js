@@ -30,9 +30,9 @@ import PlanCard from './PlanCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../UI/AlertMessage';
-import Individuals from './Icons/Individual';
-import Team from './Icons/Team';
-import Education from './Icons/Education';
+import IndividualPlans from './Icons/IndividualPlans';
+import TeamPlans from './Icons/TeamPlans';
+import EducationPlans from './Icons/EducationPlans';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PlaceholderError from '../../UI/PlaceholderError';
 
@@ -65,17 +65,17 @@ const subscriptionOptions: {
   individual: {
     title: <Trans>For Individuals</Trans>,
     description: <Trans>Hobbyists and indie devs</Trans>,
-    icon: <Individuals style={{ width: 115, height: 100 }} />,
+    icon: <IndividualPlans style={{ width: 115, height: 100 }} />,
   },
   team: {
     title: <Trans>For Teams</Trans>,
     description: <Trans>Companies, studios and agencies</Trans>,
-    icon: <Team style={{ width: 175, height: 100 }} />,
+    icon: <TeamPlans style={{ width: 175, height: 100 }} />,
   },
   education: {
     title: <Trans>For Education</Trans>,
     description: <Trans>Teachers, courses and universities</Trans>,
-    icon: <Education style={{ width: 110, height: 100 }} />,
+    icon: <EducationPlans style={{ width: 110, height: 100 }} />,
   },
 };
 
@@ -378,7 +378,7 @@ const SubscriptionDetails = ({
             </ResponsiveLineStackLayout>
           </Paper>
         ) : (
-          <ResponsiveLineStackLayout>
+          <ResponsiveLineStackLayout noColumnMargin>
             {Object.keys(subscriptionOptions).map(key => {
               const { title, description, icon } = subscriptionOptions[key];
               return (

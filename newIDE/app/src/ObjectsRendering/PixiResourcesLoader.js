@@ -155,7 +155,7 @@ const removeMetalness = (material: THREE.Material): void => {
   }
 };
 
-const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>): void => {
+const removeMetalnessFromMesh = (node: THREE.Object3D): void => {
   const mesh = (node: THREE.Mesh);
   if (!mesh.material) {
     return;
@@ -169,9 +169,8 @@ const removeMetalnessFromMesh = (node: THREE.Object3D<THREE.Event>): void => {
   }
 };
 
-const traverseToRemoveMetalnessFromMeshes = (
-  node: THREE.Object3D<THREE.Event>
-) => node.traverse(removeMetalnessFromMesh);
+const traverseToRemoveMetalnessFromMeshes = (node: THREE.Object3D) =>
+  node.traverse(removeMetalnessFromMesh);
 
 export const readEmbeddedResourcesMapping = (
   resource: gdResource

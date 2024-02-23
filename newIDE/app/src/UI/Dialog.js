@@ -5,8 +5,8 @@ import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from './Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
@@ -67,8 +67,8 @@ const dialogActionPadding = 24;
 // Mobile.
 const dialogSmallPadding = 8;
 
-const getDefaultMaxWidthFromSize = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getDefaultMaxWidthFromSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return false; // Full width
     case 'medium':
@@ -87,7 +87,6 @@ const styles = {
     flexDirection: 'column',
     flex: 1,
     overflowY: 'auto',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
   dialogContent: {
     overflowX: 'hidden',
@@ -247,12 +246,11 @@ const Dialog = ({
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { windowSize, isMobile } = useResponsiveWindowSize();
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
-  const isFullScreen = isMobileScreen && !noMobileFullScreen;
+  const isFullScreen = isMobile && !noMobileFullScreen;
 
   const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
   const classesForDialogContent = useStylesForDialogContent();
@@ -365,7 +363,7 @@ const Dialog = ({
       maxWidth={
         maxWidth !== undefined
           ? maxWidth
-          : getDefaultMaxWidthFromSize(windowWidth)
+          : getDefaultMaxWidthFromSize(windowSize)
       }
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}

@@ -31,6 +31,7 @@ export default class InstancesRenderer {
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
+  onUpInstance: (gdInitialInstance, number, number) => void;
 
   layersRenderers: { [string]: LayerRenderer };
 
@@ -58,6 +59,7 @@ export default class InstancesRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+    onUpInstance,
     showObjectInstancesIn3D,
   }: {
     project: gdProject,
@@ -77,6 +79,7 @@ export default class InstancesRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
+    onUpInstance: (gdInitialInstance, number, number) => void,
     showObjectInstancesIn3D: boolean,
   }) {
     this.project = project;
@@ -91,6 +94,7 @@ export default class InstancesRenderer {
     this.onMoveInstance = onMoveInstance;
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
+    this.onUpInstance = onUpInstance;
 
     this._showObjectInstancesIn3D = showObjectInstancesIn3D;
     this.layersRenderers = {};
@@ -200,6 +204,7 @@ export default class InstancesRenderer {
           onMoveInstance: this.onMoveInstance,
           onMoveInstanceEnd: this.onMoveInstanceEnd,
           onDownInstance: this.onDownInstance,
+          onUpInstance: this.onUpInstance,
           pixiRenderer: pixiRenderer,
           showObjectInstancesIn3D: this._showObjectInstancesIn3D,
         });

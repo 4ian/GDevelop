@@ -28,7 +28,7 @@ import {
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
@@ -107,7 +107,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       searchText,
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
-      assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
     const {
       privateGameTemplateListingDatas,
@@ -132,21 +131,20 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const searchBar = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobileScreen) {
+        if (isMobile) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobileScreen]
+      [isMobile]
     );
 
     const [
@@ -350,14 +348,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     // if the user owns it, we set it as the chosen category,
     // otherwise we open the page to buy it.
     const selectPrivateAssetPack = React.useCallback(
-      (privateAssetPackListingData: PrivateAssetPackListingData) => {
+      (
+        privateAssetPackListingData: PrivateAssetPackListingData,
+        options?: {|
+          forceProductPage?: boolean,
+        |}
+      ) => {
         const receivedAssetPack = receivedAssetPacks
           ? receivedAssetPacks.find(
               pack => pack.id === privateAssetPackListingData.id
             )
           : null;
 
-        if (!receivedAssetPack) {
+        if (!receivedAssetPack || (options && options.forceProductPage)) {
           // The user has not received the pack, open the page to buy it.
           sendAssetPackInformationOpened({
             assetPackName: privateAssetPackListingData.name,
@@ -721,8 +724,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               </PlaceholderError>
             ) : publicAssetPacks &&
               privateAssetPackListingDatas &&
-              privateGameTemplateListingDatas &&
-              assetPackRandomOrdering ? (
+              privateGameTemplateListingDatas ? (
               <AssetsHome
                 ref={assetsHome}
                 publicAssetPacks={publicAssetPacks}
@@ -730,7 +732,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 privateGameTemplateListingDatas={
                   privateGameTemplateListingDatas
                 }
-                assetPackRandomOrdering={assetPackRandomOrdering}
                 onPublicAssetPackSelection={selectPublicAssetPack}
                 onPrivateAssetPackSelection={selectPrivateAssetPack}
                 onPrivateGameTemplateSelection={selectPrivateGameTemplate}
@@ -778,7 +779,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateAssetPackListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
               privateAssetPackListingDatasFromSameCreator={
                 privateAssetPackListingDatasFromSameCreator
@@ -794,7 +794,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   openedPrivateGameTemplateListingData
                 )
               }
-              isPurchaseDialogOpen={!!purchasingPrivateGameTemplateListingData}
               onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
                   onOpenPrivateGameTemplateListingData(

@@ -10,7 +10,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^14.11.1",
     "@types/sinon": "^10.0.13",
-    "@types/three": "0.152.0",
+    "@types/three": "0.160.0",
     "esbuild": "^0.13.12",
     "lebab": "^3.1.0",
     "minimist": "^1.2.5",

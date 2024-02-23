@@ -13,6 +13,7 @@ export type ExportPipelineContext<ExportState> = {|
 
 export type HeaderProps<ExportState> = {|
   project: gdProject,
+  authenticatedUser: AuthenticatedUser,
   exportState: ExportState,
   updateExportState: (
     updater: (prevExportState: ExportState) => ExportState
@@ -38,6 +39,10 @@ export type ExportPipeline<
   getInitialExportState: (project: gdProject) => ExportState,
 
   renderHeader: (HeaderProps<ExportState>) => React.Node,
+
+  shouldSuggestBumpingVersionNumber?: ({|
+    exportState: ExportState,
+  |}) => boolean,
 
   renderLaunchButtonLabel: () => React.Node,
 

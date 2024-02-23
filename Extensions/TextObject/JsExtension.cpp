@@ -127,10 +127,60 @@ class TextObjectJsExtension : public gd::PlatformExtension {
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetOutline"]
         .SetFunctionName("setOutline");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetOutlineEnabled"]
+        .SetFunctionName("setOutlineEnabled");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::IsOutlineEnabled"]
+        .SetFunctionName("isOutlineEnabled");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetOutlineColor"]
+        .SetFunctionName("setOutlineColor");
+    GetAllExpressionsForObject("TextObject::Text")["TextObject::Text::OutlineThickness"]
+        .SetFunctionName("getOutlineThickness");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::OutlineThickness"]
+        .SetFunctionName("getOutlineThickness");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetOutlineThickness"]
+        .SetFunctionName("setOutlineThickness")
+        .SetGetter("getOutlineThickness");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::SetShadow"]
         .SetFunctionName("setShadow");
     GetAllActionsForObject("TextObject::Text")["TextObject::ShowShadow"]
         .SetFunctionName("showShadow");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::IsShadowEnabled"]
+        .SetFunctionName("isShadowEnabled");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowColor"]
+        .SetFunctionName("setShadowColor");
+
+    GetAllExpressionsForObject("TextObject::Text")["TextObject::Text::ShadowOpacity"]
+        .SetFunctionName("getShadowOpacity");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::ShadowOpacity"]
+        .SetFunctionName("getShadowOpacity");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowOpacity"]
+        .SetFunctionName("setShadowOpacity")
+        .SetGetter("getShadowOpacity");
+
+    GetAllExpressionsForObject("TextObject::Text")["TextObject::Text::ShadowDistance"]
+        .SetFunctionName("getShadowDistance");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::ShadowDistance"]
+        .SetFunctionName("getShadowDistance");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowDistance"]
+        .SetFunctionName("setShadowDistance")
+        .SetGetter("getShadowDistance");
+
+    GetAllExpressionsForObject("TextObject::Text")["TextObject::Text::ShadowAngle"]
+        .SetFunctionName("getShadowAngle");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::ShadowAngle"]
+        .SetFunctionName("getShadowAngle");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowAngle"]
+        .SetFunctionName("setShadowAngle")
+        .SetGetter("getShadowAngle");
+
+    GetAllExpressionsForObject("TextObject::Text")["TextObject::Text::ShadowBlurRadius"]
+        .SetFunctionName("getShadowBlurRadius");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::ShadowBlurRadius"]
+        .SetFunctionName("getShadowBlurRadius");
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetShadowBlurRadius"]
+        .SetFunctionName("setShadowBlurRadius")
+        .SetGetter("getShadowBlurRadius");
 
     // Unimplemented actions and conditions:
     GetAllActionsForObject("TextObject::Text")["TextObject::Font"]

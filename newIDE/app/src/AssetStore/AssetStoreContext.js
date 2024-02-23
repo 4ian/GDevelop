@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
@@ -32,14 +33,12 @@ import {
   assetStoreHomePageState,
 } from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
-import shuffle from 'lodash/shuffle';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   getAssetPackFromUserFriendlySlug,
   getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { t } from '@lingui/macro';
 
 const defaultSearchText = '';
 
@@ -67,10 +66,6 @@ type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPackListingDatas: ?Array<PrivateAssetPackListingData>,
-  assetPackRandomOrdering: ?{|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -96,11 +91,10 @@ type AssetStoreState = {|
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => void,
 |};
 
-export const AssetStoreContext = React.createContext<AssetStoreState>({
+export const initialAssetStoreState: AssetStoreState = {
   filters: null,
   publicAssetPacks: null,
   privateAssetPackListingDatas: null,
-  assetPackRandomOrdering: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -157,10 +151,13 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
   setInitialPackUserFriendlySlug: (initialPackUserFriendlySlug: string) => {},
-});
+};
+
+export const AssetStoreContext = React.createContext<AssetStoreState>(
+  initialAssetStoreState
+);
 
 type AssetStoreStateProviderProps = {|
-  onlyAppStorePrivateAssetPacks?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
@@ -182,14 +179,7 @@ const getPrivateAssetPackListingDataSearchTerms = (
   privateAssetPack: PrivateAssetPackListingData
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
-const getAssetPackRandomOrdering = (length: number): Array<number> => {
-  const array = new Array(length).fill(0).map((_, index) => index);
-
-  return shuffle(array);
-};
-
 export const AssetStoreStateProvider = ({
-  onlyAppStorePrivateAssetPacks,
   shopNavigationState,
   children,
 }: AssetStoreStateProviderProps) => {
@@ -208,13 +198,6 @@ export const AssetStoreStateProvider = ({
     publicAssetPacks,
     setPublicAssetPacks,
   ] = React.useState<?PublicAssetPacks>(null);
-  const [
-    assetPackRandomOrdering,
-    setAssetPackRandomOrdering,
-  ] = React.useState<?{|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |}>(null);
   const [
     privateAssetPackListingDatas,
     setPrivateAssetPackListingDatas,
@@ -314,11 +297,7 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
-          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks(
-            {
-              onlyAppStorePrivateAssetPacks,
-            }
-          );
+          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
 
           console.info(
             `Loaded ${
@@ -342,7 +321,7 @@ export const AssetStoreStateProvider = ({
         }
       })();
     },
-    [environment, onlyAppStorePrivateAssetPacks]
+    [environment]
   );
 
   // When the public assets or the private assets are loaded, regenerate the
@@ -486,27 +465,6 @@ export const AssetStoreStateProvider = ({
     [privateAssetPackListingDatas]
   );
 
-  // Randomize asset packs when number of asset packs and private asset packs change
-  const assetPackCount =
-    publicAssetPacks && publicAssetPacks.starterPacks
-      ? publicAssetPacks.starterPacks.length
-      : undefined;
-  const privateAssetPackCount = privateAssetPackListingDatas
-    ? privateAssetPackListingDatas.length
-    : undefined;
-  React.useEffect(
-    () => {
-      if (assetPackCount === undefined || privateAssetPackCount === undefined) {
-        return;
-      }
-      setAssetPackRandomOrdering({
-        starterPacks: getAssetPackRandomOrdering(assetPackCount),
-        privateAssetPacks: getAssetPackRandomOrdering(privateAssetPackCount),
-      });
-    },
-    [assetPackCount, privateAssetPackCount]
-  );
-
   const currentPage = shopNavigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const assetShortHeadersSearchResults: ?Array<AssetShortHeader> = useSearchItem(
@@ -605,7 +563,6 @@ export const AssetStoreStateProvider = ({
       filters,
       publicAssetPacks,
       privateAssetPackListingDatas,
-      assetPackRandomOrdering,
       authors,
       licenses,
       environment,
@@ -642,7 +599,6 @@ export const AssetStoreStateProvider = ({
       filters,
       publicAssetPacks,
       privateAssetPackListingDatas,
-      assetPackRandomOrdering,
       authors,
       licenses,
       environment,

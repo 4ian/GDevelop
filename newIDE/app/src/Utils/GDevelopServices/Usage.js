@@ -195,17 +195,19 @@ export const getSubscriptionPlanPricingSystem = async (
   }
 };
 
-export const listSubscriptionPlanPricingSystems = async (
-  subscriptionPlanIds?: ?(string[])
-): Promise<SubscriptionPlanPricingSystem[]> => {
-  const params =
-    subscriptionPlanIds && subscriptionPlanIds.length > 0
-      ? { subscriptionPlanIds: subscriptionPlanIds.join(',') }
-      : undefined;
-  const response = await apiClient.get(
-    '/subscription-plan-pricing-system',
-    params
-  );
+export const listSubscriptionPlanPricingSystems = async (options: {|
+  subscriptionPlanIds?: ?(string[]),
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlanPricingSystem[]> => {
+  const params: {| includeLegacy: string, subscriptionPlanIds?: string |} = {
+    includeLegacy: options.includeLegacy ? 'true' : 'false',
+  };
+  if (options.subscriptionPlanIds && options.subscriptionPlanIds.length > 0) {
+    params.subscriptionPlanIds = options.subscriptionPlanIds.join(',');
+  }
+  const response = await apiClient.get('/subscription-plan-pricing-system', {
+    params,
+  });
   return response.data;
 };
 
@@ -263,13 +265,18 @@ export const getUserSubscription = async (
 export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  newSubscriptionDetails: {| planId: string | null, stripeToken?: any |}
+  newSubscriptionDetails: {| planId: string | null |},
+  options: {| cancelImmediately: boolean |}
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 
   const response = await apiClient.post(
     '/subscription-v2',
-    newSubscriptionDetails,
+    {
+      ...newSubscriptionDetails,
+      prohibitSeamlessUpdate: true,
+      cancelImmediately: options.cancelImmediately,
+    },
     {
       params: {
         userId,
@@ -287,20 +294,18 @@ export const canSeamlesslyChangeSubscription = (
   subscription: Subscription,
   planId: string
 ) => {
-  // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
-  // Otherwise (Paypal), it needs to be cancelled first.
-  // If the user changes for an education plan and already has a subscription made with
-  // Stripe, the Stripe subscription has to be cancelled first.
-  return (
-    !!subscription.stripeSubscriptionId &&
-    !planId.startsWith('gdevelop_education')
-  );
+  // Bringing prices with different currencies prevents subscriptions to be changed seamlessly
+  // on Stripe.
+  // TODO: When the backend allows it, make it possible to seamlessly change subscription
+  // if the currencies of the current and requested subscriptions match.
+  return false;
 };
 
 export const canCancelAtEndOfPeriod = (subscription: Subscription) => {
   // If the subscription is on Stripe, it can be set as cancelled and only removed at the
-  // end of the period alreayd paid.
+  // end of the period already paid.
   // Otherwise (Paypal), it will be cancelled immediately.
+  // TODO: When the backend allows it, remove this payment provider condition.
   return !!subscription.stripeSubscriptionId;
 };
 

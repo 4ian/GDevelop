@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 
 const styles = {
@@ -24,13 +24,12 @@ type Props = {|
 |};
 
 export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
   // Make the icon be full width on mobile.
-  const height = isMobileScreen ? undefined : ICON_DESKTOP_HEIGHT;
-  const width = isMobileScreen ? '100%' : undefined;
+  const height = isMobile ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = isMobile ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>

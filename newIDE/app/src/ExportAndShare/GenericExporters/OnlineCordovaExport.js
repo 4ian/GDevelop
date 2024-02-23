@@ -91,7 +91,7 @@ export const SetupExportHeader = ({
           ]}
           secondaryActions={[
             <HelpButton
-              helpPagePath="/publishing/android_and_ios/play-store/upgrading-from-apk-to-aab"
+              helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
               key="help"
             />,
           ]}
@@ -154,6 +154,6 @@ export const SetupExportHeader = ({
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
   tabName: <Trans>Mobile</Trans>,
-  name: <Trans>Android (&amp; iOS coming soon)</Trans>,
-  helpPage: '/publishing/android_and_ios',
+  name: <Trans>Android</Trans>,
+  helpPage: '/publishing/android',
 };

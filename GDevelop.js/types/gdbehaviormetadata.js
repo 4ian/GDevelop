@@ -35,6 +35,8 @@ declare class gdBehaviorMetadata {
   setHidden(): gdBehaviorMetadata;
   get(): gdBehavior;
   getSharedDataInstance(): gdBehaviorsSharedData;
+  getProperties(): gdMapStringPropertyDescriptor;
+  getSharedProperties(): gdMapStringPropertyDescriptor;
   delete(): void;
   ptr: number;
 };

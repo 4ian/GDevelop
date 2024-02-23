@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
-import Mobile from '../../UI/CustomSvgIcons/Mobile';
+import Apple from '../../UI/CustomSvgIcons/Apple';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import {
@@ -21,7 +21,6 @@ import { ButtonBase, createStyles, makeStyles } from '@material-ui/core';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import TextButton from '../../UI/TextButton';
 import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
-import { capitalize } from 'lodash';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import GdGames from '../../UI/CustomSvgIcons/GdGames';
 import ItchIo from '../../UI/CustomSvgIcons/ItchIo';
@@ -29,6 +28,8 @@ import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import Android from '../../UI/CustomSvgIcons/Android';
+import { isNativeMobileApp } from '../../Utils/Platform';
 
 const styles = {
   buttonBase: {
@@ -54,6 +55,21 @@ const styles = {
   },
 };
 
+const getSectionLabel = ({ section }: { section: ExporterSection }) => {
+  switch (section) {
+    case 'browser':
+      return <Trans>Browser</Trans>;
+    case 'desktop':
+      return <Trans>Desktop</Trans>;
+    case 'android':
+      return <Trans>Android</Trans>;
+    case 'ios':
+      return <Trans>iOS</Trans>;
+    default:
+      return null;
+  }
+};
+
 const getSectionIcon = ({
   section,
   small,
@@ -66,8 +82,10 @@ const getSectionIcon = ({
       return <Chrome style={small ? styles.iconSmall : styles.icon} />;
     case 'desktop':
       return <Desktop style={small ? styles.iconSmall : styles.icon} />;
-    case 'mobile':
-      return <Mobile style={small ? styles.iconSmall : styles.icon} />;
+    case 'android':
+      return <Android style={small ? styles.iconSmall : styles.icon} />;
+    case 'ios':
+      return <Apple style={small ? styles.iconSmall : styles.icon} />;
     default:
       return null;
   }
@@ -90,7 +108,16 @@ const getSubSectionIcon = (
           return null;
       }
     case 'desktop':
-    case 'mobile':
+    case 'android':
+      switch (subSection) {
+        case 'online':
+          return <CloudDownload style={styles.icon} />;
+        case 'offline':
+          return <Wrench style={styles.iconSmall} />;
+        default:
+          return null;
+      }
+    case 'ios':
       switch (subSection) {
         case 'online':
           return <CloudDownload style={styles.icon} />;
@@ -293,16 +320,16 @@ const PublishHome = ({
                 alignItems="center"
                 justifyContent="center"
               >
-                {selectedExporter
-                  ? undefined
-                  : getSectionIcon({
-                      section: chosenSection,
-                      small: true,
-                    })}
+                {getSectionIcon({
+                  section: chosenSection,
+                  small: true,
+                })}
                 <Text size="block-title" noMargin>
                   {selectedExporter
                     ? selectedExporter.name
-                    : capitalize(chosenSection)}
+                    : getSectionLabel({
+                        section: chosenSection,
+                      })}
                 </Text>
               </LineStackLayout>
             )}
@@ -333,7 +360,7 @@ const PublishHome = ({
           />
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>Browser</Trans>}
+              label={getSectionLabel({ section: 'browser' })}
               icon={getSectionIcon({ section: 'browser' })}
               description={
                 <Trans>Gaming portals (Itch.io, Poki, Facebook...)</Trans>
@@ -345,7 +372,7 @@ const PublishHome = ({
           )}
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>Desktop</Trans>}
+              label={getSectionLabel({ section: 'desktop' })}
               icon={getSectionIcon({ section: 'desktop' })}
               description={
                 <Trans>Windows, MacOS, Linux (Steam, MS Store...)</Trans>
@@ -357,12 +384,22 @@ const PublishHome = ({
           )}
           {!showOnlineWebExporterOnly && (
             <SectionLine
-              label={<Trans>Mobile</Trans>}
-              icon={getSectionIcon({ section: 'mobile' })}
-              description={<Trans>Android and iOS (App stores)</Trans>}
-              onClick={() => onChooseSection('mobile')}
+              label={getSectionLabel({ section: 'android' })}
+              icon={getSectionIcon({ section: 'android' })}
+              description={<Trans>Google Play (or other stores)</Trans>}
+              onClick={() => onChooseSection('android')}
               disabled={allExportersRequireOnline && !isOnline}
               id="publish-mobile"
+            />
+          )}
+          {!showOnlineWebExporterOnly && !isNativeMobileApp() && (
+            <SectionLine
+              label={getSectionLabel({ section: 'ios' })}
+              icon={getSectionIcon({ section: 'ios' })}
+              description={<Trans>Apple App Store</Trans>}
+              onClick={() => onChooseSection('ios')}
+              disabled={allExportersRequireOnline && !isOnline}
+              id="publish-mobile-ios"
             />
           )}
         </ColumnStackLayout>
@@ -422,12 +459,12 @@ const PublishHome = ({
           />
         </ColumnStackLayout>
       )}
-      {chosenSection === 'mobile' && !chosenSubSection && (
+      {chosenSection === 'android' && !chosenSubSection && (
         <ColumnStackLayout expand noMargin>
           <SectionLine
             label={<Trans>One-click packaging</Trans>}
-            icon={getSubSectionIcon('mobile', 'online')}
-            description={<Trans>Android only</Trans>}
+            icon={getSubSectionIcon('android', 'online')}
+            description={<Trans>Automated</Trans>}
             onClick={() => onChooseSubSection('online')}
             highlighted
             disabled={!isOnline}
@@ -441,6 +478,28 @@ const PublishHome = ({
             small
             disabled={allExportersRequireOnline && !isOnline}
             id="publish-mobile-manual"
+          />
+        </ColumnStackLayout>
+      )}
+      {chosenSection === 'ios' && !chosenSubSection && (
+        <ColumnStackLayout expand noMargin>
+          <SectionLine
+            label={<Trans>One-click packaging</Trans>}
+            icon={getSubSectionIcon('ios', 'online')}
+            description={<Trans>Automated</Trans>}
+            onClick={() => onChooseSubSection('online')}
+            highlighted
+            disabled={!isOnline}
+            id="publish-ios-cloud"
+          />
+          <SectionLine
+            label={<Trans>Manual build</Trans>}
+            icon={getSubSectionIcon('desktop', 'offline')}
+            description={<Trans>Development tools required</Trans>}
+            onClick={() => onChooseSubSection('offline')}
+            small
+            disabled={allExportersRequireOnline && !isOnline}
+            id="publish-ios-manual"
           />
         </ColumnStackLayout>
       )}

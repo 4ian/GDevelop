@@ -8,7 +8,7 @@ import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 
 export type PreviewAndShareButtonsProps = {|
@@ -43,8 +43,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
     openShareDialog,
     isSharingEnabled,
   }: PreviewAndShareButtonsProps) {
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     const previewBuildMenuTemplate = React.useCallback(
       (i18n: I18nType) => [
@@ -140,7 +139,7 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
           disabled={!isPreviewEnabled}
           icon={hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />}
           label={
-            !isMobileScreen ? (
+            !isMobile ? (
               hasPreviewsRunning ? (
                 <Trans>Update</Trans>
               ) : (

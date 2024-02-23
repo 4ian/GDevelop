@@ -29,7 +29,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '../../../../UI/IconButton';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import { useLongTouch } from '../../../../Utils/UseLongTouch';
-import { Avatar, Tooltip } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import Tooltip from '@material-ui/core/Tooltip';
 import { getGravatarUrl } from '../../../../UI/GravatarUrl';
 import { type LastModifiedInfo } from './utils';
 import DotBadge from '../../../../UI/DotBadge';
@@ -204,10 +205,10 @@ type ProjectFileListItemProps = {|
   lastModifiedInfo?: LastModifiedInfo | null,
   storageProviders: Array<StorageProvider>,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
-  isWindowWidthMediumOrLarger: boolean,
+  isWindowSizeMediumOrLarger: boolean,
   hideDeleteContextMenuAction?: boolean,
-  onManageGame?: ({ gameId: string }) => void,
-  canManageGame?: ({ gameId: string }) => boolean,
+  onManageGame?: ({| gameId: string |}) => void,
+  canManageGame?: ({| gameId: string |}) => boolean,
 |};
 
 export const ProjectFileListItem = ({
@@ -216,7 +217,7 @@ export const ProjectFileListItem = ({
   lastModifiedInfo, // If null, the project has been modified last by the current user.
   storageProviders,
   onOpenRecentFile,
-  isWindowWidthMediumOrLarger,
+  isWindowSizeMediumOrLarger,
   hideDeleteContextMenuAction,
   onManageGame,
   canManageGame,
@@ -284,6 +285,10 @@ export const ProjectFileListItem = ({
     file: ?FileMetadataAndStorageProviderName
   ): Array<MenuItemTemplate> => {
     if (!file) return [];
+    const isCurrentProjectOpened =
+      !!currentFileMetadata &&
+      currentFileMetadata.fileIdentifier === file.fileMetadata.fileIdentifier;
+
     let actions = [
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
     ];
@@ -293,6 +298,7 @@ export const ProjectFileListItem = ({
           {
             label: i18n._(t`Delete`),
             click: () => onDeleteCloudProject(i18n, file),
+            enabled: !isCurrentProjectOpened,
           },
         ]);
       }
@@ -364,7 +370,7 @@ export const ProjectFileListItem = ({
             onContextMenu={event => openContextMenu(event, file)}
             {...longTouchForContextMenuProps}
           >
-            {isWindowWidthMediumOrLarger ? (
+            {isWindowSizeMediumOrLarger ? (
               <LineStackLayout justifyContent="flex-start" expand>
                 <Column expand>
                   <Line noMargin alignItems="center">

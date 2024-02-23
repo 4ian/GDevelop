@@ -39,7 +39,7 @@ try {
     const theme = getFullTheme({
       themeName: values.themeName,
       language: 'en', // language is not important here as we only look for a color.
-      windowWidth: 'small', // window size is not important as we only look for a color.
+      isMobile: true, // window size is not important as we only look for a color.
     });
     color = theme.muiTheme.palette.background.default;
   }

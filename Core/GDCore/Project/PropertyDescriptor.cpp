@@ -29,8 +29,15 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   for (const gd::String& information : extraInformation) {
     extraInformationElement.AddChild("").SetStringValue(information);
   }
-  element.AddChild("hidden").SetBoolValue(hidden);
-  element.AddChild("deprecated").SetBoolValue(deprecated);
+  if (hidden) {
+    element.AddChild("hidden").SetBoolValue(hidden);
+  }
+  if (deprecated) {
+    element.AddChild("deprecated").SetBoolValue(deprecated);
+  }
+  if (advanced) {
+    element.AddChild("advanced").SetBoolValue(advanced);
+  }
 }
 
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
@@ -61,6 +68,9 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
                : false;
   deprecated = element.HasChild("deprecated")
                ? element.GetChild("deprecated").GetBoolValue()
+               : false;
+  advanced = element.HasChild("advanced")
+               ? element.GetChild("advanced").GetBoolValue()
                : false;
 }
 

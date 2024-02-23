@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import Paper from './Paper';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 import Drawer from '@material-ui/core/Drawer';
 
 const styles = {
@@ -35,9 +35,8 @@ export const ResponsivePaperOrDrawer = ({
   onClose: () => void,
   children: React.Node,
 |}) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  if (!isMobileScreen) {
+  const { isMobile } = useResponsiveWindowSize();
+  if (!isMobile) {
     if (!open) return null;
     return (
       <Paper style={styles.paper} background="medium">

@@ -17,9 +17,7 @@ declare class gdPlatformExtension {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addDependency(): gdDependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
-  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): gdBehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObjectConfiguration): gdObjectMetadata;
-  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): gdObjectMetadata;
   addEffect(name: string): gdEffectMetadata;
   registerProperty(name: string): gdPropertyDescriptor;
   getFullName(): string;

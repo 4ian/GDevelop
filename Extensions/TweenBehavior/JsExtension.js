@@ -563,7 +563,7 @@ module.exports = {
         'Progress',
         _('Tween progress'),
         _('the progress of a tween (between 0.0 and 1.0)'),
-        _('the progress of a tween'),
+        _('the progress of the scene tween _PARAM1_'),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior32.png'
       )
@@ -2069,7 +2069,7 @@ module.exports = {
         'Progress',
         _('Tween progress'),
         _('the progress of a tween (between 0.0 and 1.0)'),
-        _('the progress of a tween'),
+        _('the progress of the tween _PARAM2_'),
         '',
         'JsPlatform/Extensions/tween_behavior32.png'
       )

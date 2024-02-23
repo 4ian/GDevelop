@@ -4,7 +4,6 @@ import * as React from 'react';
 import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
-import DismissableTutorialMessage from '../../../Hints/DismissableTutorialMessage';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
 import { getBuilds } from '../../../Utils/GDevelopServices/Build';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -35,7 +34,6 @@ const ExplanationHeader = ({ game }: Props) => {
 
   return (
     <Column noMargin expand>
-      <DismissableTutorialMessage tutorialId="publish-on-gdgames" />
       <Line alignItems="center" justifyContent="center">
         <Text>
           <Trans>

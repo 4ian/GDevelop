@@ -5,15 +5,17 @@ import MUICard from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from './Grid';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   headerContainer: {
     minWidth: 0,
     flex: 1,
+    display: 'flex',
+    alignItems: 'center',
   },
   cardContent: {
-    paddingBottom: 32,
+    paddingBottom: 18,
     paddingTop: 0,
     minWidth: 0,
   },
@@ -37,8 +39,7 @@ const Card = ({
   isHighlighted,
   disabled,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <MUICard
@@ -62,8 +63,8 @@ const Card = ({
           <div
             style={{
               ...styles.headerContainer,
-              paddingLeft: isMobileScreen ? 8 : 32,
-              paddingRight: cardCornerAction ? (isMobileScreen ? 8 : 32) : 0,
+              paddingLeft: isMobile ? 8 : 24,
+              paddingRight: cardCornerAction ? (isMobile ? 8 : 24) : 0,
             }}
           >
             {header}
@@ -73,8 +74,8 @@ const Card = ({
         <CardContent
           style={{
             ...styles.cardContent,
-            paddingRight: isMobileScreen ? 8 : 32,
-            paddingLeft: isMobileScreen ? 8 : 32,
+            paddingRight: isMobile ? 8 : 24,
+            paddingLeft: isMobile ? 8 : 24,
           }}
         >
           {children}

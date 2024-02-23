@@ -4,7 +4,7 @@ import TextButton from '../TextButton';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Reponsive/ResponsiveWindowMeasurer';
 import HelpIcon from '../HelpIcon';
 import Help from '../CustomSvgIcons/Help';
 
@@ -18,8 +18,7 @@ type PropsType = {
  * The button that can be used in any dialog to open a help page
  */
 const HelpButton = (props: PropsType) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);
   if (!helpLink) return null;
@@ -30,7 +29,7 @@ const HelpButton = (props: PropsType) => {
     }
   };
 
-  return !isMobileScreen ? (
+  return !isMobile ? (
     <TextButton
       onClick={onClick}
       target="_blank"

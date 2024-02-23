@@ -16,7 +16,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
@@ -37,7 +37,6 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
@@ -104,12 +103,17 @@ const GetStartedSection = ({
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [
+    isLoggingInUsingProvider,
+    setIsLoggingInUsingProvider,
+  ] = React.useState<boolean>(false);
   const {
     profile,
     onResetPassword,
     creatingOrLoggingInAccount,
     onLogin,
     onLoginWithProvider,
+    onCancelLogin,
     onEditProfile,
     onCreateAccount,
     authenticationError,
@@ -122,8 +126,7 @@ const GetStartedSection = ({
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
   const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [step, setStep] = React.useState<
     | 'welcome'
     | 'login'
@@ -202,6 +205,18 @@ const GetStartedSection = ({
     }
   };
 
+  const loginWithProvider = React.useCallback(
+    async provider => {
+      try {
+        setIsLoggingInUsingProvider(true);
+        await onLoginWithProvider(provider);
+      } finally {
+        setIsLoggingInUsingProvider(false);
+      }
+    },
+    [onLoginWithProvider]
+  );
+
   React.useEffect(
     () => {
       if (step === 'welcome' && profile && profile.survey) {
@@ -274,7 +289,31 @@ const GetStartedSection = ({
           justifyContent="center"
           alignItems="center"
         >
-          <CircularProgress size={40} />
+          <ColumnStackLayout
+            noMargin
+            expand
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CircularProgress size={40} />
+          </ColumnStackLayout>
+          {isLoggingInUsingProvider && (
+            <div style={styles.bottomPageButtonContainer}>
+              <Column>
+                <LineStackLayout
+                  expand
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <FlatButton
+                    primary
+                    label={<Trans>Cancel</Trans>}
+                    onClick={onCancelLogin}
+                  />
+                </LineStackLayout>
+              </Column>
+            </div>
+          )}
         </ColumnStackLayout>
       </SectionContainer>
     );
@@ -352,7 +391,7 @@ const GetStartedSection = ({
             justifyContent="center"
           >
             <Text size="title" align="center">
-              <Trans>Log in to Gdevelop</Trans>
+              <Trans>Log in to GDevelop</Trans>
             </Text>
             <BackgroundText>
               <Trans>
@@ -366,11 +405,12 @@ const GetStartedSection = ({
                 password={password}
                 onChangePassword={setPassword}
                 onLogin={doLogin}
-                onLoginWithProvider={onLoginWithProvider}
+                onLoginWithProvider={loginWithProvider}
                 loginInProgress={creatingOrLoggingInAccount}
                 onForgotPassword={onResetPassword}
                 error={error}
               />
+              {/* TODO: Add button to cancel login with providers */}
             </div>
           </ColumnStackLayout>
           <div style={styles.bottomPageButtonContainer}>
@@ -426,7 +466,7 @@ const GetStartedSection = ({
               <CreateAccountForm
                 email={email}
                 onChangeEmail={setEmail}
-                onLoginWithProvider={onLoginWithProvider}
+                onLoginWithProvider={loginWithProvider}
                 password={password}
                 onChangePassword={setPassword}
                 username={username}
@@ -616,7 +656,6 @@ const GetStartedSection = ({
   if (step === 'recommendations' && profile) {
     return (
       <>
-        <AnnouncementsFeed canClose level="urgent" addMargins />
         <SectionContainer
           title={
             profile.username ? (
@@ -627,6 +666,7 @@ const GetStartedSection = ({
           }
           renderSubtitle={renderSubtitle}
           flexBody
+          showAnnouncementsAndPromotions
         >
           <RecommendationList
             authenticatedUser={authenticatedUser}

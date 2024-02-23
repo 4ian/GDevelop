@@ -27,7 +27,7 @@ import {
   useSearchBox,
 } from 'react-instantsearch-hooks';
 import { useDebounce } from '../../Utils/UseDebounce';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -54,8 +54,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
     const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
@@ -190,7 +189,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 onInputChange={setSearchText}
                 items={allCommands}
                 placeholder={
-                  isMobileScreen
+                  isMobile
                     ? t`Search`
                     : t`Start typing a command or searching something...`
                 }

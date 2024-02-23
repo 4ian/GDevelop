@@ -8,7 +8,6 @@ import {
   type ForgotPasswordForm,
   type AuthError,
   type IdentityProvider,
-  type LoginOptions,
 } from '../Utils/GDevelopServices/Authentication';
 import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
@@ -25,6 +24,7 @@ import {
   type PrivateAssetPack,
   type PrivateGameTemplate,
 } from '../Utils/GDevelopServices/Asset';
+import { type Purchase } from '../Utils/GDevelopServices/Shop';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
@@ -38,6 +38,8 @@ export type AuthenticatedUser = {|
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  gameTemplatePurchases: ?Array<Purchase>,
+  assetPackPurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
   limits: ?Limits,
   authenticationError: ?AuthError,
@@ -45,6 +47,7 @@ export type AuthenticatedUser = {|
   subscription: ?Subscription,
   onLogin: (form: LoginForm) => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
+  onCancelLogin: () => void,
   onLogout: () => Promise<void>,
   onCreateAccount: (
     form: RegisterForm,
@@ -56,7 +59,7 @@ export type AuthenticatedUser = {|
     options: {| throwError: boolean |}
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
-  onOpenLoginDialog: (?LoginOptions) => void,
+  onOpenLoginDialog: () => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,
   onOpenCreateAccountDialog: () => void,
@@ -66,6 +69,8 @@ export type AuthenticatedUser = {|
   onRefreshFirebaseProfile: () => Promise<void>,
   onRefreshSubscription: () => Promise<void>,
   onRefreshLimits: () => Promise<void>,
+  onRefreshGameTemplatePurchases: () => Promise<void>,
+  onRefreshAssetPackPurchases: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
   onOpenEmailVerificationDialog: ({|
@@ -88,6 +93,8 @@ export const initialAuthenticatedUser = {
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
   receivedGameTemplates: null,
+  gameTemplatePurchases: null,
+  assetPackPurchases: null,
   recommendations: null,
   subscription: null,
   usages: null,
@@ -95,6 +102,7 @@ export const initialAuthenticatedUser = {
   authenticationError: null,
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
+  onCancelLogin: () => {},
   onLogout: async () => {},
   onCreateAccount: async () => {},
   onEditProfile: async () => {},
@@ -109,6 +117,8 @@ export const initialAuthenticatedUser = {
   onRefreshFirebaseProfile: async () => {},
   onRefreshSubscription: async () => {},
   onRefreshLimits: async () => {},
+  onRefreshGameTemplatePurchases: async () => {},
+  onRefreshAssetPackPurchases: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},

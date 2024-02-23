@@ -17,6 +17,7 @@ import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import { Column, Line } from '../../UI/Grid';
 const gd = global.gd;
 
 const minimumWidths = {
@@ -49,7 +50,6 @@ const styles = {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 
@@ -245,6 +245,22 @@ class InstancesList extends Component<Props, State> {
       <GDevelopThemeContext.Consumer>
         {gdevelopTheme => (
           <div style={styles.container}>
+            <Line>
+              <Column expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={searchText =>
+                    this.setState({
+                      searchText,
+                    })
+                  }
+                  onRequestSearch={this._selectFirstInstance}
+                  ref={this._searchBar}
+                  placeholder={t`Search instances`}
+                  autoFocus="desktop"
+                />
+              </Column>
+            </Line>
             <div
               style={styles.tableContainer}
               onKeyDown={this._keyboardShortcuts.onKeyDown}
@@ -331,19 +347,6 @@ class InstancesList extends Component<Props, State> {
                 )}
               </AutoSizer>
             </div>
-            <SearchBar
-              value={searchText}
-              onChange={searchText =>
-                this.setState({
-                  searchText,
-                })
-              }
-              onRequestSearch={this._selectFirstInstance}
-              ref={this._searchBar}
-              placeholder={t`Search instances`}
-              aspect="integrated-search-bar"
-              autoFocus="desktop"
-            />
           </div>
         )}
       </GDevelopThemeContext.Consumer>

@@ -29,6 +29,7 @@ const facesProperties = [
     visibilityProperty: 'frontFaceVisible',
     resourceRepeatProperty: 'frontFaceResourceRepeat',
     resourceNameProperty: 'frontFaceResourceName',
+    newResourceNameSuffix: 'Front',
   },
   {
     id: 'backFace',
@@ -36,6 +37,7 @@ const facesProperties = [
     visibilityProperty: 'backFaceVisible',
     resourceRepeatProperty: 'backFaceResourceRepeat',
     resourceNameProperty: 'backFaceResourceName',
+    newResourceNameSuffix: 'Back',
   },
   {
     id: 'leftFace',
@@ -43,6 +45,7 @@ const facesProperties = [
     visibilityProperty: 'leftFaceVisible',
     resourceRepeatProperty: 'leftFaceResourceRepeat',
     resourceNameProperty: 'leftFaceResourceName',
+    newResourceNameSuffix: 'Left',
   },
   {
     id: 'rightFace',
@@ -50,6 +53,7 @@ const facesProperties = [
     visibilityProperty: 'rightFaceVisible',
     resourceRepeatProperty: 'rightFaceResourceRepeat',
     resourceNameProperty: 'rightFaceResourceName',
+    newResourceNameSuffix: 'Right',
   },
   {
     id: 'topFace',
@@ -57,6 +61,7 @@ const facesProperties = [
     visibilityProperty: 'topFaceVisible',
     resourceRepeatProperty: 'topFaceResourceRepeat',
     resourceNameProperty: 'topFaceResourceName',
+    newResourceNameSuffix: 'Top',
   },
   {
     id: 'bottomFace',
@@ -64,6 +69,7 @@ const facesProperties = [
     visibilityProperty: 'bottomFaceVisible',
     resourceRepeatProperty: 'bottomFaceResourceRepeat',
     resourceNameProperty: 'bottomFaceResourceName',
+    newResourceNameSuffix: 'Bottom',
   },
 ];
 
@@ -72,6 +78,7 @@ const Cube3DEditor = ({
   project,
   layout,
   resourceManagementProps,
+  objectName,
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
@@ -279,6 +286,9 @@ const Cube3DEditor = ({
               resourceName={properties
                 .get(faceProperty.resourceNameProperty)
                 .getValue()}
+              defaultNewResourceName={
+                objectName + '_' + faceProperty.newResourceNameSuffix
+              }
               onChange={value =>
                 onChangeProperty(faceProperty.resourceNameProperty, value)
               }

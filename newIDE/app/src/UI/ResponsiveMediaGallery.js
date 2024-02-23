@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 
@@ -48,12 +48,10 @@ const styles = {
     display: 'grid',
     grid: 'auto / auto-flow max-content',
     overflowX: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     gap: '8px',
   },
   mobileGrid: {
     overflowX: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowY: 'hidden',
     scrollSnapType: 'x mandatory',
   },
@@ -80,17 +78,16 @@ type Props = {|
   horizontalOuterMarginToEatOnMobile?: number,
 |};
 
-const ResponseMediaGallery = ({
+const ResponsiveMediaGallery = ({
   mediaItems,
   altTextTemplate,
   horizontalOuterMarginToEatOnMobile,
 }: Props) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = React.useState<number>(0);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const mobileExtremeItemsPadding =
-    isMobileScreen && horizontalOuterMarginToEatOnMobile
+    isMobile && horizontalOuterMarginToEatOnMobile
       ? 2 * horizontalOuterMarginToEatOnMobile
       : 0;
 
@@ -107,7 +104,7 @@ const ResponseMediaGallery = ({
             paddingRight: mobileExtremeItemsPadding,
           },
         },
-        root: isMobileScreen
+        root: isMobile
           ? {
               scrollbarHeight: 'none' /* For Firefox */,
               '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
@@ -117,7 +114,7 @@ const ResponseMediaGallery = ({
             }
           : undefined,
       }),
-    [mobileExtremeItemsPadding, isMobileScreen]
+    [mobileExtremeItemsPadding, isMobile]
   )();
 
   const [
@@ -131,22 +128,28 @@ const ResponseMediaGallery = ({
   ] = React.useState<number>(0);
 
   const mobileImageWidth =
-    mobileGridClientWidth -
-    30 - // Width kept for user to see that there's an image after or before
-    (horizontalOuterMarginToEatOnMobile || 0);
+    Math.max(
+      mobileGridClientWidth -
+      30 - // Width kept for user to see that there's an image after or before
+        (horizontalOuterMarginToEatOnMobile || 0),
+      0
+    ) || 320; // Set a default width if the component is not yet measured, to avoid layout shift and a scroll to trigger.
 
   React.useEffect(
     () => {
-      setCurrentlyViewedImageIndex(
-        Math.round(mobileGridScrollX / (mobileImageWidth + GRID_SPACING))
-      );
+      if (mobileImageWidth && mobileGridScrollX) {
+        const newCurrentlyViewedImageIndex = Math.round(
+          mobileGridScrollX / (mobileImageWidth + GRID_SPACING)
+        );
+        setCurrentlyViewedImageIndex(newCurrentlyViewedImageIndex);
+      }
     },
     [mobileImageWidth, mobileGridScrollX]
   );
 
   const selectedMedia = mediaItems[selectedMediaIndex];
 
-  if (isMobileScreen) {
+  if (isMobile) {
     return (
       <div
         style={{
@@ -282,4 +285,4 @@ const ResponseMediaGallery = ({
   );
 };
 
-export default ResponseMediaGallery;
+export default ResponsiveMediaGallery;

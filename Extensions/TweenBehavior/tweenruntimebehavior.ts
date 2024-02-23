@@ -808,7 +808,13 @@ namespace gdjs {
       const owner = this.owner;
       if (!isScalable(owner)) return;
 
-      const owner3d = owner instanceof gdjs.RuntimeObject3D ? owner : null;
+      // This action doesn't require 3D capabilities.
+      // So, gdjs.RuntimeObject3D may not exist
+      // when the 3D extension is not used.
+      const owner3d =
+        gdjs.RuntimeObject3D && owner instanceof gdjs.RuntimeObject3D
+          ? owner
+          : null;
 
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {

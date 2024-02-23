@@ -14,8 +14,8 @@ import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import { formatTutorialToImageTileComponent } from '../LearnSection';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
@@ -47,10 +47,13 @@ const useStyles = makeStyles({
   },
 });
 
-const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getTextTutorialsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -61,10 +64,13 @@ const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getVideoTutorialsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 5 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -75,10 +81,13 @@ const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getTutorialsLimitsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getTutorialsLimitsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 3;
+      return isLandscape ? 5 : 3;
     case 'medium':
       return 3;
     case 'large':
@@ -116,7 +125,7 @@ type TextTutorialsRowProps = {|
 
 const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
   const classes = useStyles();
-  const windowWidth = useResponsiveWindowWidth();
+  const { isLandscape, windowSize } = useResponsiveWindowSize();
 
   return (
     <>
@@ -131,7 +140,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         </Text>
       </Column>
       <GridList
-        cols={getTextTutorialsColumnsFromWidth(windowWidth)}
+        cols={getTextTutorialsColumnsFromWidth(windowSize, isLandscape)}
         cellHeight="auto"
         spacing={10}
       >
@@ -231,8 +240,8 @@ const RecommendationList = ({
                 items={recommendedVideoTutorials.map(tutorial =>
                   formatTutorialToImageTileComponent(i18n, tutorial)
                 )}
-                getColumnsFromWidth={getVideoTutorialsColumnsFromWidth}
-                getLimitFromWidth={getTutorialsLimitsFromWidth}
+                getColumnsFromWindowSize={getVideoTutorialsColumnsFromWidth}
+                getLimitFromWindowSize={getTutorialsLimitsFromWidth}
               />
             </SectionRow>
           );

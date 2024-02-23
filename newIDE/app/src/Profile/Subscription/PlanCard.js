@@ -14,9 +14,12 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Paper from '../../UI/Paper';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Silver from './Icons/Silver';
 import Gold from './Icons/Gold';
+import Startup from './Icons/Startup';
+import Business from './Icons/Business';
+import Education from './Icons/Education';
 import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 
@@ -183,8 +186,11 @@ const getPlanPrices = ({
   );
 };
 
-const PLAN_LOGO_SIZE = 25;
-const PLAN_LOGO_PADDING = 20;
+const GDEVELOP_LOGO_SIZE = 25;
+const GDEVELOP_LOGO_PADDING = 20;
+// The plan logos are bigger than the GDevelop logo because they contain a glow effect,
+// so we increase the size.
+const PLAN_LOGO_SIZE = GDEVELOP_LOGO_SIZE + 2 * GDEVELOP_LOGO_PADDING;
 
 const getPlanIcon = (
   subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems
@@ -195,9 +201,8 @@ const getPlanIcon = (
       return (
         <Silver
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
@@ -206,23 +211,45 @@ const getPlanIcon = (
       return (
         <Gold
           style={{
-            // Those icons have a glow effect, so the padding is in the size of the image.
-            width: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
-            height: PLAN_LOGO_SIZE + 2 * PLAN_LOGO_PADDING,
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
           }}
         />
       );
-    // TODO: Add icons for other plans.
     case 'gdevelop_education':
+      return (
+        <Education
+          style={{
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
+          }}
+        />
+      );
     case 'gdevelop_startup':
+      return (
+        <Startup
+          style={{
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
+          }}
+        />
+      );
     case 'gdevelop_enterprise':
+      return (
+        <Business
+          style={{
+            width: PLAN_LOGO_SIZE,
+            height: PLAN_LOGO_SIZE,
+          }}
+        />
+      );
     default:
       return (
         <GDevelopGLogo
           style={{
-            width: PLAN_LOGO_SIZE,
-            height: PLAN_LOGO_SIZE,
-            padding: PLAN_LOGO_PADDING,
+            width: GDEVELOP_LOGO_SIZE,
+            height: GDEVELOP_LOGO_SIZE,
+            padding: GDEVELOP_LOGO_PADDING,
           }}
         />
       );
@@ -240,8 +267,7 @@ type Props = {|
 
 const PlanCard = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const planIcon = getPlanIcon(props.subscriptionPlanWithPricingSystems);
 
@@ -251,8 +277,8 @@ const PlanCard = (props: Props) => {
         <Paper
           background={props.background}
           style={{
-            paddingRight: isMobileScreen ? 8 : 32,
-            paddingLeft: !!planIcon ? 0 : isMobileScreen ? 8 : 65,
+            paddingRight: isMobile ? 8 : 32,
+            paddingLeft: !!planIcon ? 0 : isMobile ? 8 : 65,
             border: `1px solid ${gdevelopTheme.text.color.disabled}`,
             paddingTop: 16,
             paddingBottom: 16,

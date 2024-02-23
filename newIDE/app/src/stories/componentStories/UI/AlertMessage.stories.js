@@ -8,7 +8,7 @@ import AlertMessage from '../../../UI/AlertMessage';
 import { ColumnStackLayout } from '../../../UI/Layout';
 
 export default {
-  title: 'AlertMessage',
+  title: 'UI Building Blocks/AlertMessage',
   component: AlertMessage,
   decorators: [getPaperDecorator('medium'), muiDecorator],
 };

@@ -14,8 +14,8 @@ import {
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
+  useResponsiveWindowSize,
+  type WindowSizeType,
 } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
@@ -28,10 +28,13 @@ import {
 
 const cellSpacing = 2;
 
-const getCategoryColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getCategoryColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -43,10 +46,13 @@ const getCategoryColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -59,15 +65,15 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
 };
 
 export const shopCategories = {
-  'full-game-pack': {
-    title: <Trans>Full Game Packs</Trans>,
-    imageAlt: 'Full game asset packs category',
-    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
-  },
   'game-template': {
-    title: <Trans>Game Templates</Trans>,
+    title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
     imageSource: 'res/shop-categories/Game_Templates.jpeg',
+  },
+  'full-game-pack': {
+    title: <Trans>Full Game Asset Packs</Trans>,
+    imageAlt: 'Full game asset packs category',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
@@ -123,10 +129,6 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
-  assetPackRandomOrdering: {|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
@@ -141,7 +143,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
       privateGameTemplateListingDatas,
-      assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
       onPrivateGameTemplateSelection,
@@ -151,7 +152,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     }: Props,
     ref
   ) => {
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
     );
@@ -209,12 +210,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           !openedShopCategory ||
           assetPack.categories.includes(openedShopCategory)
       )
-      .map((pack, index) => ({
-        pos: assetPackRandomOrdering.starterPacks[index],
-        pack,
-      }))
-      .sort((a, b) => a.pos - b.pos)
-      .map(sortObject => sortObject.pack)
       .map((assetPack, index) => (
         <PublicAssetPackTile
           assetPack={assetPack}
@@ -236,13 +231,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               !openedShopCategory ||
               assetPackListingData.categories.includes(openedShopCategory)
           )
-          .map((listingData, index) => ({
-            pos: assetPackRandomOrdering.privateAssetPacks[index],
-            listingData,
-          }))
-          .sort((a, b) => a.pos - b.pos)
-          .map(sortObject => sortObject.listingData)
-          .filter(Boolean)
           .forEach(assetPackListingData => {
             const isPackOwned =
               !!receivedAssetPacks &&
@@ -297,7 +285,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       [
         privateAssetPackListingDatas,
         openedShopCategory,
-        assetPackRandomOrdering,
         onPrivateAssetPackSelection,
         starterPacksTiles,
         receivedAssetPacks,
@@ -352,7 +339,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getCategoryColumns(windowWidth)}
+              cols={getCategoryColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -371,7 +358,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -399,7 +386,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Column>
             )}
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -418,7 +405,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </Column>
         )}
         <GridList
-          cols={getShopItemsColumns(windowWidth)}
+          cols={getShopItemsColumns(windowSize, isLandscape)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

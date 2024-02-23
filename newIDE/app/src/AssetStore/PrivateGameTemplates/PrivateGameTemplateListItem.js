@@ -12,7 +12,7 @@ import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from '../../UI/FlatButton';
 import { capitalize } from 'lodash';
 import Chip from '../../UI/Chip';
@@ -70,8 +70,7 @@ const PrivateGameTemplateListItem = ({
   onHeightComputed,
   owned,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
   React.useLayoutEffect(() => {
@@ -104,8 +103,8 @@ const PrivateGameTemplateListItem = ({
                 <CorsAwareImage
                   style={{
                     ...styles.icon,
-                    height: isMobileScreen ? undefined : 120,
-                    width: isMobileScreen ? '100%' : undefined,
+                    height: isMobile ? undefined : 120,
+                    width: isMobile ? '100%' : undefined,
                   }}
                   src={
                     (shouldUseAppStoreProduct() &&

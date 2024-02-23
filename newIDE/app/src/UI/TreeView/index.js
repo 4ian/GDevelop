@@ -7,7 +7,7 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Reponsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
@@ -64,11 +64,12 @@ export type ItemData<Item> = {|
   canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
   onEditItem?: Item => void,
-  isMobileScreen: boolean,
+  isMobile: boolean,
   shouldHideMenuIcon: ?boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
+  shouldSelectUponContextMenuOpening?: boolean,
 |};
 
 const getItemProps = memoizeOne(
@@ -88,11 +89,12 @@ const getItemProps = memoizeOne(
     canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
     onEditItem?: Item => void,
-    isMobileScreen: boolean,
+    isMobile: boolean,
     shouldHideMenuIcon: ?boolean,
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
-    forceDefaultDraggingPreview?: boolean
+    forceDefaultDraggingPreview?: boolean,
+    shouldSelectUponContextMenuOpening?: boolean
   ): ItemData<Item> => ({
     onOpen,
     onSelect,
@@ -104,11 +106,12 @@ const getItemProps = memoizeOne(
     canDrop,
     onDrop,
     onEditItem,
-    isMobileScreen,
+    isMobile,
     shouldHideMenuIcon,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
+    shouldSelectUponContextMenuOpening,
   })
 );
 
@@ -163,6 +166,7 @@ type Props<Item> = {|
     onGetItemOutside: (item: Item) => ?Item,
   |},
   forceDefaultDraggingPreview?: boolean,
+  shouldSelectUponContextMenuOpening?: boolean,
   shouldHideMenuIcon?: boolean,
 |};
 
@@ -194,6 +198,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     initiallyOpenedNodeIds,
     arrowKeyNavigationProps,
     forceDefaultDraggingPreview,
+    shouldSelectUponContextMenuOpening,
     shouldHideMenuIcon,
   }: Props<Item>,
   ref: TreeViewInterface<Item>
@@ -211,11 +216,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
-  const isMobileScreen = windowWidth === 'small';
   const isSearching = !!searchText;
   const flattenNode = React.useCallback(
     (
@@ -552,11 +556,12 @@ const TreeView = <Item: ItemBaseAttributes>(
     canMoveSelectionToItem,
     onMoveSelectionToItem,
     onEditItem,
-    isMobileScreen,
+    isMobile,
     shouldHideMenuIcon,
     DragSourceAndDropTarget,
     getItemHtmlId,
-    forceDefaultDraggingPreview
+    forceDefaultDraggingPreview,
+    shouldSelectUponContextMenuOpening
   );
 
   // Reset opened nodes during search when user stops searching

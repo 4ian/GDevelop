@@ -5,7 +5,7 @@ import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   itemsWithJustImage,
   itemsWithOverlay,
@@ -13,13 +13,13 @@ import {
 } from './data';
 
 export default {
-  title: 'ImageTile/ImageTileGrid',
+  title: 'UI Building Blocks/ImageTile/ImageTileGrid',
   component: ImageTileGrid,
   decorators: [paperDecorator, muiDecorator],
 };
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return 1;
     case 'medium':
@@ -33,20 +33,20 @@ const getColumnsFromWidth = (width: WidthType) => {
 export const Default = () => (
   <ImageTileGrid
     items={itemsWithJustImage}
-    getColumnsFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
 export const WithTitleAndDescription = () => (
   <ImageTileGrid
     items={itemsWithTitleAndDescription}
-    getColumnsFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
 export const WithOverlay = () => (
   <ImageTileGrid
     items={itemsWithOverlay}
-    getColumnsFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
   />
 );

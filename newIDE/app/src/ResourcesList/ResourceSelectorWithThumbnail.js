@@ -11,7 +11,7 @@ import ResourceThumbnail, {
 } from './ResourceThumbnail';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { LineStackLayout } from '../UI/Layout';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { Line } from '../UI/Grid';
 
 type Props = {|
@@ -19,6 +19,7 @@ type Props = {|
   resourceManagementProps: ResourceManagementProps,
   resourceKind: ResourceKind,
   resourceName: string,
+  defaultNewResourceName?: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
@@ -32,6 +33,7 @@ const ResourceSelectorWithThumbnail = ({
   resourceManagementProps,
   resourceKind,
   resourceName,
+  defaultNewResourceName,
   onChange,
   floatingLabelText,
   hintText,
@@ -39,9 +41,8 @@ const ResourceSelectorWithThumbnail = ({
   fallbackResourceKind,
   id,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const itemsAlignment = isMobileScreen ? 'center' : 'flex-end';
+  const { isMobile } = useResponsiveWindowSize();
+  const itemsAlignment = isMobile ? 'center' : 'flex-end';
   const displayThumbnail = resourcesKindsWithThumbnail.includes(resourceKind);
 
   const resourcesSelector = (
@@ -52,6 +53,7 @@ const ResourceSelectorWithThumbnail = ({
       resourceKind={resourceKind}
       fullWidth
       initialResourceName={resourceName}
+      defaultNewResourceName={defaultNewResourceName}
       onChange={onChange}
       floatingLabelText={floatingLabelText}
       hintText={hintText}

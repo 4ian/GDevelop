@@ -72,14 +72,16 @@ const ExtensionInstallDialog = ({
   onEdit,
   project,
 }: Props) => {
-  const alreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
+  const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
 
-  const fromStore = alreadyInstalled
-    ? project
-        .getEventsFunctionsExtension(extensionShortHeader.name)
-        .getOriginName() === 'gdevelop-extension-store'
+  const installedExtension = isAlreadyInstalled
+    ? project.getEventsFunctionsExtension(extensionShortHeader.name)
+    : null;
+
+  const isFromStore = installedExtension
+    ? installedExtension.getOriginName() === 'gdevelop-extension-store'
     : false;
 
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
@@ -116,10 +118,10 @@ const ExtensionInstallDialog = ({
   const onInstallExtension = React.useCallback(
     () => {
       if (canInstallExtension && onInstall) {
-        if (alreadyInstalled) {
+        if (isAlreadyInstalled) {
           let dialogText =
             'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
-          if (!fromStore)
+          if (!isFromStore)
             dialogText =
               'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
 
@@ -131,7 +133,7 @@ const ExtensionInstallDialog = ({
         }
       }
     },
-    [onInstall, canInstallExtension, alreadyInstalled, fromStore]
+    [onInstall, canInstallExtension, isAlreadyInstalled, isFromStore]
   );
 
   const showOutOfDateAlert = useOutOfDateAlertDialog();
@@ -172,8 +174,8 @@ const ExtensionInstallDialog = ({
               label={
                 !isCompatible ? (
                   <Trans>Not compatible</Trans>
-                ) : alreadyInstalled ? (
-                  fromStore ? (
+                ) : isAlreadyInstalled ? (
+                  isFromStore ? (
                     extensionUpdate ? (
                       extensionShortHeader.tier === 'community' ? (
                         <Trans>Update (could break the project)</Trans>
@@ -207,7 +209,7 @@ const ExtensionInstallDialog = ({
         ) : (
           undefined
         ),
-        alreadyInstalled ? (
+        isAlreadyInstalled ? (
           <FlatButton
             key="report-extension"
             label={<Trans>Report an issue</Trans>}
@@ -239,7 +241,13 @@ const ExtensionInstallDialog = ({
           />
           <Column expand>
             <Text noMargin size="body2">
-              <Trans>Version {' ' + extensionShortHeader.version}</Trans>
+              {extensionUpdate && installedExtension ? (
+                <Trans>{`Version ${installedExtension.getVersion()} (${
+                  extensionShortHeader.version
+                } available)`}</Trans>
+              ) : (
+                <Trans>{`Version ${extensionShortHeader.version}`}</Trans>
+              )}
             </Text>
             <Line>
               <div style={{ flexWrap: 'wrap' }}>

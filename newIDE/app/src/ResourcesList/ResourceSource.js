@@ -116,6 +116,8 @@ export type ChooseResourceOptions = {|
   resourceKind: ResourceKind,
 |};
 
+export type ResourceImportationBehavior = 'import' | 'relative' | 'ask';
+
 export type ChooseResourceProps = {|
   i18n: I18nType,
   project: gdProject,
@@ -129,6 +131,7 @@ export type ChooseResourceProps = {|
   ) => void,
   options: ChooseResourceOptions,
   automaticallyOpenIfPossible?: boolean,
+  resourcesImporationBehavior: ResourceImportationBehavior,
 |};
 
 export type ResourceSourceComponentProps = {|

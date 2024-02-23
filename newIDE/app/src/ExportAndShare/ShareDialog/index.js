@@ -12,7 +12,7 @@ import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import TutorialButton from '../../UI/TutorialButton';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -22,12 +22,13 @@ import ErrorBoundary from '../../UI/ErrorBoundary';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 export type ShareTab = 'invite' | 'publish';
-export type ExporterSection = 'browser' | 'desktop' | 'mobile';
+export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
 export type ExporterSubSection = 'online' | 'offline' | 'facebook';
 export type ExporterKey =
   | 'onlinewebexport'
   | 'onlineelectronexport'
   | 'onlinecordovaexport'
+  | 'onlinecordovaiosexport'
   | 'webexport'
   | 'facebookinstantgamesexport'
   | 'electronexport'
@@ -46,8 +47,13 @@ const exporterSectionMapping: {
     offline: 'electronexport',
     facebook: null,
   },
-  mobile: {
+  android: {
     online: 'onlinecordovaexport',
+    offline: 'cordovaexport',
+    facebook: null,
+  },
+  ios: {
+    online: 'onlinecordovaiosexport',
     offline: 'cordovaexport',
     facebook: null,
   },
@@ -109,8 +115,7 @@ const ShareDialog = ({
   fileMetadata,
   storageProvider,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     setShareDialogDefaultTab,
     getShareDialogDefaultTab,
@@ -264,22 +269,14 @@ const ShareDialog = ({
               key="tutorial"
               tutorialId="export-to-itch"
               label={
-                isMobileScreen ? (
-                  'Itch.io'
-                ) : (
-                  <Trans>How to export to Itch.io</Trans>
-                )
+                isMobile ? 'Itch.io' : <Trans>How to export to Itch.io</Trans>
               }
             />
           ) : null,
           <TextButton
             key="exports"
             label={
-              isMobileScreen ? (
-                <Trans>Exports</Trans>
-              ) : (
-                <Trans>See all exports</Trans>
-              )
+              isMobile ? <Trans>Exports</Trans> : <Trans>See all exports</Trans>
             }
             onClick={openBuildDialog}
             disabled={isNavigationDisabled || !isOnline}

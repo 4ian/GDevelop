@@ -178,6 +178,7 @@ export default class InstancesEditor extends Component<Props> {
       const threeRenderer = new THREE.WebGLRenderer({
         canvas: gameCanvas,
       });
+      threeRenderer.useLegacyLights = true;
       threeRenderer.autoClear = false;
       threeRenderer.setSize(this.props.width, this.props.height);
 
@@ -290,7 +291,10 @@ export default class InstancesEditor extends Component<Props> {
     );
     panable(this.backgroundArea);
     this.backgroundArea.addEventListener('mousedown', event =>
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y, event)
+      this._onDownBackground(event.data.global.x, event.data.global.y, event)
+    );
+    this.backgroundArea.addEventListener('mouseup', event =>
+      this._onUpBackground(event.data.global.x, event.data.global.y, event)
     );
     this.backgroundArea.addEventListener(
       'rightclick',
@@ -314,7 +318,14 @@ export default class InstancesEditor extends Component<Props> {
         return;
       }
 
-      this._onBackgroundClicked(event.data.global.x, event.data.global.y);
+      this._onDownBackground(event.data.global.x, event.data.global.y);
+    });
+    this.backgroundArea.addEventListener('touchend', event => {
+      if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+        return;
+      }
+
+      this._onUpBackground(event.data.global.x, event.data.global.y);
     });
     this.backgroundArea.addEventListener('globalmousemove', event => {
       const cursorX = event.data.global.x || 0;
@@ -417,6 +428,7 @@ export default class InstancesEditor extends Component<Props> {
       onMoveInstance: this._onMoveInstance,
       onMoveInstanceEnd: this._onMoveInstanceEnd,
       onDownInstance: this._onDownInstance,
+      onUpInstance: this._onUpInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
       onInstanceRightClicked: this._onInstanceRightClicked,
@@ -652,7 +664,7 @@ export default class InstancesEditor extends Component<Props> {
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x: number, y: number, event?: PointerEvent) => {
+  _onDownBackground = (x: number, y: number, event?: PointerEvent) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
@@ -691,8 +703,12 @@ export default class InstancesEditor extends Component<Props> {
       const sceneDeltaY = deltaY / this.getZoomFactor();
 
       this.scrollBy(-sceneDeltaX, -sceneDeltaY);
-    } else {
+      return;
+    }
+
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
       this.selectionRectangle.updateSelectionRectangle(x, y);
+      return;
     }
   };
 
@@ -707,20 +723,30 @@ export default class InstancesEditor extends Component<Props> {
     return layersLocks;
   };
 
+  _onUpBackground = (x: number, y: number, event?: PointerEvent) => {
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+      this._selectInstanceInsideSelectionRectangle();
+    }
+  };
+
   _onPanEnd = () => {
     // When a pan is ended, this can be that either the user was making
     // a selection, or that the user was moving the view.
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
-      let instancesSelected = this.selectionRectangle.endSelectionRectangle();
-
-      this.props.instancesSelection.selectInstances({
-        instances: instancesSelected,
-        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
-        layersLocks: this._getLayersLocks(),
-      });
-      instancesSelected = this.props.instancesSelection.getSelectedInstances();
-      this.props.onInstancesSelected(instancesSelected);
+      this._selectInstanceInsideSelectionRectangle();
     }
+  };
+
+  _selectInstanceInsideSelectionRectangle = () => {
+    let instancesSelected = this.selectionRectangle.endSelectionRectangle();
+
+    this.props.instancesSelection.selectInstances({
+      instances: instancesSelected,
+      multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+      layersLocks: this._getLayersLocks(),
+    });
+    instancesSelected = this.props.instancesSelection.getSelectedInstances();
+    this.props.onInstancesSelected(instancesSelected);
   };
 
   _onInstanceClicked = (instance: gdInitialInstance) => {
@@ -777,25 +803,43 @@ export default class InstancesEditor extends Component<Props> {
     sceneY: number
   ) => {
     this.fpsLimiter.notifyInteractionHappened();
+
+    this.hasCursorMovedSinceItIsDown = false;
+
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
       // it's just the beginning of the user panning the view.
       return;
     }
 
+    if (
+      this.keyboardShortcuts.shouldStartRectangleSelectionInsteadOfSelecting()
+    ) {
+      const canvasPosition = this.viewPosition.toCanvasCoordinates(
+        sceneX,
+        sceneY
+      );
+      this.selectionRectangle.startSelectionRectangle(
+        canvasPosition[0],
+        canvasPosition[1]
+      );
+      return;
+    }
+
+    // MultiSelect is not done here because it's the same modifier as
+    // shouldStartRectangleSelectionInsteadOfSelecting.
+    // It's done in _onUpInstance instead.
     this.props.instancesSelection.selectInstance({
       instance,
       multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
       layersLocks: this._getLayersLocks(),
     });
-
     if (this.props.onInstancesSelected) {
       this.props.onInstancesSelected(
         this.props.instancesSelection.getSelectedInstances()
       );
     }
 
-    this.hasCursorMovedSinceItIsDown = false;
     this.instancesMover.startMove(sceneX, sceneY);
   };
 
@@ -804,26 +848,44 @@ export default class InstancesEditor extends Component<Props> {
       this.highlightedInstance.setInstance(null);
   };
 
+  _onUpInstance = (
+    instance: gdInitialInstance,
+    sceneX: number,
+    sceneY: number
+  ) => {
+    // Select instances on a click.
+    // - In case of standard selection, it's already done in _onDownInstance
+    // but selecting the same instance twice has no side effect on the
+    // selection.
+    // - For MultiSelect, the selection is not done in _onDownInstance.
+    if (!this.hasCursorMovedSinceItIsDown) {
+      this.props.instancesSelection.selectInstance({
+        instance,
+        multiSelect: this.keyboardShortcuts.shouldMultiSelect(),
+        layersLocks: this._getLayersLocks(),
+      });
+      if (this.props.onInstancesSelected) {
+        this.props.onInstancesSelected(
+          this.props.instancesSelection.getSelectedInstances()
+        );
+      }
+
+      if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+        this._selectInstanceInsideSelectionRectangle();
+      }
+    }
+  };
+
   _onMoveInstance = (
     instance: gdInitialInstance,
     deltaX: number,
     deltaY: number
   ) => {
     this.fpsLimiter.notifyInteractionHappened();
-    if (
-      !this.hasCursorMovedSinceItIsDown &&
-      this.keyboardShortcuts.shouldCloneInstances()
-    ) {
-      this.hasCursorMovedSinceItIsDown = true;
 
-      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-      for (var i = 0; i < selectedInstances.length; i++) {
-        const instance = selectedInstances[i];
-        this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-      }
-    }
+    const isMovingForTheFirstTimeSinceItIsDown = !this
+      .hasCursorMovedSinceItIsDown;
+    this.hasCursorMovedSinceItIsDown = true;
 
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
@@ -834,6 +896,30 @@ export default class InstancesEditor extends Component<Props> {
     if (this.keyboardShortcuts.shouldMoveView()) {
       this.scrollBy(-sceneDeltaX, -sceneDeltaY);
       return;
+    }
+
+    if (
+      this.selectionRectangle.hasStartedSelectionRectangle() &&
+      this.selectionRectangle.selectionRectangleEnd
+    ) {
+      this.selectionRectangle.updateSelectionRectangle(
+        this.selectionRectangle.selectionRectangleEnd.x + deltaX,
+        this.selectionRectangle.selectionRectangleEnd.y + deltaY
+      );
+      return;
+    }
+
+    if (
+      this.keyboardShortcuts.shouldCloneInstances() &&
+      isMovingForTheFirstTimeSinceItIsDown
+    ) {
+      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+      for (let i = 0; i < selectedInstances.length; i++) {
+        const instance = selectedInstances[i];
+        this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+      }
     }
 
     if (!this.props.instancesSelection.isInstanceSelected(instance)) {
@@ -851,6 +937,15 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onMoveInstanceEnd = () => {
+    if (!this.hasCursorMovedSinceItIsDown) {
+      return;
+    }
+
+    if (this.selectionRectangle.hasStartedSelectionRectangle()) {
+      this._selectInstanceInsideSelectionRectangle();
+      return;
+    }
+
     this.instancesMover.endMove();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();

@@ -1,13 +1,5 @@
 // @flow
-import axios from 'axios';
-import {
-  GDevelopAuthorizationWebSocketApi,
-  GDevelopAuthorizationApi,
-} from './ApiConfigs';
-
-export const FEATURE_FLAG_SSO_LOGIN = false;
-
-const apiClient = axios.create({ baseURL: GDevelopAuthorizationApi.baseUrl });
+import { GDevelopAuthorizationWebSocketApi } from './ApiConfigs';
 
 let webSocket: ?WebSocket;
 
@@ -15,12 +7,18 @@ export const setupAuthenticationWebSocket = ({
   onConnectionEstablished,
   onTokenReceived,
   onError,
+  onTimeout,
 }: {|
   onConnectionEstablished: (connectionId: string) => void,
-  onTokenReceived: (token: string) => Promise<void>,
+  onTokenReceived: ({|
+    provider: 'apple' | 'google' | 'github',
+    data: any,
+  |}) => Promise<void>,
   onError: Error => void,
+  onTimeout: () => void,
 |}) => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
+  const timeoutId = setTimeout(onTimeout, 10000);
   webSocket.onopen = () => {
     console.info('WebSocket - Open.');
     if (webSocket) {
@@ -29,9 +27,11 @@ export const setupAuthenticationWebSocket = ({
   };
   webSocket.onclose = () => {
     console.info('WebSocket - Closed.');
+    clearTimeout(timeoutId);
   };
   webSocket.onerror = event => {
     console.error('WebSocket - Error:', event);
+    clearTimeout(timeoutId);
     onError(event);
   };
 
@@ -46,11 +46,7 @@ export const setupAuthenticationWebSocket = ({
       const messageContent = JSON.parse(event.data);
       if (messageContent.type === 'authenticationResult') {
         const messageData = messageContent.data;
-        const token = messageData.token;
-        if (!token) {
-          console.error('WebSocket - No token received.');
-        }
-        onTokenReceived(token);
+        onTokenReceived(messageData);
         return;
       }
       if (messageContent.type === 'connectionId') {
@@ -60,6 +56,7 @@ export const setupAuthenticationWebSocket = ({
           console.error('WebSocket - No connectionId received.');
           return;
         }
+        clearTimeout(timeoutId);
         onConnectionEstablished(connectionId);
         return;
       }
@@ -73,23 +70,4 @@ export const terminateWebSocket = () => {
     webSocket.close();
     webSocket = null;
   }
-};
-
-export const generateCustomToken = async (
-  userId: string,
-  getAuthorizationHeader: () => string,
-  options: {|
-    connectionId: string,
-  |}
-): Promise<?void> => {
-  const authorizationHeader = await getAuthorizationHeader();
-  const response = await apiClient.post(
-    '/action/generate-custom-token',
-    options,
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
-  return response.data;
 };

@@ -39,24 +39,17 @@ public:
    * \param object The object to serialize as an asset.
    * \param objectFullName The object name with spaces instead of PascalCase.
    * \param element The element where the asset is serialize.
-   * \param resourcesFileNameMap The map from project resource file paths to
-   * asset resource file paths.
+   * \param usedResourceNames Return the names of the resources used by the asset.
    */
   static void
   SerializeTo(gd::Project &project, const gd::Object &object,
               const gd::String &objectFullName, SerializerElement &element,
-              std::map<gd::String, gd::String> &resourcesFileNameMap);
+              std::vector<gd::String> &usedResourceNames);
 
   ~ObjectAssetSerializer(){};
 
 private:
   ObjectAssetSerializer(){};
-
-  static void RenameObjectResourceFiles(
-      gd::Project &project, gd::Object &object,
-      const gd::String &destinationDirectory, const gd::String &objectFullName,
-      std::map<gd::String, gd::String> &resourcesFileNameMap,
-      std::map<gd::String, gd::String> &resourcesNameReverseMap);
 
   static gd::String GetObjectExtensionName(const gd::Object &object);
 };

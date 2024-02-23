@@ -31,25 +31,33 @@ const CurrentUsageDisplayer = ({
   const remainingBuilds = Math.max(quota.max - quota.current, 0);
   const remainingMultipleMessage = (
     <Trans>
-      You have {remainingBuilds} builds remaining (You have used {quota.current}
-      /{quota.max} in the last 24h).
+      You have {remainingBuilds} builds remaining (you have used {quota.current}{' '}
+      out of {quota.max} in the last 24h).
     </Trans>
   );
   const remainingSingleMessage = (
     <Trans>
-      You have {remainingBuilds} build remaining (You have used {quota.current}/
-      {quota.max} in the last 24h).
+      You have {remainingBuilds} build remaining (you have used {quota.current}{' '}
+      out of {quota.max} in the last 24h).
     </Trans>
   );
-
   return (
     <ColumnStackLayout noMargin>
-      <AlertMessage kind="info">
-        {remainingBuilds === 1
-          ? remainingSingleMessage
-          : remainingMultipleMessage}
-      </AlertMessage>
-      {hasSubscription && quota.limitReached && (
+      {quota.max === 0 && (
+        <GetSubscriptionCard subscriptionDialogOpeningReason="Unlock build type">
+          <Text>
+            <Trans>Get a subscription to unlock this packaging.</Trans>
+          </Text>
+        </GetSubscriptionCard>
+      )}
+      {quota.max !== 0 && (
+        <AlertMessage kind="info">
+          {remainingBuilds === 1
+            ? remainingSingleMessage
+            : remainingMultipleMessage}
+        </AlertMessage>
+      )}
+      {quota.max !== 0 && hasSubscription && quota.limitReached && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
           <Text>
             <Trans>
@@ -59,7 +67,7 @@ const CurrentUsageDisplayer = ({
           </Text>
         </GetSubscriptionCard>
       )}
-      {loadedButHasNoSubscription && (
+      {quota.max !== 0 && loadedButHasNoSubscription && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
           <Text>
             <Trans>

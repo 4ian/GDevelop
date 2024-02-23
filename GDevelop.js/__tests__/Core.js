@@ -3277,6 +3277,7 @@ describe('libGD.js', function () {
           'License of test extension'
         );
         const dummyBehavior = new gd.BehaviorJsImplementation();
+        dummyBehavior.initializeContent = function (behaviorContent) {};
         const behaviorMetadata = extension.addBehavior(
           'DummyBehavior',
           'Dummy behavior for testing',

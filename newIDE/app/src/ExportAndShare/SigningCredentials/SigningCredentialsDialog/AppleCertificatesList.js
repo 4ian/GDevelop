@@ -7,6 +7,7 @@ import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContex
 import {
   type SigningCredential,
   filterAppleCertificateSigningCredentials,
+  signingCredentialApi,
 } from '../../../Utils/GDevelopServices/Build';
 import PlaceholderError from '../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
@@ -27,6 +28,7 @@ import CheckCircle from '../../../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import CircledInfo from '../../../UI/CustomSvgIcons/CircledInfo';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 
 type Props = {
   signingCredentials: Array<SigningCredential> | null,
@@ -105,7 +107,31 @@ export const AppleCertificatesList = ({
                           });
                           if (!answer) return;
                         }
-                        // TODO
+
+                        try {
+                          const userId = authenticatedUser.profile
+                            ? authenticatedUser.profile.id
+                            : null;
+                          if (!userId) {
+                            return;
+                          }
+
+                          await signingCredentialApi.deleteSigningCredential(
+                            authenticatedUser.getAuthorizationHeader,
+                            userId,
+                            {
+                              type: 'apple-certificate',
+                              certificateSerial:
+                                signingCredential.certificateSerial,
+                            }
+                          );
+                          onRefreshSigningCredentials();
+                        } catch (err) {
+                          console.error(
+                            'Unable to delete the certificate',
+                            err
+                          );
+                        }
                       },
                     },
                   ]}

@@ -584,4 +584,31 @@ export const signingCredentialApi = {
 
     return response.data;
   },
+  deleteSigningCredential: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      type: string,
+      appleApiKey?: string,
+      certificateSerial?: string,
+      mobileProvisionUuid?: string,
+    |}
+  ): Promise<void> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.delete(
+      `${GDevelopBuildApi.baseUrl}/signing-credential`,
+      {
+        params: {
+          userId,
+          ...options,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
 };

@@ -7,6 +7,7 @@ import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContex
 import {
   type SigningCredential,
   filterAppleAuthKeySigningCredentials,
+  signingCredentialApi,
 } from '../../../Utils/GDevelopServices/Build';
 import PlaceholderError from '../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
@@ -90,7 +91,26 @@ export const AppleAuthKeysList = ({
                     {
                       label: i18n._(t`Remove this Auth Key`),
                       click: async () => {
-                        // TODO
+                        const userId = authenticatedUser.profile
+                          ? authenticatedUser.profile.id
+                          : null;
+                        if (!userId) {
+                          return;
+                        }
+
+                        try {
+                          await signingCredentialApi.deleteSigningCredential(
+                            authenticatedUser.getAuthorizationHeader,
+                            userId,
+                            {
+                              type: 'apple-auth-key',
+                              appleApiKey: signingCredential.apiKey,
+                            }
+                          );
+                          onRefreshSigningCredentials();
+                        } catch (err) {
+                          console.error('Unable to delete the auth key', err);
+                        }
                       },
                     },
                   ]}

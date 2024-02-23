@@ -7,7 +7,10 @@ import {
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type Release } from '../../Utils/GDevelopServices/Release';
-import { type Build } from '../../Utils/GDevelopServices/Build';
+import {
+  type Build,
+  type SigningCredential,
+} from '../../Utils/GDevelopServices/Build';
 import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 import {
   type ExtensionShortHeader,
@@ -2821,5 +2824,123 @@ export const fakePromotions: Promotion[] = [
     productId: '30933458-99e6-41b5-a5f6-5bb220e8754f',
     display: 'all',
     type: 'asset-pack',
+  },
+];
+
+export const mockSigningCredentials: Array<SigningCredential> = [
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 1',
+    certificateSerial: '12345',
+    hasCertificateReady: true,
+    kind: 'distribution',
+    provisioningProfiles: [
+      {
+        uuid: '12345678',
+        name: 'My provisioning profile',
+      },
+      {
+        uuid: '12345679',
+        name: 'My other provisioning profile',
+      },
+    ],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 1',
+    certificateSerial: '22345',
+    hasCertificateReady: true,
+    kind: 'development',
+    provisioningProfiles: [
+      {
+        uuid: '22345678',
+        name: 'My dev provisioning profile',
+      },
+      {
+        uuid: '22345679',
+        name: 'My other dev provisioning profile',
+      },
+    ],
+  },
+  // No provisioning profiles
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 2',
+    certificateSerial: '12346',
+    hasCertificateReady: true,
+    kind: 'distribution',
+    provisioningProfiles: [],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 2',
+    certificateSerial: '22346',
+    hasCertificateReady: true,
+    kind: 'development',
+    provisioningProfiles: [],
+  },
+  // Not ready
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 3',
+    certificateSerial: '12347',
+    hasCertificateReady: false,
+    kind: 'distribution',
+    provisioningProfiles: [
+      {
+        uuid: '12345678',
+        name: 'My provisioning profile',
+      },
+    ],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 3',
+    certificateSerial: '22347',
+    hasCertificateReady: false,
+    kind: 'development',
+    provisioningProfiles: [
+      {
+        uuid: '22345678',
+        name: 'My dev provisioning profile',
+      },
+    ],
+  },
+  // Unkown kind
+  {
+    type: 'apple-certificate',
+    name: 'Some unknown certificate 4',
+    certificateSerial: '12347',
+    hasCertificateReady: true,
+    kind: 'unknown',
+    provisioningProfiles: [
+      {
+        uuid: '12345610',
+        name: 'My yet other unknown provisioning profile',
+      },
+    ],
+  },
+
+  // Auth keys:
+  {
+    type: 'apple-auth-key',
+    name: 'Some Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE34',
+    hasAuthKeyReady: true,
+  },
+  {
+    type: 'apple-auth-key',
+    name: 'Some Not Ready Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE35',
+    hasAuthKeyReady: false,
+  },
+  {
+    type: 'apple-auth-key',
+    name: 'Some Other Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE36',
+    hasAuthKeyReady: true,
   },
 ];

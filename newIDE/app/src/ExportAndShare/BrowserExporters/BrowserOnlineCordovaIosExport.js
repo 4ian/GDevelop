@@ -4,15 +4,20 @@ import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
-  buildCordovaAndroid,
+  buildCordovaIos,
   getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
-import { uploadLocalFile } from './LocalFileUploader';
+import { uploadBlobFile } from './BrowserFileUploader';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
-import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import optionalRequire from '../../Utils/OptionalRequire';
-import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
+import { findGDJS } from '../../GameEngineFinder/BrowserS3GDJSFinder';
+import BrowserFileSystem from './BrowserFileSystem';
+import {
+  type UrlFileDescriptor,
+  type TextFileDescriptor,
+  type BlobFileDescriptor,
+  downloadUrlFilesToBlobFiles,
+  archiveFiles,
+} from '../../Utils/BrowserArchiver';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
@@ -20,50 +25,47 @@ import {
 import {
   type ExportState,
   SetupExportHeader,
-} from '../GenericExporters/OnlineCordovaExport';
-import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-const path = optionalRequire('path');
-const os = optionalRequire('os');
+} from '../GenericExporters/OnlineCordovaIosExport';
 const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
-  localFileSystem: LocalFileSystem,
-  temporaryOutputDir: string,
+  abstractFileSystem: BrowserFileSystem,
+  outputDir: string,
 |};
 
 type ExportOutput = {|
-  temporaryOutputDir: string,
+  textFiles: Array<TextFileDescriptor>,
   urlFiles: Array<UrlFileDescriptor>,
 |};
 
 type ResourcesDownloadOutput = {|
-  temporaryOutputDir: string,
+  textFiles: Array<TextFileDescriptor>,
+  blobFiles: Array<BlobFileDescriptor>,
 |};
 
-type CompressionOutput = string;
+type CompressionOutput = Blob;
 
-export const localOnlineCordovaExportPipeline: ExportPipeline<
+export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-cordova',
-  onlineBuildType: 'cordova-build',
+  name: 'browser-online-cordova-ios',
+  onlineBuildType: 'cordova-ios-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
 
   getInitialExportState: () => ({
-    targets: ['androidApk'],
-    keystore: 'new',
-    signingDialogOpen: false,
+    targets: ['iosAppStore'],
+    signing: null,
   }),
 
   // Build can be launched only if just opened the dialog or build errored.
   canLaunchBuild: (exportState, errored, exportStep) =>
-    errored || exportStep === '',
+    (errored || exportStep === '') && !!exportState.signing,
 
   // Navigation is enabled when the build is errored or whilst uploading.
   isNavigationDisabled: (exportStep, errored) =>
@@ -76,46 +78,39 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 
   shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Create package for iOS</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
   ): Promise<PreparedExporter> => {
-    return findGDJS().then(({ gdjsRoot }) => {
+    return findGDJS('cordova').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
-      const localFileSystem = new LocalFileSystem({
-        downloadUrlsToLocalFiles: true,
+      const outputDir = '/export/';
+      const abstractFileSystem = new BrowserFileSystem({
+        textFiles: filesContent,
       });
       const fileSystem = assignIn(
         new gd.AbstractFileSystemJS(),
-        localFileSystem
+        abstractFileSystem
       );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-      const temporaryOutputDir = path.join(
-        fileSystem.getTempDir(),
-        'OnlineCordovaExport'
-      );
-      fileSystem.mkDir(temporaryOutputDir);
-      fileSystem.clearDir(temporaryOutputDir);
 
       return {
         exporter,
-        localFileSystem,
-        temporaryOutputDir,
+        outputDir,
+        abstractFileSystem,
       };
     });
   },
 
-  launchExport: async (
+  launchExport: (
     context: ExportPipelineContext<ExportState>,
-    { exporter, localFileSystem, temporaryOutputDir }: PreparedExporter,
+    { exporter, outputDir, abstractFileSystem }: PreparedExporter,
     fallbackAuthor: ?{ id: string, username: string }
   ): Promise<ExportOutput> => {
-    const exportOptions = new gd.ExportOptions(
-      context.project,
-      temporaryOutputDir
-    );
+    const { project } = context;
+    const exportOptions = new gd.ExportOptions(project, outputDir);
     exportOptions.setTarget('cordova');
     if (fallbackAuthor) {
       exportOptions.setFallbackAuthor(
@@ -127,43 +122,44 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     exportOptions.delete();
     exporter.delete();
 
-    return {
-      temporaryOutputDir,
-      urlFiles: localFileSystem.getAllUrlFilesIn(temporaryOutputDir),
-    };
+    return Promise.resolve({
+      textFiles: abstractFileSystem.getAllTextFilesIn(outputDir),
+      urlFiles: abstractFileSystem.getAllUrlFilesIn(outputDir),
+    });
   },
 
-  launchResourcesDownload: async (
+  launchResourcesDownload: (
     context: ExportPipelineContext<ExportState>,
-    { temporaryOutputDir, urlFiles }: ExportOutput
+    { textFiles, urlFiles }: ExportOutput
   ): Promise<ResourcesDownloadOutput> => {
-    await downloadUrlsToLocalFiles({
-      urlContainers: urlFiles,
+    return downloadUrlFilesToBlobFiles({
+      urlFiles,
       onProgress: context.updateStepProgress,
-      throwIfAnyError: true,
-    });
-
-    return { temporaryOutputDir };
+    }).then(blobFiles => ({
+      blobFiles,
+      textFiles,
+    }));
   },
 
   launchCompression: (
     context: ExportPipelineContext<ExportState>,
-    { temporaryOutputDir }: ResourcesDownloadOutput
-  ): Promise<CompressionOutput> => {
-    const archiveOutputDir = os.tmpdir();
-    return archiveLocalFolder({
-      path: temporaryOutputDir,
-      outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
+    { textFiles, blobFiles }: ResourcesDownloadOutput
+  ): Promise<Blob> => {
+    return archiveFiles({
+      blobFiles,
+      textFiles,
+      basePath: '/export/',
+      onProgress: context.updateStepProgress,
     });
   },
 
   launchUpload: (
     context: ExportPipelineContext<ExportState>,
-    outputFile: CompressionOutput
+    blobFile: Blob
   ): Promise<string> => {
     return getBuildFileUploadOptions().then(uploadOptions => {
-      return uploadLocalFile(
-        outputFile,
+      return uploadBlobFile(
+        blobFile,
         uploadOptions,
         context.updateStepProgress
       ).then(() => uploadOptions.key);
@@ -180,16 +176,17 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
       gameVersion: string,
     |}
   ): Promise<Build> => {
-    const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-    if (!firebaseUser)
-      return Promise.reject(new Error('User is not authenticated'));
+    const { getAuthorizationHeader, profile } = authenticatedUser;
+    if (!profile) return Promise.reject(new Error('User is not authenticated'));
+    if (!exportState.signing)
+      return Promise.reject(new Error('Signing options not set up'));
 
-    return buildCordovaAndroid(
+    return buildCordovaIos(
       getAuthorizationHeader,
-      firebaseUser.uid,
+      profile.id,
       uploadBucketKey,
       exportState.targets,
-      exportState.keystore,
+      exportState.signing,
       gameId,
       options
     );

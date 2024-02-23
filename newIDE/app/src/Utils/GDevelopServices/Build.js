@@ -12,9 +12,15 @@ export type TargetName =
   | 'linuxAppImage'
   | 'androidApk'
   | 'androidAppBundle'
+  | 'iosAppStore'
+  | 'iosDevelopment'
   | 's3';
 
-export type BuildType = 'cordova-build' | 'electron-build' | 'web-build';
+export type BuildType =
+  | 'cordova-build'
+  | 'cordova-ios-build'
+  | 'electron-build'
+  | 'web-build';
 
 export type Build = {
   id: string,
@@ -31,6 +37,8 @@ export type Build = {
   macosZipKey?: string,
   linuxAppImageKey?: string,
   s3Key?: string,
+  iosAppStoreIpaKey?: string,
+  iosDevelopmentIpaKey?: string,
   status: 'pending' | 'complete' | 'error',
   type: BuildType,
   targets?: Array<TargetName>,
@@ -46,7 +54,62 @@ export type BuildArtifactKeyName =
   | 'macosZipKey'
   | 'linuxAppImageKey'
   | 's3Key'
+  | 'iosAppStoreIpaKey'
+  | 'iosDevelopmentIpaKey'
   | 'logsKey';
+
+export type BuildSigningOptions = {|
+  keystore?: string,
+  certificateSerial?: string,
+  mobileProvisionUuid?: string,
+  authKeyApiKey?: string,
+|};
+
+export type AppleCertificateSigningCredential = {
+  type: 'apple-certificate',
+  name: string,
+  certificateSerial: string,
+  hasCertificateReady: boolean,
+  kind: 'development' | 'distribution' | 'unknown',
+  provisioningProfiles: Array<{
+    uuid: string,
+    name: string,
+  }>,
+};
+
+export type AppleAuthKeySigningCredential = {
+  type: 'apple-auth-key',
+  name: string,
+  apiKey: string,
+  apiIssuer: string,
+  hasAuthKeyReady: boolean,
+};
+
+export type SigningCredential =
+  | AppleCertificateSigningCredential
+  | AppleAuthKeySigningCredential;
+
+export const filterAppleCertificateSigningCredentials = (
+  signingCredentials: Array<SigningCredential> | null
+): Array<AppleCertificateSigningCredential> | null => {
+  return signingCredentials
+    ? // $FlowFixMe - we're sure this should refine the type.
+      signingCredentials.filter(
+        signingCredential => signingCredential.type === 'apple-certificate'
+      )
+    : null;
+};
+
+export const filterAppleAuthKeySigningCredentials = (
+  signingCredentials: Array<SigningCredential> | null
+): Array<AppleAuthKeySigningCredential> | null => {
+  return signingCredentials
+    ? // $FlowFixMe - we're sure this should refine the type.
+      signingCredentials.filter(
+        signingCredential => signingCredential.type === 'apple-auth-key'
+      )
+    : null;
+};
 
 export const getBuildExtensionlessFilename = ({
   gameName,
@@ -235,6 +298,43 @@ export const buildCordovaAndroid = (
     .then(response => response.data);
 };
 
+export const buildCordovaIos = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  key: string,
+  targets: Array<TargetName>,
+  signing: BuildSigningOptions,
+  gameId: string,
+  options: {|
+    gameName: string,
+    gameVersion: string,
+  |}
+): Promise<Build> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopBuildApi.baseUrl}/build`,
+        {
+          signing,
+        },
+        {
+          params: {
+            userId,
+            key,
+            type: 'cordova-ios-build',
+            targets: targets.join(','),
+            gameId,
+            filename: getBuildExtensionlessFilename(options),
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
 export const getBuild = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -315,4 +415,200 @@ export const deleteBuild = (
       })
     )
     .then(response => response.data);
+};
+
+export const getUserSigningCredentials = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<SigningCredential>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await axios.get(
+    `${GDevelopBuildApi.baseUrl}/signing-credential`,
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  if (!response.data || !Array.isArray(response.data))
+    throw new Error('Unexpected data returned by the endpoint.');
+
+  return response.data;
+};
+
+export const signingCredentialApi = {
+  createCertificateSigningRequest: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      commonName: string,
+      countryName: string,
+    |}
+  ): Promise<{ certificateRequestUuid: string, csrPem: string }> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.post(
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/create-csr`,
+      {
+        ...options,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  uploadCertificate: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      certificateAsBase64: string,
+    |}
+  ): Promise<{ certificateSerial: string, certificateKind: string }> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.post(
+      `${
+        GDevelopBuildApi.baseUrl
+      }/signing-credential/action/upload-certificate`,
+      {
+        ...options,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  createCertificateP12: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      certificateKind: string,
+      certificateSerial: string,
+      certificateRequestUuid: string,
+    |}
+  ): Promise<{ certificateSerial: string }> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.post(
+      `${
+        GDevelopBuildApi.baseUrl
+      }/signing-credential/action/create-certificate-p12`,
+      {
+        ...options,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  uploadMobileProvision: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      mobileProvisionAsBase64: string,
+    |}
+  ): Promise<{ uuid: string, name: string, certificatesCount: number }> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.post(
+      `${
+        GDevelopBuildApi.baseUrl
+      }/signing-credential/action/upload-mobile-provision`,
+      {
+        ...options,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  uploadAuthKey: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      name: string,
+      appleApiKey: string,
+      appleApiIssuer: string,
+      appleAuthKeyP8AsBase64: string,
+    |}
+  ): Promise<{}> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.post(
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/upload-auth-key`,
+      {
+        ...options,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
+  deleteSigningCredential: async (
+    getAuthorizationHeader: () => Promise<string>,
+    userId: string,
+    options: {|
+      type: string,
+      appleApiKey?: string,
+      certificateSerial?: string,
+      mobileProvisionUuid?: string,
+    |}
+  ): Promise<void> => {
+    const authorizationHeader = await getAuthorizationHeader();
+
+    const response = await axios.delete(
+      `${GDevelopBuildApi.baseUrl}/signing-credential`,
+      {
+        params: {
+          userId,
+          ...options,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+
+    return response.data;
+  },
 };

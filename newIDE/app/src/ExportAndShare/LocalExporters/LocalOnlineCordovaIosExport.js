@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
-  buildCordovaAndroid,
+  buildCordovaIos,
   getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
 import { uploadLocalFile } from './LocalFileUploader';
@@ -20,7 +20,7 @@ import {
 import {
   type ExportState,
   SetupExportHeader,
-} from '../GenericExporters/OnlineCordovaExport';
+} from '../GenericExporters/OnlineCordovaIosExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -43,27 +43,26 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
-export const localOnlineCordovaExportPipeline: ExportPipeline<
+export const localOnlineCordovaIosExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-cordova',
-  onlineBuildType: 'cordova-build',
+  name: 'local-online-cordova-ios',
+  onlineBuildType: 'cordova-ios-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
 
   getInitialExportState: () => ({
-    targets: ['androidApk'],
-    keystore: 'new',
-    signingDialogOpen: false,
+    targets: ['iosAppStore'],
+    signing: null,
   }),
 
   // Build can be launched only if just opened the dialog or build errored.
   canLaunchBuild: (exportState, errored, exportStep) =>
-    errored || exportStep === '',
+    (errored || exportStep === '') && !!exportState.signing,
 
   // Navigation is enabled when the build is errored or whilst uploading.
   isNavigationDisabled: (exportStep, errored) =>
@@ -76,7 +75,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 
   shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Create package for iOS</Trans>,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -180,16 +179,17 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
       gameVersion: string,
     |}
   ): Promise<Build> => {
-    const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-    if (!firebaseUser)
-      return Promise.reject(new Error('User is not authenticated'));
+    const { getAuthorizationHeader, profile } = authenticatedUser;
+    if (!profile) return Promise.reject(new Error('User is not authenticated'));
+    if (!exportState.signing)
+      return Promise.reject(new Error('Signing options not set up'));
 
-    return buildCordovaAndroid(
+    return buildCordovaIos(
       getAuthorizationHeader,
-      firebaseUser.uid,
+      profile.id,
       uploadBucketKey,
       exportState.targets,
-      exportState.keystore,
+      exportState.signing,
       gameId,
       options
     );

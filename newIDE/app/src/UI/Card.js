@@ -11,9 +11,11 @@ const styles = {
   headerContainer: {
     minWidth: 0,
     flex: 1,
+    display: 'flex',
+    alignItems: 'center',
   },
   cardContent: {
-    paddingBottom: 32,
+    paddingBottom: 18,
     paddingTop: 0,
     minWidth: 0,
   },
@@ -61,8 +63,8 @@ const Card = ({
           <div
             style={{
               ...styles.headerContainer,
-              paddingLeft: isMobile ? 8 : 32,
-              paddingRight: cardCornerAction ? (isMobile ? 8 : 32) : 0,
+              paddingLeft: isMobile ? 8 : 24,
+              paddingRight: cardCornerAction ? (isMobile ? 8 : 24) : 0,
             }}
           >
             {header}
@@ -72,8 +74,8 @@ const Card = ({
         <CardContent
           style={{
             ...styles.cardContent,
-            paddingRight: isMobile ? 8 : 32,
-            paddingLeft: isMobile ? 8 : 32,
+            paddingRight: isMobile ? 8 : 24,
+            paddingLeft: isMobile ? 8 : 24,
           }}
         >
           {children}

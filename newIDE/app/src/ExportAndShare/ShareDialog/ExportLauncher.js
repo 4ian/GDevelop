@@ -37,6 +37,8 @@ import {
 } from '../../Utils/GDevelopServices/Badge';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import inc from 'semver/functions/inc';
+import Toggle from '../../UI/Toggle';
 
 type State = {|
   exportStep: BuildStep,
@@ -45,6 +47,7 @@ type State = {|
   stepCurrentProgress: number,
   stepMaxProgress: number,
   errored: boolean,
+  shouldBumpVersionNumber: boolean,
   exportState: any,
   doneFooterOpen: boolean,
 |};
@@ -62,6 +65,10 @@ type Props = {|
   game: ?Game,
 |};
 
+const getIncrementedVersionNumber = (project: gdProject) => {
+  return inc(project.getVersion(), 'patch', { loose: true });
+};
+
 /**
  * A generic UI to launch, monitor the progress and get the result
  * of an export.
@@ -75,10 +82,12 @@ export default class ExportLauncher extends Component<Props, State> {
     stepMaxProgress: 0,
     doneFooterOpen: false,
     errored: false,
+    shouldBumpVersionNumber: true,
     exportState: this.props.exportPipeline.getInitialExportState(
       this.props.project
     ),
   };
+  _candidateBumpedVersionNumber = '';
   buildsWatcher = new BuildsWatcher();
   launchWholeExport: (i18n: I18nType) => Promise<void>;
 
@@ -95,6 +104,10 @@ export default class ExportLauncher extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this._setupAchievementHook();
+
+    this._candidateBumpedVersionNumber = getIncrementedVersionNumber(
+      props.project
+    );
   }
   componentDidUpdate(prevProps: Props, prevState: State) {
     this._setupAchievementHook();
@@ -314,6 +327,17 @@ export default class ExportLauncher extends Component<Props, State> {
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
       };
+
+      if (
+        exportPipeline.shouldSuggestBumpingVersionNumber &&
+        exportPipeline.shouldSuggestBumpingVersionNumber({
+          exportState: this.state.exportState,
+        }) &&
+        this.state.shouldBumpVersionNumber
+      ) {
+        project.setVersion(this._candidateBumpedVersionNumber);
+      }
+
       setStep('export');
       this.setState({
         stepCurrentProgress: 0,
@@ -455,11 +479,34 @@ export default class ExportLauncher extends Component<Props, State> {
             <Line alignItems="center" justifyContent="center">
               {exportPipeline.renderHeader({
                 project,
+                authenticatedUser,
                 exportState,
                 updateExportState: this._updateExportState,
                 game: this.props.game,
               })}
             </Line>
+            {exportPipeline.shouldSuggestBumpingVersionNumber &&
+              exportPipeline.shouldSuggestBumpingVersionNumber({
+                exportState,
+              }) && (
+                <Line noMargin>
+                  <Toggle
+                    labelPosition="right"
+                    toggled={this.state.shouldBumpVersionNumber}
+                    label={
+                      <Trans>
+                        Increase version number to{' '}
+                        {this._candidateBumpedVersionNumber}
+                      </Trans>
+                    }
+                    onToggle={(e, toggled) => {
+                      this.setState({
+                        shouldBumpVersionNumber: toggled,
+                      });
+                    }}
+                  />
+                </Line>
+              )}
             {(!exportPipeline.onlineBuildType ||
               authenticatedUser.authenticated) && (
               <Line justifyContent="center">

@@ -22,12 +22,13 @@ import ErrorBoundary from '../../UI/ErrorBoundary';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 export type ShareTab = 'invite' | 'publish';
-export type ExporterSection = 'browser' | 'desktop' | 'mobile';
+export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
 export type ExporterSubSection = 'online' | 'offline' | 'facebook';
 export type ExporterKey =
   | 'onlinewebexport'
   | 'onlineelectronexport'
   | 'onlinecordovaexport'
+  | 'onlinecordovaiosexport'
   | 'webexport'
   | 'facebookinstantgamesexport'
   | 'electronexport'
@@ -46,8 +47,13 @@ const exporterSectionMapping: {
     offline: 'electronexport',
     facebook: null,
   },
-  mobile: {
+  android: {
     online: 'onlinecordovaexport',
+    offline: 'cordovaexport',
+    facebook: null,
+  },
+  ios: {
+    online: 'onlinecordovaiosexport',
     offline: 'cordovaexport',
     facebook: null,
   },

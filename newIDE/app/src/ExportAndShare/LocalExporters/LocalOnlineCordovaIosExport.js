@@ -57,7 +57,7 @@ export const localOnlineCordovaIosExportPipeline: ExportPipeline<
 
   getInitialExportState: () => ({
     targets: ['iosAppStore'],
-    signing: null, // TODO: Do something to load last value
+    signing: null,
   }),
 
   // Build can be launched only if just opened the dialog or build errored.

@@ -28,7 +28,6 @@ import CheckCircle from '../../../UI/CustomSvgIcons/CheckCircle';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import CircledInfo from '../../../UI/CustomSvgIcons/CircledInfo';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
-import { showErrorBox } from '../../../UI/Messages/MessageBox';
 
 type Props = {
   signingCredentials: Array<SigningCredential> | null,

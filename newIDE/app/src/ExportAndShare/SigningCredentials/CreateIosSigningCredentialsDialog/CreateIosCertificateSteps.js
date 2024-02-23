@@ -17,6 +17,7 @@ import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import { type AuthenticatedUser } from '../../../Profile/AuthenticatedUserContext';
 import { signingCredentialApi } from '../../../Utils/GDevelopServices/Build';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 
 export const getBase64FromFile = async (file: File) => {
   return new Promise((resolve, reject) => {
@@ -57,6 +58,8 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
     ? authenticatedUser.profile.id
     : null;
 
+  const [commonName, setCommonName] = React.useState('');
+  const [countryName, setCountryName] = React.useState('');
   const [certificateRequestUuid, setCertificateRequestUuid] = React.useState(
     ''
   );
@@ -84,8 +87,8 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
           authenticatedUser.getAuthorizationHeader,
           userId,
           {
-            commonName: 'TODO',
-            countryName: 'TODO',
+            commonName: commonName || 'Unspecified',
+            countryName: countryName || 'US',
           }
         );
         setCertificateRequestUuid(certificateRequestUuid);
@@ -230,6 +233,23 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
         allowParagraphs
         translatableSource={t`Create a certificate signing request that will be asked by Apple to generate a full certificate.`}
       />
+
+      <LineStackLayout noMargin>
+        <SemiControlledTextField
+          fullWidth
+          floatingLabelText={<Trans>Company name or full name</Trans>}
+          value={commonName}
+          onChange={text => setCommonName(text)}
+          maxLength={64}
+        />
+        <SemiControlledTextField
+          fullWidth
+          floatingLabelText={<Trans>Country name</Trans>}
+          value={countryName}
+          onChange={text => setCountryName(text)}
+          maxLength={64}
+        />
+      </LineStackLayout>
 
       <LineStackLayout noMargin justifyContent="flex-end">
         <LeftLoader isLoading={isCertificateSigningRequestLoading}>

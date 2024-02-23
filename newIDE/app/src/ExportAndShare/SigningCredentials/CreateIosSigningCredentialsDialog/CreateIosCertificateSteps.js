@@ -103,7 +103,7 @@ export const CreateIosCertificateSteps = ({ authenticatedUser }: Props) => {
         setIsCertificateSigningRequestLoading(false);
       }
     },
-    [authenticatedUser.getAuthorizationHeader, userId]
+    [authenticatedUser.getAuthorizationHeader, userId, commonName, countryName]
   );
 
   const [wasCertificateGenerated, setWasCertificateGenerated] = React.useState(

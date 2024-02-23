@@ -2834,35 +2834,33 @@ export function asJsCodeEvent(obj: EmscriptenObject): JsCodeEvent;
 
 export function asPlatform(obj: EmscriptenObject): Platform;
 
-export function asSpriteConfiguration(obj: EmscriptenObject): SpriteConfiguration;
+export function asSpriteConfiguration(obj: EmscriptenObject): SpriteObject;
 
-export function asTiledSpriteConfiguration(obj: EmscriptenObject): TiledSpriteConfiguration;
+export function asTiledSpriteConfiguration(obj: EmscriptenObject): TiledSpriteObject;
 
-export function asPanelSpriteConfiguration(obj: EmscriptenObject): PanelSpriteConfiguration;
+export function asPanelSpriteConfiguration(obj: EmscriptenObject): PanelSpriteObject;
 
-export function asTextObjectConfiguration(obj: EmscriptenObject): TextObjectConfiguration;
+export function asTextObjectConfiguration(obj: EmscriptenObject): TextObject;
 
-export function asShapePainterConfiguration(obj: EmscriptenObject): ShapePainterConfiguration;
-
-export function asAdMobConfiguration(obj: EmscriptenObject): AdMobConfiguration;
+export function asShapePainterConfiguration(obj: EmscriptenObject): ShapePainterObject;
 
 export function asTextEntryObject(obj: EmscriptenObject): TextEntryObject;
 
-export function asParticleEmitterConfiguration(obj: EmscriptenObject): ParticleEmitterConfiguration;
+export function asParticleEmitterConfiguration(obj: EmscriptenObject): ParticleEmitterObject;
 
 export function asObjectJsImplementation(obj: EmscriptenObject): ObjectJsImplementation;
 
 export function asCustomObjectConfiguration(obj: EmscriptenObject): CustomObjectConfiguration;
 
-export function asModel3DConfiguration(obj: EmscriptenObject): Model3DConfiguration;
+export function asModel3DConfiguration(obj: EmscriptenObject): Model3DObjectConfiguration;
 
-export function asSpineConfiguration(obj: EmscriptenObject): SpineConfiguration;
+export function asSpineConfiguration(obj: EmscriptenObject): SpineObjectConfiguration;
 
 export function asImageResource(obj: EmscriptenObject): ImageResource;
 
 
-export const Object = gd.gdObject;
-export const initializePlatforms = gd.ProjectHelper.prototype.initializePlatforms;
+export const Object: typeof gd.gdObject;
+export const initializePlatforms: typeof gd.ProjectHelper.initializePlatforms;
 
 export as namespace gd;
 

@@ -9,33 +9,32 @@ const bindingsFile = readFileSync(
   'utf-8'
 );
 
-const castFunctions = [
-  'StandardEvent',
-  'RepeatEvent',
-  'WhileEvent',
-  'ForEachEvent',
-  'ForEachChildVariableEvent',
-  'CommentEvent',
-  'GroupEvent',
-  'LinkEvent',
-  'JsCodeEvent',
-  'Platform',
+const castFunctions = {
+  StandardEvent: 'StandardEvent',
+  RepeatEvent: 'RepeatEvent',
+  WhileEvent: 'WhileEvent',
+  ForEachEvent: 'ForEachEvent',
+  ForEachChildVariableEvent: 'ForEachChildVariableEvent',
+  CommentEvent: 'CommentEvent',
+  GroupEvent: 'GroupEvent',
+  LinkEvent: 'LinkEvent',
+  JsCodeEvent: 'JsCodeEvent',
+  Platform: 'Platform',
 
-  'SpriteConfiguration',
-  'TiledSpriteConfiguration',
-  'PanelSpriteConfiguration',
-  'TextObjectConfiguration',
-  'ShapePainterConfiguration',
-  'AdMobConfiguration',
-  'TextEntryObject',
-  'ParticleEmitterConfiguration',
-  'ObjectJsImplementation',
-  'CustomObjectConfiguration',
-  'Model3DConfiguration',
-  'SpineConfiguration',
+  SpriteConfiguration: 'SpriteObject',
+  TiledSpriteConfiguration: 'TiledSpriteObject',
+  PanelSpriteConfiguration: 'PanelSpriteObject',
+  TextObjectConfiguration: 'TextObject',
+  ShapePainterConfiguration: 'ShapePainterObject',
+  TextEntryObject: 'TextEntryObject',
+  ParticleEmitterConfiguration: 'ParticleEmitterObject',
+  ObjectJsImplementation: 'ObjectJsImplementation',
+  CustomObjectConfiguration: 'CustomObjectConfiguration',
+  Model3DConfiguration: 'Model3DObjectConfiguration',
+  SpineConfiguration: 'SpineObjectConfiguration',
 
-  'ImageResource',
-];
+  ImageResource: 'ImageResource',
+};
 
 const PrimitiveTypes = new Map([
   ['DOMString', 'string'],
@@ -321,16 +320,16 @@ ${enums.join('\n\n')}
 
 ${interfaces.join('\n\n')}
 
-${castFunctions
+${Object.entries(castFunctions)
   .map(
-    (interfaceName) => `
-export function as${interfaceName}(obj: EmscriptenObject): ${interfaceName};
+    ([interfaceName, returnType]) => `
+export function as${interfaceName}(obj: EmscriptenObject): ${returnType};
 `
   )
   .join('')}
 
-export const Object = gd.gdObject;
-export const initializePlatforms = gd.ProjectHelper.prototype.initializePlatforms;
+export const Object: typeof gd.gdObject;
+export const initializePlatforms: typeof gd.ProjectHelper.initializePlatforms;
 
 export as namespace gd;
 

@@ -353,7 +353,8 @@ export type SubscriptionDialogDisplayReason =
   | 'Generate project from prompt'
   | 'Version history'
   | 'Add collaborators on project'
-  | 'Claim asset pack';
+  | 'Claim asset pack'
+  | 'Unlock build type';
 
 export const sendSubscriptionDialogShown = (metadata: {|
   reason: SubscriptionDialogDisplayReason,

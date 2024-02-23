@@ -41,15 +41,23 @@ const CurrentUsageDisplayer = ({
       out of {quota.max} in the last 24h).
     </Trans>
   );
-
   return (
     <ColumnStackLayout noMargin>
-      <AlertMessage kind="info">
-        {remainingBuilds === 1
-          ? remainingSingleMessage
-          : remainingMultipleMessage}
-      </AlertMessage>
-      {hasSubscription && quota.limitReached && (
+      {quota.max === 0 && (
+        <GetSubscriptionCard subscriptionDialogOpeningReason="Unlock build type">
+          <Text>
+            <Trans>Get a subscription to unlock this packaging.</Trans>
+          </Text>
+        </GetSubscriptionCard>
+      )}
+      {quota.max !== 0 && (
+        <AlertMessage kind="info">
+          {remainingBuilds === 1
+            ? remainingSingleMessage
+            : remainingMultipleMessage}
+        </AlertMessage>
+      )}
+      {quota.max !== 0 && hasSubscription && quota.limitReached && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
           <Text>
             <Trans>
@@ -59,7 +67,7 @@ const CurrentUsageDisplayer = ({
           </Text>
         </GetSubscriptionCard>
       )}
-      {loadedButHasNoSubscription && (
+      {quota.max !== 0 && loadedButHasNoSubscription && (
         <GetSubscriptionCard subscriptionDialogOpeningReason="Build limit reached">
           <Text>
             <Trans>

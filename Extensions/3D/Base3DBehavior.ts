@@ -228,7 +228,7 @@ namespace gdjs {
       return this.object.getAABBMinZ();
     }
 
-    getAABBMaxZ(): number{
+    getAABBMaxZ(): number {
       return this.object.getAABBMaxZ();
     }
   }

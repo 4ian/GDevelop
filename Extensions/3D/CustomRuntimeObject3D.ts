@@ -15,11 +15,7 @@ namespace gdjs {
    */
   export class CustomRuntimeObject3D
     extends gdjs.CustomRuntimeObject
-    implements
-      gdjs.Resizable,
-      gdjs.Scalable,
-      gdjs.Flippable,
-      gdjs.Base3DHandler {
+    implements gdjs.Base3DHandler {
     /**
      * Position on the Z axis.
      */
@@ -40,14 +36,15 @@ namespace gdjs {
      * Note that `_rotationZ` is `angle` from `gdjs.RuntimeObject`.
      */
     private _rotationY: float = 0;
+    private _customCenterZ: float = 0;
     private static _temporaryVector = new THREE.Vector3();
 
     constructor(
-      instanceContainer: gdjs.RuntimeInstanceContainer,
+      parent: gdjs.RuntimeInstanceContainer,
       objectData: Object3DData & CustomObjectConfiguration
     ) {
-      super(instanceContainer, objectData);
-      this.setRotationCenter(0, 0);
+      super(parent, objectData);
+      this._renderer.reinitialize(this, parent);
     }
 
     protected _createRender() {
@@ -57,6 +54,10 @@ namespace gdjs {
         this._instanceContainer,
         parent
       );
+    }
+
+    protected _reinitializeRender(): void {
+      this.getRenderer().reinitialize(this, this.getParent());
     }
 
     getRenderer(): gdjs.CustomRuntimeObject3DRenderer {
@@ -267,10 +268,32 @@ namespace gdjs {
     }
 
     /**
-     * @returns the center X from the local origin (0;0).
+     * @returns the center Z from the local origin (0;0).
      */
     getUnscaledCenterZ(): float {
-      return 0;
+      if (this.hasCustomRotationCenter()) {
+        return this._customCenterZ;
+      }
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return (this._minZ + this._maxZ) / 2;
+    }
+
+    /**
+     * The center of rotation is defined relatively to the origin (the object
+     * position).
+     * This avoids the center to move when children push the bounds.
+     *
+     * When no custom center is defined, it will move
+     * to stay at the center of the children bounds.
+     *
+     * @param x coordinate of the custom center
+     * @param y coordinate of the custom center
+     */
+    setRotationCenter3D(x: float, y: float, z: float) {
+      this._customCenterZ = z;
+      this.setRotationCenter(x, y);
     }
 
     /**
@@ -306,7 +329,6 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleZ(newScale: number): void {
-      console.log("scale: " + newScale);
       if (newScale < 0) {
         newScale = 0;
       }

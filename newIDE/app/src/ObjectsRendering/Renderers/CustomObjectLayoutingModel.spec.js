@@ -39,6 +39,7 @@ describe('getLayouts', () => {
       isShown: false,
       horizontalLayout: {},
       verticalLayout: {},
+      depthLayout: {},
     });
   });
 
@@ -67,6 +68,7 @@ describe('getLayouts', () => {
         maxSideAbsoluteMargin: 20,
       },
       verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
+      depthLayout: {},
     });
   });
 
@@ -107,6 +109,7 @@ describe('getLayouts', () => {
         anchorTarget: 0.5,
         anchorTargetObject: '',
       },
+      depthLayout: {},
     });
   });
 
@@ -142,6 +145,7 @@ describe('getLayouts', () => {
         anchorTarget: 0.5,
         anchorTargetObject: 'PanelBar',
       },
+      depthLayout: {},
     });
   });
 
@@ -184,6 +188,7 @@ describe('getLayouts', () => {
         anchorTargetObject: 'Border',
         isScaledProportionally: true,
       },
+      depthLayout: {},
     });
   });
 });
@@ -197,6 +202,7 @@ describe('applyChildLayouts', () => {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
+      depthLayout: {},
     });
 
     applyChildLayouts(parent);
@@ -218,6 +224,7 @@ describe('applyChildLayouts', () => {
       isShown: false,
       horizontalLayout: {},
       verticalLayout: {},
+      depthLayout: {},
     });
 
     applyChildLayouts(parent);
@@ -238,6 +245,7 @@ describe('applyChildLayouts', () => {
         maxSideAbsoluteMargin: 20,
       },
       verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
+      depthLayout: {},
     });
 
     applyChildLayouts(parent);
@@ -263,6 +271,7 @@ describe('applyChildLayouts', () => {
           minSideAbsoluteMargin: 30,
           maxSideAbsoluteMargin: 40,
         },
+        depthLayout: {},
       },
       { heightAfterUpdate: 20 }
     );
@@ -281,6 +290,7 @@ describe('applyChildLayouts', () => {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
+      depthLayout: {},
     });
     const tiledBar = parent.addChild(
       'TiledBar',
@@ -291,6 +301,7 @@ describe('applyChildLayouts', () => {
           maxSideAbsoluteMargin: 20,
         },
         verticalLayout: { anchorOrigin: 0.5, anchorTarget: 0.5 },
+        depthLayout: {},
       },
       { defaultWidth: 30, defaultHeight: 40 }
     );
@@ -310,6 +321,7 @@ describe('applyChildLayouts', () => {
       isShown: true,
       horizontalLayout: {},
       verticalLayout: {},
+      depthLayout: {},
     });
     parent.addChild('PanelBar', {
       isShown: true,
@@ -318,6 +330,7 @@ describe('applyChildLayouts', () => {
         maxSideAbsoluteMargin: 20,
       },
       verticalLayout: { minSideAbsoluteMargin: 30, maxSideAbsoluteMargin: 40 },
+      depthLayout: {},
     });
     const thumb = parent.addChild(
       'Thumb',
@@ -333,6 +346,7 @@ describe('applyChildLayouts', () => {
           anchorTarget: 0.5,
           anchorTargetObject: 'PanelBar',
         },
+        depthLayout: {},
       },
       { defaultWidth: 50, defaultHeight: 60 }
     );
@@ -354,6 +368,7 @@ describe('applyChildLayouts', () => {
         isShown: true,
         horizontalLayout: {},
         verticalLayout: {},
+        depthLayout: {},
       },
       { defaultWidth: 25, defaultHeight: 50 }
     );
@@ -373,6 +388,7 @@ describe('applyChildLayouts', () => {
           anchorTargetObject: 'Border',
           isScaledProportionally: true,
         },
+        depthLayout: {},
       },
       { defaultWidth: 10, defaultHeight: 15 }
     );
@@ -515,6 +531,10 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
 
   getHeight() {
     return this.height;
+  }
+
+  getDepth() {
+    return 0;
   }
 
   addChild(

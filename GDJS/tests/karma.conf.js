@@ -73,6 +73,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/runtimebehavior.js',
       './newIDE/app/resources/GDJS/Runtime/spriteruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject.js',
+      './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject2D.js',
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObjectInstanceContainer.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/commontools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/runtimescenetools.js',

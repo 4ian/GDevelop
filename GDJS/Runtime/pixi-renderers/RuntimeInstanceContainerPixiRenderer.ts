@@ -20,7 +20,7 @@ namespace gdjs {
      */
     setLayerIndex(layer: gdjs.RuntimeLayer, index: integer): void;
 
-    getRendererObject(): PIXI.Container;
+    getRendererObject(): PIXI.Container | null;
 
     get3DRendererObject(): THREE.Object3D | null;
   }

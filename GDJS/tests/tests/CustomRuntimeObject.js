@@ -12,7 +12,7 @@ describe('gdjs.CustomRuntimeObject', function () {
   const createCustomObject = (instanceContainer) => {
     // The corresponding event-based object declaration is done by
     // getPixiRuntimeGameWithAssets.
-    const customObject = new gdjs.CustomRuntimeObject(instanceContainer, {
+    const customObject = new gdjs.CustomRuntimeObject2D(instanceContainer, {
       name: 'MyCustomObject',
       type: 'MyExtension::MyEventsBasedObject',
       variables: [],

@@ -19,14 +19,14 @@ namespace gdjs {
    *
    * @see gdjs.CustomRuntimeObjectInstanceContainer
    */
-  export class CustomRuntimeObject
+  export abstract class CustomRuntimeObject
     extends gdjs.RuntimeObject
     implements
       gdjs.Resizable,
       gdjs.Scalable,
       gdjs.Flippable,
       gdjs.OpacityHandler {
-    _renderer: gdjs.CustomObjectRenderer;
+    _renderer: gdjs.CustomObjectRenderer | gdjs.CustomRuntimeObject3DRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
@@ -60,26 +60,21 @@ namespace gdjs {
       this._renderer = this._createRender();
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, parent);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
     }
 
-    protected _createRender() {
-      const parent = this._runtimeScene;
-      return new gdjs.CustomObjectRenderer(
-        this,
-        this._instanceContainer,
-        parent
-      );
-    }
+    protected abstract _createRender():
+      | gdjs.CustomObjectRenderer
+      | gdjs.CustomRuntimeObject3DRenderer;
+    protected abstract _reinitializeRender(): void;
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, this.getParent());
+      this._reinitializeRender();
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
@@ -151,11 +146,9 @@ namespace gdjs {
       this.getRenderer().ensureUpToDate();
     }
 
-    getRendererObject() {
-      return this.getRenderer().getRendererObject();
-    }
-
-    getRenderer() {
+    getRenderer():
+      | gdjs.CustomObjectRenderer
+      | gdjs.CustomRuntimeObject3DRenderer {
       return this._renderer;
     }
 
@@ -424,6 +417,10 @@ namespace gdjs {
 
       this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
+    }
+
+    hasCustomRotationCenter(): boolean {
+      return !!this._customCenter;
     }
 
     getCenterX(): float {

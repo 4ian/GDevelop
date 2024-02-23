@@ -258,7 +258,9 @@ namespace gdjs {
     /**
      * Get the renderer associated to the RuntimeScene.
      */
-    getRenderer(): gdjs.CustomObjectRenderer {
+    getRenderer():
+      | gdjs.CustomObjectRenderer
+      | gdjs.CustomRuntimeObject3DRenderer {
       return this._customObject.getRenderer();
     }
 

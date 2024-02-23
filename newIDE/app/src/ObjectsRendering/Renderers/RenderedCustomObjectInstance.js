@@ -14,6 +14,7 @@ import {
   LayoutedParent,
   getProportionalPositionX,
   getProportionalPositionY,
+  getProportionalPositionZ,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
@@ -34,6 +35,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
+  _proportionalOriginZ: number;
   _threeObjectPivot: THREE.Group | null;
 
   constructor(
@@ -68,7 +70,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       this._threeObjectPivot = new THREE.Group();
       this._threeObjectPivot.rotation.order = 'ZYX';
       threeObject.add(this._threeObjectPivot);
-      this._threeObject = threeObject
+      this._threeObject = threeObject;
     }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
@@ -85,6 +87,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     const parentOriginYPositionName =
       properties.has('ParentOriginY') &&
       properties.get('ParentOriginY').getValue();
+    const parentOriginZPositionName =
+      properties.has('ParentOriginZ') &&
+      properties.get('ParentOriginZ').getValue();
     this._proportionalOriginX =
       (parentOriginPositionName &&
         getProportionalPositionX(parentOriginPositionName)) ||
@@ -96,6 +101,12 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         getProportionalPositionY(parentOriginPositionName)) ||
       (parentOriginYPositionName &&
         getProportionalPositionY(parentOriginYPositionName)) ||
+      0;
+    this._proportionalOriginZ =
+      (parentOriginPositionName &&
+        getProportionalPositionZ(parentOriginPositionName)) ||
+      (parentOriginZPositionName &&
+        getProportionalPositionZ(parentOriginZPositionName)) ||
       0;
 
     const eventBasedObject = project.hasEventsBasedObject(
@@ -128,6 +139,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
         isShown: true,
         horizontalLayout: {},
         verticalLayout: {},
+        depthLayout: {},
       };
 
       const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
@@ -145,7 +157,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
-        this._threeObjectPivot.remove(renderer._threeObject);
+        if (this._threeObjectPivot && renderer instanceof Rendered3DInstance) {
+          this._threeObjectPivot.remove(renderer._threeObject);
+        }
       }
 
       if (renderer instanceof RenderedTextInstance) {
@@ -277,47 +291,34 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       : 48;
   }
 
-  getOriginX(): number {
-    // When the custom object is rendered with a 3D object,
-    // the transformation logic from the displayed child is used.
+  getDefaultDepth() {
     const firstInstance = this.childrenRenderedInstances[0];
     return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getOriginX()
-      : this._proportionalOriginX * this.getWidth();
+      ? firstInstance.getDefaultDepth()
+      : 48;
+  }
+
+  getOriginX(): number {
+    return this._proportionalOriginX * this.getWidth();
   }
 
   getOriginY(): number {
-    const firstInstance = this.childrenRenderedInstances[0];
-    return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getOriginY()
-      : this._proportionalOriginY * this.getHeight();
+    return this._proportionalOriginY * this.getHeight();
   }
 
   getOriginZ(): number {
-    const firstInstance = this.childrenRenderedInstances[0];
-    return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getOriginZ()
-      : 0;
+    return this._proportionalOriginZ * this.getDepth();
   }
 
   getCenterX() {
-    const firstInstance = this.childrenRenderedInstances[0];
-    return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getCenterX()
-      : this.getWidth() / 2;
+    return this.getWidth() / 2;
   }
 
   getCenterY() {
-    const firstInstance = this.childrenRenderedInstances[0];
-    return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getCenterY()
-      : this.getHeight() / 2;
+    return this.getHeight() / 2;
   }
 
   getCenterZ() {
-    const firstInstance = this.childrenRenderedInstances[0];
-    return firstInstance && firstInstance instanceof Rendered3DInstance
-      ? firstInstance.getCenterZ()
-      : 0;
+    return this.getDepth() / 2;
   }
 }

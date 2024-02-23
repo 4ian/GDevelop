@@ -22,8 +22,7 @@ const styles = {
     flex: 1,
     position: 'relative',
     overflow: 'hidden',
-    width: `calc(100% - 2*${marginsSize}px)`,
-    margin: marginsSize,
+    width: '100%',
     borderRadius: 6,
   },
   slideImage: {
@@ -205,8 +204,8 @@ const Slideshow = ({
     // If they're loading, display a skeleton so that it doesn't jump when loaded.
     return (
       <Paper square background="dark">
-        <Line expand>
-          <Column expand>
+        <Line expand noMargin>
+          <Column expand noMargin>
             <Skeleton
               variant="rect"
               height={itemLineHeight}

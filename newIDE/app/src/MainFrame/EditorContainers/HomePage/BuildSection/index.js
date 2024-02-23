@@ -292,6 +292,7 @@ const BuildSection = ({
   ) : (
     <SectionContainer
       title={<Trans>My projects</Trans>}
+      showAnnouncementsAndPromotions
       renderFooter={
         limits && hasTooManyCloudProjects
           ? () => (

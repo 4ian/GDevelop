@@ -77,10 +77,7 @@ namespace gdjs {
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
-      if (initialInstanceData.customSize) {
-        this.setWidth(initialInstanceData.width);
-        this.setHeight(initialInstanceData.height);
-      }
+      super.extraInitializationFromInitialInstance(initialInstanceData);
       if (initialInstanceData.depth !== undefined)
         this.setDepth(initialInstanceData.depth);
     }
@@ -133,6 +130,22 @@ namespace gdjs {
 
     setCenterZInScene(z: float): void {
       this.setZ(z + this._z - (this.getDrawableZ() + this.getCenterZ()));
+    }
+
+    /**
+     * Return the bottom Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getAABBMinZ(): number {
+      return this.getDrawableZ();
+    }
+
+    /**
+     * Return the top Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getAABBMaxZ(): number {
+      return this.getDrawableZ() + this.getDepth();
     }
 
     /**
@@ -231,25 +244,26 @@ namespace gdjs {
     _updateUntransformedHitBoxes(): void {
       super._updateUntransformedHitBoxes();
 
-      if (this._instanceContainer.getAdhocListOfAllInstances().length === 0) {
-        this._minZ = 0;
-        this._maxZ = 0;
-      } else {
-        let minZ = Number.MAX_VALUE;
-        let maxZ = -Number.MAX_VALUE;
-        for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
-          if (!childInstance.isIncludedInParentCollisionMask()) {
-            continue;
-          }
-          if (!gdjs.Base3DHandler.is3D(childInstance)) {
-            continue;
-          }
-          minZ = Math.min(minZ, childInstance.getAABBMinZ());
-          maxZ = Math.max(maxZ, childInstance.getAABBMaxZ());
+      let minZ = Number.MAX_VALUE;
+      let maxZ = -Number.MAX_VALUE;
+      for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
+        if (!childInstance.isIncludedInParentCollisionMask()) {
+          continue;
         }
-        this._minZ = minZ;
-        this._maxZ = maxZ;
+        if (!gdjs.Base3DHandler.is3D(childInstance)) {
+          continue;
+        }
+        minZ = Math.min(minZ, childInstance.getAABBMinZ());
+        maxZ = Math.max(maxZ, childInstance.getAABBMaxZ());
       }
+      if (minZ === Number.MAX_VALUE) {
+        // The unscaled size can't be 0 because setWidth and setHeight wouldn't
+        // have any effect.
+        minZ = 0;
+        maxZ = 1;
+      }
+      this._minZ = minZ;
+      this._maxZ = maxZ;
     }
 
     /**
@@ -272,7 +286,7 @@ namespace gdjs {
     setDepth(depth: float): void {
       const unscaledDepth = this.getUnscaledDepth();
       if (unscaledDepth !== 0) {
-        this.setScaleX(depth / unscaledDepth);
+        this.setScaleZ(depth / unscaledDepth);
       }
     }
 
@@ -292,6 +306,7 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScaleZ(newScale: number): void {
+      console.log("scale: " + newScale);
       if (newScale < 0) {
         newScale = 0;
       }

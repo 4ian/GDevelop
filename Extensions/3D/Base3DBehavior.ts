@@ -223,6 +223,14 @@ namespace gdjs {
     isFlippedZ(): boolean {
       return this.object.isFlippedZ();
     }
+
+    getAABBMinZ(): number {
+      return this.object.getAABBMinZ();
+    }
+
+    getAABBMaxZ(): number{
+      return this.object.getAABBMaxZ();
+    }
   }
 
   gdjs.registerBehavior('Scene3D::Base3DBehavior', gdjs.Base3DBehavior);

@@ -145,6 +145,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
+        this._threeObjectPivot.remove(renderer._threeObject);
       }
 
       if (renderer instanceof RenderedTextInstance) {

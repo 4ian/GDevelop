@@ -18,7 +18,6 @@ const styles = {
   popover: {
     paddingBottom: 10,
     overflowY: 'auto',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
 
     // Never show a horizontal scrollbar
     overflowX: 'hidden',

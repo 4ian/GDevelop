@@ -39,7 +39,6 @@ const styles = {
   },
   scrollContainer: {
     overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
   noScrollContainer: {
     overflowY: 'hidden',
@@ -75,7 +74,7 @@ const SectionContainer = ({
     paddingLeft: number,
     paddingRight: number,
   |} = isMobile ? styles.mobileContainer : styles.desktopContainer;
-  const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
+  const scrollStyle: {| overflowY: string |} = noScroll
     ? styles.noScrollContainer
     : styles.scrollContainer;
   const paperStyle = {

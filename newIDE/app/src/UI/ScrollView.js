@@ -6,7 +6,6 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 const styles = {
   container: {
     flex: 1,
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 

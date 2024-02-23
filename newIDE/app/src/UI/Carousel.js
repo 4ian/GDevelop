@@ -131,10 +131,10 @@ const useStylesForGridList = makeStyles({
     overflowX: 'scroll',
     overflowY: 'hidden',
     flexWrap: 'nowrap',
-    scrollbarWidth: 'none' /* For Firefox */,
+    scrollbarWidth: 'none' /* For modern browsers */,
     '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
     '&::-webkit-scrollbar': {
-      height: 0 /* For Chrome, Safari, and Opera */,
+      height: 0 /* For old hrome, Safari, and Opera */,
     },
   },
 });

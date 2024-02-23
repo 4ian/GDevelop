@@ -23,7 +23,6 @@ const styles = {
   container: { flex: 1 },
   grid: {
     overflowX: 'hidden',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 

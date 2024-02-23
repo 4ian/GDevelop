@@ -436,8 +436,8 @@ export const getProductMediaItems = <
   ];
 
   if (product.previewSoundUrls) {
-    mediaItems.concat(
-      product.previewSoundUrls.map(url => ({
+    mediaItems.push(
+      ...product.previewSoundUrls.map(url => ({
         kind: 'audio',
         url,
       }))

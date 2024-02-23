@@ -477,8 +477,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
       // TODO: Adapt message to redeem condition
       message: (
         <Trans>
-          Single commercial use license for claim with Gold or Startup
-          subscription
+          Single commercial use license for claim with Gold or Pro subscription
         </Trans>
       ),
     };
@@ -489,9 +488,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
       canRedeemAssetPack: redemptionCheck.canRedeem,
       // TODO: Adapt message to redeem condition
       message: (
-        <Trans>
-          Personal license for claim with Gold or Startup subscription
-        </Trans>
+        <Trans>Personal license for claim with Gold or Pro subscription</Trans>
       ),
     };
   }
@@ -502,7 +499,7 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
       // TODO: Adapt message to redeem condition
       message: (
         <Trans>
-          Unlimited commercial use license for claim with Gold or Startup
+          Unlimited commercial use license for claim with Gold or Pro
           subscription
         </Trans>
       ),

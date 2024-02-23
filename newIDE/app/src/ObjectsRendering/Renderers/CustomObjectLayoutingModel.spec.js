@@ -188,7 +188,9 @@ describe('getLayouts', () => {
         anchorTargetObject: 'Border',
         isScaledProportionally: true,
       },
-      depthLayout: {},
+      depthLayout: {
+        isScaledProportionally: true,
+      },
     });
   });
 });

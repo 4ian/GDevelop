@@ -107,7 +107,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       searchText,
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
-      assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
     const {
       privateGameTemplateListingDatas,
@@ -725,8 +724,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               </PlaceholderError>
             ) : publicAssetPacks &&
               privateAssetPackListingDatas &&
-              privateGameTemplateListingDatas &&
-              assetPackRandomOrdering ? (
+              privateGameTemplateListingDatas ? (
               <AssetsHome
                 ref={assetsHome}
                 publicAssetPacks={publicAssetPacks}
@@ -734,7 +732,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 privateGameTemplateListingDatas={
                   privateGameTemplateListingDatas
                 }
-                assetPackRandomOrdering={assetPackRandomOrdering}
                 onPublicAssetPackSelection={selectPublicAssetPack}
                 onPrivateAssetPackSelection={selectPrivateAssetPack}
                 onPrivateGameTemplateSelection={selectPrivateGameTemplate}

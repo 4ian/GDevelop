@@ -25,7 +25,6 @@ import {
   PublicAssetPackTile,
   PrivateGameTemplateTile,
 } from './ShopTiles';
-import { shuffleArrayWith } from '../Utils/Random';
 
 const cellSpacing = 2;
 
@@ -130,10 +129,6 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
-  assetPackRandomOrdering: {|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
@@ -148,7 +143,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
       privateGameTemplateListingDatas,
-      assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
       onPrivateGameTemplateSelection,
@@ -210,20 +204,19 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ? shopCategories[openedShopCategory].title
       : null;
 
-    const starterPacksTiles: Array<React.Node> = shuffleArrayWith(
-      starterPacks.filter(
+    const starterPacksTiles: Array<React.Node> = starterPacks
+      .filter(
         assetPack =>
           !openedShopCategory ||
           assetPack.categories.includes(openedShopCategory)
-      ),
-      assetPackRandomOrdering.starterPacks
-    ).map((assetPack, index) => (
-      <PublicAssetPackTile
-        assetPack={assetPack}
-        onSelect={() => onPublicAssetPackSelection(assetPack)}
-        key={`${assetPack.tag}-${index}`}
-      />
-    ));
+      )
+      .map((assetPack, index) => (
+        <PublicAssetPackTile
+          assetPack={assetPack}
+          onSelect={() => onPublicAssetPackSelection(assetPack)}
+          key={`${assetPack.tag}-${index}`}
+        />
+      ));
 
     const { allStandAloneTiles, allBundleTiles } = React.useMemo(
       () => {
@@ -232,46 +225,45 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         const privateAssetPackBundleTiles: Array<React.Node> = [];
         const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        shuffleArrayWith(
-          privateAssetPackListingDatas.filter(
+        privateAssetPackListingDatas
+          .filter(
             assetPackListingData =>
               !openedShopCategory ||
               assetPackListingData.categories.includes(openedShopCategory)
-          ),
-          assetPackRandomOrdering.privateAssetPacks
-        ).forEach(assetPackListingData => {
-          const isPackOwned =
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackListingData.id
+          )
+          .forEach(assetPackListingData => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(assetPackListingData);
+                }}
+                owned={isPackOwned}
+                key={assetPackListingData.id}
+              />
             );
-          const tile = (
-            <PrivateAssetPackTile
-              assetPackListingData={assetPackListingData}
-              onSelect={() => {
-                onPrivateAssetPackSelection(assetPackListingData);
-              }}
-              owned={isPackOwned}
-              key={assetPackListingData.id}
-            />
-          );
-          if (
-            assetPackListingData.includedListableProductIds &&
-            !!assetPackListingData.includedListableProductIds.length
-          ) {
-            if (isPackOwned) {
-              privateOwnedAssetPackBundleTiles.push(tile);
+            if (
+              assetPackListingData.includedListableProductIds &&
+              !!assetPackListingData.includedListableProductIds.length
+            ) {
+              if (isPackOwned) {
+                privateOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                privateAssetPackBundleTiles.push(tile);
+              }
             } else {
-              privateAssetPackBundleTiles.push(tile);
+              if (isPackOwned) {
+                privateOwnedAssetPackStandAloneTiles.push(tile);
+              } else {
+                privateAssetPackStandAloneTiles.push(tile);
+              }
             }
-          } else {
-            if (isPackOwned) {
-              privateOwnedAssetPackStandAloneTiles.push(tile);
-            } else {
-              privateAssetPackStandAloneTiles.push(tile);
-            }
-          }
-        });
+          });
 
         const allBundleTiles = [
           ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
@@ -293,7 +285,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       [
         privateAssetPackListingDatas,
         openedShopCategory,
-        assetPackRandomOrdering,
         onPrivateAssetPackSelection,
         starterPacksTiles,
         receivedAssetPacks,

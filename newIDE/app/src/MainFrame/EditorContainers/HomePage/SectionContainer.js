@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
@@ -8,6 +8,9 @@ import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
 import { LineStackLayout } from '../../../UI/Layout';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 export const SECTION_PADDING = 30;
 
@@ -55,6 +58,7 @@ type Props = {|
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,
+  showAnnouncementsAndPromotions?: boolean,
 |};
 
 const SectionContainer = ({
@@ -67,8 +71,10 @@ const SectionContainer = ({
   flexBody,
   renderFooter,
   noScroll,
+  showAnnouncementsAndPromotions,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
+  const { announcements } = React.useContext(AnnouncementsFeedContext);
   const containerStyle: {|
     paddingTop: number,
     paddingLeft: number,
@@ -88,6 +94,16 @@ const SectionContainer = ({
     <Column useFullHeight noMargin expand>
       <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
+          {showAnnouncementsAndPromotions && (
+            <>
+              <AnnouncementsFeed canClose level="urgent" hideLoader />
+              {announcements && announcements.length > 0 && <Spacer />}
+              <Column noMargin expand>
+                <PromotionsSlideshow />
+              </Column>
+              <Spacer />
+            </>
+          )}
           {backAction && (
             <Line>
               <TextButton

@@ -45,7 +45,9 @@ export const renderProductPrice = ({
     shouldUseAppStoreProduct() &&
     productListingData.productType === 'CREDITS_PACKAGE'
   ) {
-    const appStoreProduct = getAppStoreProduct(productListingData.id);
+    const appStoreProduct = getAppStoreProduct(
+      productListingData.appStoreProductId
+    );
     return appStoreProduct ? appStoreProduct.price : '';
   }
 

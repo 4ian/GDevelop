@@ -37,11 +37,9 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
-import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 
 const ONE_WEEK = 7 * 24 * 3600 * 1000;
 const THRESHOLD_BEFORE_ALLOWING_TO_HIDE_GET_STARTED_SECTION = 15;
@@ -658,8 +656,6 @@ const GetStartedSection = ({
   if (step === 'recommendations' && profile) {
     return (
       <>
-        <AnnouncementsFeed canClose level="urgent" addMargins hideLoader />
-        <PromotionsSlideshow />
         <SectionContainer
           title={
             profile.username ? (
@@ -670,6 +666,7 @@ const GetStartedSection = ({
           }
           renderSubtitle={renderSubtitle}
           flexBody
+          showAnnouncementsAndPromotions
         >
           <RecommendationList
             authenticatedUser={authenticatedUser}

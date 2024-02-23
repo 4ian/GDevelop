@@ -29,6 +29,7 @@ import { type Game } from '../../Utils/GDevelopServices/Game';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Android from '../../UI/CustomSvgIcons/Android';
+import { isNativeMobileApp } from '../../Utils/Platform';
 
 const styles = {
   buttonBase: {
@@ -391,7 +392,7 @@ const PublishHome = ({
               id="publish-mobile"
             />
           )}
-          {!showOnlineWebExporterOnly && (
+          {!showOnlineWebExporterOnly && !isNativeMobileApp() && (
             <SectionLine
               label={getSectionLabel({ section: 'ios' })}
               icon={getSectionIcon({ section: 'ios' })}

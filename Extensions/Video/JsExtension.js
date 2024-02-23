@@ -1,4 +1,6 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
+
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,34 +14,27 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'Video',
         _('Video'),
-        _('Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.'),
+        _(
+          'Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.'
+        ),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
       .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
-    extension.addInstructionOrExpressionGroupMetadata(_("Video"))
-        .setIcon("JsPlatform/Extensions/videoicon16.png");
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Video'))
+      .setIcon('JsPlatform/Extensions/videoicon16.png');
 
     var videoObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -64,7 +59,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -104,7 +98,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -115,7 +108,6 @@ module.exports = {
     ) {
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -132,13 +124,14 @@ module.exports = {
         _('Video'),
         _('Displays a video.'),
         'JsPlatform/Extensions/videoicon32.png',
+        // @ts-ignore - TODO: Fix videoObject being an ObjectJsImplementation instead of an ObjectConfiguration
         videoObject
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
       .setCategoryFullName(_('User interface'))
       .addDefaultBehavior('EffectCapability::EffectBehavior')
-      .addDefaultBehavior("OpacityCapability::OpacityBehavior");
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     object
       .addAction(
@@ -533,10 +526,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -545,9 +535,7 @@ module.exports = {
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
 
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'Video::VideoObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -560,9 +548,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -570,7 +556,7 @@ module.exports = {
      * Renderer for instances of VideoObject inside the IDE.
      */
     class RenderedVideoObjectInstance extends RenderedInstance {
-      constructor (
+      constructor(
         project,
         layout,
         instance,
@@ -606,11 +592,7 @@ module.exports = {
       /**
        * Return the path to the thumbnail of the specified object.
        */
-      static getThumbnail(
-        project,
-        resourcesLoader,
-        objectConfiguration
-      ) {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/videoicon24.png';
       }
 
@@ -647,14 +629,13 @@ module.exports = {
             that._pixiObject.texture.on('error', function () {
               that._pixiObject.texture.off('error', this);
 
-              that._pixiObject.texture =
-                that._pixiResourcesLoader.getInvalidPIXITexture();
+              that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
             });
           }
         }
 
         // Update opacity
-        const opacity = this._associatedObjectConfiguration
+        const opacity = +this._associatedObjectConfiguration
           .getProperties()
           .get('Opacity')
           .getValue();

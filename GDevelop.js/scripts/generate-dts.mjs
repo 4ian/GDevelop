@@ -1,13 +1,41 @@
 // @ts-check
-import { readFileSync, writeFileSync } from 'fs';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const bindingsFile = readFileSync(
   __dirname + '/../Bindings/Bindings.idl',
   'utf-8'
 );
+
+const castFunctions = [
+  'StandardEvent',
+  'RepeatEvent',
+  'WhileEvent',
+  'ForEachEvent',
+  'ForEachChildVariableEvent',
+  'CommentEvent',
+  'GroupEvent',
+  'LinkEvent',
+  'JsCodeEvent',
+  'Platform',
+
+  'SpriteConfiguration',
+  'TiledSpriteConfiguration',
+  'PanelSpriteConfiguration',
+  'TextObjectConfiguration',
+  'ShapePainterConfiguration',
+  'AdMobConfiguration',
+  'TextEntryObject',
+  'ParticleEmitterConfiguration',
+  'ObjectJsImplementation',
+  'CustomObjectConfiguration',
+  'Model3DConfiguration',
+  'SpineConfiguration',
+
+  'ImageResource',
+];
 
 const PrimitiveTypes = new Map([
   ['DOMString', 'string'],
@@ -69,6 +97,8 @@ class Parser {
   static readUntil(thisCharacter, skipOverIt = true) {
     let token = '';
     while (this.currentCharacter !== thisCharacter) {
+      if (this.isDone)
+        throw new Error(`Never reached character '${thisCharacter}'!`);
       token += this.currentCharacter;
       this.parserPosition++;
     }
@@ -83,17 +113,23 @@ class Parser {
     Parser.skipWhitespaces();
 
     // Read the type
-    let type = Parser.readUntil(' ');
+    /** @type {string} */
+    let type;
     let optional = false;
-    if (type === 'optional') optional = true;
-    while (type === 'unsigned' || type === 'optional') {
-      // Re-read the type since unsigned is an unnecessary prefix for typescript
+    let attribute = false;
+    do {
       Parser.skipWhitespaces();
       type = Parser.readUntil(' ');
-    }
+      if (type === 'optional') optional = true;
+      if (type === 'attribute') attribute = true;
+    } while (
+      type === 'unsigned' ||
+      type === 'optional' ||
+      type === 'attribute'
+    );
     Parser.skipWhitespaces();
 
-    return { type, optional };
+    return { type, optional, attribute };
   }
 
   static readIdentifier() {
@@ -137,21 +173,46 @@ for (const [_, enumName, enumCode] of bindingsFile.matchAll(
     members.push(`  ${memberName} = ${i++},`);
   }
   enums.push(
-    `enum ${enumName} {
+    `export enum ${enumName} {
 ${members.join('\n')}
 }`
   );
 }
 
 const interfaces = [];
-for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
-  /interface\s+([a-zA-Z]+)\s+{\r?\n?([^}]*)\r?\n}/gm
+for (const [
+  _,
+  implementationName,
+  interfaceName,
+  interfaceCode,
+] of bindingsFile.matchAll(
+  /(?:\[JSImplementation=([a-zA-Z0-9]+)\]\r?\n?)?interface\s+([a-zA-Z0-9]+)\s+{(?:}|(?:\r?\n?([^}]*)\r?\n}))/gm
 )) {
+  if (!interfaceCode) {
+    interfaces.push(
+      `export class ${interfaceName} extends EmscriptenObject {}`
+    );
+    continue;
+  }
+
   const methods = [];
+  const attributes = [];
 
   Parser.setSource(interfaceCode);
   while (!Parser.isDone) {
-    const { type: returnType, optional: optionalReturn } = Parser.readType();
+    const {
+      type: returnType,
+      optional: optionalReturn,
+      attribute: isAttribute,
+    } = Parser.readType();
+
+    if (isAttribute) {
+      const attributeName = Parser.readUntil(';');
+      attributes.push(
+        `${attributeName}${optionalReturn ? '?' : ''}: ${returnType};`
+      );
+      continue;
+    }
 
     let methodName = Parser.readUntil('(');
     const isStatic = methodName.includes('STATIC_');
@@ -160,6 +221,8 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
     methodName = methodName
       .replace('WRAPPED_', '')
       .replace('MAP_', '')
+      .replace('FREE_', '')
+      .replace('CLONE_', '')
       .replace('STATIC_', '');
     // Convert PascalCase to camelCase
     methodName = methodName[0].toLowerCase() + methodName.slice(1);
@@ -203,26 +266,40 @@ for (const [_, interfaceName, interfaceCode] of bindingsFile.matchAll(
           ({ name, type, optional, defaultValue }) =>
             `${name}${optional ? '?' : ''}: ${
               PrimitiveTypes.has(type) ? PrimitiveTypes.get(type) : type
-            }${defaultValue !== none ? ` = ${defaultValue}` : ''}`
+            }`
         )
-        .join(', ')}): ${
-        PrimitiveTypes.has(returnType)
-          ? PrimitiveTypes.get(returnType)
-          : returnType
+        .join(', ')})${
+        isConstructor
+          ? ''
+          : `: ${
+              PrimitiveTypes.has(returnType)
+                ? PrimitiveTypes.get(returnType)
+                : returnType
+            }`
       };`
     );
   }
 
+  const explicitlyInheritedClass = bindingsFile.match(
+    new RegExp(`(?<![a-zA-Z0-9])${interfaceName} implements ([a-zA-Z0-9]+)`)
+  );
+  const inheritedClass =
+    implementationName ||
+    (!!explicitlyInheritedClass && explicitlyInheritedClass[1]);
+
   interfaces.push(
-    `export class ${interfaceName} extends EmscriptenObject {
-  ${methods.join('\n  ')}
+    `export class ${interfaceName} extends ${
+      inheritedClass ? inheritedClass : 'EmscriptenObject'
+    } {${methods.length ? '\n  ' + methods.join('\n  ') : ''}${
+      attributes.length ? '\n  ' + attributes.join('\n  ') : ''
+    }
 }`
   );
 }
 
 const dts = `// Automatically generated by GDevelop.js/scripts/generate-dts.js
 
-class EmscriptenObject {
+declare class EmscriptenObject {
   /** The object's index in the WASM memory, and thus its unique identifier. */
   ptr: number;
 
@@ -244,7 +321,22 @@ ${enums.join('\n\n')}
 
 ${interfaces.join('\n\n')}
 
+${castFunctions
+  .map(
+    (interfaceName) => `
+export function as${interfaceName}(obj: EmscriptenObject): ${interfaceName};
+`
+  )
+  .join('')}
+
+export const Object = gd.gdObject;
+export const initializePlatforms = gd.ProjectHelper.prototype.initializePlatforms;
+
 export as namespace gd;
+
+declare global {
+  const gd: typeof gd;
+}
 `;
 
 writeFileSync(__dirname + '/../types.d.ts', dts);

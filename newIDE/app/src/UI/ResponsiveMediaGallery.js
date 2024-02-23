@@ -48,12 +48,10 @@ const styles = {
     display: 'grid',
     grid: 'auto / auto-flow max-content',
     overflowX: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     gap: '8px',
   },
   mobileGrid: {
     overflowX: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowY: 'hidden',
     scrollSnapType: 'x mandatory',
   },

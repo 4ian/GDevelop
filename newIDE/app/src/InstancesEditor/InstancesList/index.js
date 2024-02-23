@@ -50,7 +50,6 @@ const styles = {
     flex: 1,
     overflowX: 'auto',
     overflowY: 'hidden',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 

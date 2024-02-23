@@ -328,8 +328,8 @@ export function as${interfaceName}(obj: EmscriptenObject): ${returnType};
   )
   .join('')}
 
-export const Object: typeof gd.gdObject;
-export const initializePlatforms: typeof gd.ProjectHelper.initializePlatforms;
+export const Object: typeof gdObject;
+export const initializePlatforms: typeof ProjectHelper.initializePlatforms;
 
 export as namespace gd;
 

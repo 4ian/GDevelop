@@ -15,7 +15,7 @@ declare class EmscriptenObject {
    * If the object is owned by your code, you should still call this method when adequate, as 
    * otherwise the memory will never be freed, causing a memory leak, which is to be avoided.
    */
-  destroy(): void;
+  delete(): void;
 }
 
 export enum Variable_Type {
@@ -2859,8 +2859,8 @@ export function asSpineConfiguration(obj: EmscriptenObject): SpineObjectConfigur
 export function asImageResource(obj: EmscriptenObject): ImageResource;
 
 
-export const Object: typeof gd.gdObject;
-export const initializePlatforms: typeof gd.ProjectHelper.initializePlatforms;
+export const Object: typeof gdObject;
+export const initializePlatforms: typeof ProjectHelper.initializePlatforms;
 
 export as namespace gd;
 

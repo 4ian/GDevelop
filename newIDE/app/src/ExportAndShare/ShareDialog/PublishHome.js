@@ -29,6 +29,7 @@ import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import Android from '../../UI/CustomSvgIcons/Android';
 
 const styles = {
   buttonBase: {
@@ -82,7 +83,7 @@ const getSectionIcon = ({
     case 'desktop':
       return <Desktop style={small ? styles.iconSmall : styles.icon} />;
     case 'android':
-      return <Mobile style={small ? styles.iconSmall : styles.icon} />;
+      return <Android style={small ? styles.iconSmall : styles.icon} />;
     case 'ios':
       return <Apple style={small ? styles.iconSmall : styles.icon} />;
     default:

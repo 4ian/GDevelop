@@ -37,9 +37,9 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
-import Mobile from '../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
 import Apple from '../../UI/CustomSvgIcons/Apple';
+import Android from '../../UI/CustomSvgIcons/Android';
 
 const styles = {
   icon: {
@@ -84,7 +84,7 @@ const getIcon = (
 ) => {
   switch (buildType) {
     case 'cordova-build':
-      return <Mobile style={styles.icon} />;
+      return <Android style={styles.icon} />;
     case 'cordova-ios-build':
       return <Apple style={styles.icon} />;
     case 'electron-build':

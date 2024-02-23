@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
-import Mobile from '../../UI/CustomSvgIcons/Mobile';
 import Apple from '../../UI/CustomSvgIcons/Apple';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';

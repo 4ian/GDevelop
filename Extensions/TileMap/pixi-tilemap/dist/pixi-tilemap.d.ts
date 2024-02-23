@@ -1,5 +1,5 @@
 declare namespace PIXI {
-  namespace tilemap {
+  export namespace tilemap {
     /**
      * The renderer plugin for canvas. It isn't registered by default.
      *

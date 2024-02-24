@@ -1931,11 +1931,7 @@ module.exports = {
       const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
-        .setDescription(
-          _(
-            'Adjust hue and saturation.'
-          )
-        )
+        .setDescription(_('Adjust hue and saturation.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
@@ -1955,11 +1951,7 @@ module.exports = {
       const effect = extension
         .addEffect('Exposure')
         .setFullName(_('Exposure'))
-        .setDescription(
-          _(
-            'Adjust exposure.'
-          )
-        )
+        .setDescription(_('Adjust exposure.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/ExposureEffect.js');
@@ -1974,11 +1966,7 @@ module.exports = {
       const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
-        .setDescription(
-          _(
-            'Apply a bloom effect.'
-          )
-        )
+        .setDescription(_('Apply a bloom effect.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BloomEffect.js');
@@ -2003,11 +1991,7 @@ module.exports = {
       const effect = extension
         .addEffect('BrightnessAndContrast')
         .setFullName(_('Brightness and contrast.'))
-        .setDescription(
-          _(
-            'Adjust brightness and contrast.'
-          )
-        )
+        .setDescription(_('Adjust brightness and contrast.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
@@ -3072,7 +3056,7 @@ module.exports = {
         );
         threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
-        
+
         const shouldKeepModelOrigin = !this._originPoint;
         if (shouldKeepModelOrigin) {
           // Keep the origin as part of the model.

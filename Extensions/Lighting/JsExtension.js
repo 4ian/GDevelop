@@ -56,6 +56,7 @@ module.exports = {
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',
         'LightObstacleBehavior',
+        //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
         lightObstacleBehavior,
         new gd.BehaviorsSharedData()
       )

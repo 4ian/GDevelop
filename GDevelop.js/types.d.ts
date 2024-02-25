@@ -2814,6 +2814,31 @@ export class MetadataDeclarationHelper extends EmscriptenObject {
   static shiftSentenceParamIndexes(sentence: string, offset: number): string;
 }
 
+export function toNewVectorString(): VectorString;
+
+export function getTypeOfBehavior(layout: Layout, name: string, searchInGroups: boolean): string;
+
+export function getTypeOfObject(layout: Layout, name: string, searchInGroups: boolean): string;
+
+export function getBehaviorsOfObject(layout: Layout, name: string, searchInGroups: boolean): VectorString;
+
+export function isDefaultBehavior(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): boolean;
+
+export function getTypeOfBehaviorInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+
+export function getBehaviorNamesInObjectOrGroup(layout: Layout, objectOrGroupName: string, behaviorType: string, searchInGroups: boolean): VectorString;
+
+export function removeFromVectorParameterMetadata(index: number): void;
+
+export function insertIntoVectorParameterMetadata(index: number, parameterMetadata: ParameterMetadata): void;
+
+export function swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
+
+export function removeFromVectorPolygon2d(index: number): void;
+
+export function removeFromVectorVector2f(index: number): void;
+
+export function moveVector2fInVector(oldIndex: number, newIndex: number): void;
 
 export function asStandardEvent(object: EmscriptenObject): StandardEvent;
 

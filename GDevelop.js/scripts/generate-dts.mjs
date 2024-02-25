@@ -179,6 +179,7 @@ ${members.join('\n')}
 }
 
 const interfaces = [];
+const freeFunctions = [];
 for (const [
   _,
   implementationName,
@@ -215,6 +216,7 @@ for (const [
 
     let methodName = Parser.readUntil('(');
     const isStatic = methodName.includes('STATIC_');
+    const isFree = methodName.includes('FREE_');
     const isConstructor = returnType === 'void' && methodName === interfaceName;
     // Remove prefixes which are not part of the actual function name
     methodName = methodName
@@ -257,26 +259,27 @@ for (const [
     Parser.parserPosition++;
     Parser.skipWhitespaces();
 
-    methods.push(
-      `${isStatic ? 'static ' : ''}${
-        isConstructor ? `constructor` : methodName
-      }(${parameters
-        .map(
-          ({ name, type, optional, defaultValue }) =>
-            `${name}${optional ? '?' : ''}: ${
-              PrimitiveTypes.has(type) ? PrimitiveTypes.get(type) : type
-            }`
-        )
-        .join(', ')})${
-        isConstructor
-          ? ''
-          : `: ${
-              PrimitiveTypes.has(returnType)
-                ? PrimitiveTypes.get(returnType)
-                : returnType
-            }`
-      };`
-    );
+    const method = `${isStatic ? 'static ' : ''}${
+      isConstructor ? `constructor` : methodName
+    }(${parameters
+      .map(
+        ({ name, type, optional, defaultValue }) =>
+          `${name}${optional ? '?' : ''}: ${
+            PrimitiveTypes.has(type) ? PrimitiveTypes.get(type) : type
+          }`
+      )
+      .join(', ')})${
+      isConstructor
+        ? ''
+        : `: ${
+            PrimitiveTypes.has(returnType)
+              ? PrimitiveTypes.get(returnType)
+              : returnType
+          }`
+    };`;
+
+    if (isFree) freeFunctions.push(`export function ${method}`);
+    methods.push(method);
   }
 
   const explicitlyInheritedClass = bindingsFile.match(
@@ -321,6 +324,7 @@ ${enums.join('\n\n')}
 
 ${interfaces.join('\n\n')}
 
+${freeFunctions.join('\n\n')}
 ${Object.entries(castFunctions)
   .map(
     ([interfaceName, returnType]) => `

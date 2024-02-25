@@ -9,31 +9,67 @@ const bindingsFile = readFileSync(
   'utf-8'
 );
 
+/** @type {Record<string, {returnType: string, inputType?: string}>} */
 const castFunctions = {
-  StandardEvent: 'StandardEvent',
-  RepeatEvent: 'RepeatEvent',
-  WhileEvent: 'WhileEvent',
-  ForEachEvent: 'ForEachEvent',
-  ForEachChildVariableEvent: 'ForEachChildVariableEvent',
-  CommentEvent: 'CommentEvent',
-  GroupEvent: 'GroupEvent',
-  LinkEvent: 'LinkEvent',
-  JsCodeEvent: 'JsCodeEvent',
-  Platform: 'Platform',
+  StandardEvent: { inputType: 'Event', returnType: 'StandardEvent' },
+  RepeatEvent: { inputType: 'Event', returnType: 'RepeatEvent' },
+  WhileEvent: { inputType: 'Event', returnType: 'WhileEvent' },
+  ForEachEvent: { inputType: 'Event', returnType: 'ForEachEvent' },
+  ForEachChildVariableEvent: {
+    inputType: 'Event',
+    returnType: 'ForEachChildVariableEvent',
+  },
+  CommentEvent: { inputType: 'Event', returnType: 'CommentEvent' },
+  GroupEvent: { inputType: 'Event', returnType: 'GroupEvent' },
+  LinkEvent: { inputType: 'Event', returnType: 'LinkEvent' },
+  JsCodeEvent: { inputType: 'Event', returnType: 'JsCodeEvent' },
 
-  SpriteConfiguration: 'SpriteObject',
-  TiledSpriteConfiguration: 'TiledSpriteObject',
-  PanelSpriteConfiguration: 'PanelSpriteObject',
-  TextObjectConfiguration: 'TextObject',
-  ShapePainterConfiguration: 'ShapePainterObject',
-  TextEntryObject: 'TextEntryObject',
-  ParticleEmitterConfiguration: 'ParticleEmitterObject',
-  ObjectJsImplementation: 'ObjectJsImplementation',
-  CustomObjectConfiguration: 'CustomObjectConfiguration',
-  Model3DConfiguration: 'Model3DObjectConfiguration',
-  SpineConfiguration: 'SpineObjectConfiguration',
+  Platform: { inputType: 'JsPlatform', returnType: 'Platform' },
 
-  ImageResource: 'ImageResource',
+  SpriteConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'SpriteObject',
+  },
+  TiledSpriteConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'TiledSpriteObject',
+  },
+  PanelSpriteConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'PanelSpriteObject',
+  },
+  TextObjectConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'TextObject',
+  },
+  ShapePainterConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'ShapePainterObject',
+  },
+  TextEntryObject: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'TextEntryObject',
+  },
+  ParticleEmitterConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'ParticleEmitterObject',
+  },
+  CustomObjectConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'CustomObjectConfiguration',
+  },
+  Model3DConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'Model3DObjectConfiguration',
+  },
+  SpineConfiguration: {
+    inputType: 'ObjectConfiguration',
+    returnType: 'SpineObjectConfiguration',
+  },
+
+  ObjectJsImplementation: { returnType: 'ObjectJsImplementation' },
+
+  ImageResource: { inputType: 'Resource', returnType: 'ImageResource' },
 };
 
 const PrimitiveTypes = new Map([
@@ -327,8 +363,8 @@ ${interfaces.join('\n\n')}
 ${freeFunctions.join('\n\n')}
 ${Object.entries(castFunctions)
   .map(
-    ([interfaceName, returnType]) => `
-export function as${interfaceName}(object: EmscriptenObject): ${returnType};
+    ([interfaceName, { returnType, inputType = 'EmscriptenObject' }]) => `
+export function as${interfaceName}(object: ${inputType}): ${returnType};
 `
   )
   .join('')}

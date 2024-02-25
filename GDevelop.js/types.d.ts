@@ -2840,49 +2840,49 @@ export function removeFromVectorVector2f(index: number): void;
 
 export function moveVector2fInVector(oldIndex: number, newIndex: number): void;
 
-export function asStandardEvent(object: EmscriptenObject): StandardEvent;
+export function asStandardEvent(object: Event): StandardEvent;
 
-export function asRepeatEvent(object: EmscriptenObject): RepeatEvent;
+export function asRepeatEvent(object: Event): RepeatEvent;
 
-export function asWhileEvent(object: EmscriptenObject): WhileEvent;
+export function asWhileEvent(object: Event): WhileEvent;
 
-export function asForEachEvent(object: EmscriptenObject): ForEachEvent;
+export function asForEachEvent(object: Event): ForEachEvent;
 
-export function asForEachChildVariableEvent(object: EmscriptenObject): ForEachChildVariableEvent;
+export function asForEachChildVariableEvent(object: Event): ForEachChildVariableEvent;
 
-export function asCommentEvent(object: EmscriptenObject): CommentEvent;
+export function asCommentEvent(object: Event): CommentEvent;
 
-export function asGroupEvent(object: EmscriptenObject): GroupEvent;
+export function asGroupEvent(object: Event): GroupEvent;
 
-export function asLinkEvent(object: EmscriptenObject): LinkEvent;
+export function asLinkEvent(object: Event): LinkEvent;
 
-export function asJsCodeEvent(object: EmscriptenObject): JsCodeEvent;
+export function asJsCodeEvent(object: Event): JsCodeEvent;
 
-export function asPlatform(object: EmscriptenObject): Platform;
+export function asPlatform(object: JsPlatform): Platform;
 
-export function asSpriteConfiguration(object: EmscriptenObject): SpriteObject;
+export function asSpriteConfiguration(object: ObjectConfiguration): SpriteObject;
 
-export function asTiledSpriteConfiguration(object: EmscriptenObject): TiledSpriteObject;
+export function asTiledSpriteConfiguration(object: ObjectConfiguration): TiledSpriteObject;
 
-export function asPanelSpriteConfiguration(object: EmscriptenObject): PanelSpriteObject;
+export function asPanelSpriteConfiguration(object: ObjectConfiguration): PanelSpriteObject;
 
-export function asTextObjectConfiguration(object: EmscriptenObject): TextObject;
+export function asTextObjectConfiguration(object: ObjectConfiguration): TextObject;
 
-export function asShapePainterConfiguration(object: EmscriptenObject): ShapePainterObject;
+export function asShapePainterConfiguration(object: ObjectConfiguration): ShapePainterObject;
 
-export function asTextEntryObject(object: EmscriptenObject): TextEntryObject;
+export function asTextEntryObject(object: ObjectConfiguration): TextEntryObject;
 
-export function asParticleEmitterConfiguration(object: EmscriptenObject): ParticleEmitterObject;
+export function asParticleEmitterConfiguration(object: ObjectConfiguration): ParticleEmitterObject;
+
+export function asCustomObjectConfiguration(object: ObjectConfiguration): CustomObjectConfiguration;
+
+export function asModel3DConfiguration(object: ObjectConfiguration): Model3DObjectConfiguration;
+
+export function asSpineConfiguration(object: ObjectConfiguration): SpineObjectConfiguration;
 
 export function asObjectJsImplementation(object: EmscriptenObject): ObjectJsImplementation;
 
-export function asCustomObjectConfiguration(object: EmscriptenObject): CustomObjectConfiguration;
-
-export function asModel3DConfiguration(object: EmscriptenObject): Model3DObjectConfiguration;
-
-export function asSpineConfiguration(object: EmscriptenObject): SpineObjectConfiguration;
-
-export function asImageResource(object: EmscriptenObject): ImageResource;
+export function asImageResource(object: Resource): ImageResource;
 
 
 export const Object: typeof gdObject;

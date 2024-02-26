@@ -46,12 +46,12 @@ namespace gdjs {
     _updateThreeGroup() {
       const threeObject3D = this.get3DRendererObject();
 
-      const pivotX = this._object.getUnscaledCenterX();
-      const pivotY = this._object.getUnscaledCenterY();
-      const pivotZ = this._object.getUnscaledCenterZ();
       const scaleX = this._object.getScaleX();
       const scaleY = this._object.getScaleY();
       const scaleZ = this._object.getScaleZ();
+      const pivotX = this._object.getUnscaledCenterX() * scaleX;
+      const pivotY = this._object.getUnscaledCenterY() * scaleY;
+      const pivotZ = this._object.getUnscaledCenterZ() * scaleZ;
 
       threeObject3D.rotation.set(
         gdjs.toRad(this._object.getRotationX()),
@@ -59,14 +59,21 @@ namespace gdjs {
         gdjs.toRad(this._object.angle)
       );
 
-      // TODO does it work with scaling and flipping?
-      threeObject3D.position.set(-pivotX, -pivotY, -pivotZ);
+      threeObject3D.position.set(
+        this._object.isFlippedX() ? pivotX : -pivotX,
+        this._object.isFlippedY() ? pivotY : -pivotY,
+        this._object.isFlippedZ() ? pivotZ : -pivotZ
+      );
       threeObject3D.position.applyEuler(threeObject3D.rotation);
       threeObject3D.position.x += this._object.getX() + pivotX;
       threeObject3D.position.y += this._object.getY() + pivotY;
       threeObject3D.position.z += this._object.getZ() + pivotZ;
 
-      threeObject3D.scale.set(scaleX, scaleY, scaleZ);
+      threeObject3D.scale.set(
+        this._object.isFlippedX() ? -scaleX : scaleX,
+        this._object.isFlippedY() ? -scaleY : scaleY,
+        this._object.isFlippedZ() ? -scaleZ : scaleZ
+      );
 
       threeObject3D.visible = !this._object.hidden;
 

@@ -141,6 +141,7 @@ namespace gdjs {
     setBBText(text): void {
       this._text = text;
       this._renderer.updateText();
+      this.invalidateHitboxes();
     }
 
     /**

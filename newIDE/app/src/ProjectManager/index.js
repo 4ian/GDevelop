@@ -97,10 +97,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    overflowY: 'scroll',
-    marginTop: 16,
-    padding: '0 8px 12px 12px',
-    position: 'relative',
+    padding: '0 8px 8px 8px',
   },
   autoSizerContainer: { flex: 1 },
   autoSizer: { width: '100%' },
@@ -379,6 +376,7 @@ const getTreeViewItemRightButton = (i18n: I18nType) => (item: TreeViewItem) =>
 
 export type ProjectManagerInterface = {|
   forceUpdateList: () => void,
+  focusSearchBar: () => void,
 |};
 
 type Props = {|
@@ -455,13 +453,6 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
       [forceUpdate]
     );
-
-    React.useImperativeHandle(ref, () => ({
-      forceUpdateList: () => {
-        forceUpdate();
-        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-      },
-    }));
 
     const [searchText, setSearchText] = React.useState('');
 
@@ -557,15 +548,16 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     const [openedExtensionName, setOpenedExtensionName] = React.useState(null);
 
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
-    const shouldAutofocusInput = useShouldAutofocusInput();
-    React.useEffect(
-      () => {
-        if (!freezeUpdate && shouldAutofocusInput && searchBarRef.current) {
-          searchBarRef.current.focus();
-        }
+
+    React.useImperativeHandle(ref, () => ({
+      forceUpdateList: () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
       },
-      [freezeUpdate, shouldAutofocusInput]
-    );
+      focusSearchBar: () => {
+        if (searchBarRef.current) searchBarRef.current.focus();
+      },
+    }));
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -1465,7 +1457,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props): boolean =>
   // from the component.
   // If a change is made, the component won't notice it: you have to manually
   // call forceUpdate.
-  prevProps.project === nextProps.project;
+  nextProps.freezeUpdate;
 
 const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
   ProjectManager,
@@ -1475,13 +1467,41 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
 const ProjectManagerWithErrorBoundary = React.forwardRef<
   Props,
   ProjectManagerInterface
->((props, ref) => (
-  <ErrorBoundary
-    componentTitle={<Trans>Objects list</Trans>}
-    scope="project-manager"
-  >
-    <MemoizedProjectManager ref={ref} {...props} />
-  </ErrorBoundary>
-));
+>((props, outerRef) => {
+  const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
+  const shouldAutofocusInput = useShouldAutofocusInput();
+
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        if (
+          !props.freezeUpdate &&
+          shouldAutofocusInput &&
+          projectManagerRef.current
+        ) {
+          projectManagerRef.current.focusSearchBar();
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    },
+    [props.freezeUpdate, shouldAutofocusInput]
+  );
+
+  return (
+    <ErrorBoundary
+      componentTitle={<Trans>Project manager</Trans>}
+      scope="project-manager"
+    >
+      <MemoizedProjectManager
+        ref={ref => {
+          projectManagerRef.current = ref;
+          if (typeof outerRef === 'function') outerRef(ref);
+          else if (outerRef !== null) outerRef.current = ref;
+        }}
+        {...props}
+      />
+    </ErrorBoundary>
+  );
+});
 
 export default ProjectManagerWithErrorBoundary;

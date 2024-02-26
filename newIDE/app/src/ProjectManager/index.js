@@ -106,9 +106,6 @@ const styles = {
   autoSizer: { width: '100%' },
 };
 
-export const getProjectManagerItemId = (identifier: string) =>
-  `project-manager-tab-${identifier}`;
-
 const extensionItemReactDndType = 'GD_EXTENSION_ITEM';
 
 export interface TreeViewItemContent {
@@ -434,7 +431,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       onInstallExtension,
       onShareProject,
       resourceManagementProps,
-    }: Props,
+    },
     ref
   ) => {
     const [selectedItems, setSelectedItems] = React.useState<
@@ -561,11 +558,14 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusInput = useShouldAutofocusInput();
-    React.useEffect(() => {
-      if (!freezeUpdate && shouldAutofocusInput && searchBarRef.current) {
-        searchBarRef.current.focus();
-      }
-    });
+    React.useEffect(
+      () => {
+        if (!freezeUpdate && shouldAutofocusInput && searchBarRef.current) {
+          searchBarRef.current.focus();
+        }
+      },
+      [freezeUpdate, shouldAutofocusInput]
+    );
 
     const onProjectItemModified = React.useCallback(
       () => {
@@ -1148,7 +1148,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               );
             },
           },
-        ].filter(Boolean);
+        ];
       },
       [
         addExternalEvents,
@@ -1172,6 +1172,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
         selectedItems.every(item => {
           return (
+            // Project and game settings children `getRootId` return an empty string.
             item.content.getRootId().length > 0 &&
             item.content.getRootId() === destinationItem.content.getRootId()
           );
@@ -1213,7 +1214,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [selectedItems]
     );
 
-    // Force List component to be mounted again if project or objectsContainer
+    // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr;

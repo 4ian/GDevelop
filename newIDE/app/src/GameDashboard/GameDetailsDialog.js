@@ -43,10 +43,12 @@ export const GameDetailsDialog = ({
   );
   const onClickShare = React.useCallback(
     () => {
-      if (!!profile) {
-        onShareProject && onShareProject();
-      } else {
+      if (!profile) {
         onOpenLoginDialog();
+        return;
+      }
+      if (onShareProject) {
+        onShareProject();
       }
     },
     [profile, onShareProject, onOpenLoginDialog]
@@ -112,7 +114,7 @@ export const GameDetailsDialog = ({
                   </Trans>
                 }
                 helpPagePath="/publishing"
-                actionButtonId="add-behavior-button"
+                actionButtonId="game-detail-share-button"
                 actionIcon={<Publish />}
                 actionLabel={<Trans>Share</Trans>}
                 onAction={onClickShare}

@@ -263,8 +263,6 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return null;
   }
 
-  addFunctionAtSelection(): void {}
-
   _setProjectFirstScene(sceneName: string): void {
     this.props.project.setFirstLayout(sceneName);
     this.props.forceUpdate();

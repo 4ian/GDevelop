@@ -211,6 +211,4 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
   getRightButton(i18n: I18nType) {
     return null;
   }
-
-  addFunctionAtSelection(): void {}
 }

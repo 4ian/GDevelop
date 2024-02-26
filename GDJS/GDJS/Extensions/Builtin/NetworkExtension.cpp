@@ -25,6 +25,11 @@ NetworkExtension::NetworkExtension() {
       "gdjs.evtTools.network.enableMetrics");
   GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");
 
+  AddDependency()
+      .SetName("InAppBrowser Cordova plugin")
+      .SetDependencyType("cordova")
+      .SetExportName("cordova-plugin-inappbrowser");
+
   StripUnimplementedInstructionsAndExpressions();
 }
 

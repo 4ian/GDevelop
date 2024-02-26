@@ -143,7 +143,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       },
       {
         label: i18n._(t`Duplicate`),
-        click: () => this._duplicateScene(),
+        click: () => this._duplicate(),
       },
     ];
   }
@@ -225,14 +225,15 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     const newScene = project.insertNewLayout(newName, this.getIndex() + 1);
 
     unserializeFromJSObject(newScene, copiedScene, 'unserializeFrom', project);
-    newScene.setName(newName); // Unserialization has overwritten the name.
+    // Unserialization has overwritten the name.
+    newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();
     this.props.editName(getSceneTreeViewItemId(newScene));
   }
 
-  _duplicateScene(): void {
+  _duplicate(): void {
     const { project } = this.props;
     const newName = newNameGenerator(this.scene.getName(), name =>
       project.hasLayoutNamed(name)
@@ -246,7 +247,8 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
-    newScene.setName(newName); // Unserialization has overwritten the name.
+    // Unserialization has overwritten the name.
+    newScene.setName(newName);
     newScene.updateBehaviorsSharedData(project);
 
     this._onProjectItemModified();

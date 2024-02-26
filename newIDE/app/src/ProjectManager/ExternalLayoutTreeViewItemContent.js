@@ -159,7 +159,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
 
   copy(): void {
     Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
-      layout: serializeToJSObject(this.externalLayout),
+      externalLayout: serializeToJSObject(this.externalLayout),
       name: this.externalLayout.getName(),
     });
   }
@@ -191,7 +191,8 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     );
 
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
-    newExternalLayout.setName(newName); // Unserialization has overwritten the name.
+    // Unserialization has overwritten the name.
+    newExternalLayout.setName(newName);
 
     this._onProjectItemModified();
     this.props.editName(getExternalLayoutTreeViewItemId(newExternalLayout));

@@ -159,7 +159,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
 
   copy(): void {
     Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
-      layout: serializeToJSObject(this.externalEvents),
+      externalEvents: serializeToJSObject(this.externalEvents),
       name: this.externalEvents.getName(),
     });
   }
@@ -196,7 +196,8 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
       'unserializeFrom',
       project
     );
-    newExternalEvents.setName(newName); // Unserialization has overwritten the name.
+    // Unserialization has overwritten the name.
+    newExternalEvents.setName(newName);
 
     this._onProjectItemModified();
     this.props.editName(getExternalEventsTreeViewItemId(newExternalEvents));

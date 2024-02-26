@@ -859,8 +859,12 @@ namespace gdjs {
         const electron = this.getElectron();
         if (electron) {
           electron.shell.openExternal(url);
+        } else if (
           // @ts-ignore
-        } else if (typeof window.cordova !== 'undefined') {
+          typeof window.cordova !== 'undefined' &&
+          // @ts-ignore
+          typeof window.cordova.InAppBrowser !== 'undefined'
+        ) {
           // @ts-ignore
           window.cordova.InAppBrowser.open(url, '_system', 'location=yes');
         } else {

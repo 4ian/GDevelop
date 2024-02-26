@@ -859,10 +859,12 @@ namespace gdjs {
         const electron = this.getElectron();
         if (electron) {
           electron.shell.openExternal(url);
-        } else {
           // @ts-ignore
-          const target = window.cordova ? '_system' : '_blank';
-          window.open(url, target);
+        } else if (typeof window.cordova !== 'undefined') {
+          // @ts-ignore
+          window.cordova.InAppBrowser.open(url, '_system', 'location=yes');
+        } else {
+          window.open(url, '_blank');
         }
       }
     }

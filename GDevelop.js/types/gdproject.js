@@ -70,6 +70,7 @@ declare class gdProject extends gdObjectsContainer {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): gdExternalEvents;
   getExternalEventsAt(index: number): gdExternalEvents;
@@ -78,6 +79,7 @@ declare class gdProject extends gdObjectsContainer {
   getExternalEventsCount(): number;
   insertNewExternalEvents(name: string, position: number): gdExternalEvents;
   removeExternalEvents(name: string): void;
+  getExternalEventsPosition(name: string): number;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): gdExternalLayout;
   getExternalLayoutAt(index: number): gdExternalLayout;
@@ -86,6 +88,7 @@ declare class gdProject extends gdObjectsContainer {
   getExternalLayoutsCount(): number;
   insertNewExternalLayout(name: string, position: number): gdExternalLayout;
   removeExternalLayout(name: string): void;
+  getExternalLayoutPosition(name: string): number;
   hasEventsFunctionsExtensionNamed(name: string): boolean;
   getEventsFunctionsExtension(name: string): gdEventsFunctionsExtension;
   getEventsFunctionsExtensionAt(index: number): gdEventsFunctionsExtension;
@@ -95,6 +98,7 @@ declare class gdProject extends gdObjectsContainer {
   insertNewEventsFunctionsExtension(name: string, position: number): gdEventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: gdEventsFunctionsExtension, position: number): gdEventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  getEventsFunctionsExtensionPosition(name: string): number;
   hasEventsBasedBehavior(type: string): boolean;
   getEventsBasedBehavior(type: string): gdEventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;

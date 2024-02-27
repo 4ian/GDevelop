@@ -1239,7 +1239,7 @@ const EventsFunctionsList = React.forwardRef<
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
                       forceDefaultDraggingPreview
-                      shouldHideMenuIcon
+                      shouldHideMenuIcon={() => true}
                     />
                   )}
                 </AutoSizer>

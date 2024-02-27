@@ -85,9 +85,6 @@ const GamesList = ({
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
   const [searchText, setSearchText] = React.useState<string>('');
-  const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
-    games
-  );
   const [currentPage, setCurrentPage] = React.useState<number>(0);
 
   const searchClient = React.useMemo(
@@ -97,6 +94,16 @@ const GamesList = ({
         keys: [{ name: 'gameName', weight: 1 }],
       }),
     [games]
+  );
+
+  const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
+    getGamesToDisplay({
+      project,
+      games,
+      searchText,
+      searchClient,
+      currentPage,
+    })
   );
 
   const onRegisterGame = React.useCallback(

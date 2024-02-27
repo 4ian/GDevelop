@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import List from '@material-ui/core/List';
 import { Line, Column } from '../../../../UI/Grid';
@@ -36,6 +37,11 @@ import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWind
 import RaisedButton from '../../../../UI/RaisedButton';
 import { groupMembersByGroupId } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../../UI/Menu/ContextMenu';
+import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
+import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 
 const PADDING = 16;
 
@@ -82,6 +88,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
+    const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
     React.useImperativeHandle(ref, () => ({
       forceUpdate,
@@ -145,9 +152,14 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       },
       [onRefreshMembers]
     );
+
     const changeUserGroup = React.useCallback(
       async (user: User, group: TeamGroup) => {
         try {
+          setMovingUsers({
+            groupId: group.id,
+            users: [user],
+          });
           await onChangeUserGroup(user, group);
         } catch (error) {
           console.error(
@@ -161,6 +173,27 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         }
       },
       [onChangeUserGroup]
+    );
+
+    const buildContextMenu = (
+      i18n: I18nType,
+      member: User
+    ): Array<MenuItemTemplate> => {
+      return [
+        {
+          label: i18n._(t`See projects`),
+          click: () => listUserProjects(member),
+        },
+      ];
+    };
+
+    const openContextMenu = React.useCallback(
+      (event: ClientCoordinates, member: User) => {
+        if (contextMenu.current) {
+          contextMenu.current.open(event.clientX, event.clientY, { member });
+        }
+      },
+      []
     );
 
     const membersByGroupId = groupMembersByGroupId({
@@ -253,6 +286,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                         <TeamMemberRow
                           isTemporary={false}
                           key={member.id}
+                          onOpenContextMenu={openContextMenu}
                           member={member}
                           onListUserProjects={() => listUserProjects(member)}
                           onDrag={setDraggedUser}
@@ -292,20 +326,23 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             <ColumnStackLayout noMargin>
               {groupsAndMembers.length > 0 ? (
                 groupsAndMembers.map(({ group, members }) => {
-                  const membersToDisplay =
-                    !!movingUsers && movingUsers.groupId === group.id
-                      ? [...members, ...movingUsers.users]
-                      : members;
+                  const membersToDisplay = [...members];
+                  if (!!movingUsers && movingUsers.groupId === group.id) {
+                    movingUsers.users.forEach(movingUser => {
+                      if (
+                        !members.some(member => member.id === movingUser.id)
+                      ) {
+                        membersToDisplay.push(movingUser);
+                      }
+                    });
+                  }
+
                   return (
                     <DropTarget
                       canDrop={() => true}
                       drop={() => {
                         const droppedUser = draggedUserRef.current;
                         if (!droppedUser) return;
-                        setMovingUsers({
-                          groupId: group.id,
-                          users: [droppedUser],
-                        });
                         changeUserGroup(droppedUser, group);
                         draggedUserRef.current = null;
                       }}
@@ -339,22 +376,28 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                                 <List style={styles.list}>
                                   {membersToDisplay
                                     .sort(sortMembersByNameOrEmail)
-                                    .map(member => (
-                                      <TeamMemberRow
-                                        isTemporary={
-                                          !!movingUsers &&
-                                          movingUsers.users.some(
-                                            user => user.id === member.id
-                                          )
-                                        }
-                                        key={member.id}
-                                        member={member}
-                                        onListUserProjects={() =>
-                                          listUserProjects(member)
-                                        }
-                                        onDrag={setDraggedUser}
-                                      />
-                                    ))}
+                                    .map(member => {
+                                      const isTemporary =
+                                        !!movingUsers &&
+                                        movingUsers.users.some(
+                                          user => user.id === member.id
+                                        );
+                                      return (
+                                        <TeamMemberRow
+                                          isTemporary={isTemporary}
+                                          key={
+                                            member.id +
+                                            (isTemporary ? '_temp' : '')
+                                          }
+                                          member={member}
+                                          onOpenContextMenu={openContextMenu}
+                                          onListUserProjects={() =>
+                                            listUserProjects(member)
+                                          }
+                                          onDrag={setDraggedUser}
+                                        />
+                                      );
+                                    })}
                                 </List>
                               </Column>
                             </Line>
@@ -372,6 +415,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             </ColumnStackLayout>
           </div>
         </SectionRow>
+        <ContextMenu
+          ref={contextMenu}
+          buildMenuTemplate={(_i18n, { member }) =>
+            buildContextMenu(_i18n, member)
+          }
+        />
       </SectionContainer>
     );
   }

@@ -248,7 +248,8 @@ const MarketingPlans = ({ game }: Props) => {
             <Trans>
               🎉 Congrats on getting the {translatedName} featuring for your
               game {game.gameName}! Ensure that your game is public and you have
-              configured a thumbnail for gd.games.
+              configured a thumbnail for gd.games. This can take a few minutes
+              for your game to be visible on the platform.
             </Trans>
           ) : (
             <Trans>

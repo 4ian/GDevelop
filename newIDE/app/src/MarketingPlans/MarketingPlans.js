@@ -226,7 +226,8 @@ const MarketingPlans = ({ game }: Props) => {
         message: activeFeaturing ? (
           <Trans>
             You are about to use {packCreditsAmount} credits to extend the game
-            featuring {translatedName} for your game {game.gameName}. Continue?
+            featuring {translatedName} for your game {game.gameName} and push it
+            to the top of gd.games. Continue?
           </Trans>
         ) : (
           <Trans>

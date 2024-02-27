@@ -219,7 +219,8 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
       if (
         childType === 'Sprite' ||
         childType === 'TiledSpriteObject::TiledSprite' ||
-        childType === 'PanelSpriteObject::PanelSprite'
+        childType === 'PanelSpriteObject::PanelSprite' ||
+        childType === 'Scene3D::Cube3DObject'
       ) {
         const thumbnail = ObjectsRenderingService.getThumbnail(
           project,

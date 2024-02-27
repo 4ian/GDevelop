@@ -1385,9 +1385,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                       setOpenGameDetails(false);
                       fetchGames();
                     }}
-                    onGameUpdated={() => {
-                      fetchGames();
-                    }}
+                    onGameUpdated={fetchGames}
                     onShareProject={onShareProject}
                   />
                 )}

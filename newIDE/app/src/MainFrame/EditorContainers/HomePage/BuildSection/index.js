@@ -42,6 +42,7 @@ import { PrivateGameTemplateStoreContext } from '../../../../AssetStore/PrivateG
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import ProjectFileListItem from './ProjectFileListItem';
+import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 import {
   getAllGameTemplatesAndExamplesFlaggedAsGameCount,
   getExampleAndTemplateItemsForBuildSection,
@@ -54,6 +55,16 @@ import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
 import type { WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from '../../../../UI/FlatButton';
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import optionalRequire from '../../../../Utils/OptionalRequire';
+import { deleteCloudProject } from '../../../../Utils/GDevelopServices/Project';
+import { extractGDevelopApiErrorStatusAndCode } from '../../../../Utils/GDevelopServices/Errors';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../../UI/Menu/ContextMenu';
+import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
+const electron = optionalRequire('electron');
+const path = optionalRequire('path');
 
 const cellSpacing = 2;
 
@@ -108,6 +119,13 @@ type Props = {|
   canManageGame: ({| gameId: string |}) => boolean,
 |};
 
+const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
+  if (!electron) return;
+  electron.shell.showItemInFolder(
+    path.resolve(file.fileMetadata.fileIdentifier)
+  );
+};
+
 const BuildSection = ({
   project,
   currentFileMetadata,
@@ -125,6 +143,9 @@ const BuildSection = ({
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const { exampleShortHeaders } = React.useContext(ExampleStoreContext);
+  const { showDeleteConfirmation, showAlert } = useAlertDialog();
+  const { removeRecentProjectFile } = React.useContext(PreferencesContext);
+  const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const [
     showAllGameTemplates,
     setShowAllGameTemplates,
@@ -132,10 +153,12 @@ const BuildSection = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
+  const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [
     showCloudProjectsInfoIfNotLoggedIn,
     setShowCloudProjectsInfoIfNotLoggedIn,
@@ -204,7 +227,111 @@ const BuildSection = ({
     authenticatedUser
   );
 
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const onDeleteCloudProject = async (
+    i18n: I18nType,
+    { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
+  ) => {
+    if (storageProviderName !== 'Cloud') return;
+    const projectName = fileMetadata.name;
+    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
+
+    // Extract word translation to ensure it is not wrongly translated in the sentence.
+    const translatedConfirmText = i18n._(t`delete`);
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete your project ${projectName}?`,
+      message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
+      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
+      confirmText: translatedConfirmText,
+      confirmButtonLabel: t`Delete project`,
+    });
+    if (!deleteAnswer) return;
+
+    try {
+      setPendingProject(fileMetadata.fileIdentifier);
+      await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
+      authenticatedUser.onCloudProjectsChanged();
+    } catch (error) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      const message =
+        extractedStatusAndCode && extractedStatusAndCode.status === 403
+          ? t`You don't have permissions to delete this project.`
+          : t`An error occurred when saving the project. Please try again later.`;
+      showAlert({
+        title: t`Unable to delete the project`,
+        message,
+      });
+    } finally {
+      setPendingProject(null);
+    }
+  };
+
+  const buildContextMenu = (
+    i18n: I18nType,
+    file: ?FileMetadataAndStorageProviderName
+  ): Array<MenuItemTemplate> => {
+    if (!file) return [];
+    const isCurrentProjectOpened =
+      !!currentFileMetadata &&
+      currentFileMetadata.fileIdentifier === file.fileMetadata.fileIdentifier;
+
+    const actions = [
+      { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
+    ];
+    if (file.storageProviderName === 'Cloud') {
+      actions.push({
+        label: i18n._(t`Delete`),
+        click: () => onDeleteCloudProject(i18n, file),
+        enabled: !isCurrentProjectOpened,
+      });
+    } else if (file.storageProviderName === 'LocalFile') {
+      actions.push(
+        ...[
+          {
+            label: i18n._(t`Show in local folder`),
+            click: () => locateProjectFile(file),
+          },
+          {
+            label: i18n._(t`Remove from list`),
+            click: () => removeRecentProjectFile(file),
+          },
+        ]
+      );
+    } else {
+      actions.push({
+        label: i18n._(t`Remove from list`),
+        click: () => removeRecentProjectFile(file),
+      });
+    }
+
+    const gameId = file.fileMetadata.gameId;
+    if (gameId) {
+      actions.push(
+        ...[
+          { type: 'separator' },
+          {
+            label: i18n._(t`Manage game`),
+            click: () => onManageGame({ gameId }),
+            enabled: canManageGame({ gameId }),
+          },
+        ]
+      );
+    }
+
+    return actions;
+  };
+
+  const openContextMenu = React.useCallback(
+    (event: ClientCoordinates, file: FileMetadataAndStorageProviderName) => {
+      if (contextMenu.current) {
+        contextMenu.current.open(event.clientX, event.clientY, { file });
+      }
+    },
+    []
+  );
+
   const refreshCloudProjects = React.useCallback(
     async () => {
       if (isRefreshing) return;
@@ -439,6 +566,10 @@ const BuildSection = ({
                   <ProjectFileListItem
                     key={file.fileMetadata.fileIdentifier}
                     file={file}
+                    onOpenContextMenu={openContextMenu}
+                    isLoading={
+                      pendingProject === file.fileMetadata.fileIdentifier
+                    }
                     currentFileMetadata={currentFileMetadata}
                     storageProviders={storageProviders}
                     isWindowSizeMediumOrLarger={!isMobile}
@@ -448,8 +579,6 @@ const BuildSection = ({
                         file.fileMetadata.fileIdentifier
                       ]
                     }
-                    onManageGame={onManageGame}
-                    canManageGame={canManageGame}
                   />
                 ))}
               </List>
@@ -509,6 +638,10 @@ const BuildSection = ({
         duration={5000}
         onActionClick={onOpenLoginDialog}
         actionLabel={<Trans>Log in</Trans>}
+      />
+      <ContextMenu
+        ref={contextMenu}
+        buildMenuTemplate={(_i18n, { file }) => buildContextMenu(_i18n, file)}
       />
     </>
   );

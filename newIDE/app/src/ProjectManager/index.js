@@ -220,7 +220,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return null;
+    return this.id;
   }
 
   getThumbnail(): ?string {
@@ -304,7 +304,7 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
   }
 
   getHtmlId(index: number): ?string {
-    return null;
+    return this.id;
   }
 
   getThumbnail(): ?string {

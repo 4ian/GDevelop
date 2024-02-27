@@ -156,6 +156,10 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
     const changeUserGroup = React.useCallback(
       async (user: User, group: TeamGroup) => {
         try {
+          setMovingUsers({
+            groupId: group.id,
+            users: [user],
+          });
           await onChangeUserGroup(user, group);
         } catch (error) {
           console.error(
@@ -322,20 +326,23 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
             <ColumnStackLayout noMargin>
               {groupsAndMembers.length > 0 ? (
                 groupsAndMembers.map(({ group, members }) => {
-                  const membersToDisplay =
-                    !!movingUsers && movingUsers.groupId === group.id
-                      ? [...members, ...movingUsers.users]
-                      : members;
+                  const membersToDisplay = [...members];
+                  if (!!movingUsers && movingUsers.groupId === group.id) {
+                    movingUsers.users.forEach(movingUser => {
+                      if (
+                        !members.some(member => member.id === movingUser.id)
+                      ) {
+                        membersToDisplay.push(movingUser);
+                      }
+                    });
+                  }
+
                   return (
                     <DropTarget
                       canDrop={() => true}
                       drop={() => {
                         const droppedUser = draggedUserRef.current;
                         if (!droppedUser) return;
-                        setMovingUsers({
-                          groupId: group.id,
-                          users: [droppedUser],
-                        });
                         changeUserGroup(droppedUser, group);
                         draggedUserRef.current = null;
                       }}
@@ -369,23 +376,28 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                                 <List style={styles.list}>
                                   {membersToDisplay
                                     .sort(sortMembersByNameOrEmail)
-                                    .map(member => (
-                                      <TeamMemberRow
-                                        isTemporary={
-                                          !!movingUsers &&
-                                          movingUsers.users.some(
-                                            user => user.id === member.id
-                                          )
-                                        }
-                                        key={member.id}
-                                        member={member}
-                                        onOpenContextMenu={openContextMenu}
-                                        onListUserProjects={() =>
-                                          listUserProjects(member)
-                                        }
-                                        onDrag={setDraggedUser}
-                                      />
-                                    ))}
+                                    .map(member => {
+                                      const isTemporary =
+                                        !!movingUsers &&
+                                        movingUsers.users.some(
+                                          user => user.id === member.id
+                                        );
+                                      return (
+                                        <TeamMemberRow
+                                          isTemporary={isTemporary}
+                                          key={
+                                            member.id +
+                                            (isTemporary ? '_temp' : '')
+                                          }
+                                          member={member}
+                                          onOpenContextMenu={openContextMenu}
+                                          onListUserProjects={() =>
+                                            listUserProjects(member)
+                                          }
+                                          onDrag={setDraggedUser}
+                                        />
+                                      );
+                                    })}
                                 </List>
                               </Column>
                             </Line>

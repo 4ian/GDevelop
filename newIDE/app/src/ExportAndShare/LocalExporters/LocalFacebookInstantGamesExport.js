@@ -184,7 +184,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ exportState, onClose }) => {
+  renderDoneFooter: ({ exportState }) => {
     const openExportFolder = () => {
       if (shell && path)
         shell.openPath(path.dirname(exportState.archiveOutputFilename));

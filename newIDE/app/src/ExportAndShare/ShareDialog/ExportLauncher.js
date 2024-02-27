@@ -236,7 +236,6 @@ export default class ExportLauncher extends Component<Props, State> {
       eventsFunctionsExtensionsState,
       authenticatedUser,
     } = this.props;
-    console.log('launching export');
     sendExportLaunched(exportPipeline.name);
 
     if (
@@ -341,16 +340,10 @@ export default class ExportLauncher extends Component<Props, State> {
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
       };
-      const quota = getBuildQuota(
-        authenticatedUser,
-        exportPipeline.onlineBuildType
-      );
 
       if (
         exportPipeline.shouldSuggestBumpingVersionNumber &&
-        exportPipeline.shouldSuggestBumpingVersionNumber({
-          quota,
-        }) &&
+        exportPipeline.shouldSuggestBumpingVersionNumber() &&
         this.state.shouldBumpVersionNumber
       ) {
         project.setVersion(this._candidateBumpedVersionNumber);
@@ -429,11 +422,6 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  _closeDoneFooter = () =>
-    this.setState({
-      doneFooterOpen: false,
-    });
-
   _updateExportState = (updater: any => any) => {
     this.setState(prevState => ({
       ...prevState,
@@ -485,8 +473,13 @@ export default class ExportLauncher extends Component<Props, State> {
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
       if (buildQuota) {
         const buildsCurrentlyRunning = getNumberOfBuildsCurrentlyRunning();
+        // Just in case multiple builds have been launched at the same time,
+        // min value is 0.
         const buildsRemaining = buildQuota
-          ? buildQuota.max - (buildQuota.current + buildsCurrentlyRunning)
+          ? Math.max(
+              buildQuota.max - (buildQuota.current + buildsCurrentlyRunning),
+              0
+            )
           : 0;
         if (!buildsRemaining) return false;
       }
@@ -504,6 +497,8 @@ export default class ExportLauncher extends Component<Props, State> {
       (!!build && build.status === 'pending');
     const isUsingOnlineBuildNonAuthenticated =
       !!exportPipeline.onlineBuildType && !authenticatedUser.authenticated;
+    const isOnlineBuildIncludedInSubscription =
+      !!buildQuota && buildQuota.max > 0;
 
     return (
       <I18n>
@@ -550,10 +545,9 @@ export default class ExportLauncher extends Component<Props, State> {
                 </Line>
               )}
               {!isUsingOnlineBuildNonAuthenticated &&
+                isOnlineBuildIncludedInSubscription &&
                 exportPipeline.shouldSuggestBumpingVersionNumber &&
-                exportPipeline.shouldSuggestBumpingVersionNumber({
-                  quota: buildQuota,
-                }) && (
+                exportPipeline.shouldSuggestBumpingVersionNumber() && (
                   <Line noMargin>
                     <Toggle
                       labelPosition="right"
@@ -623,7 +617,6 @@ export default class ExportLauncher extends Component<Props, State> {
                 exportPipeline.renderDoneFooter({
                   compressionOutput,
                   exportState,
-                  onClose: this._closeDoneFooter,
                 })}
             </Column>
           </Column>

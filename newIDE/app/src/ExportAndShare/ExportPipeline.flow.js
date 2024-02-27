@@ -63,9 +63,7 @@ export type ExportPipeline<
 
   renderHeader: (HeaderProps<ExportState>) => React.Node,
 
-  shouldSuggestBumpingVersionNumber?: ({|
-    quota: ?Quota,
-  |}) => boolean,
+  shouldSuggestBumpingVersionNumber?: () => boolean,
 
   renderExportFlow: (props: ExportFlowProps) => React.Node,
 
@@ -129,6 +127,5 @@ export type ExportPipeline<
   renderDoneFooter?: ({|
     compressionOutput: CompressionOutput,
     exportState: ExportState,
-    onClose: () => void,
   |}) => React.Node,
 |};

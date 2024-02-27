@@ -355,7 +355,7 @@ const PublishHome = ({
               alignItems="center"
               justifyContent="center"
             >
-              {selectedExporter || !chosenSection
+              {!chosenSection
                 ? undefined
                 : getSectionIcon({
                     section: chosenSection,

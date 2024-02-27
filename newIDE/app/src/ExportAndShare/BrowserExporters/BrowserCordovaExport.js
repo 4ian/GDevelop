@@ -147,7 +147,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+  renderDoneFooter: ({ compressionOutput, exportState }) => {
     return (
       <DoneFooter
         renderGameButton={() => (

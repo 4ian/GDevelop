@@ -145,7 +145,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+  renderDoneFooter: ({ compressionOutput, exportState }) => {
     return (
       <DoneFooter
         renderGameButton={() => (

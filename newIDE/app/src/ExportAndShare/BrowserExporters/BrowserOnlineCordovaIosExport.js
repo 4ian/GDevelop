@@ -80,7 +80,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  shouldSuggestBumpingVersionNumber: ({ quota }) => !quota || quota.max > 0,
+  shouldSuggestBumpingVersionNumber: () => true,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />

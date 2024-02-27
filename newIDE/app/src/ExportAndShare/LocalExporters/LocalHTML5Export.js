@@ -159,7 +159,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
     return Promise.resolve(null);
   },
 
-  renderDoneFooter: ({ exportState, onClose }) => {
+  renderDoneFooter: ({ exportState }) => {
     const openExportFolder = () => {
       if (shell) shell.openPath(exportState.outputDir);
     };

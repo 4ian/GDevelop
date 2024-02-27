@@ -69,7 +69,6 @@ const OnlineGameLink = ({
     isOnlineGamePropertiesDialogOpen,
     setIsOnlineGamePropertiesDialogOpen,
   ] = React.useState<boolean>(false);
-  // const [game, setGame] = React.useState<?Game>(null);
   const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext

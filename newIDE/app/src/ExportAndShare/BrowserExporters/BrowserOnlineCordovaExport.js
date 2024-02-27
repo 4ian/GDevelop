@@ -49,7 +49,6 @@ type ResourcesDownloadOutput = {|
 type CompressionOutput = Blob;
 
 const exportPipelineName = 'browser-online-cordova';
-const onlineBuildType = 'cordova-build';
 
 export const browserOnlineCordovaExportPipeline: ExportPipeline<
   ExportState,
@@ -59,7 +58,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   CompressionOutput
 > = {
   name: exportPipelineName,
-  onlineBuildType,
+  onlineBuildType: 'cordova-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
 
@@ -82,7 +81,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  shouldSuggestBumpingVersionNumber: ({ quota }) => !quota || quota.max > 0,
+  shouldSuggestBumpingVersionNumber: () => true,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />

@@ -272,6 +272,47 @@ const MarketingPlans = ({ game }: Props) => {
     ]
   );
 
+  const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
+    const requirementsErrors = [];
+    if (marketingPlan.id === 'featuring-basic') {
+      if (!game.thumbnailUrl) {
+        requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
+      }
+      if (!game.publicWebBuildId) {
+        requirementsErrors.push(
+          <Trans>Your game does not have a public build</Trans>
+        );
+      }
+      if (!game.discoverable) {
+        requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
+      }
+    }
+
+    return requirementsErrors;
+  };
+
+  const getActiveMessage = ({
+    marketingPlan,
+    activeFeaturing,
+    i18n,
+    hasErrors,
+  }: {|
+    marketingPlan: MarketingPlan,
+    activeFeaturing: GameFeaturing,
+    i18n: I18nType,
+    hasErrors: boolean,
+  |}) => {
+    if (hasErrors) {
+      return <Trans>Fix those issues to get the campaign up!</Trans>;
+    }
+
+    return activeFeaturing.featuring === 'games-platform-home' ? (
+      <Trans>Active until {i18n.date(activeFeaturing.expiresAt * 1000)}</Trans>
+    ) : (
+      <Trans>Active, we will get in touch to get the campaign up!</Trans>
+    );
+  };
+
   if (!profile) return null;
 
   return (
@@ -320,6 +361,10 @@ const MarketingPlans = ({ game }: Props) => {
                   bulletPointsByLocale,
                 } = marketingPlan;
                 const activeFeaturing = getActiveFeaturing(marketingPlan);
+                const requirementsErrors = activeFeaturing
+                  ? getRequirementsErrors(marketingPlan)
+                  : [];
+                const hasErrors = requirementsErrors.length > 0;
                 return (
                   <div
                     style={{
@@ -355,28 +400,45 @@ const MarketingPlans = ({ game }: Props) => {
                       </div>
 
                       <div style={styles.bulletPointsContainer}>
-                        {bulletPointsByLocale.map(
-                          (bulletPointByLocale, index) => (
-                            <Column key={index} expand noMargin>
-                              <Line noMargin alignItems="center">
-                                <CheckCircle
-                                  style={{
-                                    ...styles.bulletIcon,
-                                    ...(activeFeaturing
-                                      ? { color: gdevelopTheme.message.valid }
-                                      : {}),
-                                  }}
-                                />
-                                <Text style={{ flex: 1 }}>
-                                  {selectMessageByLocale(
-                                    i18n,
-                                    bulletPointByLocale
-                                  )}
-                                </Text>
-                              </Line>
-                            </Column>
-                          )
-                        )}
+                        {hasErrors
+                          ? requirementsErrors.map((error, index) => (
+                              <Column key={index} expand noMargin>
+                                <Line noMargin alignItems="center">
+                                  <CheckCircle
+                                    style={{
+                                      ...styles.bulletIcon,
+                                      color: gdevelopTheme.message.error,
+                                    }}
+                                  />
+                                  <Text style={{ flex: 1 }}>{error}</Text>
+                                </Line>
+                              </Column>
+                            ))
+                          : bulletPointsByLocale.map(
+                              (bulletPointByLocale, index) => (
+                                <Column key={index} expand noMargin>
+                                  <Line noMargin alignItems="center">
+                                    <CheckCircle
+                                      style={{
+                                        ...styles.bulletIcon,
+                                        ...(activeFeaturing
+                                          ? {
+                                              color:
+                                                gdevelopTheme.message.valid,
+                                            }
+                                          : {}),
+                                      }}
+                                    />
+                                    <Text style={{ flex: 1 }}>
+                                      {selectMessageByLocale(
+                                        i18n,
+                                        bulletPointByLocale
+                                      )}
+                                    </Text>
+                                  </Line>
+                                </Column>
+                              )
+                            )}
                       </div>
 
                       <Column
@@ -391,22 +453,14 @@ const MarketingPlans = ({ game }: Props) => {
                           color="secondary"
                           align="left"
                         >
-                          {activeFeaturing ? (
-                            activeFeaturing.featuring ===
-                            'games-platform-home' ? (
-                              <Trans>
-                                Active until{' '}
-                                {i18n.date(activeFeaturing.expiresAt * 1000)}
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Active, we will get in touch to get the campaign
-                                up!
-                              </Trans>
-                            )
-                          ) : (
-                            selectMessageByLocale(i18n, descriptionByLocale)
-                          )}
+                          {activeFeaturing
+                            ? getActiveMessage({
+                                activeFeaturing,
+                                marketingPlan,
+                                i18n,
+                                hasErrors,
+                              })
+                            : selectMessageByLocale(i18n, descriptionByLocale)}
                         </Text>
                       </Column>
                       <RaisedButton

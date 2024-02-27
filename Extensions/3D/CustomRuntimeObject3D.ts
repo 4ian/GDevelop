@@ -109,7 +109,10 @@ namespace gdjs {
      * @return The Z position of the rendered object.
      */
     getDrawableZ(): float {
-      return this.getZ();
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return this._minZ;
     }
 
     /**

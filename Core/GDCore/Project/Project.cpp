@@ -103,7 +103,8 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   };
 
   if (project.HasEventsBasedObject(objectType)) {
-    // Event-based object metadata may not be generated yet.
+    // During project deserialization, event-based object metadata are not yet
+    // generated.
     addDefaultBehavior("EffectCapability::EffectBehavior");
     addDefaultBehavior("ResizableCapability::ResizableBehavior");
     addDefaultBehavior("ScalableCapability::ScalableBehavior");

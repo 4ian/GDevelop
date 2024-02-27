@@ -1218,20 +1218,39 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
   // Objects are identified by their name alone.
   auto &objectType = eventsBasedObject.GetName();
 
-  objectMetadata
-      .AddScopedAction(
-          "SetRotationCenter", _("Center of rotation"),
-          _("Change the center of rotation of an object relatively to the "
-            "object origin."),
-          _("Change the center of rotation of _PARAM0_ to _PARAM1_, _PARAM2_"),
-          _("Angle"), "res/actions/position24_black.png",
-          "res/actions/position_black.png")
-      .AddParameter("object", _("Object"), objectType)
-      .AddParameter("number", _("X position"))
-      .AddParameter("number", _("Y position"))
-      .MarkAsAdvanced()
-      .SetPrivate()
-      .SetFunctionName("setRotationCenter");
+  if (eventsBasedObject.IsRenderedIn3D()) {
+    objectMetadata
+        .AddScopedAction(
+            "SetRotationCenter", _("Center of rotation"),
+            _("Change the center of rotation of an object relatively to the "
+              "object origin."),
+            _("Change the center of rotation of _PARAM0_ to _PARAM1_ ; _PARAM2_ ; _PARAM3_"),
+            _("Angle"), "res/actions/position24_black.png",
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position"))
+        .AddParameter("number", _("Y position"))
+        .AddParameter("number", _("Z position"))
+        .MarkAsAdvanced()
+        .SetPrivate()
+        .SetFunctionName("setRotationCenter3D");
+  }
+  else {
+    objectMetadata
+        .AddScopedAction(
+            "SetRotationCenter", _("Center of rotation"),
+            _("Change the center of rotation of an object relatively to the "
+              "object origin."),
+            _("Change the center of rotation of _PARAM0_ to _PARAM1_ ; _PARAM2_"),
+            _("Angle"), "res/actions/position24_black.png",
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position"))
+        .AddParameter("number", _("Y position"))
+        .MarkAsAdvanced()
+        .SetPrivate()
+        .SetFunctionName("setRotationCenter");
+  }
 }
 
 void MetadataDeclarationHelper::AddParameter(

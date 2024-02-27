@@ -600,7 +600,7 @@ function generateObjectMetadata(
   const includeFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
     codeNamespace
   );
-
+  // Objects may already have included files for 3D for instance.
   objectMetadata.addIncludeFile(includeFile);
 
   // Always include the extension include files when using an object.

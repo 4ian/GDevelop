@@ -114,6 +114,8 @@ public:
 
   /**
    * \brief Erase any existing include file and add the specified include.
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
    */
   virtual AbstractFunctionMetadata &
   SetIncludeFile(const gd::String &includeFile) = 0;

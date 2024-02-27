@@ -150,6 +150,10 @@ class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata 
     return *this;
   }
 
+  /**
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
+   */
   MultipleInstructionMetadata &SetIncludeFile(const gd::String &includeFile) override {
     if (expression)
       expression->SetIncludeFile(includeFile);

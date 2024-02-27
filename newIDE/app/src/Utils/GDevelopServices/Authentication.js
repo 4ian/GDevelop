@@ -404,7 +404,8 @@ export default class Authentication {
   };
 
   acceptGameStatsEmail = async (
-    getAuthorizationHeader: () => Promise<string>
+    getAuthorizationHeader: () => Promise<string>,
+    value: boolean
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -416,7 +417,7 @@ export default class Authentication {
       .then(authorizationHeader => {
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
-          { getGameStatsEmail: true },
+          { getGameStatsEmail: value },
           {
             params: { userId: currentUser.uid },
             headers: { Authorization: authorizationHeader },

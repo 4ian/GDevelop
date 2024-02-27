@@ -9,6 +9,7 @@ import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
@@ -17,8 +18,10 @@ import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import {
   ExplanationHeader,
   DoneFooter,
+  ExportFlow,
 } from '../GenericExporters/FacebookInstantGamesExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -48,6 +51,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
+const exportPipelineName = 'local-facebook-instant-games';
+
 export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -55,7 +60,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-facebook-instant-games',
+  name: exportPipelineName,
 
   getInitialExportState: (project: gdProject) => ({
     archiveOutputFilename: app
@@ -67,35 +72,38 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
 
   isNavigationDisabled: () => false,
 
-  renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin expand>
-      <Line>
-        <ExplanationHeader />
-      </Line>
-      <Line>
-        <LocalFilePicker
-          title={'Facebook Instant Games export zip file'}
-          message={
-            'Choose where to save the exported file for Facebook Instant Games'
-          }
-          filters={[
-            {
-              name: 'Compressed file for Facebook Instant Games',
-              extensions: ['zip'],
-            },
-          ]}
-          value={exportState.archiveOutputFilename}
-          defaultPath={app ? app.getPath('documents') : ''}
-          onChange={value =>
-            updateExportState(() => ({ archiveOutputFilename: value }))
-          }
-          fullWidth
-        />
-      </Line>
-    </Column>
-  ),
+  renderHeader: ({ project, exportState, updateExportState, exportStep }) =>
+    exportStep !== 'done' ? (
+      <Column noMargin expand>
+        <Line>
+          <ExplanationHeader />
+        </Line>
+        <Line>
+          <LocalFilePicker
+            title={'Facebook Instant Games export zip file'}
+            message={
+              'Choose where to save the exported file for Facebook Instant Games'
+            }
+            filters={[
+              {
+                name: 'Compressed file for Facebook Instant Games',
+                extensions: ['zip'],
+              },
+            ]}
+            value={exportState.archiveOutputFilename}
+            defaultPath={app ? app.getPath('documents') : ''}
+            onChange={value =>
+              updateExportState(() => ({ archiveOutputFilename: value }))
+            }
+            fullWidth
+          />
+        </Line>
+      </Column>
+    ) : null,
 
-  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

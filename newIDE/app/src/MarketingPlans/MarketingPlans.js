@@ -4,35 +4,35 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+} from '../UI/Layout';
 import {
   buyGameFeaturing,
-  listMarketingPlans,
   listGameFeaturings,
   type Game,
   type MarketingPlan,
   type GameFeaturing,
-} from '../../Utils/GDevelopServices/Game';
-import Text from '../../UI/Text';
-import Link from '../../UI/Link';
-import Window from '../../Utils/Window';
+} from '../Utils/GDevelopServices/Game';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import Window from '../Utils/Window';
 import Basic from './Icons/Basic';
 import Pro from './Icons/Pro';
 import Premium from './Icons/Premium';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { Column, Line } from '../../UI/Grid';
-import RaisedButton from '../../UI/RaisedButton';
-import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import PlaceholderError from '../../UI/PlaceholderError';
-import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import PlaceholderError from '../UI/PlaceholderError';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { MarketingPlansStoreContext } from './MarketingPlansStoreContext';
 
 const styles = {
   campaign: {
@@ -79,14 +79,13 @@ const MarketingPlans = ({ game }: Props) => {
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
+  const {
+    marketingPlans,
+    error: marketingPlansError,
+    fetchMarketingPlans,
+  } = React.useContext(MarketingPlansStoreContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlert } = useAlertDialog();
-  const [marketingPlans, setMarketingPlans] = React.useState<
-    MarketingPlan[] | null
-  >(null);
-  const [marketingPlansError, setMarketingPlansError] = React.useState<?Error>(
-    null
-  );
   const [gameFeaturings, setGameFeaturings] = React.useState<
     GameFeaturing[] | null
   >(null);
@@ -144,17 +143,6 @@ const MarketingPlans = ({ game }: Props) => {
     },
     [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
   );
-
-  const fetchMarketingPlans = React.useCallback(async () => {
-    try {
-      setMarketingPlansError(null);
-      const marketingPlans = await listMarketingPlans();
-      setMarketingPlans(marketingPlans);
-    } catch (error) {
-      console.error('An error occurred while fetching marketing plans.', error);
-      setMarketingPlansError(error);
-    }
-  }, []);
 
   React.useEffect(
     () => {
@@ -301,13 +289,10 @@ const MarketingPlans = ({ game }: Props) => {
               connection or try again later.
             </Trans>
           </PlaceholderError>
-        ) : !marketingPlans || !gameFeaturings ? (
+        ) : !marketingPlans ? (
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            <Text size="sub-title">
-              <Trans>Marketing Campaigns</Trans>
-            </Text>
             <Text color="secondary" noMargin>
               <Trans>
                 Get ready-made packs to make your game visible to the GDevelop
@@ -428,7 +413,9 @@ const MarketingPlans = ({ game }: Props) => {
                         primary={!activeFeaturing}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
-                          activeFeaturing ? (
+                          !gameFeaturings ? (
+                            <Trans>Loading...</Trans>
+                          ) : activeFeaturing ? (
                             activeFeaturing.featuring ===
                             'games-platform-home' ? (
                               <Trans>Extend</Trans>
@@ -440,6 +427,7 @@ const MarketingPlans = ({ game }: Props) => {
                           )
                         }
                         fullWidth
+                        disabled={!gameFeaturings}
                       />
                     </ColumnStackLayout>
                   </div>

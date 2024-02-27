@@ -10,7 +10,7 @@ type Props = {|
   onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
 |};
 type State = {|
   builds: ?Array<Build>,

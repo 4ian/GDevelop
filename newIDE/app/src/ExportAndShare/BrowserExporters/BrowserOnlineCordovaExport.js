@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -19,13 +18,16 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineCordovaExport';
+
 const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
@@ -46,6 +48,9 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-online-cordova';
+const onlineBuildType = 'cordova-build';
+
 export const browserOnlineCordovaExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,8 +58,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-cordova',
-  onlineBuildType: 'cordova-build',
+  name: exportPipelineName,
+  onlineBuildType,
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
 
@@ -77,9 +82,11 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
+  shouldSuggestBumpingVersionNumber: ({ quota }) => !quota || quota.max > 0,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import MarketingPlans from '../../../../GameDashboard/Marketing/MarketingPlans';
+import MarketingPlans from '../../../../MarketingPlans/MarketingPlans';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import { type MarketingPlan } from '../../../../Utils/GDevelopServices/Game';
 import {

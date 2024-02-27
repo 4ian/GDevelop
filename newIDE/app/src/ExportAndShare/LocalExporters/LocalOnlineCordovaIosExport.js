@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -14,14 +13,17 @@ import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire';
 import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineCordovaIosExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -43,6 +45,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
+const exportPipelineName = 'local-online-cordova-ios';
+
 export const localOnlineCordovaIosExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -50,7 +54,7 @@ export const localOnlineCordovaIosExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-cordova-ios',
+  name: exportPipelineName,
   onlineBuildType: 'cordova-ios-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
@@ -73,9 +77,11 @@ export const localOnlineCordovaIosExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  shouldSuggestBumpingVersionNumber: ({ exportState }) => true,
+  shouldSuggestBumpingVersionNumber: ({ quota }) => !quota || quota.max > 0,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for iOS</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

@@ -245,6 +245,7 @@ type Props = {
   authenticatedUser: AuthenticatedUser,
   buildSigningOptions: BuildSigningOptions | null,
   onSelectBuildSigningOptions: (BuildSigningOptions | null) => void,
+  disabled?: boolean,
 };
 
 export const IosSigningCredentialsSelector = ({
@@ -252,6 +253,7 @@ export const IosSigningCredentialsSelector = ({
   authenticatedUser,
   buildSigningOptions,
   onSelectBuildSigningOptions,
+  disabled,
 }: Props) => {
   const {
     signingCredentials,
@@ -287,7 +289,6 @@ export const IosSigningCredentialsSelector = ({
           buildSigningOptions
         )
       ) {
-        console.log(newBuildSigningOptions);
         onSelectBuildSigningOptions(newBuildSigningOptions);
       }
     },
@@ -328,6 +329,7 @@ export const IosSigningCredentialsSelector = ({
                 : t`Add a certificate/profile first`
               : t`Loading...`
           }
+          disabled={disabled}
         >
           {appleCertificateSigningCredentials ? (
             appleCertificateSigningCredentials.flatMap(signingCredential => {
@@ -360,6 +362,7 @@ export const IosSigningCredentialsSelector = ({
             style={styles.button}
             label={<Trans>Add or edit</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}
+            disabled={disabled}
           />
         ) : (
           <RaisedButton
@@ -367,6 +370,7 @@ export const IosSigningCredentialsSelector = ({
             style={styles.raisedButton}
             label={<Trans>Add new</Trans>}
             onClick={() => setIsSigningCredentialsDialogOpen(true)}
+            disabled={disabled}
           />
         )}
         {isSigningCredentialsDialogOpen && (
@@ -408,6 +412,7 @@ export const IosSigningCredentialsSelector = ({
                   : t`Add an Auth Key first`
                 : t`Loading...`
             }
+            disabled={disabled}
           >
             {appleAuthKeySigningCredentials ? (
               appleAuthKeySigningCredentials.flatMap(signingCredential => {

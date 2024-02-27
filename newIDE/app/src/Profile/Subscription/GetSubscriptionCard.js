@@ -10,6 +10,7 @@ import Link from '../../UI/Link';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
+import RaisedButton from '../../UI/RaisedButton';
 
 const styles = {
   subscriptionContainer: {
@@ -26,6 +27,8 @@ const styles = {
 type Props = {|
   children: React.Node,
   subscriptionDialogOpeningReason: SubscriptionDialogDisplayReason,
+  label?: React.Node,
+  makeButtonRaised?: boolean,
 |};
 
 const GetSubscriptionCard = (props: Props) => {
@@ -36,7 +39,7 @@ const GetSubscriptionCard = (props: Props) => {
 
   const subscriptionContainerStyle = {
     ...styles.subscriptionContainer,
-    border: `1px solid ${gdevelopTheme.palette.primary}`,
+    border: `1px solid ${gdevelopTheme.palette.secondary}`,
   };
 
   return (
@@ -47,20 +50,34 @@ const GetSubscriptionCard = (props: Props) => {
           {props.children}
         </Column>
         <Column>
-          <Link
-            href="#"
-            onClick={() => {
-              openSubscriptionDialog({
-                analyticsMetadata: {
-                  reason: props.subscriptionDialogOpeningReason,
-                },
-              });
-            }}
-          >
-            <Text noMargin color="inherit">
-              <Trans>Upgrade</Trans>
-            </Text>
-          </Link>
+          {!props.makeButtonRaised ? (
+            <Link
+              href="#"
+              onClick={() => {
+                openSubscriptionDialog({
+                  analyticsMetadata: {
+                    reason: props.subscriptionDialogOpeningReason,
+                  },
+                });
+              }}
+            >
+              <Text noMargin color="inherit">
+                {props.label || <Trans>Upgrade</Trans>}
+              </Text>
+            </Link>
+          ) : (
+            <RaisedButton
+              label={props.label || <Trans>Upgrade</Trans>}
+              primary
+              onClick={() => {
+                openSubscriptionDialog({
+                  analyticsMetadata: {
+                    reason: props.subscriptionDialogOpeningReason,
+                  },
+                });
+              }}
+            />
+          )}
         </Column>
       </LineStackLayout>
     </div>

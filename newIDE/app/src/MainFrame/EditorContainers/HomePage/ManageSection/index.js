@@ -40,7 +40,6 @@ type Props = {|
   project: ?gdProject,
   games: ?Array<Game>,
   onRefreshGames: () => Promise<void>,
-  onGameUpdated: Game => void,
   gamesFetchingError: ?Error,
   openedGame: ?Game,
   setOpenedGame: (?Game) => void,
@@ -52,7 +51,6 @@ const ManageSection = ({
   project,
   games,
   onRefreshGames,
-  onGameUpdated,
   gamesFetchingError,
   openedGame,
   setOpenedGame,
@@ -109,7 +107,7 @@ const ManageSection = ({
               <GameDetails
                 game={openedGame}
                 project={project}
-                onGameUpdated={onGameUpdated}
+                onGameUpdated={onRefreshGames}
                 onGameDeleted={() => {
                   onBack();
                   onRefreshGames();
@@ -216,7 +214,6 @@ const ManageSection = ({
               project={project}
               games={games}
               onRefreshGames={onRefreshGames}
-              onGameUpdated={onGameUpdated}
               onOpenGame={setOpenedGame}
             />
           )

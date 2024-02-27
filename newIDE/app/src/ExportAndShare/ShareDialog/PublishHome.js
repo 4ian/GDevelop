@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
 import Apple from '../../UI/CustomSvgIcons/Apple';
@@ -26,15 +26,18 @@ import GdGames from '../../UI/CustomSvgIcons/GdGames';
 import ItchIo from '../../UI/CustomSvgIcons/ItchIo';
 import CloudDownload from '../../UI/CustomSvgIcons/CloudDownload';
 import { type Game } from '../../Utils/GDevelopServices/Game';
+import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
 import Wrench from '../../UI/CustomSvgIcons/Wrench';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Android from '../../UI/CustomSvgIcons/Android';
 import { isNativeMobileApp } from '../../Utils/Platform';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
 
 const styles = {
   buttonBase: {
     borderRadius: 8,
-    padding: 2,
+    padding: 8,
     flex: 1,
     cursor: 'default',
   },
@@ -52,6 +55,10 @@ const styles = {
   iconSmall: {
     width: 24,
     height: 24,
+  },
+  highlightedTag: {
+    padding: '2px 6px',
+    borderRadius: 4,
   },
 };
 
@@ -132,26 +139,16 @@ const getSubSectionIcon = (
 };
 
 // Styles to improve the interaction with the button.
-const useStylesForWidget = (highlighted: boolean) =>
+const useStylesForWidget = () =>
   makeStyles(theme => {
     return createStyles({
       root: {
-        border: highlighted
-          ? `1px solid ${theme.palette.primary.light}`
-          : `1px solid ${theme.palette.text.disabled}`,
-        backgroundColor: highlighted ? theme.palette.primary.light : undefined,
-        color: highlighted ? theme.palette.primary.contrastText : undefined,
+        border: `1px solid ${theme.palette.text.disabled}`,
         '&:focus': {
-          borderColor: highlighted ? theme.palette.primary.main : undefined,
-          backgroundColor: highlighted
-            ? theme.palette.primary.main
-            : theme.palette.action.hover,
+          backgroundColor: theme.palette.action.hover,
         },
         '&:hover': {
-          borderColor: highlighted ? theme.palette.primary.main : undefined,
-          backgroundColor: highlighted
-            ? theme.palette.primary.main
-            : theme.palette.action.hover,
+          backgroundColor: theme.palette.action.hover,
         },
         '&:disabled': {
           opacity: theme.palette.action.disabledOpacity,
@@ -179,7 +176,8 @@ const SectionLine = ({
   highlighted?: boolean,
   id: string,
 |}) => {
-  const classes = useStylesForWidget(!!highlighted);
+  const classes = useStylesForWidget();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <ButtonBase
       onClick={onClick}
@@ -209,22 +207,31 @@ const SectionLine = ({
               noMargin
               size={small ? 'sub-title' : 'block-title'}
               align="left"
-              color={highlighted ? 'inherit' : 'primary'}
+              color="primary"
             >
               {label}
             </Text>
+            {highlighted && (
+              <div
+                style={{
+                  ...styles.highlightedTag,
+                  color: gdevelopTheme.statusIndicator.success,
+                  border: `1px solid ${gdevelopTheme.statusIndicator.success}`,
+                }}
+              >
+                <Text color="inherit" noMargin>
+                  <Trans>Easiest</Trans>
+                </Text>
+              </div>
+            )}
           </LineStackLayout>
         </Column>
         <Column noMargin>
           <LineStackLayout expand noMargin alignItems="center">
-            <Text
-              color={highlighted ? 'inherit' : 'secondary'}
-              size="body2"
-              align="right"
-            >
+            <Text color="secondary" size="body2" align="right">
               {description}
             </Text>
-            <ChevronArrowRight color={highlighted ? 'inherit' : 'secondary'} />
+            <ChevronArrowRight color="secondary" />
           </LineStackLayout>
         </Column>
       </LineStackLayout>
@@ -236,7 +243,7 @@ type PublishHomeProps = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
-  onGameUpdated: () => void,
+  onGameUpdated: () => Promise<void>,
   onChangeSubscription: () => void,
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
@@ -269,6 +276,7 @@ const PublishHome = ({
 }: PublishHomeProps) => {
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile, getAuthorizationHeader } = authenticatedUser;
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -276,6 +284,9 @@ const PublishHome = ({
     hasSkippedSubSectionSelection,
     setHasSkippedSubSectionSelection,
   ] = React.useState<boolean>(false);
+  const [builds, setBuilds] = React.useState<?Array<Build>>(null);
+
+  const { showAlert } = useAlertDialog();
 
   const onBack = () => {
     if (chosenSubSection) {
@@ -291,12 +302,37 @@ const PublishHome = ({
     }
   };
 
+  const refreshBuilds = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      try {
+        const userBuilds = await getBuilds(getAuthorizationHeader, profile.id);
+        setBuilds(userBuilds);
+      } catch (error) {
+        console.error('Error while loading builds:', error);
+        showAlert({
+          title: t`Error while loading builds`,
+          message: t`An error occurred while loading your builds. Verify your internet connection and try again.`,
+        });
+      }
+    },
+    [profile, getAuthorizationHeader, showAlert]
+  );
+
+  React.useEffect(
+    () => {
+      refreshBuilds();
+    },
+    [refreshBuilds]
+  );
+
   const shouldShowBackButton = !!(chosenSection || chosenSubSection);
 
   return (
     <ColumnStackLayout expand noMargin>
       {!showOnlineWebExporterOnly && (
-        <Line noMargin justifyContent="space-between" alignItems="center">
+        <Line justifyContent="space-between" alignItems="center">
           <Column
             expand
             alignItems="flex-start"
@@ -314,25 +350,29 @@ const PublishHome = ({
             )}
           </Column>
           <Column expand alignItems="center">
-            {!!chosenSection && (
-              <LineStackLayout
-                noMargin
-                alignItems="center"
-                justifyContent="center"
-              >
-                {getSectionIcon({
-                  section: chosenSection,
-                  small: true,
-                })}
-                <Text size="block-title" noMargin>
-                  {selectedExporter
-                    ? selectedExporter.name
-                    : getSectionLabel({
-                        section: chosenSection,
-                      })}
-                </Text>
-              </LineStackLayout>
-            )}
+            <LineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="center"
+            >
+              {selectedExporter || !chosenSection
+                ? undefined
+                : getSectionIcon({
+                    section: chosenSection,
+                    small: true,
+                  })}
+              <Text size="block-title">
+                {selectedExporter ? (
+                  selectedExporter.name
+                ) : chosenSection ? (
+                  getSectionLabel({
+                    section: chosenSection,
+                  })
+                ) : (
+                  <Trans>Export your game</Trans>
+                )}
+              </Text>
+            </LineStackLayout>
           </Column>
           {/** Keep empty column to have title centered */}
           <Column expand alignItems="flex-end" noMargin />
@@ -344,7 +384,7 @@ const PublishHome = ({
         </AlertMessage>
       )}
       {!chosenSection && (
-        <ColumnStackLayout expand noMargin>
+        <ColumnStackLayout noMargin>
           <SectionLine
             label={<Trans>gd.games</Trans>}
             icon={getSubSectionIcon('browser', 'online')}
@@ -405,7 +445,7 @@ const PublishHome = ({
         </ColumnStackLayout>
       )}
       {chosenSection === 'browser' && !chosenSubSection && (
-        <ColumnStackLayout expand noMargin>
+        <ColumnStackLayout noMargin>
           <SectionLine
             label={<Trans>gd.games</Trans>}
             icon={getSubSectionIcon('browser', 'online')}
@@ -438,7 +478,7 @@ const PublishHome = ({
         </ColumnStackLayout>
       )}
       {chosenSection === 'desktop' && !chosenSubSection && (
-        <ColumnStackLayout expand noMargin>
+        <ColumnStackLayout noMargin>
           <SectionLine
             label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('desktop', 'online')}
@@ -460,7 +500,7 @@ const PublishHome = ({
         </ColumnStackLayout>
       )}
       {chosenSection === 'android' && !chosenSubSection && (
-        <ColumnStackLayout expand noMargin>
+        <ColumnStackLayout noMargin>
           <SectionLine
             label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('android', 'online')}
@@ -482,7 +522,7 @@ const PublishHome = ({
         </ColumnStackLayout>
       )}
       {chosenSection === 'ios' && !chosenSubSection && (
-        <ColumnStackLayout expand noMargin>
+        <ColumnStackLayout noMargin>
           <SectionLine
             label={<Trans>One-click packaging</Trans>}
             icon={getSubSectionIcon('ios', 'online')}
@@ -515,6 +555,8 @@ const PublishHome = ({
           onChangeSubscription={onChangeSubscription}
           setIsNavigationDisabled={setIsNavigationDisabled}
           game={game}
+          builds={builds}
+          onRefreshBuilds={refreshBuilds}
         />
       )}
     </ColumnStackLayout>

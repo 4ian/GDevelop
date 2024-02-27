@@ -20,7 +20,7 @@ type Props = {|
   game: ?Game,
   project: ?gdProject,
   onClose: () => void,
-  onGameUpdated: (updatedGame: Game) => void,
+  onGameUpdated: () => Promise<void>,
   onGameDeleted: () => void,
   analyticsSource: 'profile' | 'homepage' | 'projectManager',
   onShareProject?: () => void,

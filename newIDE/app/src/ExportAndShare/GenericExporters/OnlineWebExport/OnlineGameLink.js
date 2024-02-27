@@ -15,7 +15,6 @@ import InfoBar from '../../../UI/Messages/InfoBar';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import {
-  getGame,
   getGameUrl,
   updateGame,
   setGameSlug,
@@ -31,28 +30,34 @@ import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import { ColumnStackLayout } from '../../../UI/Layout';
-import LinearProgress from '../../../UI/LinearProgress';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';
+import { GameRegistration } from '../../../GameDashboard/GameRegistration';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
+  game: ?Game,
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
   errored: boolean,
   exportStep: BuildStep,
+  onGameUpdated: () => Promise<void>,
+  automaticallyOpenGameProperties?: boolean,
 |};
 
 const timeForExport = 5; // seconds.
 
 const OnlineGameLink = ({
   build,
+  game,
   project,
   onSaveProject,
   isSavingProject,
   errored,
   exportStep,
+  onGameUpdated,
+  automaticallyOpenGameProperties,
 }: OnlineGameLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
@@ -64,7 +69,7 @@ const OnlineGameLink = ({
     isOnlineGamePropertiesDialogOpen,
     setIsOnlineGamePropertiesDialogOpen,
   ] = React.useState<boolean>(false);
-  const [game, setGame] = React.useState<?Game>(null);
+  // const [game, setGame] = React.useState<?Game>(null);
   const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -101,25 +106,6 @@ const OnlineGameLink = ({
       }
     },
     [exportPending, timeBeforeExportFinished]
-  );
-
-  const loadGame = React.useCallback(
-    async () => {
-      const gameId = build && build.gameId;
-      if (!profile || !gameId) return;
-
-      const { id } = profile;
-      try {
-        setIsGameLoading(true);
-        const game = await getGame(getAuthorizationHeader, id, gameId);
-        setGame(game);
-      } catch (err) {
-        console.error('Unable to load the game', err);
-      } finally {
-        setIsGameLoading(false);
-      }
-    },
-    [build, getAuthorizationHeader, profile]
   );
 
   const tryUpdateAuthors = React.useCallback(
@@ -187,22 +173,21 @@ const OnlineGameLink = ({
 
   React.useEffect(
     () => {
-      // Load game only once
-      if (!game && isBuildComplete) {
-        loadGame();
-      }
-    },
-    [game, loadGame, isBuildComplete]
-  );
-
-  React.useEffect(
-    () => {
       if (exportStep === 'done') {
         setTimeBeforeExportFinished(timeForExport); // reset.
         setIsShareDialogOpen(true);
       }
     },
-    [exportStep]
+    [exportStep, automaticallyOpenGameProperties]
+  );
+
+  React.useEffect(
+    () => {
+      if (isBuildComplete && automaticallyOpenGameProperties) {
+        setIsOnlineGamePropertiesDialogOpen(true);
+      }
+    },
+    [isBuildComplete, automaticallyOpenGameProperties]
   );
 
   const onGameUpdate = React.useCallback(
@@ -234,7 +219,7 @@ const OnlineGameLink = ({
           tryUpdateSlug(partialGameChange, i18n),
         ]);
         // Update game again as cached values on the game entity might have changed.
-        await loadGame();
+        await onGameUpdated();
         // If one of the update failed, return false so that the dialog is not closed.
         if (!authorsUpdated || !slugUpdated) {
           return false;
@@ -260,7 +245,7 @@ const OnlineGameLink = ({
       project,
       tryUpdateAuthors,
       tryUpdateSlug,
-      loadGame,
+      onGameUpdated,
       showAlert,
     ]
   );
@@ -289,14 +274,12 @@ const OnlineGameLink = ({
       {({ i18n }) => (
         <>
           {exportPending && (
-            <>
+            <Column alignItems="center">
               <Text>
-                <Trans>
-                  The game is being exported and the link generated...
-                </Trans>
+                <Trans>Uploading your game...</Trans>
               </Text>
               <Line expand>
-                <LinearProgress
+                <CircularProgress
                   value={
                     ((timeForExport - timeBeforeExportFinished) /
                       timeForExport) *
@@ -309,13 +292,14 @@ const OnlineGameLink = ({
                   }
                 />
               </Line>
-            </>
+            </Column>
           )}
           {isShareDialogOpen && (
             <Dialog
               title={<Trans>Share your game</Trans>}
               id="export-game-share-dialog"
               minHeight="sm"
+              maxWidth="md"
               actions={dialogActions}
               open
               onRequestClose={() => setIsShareDialogOpen(false)}
@@ -324,31 +308,32 @@ const OnlineGameLink = ({
                   setIsOnlineGamePropertiesDialogOpen(true);
                 }
               }}
+              flexColumnBody
             >
               {buildUrl && !isGameLoading ? (
                 <ColumnStackLayout noMargin>
                   <ShareLink url={buildUrl} />
-                  <ColumnStackLayout noMargin expand>
-                    {isBuildPublished && navigator.share && (
-                      <ShareButton url={buildUrl} />
-                    )}
-                    {isBuildPublished && !navigator.share && (
-                      <Column
-                        expand
-                        justifyContent="flex-end"
-                        noMargin
-                        alignItems="flex-end"
-                      >
-                        <SocialShareButtons url={buildUrl} />
-                      </Column>
-                    )}
-                    <AlertMessage kind="info">
-                      <Trans>
-                        You can administrate your game and promote it from the
-                        Manage section on the home page.
-                      </Trans>
-                    </AlertMessage>
-                  </ColumnStackLayout>
+                  {isBuildPublished && (
+                    <ColumnStackLayout noMargin expand>
+                      {navigator.share ? (
+                        <ShareButton url={buildUrl} />
+                      ) : (
+                        <Column
+                          expand
+                          justifyContent="flex-end"
+                          noMargin
+                          alignItems="flex-end"
+                        >
+                          <SocialShareButtons url={buildUrl} />
+                        </Column>
+                      )}
+                      <GameRegistration
+                        project={project}
+                        hideLoader
+                        suggestAdditionalActions
+                      />
+                    </ColumnStackLayout>
+                  )}
                   {!isBuildPublished && game && (
                     <AlertMessage kind="info">
                       <Trans>
@@ -361,12 +346,20 @@ const OnlineGameLink = ({
                   )}
                 </ColumnStackLayout>
               ) : (
-                <ColumnStackLayout alignItems="center">
+                <ColumnStackLayout
+                  alignItems="center"
+                  justifyContent="center"
+                  expand
+                >
                   <Line>
                     <CircularProgress size={40} />
                   </Line>
                   <Text>
-                    <Trans>Loading your link...</Trans>
+                    {automaticallyOpenGameProperties ? (
+                      <Trans>Loading your game...</Trans>
+                    ) : (
+                      <Trans>Loading your link...</Trans>
+                    )}
                   </Text>
                 </ColumnStackLayout>
               )}
@@ -382,7 +375,15 @@ const OnlineGameLink = ({
               project={project}
               onSaveProject={onSaveProject}
               buildId={build.id}
-              onClose={() => setIsOnlineGamePropertiesDialogOpen(false)}
+              onClose={() => {
+                setIsOnlineGamePropertiesDialogOpen(false);
+                if (automaticallyOpenGameProperties) {
+                  // If the dialog was automatically opened,
+                  // Also close the share dialog, as they are probably not
+                  // looking for a new link.
+                  setIsShareDialogOpen(false);
+                }
+              }}
               onApply={async partialGameChange => {
                 const isGameUpdated = await onGameUpdate(
                   partialGameChange,

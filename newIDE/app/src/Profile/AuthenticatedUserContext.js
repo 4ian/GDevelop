@@ -77,7 +77,7 @@ export type AuthenticatedUser = {|
     sendEmailAutomatically: boolean,
     showSendEmailButton: boolean,
   |}) => void,
-  onAcceptGameStatsEmail: () => Promise<void>,
+  onAcceptGameStatsEmail: (value: boolean) => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
 

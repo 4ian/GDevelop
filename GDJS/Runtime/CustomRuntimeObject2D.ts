@@ -31,12 +31,5 @@ namespace gdjs {
     getRendererObject() {
       return this.getRenderer().getRendererObject();
     }
-
-    updateFromObjectData(
-      oldObjectData: Object3DData,
-      newObjectData: Object3DData
-    ): boolean {
-      return true;
-    }
   }
 }

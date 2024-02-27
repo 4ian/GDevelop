@@ -70,13 +70,6 @@ namespace gdjs {
       return this.getRenderer().get3DRendererObject()!;
     }
 
-    updateFromObjectData(
-      oldObjectData: Object3DData,
-      newObjectData: Object3DData
-    ): boolean {
-      return true;
-    }
-
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       super.extraInitializationFromInitialInstance(initialInstanceData);
       if (initialInstanceData.depth !== undefined)

@@ -15,34 +15,44 @@ namespace gdjs {
   }
 
   function isScalable(
-    o: gdjs.RuntimeObject
-  ): o is gdjs.RuntimeObject & gdjs.Scalable {
-    //@ts-ignore We are checking if the methods are present.
-    return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.Scalable {
+    return (
+      //@ts-ignore We are checking if the methods are present.
+      object.setScaleX &&
+      //@ts-ignore
+      object.setScaleY &&
+      //@ts-ignore
+      object.getScaleX &&
+      //@ts-ignore
+      object.getScaleY
+    );
   }
 
   function isOpaque(
-    o: gdjs.RuntimeObject
-  ): o is gdjs.RuntimeObject & gdjs.OpacityHandler {
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.OpacityHandler {
     //@ts-ignore We are checking if the methods are present.
-    return o.setOpacity && o.getOpacity;
+    return object.setOpacity && object.getOpacity;
   }
 
   function is3D(
-    o: gdjs.RuntimeObject
-  ): o is gdjs.RuntimeObject & gdjs.Base3DHandler {
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.Base3DHandler {
     //@ts-ignore We are checking if the methods are present.
-    return o.getZ && o.setZ;
+    return object.getZ && object.setZ;
   }
 
-  function isColorable(o: gdjs.RuntimeObject): o is IColorable {
+  function isColorable(object: gdjs.RuntimeObject): object is IColorable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setColor && o.getColor;
+    return object.setColor && object.getColor;
   }
 
-  function isCharacterScalable(o: gdjs.RuntimeObject): o is ICharacterScalable {
+  function isCharacterScalable(
+    object: gdjs.RuntimeObject
+  ): object is ICharacterScalable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setCharacterSize && o.getCharacterSize;
+    return object.setCharacterSize && object.getCharacterSize;
   }
 
   const linearInterpolation = gdjs.evtTools.common.lerp;

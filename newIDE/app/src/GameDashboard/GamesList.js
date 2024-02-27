@@ -187,17 +187,23 @@ const GamesList = ({
     ]
   );
 
-  const getGamesToDisplayDebounced = useDebounce(() => {
-    setDisplayedGames(
-      getGamesToDisplay({
-        project,
-        games,
-        searchText,
-        searchClient,
-        currentPage,
-      })
-    );
-  }, 250);
+  const getGamesToDisplayDebounced = useDebounce(
+    () => {
+      setDisplayedGames(
+        getGamesToDisplay({
+          project,
+          games,
+          searchText,
+          searchClient,
+          currentPage,
+        })
+      );
+    },
+    // Use debounce when searching for a game.
+    // Keep a lower debounce when changing pages so that the UI does not refresh until the
+    // user stops changing pages, giving a sense of rapidity.
+    searchText ? 250 : 150
+  );
 
   // Refresh games to display when:
   // - search text changes (user input)

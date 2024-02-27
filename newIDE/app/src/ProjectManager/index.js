@@ -75,17 +75,24 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from '../UI/Theme';
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
-const gameSettingsRootFolderId = 'game-settings';
-const gamePropertiesItemId = 'game-properties';
-const gameIconsItemId = 'game-icons';
-const gameDashboardItemId = 'game-dashboard';
-const projectSettingsRootFolderId = 'project-settings';
-const globalVariablesItemId = 'global-variables';
-const gameResourcesItemId = 'game-resources';
-export const scenesRootFolderId = 'scenes';
-export const extensionsRootFolderId = 'extensions';
-export const externalEventsRootFolderId = 'external-events';
-export const externalLayoutsRootFolderId = 'external-layout';
+export const getProjectManagerItemId = (identifier: string) =>
+  `project-manager-tab-${identifier}`;
+
+const gameSettingsRootFolderId = getProjectManagerItemId('game-settings');
+const gamePropertiesItemId = getProjectManagerItemId('game-properties');
+const gameIconsItemId = getProjectManagerItemId('game-icons');
+const gameDashboardItemId = 'manage';
+const projectSettingsRootFolderId = getProjectManagerItemId('project-settings');
+const globalVariablesItemId = getProjectManagerItemId('global-variables');
+const gameResourcesItemId = getProjectManagerItemId('game-resources');
+export const scenesRootFolderId = getProjectManagerItemId('scenes');
+export const extensionsRootFolderId = getProjectManagerItemId('extensions');
+export const externalEventsRootFolderId = getProjectManagerItemId(
+  'external-events'
+);
+export const externalLayoutsRootFolderId = getProjectManagerItemId(
+  'external-layout'
+);
 
 const scenesEmptyPlaceholderId = 'scenes-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';

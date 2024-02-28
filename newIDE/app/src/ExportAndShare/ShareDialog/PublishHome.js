@@ -4,14 +4,18 @@ import * as React from 'react';
 import Chrome from '../../UI/CustomSvgIcons/Chrome';
 import Apple from '../../UI/CustomSvgIcons/Apple';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
-import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../UI/Layout';
 import {
   type Exporter,
   type ExporterSection,
   type ExporterSubSection,
 } from '.';
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, marginsSize } from '../../UI/Grid';
 import ExportLauncher from './ExportLauncher';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
@@ -33,6 +37,7 @@ import Android from '../../UI/CustomSvgIcons/Android';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
   buttonBase: {
@@ -40,6 +45,13 @@ const styles = {
     padding: 8,
     flex: 1,
     cursor: 'default',
+  },
+  titleContainer: {
+    marginLeft: marginsSize,
+    marginRight: marginsSize,
+    display: 'flex',
+    alignItems: 'center',
+    flex: 3, // Give more space to the title, to ensure it doesn't wrap.
   },
   iconContainer: {
     width: 36,
@@ -178,6 +190,7 @@ const SectionLine = ({
 |}) => {
   const classes = useStylesForWidget();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { isMobile } = useResponsiveWindowSize();
   return (
     <ButtonBase
       onClick={onClick}
@@ -194,13 +207,13 @@ const SectionLine = ({
       disabled={disabled}
       id={id}
     >
-      <LineStackLayout
+      <ResponsiveLineStackLayout
         expand
         justifyContent="space-between"
         alignItems="center"
-        noMargin={!!small}
+        noColumnMargin
       >
-        <Column>
+        <Column alignItems="flex-start">
           <LineStackLayout expand noMargin alignItems="center">
             <div style={styles.iconContainer}>{icon}</div>
             <Text
@@ -226,15 +239,25 @@ const SectionLine = ({
             )}
           </LineStackLayout>
         </Column>
-        <Column noMargin>
-          <LineStackLayout expand noMargin alignItems="center">
-            <Text color="secondary" size="body2" align="right">
+        <Column>
+          <LineStackLayout
+            expand
+            noMargin
+            alignItems="center"
+            justifyContent={isMobile ? 'space-between' : 'flex-end'}
+          >
+            <Text
+              color="secondary"
+              size="body2"
+              align={isMobile ? 'left' : 'right'}
+              noMargin
+            >
               {description}
             </Text>
             <ChevronArrowRight color="secondary" />
           </LineStackLayout>
         </Column>
-      </LineStackLayout>
+      </ResponsiveLineStackLayout>
     </ButtonBase>
   );
 };
@@ -274,6 +297,7 @@ const PublishHome = ({
   allExportersRequireOnline,
   showOnlineWebExporterOnly,
 }: PublishHomeProps) => {
+  const { isMobile } = useResponsiveWindowSize();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
@@ -334,7 +358,7 @@ const PublishHome = ({
       {!showOnlineWebExporterOnly && (
         <Line justifyContent="space-between" alignItems="center">
           <Column
-            expand
+            expand={!isMobile} // To give space to the title on mobile.
             alignItems="flex-start"
             justifyContent="center"
             noMargin
@@ -349,7 +373,13 @@ const PublishHome = ({
               />
             )}
           </Column>
-          <Column expand alignItems="center">
+          <div
+            style={{
+              ...styles.titleContainer,
+              justifyContent:
+                isMobile && shouldShowBackButton ? 'flex-end' : 'center',
+            }}
+          >
             <LineStackLayout
               noMargin
               alignItems="center"
@@ -373,9 +403,9 @@ const PublishHome = ({
                 )}
               </Text>
             </LineStackLayout>
-          </Column>
-          {/** Keep empty column to have title centered */}
-          <Column expand alignItems="flex-end" noMargin />
+          </div>
+          {/** Keep empty column to have title centered on desktop */}
+          {!isMobile && <Column expand alignItems="flex-end" noMargin />}
         </Line>
       )}
       {!isOnline && (

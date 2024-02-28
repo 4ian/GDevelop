@@ -33,7 +33,7 @@ export const SetupExportHeader = ({
   return (
     <Column noMargin expand>
       <Line>
-        <Text>
+        <Text align="center">
           <Trans>
             Packaging your game for Android will create an APK file that can be
             installed on Android phones or an Android App Bundle that can be

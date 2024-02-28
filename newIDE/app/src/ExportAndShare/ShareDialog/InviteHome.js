@@ -65,8 +65,8 @@ const UserLine = ({
 |}) => (
   <I18n>
     {({ i18n }) => (
-      <Line expand justifyContent="space-between">
-        <Line expand noMargin>
+      <Line justifyContent="space-between">
+        <Line noMargin expand>
           <Avatar src={getGravatarUrl(email, { size: 40 })} />
           <Column expand justifyContent="flex-end">
             {username && <Text noMargin>{username}</Text>}
@@ -392,12 +392,14 @@ const InviteHome = ({ cloudProjectId }: Props) => {
             </GetSubscriptionCard>
           )}
         {fetchError === 'unexpected' ? (
-          <PlaceholderError onRetry={fetchProjectUserAcls}>
-            <Trans>
-              Error while loading the collaborators. Verify your internet
-              connection or try again later.
-            </Trans>
-          </PlaceholderError>
+          <Line noMargin>
+            <PlaceholderError onRetry={fetchProjectUserAcls}>
+              <Trans>
+                Error while loading the collaborators. Verify your internet
+                connection or try again later.
+              </Trans>
+            </PlaceholderError>
+          </Line>
         ) : fetchError === 'project-not-found' ? (
           <AlertMessage kind="info">
             <Trans>

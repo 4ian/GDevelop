@@ -9,6 +9,7 @@ import Popover from '@material-ui/core/Popover';
 import Text from '../Text';
 import { Trans } from '@lingui/macro';
 import Paper from '../Paper';
+import Badge from '../Badge';
 
 type Props = {||};
 
@@ -25,7 +26,19 @@ const NotificationChip = (props: Props) => {
           setAnchorEl(e.currentTarget);
         }}
       >
-        <Bell color="secondary" />
+        <Badge
+          variant="dot"
+          badgeContent={''}
+          invisible={
+            !(
+              notifications &&
+              notifications.some(notification => !notification.seenAt)
+            )
+          }
+          color="primary"
+        >
+          <Bell color="secondary" />
+        </Badge>
       </IconButton>
       <Popover
         open={!!anchorEl}

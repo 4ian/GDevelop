@@ -55,7 +55,7 @@ const NotificationList = ({ notifications }: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <Column>
+        <Column noMargin>
           {days.map(day => {
             // $FlowIgnore
             const dayNotifications = notificationsGroupedByDayOrNovelty[day];

@@ -6,6 +6,8 @@ type Props = {|
   children: React.Node,
   badgeContent: React.Node,
   color: 'error' | 'primary' | 'secondary' | 'default',
+  variant?: 'dot',
+  invisible?: boolean,
 |};
 
 const Badge = (props: Props) => <MuiBadge {...props} />;

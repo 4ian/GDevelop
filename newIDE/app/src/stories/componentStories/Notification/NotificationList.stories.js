@@ -59,12 +59,36 @@ const notifications: Notification[] = [
     data: { amount: 1000, reason: 'subscription' },
   },
   {
+    id: 'notification-id-41',
+    userId,
+    createdAt: now - 27 * ONE_HOUR,
+    seenAt: now - 25 * ONE_HOUR,
+    type: 'credits-drop',
+    data: { amount: 50, reason: 'subscription' },
+  },
+  {
     id: 'notification-id-5',
     userId,
     createdAt: now - 3 * ONE_DAY,
     seenAt: now - 2 * ONE_DAY,
     type: 'credits-drop',
     data: { amount: 800, reason: 'subscription' },
+  },
+  {
+    id: 'notification-id-6',
+    userId,
+    createdAt: now - 45 * ONE_DAY,
+    seenAt: now - 40 * ONE_DAY,
+    type: 'credits-drop',
+    data: { amount: 750, reason: 'subscription' },
+  },
+  {
+    id: 'notification-id-7',
+    userId,
+    createdAt: now - 400 * ONE_DAY,
+    seenAt: now - 399 * ONE_DAY,
+    type: 'credits-drop',
+    data: { amount: 850, reason: 'subscription' },
   },
 ];
 

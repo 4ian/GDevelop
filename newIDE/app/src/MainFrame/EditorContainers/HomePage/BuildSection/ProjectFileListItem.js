@@ -160,7 +160,9 @@ const ListItemLastModification = ({
                 i18n,
                 dateAsNumber: lastModifiedAt,
                 sameDayFormat: 'todayAndHour',
-                dayBeforeFormat: 'yesterdayAndHour'
+                dayBeforeFormat: 'yesterdayAndHour',
+                relativeLimit: 'currentWeek',
+                sameWeekFormat: 'thisWeek',
               })
             )}
           </Text>

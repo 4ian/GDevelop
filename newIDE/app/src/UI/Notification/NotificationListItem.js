@@ -42,7 +42,9 @@ const NotificationListItem = ({ notification }: Props) => {
             i18n,
             dateAsNumber: notification.createdAt,
             sameDayFormat: 'timeAgo',
+            sameWeekFormat: 'timeAgo',
             dayBeforeFormat: 'yesterday',
+            relativeLimit: 'currentWeek',
           })}
           leftIcon={notificationTypeToIcon[notification.type]}
         />

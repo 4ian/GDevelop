@@ -6,12 +6,16 @@ import { type I18n as I18nType } from '@lingui/core';
 export const getRelativeOrAbsoluteDisplayDate = ({
   i18n,
   dateAsNumber,
+  relativeLimit,
   sameDayFormat,
+  sameWeekFormat,
   dayBeforeFormat,
 }: {|
   i18n: I18nType,
   dateAsNumber: number,
-  sameDayFormat: 'todayAndHour' | 'timeAgo',
+  relativeLimit: 'currentWeek' | 'currentYear',
+  sameDayFormat: 'todayAndHour' | 'timeAgo' | 'today',
+  sameWeekFormat: 'timeAgo' | 'thisWeek',
   dayBeforeFormat: 'yesterdayAndHour' | 'yesterday',
 |}): React.Node => {
   const nowAsNumber = Date.now();
@@ -33,6 +37,8 @@ export const getRelativeOrAbsoluteDisplayDate = ({
           hour: 'numeric',
         })}`
       );
+    } else if (sameDayFormat === 'today') {
+      return i18n._(t`Today`);
     } else {
       if (nowAsNumber - dateAsNumber < 3600 * 1000) {
         const minutesAgo = Math.floor(
@@ -75,9 +81,31 @@ export const getRelativeOrAbsoluteDisplayDate = ({
     now.getMonth() === date.getMonth() &&
     sevenDaysAgoAtFirstHour.getTime() <= date.getTime()
   ) {
-    return i18n._(t`This week`);
+    if (sameWeekFormat === 'thisWeek') {
+      return i18n._(t`This week`);
+    } else {
+      const daysAgo = Math.floor(
+        (nowAsNumber - dateAsNumber) / (24 * 3600 * 1000)
+      );
+      if (daysAgo === 1) return i18n._(t`1 day ago`);
+      return i18n._(t`${daysAgo} days ago`);
+    }
   }
-  return i18n.date(date);
+  if (relativeLimit === 'currentWeek') {
+    return i18n.date(date);
+  }
+
+  if (
+    now.getFullYear() === date.getFullYear() &&
+    now.getMonth() === date.getMonth()
+  ) {
+    return i18n._(t`This month`);
+  }
+
+  if (now.getFullYear() === date.getFullYear()) {
+    return i18n._(t`This year`);
+  }
+  return date.getFullYear();
 };
 
 export const secondsToMinutesAndSeconds = (seconds: number): string => {

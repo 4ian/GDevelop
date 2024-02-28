@@ -133,7 +133,7 @@ namespace gdjs {
      * Return the bottom Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMinZ(): number {
+    getUnrotatedAABBMinZ(): number {
       return this.getDrawableZ();
     }
 
@@ -141,7 +141,7 @@ namespace gdjs {
      * Return the top Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMaxZ(): number {
+    getUnrotatedAABBMaxZ(): number {
       return this.getDrawableZ() + this.getDepth();
     }
 
@@ -250,8 +250,8 @@ namespace gdjs {
         if (!gdjs.Base3DHandler.is3D(childInstance)) {
           continue;
         }
-        minZ = Math.min(minZ, childInstance.getAABBMinZ());
-        maxZ = Math.max(maxZ, childInstance.getAABBMaxZ());
+        minZ = Math.min(minZ, childInstance.getUnrotatedAABBMinZ());
+        maxZ = Math.max(maxZ, childInstance.getUnrotatedAABBMaxZ());
       }
       if (minZ === Number.MAX_VALUE) {
         // The unscaled size can't be 0 because setWidth and setHeight wouldn't

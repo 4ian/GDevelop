@@ -154,14 +154,14 @@ namespace gdjs {
      * @return The Z position of the rendered object.
      */
     getDrawableZ(): float {
-      return this.getZ();
+      return this._z;
     }
 
     /**
      * Return the bottom Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMinZ(): number {
+    getUnrotatedAABBMinZ(): number {
       return this.getDrawableZ();
     }
 
@@ -169,7 +169,7 @@ namespace gdjs {
      * Return the top Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMaxZ(): number {
+    getUnrotatedAABBMaxZ(): number {
       return this.getDrawableZ() + this.getDepth();
     }
 
@@ -191,7 +191,7 @@ namespace gdjs {
     }
 
     setCenterZInScene(z: float): void {
-      this.setZ(z + this.getZ() - (this.getDrawableZ() + this.getCenterZ()));
+      this.setZ(z + this._z - (this.getDrawableZ() + this.getCenterZ()));
     }
 
     setAngle(angle: float): void {

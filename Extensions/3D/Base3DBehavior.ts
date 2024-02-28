@@ -108,13 +108,13 @@ namespace gdjs {
      * Return the bottom Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMinZ(): number;
+    getUnrotatedAABBMinZ(): number;
 
     /**
      * Return the top Z of the object.
      * Rotations around X and Y are not taken into account.
      */
-    getAABBMaxZ(): number;
+    getUnrotatedAABBMaxZ(): number;
   }
 
   export namespace Base3DHandler {
@@ -224,12 +224,12 @@ namespace gdjs {
       return this.object.isFlippedZ();
     }
 
-    getAABBMinZ(): number {
-      return this.object.getAABBMinZ();
+    getUnrotatedAABBMinZ(): number {
+      return this.object.getUnrotatedAABBMinZ();
     }
 
-    getAABBMaxZ(): number {
-      return this.object.getAABBMaxZ();
+    getUnrotatedAABBMaxZ(): number {
+      return this.object.getUnrotatedAABBMaxZ();
     }
   }
 

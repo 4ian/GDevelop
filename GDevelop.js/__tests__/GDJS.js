@@ -92,7 +92,7 @@ describe('libGD.js - GDJS related tests', function () {
     it('properly exports Cordova files', () => {
       // Create a simple project
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setName('My great project with spaces and "quotes"!');
+      project.setName('My great project with spaces and "quotes" and (parentheses)!');
       project.setVersion('1.2.3');
 
       // Prepare a fake file system
@@ -114,7 +114,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-export-dir/config.xml',
         `
 <widget id="com.example.gamename" version="1.2.3">
-  <name>My great project with spaces and &quot;quotes&quot;!</name>
+  <name>My great project with spaces and &quot;quotes&quot; and parentheses!</name>
   <platform name="android">
 
   </platform>
@@ -124,14 +124,15 @@ describe('libGD.js - GDJS related tests', function () {
 
 </widget>`
       );
+      console.dir(fs.writeToFile.mock.calls);
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `
 {
-  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
-  \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_32and_32_40parentheses_41_33\",
+  \"displayName\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"version\": \"1.2.3\",
-  \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"description\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"author\": \"\"
 }`
       );

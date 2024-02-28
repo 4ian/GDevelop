@@ -977,7 +977,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_name>", uncapitalizedLabel),
         _("Property <property_name> of _PARAM0_ is true")
             .FindAndReplace("<property_name>", uncapitalizedLabel),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
     conditionMetadata.SetFunctionName(getterName);
@@ -992,7 +992,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_value>",
                             "_PARAM" + gd::String::From(valueParameterIndex) +
                                 "_"),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(setterActionMetadata);
     setterActionMetadata

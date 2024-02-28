@@ -13,7 +13,8 @@ EventsBasedObject::EventsBasedObject()
     : AbstractEventsBasedEntity(
         "MyObject",
         gd::EventsFunctionsContainer::FunctionOwner::Object),
-    ObjectsContainer() {
+    ObjectsContainer(),
+    isRenderedIn3D(false) {
 }
 
 EventsBasedObject::~EventsBasedObject() {}

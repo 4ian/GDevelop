@@ -48,13 +48,13 @@ const CurrentUsageDisplayer = ({
   const usageRatio = `${usedBuilds}/${quota.max}`;
   const remainingMultipleMessage = (
     <Trans>
-      You have {remainingBuilds} builds remaining (You have used {usageRatio} in
+      You have {remainingBuilds} builds remaining (you have used {usageRatio} in
       the last 24h).
     </Trans>
   );
   const remainingSingleMessage = (
     <Trans>
-      You have {remainingBuilds} build remaining (You have used {usageRatio} in
+      You have {remainingBuilds} build remaining (you have used {usageRatio} in
       the last 24h).
     </Trans>
   );

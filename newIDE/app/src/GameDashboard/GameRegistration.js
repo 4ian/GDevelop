@@ -147,9 +147,9 @@ export const GameRegistration = ({
       try {
         await onAcceptGameStatsEmail(value);
       } catch (error) {
-        console.error('Unable to toggle game stats email.', error);
+        console.error('Unable to change your email preferences.', error);
         showAlert({
-          title: t`Unable to toggle game stats email`,
+          title: t`Unable to change your email preferences`,
           message: t`Verify your internet connection or try again later.`,
         });
       }
@@ -174,9 +174,9 @@ export const GameRegistration = ({
         );
         setGame(newGame);
       } catch (error) {
-        console.error('Unable to toggle game feedbacks.', error);
+        console.error('Unable to change feedback for this game.', error);
         showAlert({
-          title: t`Unable to toggle game feedbacks`,
+          title: t`Unable to change feedback for this game`,
           message: t`Verify your internet connection or try again later.`,
         });
       }

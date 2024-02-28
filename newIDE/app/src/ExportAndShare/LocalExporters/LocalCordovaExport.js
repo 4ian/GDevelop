@@ -10,12 +10,14 @@ import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   ExplanationHeader,
   DoneFooter,
+  ExportFlow,
 } from '../GenericExporters/CordovaExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
 const electron = optionalRequire('electron');
@@ -40,6 +42,8 @@ type ResourcesDownloadOutput = null;
 
 type CompressionOutput = null;
 
+const exportPipelineName = 'local-cordova';
+
 export const localCordovaExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -47,7 +51,7 @@ export const localCordovaExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-cordova',
+  name: exportPipelineName,
   packageNameWarningType: 'mobile',
 
   getInitialExportState: (project: gdProject) => ({
@@ -58,29 +62,32 @@ export const localCordovaExportPipeline: ExportPipeline<
 
   isNavigationDisabled: () => false,
 
-  renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin>
-      <Line>
-        <Column noMargin>
-          <ExplanationHeader />
-        </Column>
-      </Line>
-      <Line>
-        <LocalFolderPicker
-          type="export"
-          value={exportState.outputDir}
-          defaultPath={project.getLastCompilationDirectory()}
-          onChange={outputDir => {
-            updateExportState(() => ({ outputDir }));
-            project.setLastCompilationDirectory(outputDir);
-          }}
-          fullWidth
-        />
-      </Line>
-    </Column>
-  ),
+  renderHeader: ({ project, exportState, updateExportState, exportStep }) =>
+    exportStep !== 'done' ? (
+      <Column noMargin>
+        <Line>
+          <Column noMargin>
+            <ExplanationHeader />
+          </Column>
+        </Line>
+        <Line>
+          <LocalFolderPicker
+            type="export"
+            value={exportState.outputDir}
+            defaultPath={project.getLastCompilationDirectory()}
+            onChange={outputDir => {
+              updateExportState(() => ({ outputDir }));
+              project.setLastCompilationDirectory(outputDir);
+            }}
+            fullWidth
+          />
+        </Line>
+      </Column>
+    ) : null,
 
-  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -150,7 +157,7 @@ export const localCordovaExportPipeline: ExportPipeline<
     return Promise.resolve(null);
   },
 
-  renderDoneFooter: ({ exportState, onClose }) => {
+  renderDoneFooter: ({ exportState }) => {
     const openExportFolder = () => {
       if (shell) shell.openPath(exportState.outputDir);
     };

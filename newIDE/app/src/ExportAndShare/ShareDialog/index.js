@@ -11,7 +11,6 @@ import { type ExportPipeline } from '../ExportPipeline.flow';
 import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
-import TutorialButton from '../../UI/TutorialButton';
 import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
@@ -247,8 +246,8 @@ const ShareDialog = ({
 
   const mainActions = [
     <FlatButton
-      label={<Trans>Close</Trans>}
-      key="close"
+      label={<Trans>Cancel</Trans>}
+      key="cancel"
       primary={false}
       onClick={onClose}
       disabled={isNavigationDisabled}
@@ -260,18 +259,6 @@ const ShareDialog = ({
       ? [
           exporter ? (
             <HelpButton key="help" helpPagePath={exporter.helpPage} />
-          ) : null,
-          exporter &&
-          exporter.exportPipeline &&
-          (exporter.exportPipeline.name === 'local-html5' ||
-            exporter.exportPipeline.name === 'browser-html5') ? (
-            <TutorialButton
-              key="tutorial"
-              tutorialId="export-to-itch"
-              label={
-                isMobile ? 'Itch.io' : <Trans>How to export to Itch.io</Trans>
-              }
-            />
           ) : null,
           <TextButton
             key="exports"
@@ -320,6 +307,7 @@ const ShareDialog = ({
           ]}
         />
       }
+      flexColumnBody
     >
       {currentTab === 'invite' && (
         <InviteHome
@@ -335,7 +323,7 @@ const ShareDialog = ({
           project={project}
           onSaveProject={onSaveProject}
           isSavingProject={isSavingProject}
-          onGameUpdated={setGame}
+          onGameUpdated={loadGame}
           onChangeSubscription={onChangeSubscription}
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
@@ -355,7 +343,7 @@ const ShareDialog = ({
           onClose={() => setBuildsDialogOpen(false)}
           authenticatedUser={authenticatedUser}
           game={game}
-          onGameUpdated={setGame}
+          onGameUpdated={loadGame}
         />
       )}
     </Dialog>

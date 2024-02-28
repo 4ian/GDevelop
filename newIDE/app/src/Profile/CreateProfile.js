@@ -31,7 +31,7 @@ const CreateProfile = ({
   <Column alignItems="center">
     <div style={styles.container}>
       <ColumnStackLayout>
-        <Text noMargin>
+        <Text noMargin align="center">
           {message || (
             <Trans>
               You are not connected. Create an account to build your game for

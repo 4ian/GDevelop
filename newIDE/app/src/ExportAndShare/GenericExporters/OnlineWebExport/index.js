@@ -4,36 +4,23 @@ import * as React from 'react';
 import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
-import { getBuilds } from '../../../Utils/GDevelopServices/Build';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import AlertMessage from '../../../UI/AlertMessage';
+import GdGames from '../../../UI/CustomSvgIcons/GdGames';
+import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
-type Props = {|
-  game: ?Game,
-|};
+const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
+  return {
+    height: isMobile ? 30 : 48,
+    width: isMobile ? 30 : 48,
+    margin: 10,
+  };
+};
 
-const ExplanationHeader = ({ game }: Props) => {
-  const { getAuthorizationHeader, firebaseUser } = React.useContext(
-    AuthenticatedUserContext
-  );
-  const hasGameExistingBuilds = React.useMemo(
-    async () => {
-      if (!game) return false;
-      if (!firebaseUser) return false; // This should not happen.
-      const builds = await getBuilds(
-        getAuthorizationHeader,
-        firebaseUser.uid,
-        game.id
-      );
-      return !!builds.length;
-    },
-    [firebaseUser, game, getAuthorizationHeader]
-  );
-  const isGamePublishedOnGdGames = !!game && !!game.publicWebBuildId;
+const ExplanationHeader = () => {
+  const { isMobile } = useResponsiveWindowSize();
+  const iconStyle = getIconStyle({ isMobile });
 
   return (
-    <Column noMargin expand>
+    <Column noMargin>
       <Line alignItems="center" justifyContent="center">
         <Text>
           <Trans>
@@ -42,22 +29,9 @@ const ExplanationHeader = ({ game }: Props) => {
           </Trans>
         </Text>
       </Line>
-      {!!isGamePublishedOnGdGames ? (
-        <AlertMessage kind="info">
-          <Trans>
-            A new private link will be created without replacing the version
-            published on gd.games. You will then be able to share it like this
-            or push it live!
-          </Trans>
-        </AlertMessage>
-      ) : !!hasGameExistingBuilds ? (
-        <AlertMessage kind="info">
-          <Trans>
-            A new private link will be created. You will then be able to share
-            it like this or decide to promote it on gd.games.
-          </Trans>
-        </AlertMessage>
-      ) : null}
+      <Line justifyContent="center">
+        <GdGames color="secondary" style={iconStyle} />
+      </Line>
     </Column>
   );
 };

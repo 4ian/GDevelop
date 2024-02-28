@@ -208,12 +208,7 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const {
-        games,
-        gamesFetchingError,
-        onGameUpdated,
-        fetchGames,
-      } = useGamesList();
+      const { games, gamesFetchingError, fetchGames } = useGamesList();
       const {
         shouldDisplayNewFeatureHighlighting,
         acknowledgeNewFeature,
@@ -421,14 +416,6 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      const handleGameUpdated = React.useCallback(
-        (game: Game) => {
-          onGameUpdated(game);
-          if (openedGame) setOpenedGame(game);
-        },
-        [onGameUpdated, openedGame]
-      );
-
       const onManageGame = React.useCallback(
         ({ gameId }: {| gameId: string |}) => {
           if (!games) return;
@@ -459,7 +446,6 @@ export const HomePage = React.memo<Props>(
                     <ManageSection
                       project={project}
                       games={games}
-                      onGameUpdated={handleGameUpdated}
                       onRefreshGames={fetchGames}
                       gamesFetchingError={gamesFetchingError}
                       openedGame={openedGame}

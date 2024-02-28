@@ -4,35 +4,35 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+} from '../UI/Layout';
 import {
   buyGameFeaturing,
-  listMarketingPlans,
   listGameFeaturings,
   type Game,
   type MarketingPlan,
   type GameFeaturing,
-} from '../../Utils/GDevelopServices/Game';
-import Text from '../../UI/Text';
-import Link from '../../UI/Link';
-import Window from '../../Utils/Window';
+} from '../Utils/GDevelopServices/Game';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import Window from '../Utils/Window';
 import Basic from './Icons/Basic';
 import Pro from './Icons/Pro';
 import Premium from './Icons/Premium';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { Column, Line } from '../../UI/Grid';
-import RaisedButton from '../../UI/RaisedButton';
-import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import PlaceholderError from '../../UI/PlaceholderError';
-import { CreditsPackageStoreContext } from '../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import PlaceholderError from '../UI/PlaceholderError';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { MarketingPlansStoreContext } from './MarketingPlansStoreContext';
 
 const styles = {
   campaign: {
@@ -79,14 +79,13 @@ const MarketingPlans = ({ game }: Props) => {
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
+  const {
+    marketingPlans,
+    error: marketingPlansError,
+    fetchMarketingPlans,
+  } = React.useContext(MarketingPlansStoreContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlert } = useAlertDialog();
-  const [marketingPlans, setMarketingPlans] = React.useState<
-    MarketingPlan[] | null
-  >(null);
-  const [marketingPlansError, setMarketingPlansError] = React.useState<?Error>(
-    null
-  );
   const [gameFeaturings, setGameFeaturings] = React.useState<
     GameFeaturing[] | null
   >(null);
@@ -144,17 +143,6 @@ const MarketingPlans = ({ game }: Props) => {
     },
     [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
   );
-
-  const fetchMarketingPlans = React.useCallback(async () => {
-    try {
-      setMarketingPlansError(null);
-      const marketingPlans = await listMarketingPlans();
-      setMarketingPlans(marketingPlans);
-    } catch (error) {
-      console.error('An error occurred while fetching marketing plans.', error);
-      setMarketingPlansError(error);
-    }
-  }, []);
 
   React.useEffect(
     () => {
@@ -238,7 +226,8 @@ const MarketingPlans = ({ game }: Props) => {
         message: activeFeaturing ? (
           <Trans>
             You are about to use {packCreditsAmount} credits to extend the game
-            featuring {translatedName} for your game {game.gameName}. Continue?
+            featuring {translatedName} for your game {game.gameName} and push it
+            to the top of gd.games. Continue?
           </Trans>
         ) : (
           <Trans>
@@ -260,7 +249,8 @@ const MarketingPlans = ({ game }: Props) => {
             <Trans>
               🎉 Congrats on getting the {translatedName} featuring for your
               game {game.gameName}! Ensure that your game is public and you have
-              configured a thumbnail for gd.games.
+              configured a thumbnail for gd.games. This can take a few minutes
+              for your game to be visible on the platform.
             </Trans>
           ) : (
             <Trans>
@@ -284,6 +274,47 @@ const MarketingPlans = ({ game }: Props) => {
     ]
   );
 
+  const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
+    const requirementsErrors = [];
+    if (marketingPlan.id === 'featuring-basic') {
+      if (!game.thumbnailUrl) {
+        requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
+      }
+      if (!game.publicWebBuildId) {
+        requirementsErrors.push(
+          <Trans>Your game does not have a public build</Trans>
+        );
+      }
+      if (!game.discoverable) {
+        requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
+      }
+    }
+
+    return requirementsErrors;
+  };
+
+  const getActiveMessage = ({
+    marketingPlan,
+    activeFeaturing,
+    i18n,
+    hasErrors,
+  }: {|
+    marketingPlan: MarketingPlan,
+    activeFeaturing: GameFeaturing,
+    i18n: I18nType,
+    hasErrors: boolean,
+  |}) => {
+    if (hasErrors) {
+      return <Trans>Fix those issues to get the campaign up!</Trans>;
+    }
+
+    return activeFeaturing.featuring === 'games-platform-home' ? (
+      <Trans>Active until {i18n.date(activeFeaturing.expiresAt * 1000)}</Trans>
+    ) : (
+      <Trans>Active, we will get in touch to get the campaign up!</Trans>
+    );
+  };
+
   if (!profile) return null;
 
   return (
@@ -301,13 +332,10 @@ const MarketingPlans = ({ game }: Props) => {
               connection or try again later.
             </Trans>
           </PlaceholderError>
-        ) : !marketingPlans || !gameFeaturings ? (
+        ) : !marketingPlans ? (
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            <Text size="sub-title">
-              <Trans>Marketing Campaigns</Trans>
-            </Text>
             <Text color="secondary" noMargin>
               <Trans>
                 Get ready-made packs to make your game visible to the GDevelop
@@ -335,6 +363,10 @@ const MarketingPlans = ({ game }: Props) => {
                   bulletPointsByLocale,
                 } = marketingPlan;
                 const activeFeaturing = getActiveFeaturing(marketingPlan);
+                const requirementsErrors = activeFeaturing
+                  ? getRequirementsErrors(marketingPlan)
+                  : [];
+                const hasErrors = requirementsErrors.length > 0;
                 return (
                   <div
                     style={{
@@ -370,28 +402,45 @@ const MarketingPlans = ({ game }: Props) => {
                       </div>
 
                       <div style={styles.bulletPointsContainer}>
-                        {bulletPointsByLocale.map(
-                          (bulletPointByLocale, index) => (
-                            <Column key={index} expand noMargin>
-                              <Line noMargin alignItems="center">
-                                <CheckCircle
-                                  style={{
-                                    ...styles.bulletIcon,
-                                    ...(activeFeaturing
-                                      ? { color: gdevelopTheme.message.valid }
-                                      : {}),
-                                  }}
-                                />
-                                <Text style={{ flex: 1 }}>
-                                  {selectMessageByLocale(
-                                    i18n,
-                                    bulletPointByLocale
-                                  )}
-                                </Text>
-                              </Line>
-                            </Column>
-                          )
-                        )}
+                        {hasErrors
+                          ? requirementsErrors.map((error, index) => (
+                              <Column key={index} expand noMargin>
+                                <Line noMargin alignItems="center">
+                                  <CheckCircle
+                                    style={{
+                                      ...styles.bulletIcon,
+                                      color: gdevelopTheme.message.error,
+                                    }}
+                                  />
+                                  <Text style={{ flex: 1 }}>{error}</Text>
+                                </Line>
+                              </Column>
+                            ))
+                          : bulletPointsByLocale.map(
+                              (bulletPointByLocale, index) => (
+                                <Column key={index} expand noMargin>
+                                  <Line noMargin alignItems="center">
+                                    <CheckCircle
+                                      style={{
+                                        ...styles.bulletIcon,
+                                        ...(activeFeaturing
+                                          ? {
+                                              color:
+                                                gdevelopTheme.message.valid,
+                                            }
+                                          : {}),
+                                      }}
+                                    />
+                                    <Text style={{ flex: 1 }}>
+                                      {selectMessageByLocale(
+                                        i18n,
+                                        bulletPointByLocale
+                                      )}
+                                    </Text>
+                                  </Line>
+                                </Column>
+                              )
+                            )}
                       </div>
 
                       <Column
@@ -406,29 +455,23 @@ const MarketingPlans = ({ game }: Props) => {
                           color="secondary"
                           align="left"
                         >
-                          {activeFeaturing ? (
-                            activeFeaturing.featuring ===
-                            'games-platform-home' ? (
-                              <Trans>
-                                Active until{' '}
-                                {i18n.date(activeFeaturing.expiresAt * 1000)}
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Active, we will get in touch to get the campaign
-                                up!
-                              </Trans>
-                            )
-                          ) : (
-                            selectMessageByLocale(i18n, descriptionByLocale)
-                          )}
+                          {activeFeaturing
+                            ? getActiveMessage({
+                                activeFeaturing,
+                                marketingPlan,
+                                i18n,
+                                hasErrors,
+                              })
+                            : selectMessageByLocale(i18n, descriptionByLocale)}
                         </Text>
                       </Column>
                       <RaisedButton
                         primary={!activeFeaturing}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
-                          activeFeaturing ? (
+                          !gameFeaturings ? (
+                            <Trans>Loading...</Trans>
+                          ) : activeFeaturing ? (
                             activeFeaturing.featuring ===
                             'games-platform-home' ? (
                               <Trans>Extend</Trans>
@@ -440,6 +483,7 @@ const MarketingPlans = ({ game }: Props) => {
                           )
                         }
                         fullWidth
+                        disabled={!gameFeaturings}
                       />
                     </ColumnStackLayout>
                   </div>

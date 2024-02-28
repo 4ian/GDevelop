@@ -28,6 +28,20 @@ export const Default = () => (
       limitReached: false,
     }}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
+  />
+);
+
+export const With2BuildsRunning = () => (
+  <CurrentUsageDisplayer
+    subscription={subscriptionForIndieUser}
+    quota={{
+      current: 0,
+      max: 5,
+      limitReached: false,
+    }}
+    onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={2}
   />
 );
 
@@ -40,6 +54,20 @@ export const With1BuildRemaining = () => (
       limitReached: false,
     }}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
+  />
+);
+
+export const With1BuildRemainingBut1BuildRunning = () => (
+  <CurrentUsageDisplayer
+    subscription={subscriptionForIndieUser}
+    quota={{
+      current: 4,
+      max: 5,
+      limitReached: false,
+    }}
+    onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={1}
   />
 );
 
@@ -52,6 +80,7 @@ export const WithRedemptionCode = () => (
       limitReached: false,
     }}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
   />
 );
 
@@ -64,6 +93,7 @@ export const WithExpiredRedemptionCode = () => (
       limitReached: false,
     }}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
   />
 );
 
@@ -72,6 +102,7 @@ export const LimitReached = () => (
     subscription={subscriptionForIndieUser}
     quota={limitsReached.quotas['cordova-build']}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
   />
 );
 
@@ -80,5 +111,6 @@ export const LimitsReachedWithoutSubscription = () => (
     subscription={noSubscription}
     quota={limitsReached.quotas['cordova-build']}
     onChangeSubscription={action('on change subscription callback')}
+    numberOfPendingBuilds={0}
   />
 );

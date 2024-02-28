@@ -12,6 +12,7 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
@@ -20,7 +21,12 @@ import {
   BlobDownloadUrlHolder,
   openBlobDownloadUrl,
 } from '../../Utils/BlobDownloadUrlHolder';
-import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
+import {
+  ExplanationHeader,
+  DoneFooter,
+  ExportFlow,
+} from '../GenericExporters/HTML5Export';
+
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -43,6 +49,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-html5';
+
 export const browserHTML5ExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -50,7 +58,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-html5',
+  name: exportPipelineName,
 
   getInitialExportState: () => null,
 
@@ -60,7 +68,9 @@ export const browserHTML5ExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Export as a HTML5 game</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -135,14 +145,13 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+  renderDoneFooter: ({ compressionOutput, exportState }) => {
     return (
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
             {blobDownloadUrl => (
               <RaisedButton
-                fullWidth
                 primary
                 onClick={() => openBlobDownloadUrl(blobDownloadUrl, 'game.zip')}
                 label={<Trans>Download the exported game</Trans>}

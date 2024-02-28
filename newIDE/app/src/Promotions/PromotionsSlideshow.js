@@ -9,6 +9,7 @@ import {
   homepageMediumMenuBarWidth,
 } from '../MainFrame/EditorContainers/HomePage/HomePageMenuBar';
 import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { SECTION_PADDING } from '../MainFrame/EditorContainers/HomePage/SectionContainer';
 
 const promotionDesktopRatio = 5038 / 459;
 const promotionMobileRatio = 18 / 7;
@@ -50,8 +51,8 @@ const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
         isMobile
           ? 0
           : isMediumScreen
-          ? homepageMediumMenuBarWidth
-          : homepageDesktopMenuBarWidth
+          ? homepageMediumMenuBarWidth + 2 * SECTION_PADDING
+          : homepageDesktopMenuBarWidth + 2 * SECTION_PADDING
       }
     />
   );

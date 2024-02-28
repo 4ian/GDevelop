@@ -63,17 +63,10 @@ type Props = {|
   project: ?gdProject,
   games: Array<Game>,
   onRefreshGames: () => Promise<void>,
-  onGameUpdated: Game => void,
   onOpenGame: (?Game) => void,
 |};
 
-const GamesList = ({
-  project,
-  games,
-  onRefreshGames,
-  onGameUpdated,
-  onOpenGame,
-}: Props) => {
+const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
   const {
     routeArguments,
     addRouteArguments,

@@ -46,18 +46,30 @@ const CurrentUsageDisplayer = ({
   const usedBuilds = Math.min(quota.current + numberOfPendingBuilds, quota.max);
   const remainingBuilds = Math.max(quota.max - usedBuilds, 0);
   const usageRatio = `${usedBuilds}/${quota.max}`;
-  const remainingMultipleMessage = (
-    <Trans>
-      You have {remainingBuilds} builds remaining (you have used {usageRatio} in
-      the last 24h).
-    </Trans>
-  );
-  const remainingSingleMessage = (
-    <Trans>
-      You have {remainingBuilds} build remaining (you have used {usageRatio} in
-      the last 24h).
-    </Trans>
-  );
+  const remainingMultipleMessage =
+    quota.period === '30days' ? (
+      <Trans>
+        You have <b>{remainingBuilds}</b> builds remaining — you have used
+        {usageRatio} in the past 30 days.
+      </Trans>
+    ) : (
+      <Trans>
+        You have <b>{remainingBuilds}</b> builds remaining — you have used
+        {usageRatio} in the past 24h.
+      </Trans>
+    );
+  const remainingSingleMessage =
+    quota.period === '30days' ? (
+      <Trans>
+        You have <b>{remainingBuilds}</b> build remaining — you have used
+        {usageRatio} in the past 30 days.
+      </Trans>
+    ) : (
+      <Trans>
+        You have <b>{remainingBuilds}</b> build remaining — you have used
+        {usageRatio} in the past 24h.
+      </Trans>
+    );
   return (
     <ColumnStackLayout noMargin>
       {hasSubscription ? (

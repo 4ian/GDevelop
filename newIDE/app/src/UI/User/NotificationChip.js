@@ -28,7 +28,7 @@ const NotificationChip = (props: Props) => {
       >
         <Badge
           variant="dot"
-          badgeContent={''}
+          overlap="circle"
           invisible={
             !(
               notifications &&

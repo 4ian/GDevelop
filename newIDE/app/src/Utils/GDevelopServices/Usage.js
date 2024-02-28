@@ -91,6 +91,7 @@ export type Quota = {|
   limitReached: boolean,
   current: number,
   max: number,
+  period?: '1day' | '30days',
 |};
 
 export type Quotas = {

@@ -14,6 +14,7 @@ import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/P
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import { type Recommendation } from '../Utils/GDevelopServices/User';
+import { type Notification } from '../Utils/GDevelopServices/Notification';
 import {
   type Limits,
   type Usages,
@@ -41,6 +42,7 @@ export type AuthenticatedUser = {|
   gameTemplatePurchases: ?Array<Purchase>,
   assetPackPurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
+  notifications: ?Array<Notification>,
   limits: ?Limits,
   authenticationError: ?AuthError,
   usages: ?Usages,
@@ -96,6 +98,7 @@ export const initialAuthenticatedUser = {
   gameTemplatePurchases: null,
   assetPackPurchases: null,
   recommendations: null,
+  notifications: null,
   subscription: null,
   usages: null,
   limits: null,

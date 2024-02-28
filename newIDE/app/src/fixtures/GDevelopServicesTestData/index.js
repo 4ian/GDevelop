@@ -1340,6 +1340,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticationError: null,
   badges: null,
   cloudProjects: null,
+  notifications: null,
   recommendations: [
     {
       type: 'gdevelop-tutorial',

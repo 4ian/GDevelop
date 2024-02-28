@@ -58,6 +58,7 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
+import { listNotifications } from '../Utils/GDevelopServices/Notification';
 
 type Props = {|
   authentication: Authentication,
@@ -503,6 +504,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     );
     this._fetchUserBadges();
+    this._fetchUserNotifications();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -558,6 +560,27 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserNotifications = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const notifications = await listNotifications(
+        authentication.getAuthorizationHeader,
+        { userId: firebaseUser.uid }
+      );
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          notifications,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user notifications:', error);
     }
   };
 

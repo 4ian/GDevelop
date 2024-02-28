@@ -15,6 +15,7 @@ import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindow
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';
+import NotificationChip from '../../../UI/User/NotificationChip';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -81,6 +82,7 @@ export const HomePageHeader = ({
                 />
               )}
               <UserChip onOpenProfile={onOpenProfile} />
+              <NotificationChip />
               <TextButton
                 label={i18n.language.toUpperCase()}
                 onClick={onOpenLanguageDialog}

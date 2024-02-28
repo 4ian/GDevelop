@@ -190,6 +190,7 @@ const SectionLine = ({
 |}) => {
   const classes = useStylesForWidget();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { isMobile } = useResponsiveWindowSize();
   return (
     <ButtonBase
       onClick={onClick}
@@ -212,7 +213,7 @@ const SectionLine = ({
         alignItems="center"
         noColumnMargin
       >
-        <Column alignItems="flex-end">
+        <Column alignItems="flex-start">
           <LineStackLayout expand noMargin alignItems="center">
             <div style={styles.iconContainer}>{icon}</div>
             <Text
@@ -238,14 +239,19 @@ const SectionLine = ({
             )}
           </LineStackLayout>
         </Column>
-        <Column noMargin>
+        <Column>
           <LineStackLayout
             expand
             noMargin
             alignItems="center"
-            justifyContent="flex-end"
+            justifyContent={isMobile ? 'space-between' : 'flex-end'}
           >
-            <Text color="secondary" size="body2" align="right" noMargin>
+            <Text
+              color="secondary"
+              size="body2"
+              align={isMobile ? 'left' : 'right'}
+              noMargin
+            >
               {description}
             </Text>
             <ChevronArrowRight color="secondary" />
@@ -370,7 +376,8 @@ const PublishHome = ({
           <div
             style={{
               ...styles.titleContainer,
-              justifyContent: isMobile ? 'flex-end' : 'center',
+              justifyContent:
+                isMobile && shouldShowBackButton ? 'flex-end' : 'center',
             }}
           >
             <LineStackLayout

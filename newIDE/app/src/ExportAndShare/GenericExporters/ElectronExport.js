@@ -13,7 +13,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
 export const ExplanationHeader = () => (
-  <Text>
+  <Text align="center">
     <Trans>
       This will export your game so that you can package it for Windows, macOS
       or Linux. You will need to install third-party tools (Node.js, Electron

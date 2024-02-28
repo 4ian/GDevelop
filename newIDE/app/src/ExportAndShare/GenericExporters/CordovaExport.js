@@ -13,7 +13,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
 export const ExplanationHeader = () => (
-  <Text>
+  <Text align="center">
     <Trans>
       This will export your game as a Cordova project. Cordova is a technology
       that enables HTML5 games to be packaged for iOS and Android.

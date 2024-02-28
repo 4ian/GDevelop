@@ -48,7 +48,7 @@ export const SetupExportHeader = ({
     <React.Fragment>
       <Column noMargin expand>
         <Line>
-          <Text>
+          <Text align="center">
             <Trans>
               Your game will be exported and packaged online as a stand-alone
               game for Windows, Linux and/or macOS.

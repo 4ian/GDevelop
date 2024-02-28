@@ -2,7 +2,10 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ExportFlowProps } from '../../ExportPipeline.flow';
-import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../UI/Layout';
 import FlatButton from '../../../UI/FlatButton';
 import RaisedButton from '../../../UI/RaisedButton';
 import { Line } from '../../../UI/Grid';
@@ -42,7 +45,7 @@ const OnlineWebExportFlow = ({
 
   const Buttons = isExportPending ? null : hasGameExistingBuilds ? (
     isPublishedOnGdgames ? (
-      <LineStackLayout justifyContent="center">
+      <ResponsiveLineStackLayout justifyContent="center">
         <FlatButton
           label={<Trans>Generate new link</Trans>}
           primary
@@ -63,7 +66,7 @@ const OnlineWebExportFlow = ({
           }}
           disabled={disabled}
         />
-      </LineStackLayout>
+      </ResponsiveLineStackLayout>
     ) : (
       <Line justifyContent="center">
         <RaisedButton

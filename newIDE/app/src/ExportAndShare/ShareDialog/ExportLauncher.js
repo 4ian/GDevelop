@@ -36,6 +36,7 @@ import { type EventsFunctionsExtensionsState } from '../../EventsFunctionsExtens
 import inc from 'semver/functions/inc';
 import Toggle from '../../UI/Toggle';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import AlertMessage from '../../UI/AlertMessage';
 
 type State = {|
   exportStep: BuildStep,
@@ -499,6 +500,7 @@ export default class ExportLauncher extends Component<Props, State> {
       !!exportPipeline.onlineBuildType && !authenticatedUser.authenticated;
     const isOnlineBuildIncludedInSubscription =
       !!buildQuota && buildQuota.max > 0;
+    const numberOfBuildsCurrentlyRunning = getNumberOfBuildsCurrentlyRunning();
 
     return (
       <I18n>
@@ -529,7 +531,7 @@ export default class ExportLauncher extends Component<Props, State> {
                   exportPipeline.renderTutorial()}
               </Column>
             )}
-            <Column noMargin expand justifyContent="center">
+            <Column expand justifyContent="center">
               {!isUsingOnlineBuildNonAuthenticated && (
                 <Line alignItems="center" justifyContent="center">
                   {exportPipeline.renderHeader({
@@ -575,10 +577,22 @@ export default class ExportLauncher extends Component<Props, State> {
                         subscription={authenticatedUser.subscription}
                         quota={buildQuota}
                         onChangeSubscription={this.props.onChangeSubscription}
-                        numberOfPendingBuilds={getNumberOfBuildsCurrentlyRunning()}
+                        numberOfPendingBuilds={numberOfBuildsCurrentlyRunning}
                       />
                     </Column>
                   </Line>
+                )}
+              {!!exportPipeline.limitedBuilds &&
+                authenticatedUser.authenticated &&
+                !build &&
+                numberOfBuildsCurrentlyRunning > 0 && (
+                  <AlertMessage kind="info">
+                    <Trans>
+                      You have a build currently running, you can see its
+                      progress via the exports button at the bottom of this
+                      dialog.
+                    </Trans>
+                  </AlertMessage>
                 )}
               {isUsingOnlineBuildNonAuthenticated && (
                 <CreateProfile

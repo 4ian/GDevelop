@@ -29,7 +29,7 @@ export const ExplanationHeader = () => {
   return (
     <Column noMargin>
       <Line>
-        <Text>
+        <Text align="center">
           <Trans>
             Prepare your game for Facebook Instant Games so that it can be play
             on Facebook Messenger. GDevelop will create a compressed file that

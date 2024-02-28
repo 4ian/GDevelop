@@ -36,8 +36,8 @@ export const SetupExportHeader = ({
 
   return (
     <ColumnStackLayout noMargin expand>
-      <Line>
-        <Text>
+      <Line alignItems="center" justifyContent="center">
+        <Text align="center">
           <Trans>
             Package the game for iOS, using your Apple Developer account.
           </Trans>

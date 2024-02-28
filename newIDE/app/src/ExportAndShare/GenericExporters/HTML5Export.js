@@ -33,7 +33,7 @@ export const ExplanationHeader = () => {
   return (
     <Column noMargin>
       <Line>
-        <Text>
+        <Text align="center">
           <Trans>
             This will export your game to a folder. You can then upload it on a
             website/game hosting service and share it on marketplaces and gaming

@@ -22,7 +22,7 @@ const ExplanationHeader = () => {
   return (
     <Column noMargin>
       <Line alignItems="center" justifyContent="center">
-        <Text>
+        <Text align="center">
           <Trans>
             Generate a unique link, playable from any computer or mobile phone's
             browser.

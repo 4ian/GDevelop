@@ -5,20 +5,16 @@ import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
 import OnlineGameLink from './OnlineGameLink';
 import GdGames from '../../../UI/CustomSvgIcons/GdGames';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
-  return {
-    height: isMobile ? 30 : 48,
-    width: isMobile ? 30 : 48,
+const styles = {
+  icon: {
+    height: 48,
+    width: 48,
     margin: 10,
-  };
+  },
 };
 
 const ExplanationHeader = () => {
-  const { isMobile } = useResponsiveWindowSize();
-  const iconStyle = getIconStyle({ isMobile });
-
   return (
     <Column noMargin>
       <Line alignItems="center" justifyContent="center">
@@ -30,7 +26,7 @@ const ExplanationHeader = () => {
         </Text>
       </Line>
       <Line justifyContent="center">
-        <GdGames color="secondary" style={iconStyle} />
+        <GdGames color="secondary" style={styles.icon} />
       </Line>
     </Column>
   );

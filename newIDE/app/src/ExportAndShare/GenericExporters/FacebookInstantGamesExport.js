@@ -7,25 +7,21 @@ import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Help from '../../UI/CustomSvgIcons/Help';
 import Check from '../../UI/CustomSvgIcons/Check';
 import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import { type ExportFlowProps } from '../ExportPipeline.flow';
 
-const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
-  return {
-    height: isMobile ? 30 : 48,
-    width: isMobile ? 30 : 48,
+const styles = {
+  icon: {
+    height: 48,
+    width: 48,
     margin: 10,
-  };
+  },
 };
 
 export const ExplanationHeader = () => {
-  const { isMobile } = useResponsiveWindowSize();
-  const iconStyle = getIconStyle({ isMobile });
-
   return (
     <Column noMargin>
       <Line>
@@ -38,7 +34,7 @@ export const ExplanationHeader = () => {
         </Text>
       </Line>
       <Line justifyContent="center">
-        <Facebook color="secondary" style={iconStyle} />
+        <Facebook color="secondary" style={styles.icon} />
       </Line>
     </Column>
   );

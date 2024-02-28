@@ -415,10 +415,28 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     return output;
   };
 
+  auto makeProjectNameXcodeSafe = [](const gd::String &projectName) {
+    // Avoid App Store Connect STATE_ERROR.VALIDATION_ERROR.90121 error, when
+    // "CFBundleExecutable Info.plist key contains [...] any of the following
+    // unsupported characters: \ [ ] { } ( ) + *".
+
+    // Remove \ [ ] { } ( ) + * from the project name.
+    return projectName.FindAndReplace("\\", "")
+        .FindAndReplace("[", "")
+        .FindAndReplace("]", "")
+        .FindAndReplace("{", "")
+        .FindAndReplace("}", "")
+        .FindAndReplace("(", "")
+        .FindAndReplace(")", "")
+        .FindAndReplace("+", "")
+        .FindAndReplace("*", "");
+  };
+
   gd::String str =
       fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
           .FindAndReplace("GDJS_PROJECTNAME",
-                          gd::Serializer::ToEscapedXMLString(project.GetName()))
+                          gd::Serializer::ToEscapedXMLString(
+                              makeProjectNameXcodeSafe(project.GetName())))
           .FindAndReplace(
               "GDJS_PACKAGENAME",
               gd::Serializer::ToEscapedXMLString(project.GetPackageName()))

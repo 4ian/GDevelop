@@ -107,6 +107,14 @@ export default function EventsBasedObjectEditor({
         }}
       />
       <Checkbox
+        label={<Trans>Has animations</Trans>}
+        checked={eventsBasedObject.isAnimatable()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsAnimatable(checked);
+          onChange();
+        }}
+      />
+      <Checkbox
         label={<Trans>Contains text</Trans>}
         checked={eventsBasedObject.isTextContainer()}
         onCheck={(e, checked) => {

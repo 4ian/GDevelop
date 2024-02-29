@@ -2790,6 +2790,8 @@ interface EventsBasedObject {
 
     [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
     boolean IsRenderedIn3D();
+    [Ref] EventsBasedObject MarkAsAnimatable(boolean isAnimatable);
+    boolean IsAnimatable();
     [Ref] EventsBasedObject MarkAsTextContainer(boolean isTextContainer);
     boolean IsTextContainer();
 

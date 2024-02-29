@@ -86,6 +86,19 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   bool IsRenderedIn3D() const { return isRenderedIn3D; }
 
   /**
+   * \brief Declare an Animatable capability.
+   */
+  EventsBasedObject& MarkAsAnimatable(bool isAnimatable_) {
+    isAnimatable = isAnimatable_;
+    return *this;
+  }
+
+  /**
+   * \brief Return true if the object needs an Animatable capability.
+   */
+  bool IsAnimatable() const { return isAnimatable; }
+
+  /**
    * \brief Declare a TextContainer capability.
    */
   EventsBasedObject& MarkAsTextContainer(bool isTextContainer_) {
@@ -106,6 +119,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
  private:
   gd::String defaultName;
   bool isRenderedIn3D;
+  bool isAnimatable;
   bool isTextContainer;
 };
 

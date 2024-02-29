@@ -11,6 +11,8 @@ declare class gdEventsBasedObject extends gdAbstractEventsBasedEntity {
   getDefaultName(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): gdEventsBasedObject;
   isRenderedIn3D(): boolean;
+  markAsAnimatable(isAnimatable: boolean): gdEventsBasedObject;
+  isAnimatable(): boolean;
   markAsTextContainer(isTextContainer: boolean): gdEventsBasedObject;
   isTextContainer(): boolean;
   static getPropertyActionName(propertyName: string): string;

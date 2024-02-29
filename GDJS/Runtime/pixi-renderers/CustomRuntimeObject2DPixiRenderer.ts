@@ -1,8 +1,8 @@
 namespace gdjs {
   /**
-   * The renderer for a {@link gdjs.CustomRuntimeObject} using Pixi.js.
+   * The renderer for a {@link gdjs.CustomRuntimeObject2D} using Pixi.js.
    */
-  export class CustomObjectPixiRenderer
+  export class CustomRuntimeObject2DPixiRenderer
     implements gdjs.RuntimeInstanceContainerPixiRenderer {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
@@ -155,6 +155,7 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
-  export const CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
+  export type CustomRuntimeObject2DRenderer = gdjs.CustomRuntimeObject2DPixiRenderer;
+  export const CustomRuntimeObject2DRenderer =
+    gdjs.CustomRuntimeObject2DPixiRenderer;
 }

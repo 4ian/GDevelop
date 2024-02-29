@@ -1,4 +1,7 @@
 namespace gdjs {
+  /**
+   * The renderer for a {@link gdjs.CustomRuntimeObject3D} using Three.js.
+   */
   export class CustomRuntimeObject3DRenderer
     implements gdjs.RuntimeInstanceContainerRenderer {
     _object: gdjs.CustomRuntimeObject3D;

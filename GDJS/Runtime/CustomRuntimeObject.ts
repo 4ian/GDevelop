@@ -26,7 +26,9 @@ namespace gdjs {
       gdjs.Scalable,
       gdjs.Flippable,
       gdjs.OpacityHandler {
-    _renderer: gdjs.CustomObjectRenderer | gdjs.CustomRuntimeObject3DRenderer;
+    _renderer:
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
@@ -66,7 +68,7 @@ namespace gdjs {
     }
 
     protected abstract _createRender():
-      | gdjs.CustomObjectRenderer
+      | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer;
     protected abstract _reinitializeRender(): void;
 
@@ -147,7 +149,7 @@ namespace gdjs {
     }
 
     getRenderer():
-      | gdjs.CustomObjectRenderer
+      | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer {
       return this._renderer;
     }

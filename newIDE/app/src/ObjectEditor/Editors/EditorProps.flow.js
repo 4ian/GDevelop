@@ -30,4 +30,5 @@ export type EditorProps = {|
   onSizeUpdated: () => void,
   onObjectUpdated?: () => void,
   unsavedChanges?: UnsavedChanges,
+  scrollView?: ScrollViewInterface,
 |};

@@ -144,7 +144,7 @@ export default function SpriteEditor({
       {({ i18n }) => (
         <>
           <ScrollView ref={scrollView}>
-            <React.Fragment>
+            <>
               <SpacedDismissableTutorialMessage />
               <AnimationList
                 ref={animationList}
@@ -162,7 +162,7 @@ export default function SpriteEditor({
                   onCreateMatchingSpriteCollisionMask
                 }
               />
-            </React.Fragment>
+            </>
           </ScrollView>
           <Column noMargin>
             <ResponsiveLineStackLayout

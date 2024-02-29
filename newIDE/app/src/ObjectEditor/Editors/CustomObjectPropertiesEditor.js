@@ -20,6 +20,14 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { IconContainer } from '../../UI/IconContainer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import AnimationList, { type AnimationListInterface } from './SpriteEditor/AnimationList';
+import {
+  hasAnyFrame,
+  getFirstAnimationFrame,
+  setCollisionMaskOnAllFrames,
+} from './SpriteEditor/Utils/SpriteObjectHelper';
+import { getMatchingCollisionMask } from './SpriteEditor/CollisionMasksEditor/CollisionMaskHelper';
+import ResourcesLoader from '../../ResourcesLoader';
 
 const gd: libGDevelop = global.gd;
 
@@ -32,8 +40,11 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     objectConfiguration,
     project,
     layout,
+    object,
     objectName,
     resourceManagementProps,
+    onSizeUpdated,
+    onObjectUpdated,
     unsavedChanges,
   } = props;
 
@@ -61,6 +72,45 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     ? project.getEventsBasedObject(customObjectConfiguration.getType())
     : null;
 
+  const animationList = React.useRef<?AnimationListInterface>(null);
+
+  const animations = customObjectConfiguration.getAnimations();
+
+  // The matching collision mask only takes the first sprite of the first
+  // animation of the object. We consider this is enough to start with, and
+  // the user can then edit the collision mask for further needs.
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(
+    async () => {
+      const firstSprite = getFirstAnimationFrame(animations);
+      if (!firstSprite) {
+        return;
+      }
+      const firstSpriteResourceName = firstSprite.getImageName();
+      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+        project,
+        firstSpriteResourceName,
+        {}
+      );
+      let matchingCollisionMask = null;
+      try {
+        matchingCollisionMask = await getMatchingCollisionMask(
+          firstAnimationResourceSource
+        );
+      } catch (e) {
+        console.error(
+          'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
+          e
+        );
+      }
+      setCollisionMaskOnAllFrames(animations, matchingCollisionMask);
+      forceUpdate();
+    },
+    [animations, project, forceUpdate]
+  );
+
+  // TODO
+  const scrollView = {current: null}
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -72,7 +122,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
             />
           ))}
           {propertiesSchema.length ||
-          (eventBasedObject && eventBasedObject.getObjectsCount()) ? (
+          (eventBasedObject && (eventBasedObject.getObjectsCount() || eventBasedObject.isAnimatable())) ? (
             <React.Fragment>
               {extraInformation ? (
                 <Line>
@@ -92,6 +142,28 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 project={project}
                 resourceManagementProps={resourceManagementProps}
               />
+              {eventBasedObject && eventBasedObject.isAnimatable() &&
+              <Column expand>
+                <Text size="block-title">
+                  <Trans>Animations</Trans>
+                </Text>
+              <AnimationList
+                ref={animationList}
+                animations={animations}
+                project={project}
+                layout={layout}
+                object={object}
+                objectName={objectName}
+                resourceManagementProps={resourceManagementProps}
+                onSizeUpdated={onSizeUpdated}
+                onObjectUpdated={onObjectUpdated}
+                isAnimationListLocked={false}
+                scrollView={scrollView.current}
+                onCreateMatchingSpriteCollisionMask={
+                  onCreateMatchingSpriteCollisionMask
+                }
+              />
+              </Column>}
               {eventBasedObject &&
                 mapFor(0, eventBasedObject.getObjectsCount(), i => {
                   const childObject = eventBasedObject.getObjectAt(i);

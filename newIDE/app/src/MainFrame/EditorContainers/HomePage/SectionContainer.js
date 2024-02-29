@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../../UI/Grid';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';

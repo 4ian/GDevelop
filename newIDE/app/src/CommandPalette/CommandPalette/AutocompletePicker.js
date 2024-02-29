@@ -27,8 +27,8 @@ import {
   getHitLastHierarchyLevel,
   type AlgoliaSearchHit as AlgoliaSearchHitType,
 } from '../../Utils/AlgoliaSearch';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 
 const useStyles = makeStyles(theme => ({
   listItemContainer: {

@@ -20,7 +20,7 @@ import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -43,7 +43,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   SceneTreeViewItemContent,
   getSceneTreeViewItemId,

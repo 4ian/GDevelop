@@ -8,7 +8,7 @@ import { Column, Line } from './Grid';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from './Reponsive/ResponsiveWindowMeasurer';
+} from './Responsive/ResponsiveWindowMeasurer';
 import { CorsAwareImage } from './CorsAwareImage';
 import Text from './Text';
 import Skeleton from '@material-ui/lab/Skeleton';

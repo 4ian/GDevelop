@@ -29,8 +29,8 @@ import {
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';

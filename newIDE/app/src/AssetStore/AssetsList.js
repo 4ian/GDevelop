@@ -19,7 +19,7 @@ import GridList from '@material-ui/core/GridList';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';

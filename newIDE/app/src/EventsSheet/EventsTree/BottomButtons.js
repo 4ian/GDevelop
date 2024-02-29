@@ -10,7 +10,7 @@ import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 import { type SortableTreeNode } from '.';
 import { moveEventToEventsList } from './helpers';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { useScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 
 const styles = {
   addButton: {

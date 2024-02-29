@@ -10,7 +10,7 @@ import FlatButton from '../FlatButton';
 import { LargeSpacer } from '../Grid';
 import Text from '../Text';
 import TextField from '../TextField';
-import { useShouldAutofocusInput } from '../Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../Responsive/ScreenTypeMeasurer';
 
 type Props = {|
   open: boolean,

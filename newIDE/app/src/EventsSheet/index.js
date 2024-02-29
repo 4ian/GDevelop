@@ -90,8 +90,8 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,

@@ -27,7 +27,7 @@ import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import Add from '../../../UI/CustomSvgIcons/Add';
 import Trash from '../../../UI/CustomSvgIcons/Trash';

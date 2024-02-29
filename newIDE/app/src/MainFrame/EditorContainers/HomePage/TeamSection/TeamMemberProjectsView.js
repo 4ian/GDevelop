@@ -8,7 +8,7 @@ import { Column, Line } from '../../../../UI/Grid';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import AlertMessage from '../../../../UI/AlertMessage';
 import { List } from '../../../../UI/List';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,

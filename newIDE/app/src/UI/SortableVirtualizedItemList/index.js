@@ -9,8 +9,8 @@ import {
   type DraggedItem,
 } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from './DropIndicator';
-import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
-import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
+import { ResponsiveWindowMeasurer } from '../Responsive/ResponsiveWindowMeasurer';
+import { ScreenTypeMeasurer } from '../Responsive/ScreenTypeMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 const OVERSCAN_CELLS_COUNT = 20;

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n as I18nType } from '@lingui/core';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../../../../UI/Grid';

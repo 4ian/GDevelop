@@ -16,7 +16,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';

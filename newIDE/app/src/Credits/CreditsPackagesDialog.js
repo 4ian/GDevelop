@@ -29,7 +29,7 @@ import ThreeCoins from './Icons/ThreeCoins';
 import FourCoins from './Icons/FourCoins';
 import FiveCoins from './Icons/FiveCoins';
 import AlertMessage from '../UI/AlertMessage';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { getItemsSplitInLines } from './CreditsPackagesHelper';
 
 const styles = {

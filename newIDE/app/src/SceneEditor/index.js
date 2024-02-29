@@ -20,7 +20,7 @@ import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDispla
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { shortenString } from '../Utils/StringHelpers';

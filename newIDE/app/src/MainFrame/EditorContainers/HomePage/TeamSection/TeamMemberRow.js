@@ -13,7 +13,7 @@ import Text from '../../../../UI/Text';
 import DragHandle from '../../../../UI/DragHandle';
 import FlatButton from '../../../../UI/FlatButton';
 import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import ThreeDotsMenu from '../../../../UI/CustomSvgIcons/ThreeDotsMenu';
 import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';

@@ -15,7 +15,7 @@ import {
 
 import AchievementList from './AchievementList';
 import Trophy from '../../UI/CustomSvgIcons/Trophy';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 
 type Props = {|

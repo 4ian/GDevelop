@@ -20,7 +20,7 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const themeColors = {
   grey10: '#EBEBED',

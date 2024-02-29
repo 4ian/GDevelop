@@ -27,7 +27,7 @@ import {
   useSearchBox,
 } from 'react-instantsearch-hooks';
 import { useDebounce } from '../../Utils/UseDebounce';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({

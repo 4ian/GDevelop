@@ -5,7 +5,7 @@ import MUICard from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { Column, Line } from './Grid';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   headerContainer: {

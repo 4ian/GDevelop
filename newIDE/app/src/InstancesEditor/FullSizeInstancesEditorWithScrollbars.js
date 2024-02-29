@@ -5,7 +5,7 @@ import throttle from 'lodash/throttle';
 import InstancesEditor, {
   type InstancesEditorPropsWithoutSizeAndScroll,
 } from './index';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useDebounce } from '../Utils/UseDebounce';

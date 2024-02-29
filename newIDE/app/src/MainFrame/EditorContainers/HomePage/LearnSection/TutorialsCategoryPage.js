@@ -8,7 +8,7 @@ import {
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
-import { type WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {

@@ -7,7 +7,7 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
-import { useResponsiveWindowSize } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';

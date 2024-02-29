@@ -6,7 +6,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { Column, Line } from '../../../../UI/Grid';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';

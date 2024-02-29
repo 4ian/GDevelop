@@ -37,7 +37,7 @@ import Android from '../../UI/CustomSvgIcons/Android';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   buttonBase: {

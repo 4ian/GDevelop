@@ -8,13 +8,13 @@ import MuiTextField from '@material-ui/core/TextField';
 import Text from './Text';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 import { useDebounce } from '../Utils/UseDebounce';
 import SearchBarContainer from './SearchBarContainer';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 type TagsHandler = {|
   remove: string => void,

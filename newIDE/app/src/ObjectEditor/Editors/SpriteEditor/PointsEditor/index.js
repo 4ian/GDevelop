@@ -22,7 +22,7 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';

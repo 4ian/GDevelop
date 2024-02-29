@@ -9,7 +9,7 @@ import ImageTileGrid, { type ImageTileComponent } from './ImageTileGrid';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from './Reponsive/ResponsiveWindowMeasurer';
+} from './Responsive/ResponsiveWindowMeasurer';
 
 type ImageTileRowProps = {|
   title: React.Node,

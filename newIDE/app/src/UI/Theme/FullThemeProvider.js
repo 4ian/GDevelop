@@ -7,7 +7,7 @@ import { create } from 'jss';
 import rtl from 'jss-rtl';
 import GDevelopThemeContext from './GDevelopThemeContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import { useResponsiveWindowSize } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({

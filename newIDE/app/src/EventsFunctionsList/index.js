@@ -24,7 +24,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   EventsFunctionTreeViewItemContent,

@@ -11,7 +11,7 @@ import { type ExportPipeline } from '../ExportPipeline.flow';
 import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';

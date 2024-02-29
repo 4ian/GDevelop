@@ -23,7 +23,6 @@ const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
 const iconSourceId = 'icon-source';
-const iconCanvasId = 'icon-canvas';
 
 type Props = {|
   project: gdProject,
@@ -150,7 +149,6 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             width: size,
             height: size,
           },
-          iconCanvasId
         )
       ),
       ...androidSizes.map(size =>
@@ -161,7 +159,6 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             width: size,
             height: size,
           },
-          iconCanvasId
         )
       ),
       resizeImage(
@@ -173,7 +170,6 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
           transparentBorderSize:
             androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
         },
-        iconCanvasId
       ),
       ...iosSizes.map(size =>
         resizeImage(
@@ -183,7 +179,6 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             width: size,
             height: size,
           },
-          iconCanvasId
         )
       ),
     ]);
@@ -320,7 +315,6 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             {!!path ? (
               <>
                 <img style={{ display: 'none' }} id={iconSourceId} alt="" />
-                <canvas style={{ display: 'none' }} id={iconCanvasId} />
                 <RaisedButton
                   primary
                   label={<Trans>Generate icons from a file</Trans>}

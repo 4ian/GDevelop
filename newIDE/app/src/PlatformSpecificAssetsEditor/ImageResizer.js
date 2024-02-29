@@ -31,13 +31,10 @@ export const resizeImage = (
     width,
     height,
     transparentBorderSize = 0,
-  }: {| width: number, height: number, transparentBorderSize?: number |},
-  canvasElementId: string
+  }: {| width: number, height: number, transparentBorderSize?: number |}
 ): Promise<boolean> => {
-  const canvasElement = document.getElementById(canvasElementId);
-  if (!canvasElement || !(canvasElement instanceof HTMLCanvasElement))
-    return Promise.resolve(false);
   return new Promise((resolve, reject) => {
+    const canvasElement = document.createElement('canvas');
     canvasElement.width = width;
     canvasElement.height = height;
     const ctx = canvasElement.getContext('2d');
@@ -56,7 +53,6 @@ export const resizeImage = (
     canvasElement.toBlob(blob => {
       blob.arrayBuffer().then(buffer => {
         fs.writeFileSync(outputFile, Buffer.from(buffer));
-        ctx.clearRect(0, 0, width, height);
         resolve(true);
       });
     }, 'image/png');

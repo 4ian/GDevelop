@@ -15,13 +15,11 @@ export const getImageFromPath = (
 
   return new Promise<HTMLImageElement>((resolve, reject) => {
     imageElement.addEventListener('error', (event: Event) => {
-      console.error(event);
       reject(event);
     });
     imageElement.addEventListener('load', () => {
       resolve(imageElement);
     });
-    console.log(path);
     imageElement.src = `data:image/png;base64,${file}`;
   });
 };
@@ -32,7 +30,7 @@ export const resizeImage = (
   {
     width,
     height,
-    transparentBorderSize,
+    transparentBorderSize = 0,
   }: {| width: number, height: number, transparentBorderSize?: number |},
   canvasElementId: string
 ): Promise<boolean> => {
@@ -44,7 +42,16 @@ export const resizeImage = (
     canvasElement.height = height;
     const ctx = canvasElement.getContext('2d');
 
-    ctx.drawImage(image, 0, 0, width, height);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    ctx.drawImage(
+      image,
+      transparentBorderSize,
+      transparentBorderSize,
+      width - 2 * transparentBorderSize,
+      height - 2 * transparentBorderSize
+    );
 
     canvasElement.toBlob(blob => {
       blob.arrayBuffer().then(buffer => {

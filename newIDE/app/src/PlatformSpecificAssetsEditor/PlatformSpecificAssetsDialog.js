@@ -319,7 +319,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
           <Line justifyContent="center" noMargin>
             {!!path ? (
               <>
-                <img style={{ display: 'none' }} id={iconSourceId} />
+                <img style={{ display: 'none' }} id={iconSourceId} alt="" />
                 <canvas style={{ display: 'none' }} id={iconCanvasId} />
                 <RaisedButton
                   primary

@@ -36,6 +36,7 @@ declare class gdVariable {
   unserializeFrom(element: gdSerializerElement): void;
   resetPersistentUuid(): gdVariable;
   clearPersistentUuid(): gdVariable;
+  getPersistentUuid(): string;
   delete(): void;
   ptr: number;
 };

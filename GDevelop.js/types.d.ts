@@ -264,6 +264,7 @@ export class Variable extends EmscriptenObject {
   unserializeFrom(element: SerializerElement): void;
   resetPersistentUuid(): Variable;
   clearPersistentUuid(): Variable;
+  getPersistentUuid(): string;
 }
 
 export class VariablesContainer extends EmscriptenObject {

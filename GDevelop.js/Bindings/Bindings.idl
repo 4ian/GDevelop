@@ -271,6 +271,7 @@ interface Variable {
     void UnserializeFrom([Const, Ref] SerializerElement element);
     [Ref] Variable ResetPersistentUuid();
     [Ref] Variable ClearPersistentUuid();
+    [Const, Ref] DOMString GetPersistentUuid();
 };
 
 interface VariablesContainer {
@@ -1854,7 +1855,7 @@ interface BehaviorMetadata {
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
-    
+
     [Value] MapStringPropertyDescriptor GetProperties();
     [Value] MapStringPropertyDescriptor GetSharedProperties();
 };

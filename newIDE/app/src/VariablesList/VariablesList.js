@@ -12,7 +12,7 @@ import ChevronRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, Line, marginsSize, Spacer } from '../UI/Grid';
 import IconButton from '../UI/IconButton';
 import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -84,7 +84,11 @@ const DragSourceAndDropTarget = makeDragSourceAndDropTarget('variable-editor');
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
   event.stopPropagation();
 
-const styles = { inlineIcon: { padding: 0 }, handlePlaceholder: { width: 24 } };
+const styles = {
+  inlineIcon: { padding: 0 },
+  handlePlaceholder: { width: 24 },
+  undeclaredVariablePaper: { marginTop: marginsSize },
+};
 
 export type HistoryHandler = {|
   saveToHistory: () => void,
@@ -1710,7 +1714,11 @@ const VariablesList = (props: Props) => {
                           : null}
                         {renderTree(i18n)}
                         {!!undefinedVariableNames.length && (
-                          <Paper background="dark" variant="outlined">
+                          <Paper
+                            background="dark"
+                            variant="outlined"
+                            style={styles.undeclaredVariablePaper}
+                          >
                             <Column>
                               <Text>
                                 <MarkdownText

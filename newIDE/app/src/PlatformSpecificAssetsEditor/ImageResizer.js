@@ -3,9 +3,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 
 const fs = optionalRequire('fs-extra');
 
-export const getImageFromPath = (
-  path: string,
-): Promise<HTMLImageElement> => {
+export const getImageFromPath = (path: string): Promise<HTMLImageElement> => {
   const imageElement = document.createElement('img');
 
   const file = fs.readFileSync(path, { encoding: 'base64' });

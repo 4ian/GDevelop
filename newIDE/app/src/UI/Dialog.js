@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from './Reponsive/ResponsiveWindowMeasurer';
+} from './Responsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {

@@ -31,7 +31,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
 type Props = {|

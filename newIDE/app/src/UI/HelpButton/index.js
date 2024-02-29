@@ -4,7 +4,7 @@ import TextButton from '../TextButton';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
-import { useResponsiveWindowSize } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import HelpIcon from '../HelpIcon';
 import Help from '../CustomSvgIcons/Help';
 

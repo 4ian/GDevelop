@@ -25,7 +25,7 @@ import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSou
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';

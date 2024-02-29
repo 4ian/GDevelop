@@ -12,7 +12,7 @@ import GameJolt from '../../UI/CustomSvgIcons/GameJolt';
 import Poki from '../../UI/CustomSvgIcons/Poki';
 import CrazyGames from '../../UI/CustomSvgIcons/CrazyGames';
 import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
 import Check from '../../UI/CustomSvgIcons/Check';
 import Help from '../../UI/CustomSvgIcons/Help';

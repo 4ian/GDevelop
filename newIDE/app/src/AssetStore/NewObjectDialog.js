@@ -31,7 +31,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
 import NewObjectFromScratch from './NewObjectFromScratch';

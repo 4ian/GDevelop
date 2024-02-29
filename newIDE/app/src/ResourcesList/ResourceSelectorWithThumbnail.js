@@ -11,7 +11,7 @@ import ResourceThumbnail, {
 } from './ResourceThumbnail';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { LineStackLayout } from '../UI/Layout';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { Line } from '../UI/Grid';
 
 type Props = {|

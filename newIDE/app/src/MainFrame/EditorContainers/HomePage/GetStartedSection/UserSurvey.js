@@ -13,7 +13,7 @@ import UserSurveyQuestion, { TitleAndSubtitle } from './UserSurveyQuestion';
 import { ColumnStackLayout, LineStackLayout } from '../../../../UI/Layout';
 import SectionContainer from '../SectionContainer';
 import { type UserSurvey as UserSurveyType } from '../../../../Utils/GDevelopServices/User';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../../../../UI/Grid';
 import ScrollView, {

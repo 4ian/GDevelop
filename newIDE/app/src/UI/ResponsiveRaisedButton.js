@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import RaisedButton, { type RaisedButtonProps } from './RaisedButton';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 /**
  * A button which hides its label on small screens.

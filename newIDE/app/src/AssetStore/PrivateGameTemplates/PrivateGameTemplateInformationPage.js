@@ -29,7 +29,7 @@ import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import Window from '../../Utils/Window';

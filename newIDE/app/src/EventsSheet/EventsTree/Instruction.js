@@ -27,8 +27,8 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import {
   type ScreenType,
   useScreenType,
-} from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import {

@@ -3,7 +3,7 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   buttonBase: {

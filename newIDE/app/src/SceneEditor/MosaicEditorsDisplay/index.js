@@ -4,7 +4,7 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 import EditorMosaic from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';

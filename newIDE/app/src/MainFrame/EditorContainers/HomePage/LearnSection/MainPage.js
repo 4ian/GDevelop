@@ -17,7 +17,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';

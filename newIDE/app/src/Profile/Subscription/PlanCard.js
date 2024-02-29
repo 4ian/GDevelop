@@ -14,7 +14,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Paper from '../../UI/Paper';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Silver from './Icons/Silver';
 import Gold from './Icons/Gold';
 import Startup from './Icons/Startup';

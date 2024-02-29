@@ -17,7 +17,7 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { getAnnouncementContent } from './AnnouncementFormatting';
 import RouterContext from '../MainFrame/RouterContext';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
 const styles = {

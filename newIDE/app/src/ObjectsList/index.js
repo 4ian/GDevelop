@@ -50,7 +50,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;

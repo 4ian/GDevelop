@@ -8,7 +8,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Visibility from './CustomSvgIcons/Visibility';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
-import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
 import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =

@@ -16,7 +16,7 @@ import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import {

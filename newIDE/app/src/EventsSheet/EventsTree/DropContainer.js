@@ -8,7 +8,7 @@ import {
   isJustBelow,
   isSibling,
 } from './helpers';
-import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import './style.css';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';

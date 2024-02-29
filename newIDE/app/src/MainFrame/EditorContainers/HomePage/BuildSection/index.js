@@ -9,7 +9,7 @@ import Text from '../../../../UI/Text';
 import TextButton from '../../../../UI/TextButton';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { Line, Column, Spacer } from '../../../../UI/Grid';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   LineStackLayout,
   ResponsiveLineStackLayout,
@@ -53,7 +53,7 @@ import {
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import InfoBar from '../../../../UI/Messages/InfoBar';
 import GridList from '@material-ui/core/GridList';
-import type { WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import type { WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import FlatButton from '../../../../UI/FlatButton';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import optionalRequire from '../../../../Utils/OptionalRequire';

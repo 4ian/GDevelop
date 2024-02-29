@@ -21,7 +21,7 @@ import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
 const getStyles = ({ isMobile }) => {

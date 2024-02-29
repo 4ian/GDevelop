@@ -27,7 +27,7 @@ import InstancesAdder from './InstancesAdder';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
 import { objectWithContextReactDndType } from '../ObjectsList';
 import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
-import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { type ScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
 import {

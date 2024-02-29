@@ -12,7 +12,7 @@ import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 import Lightning from '../../UI/CustomSvgIcons/Lightning';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import FlatButton from '../../UI/FlatButton';
 import { capitalize } from 'lodash';
 import Chip from '../../UI/Chip';

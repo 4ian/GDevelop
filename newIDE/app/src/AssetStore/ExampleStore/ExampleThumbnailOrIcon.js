@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 
 const styles = {

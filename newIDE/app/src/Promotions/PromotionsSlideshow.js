@@ -8,7 +8,7 @@ import {
   homepageDesktopMenuBarWidth,
   homepageMediumMenuBarWidth,
 } from '../MainFrame/EditorContainers/HomePage/HomePageMenuBar';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { SECTION_PADDING } from '../MainFrame/EditorContainers/HomePage/SectionContainer';
 
 const promotionDesktopRatio = 5038 / 459;

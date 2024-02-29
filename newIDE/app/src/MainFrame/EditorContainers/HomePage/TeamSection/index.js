@@ -33,7 +33,7 @@ import TeamMemberProjectsView from './TeamMemberProjectsView';
 import Refresh from '../../../../UI/CustomSvgIcons/Refresh';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import Paper from '../../../../UI/Paper';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { groupMembersByGroupId } from './utils';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';

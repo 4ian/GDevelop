@@ -22,7 +22,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';

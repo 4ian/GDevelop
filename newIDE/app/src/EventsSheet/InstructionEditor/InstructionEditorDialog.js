@@ -16,8 +16,8 @@ import InstructionOrObjectSelector, {
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
-import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { SelectColumns } from '../../UI/Responsive/SelectColumns';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   useInstructionEditor,
   getInstructionMetadata,
@@ -31,7 +31,7 @@ import {
 } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 
 const styles = {

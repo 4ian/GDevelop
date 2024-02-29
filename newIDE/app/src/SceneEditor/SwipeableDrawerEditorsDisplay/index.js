@@ -23,7 +23,7 @@ import SwipeableDrawer from './SwipeableDrawer';
 import BottomToolbar from './BottomToolbar';
 import { FullSizeMeasurer } from '../../UI/FullSizeMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import { useScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import Paper from '../../UI/Paper';
 import { type EditorId } from '..';
 import {

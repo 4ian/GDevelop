@@ -26,7 +26,7 @@ import Card from '../../UI/Card';
 
 import BuildProgressAndActions from './BuildProgressAndActions';
 
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   deleteBuild,
   updateBuild,

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import Paper from './Paper';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import Drawer from '@material-ui/core/Drawer';
 
 const styles = {

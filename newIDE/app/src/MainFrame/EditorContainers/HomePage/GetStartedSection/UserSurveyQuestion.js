@@ -25,7 +25,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import { isOnlyOneFreeAnswerPossible } from './UserSurvey';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';

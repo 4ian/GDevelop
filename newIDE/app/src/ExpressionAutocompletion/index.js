@@ -287,8 +287,9 @@ const getAutocompletionsForText = function(
       const spriteConfiguration = gd.asSpriteConfiguration(
         object.getConfiguration()
       );
+      const animations = spriteConfiguration.getAnimations();
 
-      autocompletionTexts = getAllPointNames(spriteConfiguration)
+      autocompletionTexts = getAllPointNames(animations)
         .map(spriteObjectName =>
           spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
         )

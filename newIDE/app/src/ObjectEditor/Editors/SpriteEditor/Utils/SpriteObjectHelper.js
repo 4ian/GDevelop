@@ -1,14 +1,15 @@
 // @flow
 import { mapVector, mapFor } from '../../../../Utils/MapFor';
 import every from 'lodash/every';
-const gd = global.gd;
+
+const gd: libGDevelop = global.gd;
 
 /**
  * Return the specified animation, direction and sprite for a SpriteObject.
  * Returns null for these elements if the specified choice is not valid.
  */
 export const getCurrentElements = (
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
   animationIndex: number,
   directionIndex: number,
   spriteIndex: number
@@ -47,7 +48,7 @@ export const getCurrentElements = (
   };
 };
 
-export const getTotalSpritesCount = (animations: gdAnimationList) => {
+export const getTotalSpritesCount = (animations: gdSpriteAnimationList) => {
   let totalSpritesCount = 0;
   for (
     let animationIndex = 0;
@@ -71,7 +72,7 @@ export const getTotalSpritesCount = (animations: gdAnimationList) => {
 /**
  * Return all the point names
  */
-export const getAllPointNames = (animations: gdAnimationList) => {
+export const getAllPointNames = (animations: gdSpriteAnimationList) => {
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
@@ -202,7 +203,7 @@ export const allAnimationSpritesHaveSamePointsAs = (
 
 export const allObjectSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
-  animations: gdAnimationList
+  animations: gdSpriteAnimationList
 ) => {
   return every(
     mapFor(0, animations.getAnimationsCount(), i => {
@@ -309,7 +310,7 @@ export const allAnimationSpritesHaveSameCollisionMasksAs = (
 
 export const allObjectSpritesHaveSameCollisionMaskAs = (
   originalSprite: gdSprite,
-  animations: gdAnimationList
+  animations: gdSpriteAnimationList
 ) => {
   return every(
     mapFor(0, animations.getAnimationsCount(), i => {
@@ -323,9 +324,9 @@ export const allObjectSpritesHaveSameCollisionMaskAs = (
 };
 
 export const isFirstSpriteUsingFullImageCollisionMask = (
-  spriteObject: gdSpriteObject
+  animations: gdSpriteAnimationList
 ) => {
-  const firstSprite = getCurrentElements(spriteObject, 0, 0, 0).sprite;
+  const firstSprite = getCurrentElements(animations, 0, 0, 0).sprite;
   return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };
 
@@ -389,4 +390,69 @@ export const duplicateSpritesInAnimation = (
       }
     }
   });
+};
+
+export const hasAnyFrame = (animations: gdSpriteAnimationList): boolean => {
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = animations.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      if (direction.getSpritesCount() > 0) return true;
+    }
+  }
+  return false;
+};
+
+export const getFirstAnimationFrame = (
+  animations: gdSpriteAnimationList
+): gdSprite | null => {
+  if (animations.getAnimationsCount() === 0) {
+    return null;
+  }
+  const firstAnimation = animations.getAnimation(0);
+  if (firstAnimation.getDirectionsCount() === 0) {
+    return null;
+  }
+  const firstDirection = firstAnimation.getDirection(0);
+  if (firstDirection.getSpritesCount() === 0) {
+    return null;
+  }
+  return firstDirection.getSprite(0);
+};
+
+export const setCollisionMaskOnAllFrames = (
+  animations: gdSpriteAnimationList,
+  collisionMask: gdVectorPolygon2d | null
+) => {
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = animations.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      for (
+        let spriteIndex = 0;
+        spriteIndex < direction.getSpritesCount();
+        spriteIndex++
+      ) {
+        const sprite = direction.getSprite(spriteIndex);
+        sprite.setFullImageCollisionMask(!collisionMask);
+        if (collisionMask) sprite.setCustomCollisionMask(collisionMask);
+      }
+    }
+  }
 };

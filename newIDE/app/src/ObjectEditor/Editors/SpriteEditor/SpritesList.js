@@ -168,7 +168,7 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
 /**
  * Check if all sprites of the object have the same points and collision masks
  */
-const checkObjectPointsAndCollisionsMasks = (animations: gdAnimationList) => {
+const checkObjectPointsAndCollisionsMasks = (animations: gdSpriteAnimationList) => {
   let allObjectSpritesHaveSamePoints = false;
   let allObjectSpritesHaveSameCollisionMasks = false;
   const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
@@ -191,7 +191,7 @@ const checkObjectPointsAndCollisionsMasks = (animations: gdAnimationList) => {
 };
 
 export const applyPointsAndMasksToSpriteIfNecessary = (
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   sprite: gdSprite
 ) => {
@@ -237,7 +237,7 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
 };
 
 export const addAnimationFrame = (
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   resource: gdResource,
   onSpriteAdded: (sprite: gdSprite) => void
@@ -253,7 +253,7 @@ export const addAnimationFrame = (
 };
 
 type Props = {|
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,

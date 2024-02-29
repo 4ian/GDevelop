@@ -12,7 +12,7 @@ import { getCurrentElements } from './SpriteObjectHelper';
 import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
 
   animationIndex: number,
   directionIndex: number,

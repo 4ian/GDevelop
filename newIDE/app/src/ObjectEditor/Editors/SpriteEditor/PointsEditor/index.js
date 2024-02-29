@@ -53,7 +53,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  animations: gdAnimationList,
+  animations: gdSpriteAnimationList,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onPointsUpdated?: () => void,

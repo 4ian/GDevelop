@@ -53,8 +53,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const spriteConfiguration = gd.asSpriteConfiguration(
           object.getConfiguration()
         );
+        const animations = spriteConfiguration.getAnimations();
 
-        return getAllPointNames(spriteConfiguration)
+        return getAllPointNames(animations)
           .map(pointName => (pointName.length > 0 ? pointName : null))
           .filter(Boolean)
           .sort()
@@ -82,8 +83,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             const spriteConfiguration = gd.asSpriteConfiguration(
               object.getConfiguration()
             );
+            const animations = spriteConfiguration.getAnimations();
 
-            return getAllPointNames(spriteConfiguration)
+            return getAllPointNames(animations)
               .map(pointName => (pointName.length > 0 ? pointName : null))
               .filter(Boolean);
           }

@@ -4,18 +4,15 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_SPRITEOBJECT_H
-#define GDCORE_SPRITEOBJECT_H
-#include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
-#include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
-#include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
+#pragma once
+
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteAnimationList.h"
 #include "GDCore/Project/Object.h"
+
 namespace gd {
 class InitialInstance;
 class Object;
 class Layout;
-class Sprite;
-class Animation;
 class SerializerElement;
 class PropertyDescriptor;
 }  // namespace gd
@@ -59,76 +56,15 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
                                      gd::Project& project,
                                      gd::Layout& scene) override;
 
-  /** \name Animations
-   * Methods related to animations management
-   */
-  ///@{
   /**
-   * \brief Return the animation at the specified index.
-   * If the index is out of bound, a "bad animation" object is returned.
+   * \brief Return the animation configuration.
    */
-  const Animation& GetAnimation(std::size_t nb) const;
+  const SpriteAnimationList& GetAnimations() const;
 
   /**
-   * \brief Return the animation at the specified index.
-   * If the index is out of bound, a "bad animation" object is returned.
+   * @brief Return the animation configuration.
    */
-  Animation& GetAnimation(std::size_t nb);
-
-  /**
-   * \brief Return the number of animations this object has.
-   */
-  std::size_t GetAnimationsCount() const { return animations.size(); };
-
-  /**
-   * \brief Add an animation at the end of the existing ones.
-   */
-  void AddAnimation(const Animation& animation);
-
-  /**
-   * \brief Remove an animation.
-   */
-  bool RemoveAnimation(std::size_t nb);
-
-  /**
-   * \brief Remove all animations.
-   */
-  void RemoveAllAnimations() { animations.clear(); }
-
-  /**
-   * \brief Return true if the object hasn't any animation.
-   */
-  bool HasNoAnimations() const { return animations.empty(); }
-
-  /**
-   * \brief Swap the position of two animations
-   */
-  void SwapAnimations(std::size_t firstIndex, std::size_t secondIndex);
-
-  /**
-   * \brief Change the position of the specified animation
-   */
-  void MoveAnimation(std::size_t oldIndex, std::size_t newIndex);
-
-  /**
-   * \brief Return a read-only reference to the vector containing all the
-   * animation of the object.
-   */
-  const std::vector<Animation>& GetAllAnimations() const { return animations; }
-
-  /**
-   * @brief Check if the collision mask adapts automatically to the animation.
-   */
-  bool AdaptCollisionMaskAutomatically() const {
-    return adaptCollisionMaskAutomatically;
-  }
-
-  /**
-   * @brief Set if the collision mask adapts automatically to the animation.
-   */
-  void SetAdaptCollisionMaskAutomatically(bool enable) {
-    adaptCollisionMaskAutomatically = enable;
-  }
+  SpriteAnimationList& GetAnimations();
 
   /**
    * \brief Set if the object animation should be played even if the object is
@@ -143,25 +79,17 @@ class GD_CORE_API SpriteObject : public gd::ObjectConfiguration {
    * is hidden or far from the camera (false by default).
    */
   bool GetUpdateIfNotVisible() const { return updateIfNotVisible; }
-  ///@}
 
  private:
   void DoUnserializeFrom(gd::Project& project,
                          const gd::SerializerElement& element) override;
   void DoSerializeTo(gd::SerializerElement& element) const override;
 
-  mutable std::vector<Animation> animations;
+  SpriteAnimationList animations;
+
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play
                             ///< object animation even if hidden or far from
                             ///< the screen.
-
-  static Animation badAnimation;         //< Bad animation when an out of bound
-                                         // animation is requested.
-  bool adaptCollisionMaskAutomatically;  ///< If set to true, the collision
-                                         ///< mask will be automatically
-                                         ///< adapted to the animation of the
-                                         ///< object.
 };
 
 }  // namespace gd
-#endif  // GDCORE_SPRITEOBJECT_H

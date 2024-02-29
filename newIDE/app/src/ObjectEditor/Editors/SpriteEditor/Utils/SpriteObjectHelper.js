@@ -8,15 +8,14 @@ const gd = global.gd;
  * Returns null for these elements if the specified choice is not valid.
  */
 export const getCurrentElements = (
-  objectConfiguration: gdSpriteObject,
+  animations: gdAnimationList,
   animationIndex: number,
   directionIndex: number,
   spriteIndex: number
 ) => {
-  const hasValidAnimation =
-    animationIndex < objectConfiguration.getAnimationsCount();
+  const hasValidAnimation = animationIndex < animations.getAnimationsCount();
   const animation = hasValidAnimation
-    ? objectConfiguration.getAnimation(animationIndex)
+    ? animations.getAnimation(animationIndex)
     : null;
   if (!animation) {
     return {
@@ -48,14 +47,14 @@ export const getCurrentElements = (
   };
 };
 
-export const getTotalSpritesCount = (objectConfiguration: gdSpriteObject) => {
+export const getTotalSpritesCount = (animations: gdAnimationList) => {
   let totalSpritesCount = 0;
   for (
     let animationIndex = 0;
-    animationIndex < objectConfiguration.getAnimationsCount();
+    animationIndex < animations.getAnimationsCount();
     animationIndex++
   ) {
-    const animation = objectConfiguration.getAnimation(animationIndex);
+    const animation = animations.getAnimation(animationIndex);
     for (
       let directionIndex = 0;
       directionIndex < animation.getDirectionsCount();
@@ -72,14 +71,14 @@ export const getTotalSpritesCount = (objectConfiguration: gdSpriteObject) => {
 /**
  * Return all the point names
  */
-export const getAllPointNames = (objectConfiguration: gdSpriteObject) => {
+export const getAllPointNames = (animations: gdAnimationList) => {
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
-    animationIndex < objectConfiguration.getAnimationsCount();
+    animationIndex < animations.getAnimationsCount();
     animationIndex++
   ) {
-    const animation = objectConfiguration.getAnimation(animationIndex);
+    const animation = animations.getAnimation(animationIndex);
     for (
       let directionIndex = 0;
       directionIndex < animation.getDirectionsCount();
@@ -203,11 +202,11 @@ export const allAnimationSpritesHaveSamePointsAs = (
 
 export const allObjectSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
-  spriteObject: gdSpriteObject
+  animations: gdAnimationList
 ) => {
   return every(
-    mapFor(0, spriteObject.getAnimationsCount(), i => {
-      const animation = spriteObject.getAnimation(i);
+    mapFor(0, animations.getAnimationsCount(), i => {
+      const animation = animations.getAnimation(i);
       return allAnimationSpritesHaveSamePointsAs(originalSprite, animation);
     })
   );
@@ -310,11 +309,11 @@ export const allAnimationSpritesHaveSameCollisionMasksAs = (
 
 export const allObjectSpritesHaveSameCollisionMaskAs = (
   originalSprite: gdSprite,
-  spriteObject: gdSpriteObject
+  animations: gdAnimationList
 ) => {
   return every(
-    mapFor(0, spriteObject.getAnimationsCount(), i => {
-      const animation = spriteObject.getAnimation(i);
+    mapFor(0, animations.getAnimationsCount(), i => {
+      const animation = animations.getAnimation(i);
       return allAnimationSpritesHaveSameCollisionMasksAs(
         originalSprite,
         animation

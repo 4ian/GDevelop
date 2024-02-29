@@ -67,11 +67,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const spriteConfiguration = gd.asSpriteConfiguration(
           object.getConfiguration()
         );
+        const animations = spriteConfiguration.getAnimations();
 
-        return mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-          const animationName = spriteConfiguration
-            .getAnimation(index)
-            .getName();
+        return mapFor(0, animations.getAnimationsCount(), index => {
+          const animationName = animations.getAnimation(index).getName();
           return animationName.length > 0 ? animationName : null;
         }).filter(Boolean);
       } else if (object.getType() === 'Scene3D::Model3DObject') {

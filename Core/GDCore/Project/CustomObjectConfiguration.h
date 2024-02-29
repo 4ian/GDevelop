@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CUSTOMOBJECTCONFIGURATION_H
-#define GDCORE_CUSTOMOBJECTCONFIGURATION_H
+#pragma once
 
 #include "GDCore/Project/ObjectConfiguration.h"
 
@@ -16,7 +15,7 @@
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-
+#include "GDCore/Extensions/Builtin/SpriteExtension/SpriteAnimationList.h"
 
 using namespace gd;
 
@@ -72,6 +71,16 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   gd::ObjectConfiguration &GetChildObjectConfiguration(const gd::String& objectName);
 
+  /**
+   * \brief Return the animation configuration for Animatable custom objects.
+   */
+  const SpriteAnimationList& GetAnimations() const;
+
+  /**
+   * @brief Return the animation configuration for Animatable custom objects.
+   */
+  SpriteAnimationList& GetAnimations();
+
  protected:
   void DoSerializeTo(SerializerElement& element) const override;
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
@@ -84,6 +93,8 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
 
   static gd::ObjectConfiguration badObjectConfiguration;
 
+  SpriteAnimationList animations;
+
   /**
    * Initialize configuration using another configuration. Used by copy-ctor
    * and assign-op.
@@ -95,6 +106,5 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
    */
   void Init(const gd::CustomObjectConfiguration& object);
 };
-}  // namespace gd
 
-#endif  // GDCORE_CUSTOMOBJECTCONFIGURATION_H
+}  // namespace gd

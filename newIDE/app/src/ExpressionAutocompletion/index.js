@@ -311,14 +311,13 @@ const getAutocompletionsForText = function(
       const spriteConfiguration = gd.asSpriteConfiguration(
         object.getConfiguration()
       );
+      const animations = spriteConfiguration.getAnimations();
 
       autocompletionTexts = mapFor(
         0,
-        spriteConfiguration.getAnimationsCount(),
+        animations.getAnimationsCount(),
         index => {
-          const animationName = spriteConfiguration
-            .getAnimation(index)
-            .getName();
+          const animationName = animations.getAnimation(index).getName();
           return animationName.length > 0 ? `"${animationName}"` : null;
         }
       ).filter(Boolean);

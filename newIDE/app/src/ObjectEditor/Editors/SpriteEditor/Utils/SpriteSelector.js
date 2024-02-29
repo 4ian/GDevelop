@@ -12,7 +12,7 @@ import { getCurrentElements } from './SpriteObjectHelper';
 import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
-  spriteConfiguration: gdSpriteObject,
+  animations: gdAnimationList,
 
   animationIndex: number,
   directionIndex: number,
@@ -41,7 +41,7 @@ type Props = {|
  * all sprites of an animation, or between all sprites of all animations of the object.
  */
 const SpriteSelector = ({
-  spriteConfiguration,
+  animations,
   animationIndex,
   directionIndex,
   spriteIndex,
@@ -57,7 +57,7 @@ const SpriteSelector = ({
   hideControlsForSprite,
 }: Props) => {
   const { animation, direction, sprite } = getCurrentElements(
-    spriteConfiguration,
+    animations,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -80,8 +80,8 @@ const SpriteSelector = ({
             chooseAnimation(parseInt(value, 10) || 0)
           }
         >
-          {mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const animation = spriteConfiguration.getAnimation(i);
+          {mapFor(0, animations.getAnimationsCount(), i => {
+            const animation = animations.getAnimation(i);
             return (
               <SelectOption
                 key={i}

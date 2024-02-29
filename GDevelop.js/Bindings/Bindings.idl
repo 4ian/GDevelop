@@ -772,6 +772,8 @@ interface CustomObjectConfiguration {
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+
+    [Ref] SpriteAnimationList GetAnimations();
 };
 CustomObjectConfiguration implements ObjectConfiguration;
 
@@ -3173,8 +3175,8 @@ interface Animation {
     void SetUseMultipleDirections(boolean enable);
 };
 
-interface SpriteObject {
-    void SpriteObject();
+interface SpriteAnimationList {
+    void SpriteAnimationList();
 
     void AddAnimation([Const, Ref] Animation animation);
     [Ref] Animation GetAnimation(unsigned long index);
@@ -3185,11 +3187,17 @@ interface SpriteObject {
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
 
-    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
-    boolean GetUpdateIfNotVisible();
-
     boolean AdaptCollisionMaskAutomatically();
     void SetAdaptCollisionMaskAutomatically(boolean adaptCollisionMaskAutomatically);
+};
+
+interface SpriteObject {
+    void SpriteObject();
+
+    [Ref] SpriteAnimationList GetAnimations();
+
+    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
+    boolean GetUpdateIfNotVisible();
 };
 SpriteObject implements ObjectConfiguration;
 

@@ -105,6 +105,12 @@ bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
 
 void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {
   element.AddChild("content") = objectContent;
+
+  if (!animations.HasNoAnimations()) {
+    auto &animatableElement = element.AddChild("animatable");
+    animations.SerializeTo(animatableElement);
+  }
+
   auto &childrenContentElement = element.AddChild("childrenContent");
   for (auto &pair : childObjectConfigurations) {
     auto &childName = pair.first;
@@ -116,6 +122,12 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
 void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
                                                const SerializerElement& element) {
   objectContent = element.GetChild("content");
+
+  if (element.HasChild("animatable")) {
+    auto &animatableElement = element.GetChild("animatable");
+    animations.UnserializeFrom(animatableElement);
+  }
+
   auto &childrenContentElement = element.GetChild("childrenContent");
   for (auto &pair : childrenContentElement.GetAllChildren()) {
     auto &childName = pair.first;
@@ -126,6 +138,8 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
 }
 
 void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+  animations.ExposeResources(worker);
+
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -177,4 +191,12 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
     auto &configuration = GetChildObjectConfiguration(childObject->GetName());
     configuration.ExposeResources(worker);
   }
+}
+
+const SpriteAnimationList& CustomObjectConfiguration::GetAnimations() const {
+  return animations;
+}
+
+SpriteAnimationList& CustomObjectConfiguration::GetAnimations() {
+  return animations;
 }

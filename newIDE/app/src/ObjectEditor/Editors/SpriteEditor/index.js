@@ -134,15 +134,16 @@ export default function SpriteEditor({
   const abortControllerRef = React.useRef<?AbortController>(null);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const animations = spriteConfiguration.getAnimations();
   const { isMobile } = useResponsiveWindowSize();
   const { showConfirmation } = useAlertDialog();
   const hasNoSprites = () => {
     for (
       let animationIndex = 0;
-      animationIndex < spriteConfiguration.getAnimationsCount();
+      animationIndex < animations.getAnimationsCount();
       animationIndex++
     ) {
-      const animation = spriteConfiguration.getAnimation(animationIndex);
+      const animation = animations.getAnimation(animationIndex);
       for (
         let directionIndex = 0;
         directionIndex < animation.getDirectionsCount();
@@ -192,8 +193,8 @@ export default function SpriteEditor({
   // the user can then edit the collision mask for further needs.
   const onCreateMatchingSpriteCollisionMask = React.useCallback(
     async () => {
-      if (spriteConfiguration.getAnimationsCount() === 0) return;
-      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (animations.getAnimationsCount() === 0) return;
+      const firstAnimation = animations.getAnimation(0);
       if (firstAnimation.getDirectionsCount() === 0) return;
       const firstDirection = firstAnimation.getDirection(0);
       if (firstDirection.getSpritesCount() === 0) return;
@@ -218,10 +219,10 @@ export default function SpriteEditor({
 
       for (
         let animationIndex = 0;
-        animationIndex < spriteConfiguration.getAnimationsCount();
+        animationIndex < animations.getAnimationsCount();
         animationIndex++
       ) {
-        const animation = spriteConfiguration.getAnimation(animationIndex);
+        const animation = animations.getAnimation(animationIndex);
         for (
           let directionIndex = 0;
           directionIndex < animation.getDirectionsCount();
@@ -242,13 +243,13 @@ export default function SpriteEditor({
       }
       forceUpdate();
     },
-    [spriteConfiguration, project, forceUpdate]
+    [animations, project, forceUpdate]
   );
 
   const onApplyFirstSpriteCollisionMaskToSprite = React.useCallback(
     (sprite: gdSprite) => {
-      if (spriteConfiguration.getAnimationsCount() === 0) return;
-      const firstAnimation = spriteConfiguration.getAnimation(0);
+      if (animations.getAnimationsCount() === 0) return;
+      const firstAnimation = animations.getAnimation(0);
       if (firstAnimation.getDirectionsCount() === 0) return;
       const firstDirection = firstAnimation.getDirection(0);
       if (firstDirection.getSpritesCount() === 0) return;
@@ -258,7 +259,7 @@ export default function SpriteEditor({
 
       forceUpdate();
     },
-    [spriteConfiguration, forceUpdate]
+    [animations, forceUpdate]
   );
 
   const moveAnimation = React.useCallback(
@@ -268,13 +269,13 @@ export default function SpriteEditor({
 
       setNameErrors({});
 
-      spriteConfiguration.moveAnimation(
+      animations.moveAnimation(
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
       if (
         (draggedIndex === 0 || targetIndex === 0) &&
-        spriteConfiguration.adaptCollisionMaskAutomatically()
+        animations.adaptCollisionMaskAutomatically()
       ) {
         // If the first animation is changed and the collision mask is adapted automatically,
         // then we need to recompute it.
@@ -282,18 +283,18 @@ export default function SpriteEditor({
       }
       forceUpdate();
     },
-    [spriteConfiguration, forceUpdate, onCreateMatchingSpriteCollisionMask]
+    [animations, forceUpdate, onCreateMatchingSpriteCollisionMask]
   );
 
   const onSpriteAdded = React.useCallback(
     (sprite: gdSprite) => {
       // If a sprite is added, we want to ensure it gets the automatic
       // collision mask of the object, if the option is enabled.
-      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+      if (animations.adaptCollisionMaskAutomatically()) {
         onApplyFirstSpriteCollisionMaskToSprite(sprite);
       }
     },
-    [onApplyFirstSpriteCollisionMaskToSprite, spriteConfiguration]
+    [onApplyFirstSpriteCollisionMaskToSprite, animations]
   );
 
   const addAnimations = React.useCallback(
@@ -306,27 +307,16 @@ export default function SpriteEditor({
         animation.setDirectionsCount(1);
         const direction = animation.getDirection(0);
         for (const resource of resources) {
-          addAnimationFrame(
-            spriteConfiguration,
-            direction,
-            resource,
-            onSpriteAdded
-          );
+          addAnimationFrame(animations, direction, resource, onSpriteAdded);
         }
-        spriteConfiguration.addAnimation(animation);
+        animations.addAnimation(animation);
         animation.delete();
       }
       forceUpdate();
       onSizeUpdated();
       if (onObjectUpdated) onObjectUpdated();
     },
-    [
-      forceUpdate,
-      onObjectUpdated,
-      onSizeUpdated,
-      onSpriteAdded,
-      spriteConfiguration,
-    ]
+    [forceUpdate, onObjectUpdated, onSizeUpdated, onSpriteAdded, animations]
   );
 
   const addAnimation = React.useCallback(
@@ -335,7 +325,7 @@ export default function SpriteEditor({
 
       const emptyAnimation = new gd.Animation();
       emptyAnimation.setDirectionsCount(1);
-      spriteConfiguration.addAnimation(emptyAnimation);
+      animations.addAnimation(emptyAnimation);
       emptyAnimation.delete();
       forceUpdate();
       onSizeUpdated();
@@ -351,25 +341,25 @@ export default function SpriteEditor({
         }
       }, 100); // A few ms is enough for a new render to be done.
     },
-    [forceUpdate, onObjectUpdated, onSizeUpdated, spriteConfiguration]
+    [forceUpdate, onObjectUpdated, onSizeUpdated, animations]
   );
 
   const removeAnimation = React.useCallback(
     async (index: number, i18n: I18nType) => {
-      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const totalSpritesCount = getTotalSpritesCount(animations);
       const isDeletingLastSprites =
-        spriteConfiguration
+        animations
           .getAnimation(index)
           .getDirection(0)
           .getSpritesCount() === totalSpritesCount;
       const firstSpriteInAnimationDeleted = getCurrentElements(
-        spriteConfiguration,
+        animations,
         index,
         0,
         0
       ).sprite;
       const isUsingCustomCollisionMask =
-        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        !animations.adaptCollisionMaskAutomatically() &&
         firstSpriteInAnimationDeleted &&
         !firstSpriteInAnimationDeleted.isFullImageCollisionMask();
       const shouldWarnBecauseLosingCustomCollisionMask =
@@ -388,13 +378,10 @@ export default function SpriteEditor({
 
       setNameErrors({});
 
-      spriteConfiguration.removeAnimation(index);
+      animations.removeAnimation(index);
       forceUpdate();
       onSizeUpdated();
-      if (
-        index === 0 &&
-        spriteConfiguration.adaptCollisionMaskAutomatically()
-      ) {
+      if (index === 0 && animations.adaptCollisionMaskAutomatically()) {
         // If the first animation is removed and the collision mask is
         // automatically adapted, then recompute it.
         onCreateMatchingSpriteCollisionMask();
@@ -402,7 +389,7 @@ export default function SpriteEditor({
       if (shouldWarnBecauseLosingCustomCollisionMask) {
         // The user has deleted the last custom collision mask, so revert to automatic
         // collision mask adaptation.
-        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
+        animations.setAdaptCollisionMaskAutomatically(true);
       }
       if (onObjectUpdated) onObjectUpdated();
     },
@@ -411,28 +398,24 @@ export default function SpriteEditor({
       onObjectUpdated,
       onSizeUpdated,
       showDeleteConfirmation,
-      spriteConfiguration,
+      animations,
       onCreateMatchingSpriteCollisionMask,
     ]
   );
 
   const changeAnimationName = React.useCallback(
     (changedAnimationIndex: number, newName: string) => {
-      const animation = spriteConfiguration.getAnimation(changedAnimationIndex);
+      const animation = animations.getAnimation(changedAnimationIndex);
       const currentName = animation.getName();
       if (currentName === newName) return;
 
       setNameErrors({});
 
-      const otherNames = mapFor(
-        0,
-        spriteConfiguration.getAnimationsCount(),
-        index => {
-          return index === changedAnimationIndex
-            ? undefined // Don't check the current animation name as we're changing it.
-            : spriteConfiguration.getAnimation(index).getName();
-        }
-      ).filter(Boolean);
+      const otherNames = mapFor(0, animations.getAnimationsCount(), index => {
+        return index === changedAnimationIndex
+          ? undefined // Don't check the current animation name as we're changing it.
+          : animations.getAnimation(index).getName();
+      }).filter(Boolean);
 
       if (newName !== '' && otherNames.some(name => name === newName)) {
         // The indexes can be used as a key because errors are cleared when
@@ -467,19 +450,19 @@ export default function SpriteEditor({
       object,
       onObjectUpdated,
       project,
-      spriteConfiguration,
+      animations,
     ]
   );
 
   const replaceDirection = React.useCallback(
     (animationId, directionId, newDirection) => {
-      spriteConfiguration
+      animations
         .getAnimation(animationId)
         .setDirection(newDirection, directionId);
       forceUpdate();
       if (onObjectUpdated) onObjectUpdated();
     },
-    [forceUpdate, onObjectUpdated, spriteConfiguration]
+    [forceUpdate, onObjectUpdated, animations]
   );
 
   const storageProvider = resourceManagementProps.getStorageProvider();
@@ -493,11 +476,11 @@ export default function SpriteEditor({
 
   const adaptCollisionMaskIfNeeded = React.useCallback(
     () => {
-      if (spriteConfiguration.adaptCollisionMaskAutomatically()) {
+      if (animations.adaptCollisionMaskAutomatically()) {
         onCreateMatchingSpriteCollisionMask();
       }
     },
-    [onCreateMatchingSpriteCollisionMask, spriteConfiguration]
+    [onCreateMatchingSpriteCollisionMask, animations]
   );
 
   const importImages = React.useCallback(
@@ -552,7 +535,7 @@ export default function SpriteEditor({
       const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
         return direction.getSprite(i).getImageName();
       });
-      const animation = spriteConfiguration.getAnimation(animationIndex);
+      const animation = animations.getAnimation(animationIndex);
       const animationName = animation.getName();
 
       try {
@@ -605,7 +588,7 @@ export default function SpriteEditor({
           } else {
             // The sprite is new, apply points & collision masks if necessary.
             applyPointsAndMasksToSpriteIfNecessary(
-              spriteConfiguration,
+              animations,
               direction,
               sprite
             );
@@ -654,7 +637,7 @@ export default function SpriteEditor({
       }
     },
     [
-      spriteConfiguration,
+      animations,
       project,
       resourceManagementProps,
       objectName,
@@ -689,10 +672,10 @@ export default function SpriteEditor({
   const createAnimationWith = React.useCallback(
     async (i18n: I18nType, externalEditor: ResourceExternalEditor) => {
       addAnimation();
-      const direction = spriteConfiguration.getAnimation(0).getDirection(0);
+      const direction = animations.getAnimation(0).getDirection(0);
       await editDirectionWith(i18n, externalEditor, direction, 0, 0);
     },
-    [addAnimation, editDirectionWith, spriteConfiguration]
+    [addAnimation, editDirectionWith, animations]
   );
 
   const imageResourceExternalEditors = resourceManagementProps.resourceExternalEditors.filter(
@@ -703,7 +686,7 @@ export default function SpriteEditor({
     <I18n>
       {({ i18n }) => (
         <>
-          {spriteConfiguration.getAnimationsCount() === 0 &&
+          {animations.getAnimationsCount() === 0 &&
           // The event-based object editor gives an empty list.
           imageResourceExternalEditors.length > 0 ? (
             <Column noMargin expand justifyContent="center">
@@ -736,11 +719,9 @@ export default function SpriteEditor({
                   <SpacedDismissableTutorialMessage />
                   {mapFor(
                     0,
-                    spriteConfiguration.getAnimationsCount(),
+                    animations.getAnimationsCount(),
                     animationIndex => {
-                      const animation = spriteConfiguration.getAnimation(
-                        animationIndex
-                      );
+                      const animation = animations.getAnimation(animationIndex);
                       const animationName = animation.getName();
 
                       const animationRef =
@@ -842,9 +823,7 @@ export default function SpriteEditor({
                                         );
                                         return (
                                           <SpritesList
-                                            spriteConfiguration={
-                                              spriteConfiguration
-                                            }
+                                            animations={animations}
                                             direction={direction}
                                             key={directionIndex}
                                             project={project}
@@ -1023,7 +1002,7 @@ export default function SpriteEditor({
               open={pointsEditorOpen}
             >
               <PointsEditor
-                objectConfiguration={spriteConfiguration}
+                animations={animations}
                 resourcesLoader={ResourcesLoader}
                 project={project}
                 onPointsUpdated={onObjectUpdated}
@@ -1066,7 +1045,7 @@ export default function SpriteEditor({
               open={collisionMasksEditorOpen}
             >
               <CollisionMasksEditor
-                objectConfiguration={spriteConfiguration}
+                animations={animations}
                 resourcesLoader={ResourcesLoader}
                 project={project}
                 onMasksUpdated={onObjectUpdated}

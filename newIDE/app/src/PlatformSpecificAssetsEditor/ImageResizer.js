@@ -5,11 +5,8 @@ const fs = optionalRequire('fs-extra');
 
 export const getImageFromPath = (
   path: string,
-  imageElementId: string
 ): Promise<HTMLImageElement> => {
-  const imageElement = document.getElementById(imageElementId);
-  if (!imageElement || !(imageElement instanceof HTMLImageElement))
-    return Promise.reject(new Error('Hidden image element not found'));
+  const imageElement = document.createElement('img');
 
   const file = fs.readFileSync(path, { encoding: 'base64' });
 

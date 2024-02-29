@@ -22,8 +22,6 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
-const iconSourceId = 'icon-source';
-
 type Props = {|
   project: gdProject,
   open: boolean,
@@ -134,7 +132,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     const projectPath = path.dirname(project.getProjectFile());
     const fullPath = path.resolve(projectPath, resources[0].getFile());
 
-    const image = await getImageFromPath(fullPath, iconSourceId);
+    const image = await getImageFromPath(fullPath);
 
     // Important, we are responsible for deleting the resources that were given to us.
     // Otherwise we have a memory leak.
@@ -142,24 +140,16 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
     const results = await Promise.all([
       ...desktopSizes.map(size =>
-        resizeImage(
-          image,
-          path.join(projectPath, `desktop-icon-${size}.png`),
-          {
-            width: size,
-            height: size,
-          },
-        )
+        resizeImage(image, path.join(projectPath, `desktop-icon-${size}.png`), {
+          width: size,
+          height: size,
+        })
       ),
       ...androidSizes.map(size =>
-        resizeImage(
-          image,
-          path.join(projectPath, `android-icon-${size}.png`),
-          {
-            width: size,
-            height: size,
-          },
-        )
+        resizeImage(image, path.join(projectPath, `android-icon-${size}.png`), {
+          width: size,
+          height: size,
+        })
       ),
       resizeImage(
         image,
@@ -169,17 +159,13 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
           height: androidWindowSplashScreenAnimatedIconRecommendedSize,
           transparentBorderSize:
             androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
-        },
+        }
       ),
       ...iosSizes.map(size =>
-        resizeImage(
-          image,
-          path.join(projectPath, `ios-icon-${size}.png`),
-          {
-            width: size,
-            height: size,
-          },
-        )
+        resizeImage(image, path.join(projectPath, `ios-icon-${size}.png`), {
+          width: size,
+          height: size,
+        })
       ),
     ]);
 
@@ -313,14 +299,11 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
         <ColumnStackLayout noMargin>
           <Line justifyContent="center" noMargin>
             {!!path ? (
-              <>
-                <img style={{ display: 'none' }} id={iconSourceId} alt="" />
-                <RaisedButton
-                  primary
-                  label={<Trans>Generate icons from a file</Trans>}
-                  onClick={this._generateFromFile}
-                />
-              </>
+              <RaisedButton
+                primary
+                label={<Trans>Generate icons from a file</Trans>}
+                onClick={this._generateFromFile}
+              />
             ) : (
               <Text>
                 <Trans>

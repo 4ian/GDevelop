@@ -38,6 +38,7 @@ import { isNativeMobileApp } from '../../Utils/Platform';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
 
 const styles = {
   buttonBase: {
@@ -276,6 +277,7 @@ type PublishHomeProps = {|
   chosenSection: ?ExporterSection,
   chosenSubSection: ?ExporterSubSection,
   game: ?Game,
+  gameAvailabilityError: ?GameAvailabilityError,
   allExportersRequireOnline?: boolean,
   showOnlineWebExporterOnly?: boolean,
 |};
@@ -294,6 +296,7 @@ const PublishHome = ({
   chosenSection,
   chosenSubSection,
   game,
+  gameAvailabilityError,
   allExportersRequireOnline,
   showOnlineWebExporterOnly,
 }: PublishHomeProps) => {
@@ -585,6 +588,7 @@ const PublishHome = ({
           onChangeSubscription={onChangeSubscription}
           setIsNavigationDisabled={setIsNavigationDisabled}
           game={game}
+          gameAvailabilityError={gameAvailabilityError}
           builds={builds}
           onRefreshBuilds={refreshBuilds}
         />

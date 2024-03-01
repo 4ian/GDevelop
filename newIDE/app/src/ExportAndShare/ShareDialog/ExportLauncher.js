@@ -37,6 +37,7 @@ import inc from 'semver/functions/inc';
 import Toggle from '../../UI/Toggle';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import AlertMessage from '../../UI/AlertMessage';
+import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
 
 type State = {|
   exportStep: BuildStep,
@@ -61,6 +62,7 @@ type Props = {|
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
   onGameUpdated: () => Promise<void>,
   game: ?Game,
+  gameAvailabilityError: ?GameAvailabilityError,
   builds: ?Array<Build>,
   onRefreshBuilds: () => Promise<void>,
 |};
@@ -210,7 +212,7 @@ export default class ExportLauncher extends Component<Props, State> {
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
           error
         );
-        if (extractedStatusAndCode && extractedStatusAndCode.code === 404) {
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           // If the game is not registered, register it before launching the export.
           const authorName =
             this.props.project.getAuthor() || 'Unspecified publisher';
@@ -302,36 +304,22 @@ export default class ExportLauncher extends Component<Props, State> {
       const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
         registerError
       );
-      if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-        if (extractedStatusAndCode.code === 'game-creation/existing-game') {
-          showErrorBox({
-            message: [
-              i18n._(
-                t`A game with this ID already exists and you are not the owner.`
-              ),
-              i18n._(
-                t`A link or file will be created but the game will not be registered.`
-              ),
-            ].join('\n\n'),
-            rawError: registerError,
-            errorId: 'existing-game-register',
-          });
-        } else if (
-          extractedStatusAndCode.code === 'game-creation/too-many-games'
-        ) {
-          showErrorBox({
-            message: [
-              i18n._(
-                t`You have reached the maximum number of games you can register! You can unregister games in your Games Dashboard.`
-              ),
-              i18n._(
-                t`A link or file will be created but the game will not be registered.`
-              ),
-            ].join('\n\n'),
-            rawError: registerError,
-            errorId: 'too-many-games-register',
-          });
-        }
+      if (
+        extractedStatusAndCode &&
+        extractedStatusAndCode.code === 'game-creation/too-many-games'
+      ) {
+        showErrorBox({
+          message: [
+            i18n._(
+              t`You have reached the maximum number of games you can register! You can unregister games in your Games Dashboard.`
+            ),
+            i18n._(
+              t`A link or file will be created but the game will not be registered.`
+            ),
+          ].join('\n\n'),
+          rawError: registerError,
+          errorId: 'too-many-games-register',
+        });
       }
     }
 
@@ -410,6 +398,10 @@ export default class ExportLauncher extends Component<Props, State> {
         this.setState({ build }, () => {
           this._startBuildWatch(authenticatedUser);
         });
+
+        // When the build is started, update the game because the build may be linked to it.
+        this.props.onGameUpdated();
+        // Also refresh the builds list, as the new build will be considered as a pending build.
         this.props.onRefreshBuilds();
       }
       setStep('done');
@@ -449,6 +441,7 @@ export default class ExportLauncher extends Component<Props, State> {
       isSavingProject,
       builds,
       game,
+      gameAvailabilityError,
       onGameUpdated,
     } = this.props;
     if (!project) return null;
@@ -508,6 +501,17 @@ export default class ExportLauncher extends Component<Props, State> {
           <Column noMargin expand justifyContent="center">
             {!isUsingOnlineBuildNonAuthenticated && (
               <Column noMargin>
+                {!!exportPipeline.onlineBuildType &&
+                  gameAvailabilityError &&
+                  gameAvailabilityError === 'not-owned' && (
+                    <AlertMessage kind="warning">
+                      <Trans>
+                        The project currently opened is registered online but
+                        you don't have access to it. A link or file will be
+                        created but the game will not be registered.
+                      </Trans>
+                    </AlertMessage>
+                  )}
                 {!!exportPipeline.packageNameWarningType &&
                   project.getPackageName().indexOf('com.example') !== -1 && (
                     <Line>

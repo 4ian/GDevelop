@@ -10,9 +10,9 @@ import TextButton from '../TextButton';
 import { LineStackLayout } from '../Layout';
 import FlatButton from '../FlatButton';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { hasPendingNotifications } from '../../Utils/Notification';
 import CircularProgress from '../CircularProgress';
 import User from '../CustomSvgIcons/User';
+import { hasPendingBadgeNotifications } from '../../Utils/GDevelopServices/Badge';
 
 const styles = {
   avatar: {
@@ -34,7 +34,11 @@ const UserChip = ({ onOpenProfile }: Props) => {
     onOpenCreateAccountDialog,
     loginState,
   } = authenticatedUser;
-  const displayNotificationBadge = hasPendingNotifications(authenticatedUser);
+  // TODO: Remove the badge on the user chip and handle badge notifications
+  // with user notifications.
+  const displayNotificationBadge = hasPendingBadgeNotifications(
+    authenticatedUser
+  );
   return !profile && loginState === 'loggingIn' ? (
     <CircularProgress size={25} />
   ) : profile ? (

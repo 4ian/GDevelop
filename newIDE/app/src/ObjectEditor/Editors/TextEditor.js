@@ -48,6 +48,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
       objectConfiguration,
       project,
       resourceManagementProps,
+      renderObjectNameField,
     } = this.props;
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       objectConfiguration
@@ -57,6 +58,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <ResponsiveLineStackLayout noMargin alignItems="center">
           <Line noMargin alignItems="center">
             <MiniToolbarText firstChild>

@@ -105,7 +105,7 @@ type AnimationListProps = {|
   unsavedChanges?: UnsavedChanges,
   animations: gdSpriteAnimationList,
   isAnimationListLocked?: boolean,
-  scrollView: ?ScrollViewInterface,
+  scrollView: React.MutableRefObject<?ScrollViewInterface>,
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
@@ -147,11 +147,11 @@ const AnimationList = React.forwardRef<
     React.useEffect(
       () => {
         if (
-          scrollView &&
+          scrollView.current &&
           justAddedAnimationElement.current &&
           justAddedAnimationName
         ) {
-          scrollView.scrollTo(justAddedAnimationElement.current);
+          scrollView.current.scrollTo(justAddedAnimationElement.current);
           setJustAddedAnimationName(null);
           justAddedAnimationElement.current = null;
         }
@@ -258,8 +258,8 @@ const AnimationList = React.forwardRef<
         // to simplify the code, we just wait a few ms for a new render
         // to be done.
         setTimeout(() => {
-          if (scrollView) {
-            scrollView.scrollToBottom();
+          if (scrollView.current) {
+            scrollView.current.scrollToBottom();
           }
         }, 100); // A few ms is enough for a new render to be done.
       },

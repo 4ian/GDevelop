@@ -106,6 +106,7 @@ const Model3DEditor = ({
   onSizeUpdated,
   onObjectUpdated,
   resourceManagementProps,
+  renderObjectNameField,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
@@ -469,6 +470,7 @@ const Model3DEditor = ({
     <>
       <ScrollView ref={scrollView}>
         <ColumnStackLayout noMargin>
+          {renderObjectNameField && renderObjectNameField()}
           <PropertyResourceSelector
             objectConfiguration={objectConfiguration}
             propertyName="modelResourceName"

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import * as React from 'react';
@@ -20,7 +21,11 @@ import useForceUpdate from '../../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../../UI/Accordion';
 import { IconContainer } from '../../UI/IconContainer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import AnimationList, { type AnimationListInterface } from './SpriteEditor/AnimationList';
+import AnimationList, {
+  type AnimationListInterface,
+} from './SpriteEditor/AnimationList';
+import PointsEditor from './SpriteEditor/PointsEditor';
+import CollisionMasksEditor from './SpriteEditor/CollisionMasksEditor';
 import {
   hasAnyFrame,
   getFirstAnimationFrame,
@@ -28,6 +33,15 @@ import {
 } from './SpriteEditor/Utils/SpriteObjectHelper';
 import { getMatchingCollisionMask } from './SpriteEditor/CollisionMasksEditor/CollisionMaskHelper';
 import ResourcesLoader from '../../ResourcesLoader';
+import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Add from '../../UI/CustomSvgIcons/Add';
+import Dialog from '../../UI/Dialog';
+import HelpButton from '../../UI/HelpButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,7 +60,12 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     onSizeUpdated,
     onObjectUpdated,
     unsavedChanges,
+    renderObjectNameField,
+    isChildObject,
   } = props;
+
+  const windowWidth = useResponsiveWindowWidth();
+  const isMobileScreen = windowWidth === 'small';
 
   const customObjectConfiguration = gd.asCustomObjectConfiguration(
     objectConfiguration
@@ -71,8 +90,6 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   )
     ? project.getEventsBasedObject(customObjectConfiguration.getType())
     : null;
-
-  const animationList = React.useRef<?AnimationListInterface>(null);
 
   const animations = customObjectConfiguration.getAnimations();
 
@@ -108,150 +125,312 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     [animations, project, forceUpdate]
   );
 
-  // TODO
-  const scrollView = {current: null}
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
+  const animationList = React.useRef<?AnimationListInterface>(null);
+
+  const [
+    justAddedAnimationName,
+    setJustAddedAnimationName,
+  ] = React.useState<?string>(null);
+  const justAddedAnimationElement = React.useRef<?any>(null);
+
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedAnimationElement.current &&
+        justAddedAnimationName
+      ) {
+        scrollView.current.scrollTo(justAddedAnimationElement.current);
+        setJustAddedAnimationName(null);
+        justAddedAnimationElement.current = null;
+      }
+    },
+    [justAddedAnimationName]
+  );
+
+  const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
+  const [
+    collisionMasksEditorOpen,
+    setCollisionMasksEditorOpen,
+  ] = React.useState(false);
 
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout noMargin>
-          {tutorialIds.map(tutorialId => (
-            <DismissableTutorialMessage
-              key={tutorialId}
-              tutorialId={tutorialId}
-            />
-          ))}
-          {propertiesSchema.length ||
-          (eventBasedObject && (eventBasedObject.getObjectsCount() || eventBasedObject.isAnimatable())) ? (
-            <React.Fragment>
-              {extraInformation ? (
-                <Line>
-                  <ColumnStackLayout noMargin>
-                    {extraInformation.map(({ kind, message }, index) => (
-                      <AlertMessage kind={kind} key={index}>
-                        {i18n._(message)}
-                      </AlertMessage>
-                    ))}
-                  </ColumnStackLayout>
-                </Line>
-              ) : null}
-              <PropertiesEditor
-                unsavedChanges={unsavedChanges}
-                schema={propertiesSchema}
-                instances={[customObjectConfiguration]}
-                project={project}
-                resourceManagementProps={resourceManagementProps}
-              />
-              {eventBasedObject && eventBasedObject.isAnimatable() &&
-              <Column expand>
-                <Text size="block-title">
-                  <Trans>Animations</Trans>
-                </Text>
-              <AnimationList
-                ref={animationList}
+        <>
+          <ScrollView ref={scrollView}>
+            <ColumnStackLayout noMargin>
+              {renderObjectNameField && renderObjectNameField()}
+              {tutorialIds.map(tutorialId => (
+                <DismissableTutorialMessage
+                  key={tutorialId}
+                  tutorialId={tutorialId}
+                />
+              ))}
+              {propertiesSchema.length ||
+              (eventBasedObject &&
+                (eventBasedObject.getObjectsCount() ||
+                  eventBasedObject.isAnimatable())) ? (
+                <React.Fragment>
+                  {extraInformation ? (
+                    <Line>
+                      <ColumnStackLayout noMargin>
+                        {extraInformation.map(({ kind, message }, index) => (
+                          <AlertMessage kind={kind} key={index}>
+                            {i18n._(message)}
+                          </AlertMessage>
+                        ))}
+                      </ColumnStackLayout>
+                    </Line>
+                  ) : null}
+                  <PropertiesEditor
+                    unsavedChanges={unsavedChanges}
+                    schema={propertiesSchema}
+                    instances={[customObjectConfiguration]}
+                    project={project}
+                    resourceManagementProps={resourceManagementProps}
+                  />
+                  {eventBasedObject &&
+                    mapFor(0, eventBasedObject.getObjectsCount(), i => {
+                      const childObject = eventBasedObject.getObjectAt(i);
+                      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+                        childObject.getName()
+                      );
+                      const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+                        project,
+                        childObjectConfiguration.getType()
+                      );
+                      const EditorComponent = editorConfiguration.component;
+
+                      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+                        gd.JsPlatform.get(),
+                        childObjectConfiguration.getType()
+                      );
+                      const iconUrl = objectMetadata.getIconFilename();
+                      const tutorialIds = getObjectTutorialIds(
+                        childObjectConfiguration.getType()
+                      );
+                      const enabledTutorialIds = tutorialIds.filter(
+                        tutorialId => !values.hiddenTutorialHints[tutorialId]
+                      );
+                      // TODO EBO: Add a protection against infinite loops in case
+                      // of object cycles (thought it should be forbidden).
+                      return (
+                        <Accordion key={childObject.getName()} defaultExpanded>
+                          <AccordionHeader>
+                            {iconUrl ? (
+                              <IconContainer
+                                src={iconUrl}
+                                alt={childObject.getName()}
+                                size={20}
+                              />
+                            ) : null}
+                            <Column expand>
+                              <Text size="block-title">
+                                {childObject.getName()}
+                              </Text>
+                            </Column>
+                          </AccordionHeader>
+                          <AccordionBody>
+                            <Column expand noMargin noOverflowParent>
+                              {enabledTutorialIds.length ? (
+                                <Line>
+                                  <ColumnStackLayout expand>
+                                    {tutorialIds.map(tutorialId => (
+                                      <DismissableTutorialMessage
+                                        key={tutorialId}
+                                        tutorialId={tutorialId}
+                                      />
+                                    ))}
+                                  </ColumnStackLayout>
+                                </Line>
+                              ) : null}
+                              <Line noMargin>
+                                <Column expand>
+                                  <EditorComponent
+                                    isChildObject
+                                    objectConfiguration={
+                                      childObjectConfiguration
+                                    }
+                                    project={project}
+                                    layout={layout}
+                                    resourceManagementProps={
+                                      resourceManagementProps
+                                    }
+                                    onSizeUpdated={
+                                      forceUpdate /*Force update to ensure dialog is properly positioned*/
+                                    }
+                                    objectName={
+                                      objectName + ' ' + childObject.getName()
+                                    }
+                                  />
+                                </Column>
+                              </Line>
+                            </Column>
+                          </AccordionBody>
+                        </Accordion>
+                      );
+                    })}
+                  {eventBasedObject && eventBasedObject.isAnimatable() && (
+                    <Column expand>
+                      <Text size="block-title">
+                        <Trans>Animations</Trans>
+                      </Text>
+                      <AnimationList
+                        ref={animationList}
+                        animations={animations}
+                        project={project}
+                        layout={layout}
+                        object={object}
+                        objectName={objectName}
+                        resourceManagementProps={resourceManagementProps}
+                        onSizeUpdated={onSizeUpdated}
+                        onObjectUpdated={onObjectUpdated}
+                        isAnimationListLocked={false}
+                        scrollView={scrollView}
+                        onCreateMatchingSpriteCollisionMask={
+                          onCreateMatchingSpriteCollisionMask
+                        }
+                      />
+                    </Column>
+                  )}
+                </React.Fragment>
+              ) : (
+                <EmptyMessage>
+                  <Trans>
+                    There is nothing to configure for this object. You can still
+                    use events to interact with the object.
+                  </Trans>
+                </EmptyMessage>
+              )}
+            </ColumnStackLayout>
+          </ScrollView>
+          {eventBasedObject.isAnimatable() && !isChildObject && (
+            <Column noMargin>
+              <ResponsiveLineStackLayout
+                justifyContent="space-between"
+                noColumnMargin
+              >
+                {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
+                  <ResponsiveLineStackLayout noMargin noColumnMargin>
+                    <FlatButton
+                      label={<Trans>Edit collision masks</Trans>}
+                      onClick={() => setCollisionMasksEditorOpen(true)}
+                      disabled={!hasAnyFrame(animations)}
+                    />
+                    <FlatButton
+                      label={<Trans>Edit points</Trans>}
+                      onClick={() => setPointsEditorOpen(true)}
+                      disabled={!hasAnyFrame(animations)}
+                    />
+                  </ResponsiveLineStackLayout>
+                ) : (
+                  <FlatButtonWithSplitMenu
+                    label={<Trans>Edit collision masks</Trans>}
+                    onClick={() => setCollisionMasksEditorOpen(true)}
+                    disabled={!hasAnyFrame(animations)}
+                    buildMenuTemplate={i18n => [
+                      {
+                        label: i18n._(t`Edit points`),
+                        disabled: !hasAnyFrame(animations),
+                        click: () => setPointsEditorOpen(true),
+                      },
+                    ]}
+                  />
+                )}
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={() => {
+                    if (!animationList.current) {
+                      return;
+                    }
+                    animationList.current.addAnimation();
+                  }}
+                  icon={<Add />}
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
+          )}
+          {pointsEditorOpen && (
+            <Dialog
+              title={<Trans>Edit points</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setPointsEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/edit-points"
+                  key="help"
+                />,
+              ]}
+              onRequestClose={() => setPointsEditorOpen(false)}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              open={pointsEditorOpen}
+            >
+              <PointsEditor
                 animations={animations}
+                resourcesLoader={ResourcesLoader}
                 project={project}
-                layout={layout}
-                object={object}
-                objectName={objectName}
-                resourceManagementProps={resourceManagementProps}
-                onSizeUpdated={onSizeUpdated}
-                onObjectUpdated={onObjectUpdated}
-                isAnimationListLocked={false}
-                scrollView={scrollView.current}
+                onPointsUpdated={onObjectUpdated}
+                onRenamedPoint={(oldName, newName) =>
+                  // TODO EBO Refactor event-based object events when a point is renamed.
+                  layout &&
+                  object &&
+                  gd.WholeProjectRefactorer.renameObjectPoint(
+                    project,
+                    layout,
+                    object,
+                    oldName,
+                    newName
+                  )
+                }
+              />
+            </Dialog>
+          )}
+          {collisionMasksEditorOpen && (
+            <Dialog
+              title={<Trans>Edit collision masks</Trans>}
+              actions={[
+                <FlatButton
+                  key="close"
+                  label={<Trans>Close</Trans>}
+                  primary
+                  onClick={() => setCollisionMasksEditorOpen(false)}
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  helpPagePath="/objects/sprite/collision-mask"
+                  key="help"
+                />,
+              ]}
+              maxWidth="lg"
+              flexBody
+              fullHeight
+              onRequestClose={() => setCollisionMasksEditorOpen(false)}
+              open={collisionMasksEditorOpen}
+            >
+              <CollisionMasksEditor
+                animations={animations}
+                resourcesLoader={ResourcesLoader}
+                project={project}
+                onMasksUpdated={onObjectUpdated}
                 onCreateMatchingSpriteCollisionMask={
                   onCreateMatchingSpriteCollisionMask
                 }
               />
-              </Column>}
-              {eventBasedObject &&
-                mapFor(0, eventBasedObject.getObjectsCount(), i => {
-                  const childObject = eventBasedObject.getObjectAt(i);
-                  const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
-                    childObject.getName()
-                  );
-                  const editorConfiguration = ObjectsEditorService.getEditorConfigurationForCustomObject(
-                    project,
-                    childObjectConfiguration.getType()
-                  );
-                  const EditorComponent = editorConfiguration.component;
-
-                  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-                    gd.JsPlatform.get(),
-                    childObjectConfiguration.getType()
-                  );
-                  const iconUrl = objectMetadata.getIconFilename();
-                  const tutorialIds = getObjectTutorialIds(
-                    childObjectConfiguration.getType()
-                  );
-                  const enabledTutorialIds = tutorialIds.filter(
-                    tutorialId => !values.hiddenTutorialHints[tutorialId]
-                  );
-                  // TODO EBO: Add a protection against infinite loops in case
-                  // of object cycles (thought it should be forbidden).
-                  return (
-                    <Accordion key={childObject.getName()} defaultExpanded>
-                      <AccordionHeader>
-                        {iconUrl ? (
-                          <IconContainer
-                            src={iconUrl}
-                            alt={childObject.getName()}
-                            size={20}
-                          />
-                        ) : null}
-                        <Column expand>
-                          <Text size="block-title">
-                            {childObject.getName()}
-                          </Text>
-                        </Column>
-                      </AccordionHeader>
-                      <AccordionBody>
-                        <Column expand noMargin noOverflowParent>
-                          {enabledTutorialIds.length ? (
-                            <Line>
-                              <ColumnStackLayout expand>
-                                {tutorialIds.map(tutorialId => (
-                                  <DismissableTutorialMessage
-                                    key={tutorialId}
-                                    tutorialId={tutorialId}
-                                  />
-                                ))}
-                              </ColumnStackLayout>
-                            </Line>
-                          ) : null}
-                          <Line noMargin>
-                            <Column expand>
-                              <EditorComponent
-                                objectConfiguration={childObjectConfiguration}
-                                project={project}
-                                layout={layout}
-                                resourceManagementProps={
-                                  resourceManagementProps
-                                }
-                                onSizeUpdated={
-                                  forceUpdate /*Force update to ensure dialog is properly positioned*/
-                                }
-                                objectName={
-                                  objectName + ' ' + childObject.getName()
-                                }
-                              />
-                            </Column>
-                          </Line>
-                        </Column>
-                      </AccordionBody>
-                    </Accordion>
-                  );
-                })}
-            </React.Fragment>
-          ) : (
-            <EmptyMessage>
-              <Trans>
-                There is nothing to configure for this object. You can still use
-                events to interact with the object.
-              </Trans>
-            </EmptyMessage>
+            </Dialog>
           )}
-        </ColumnStackLayout>
+        </>
       )}
     </I18n>
   );

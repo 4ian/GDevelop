@@ -31,4 +31,6 @@ export type EditorProps = {|
   onObjectUpdated?: () => void,
   unsavedChanges?: UnsavedChanges,
   scrollView?: ScrollViewInterface,
+  renderObjectNameField?: () => JSX.Element,
+  isChildObject?: boolean,
 |};

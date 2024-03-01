@@ -168,7 +168,9 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
 /**
  * Check if all sprites of the object have the same points and collision masks
  */
-const checkObjectPointsAndCollisionsMasks = (animations: gdSpriteAnimationList) => {
+const checkObjectPointsAndCollisionsMasks = (
+  animations: gdSpriteAnimationList
+) => {
   let allObjectSpritesHaveSamePoints = false;
   let allObjectSpritesHaveSameCollisionMasks = false;
   const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;

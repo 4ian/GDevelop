@@ -58,6 +58,7 @@ const SpineEditor = ({
   onSizeUpdated,
   onObjectUpdated,
   resourceManagementProps,
+  renderObjectNameField,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
@@ -305,6 +306,7 @@ const SpineEditor = ({
     <>
       <ScrollView ref={scrollView}>
         <ColumnStackLayout noMargin>
+          {renderObjectNameField && renderObjectNameField()}
           <AlertMessage kind="warning">
             <Trans>
               You need to own a license of Spine to publish a game with a Spine

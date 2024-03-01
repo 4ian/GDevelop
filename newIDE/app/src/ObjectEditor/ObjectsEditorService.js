@@ -38,15 +38,6 @@ const ObjectsEditorService = {
       helpPagePath: '',
     });
   },
-  getEditorConfigurationForCustomObject(
-    project: gdProject,
-    objectType: string
-  ) {
-    if (this.editorConfigurationsSpecificToCustomObject[objectType]) {
-      return this.editorConfigurationsSpecificToCustomObject[objectType];
-    }
-    return this.getEditorConfiguration(project, objectType);
-  },
   registerEditorConfiguration: function(
     objectType: string,
     editorConfiguration: any
@@ -116,16 +107,6 @@ const ObjectsEditorService = {
         gd.asCustomObjectConfiguration(objectConfiguration),
       helpPagePath: options.helpPagePath,
     };
-  },
-  editorConfigurationsSpecificToCustomObject: {
-    Sprite: {
-      component: LockedSpriteEditor,
-      createNewObject: (): gdSpriteObject => new gd.SpriteObject(),
-      castToObjectType: (
-        objectConfiguration: gdObjectConfiguration
-      ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
-      helpPagePath: '/objects/sprite',
-    },
   },
   editorConfigurations: {
     Sprite: {

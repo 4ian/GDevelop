@@ -31,31 +31,6 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-export function LockedSpriteEditor({
-  objectConfiguration,
-  project,
-  layout,
-  object,
-  objectName,
-  resourceManagementProps,
-  onSizeUpdated,
-  onObjectUpdated,
-}: EditorProps) {
-  return (
-    <SpriteEditor
-      isAnimationListLocked
-      objectConfiguration={objectConfiguration}
-      project={project}
-      layout={layout}
-      object={object}
-      objectName={objectName}
-      resourceManagementProps={resourceManagementProps}
-      onSizeUpdated={onSizeUpdated}
-      onObjectUpdated={onObjectUpdated}
-    />
-  );
-}
-
 type SpriteEditorProps = {|
   ...EditorProps,
   isAnimationListLocked?: boolean,
@@ -70,7 +45,8 @@ export default function SpriteEditor({
   resourceManagementProps,
   onSizeUpdated,
   onObjectUpdated,
-  isAnimationListLocked = false,
+  isChildObject,
+  renderObjectNameField,
 }: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
@@ -145,6 +121,7 @@ export default function SpriteEditor({
         <>
           <ScrollView ref={scrollView}>
             <>
+              {renderObjectNameField && renderObjectNameField()}
               <SpacedDismissableTutorialMessage />
               <AnimationList
                 ref={animationList}
@@ -156,8 +133,8 @@ export default function SpriteEditor({
                 resourceManagementProps={resourceManagementProps}
                 onSizeUpdated={onSizeUpdated}
                 onObjectUpdated={onObjectUpdated}
-                isAnimationListLocked={isAnimationListLocked}
-                scrollView={scrollView.current}
+                isAnimationListLocked={isChildObject}
+                scrollView={scrollView}
                 onCreateMatchingSpriteCollisionMask={
                   onCreateMatchingSpriteCollisionMask
                 }
@@ -176,14 +153,12 @@ export default function SpriteEditor({
                     onClick={() => setCollisionMasksEditorOpen(true)}
                     disabled={!hasAnyFrame(animations)}
                   />
-                  {!isAnimationListLocked && (
-                    <FlatButton
-                      label={<Trans>Edit points</Trans>}
-                      onClick={() => setPointsEditorOpen(true)}
-                      disabled={!hasAnyFrame(animations)}
-                    />
-                  )}
-                  {!isAnimationListLocked && (
+                  <FlatButton
+                    label={<Trans>Edit points</Trans>}
+                    onClick={() => setPointsEditorOpen(true)}
+                    disabled={!hasAnyFrame(animations)}
+                  />
+                  {!isChildObject && (
                     <FlatButton
                       label={<Trans>Advanced options</Trans>}
                       onClick={() => setAdvancedOptionsOpen(true)}
@@ -196,29 +171,34 @@ export default function SpriteEditor({
                   label={<Trans>Edit collision masks</Trans>}
                   onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={!hasAnyFrame(animations)}
-                  buildMenuTemplate={i18n => [
-                    {
-                      label: i18n._(t`Edit points`),
-                      disabled: !hasAnyFrame(animations),
-                      click: () => setPointsEditorOpen(true),
-                    },
-                    {
-                      label: i18n._(t`Advanced options`),
-                      disabled: !hasAnyFrame(animations),
-                      click: () => setAdvancedOptionsOpen(true),
-                    },
-                  ]}
+                  buildMenuTemplate={i18n =>
+                    [
+                      {
+                        label: i18n._(t`Edit points`),
+                        disabled: !hasAnyFrame(animations),
+                        click: () => setPointsEditorOpen(true),
+                      },
+                      isChildObject
+                        ? {
+                            label: i18n._(t`Advanced options`),
+                            disabled: !hasAnyFrame(animations),
+                            click: () => setAdvancedOptionsOpen(true),
+                          }
+                        : null,
+                    ].filter(Boolean)
+                  }
                 />
               )}
-              {!isAnimationListLocked && (
+              {!isChildObject && (
                 <RaisedButton
                   label={<Trans>Add an animation</Trans>}
                   primary
-                  onClick={
-                    animationList.current
-                      ? animationList.current.addAnimation
-                      : null
-                  }
+                  onClick={() => {
+                    if (!animationList.current) {
+                      return;
+                    }
+                    animationList.current.addAnimation();
+                  }}
                   icon={<Add />}
                 />
               )}

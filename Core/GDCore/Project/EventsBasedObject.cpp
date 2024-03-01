@@ -49,6 +49,7 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                         const SerializerElement& element) {
   defaultName = element.GetStringAttribute("defaultName");
   isRenderedIn3D = element.GetBoolAttribute("is3D", false);
+  isAnimatable = element.GetBoolAttribute("isAnimatable", false);
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);

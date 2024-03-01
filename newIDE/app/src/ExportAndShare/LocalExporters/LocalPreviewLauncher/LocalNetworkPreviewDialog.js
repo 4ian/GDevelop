@@ -9,6 +9,7 @@ import { Line } from '../../../UI/Grid';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import QrCode from '../../../UI/QrCode';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   open: boolean,
@@ -30,6 +31,7 @@ const LocalNetworkPreviewDialog = ({
   onClose,
   onRunPreviewLocally,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   if (!open) return null;
   const urlWithProtocol = url ? `http://${url}` : '';
 
@@ -93,7 +95,7 @@ const LocalNetworkPreviewDialog = ({
                 </Text>
               </Line>
               <Line justifyContent="center">
-                <QrCode url={urlWithProtocol} size={100} />
+                <QrCode url={urlWithProtocol} size={isMobile ? 100 : 150} />
               </Line>
             </>
           )}

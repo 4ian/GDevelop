@@ -19,6 +19,7 @@ import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
@@ -150,9 +151,10 @@ const ShareDialog = ({
     setIsNavigationDisabled,
   ] = React.useState<boolean>(false);
   const [game, setGame] = React.useState<?Game>(null);
-  const [gameError, setGameError] = React.useState<?'not-found' | 'not-owned'>(
-    null
-  );
+  const [
+    gameAvailabilityError,
+    setGameAvailabilityError,
+  ] = React.useState<?GameAvailabilityError>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const { showAlert } = useAlertDialog();
@@ -161,9 +163,9 @@ const ShareDialog = ({
     if (!game) {
       const title = t`Cannot see the exports`;
       const message =
-        gameError === 'not-found'
+        gameAvailabilityError === 'not-found'
           ? t`Register or publish your game first to see its exports.`
-          : gameError === 'not-owned'
+          : gameAvailabilityError === 'not-owned'
           ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
           : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
 
@@ -182,7 +184,7 @@ const ShareDialog = ({
 
       const { id } = profile;
       try {
-        setGameError(null);
+        setGameAvailabilityError(null);
         const game = await getGame(
           getAuthorizationHeader,
           id,
@@ -195,13 +197,14 @@ const ShareDialog = ({
           error
         );
         if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setGameError('not-found');
+          setGameAvailabilityError('not-found');
           return;
         }
         if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-          setGameError('not-owned');
+          setGameAvailabilityError('not-owned');
           return;
         }
+        setGameAvailabilityError('unexpected');
       }
     },
     [project, getAuthorizationHeader, profile]
@@ -333,6 +336,7 @@ const ShareDialog = ({
           chosenSection={chosenExporterSection}
           chosenSubSection={chosenExporterSubSection}
           game={game}
+          gameAvailabilityError={gameAvailabilityError}
           allExportersRequireOnline={allExportersRequireOnline}
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />

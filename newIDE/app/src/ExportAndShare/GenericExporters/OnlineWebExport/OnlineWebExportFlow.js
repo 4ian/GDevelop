@@ -61,8 +61,10 @@ const OnlineWebExportFlow = ({
           primary
           id={`launch-export-and-publish-${exportPipelineName}-web-button`}
           onClick={async () => {
-            setAutomaticallyOpenGameProperties(true);
             await launchExport();
+            // Set to true after the export is done, so that the game properties
+            // are automatically opened only when the build is finished.
+            setAutomaticallyOpenGameProperties(true);
           }}
           disabled={disabled}
         />

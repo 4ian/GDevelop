@@ -29,7 +29,7 @@ export type GameRegistrationProps = {|
   onGameRegistered?: () => void | Promise<void>,
 |};
 
-type UnavailableReason = 'unauthorized' | 'not-existing' | null;
+export type GameAvailabilityError = 'not-found' | 'not-owned' | 'unexpected';
 
 export const GameRegistration = ({
   project,
@@ -47,9 +47,9 @@ export const GameRegistration = ({
   const { showAlert } = useAlertDialog();
   const [error, setError] = React.useState<Error | null>(null);
   const [
-    unavailableReason,
-    setUnavailableReason,
-  ] = React.useState<UnavailableReason>(null);
+    gameAvailabilityError,
+    setGameAvailabilityError,
+  ] = React.useState<?GameAvailabilityError>(null);
   const [game, setGame] = React.useState<Game | null>(null);
   const [registrationInProgress, setRegistrationInProgress] = React.useState(
     false
@@ -79,7 +79,7 @@ export const GameRegistration = ({
           id,
           project.getProjectUuid()
         );
-        setUnavailableReason(null);
+        setGameAvailabilityError(null);
         setGame(game);
       } catch (error) {
         console.error(
@@ -91,12 +91,13 @@ export const GameRegistration = ({
         );
         if (extractedStatusAndCode) {
           if (extractedStatusAndCode.status === 403) {
-            setUnavailableReason('unauthorized');
+            setGameAvailabilityError('not-owned');
             return;
           } else if (extractedStatusAndCode.status === 404) {
-            setUnavailableReason('not-existing');
+            setGameAvailabilityError('not-found');
             return;
           }
+          setGameAvailabilityError('unexpected');
         }
 
         setError(error);
@@ -207,7 +208,7 @@ export const GameRegistration = ({
     );
   }
 
-  if (unavailableReason === 'not-existing') {
+  if (gameAvailabilityError === 'not-found') {
     return (
       <AlertMessage
         kind="info"
@@ -228,7 +229,7 @@ export const GameRegistration = ({
     );
   }
 
-  if (unavailableReason === 'unauthorized') {
+  if (gameAvailabilityError === 'not-owned') {
     return (
       <AlertMessage kind="error">
         <Trans>

@@ -62,10 +62,10 @@ export const insertInVariablesContainer = (
   const newVariable = new gd.Variable();
   if (serializedVariable) {
     unserializeFromJSObject(newVariable, serializedVariable);
-    newVariable.resetPersistentUuid();
   } else {
     newVariable.setString('');
   }
+  newVariable.resetPersistentUuid();
   const variable = variablesContainer.insert(newName, newVariable, index);
   newVariable.delete();
   return { name: newName, variable };

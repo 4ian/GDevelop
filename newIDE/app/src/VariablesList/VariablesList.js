@@ -532,6 +532,48 @@ const VariablesList = (props: Props) => {
     () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
     [onComputeAllVariableNames]
   );
+
+  const computeVariableNamesToVariablesUuid = React.useCallback(
+    () => {
+      console.log('salut', allVariablesNames);
+      if (!allVariablesNames) return {};
+      return allVariablesNames.reduce((acc, variableName) => {
+        if (props.variablesContainer.has(variableName)) {
+          console.log(`got it ${variableName}`);
+          acc[variableName] = props.variablesContainer
+            .get(variableName)
+            .getPersistentUuid();
+        } else if (
+          props.inheritedVariablesContainer &&
+          props.inheritedVariablesContainer.has(variableName)
+        ) {
+          acc[variableName] = props.inheritedVariablesContainer
+            .get(variableName)
+            .getPersistentUuid();
+        } else {
+          acc[variableName] = null;
+        }
+        return acc;
+      }, {});
+    },
+    [
+      allVariablesNames,
+      props.variablesContainer,
+      props.inheritedVariablesContainer,
+    ]
+  );
+
+  const initialVariableNamesToVariablesUuid = React.useRef<{
+    [variableName: string]: ?string,
+  }>(computeVariableNamesToVariablesUuid());
+
+  const [
+    variableNamesToVariablesUuid,
+    setVariableNamesToVariablesUuid,
+  ] = React.useState<{
+    [variableName: string]: ?string,
+  }>(computeVariableNamesToVariablesUuid);
+
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
     Array<string>
@@ -600,15 +642,12 @@ const VariablesList = (props: Props) => {
     [containerWidth, props.size]
   );
 
-  const undefinedVariableNames = allVariablesNames
-    ? allVariablesNames.filter(variableName => {
-        return (
-          !props.variablesContainer.has(variableName) &&
-          (!props.inheritedVariablesContainer ||
-            !props.inheritedVariablesContainer.has(variableName))
-        );
-      })
-    : [];
+  const undeclaredVariableNames = Object.entries(variableNamesToVariablesUuid)
+    .map(([variableName, variableUuid]) =>
+      variableUuid !== null ? null : variableName
+    )
+    .filter(Boolean);
+  console.log(variableNamesToVariablesUuid, undeclaredVariableNames);
 
   const { historyHandler, onVariablesUpdated, variablesContainer } = props;
   const _onChange = React.useCallback(
@@ -848,9 +887,10 @@ const VariablesList = (props: Props) => {
       if (success) {
         _onChange();
         forceUpdate();
+        setVariableNamesToVariablesUuid(computeVariableNamesToVariablesUuid);
       }
     },
-    [_onChange, forceUpdate, _deleteNode]
+    [_onChange, forceUpdate, _deleteNode, computeVariableNamesToVariablesUuid]
   );
 
   const deleteSelection = React.useCallback(
@@ -868,9 +908,10 @@ const VariablesList = (props: Props) => {
       if (deleteSuccesses.some(Boolean)) {
         _onChange();
         setSelectedNodes([]);
+        setVariableNamesToVariablesUuid(computeVariableNamesToVariablesUuid);
       }
     },
-    [_onChange, _deleteNode, selectedNodes]
+    [_onChange, _deleteNode, selectedNodes, computeVariableNamesToVariablesUuid]
   );
 
   const updateExpandedAndSelectedNodesFollowingNameChange = React.useCallback(
@@ -1467,6 +1508,7 @@ const VariablesList = (props: Props) => {
 
       if (!parentVariable) {
         props.variablesContainer.rename(name, safeAndUniqueNewName);
+        setVariableNamesToVariablesUuid(computeVariableNamesToVariablesUuid);
       } else {
         parentVariable.renameChild(name, safeAndUniqueNewName);
       }
@@ -1482,6 +1524,7 @@ const VariablesList = (props: Props) => {
       _onChange,
       props.variablesContainer,
       updateExpandedAndSelectedNodesFollowingNameChange,
+      computeVariableNamesToVariablesUuid,
       refocusNameField,
     ]
   );
@@ -1713,7 +1756,7 @@ const VariablesList = (props: Props) => {
                           ? renderTree(i18n, true)
                           : null}
                         {renderTree(i18n)}
-                        {!!undefinedVariableNames.length && (
+                        {!!undeclaredVariableNames.length && (
                           <Paper
                             background="dark"
                             variant="outlined"
@@ -1723,7 +1766,7 @@ const VariablesList = (props: Props) => {
                               <Text>
                                 <MarkdownText
                                   translatableSource={t`There are variables used in events but not declared in this list: ${'`' +
-                                    undefinedVariableNames.join('`, `') +
+                                    undeclaredVariableNames.join('`, `') +
                                     '`'}.`}
                                 />
                               </Text>

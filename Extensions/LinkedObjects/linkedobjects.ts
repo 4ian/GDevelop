@@ -3,6 +3,7 @@ GDevelop - LinkedObjects Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('LinkedObjects');
   /**
    * Manages the links between objects.
    */
@@ -114,7 +115,14 @@ namespace gdjs {
           if (this._links.has(linkedObject.id)) {
             const otherObjList = this._links
               .get(linkedObject.id)!
-              .linkedObjectMap.get(removedObject.getName())!;
+              .linkedObjectMap.get(removedObject.getName());
+
+            if (!otherObjList) {
+              logger.error(
+                `Can't find link from ${linkedObject.id} (${linkedObject.name}) to ${removedObject.id} (${removedObject.name})`
+              );
+              return;
+            }
 
             const index = otherObjList.indexOf(removedObject);
             if (index !== -1) {

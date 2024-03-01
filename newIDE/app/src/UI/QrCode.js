@@ -4,6 +4,10 @@ import * as React from 'react';
 import QrCreator from 'qr-creator';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
+const styles = {
+  qrCodeContainer: { imageRendering: 'pixelated' },
+};
+
 type Props = {|
   url: string,
   size?: number,
@@ -41,7 +45,7 @@ const QrCode = ({ url, size = 128 }: Props) => {
     },
     [url, size, gdevelopTheme]
   );
-  return <div ref={containerRef} />;
+  return <div ref={containerRef} style={styles.qrCodeContainer} />;
 };
 
 export default QrCode;

@@ -326,18 +326,14 @@ const OnlineGameLink = ({
                         <SocialShareButtons url={buildOrGameUrl} />
                       </Column>
                     )}
-                    {buildOrGameUrl && (
-                      <>
-                        <Line>
-                          <Text>
-                            <Trans>Or flash this QR code:</Trans>
-                          </Text>
-                        </Line>
-                        <Line justifyContent="center">
-                          <QrCode url={buildOrGameUrl} size={100} />
-                        </Line>
-                      </>
-                    )}
+                    <Line noMargin>
+                      <Text>
+                        <Trans>Or flash this QR code:</Trans>
+                      </Text>
+                    </Line>
+                    <Line noMargin justifyContent="center">
+                      <QrCode url={buildOrGameUrl} size={100} />
+                    </Line>
                   </ColumnStackLayout>
                   {isBuildPublished ? (
                     <GameRegistration

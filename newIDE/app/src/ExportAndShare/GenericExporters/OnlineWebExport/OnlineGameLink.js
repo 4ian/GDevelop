@@ -34,6 +34,7 @@ import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';
 import { GameRegistration } from '../../../GameDashboard/GameRegistration';
 import QrCode from '../../../UI/QrCode';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -66,6 +67,7 @@ const OnlineGameLink = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );
+  const { isMobile } = useResponsiveWindowSize();
   const [
     isOnlineGamePropertiesDialogOpen,
     setIsOnlineGamePropertiesDialogOpen,
@@ -328,11 +330,14 @@ const OnlineGameLink = ({
                     )}
                     <Line noMargin>
                       <Text>
-                        <Trans>Or flash this QR code:</Trans>
+                        <Trans>Share it with this QR code:</Trans>
                       </Text>
                     </Line>
                     <Line noMargin justifyContent="center">
-                      <QrCode url={buildOrGameUrl} size={100} />
+                      <QrCode
+                        url={buildOrGameUrl}
+                        size={isMobile ? 100 : 150}
+                      />
                     </Line>
                   </ColumnStackLayout>
                   {isBuildPublished ? (

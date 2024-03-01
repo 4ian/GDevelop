@@ -658,6 +658,15 @@ namespace gdjs {
     isFlippedY(): boolean {
       return this._flippedY;
     }
+
+    /**
+     * Return the sprite animator.
+     * 
+     * It returns `null` when custom objects don't have the Animatable capability.
+     */
+    getAnimator(): gdjs.SpriteAnimator | null {
+      return null;
+    }
   }
 
   // Others initialization and internal state management :

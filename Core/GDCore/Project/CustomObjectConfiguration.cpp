@@ -19,6 +19,7 @@ using namespace gd;
 void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& objectConfiguration) {
   project = objectConfiguration.project;
   objectContent = objectConfiguration.objectContent;
+  animations = objectConfiguration.animations;
 
   // There is no default copy for a map of unique_ptr like childObjectConfigurations.
   childObjectConfigurations.clear();

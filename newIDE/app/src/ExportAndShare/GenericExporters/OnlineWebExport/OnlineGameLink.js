@@ -33,6 +33,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';
 import { GameRegistration } from '../../../GameDashboard/GameRegistration';
+import QrCode from '../../../UI/QrCode';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -83,7 +84,7 @@ const OnlineGameLink = ({
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
   const gameUrl = getGameUrl(game);
-  const buildUrl =
+  const buildOrGameUrl =
     exportPending || !isBuildComplete
       ? null
       : isBuildPublished
@@ -259,7 +260,7 @@ const OnlineGameLink = ({
       onClick={() => setIsShareDialogOpen(false)}
     />,
     // Ensure there is a game loaded, meaning the user owns the game.
-    game && buildUrl && !isBuildPublished && (
+    game && buildOrGameUrl && !isBuildPublished && (
       <DialogPrimaryButton
         key="publish"
         label={<Trans>Verify and Publish to gd.games</Trans>}
@@ -303,37 +304,48 @@ const OnlineGameLink = ({
               open
               onRequestClose={() => setIsShareDialogOpen(false)}
               onApply={() => {
-                if (game && buildUrl && !isBuildPublished) {
+                if (game && buildOrGameUrl && !isBuildPublished) {
                   setIsOnlineGamePropertiesDialogOpen(true);
                 }
               }}
               flexColumnBody
             >
-              {buildUrl && !isGameLoading ? (
+              {buildOrGameUrl && !isGameLoading ? (
                 <ColumnStackLayout noMargin>
-                  <ShareLink url={buildUrl} />
-                  {isBuildPublished && (
-                    <ColumnStackLayout noMargin expand>
-                      {navigator.share ? (
-                        <ShareButton url={buildUrl} />
-                      ) : (
-                        <Column
-                          expand
-                          justifyContent="flex-end"
-                          noMargin
-                          alignItems="flex-end"
-                        >
-                          <SocialShareButtons url={buildUrl} />
-                        </Column>
-                      )}
-                      <GameRegistration
-                        project={project}
-                        hideLoader
-                        suggestAdditionalActions
-                      />
-                    </ColumnStackLayout>
-                  )}
-                  {!isBuildPublished && game && (
+                  <ShareLink url={buildOrGameUrl} />
+                  <ColumnStackLayout noMargin expand>
+                    {navigator.share ? (
+                      <ShareButton url={buildOrGameUrl} />
+                    ) : (
+                      <Column
+                        expand
+                        justifyContent="flex-end"
+                        noMargin
+                        alignItems="flex-end"
+                      >
+                        <SocialShareButtons url={buildOrGameUrl} />
+                      </Column>
+                    )}
+                    {buildOrGameUrl && (
+                      <>
+                        <Line>
+                          <Text>
+                            <Trans>Or flash this QR code:</Trans>
+                          </Text>
+                        </Line>
+                        <Line justifyContent="center">
+                          <QrCode url={buildOrGameUrl} size={100} />
+                        </Line>
+                      </>
+                    )}
+                  </ColumnStackLayout>
+                  {isBuildPublished ? (
+                    <GameRegistration
+                      project={project}
+                      hideLoader
+                      suggestAdditionalActions
+                    />
+                  ) : game ? (
                     <AlertMessage kind="info">
                       <Trans>
                         This link is private. You can share it with
@@ -342,7 +354,7 @@ const OnlineGameLink = ({
                         gd.games - GDevelop gaming platform.
                       </Trans>
                     </AlertMessage>
-                  )}
+                  ) : null}
                 </ColumnStackLayout>
               ) : (
                 <ColumnStackLayout

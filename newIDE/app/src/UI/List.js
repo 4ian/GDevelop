@@ -18,9 +18,7 @@ import ThreeDotsMenu from './CustomSvgIcons/ThreeDotsMenu';
 import ShareExternal from './CustomSvgIcons/ShareExternal';
 import ChevronTop from './CustomSvgIcons/ChevronArrowTop';
 import ChevronBottom from './CustomSvgIcons/ChevronArrowBottom';
-import Search from './CustomSvgIcons/Search';
 import Refresh from './CustomSvgIcons/Refresh';
-import Add from './CustomSvgIcons/Add';
 import Remove from './CustomSvgIcons/Remove';
 
 const useDenseLists = true;
@@ -69,12 +67,6 @@ type ListItemRightButtonProps =
       displayRemoveButton: true,
       onRemove: () => void,
     |}
-  | {|
-      displayAddIcon: true,
-    |}
-  | {|
-      displaySearchIcon: true,
-    |}
   | {||};
 
 // We support a subset of the props supported by Material-UI v0.x ListItem
@@ -91,7 +83,6 @@ type ListItemProps = {|
   open?: boolean,
   initiallyOpen?: boolean,
   disabled?: boolean,
-  rightIconColor?: string,
   nestedListStyle?: {|
     padding: 0,
   |},
@@ -109,6 +100,7 @@ type ListItemProps = {|
 
   leftIcon?: React.Node,
   ...ListItemRightButtonProps,
+  rightIconColor?: string,
 
   secondaryTextLines?: 1 | 2,
 
@@ -257,12 +249,6 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             className={props.disableAutoTranslate ? 'notranslate' : ''}
           />
           {renderListItemSecondaryAction()}
-          {props.displayAddIcon && (
-            <Add style={{ color: props.rightIconColor }} />
-          )}
-          {props.displaySearchIcon && (
-            <Search style={{ color: props.rightIconColor }} />
-          )}
         </MUIListItem>
       );
     } else {

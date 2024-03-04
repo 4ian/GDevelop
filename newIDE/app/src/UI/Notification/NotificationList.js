@@ -6,8 +6,9 @@ import { Trans } from '@lingui/macro';
 import { type Notification } from '../../Utils/GDevelopServices/Notification';
 import { List, ListItem } from '../List';
 import NotificationListItem from './NotificationListItem';
-import { Column } from '../Grid';
+import { Column, Line } from '../Grid';
 import Text from '../Text';
+import FlatButton from '../FlatButton';
 
 type Props = {|
   notifications: Notification[],
@@ -18,9 +19,19 @@ const NotificationList = ({ notifications }: Props) => {
     <I18n>
       {({ i18n }) => (
         <Column noMargin>
-          <Text size="block-title">
-            <Trans>Notifications</Trans>
-          </Text>
+          <Line justifyContent="space-between" alignItems="center" noMargin>
+            <Text size="block-title">
+              <Trans>Notifications</Trans>
+            </Text>
+            <FlatButton
+              primary
+              label={<Trans>Mark all as read</Trans>}
+              disabled={notifications.every(
+                notification => !!notification.seenAt
+              )}
+              onClick={() => console.log('salut')}
+            />
+          </Line>
           <List>
             {notifications.length > 0 ? (
               notifications.map(notification => (

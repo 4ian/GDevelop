@@ -144,6 +144,19 @@ const MarketingPlans = ({ game }: Props) => {
     [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
   );
 
+  const getMarketingPlanPrice = React.useCallback(
+    (marketingPlan: MarketingPlan) => {
+      if (!profile || !limits) return null;
+
+      const prices = limits.credits.prices;
+      const usagePrice = prices[marketingPlan.id];
+      if (!usagePrice) return null;
+
+      return usagePrice.priceInCredits;
+    },
+    [limits, profile]
+  );
+
   React.useEffect(
     () => {
       fetchMarketingPlans();
@@ -186,11 +199,9 @@ const MarketingPlans = ({ game }: Props) => {
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
       if (!profile || !limits) return;
 
-      const {
-        creditsAmount: packCreditsAmount,
-        id,
-        nameByLocale,
-      } = marketingPlan;
+      const { id, nameByLocale } = marketingPlan;
+      const packCreditsAmount = getMarketingPlanPrice(marketingPlan);
+      if (!packCreditsAmount) return;
 
       const translatedName = selectMessageByLocale(i18n, nameByLocale);
 
@@ -271,6 +282,7 @@ const MarketingPlans = ({ game }: Props) => {
       fetchGameFeaturings,
       openCreditsPackageDialog,
       openCreditsUsageDialog,
+      getMarketingPlanPrice,
     ]
   );
 
@@ -315,7 +327,7 @@ const MarketingPlans = ({ game }: Props) => {
     );
   };
 
-  if (!profile) return null;
+  if (!profile || !limits) return null;
 
   return (
     <I18n>
@@ -356,12 +368,18 @@ const MarketingPlans = ({ game }: Props) => {
             <ResponsiveLineStackLayout noColumnMargin>
               {marketingPlans.map(marketingPlan => {
                 const {
-                  creditsAmount: packCreditsAmount,
                   id,
                   nameByLocale,
                   descriptionByLocale,
                   bulletPointsByLocale,
                 } = marketingPlan;
+                const packCreditsAmount = getMarketingPlanPrice(marketingPlan);
+                if (!packCreditsAmount) {
+                  console.error(
+                    `Could not find price for marketing plan ${id}, hiding it.`
+                  );
+                  return null;
+                }
                 const activeFeaturing = getActiveFeaturing(marketingPlan);
                 const requirementsErrors = activeFeaturing
                   ? getRequirementsErrors(marketingPlan)

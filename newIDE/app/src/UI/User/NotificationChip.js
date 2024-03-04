@@ -1,15 +1,13 @@
 // @flow
 
 import * as React from 'react';
+import Popover from '@material-ui/core/Popover';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import Bell from '../CustomSvgIcons/Bell';
 import IconButton from '../IconButton';
 import NotificationList from '../Notification/NotificationList';
-import Popover from '@material-ui/core/Popover';
-import Text from '../Text';
-import { Trans } from '@lingui/macro';
 import Paper from '../Paper';
 import Badge from '../Badge';
+import Bell from '../CustomSvgIcons/Bell';
 
 type Props = {||};
 
@@ -17,7 +15,7 @@ const NotificationChip = (props: Props) => {
   const { notifications, profile } = React.useContext(AuthenticatedUserContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  if (!profile) return null;
+  if (!profile || !notifications) return null;
   return (
     <>
       <IconButton
@@ -29,12 +27,7 @@ const NotificationChip = (props: Props) => {
         <Badge
           variant="dot"
           overlap="circle"
-          invisible={
-            !(
-              notifications &&
-              notifications.some(notification => !notification.seenAt)
-            )
-          }
+          invisible={notifications.every(notification => notification.seenAt)}
           color="primary"
         >
           <Bell color="secondary" />
@@ -54,13 +47,7 @@ const NotificationChip = (props: Props) => {
         }}
       >
         <Paper style={{ padding: '10px 20px' }} background="medium">
-          {notifications && notifications.length > 0 ? (
-            <NotificationList notifications={notifications} />
-          ) : (
-            <Text>
-              <Trans>You have 0 notification.</Trans>
-            </Text>
-          )}
+          <NotificationList notifications={notifications} />
         </Paper>
       </Popover>
     </>

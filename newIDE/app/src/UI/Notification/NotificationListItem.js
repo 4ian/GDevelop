@@ -2,18 +2,18 @@
 
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { Trans } from '@lingui/macro';
 import { type Notification } from '../../Utils/GDevelopServices/Notification';
 import { ListItem } from '../List';
-import Coin from '../../Credits/Icons/Coin';
-import { Trans } from '@lingui/macro';
 import { getRelativeOrAbsoluteDisplayDate } from '../../Utils/DateDisplay';
+import CoinOutline from '../CustomSvgIcons/CoinOutline';
 
 type Props = {|
   notification: Notification,
 |};
 
 const notificationTypeToIcon = {
-  'credits-drop': <Coin />,
+  'credits-drop': <CoinOutline />,
 };
 const getNotificationPrimaryTextByType = (
   notification: Notification

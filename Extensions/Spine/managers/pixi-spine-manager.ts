@@ -65,15 +65,14 @@ namespace gdjs {
         const spineAtlas = await this._spineAtlasManager.getOrLoad(
           atlasResourceName
         );
+        const url = this._resourceLoader.getFullUrl(resource.file);
         PIXI.Assets.setPreferences({
           preferWorkers: false,
-          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
-            resource.file
-          )
+          crossOrigin: this._resourceLoader.checkIfCredentialsRequired(url)
             ? 'use-credentials'
             : 'anonymous',
         });
-        PIXI.Assets.add(resource.name, resource.file, { spineAtlas });
+        PIXI.Assets.add(resource.name, url, { spineAtlas });
         const loadedJson = await PIXI.Assets.load(resource.name);
 
         if (loadedJson.spineData) {

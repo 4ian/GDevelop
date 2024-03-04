@@ -319,6 +319,7 @@ const CollisionMasksEditor = ({
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
@@ -356,6 +357,7 @@ const CollisionMasksEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>

@@ -48,6 +48,7 @@ const NotificationListItem = ({ notification }: Props) => {
           })}
           leftIcon={notificationTypeToIcon[notification.type]}
           displayDot={!notification.seenAt}
+          isGreyed={!!notification.seenAt}
         />
       )}
     </I18n>

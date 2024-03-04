@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import MUIList from '@material-ui/core/List';
 import MUIListItem from '@material-ui/core/ListItem';
 import MUIListItemIcon from '@material-ui/core/ListItemIcon';
@@ -81,6 +82,7 @@ type ListItemProps = {|
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
   renderNestedItems?: () => Array<React$Element<any> | null>,
+  isGreyed?: boolean,
   open?: boolean,
   initiallyOpen?: boolean,
   disabled?: boolean,
@@ -111,6 +113,12 @@ type ListItemProps = {|
 
 export type ListItemRefType = any; // Should be a material-ui ListItem
 
+const useStylesForGreyedListItem = makeStyles(theme => {
+  return createStyles({
+    root: { color: theme.palette.text.secondary },
+  });
+});
+
 /**
  * A ListItem to be used in a List.
  *
@@ -120,6 +128,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
+    const classes = useStylesForGreyedListItem();
 
     const openContextMenu = React.useCallback(
       () => {
@@ -249,6 +258,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
         >
           {props.leftIcon && (
             <MUIListItemIcon
+              classes={props.isGreyed ? classes : undefined}
               style={{
                 marginTop: 0, // MUI applies an unnecessary marginTop when items are aligned to the top.
               }}
@@ -257,9 +267,16 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             </MUIListItemIcon>
           )}
           <MUIListItemText
+            classes={props.isGreyed ? classes : undefined}
             style={styles.listItemText}
             primary={props.primaryText}
             secondary={props.secondaryText}
+            secondaryTypographyProps={
+              props.isGreyed ? { color: 'inherit' } : undefined
+            }
+            primaryTypographyProps={
+              props.isGreyed ? { color: 'inherit' } : undefined
+            }
             className={props.disableAutoTranslate ? 'notranslate' : ''}
           />
           {renderListItemSecondaryAction()}

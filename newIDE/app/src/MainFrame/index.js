@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import './MainFrame.css';
-import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
@@ -12,7 +11,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -74,12 +72,11 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext, {
   type InAppTutorialUserProgress,
@@ -174,7 +171,6 @@ import {
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
-import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
@@ -183,18 +179,10 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
+import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  drawerContent: {
-    width: 320,
-    overflowX: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-};
 
 const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
@@ -3073,28 +3061,14 @@ const MainFrame = (props: Props) => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      <Drawer
-        open={projectManagerOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={toggleProjectManager}
-        {...dataObjectToProps({
-          open: projectManagerOpen ? 'true' : undefined,
-        })}
+      <ProjectManagerDrawer
+        projectManagerOpen={projectManagerOpen}
+        toggleProjectManager={toggleProjectManager}
+        title={
+          state.currentProject ? state.currentProject.getName() : 'No project'
+        }
       >
-        <DrawerTopBar
-          title={
-            state.currentProject ? state.currentProject.getName() : 'No project'
-          }
-          onClose={toggleProjectManager}
-          id="project-manager-drawer"
-        />
-        {currentProject && (
+        {currentProject ? (
           <ProjectManager
             project={currentProject}
             onChangeProjectName={onChangeProjectName}
@@ -3134,13 +3108,8 @@ const MainFrame = (props: Props) => {
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
           />
-        )}
-        {!state.currentProject && (
-          <EmptyMessage>
-            <Trans>To begin, open or create a new project.</Trans>
-          </EmptyMessage>
-        )}
-      </Drawer>
+        ) : null}
+      </ProjectManagerDrawer>
       <TabsTitlebar
         onBuildMenuTemplate={() =>
           adaptFromDeclarativeTemplate(

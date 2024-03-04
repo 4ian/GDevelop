@@ -7,7 +7,7 @@ import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
 import { getObjectParameterIndex } from '../InstructionOrExpression/EnumerateInstructions';
 import { type ParameterFieldInterface } from './ParameterFields/ParameterFieldCommons';
-import { Drawer } from '@material-ui/core';
+import Drawer from '@material-ui/core/Drawer';
 import { Column, Line } from '../UI/Grid';
 import { isNativeMobileApp } from '../Utils/Platform';
 import {

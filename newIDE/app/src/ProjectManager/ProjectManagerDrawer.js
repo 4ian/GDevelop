@@ -8,7 +8,7 @@ import {
 } from '../UI/MobileSoftKeyboard';
 import { dataObjectToProps } from '../Utils/HTMLDataset';
 import DrawerTopBar from '../UI/DrawerTopBar';
-import { Drawer } from '@material-ui/core';
+import Drawer from '@material-ui/core/Drawer';
 
 const styles = {
   drawerContent: {

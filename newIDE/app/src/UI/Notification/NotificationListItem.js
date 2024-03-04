@@ -47,6 +47,7 @@ const NotificationListItem = ({ notification }: Props) => {
             relativeLimit: 'currentWeek',
           })}
           leftIcon={notificationTypeToIcon[notification.type]}
+          displayDot={!notification.seenAt}
         />
       )}
     </I18n>

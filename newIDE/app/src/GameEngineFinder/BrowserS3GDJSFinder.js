@@ -11,7 +11,7 @@ type FileSet =
 
 const filesToDownload: { [FileSet]: Array<string> } = {
   preview: ['/Runtime/index.html'],
-  web: ['/Runtime/index.html'],
+  web: ['/Runtime/index.html', '/Runtime/Electron/LICENSE.GDevelop.txt'],
   'cocos2d-js': [
     '/Runtime/Cocos2d/cocos2d-js-v3.10.js',
     '/Runtime/Cocos2d/index.html',
@@ -24,6 +24,7 @@ const filesToDownload: { [FileSet]: Array<string> } = {
   ],
   cordova: [
     '/Runtime/Cordova/www/index.html',
+    '/Runtime/Cordova/www/LICENSE.GDevelop.txt',
     '/Runtime/Cordova/config.xml',
     '/Runtime/Cordova/package.json',
   ],
@@ -31,6 +32,7 @@ const filesToDownload: { [FileSet]: Array<string> } = {
     '/Runtime/index.html',
     '/Runtime/Electron/main.js',
     '/Runtime/Electron/package.json',
+    '/Runtime/Electron/LICENSE.GDevelop.txt',
   ],
 };
 

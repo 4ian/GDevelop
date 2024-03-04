@@ -194,7 +194,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   for (std::size_t layoutIndex = 0;
        layoutIndex < exportedProject.GetLayoutsCount(); layoutIndex++) {
     auto &layout = exportedProject.GetLayout(layoutIndex);
-    scenesUsedResources[layout.GetName()] = 
+    scenesUsedResources[layout.GetName()] =
         gd::SceneResourcesFinder::FindSceneResources(exportedProject,
                                                           layout);
   }
@@ -513,6 +513,16 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     }
   }
 
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Cordova/www/LICENSE.GDevelop.txt");
+
+    if (!fs.WriteToFile(exportDir + "/www/LICENSE.GDevelop.txt", str)) {
+      lastError = "Unable to write Cordova LICENSE.GDevelop.txt file.";
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -530,6 +540,27 @@ bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
     if (!fs.WriteToFile(exportDir + "/fbapp-config.json", str)) {
       lastError =
           "Unable to write Facebook Instant Games fbapp-config.json file.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool ExporterHelper::ExportHtml5Files(const gd::Project &project,
+                                                     gd::String exportDir) {
+  if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
+                      GenerateWebManifest(project))) {
+    lastError = "Unable to export WebManifest.";
+    return false;
+  }
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/LICENSE.GDevelop.txt");
+
+    if (!fs.WriteToFile(exportDir + "/LICENSE.GDevelop.txt", str)) {
+      lastError = "Unable to write LICENSE.GDevelop.txt file.";
       return false;
     }
   }
@@ -611,6 +642,16 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {
       lastError = "Unable to write Electron main.js file.";
+      return false;
+    }
+  }
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/LICENSE.GDevelop.txt");
+
+    if (!fs.WriteToFile(exportDir + "/LICENSE.GDevelop.txt", str)) {
+      lastError = "Unable to write Electron LICENSE.GDevelop.txt file.";
       return false;
     }
   }

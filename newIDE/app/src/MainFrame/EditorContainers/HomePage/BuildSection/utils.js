@@ -5,7 +5,6 @@ import { getUserPublicProfilesByIds } from '../../../../Utils/GDevelopServices/U
 import { type Profile } from '../../../../Utils/GDevelopServices/Authentication';
 import { type CloudProjectWithUserAccessInfo } from '../../../../Utils/GDevelopServices/Project';
 import { type FileMetadataAndStorageProviderName } from '../../../../ProjectsStorage';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { marginsSize } from '../../../../UI/Grid';
 import { sendGameTemplateInformationOpened } from '../../../../Utils/Analytics/EventSender';
 import { getProductPriceOrOwnedLabel } from '../../../../AssetStore/ProductPriceTag';
@@ -29,8 +28,8 @@ type LastModifiedInfoByProjectId = {|
   [projectId: string]: LastModifiedInfo,
 |};
 
-export const getProjectLineHeight = (width: WidthType) => {
-  const lineHeight = width === 'small' ? 52 : 36;
+export const getProjectLineHeight = ({ isMobile }: {| isMobile: boolean |}) => {
+  const lineHeight = isMobile ? 52 : 36;
 
   return lineHeight - 2 * marginsSize;
 };
@@ -286,7 +285,39 @@ export const getExampleAndTemplateItemsForBuildSection = ({
     }
     if (privateGameTemplateActuallyAdded) privateGameTemplateIndex++;
     else exampleIndex++;
+    if (
+      exampleIndex >= exampleShortHeadersWithThumbnails.length &&
+      privateGameTemplateIndex >= privateGameTemplateListingDatas.length
+    ) {
+      break;
+    }
   }
 
   return { carouselItems, gridItems };
+};
+
+export const getAllGameTemplatesAndExamplesFlaggedAsGameCount = ({
+  privateGameTemplateListingDatas,
+  exampleShortHeaders,
+  columnsCount,
+}: {
+  privateGameTemplateListingDatas: ?(PrivateGameTemplateListingData[]),
+  exampleShortHeaders: ?(ExampleShortHeader[]),
+  columnsCount: number,
+}) => {
+  return (
+    Math.floor(
+      ((privateGameTemplateListingDatas
+        ? privateGameTemplateListingDatas.length
+        : 0) +
+        (exampleShortHeaders
+          ? exampleShortHeaders.filter(
+              exampleShortHeader =>
+                exampleShortHeader.tags.includes('game') ||
+                exampleShortHeader.tags.includes('Starter')
+            ).length
+          : 0)) /
+        columnsCount
+    ) * columnsCount
+  );
 };

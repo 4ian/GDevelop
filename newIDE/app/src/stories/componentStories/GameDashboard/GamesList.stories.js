@@ -26,7 +26,6 @@ export const WithoutAProjectOpened = () => {
       <GamesList
         project={null}
         games={[game1, game2]}
-        onGameUpdated={action('onGameUpdated')}
         onRefreshGames={action('onRefreshGames')}
         onOpenGame={action('onOpenGame')}
       />

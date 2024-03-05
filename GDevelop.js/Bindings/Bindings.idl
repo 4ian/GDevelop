@@ -63,14 +63,6 @@ interface MapStringString {
     [Value] VectorString MAP_keys();
 };
 
-interface MapStringVectorString {
-    void MapStringVectorString();
-
-    [Const, Ref] VectorString MAP_get([Const] DOMString name);
-    boolean MAP_has([Const] DOMString name);
-    [Value] VectorString MAP_keys();
-};
-
 interface MapStringBoolean {
     void MapStringBoolean();
 
@@ -525,6 +517,7 @@ interface Project {
     void RemoveLayout([Const] DOMString name);
     void SetFirstLayout([Const] DOMString name);
     [Const, Ref] DOMString GetFirstLayout();
+    unsigned long GetLayoutPosition([Const] DOMString name);
 
     boolean HasExternalEventsNamed([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEvents([Const] DOMString name);
@@ -534,6 +527,7 @@ interface Project {
     unsigned long GetExternalEventsCount();
     [Ref] ExternalEvents InsertNewExternalEvents([Const] DOMString name, unsigned long position);
     void RemoveExternalEvents([Const] DOMString name);
+    unsigned long GetExternalEventsPosition([Const] DOMString name);
 
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
@@ -543,6 +537,7 @@ interface Project {
     unsigned long GetExternalLayoutsCount();
     [Ref] ExternalLayout InsertNewExternalLayout([Const] DOMString name, unsigned long position);
     void RemoveExternalLayout([Const] DOMString name);
+    unsigned long GetExternalLayoutPosition([Const] DOMString name);
 
     boolean HasEventsFunctionsExtensionNamed([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtension([Const] DOMString name);
@@ -553,6 +548,7 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertNewEventsFunctionsExtension([Const] DOMString name, unsigned long position);
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
+    unsigned long GetEventsFunctionsExtensionPosition([Const] DOMString name);
 
     boolean HasEventsBasedBehavior([Const] DOMString type);
     [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
@@ -721,7 +717,6 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
-    boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();
 
@@ -1324,7 +1319,7 @@ interface Serializer {
 interface ObjectAssetSerializer {
     void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
         [Const] DOMString objectFullName, [Ref] SerializerElement element,
-        [Ref] MapStringVectorString resourcesNewFileNames);
+        [Ref] VectorString usedResourceNames);
 };
 
 interface InstructionsList {

@@ -386,7 +386,7 @@ class RuntimeObject {
   }
 }
 
-class CustomRuntimeObject extends RuntimeObject {
+class CustomRuntimeObject2D extends RuntimeObject {
   constructor(parentInstanceContainer, objectData) {
     super(parentInstanceContainer, objectData);
     this._instanceContainer = parentInstanceContainer;
@@ -760,7 +760,7 @@ function makeMinimalGDJSMock(options) {
       Hashtable,
       LongLivedObjectsList,
       TaskGroup,
-      CustomRuntimeObject,
+      CustomRuntimeObject2D,
       ManuallyResolvableTask,
       Variable,
     },

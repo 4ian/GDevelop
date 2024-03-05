@@ -16,7 +16,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {
@@ -37,7 +37,6 @@ import ErrorBoundary from '../../../../UI/ErrorBoundary';
 import { delay } from '../../../../Utils/Delay';
 import { type AuthError } from '../../../../Utils/GDevelopServices/Authentication';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
-import { AnnouncementsFeed } from '../../../../AnnouncementsFeed';
 import Checkbox from '../../../../UI/Checkbox';
 import { getGetStartedSectionViewCount } from '../../../../Utils/Analytics/LocalStats';
 import { sendUserSurveyCompleted } from '../../../../Utils/Analytics/EventSender';
@@ -127,8 +126,7 @@ const GetStartedSection = ({
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
   const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [step, setStep] = React.useState<
     | 'welcome'
     | 'login'
@@ -658,7 +656,6 @@ const GetStartedSection = ({
   if (step === 'recommendations' && profile) {
     return (
       <>
-        <AnnouncementsFeed canClose level="urgent" addMargins hideLoader />
         <SectionContainer
           title={
             profile.username ? (
@@ -669,6 +666,7 @@ const GetStartedSection = ({
           }
           renderSubtitle={renderSubtitle}
           flexBody
+          showAnnouncementsAndPromotions
         >
           <RecommendationList
             authenticatedUser={authenticatedUser}

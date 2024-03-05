@@ -26,7 +26,7 @@ type Props = {|
   error: ?Error,
   loadBuilds: () => void,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
   onBuildUpdated: Build => void,
   onBuildDeleted: Build => void,
 |};
@@ -53,7 +53,13 @@ const buildFilterOptions: Array<{
   {
     key: 'cordova-build',
     value: 'cordova-build',
-    label: t`Mobile builds`,
+    label: t`Android builds`,
+  },
+
+  {
+    key: 'cordova-ios-build',
+    value: 'cordova-ios-build',
+    label: t`iOS builds`,
   },
 
   {
@@ -70,6 +76,8 @@ const filterBuilds = (builds: ?Array<Build>, buildFilter: BuildFilter) => {
       return builds.filter(build => build.type === 'web-build');
     case 'cordova-build':
       return builds.filter(build => build.type === 'cordova-build');
+    case 'cordova-ios-build':
+      return builds.filter(build => build.type === 'cordova-ios-build');
     case 'electron-build':
       return builds.filter(build => build.type === 'electron-build');
     default:
@@ -80,7 +88,10 @@ const filterBuilds = (builds: ?Array<Build>, buildFilter: BuildFilter) => {
 const emptyBuildMessage = {
   'web-build': <Trans>You don't have any web builds for this game.</Trans>,
   'cordova-build': (
-    <Trans>You don't have any mobile builds for this game.</Trans>
+    <Trans>You don't have any Android builds for this game.</Trans>
+  ),
+  'cordova-ios-build': (
+    <Trans>You don't have any iOS builds for this game.</Trans>
   ),
   'electron-build': (
     <Trans>You don't have any desktop builds for this game.</Trans>

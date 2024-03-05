@@ -18,55 +18,13 @@ import BackgroundText from '../../UI/BackgroundText';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import FlatButton from '../../UI/FlatButton';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import TextField from '../../UI/TextField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import {
   shouldUseAppStoreProduct,
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
-import Form from '../../UI/Form';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-
-const PasswordPromptDialog = (props: {
-  passwordValue: string,
-  setPasswordValue: (newValue: string) => void,
-  onClose: () => void,
-  onApply: () => Promise<void>,
-}) => (
-  <Dialog
-    open
-    maxWidth="xs"
-    title={<Trans>Asset store password</Trans>}
-    onApply={props.onApply}
-    onRequestClose={props.onClose}
-    actions={[
-      <FlatButton
-        key="cancel"
-        label={<Trans>Close</Trans>}
-        onClick={props.onClose}
-      />,
-      <DialogPrimaryButton
-        key="continue"
-        primary
-        label={<Trans>Continue</Trans>}
-        onClick={props.onApply}
-      />,
-    ]}
-  >
-    <Form onSubmit={props.onApply} name="asset-store-password">
-      <TextField
-        fullWidth
-        autoFocus="desktopAndMobileDevices"
-        value={props.passwordValue}
-        floatingLabelText={<Trans>Password</Trans>}
-        type="password"
-        onChange={(e, value) => {
-          props.setPasswordValue(value);
-        }}
-      />
-    </Form>
-  </Dialog>
-);
+import PasswordPromptDialog from '../PasswordPromptDialog';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,

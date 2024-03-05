@@ -14,9 +14,9 @@ import {
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import {
@@ -25,14 +25,16 @@ import {
   PublicAssetPackTile,
   PrivateGameTemplateTile,
 } from './ShopTiles';
-import { shuffleArrayWith } from '../Utils/Random';
 
 const cellSpacing = 2;
 
-const getCategoryColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getCategoryColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -44,10 +46,13 @@ const getCategoryColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -60,15 +65,15 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
 };
 
 export const shopCategories = {
-  'full-game-pack': {
-    title: <Trans>Full Game Packs</Trans>,
-    imageAlt: 'Full game asset packs category',
-    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
-  },
   'game-template': {
-    title: <Trans>Game Templates</Trans>,
+    title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
     imageSource: 'res/shop-categories/Game_Templates.jpeg',
+  },
+  'full-game-pack': {
+    title: <Trans>Full Game Asset Packs</Trans>,
+    imageAlt: 'Full game asset packs category',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
@@ -124,10 +129,6 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
-  assetPackRandomOrdering: {|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
@@ -142,7 +143,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
       privateGameTemplateListingDatas,
-      assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
       onPrivateGameTemplateSelection,
@@ -152,7 +152,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     }: Props,
     ref
   ) => {
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
     );
@@ -204,20 +204,19 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ? shopCategories[openedShopCategory].title
       : null;
 
-    const starterPacksTiles: Array<React.Node> = shuffleArrayWith(
-      starterPacks.filter(
+    const starterPacksTiles: Array<React.Node> = starterPacks
+      .filter(
         assetPack =>
           !openedShopCategory ||
           assetPack.categories.includes(openedShopCategory)
-      ),
-      assetPackRandomOrdering.starterPacks
-    ).map((assetPack, index) => (
-      <PublicAssetPackTile
-        assetPack={assetPack}
-        onSelect={() => onPublicAssetPackSelection(assetPack)}
-        key={`${assetPack.tag}-${index}`}
-      />
-    ));
+      )
+      .map((assetPack, index) => (
+        <PublicAssetPackTile
+          assetPack={assetPack}
+          onSelect={() => onPublicAssetPackSelection(assetPack)}
+          key={`${assetPack.tag}-${index}`}
+        />
+      ));
 
     const { allStandAloneTiles, allBundleTiles } = React.useMemo(
       () => {
@@ -226,46 +225,45 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         const privateAssetPackBundleTiles: Array<React.Node> = [];
         const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        shuffleArrayWith(
-          privateAssetPackListingDatas.filter(
+        privateAssetPackListingDatas
+          .filter(
             assetPackListingData =>
               !openedShopCategory ||
               assetPackListingData.categories.includes(openedShopCategory)
-          ),
-          assetPackRandomOrdering.privateAssetPacks
-        ).forEach(assetPackListingData => {
-          const isPackOwned =
-            !!receivedAssetPacks &&
-            !!receivedAssetPacks.find(
-              pack => pack.id === assetPackListingData.id
+          )
+          .forEach(assetPackListingData => {
+            const isPackOwned =
+              !!receivedAssetPacks &&
+              !!receivedAssetPacks.find(
+                pack => pack.id === assetPackListingData.id
+              );
+            const tile = (
+              <PrivateAssetPackTile
+                assetPackListingData={assetPackListingData}
+                onSelect={() => {
+                  onPrivateAssetPackSelection(assetPackListingData);
+                }}
+                owned={isPackOwned}
+                key={assetPackListingData.id}
+              />
             );
-          const tile = (
-            <PrivateAssetPackTile
-              assetPackListingData={assetPackListingData}
-              onSelect={() => {
-                onPrivateAssetPackSelection(assetPackListingData);
-              }}
-              owned={isPackOwned}
-              key={assetPackListingData.id}
-            />
-          );
-          if (
-            assetPackListingData.includedListableProductIds &&
-            !!assetPackListingData.includedListableProductIds.length
-          ) {
-            if (isPackOwned) {
-              privateOwnedAssetPackBundleTiles.push(tile);
+            if (
+              assetPackListingData.includedListableProductIds &&
+              !!assetPackListingData.includedListableProductIds.length
+            ) {
+              if (isPackOwned) {
+                privateOwnedAssetPackBundleTiles.push(tile);
+              } else {
+                privateAssetPackBundleTiles.push(tile);
+              }
             } else {
-              privateAssetPackBundleTiles.push(tile);
+              if (isPackOwned) {
+                privateOwnedAssetPackStandAloneTiles.push(tile);
+              } else {
+                privateAssetPackStandAloneTiles.push(tile);
+              }
             }
-          } else {
-            if (isPackOwned) {
-              privateOwnedAssetPackStandAloneTiles.push(tile);
-            } else {
-              privateAssetPackStandAloneTiles.push(tile);
-            }
-          }
-        });
+          });
 
         const allBundleTiles = [
           ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
@@ -287,7 +285,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       [
         privateAssetPackListingDatas,
         openedShopCategory,
-        assetPackRandomOrdering,
         onPrivateAssetPackSelection,
         starterPacksTiles,
         receivedAssetPacks,
@@ -342,7 +339,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getCategoryColumns(windowWidth)}
+              cols={getCategoryColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -361,7 +358,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -389,7 +386,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Column>
             )}
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -408,7 +405,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </Column>
         )}
         <GridList
-          cols={getShopItemsColumns(windowWidth)}
+          cols={getShopItemsColumns(windowSize, isLandscape)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}

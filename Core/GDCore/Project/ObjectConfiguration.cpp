@@ -5,11 +5,8 @@
  */
 #include "GDCore/Project/ObjectConfiguration.h"
 
-#include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -20,7 +17,7 @@ namespace gd {
 
 ObjectConfiguration::~ObjectConfiguration() {}
 
-ObjectConfiguration::ObjectConfiguration(): is3DObject(false) {}
+ObjectConfiguration::ObjectConfiguration() {}
 
 std::map<gd::String, gd::PropertyDescriptor> ObjectConfiguration::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;

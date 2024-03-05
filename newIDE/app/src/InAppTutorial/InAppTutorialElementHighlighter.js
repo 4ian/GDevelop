@@ -143,9 +143,9 @@ function InAppTutorialElementHighlighter({ element }: Props) {
             ...styles.scrollIndicator,
             animation: `0.5s ease-in-out 0s infinite alternate none running ${
               scrollDirection === 'top' || scrollDirection === 'bottom'
-                ? 'vertical'
-                : 'horizontal'
-            }-translate`,
+                ? 'vertical-translate'
+                : 'horizontal-translate'
+            }`,
             top:
               scrollDirection === 'top'
                 ? scrollParentRectangle.top + 15

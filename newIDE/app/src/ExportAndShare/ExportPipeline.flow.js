@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react';
-import { type Build } from '../Utils/GDevelopServices/Build';
+import { type Build, type BuildType } from '../Utils/GDevelopServices/Build';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
+import { type Quota } from '../Utils/GDevelopServices/Usage';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -13,11 +14,32 @@ export type ExportPipelineContext<ExportState> = {|
 
 export type HeaderProps<ExportState> = {|
   project: gdProject,
+  authenticatedUser: AuthenticatedUser,
   exportState: ExportState,
   updateExportState: (
     updater: (prevExportState: ExportState) => ExportState
   ) => void,
+  isExporting: boolean,
+  build: ?Build,
+  exportStep: BuildStep,
+  quota: ?Quota,
+|};
+
+export type ExportFlowProps = {|
+  project: gdProject,
   game: ?Game,
+  builds: ?Array<Build>,
+  build: ?Build,
+  onSaveProject: () => Promise<void>,
+  isSavingProject: boolean,
+  errored: boolean,
+  exportStep: BuildStep,
+  disabled: boolean,
+  launchExport: () => Promise<void>,
+  isExporting: boolean,
+  stepMaxProgress: number,
+  stepCurrentProgress: number,
+  onGameUpdated: () => Promise<void>,
 |};
 
 /**
@@ -31,15 +53,19 @@ export type ExportPipeline<
   CompressionOutput
 > = {|
   name: string,
-  onlineBuildType?: string,
+  onlineBuildType?: BuildType,
   limitedBuilds?: boolean,
   packageNameWarningType?: 'mobile' | 'desktop',
 
   getInitialExportState: (project: gdProject) => ExportState,
 
+  renderTutorial?: () => React.Node,
+
   renderHeader: (HeaderProps<ExportState>) => React.Node,
 
-  renderLaunchButtonLabel: () => React.Node,
+  shouldSuggestBumpingVersionNumber?: () => boolean,
+
+  renderExportFlow: (props: ExportFlowProps) => React.Node,
 
   canLaunchBuild: (
     exportState: ExportState,
@@ -48,15 +74,6 @@ export type ExportPipeline<
   ) => boolean,
 
   isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
-
-  renderCustomStepsProgress?: ({|
-    build: ?Build,
-    project: gdProject,
-    onSaveProject: () => Promise<void>,
-    isSavingProject: boolean,
-    errored: boolean,
-    exportStep: BuildStep,
-  |}) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -110,6 +127,5 @@ export type ExportPipeline<
   renderDoneFooter?: ({|
     compressionOutput: CompressionOutput,
     exportState: ExportState,
-    onClose: () => void,
   |}) => React.Node,
 |};

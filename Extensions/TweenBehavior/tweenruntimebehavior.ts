@@ -15,27 +15,44 @@ namespace gdjs {
   }
 
   function isScalable(
-    o: gdjs.RuntimeObject
-  ): o is gdjs.RuntimeObject & gdjs.Scalable {
-    //@ts-ignore We are checking if the methods are present.
-    return o.setScaleX && o.setScaleY && o.getScaleX && o.getScaleY;
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.Scalable {
+    return (
+      //@ts-ignore We are checking if the methods are present.
+      object.setScaleX &&
+      //@ts-ignore
+      object.setScaleY &&
+      //@ts-ignore
+      object.getScaleX &&
+      //@ts-ignore
+      object.getScaleY
+    );
   }
 
   function isOpaque(
-    o: gdjs.RuntimeObject
-  ): o is gdjs.RuntimeObject & gdjs.OpacityHandler {
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.OpacityHandler {
     //@ts-ignore We are checking if the methods are present.
-    return o.setOpacity && o.getOpacity;
+    return object.setOpacity && object.getOpacity;
   }
 
-  function isColorable(o: gdjs.RuntimeObject): o is IColorable {
+  function is3D(
+    object: gdjs.RuntimeObject
+  ): object is gdjs.RuntimeObject & gdjs.Base3DHandler {
     //@ts-ignore We are checking if the methods are present.
-    return o.setColor && o.getColor;
+    return object.getZ && object.setZ;
   }
 
-  function isCharacterScalable(o: gdjs.RuntimeObject): o is ICharacterScalable {
+  function isColorable(object: gdjs.RuntimeObject): object is IColorable {
     //@ts-ignore We are checking if the methods are present.
-    return o.setCharacterSize && o.getCharacterSize;
+    return object.setColor && object.getColor;
+  }
+
+  function isCharacterScalable(
+    object: gdjs.RuntimeObject
+  ): object is ICharacterScalable {
+    //@ts-ignore We are checking if the methods are present.
+    return object.setCharacterSize && object.getCharacterSize;
   }
 
   const linearInterpolation = gdjs.evtTools.common.lerp;
@@ -516,7 +533,7 @@ namespace gdjs {
       timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -621,7 +638,7 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -654,7 +671,7 @@ namespace gdjs {
       destroyObjectWhenFinished: boolean
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,
@@ -811,10 +828,7 @@ namespace gdjs {
       // This action doesn't require 3D capabilities.
       // So, gdjs.RuntimeObject3D may not exist
       // when the 3D extension is not used.
-      const owner3d =
-        gdjs.RuntimeObject3D && owner instanceof gdjs.RuntimeObject3D
-          ? owner
-          : null;
+      const owner3d = is3D(owner) ? owner : null;
 
       const setValue = scaleFromCenterOfObject
         ? (scale: float) => {
@@ -1756,7 +1770,7 @@ namespace gdjs {
       timeSource: gdjs.evtTools.tween.TimeSource
     ) {
       const { owner } = this;
-      if (!(owner instanceof gdjs.RuntimeObject3D)) return;
+      if (!is3D(owner)) return;
 
       this._tweens.addSimpleTween(
         identifier,

@@ -9,12 +9,19 @@ import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import assignIn from 'lodash/assignIn';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { ExplanationHeader, DoneFooter } from '../GenericExporters/HTML5Export';
+import {
+  ExplanationHeader,
+  DoneFooter,
+  ExportFlow,
+} from '../GenericExporters/HTML5Export';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
+
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -37,6 +44,8 @@ type ResourcesDownloadOutput = null;
 
 type CompressionOutput = null;
 
+const exportPipelineName = 'local-html5';
+
 export const localHTML5ExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -44,7 +53,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-html5',
+  name: exportPipelineName,
 
   getInitialExportState: (project: gdProject) => ({
     outputDir: project.getLastCompilationDirectory(),
@@ -54,27 +63,34 @@ export const localHTML5ExportPipeline: ExportPipeline<
 
   isNavigationDisabled: () => false,
 
-  renderHeader: ({ project, exportState, updateExportState }) => (
-    <Column noMargin expand>
-      <Line>
-        <ExplanationHeader />
-      </Line>
-      <Line>
-        <LocalFolderPicker
-          type="export"
-          value={exportState.outputDir}
-          defaultPath={project.getLastCompilationDirectory()}
-          onChange={outputDir => {
-            updateExportState(() => ({ outputDir }));
-            project.setLastCompilationDirectory(outputDir);
-          }}
-          fullWidth
-        />
-      </Line>
-    </Column>
+  renderTutorial: () => (
+    <DismissableTutorialMessage tutorialId="export-to-itch" />
   ),
 
-  renderLaunchButtonLabel: () => <Trans>Export as a HTML5 game</Trans>,
+  renderHeader: ({ project, exportState, updateExportState, exportStep }) =>
+    exportStep !== 'done' ? (
+      <Column noMargin expand>
+        <Line>
+          <ExplanationHeader />
+        </Line>
+        <Line>
+          <LocalFolderPicker
+            type="export"
+            value={exportState.outputDir}
+            defaultPath={project.getLastCompilationDirectory()}
+            onChange={outputDir => {
+              updateExportState(() => ({ outputDir }));
+              project.setLastCompilationDirectory(outputDir);
+            }}
+            fullWidth
+          />
+        </Line>
+      </Column>
+    ) : null,
+
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -143,7 +159,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
     return Promise.resolve(null);
   },
 
-  renderDoneFooter: ({ exportState, onClose }) => {
+  renderDoneFooter: ({ exportState }) => {
     const openExportFolder = () => {
       if (shell) shell.openPath(exportState.outputDir);
     };
@@ -152,7 +168,6 @@ export const localHTML5ExportPipeline: ExportPipeline<
       <DoneFooter
         renderGameButton={() => (
           <RaisedButton
-            fullWidth
             primary
             onClick={() => openExportFolder()}
             label={<Trans>Open the exported game folder</Trans>}

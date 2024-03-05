@@ -39,6 +39,8 @@ const PrivateGameTemplateInformationDialog = ({
       ]}
       open
       onRequestClose={onClose}
+      minHeight="lg"
+      flexColumnBody
     >
       <PrivateGameTemplateInformationPage
         privateGameTemplateListingData={privateGameTemplateListingData}
@@ -46,7 +48,6 @@ const PrivateGameTemplateInformationDialog = ({
           privateGameTemplateListingDatasFromSameCreator
         }
         onOpenPurchaseDialog={onOpenPurchaseDialog}
-        isPurchaseDialogOpen={isPurchaseDialogOpen}
         onGameTemplateOpen={onGameTemplateOpen}
         onCreateWithGameTemplate={onCreateWithGameTemplate}
       />

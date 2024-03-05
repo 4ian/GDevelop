@@ -29,8 +29,8 @@ import {
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Import default style of react-sortable-tree and the override made for EventsSheet.
 import 'react-sortable-tree/style.css';
@@ -80,10 +80,10 @@ const styles = {
   },
 };
 
-export const getIndentWidth = (windowWidth: WidthType) =>
-  windowWidth === 'small' ? smallIndentWidth : defaultIndentWidth;
-const getEventContainerStyle = (windowWidth: WidthType) =>
-  windowWidth === 'small'
+export const getIndentWidth = (windowSize: WindowSizeType) =>
+  windowSize === 'small' ? smallIndentWidth : defaultIndentWidth;
+const getEventContainerStyle = (windowSize: WindowSizeType) =>
+  windowSize === 'small'
     ? styles.smallEventContainer
     : styles.defaultEventContainer;
 
@@ -123,7 +123,7 @@ type EventsContainerProps = {|
   eventsSheetHeight: number,
 
   connectDragSource: ConnectDragSource,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
 
   idPrefix: string,
 |};
@@ -220,7 +220,7 @@ const EventContainer = (props: EventsContainerProps) => {
               renderObjectThumbnail={props.renderObjectThumbnail}
               screenType={props.screenType}
               eventsSheetHeight={props.eventsSheetHeight}
-              windowWidth={props.windowWidth}
+              windowSize={props.windowSize}
               idPrefix={props.idPrefix}
             />
           </div>
@@ -310,7 +310,7 @@ type EventsTreeProps = {|
   onScroll?: () => void,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
   eventsSheetHeight: number,
   fontSize?: number,
 
@@ -761,7 +761,7 @@ export default class ThemableEventsTree extends Component<
             <div
               style={{
                 opacity: isDragged ? 0.5 : 1,
-                ...getEventContainerStyle(this.props.windowWidth),
+                ...getEventContainerStyle(this.props.windowSize),
               }}
               {...dataObjectToProps({ rowIndex: node.rowIndex.toString() })}
             >
@@ -774,7 +774,7 @@ export default class ThemableEventsTree extends Component<
                 key={event.ptr}
                 eventsHeightsCache={this.eventsHeightsCache}
                 selection={this.props.selection}
-                leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
+                leftIndentWidth={depth * getIndentWidth(this.props.windowSize)}
                 onAddNewInstruction={instructionsListContext =>
                   this.props.onAddNewInstruction(
                     eventContext,
@@ -846,7 +846,7 @@ export default class ThemableEventsTree extends Component<
                 screenType={this.props.screenType}
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
-                windowWidth={this.props.windowWidth}
+                windowSize={this.props.windowSize}
                 idPrefix={`event-${node.relativeNodePath.join('-')}`}
               />
               {this.state.draggedNode && (
@@ -859,7 +859,7 @@ export default class ThemableEventsTree extends Component<
                   DnDComponent={DropTarget}
                   onDrop={this._onDrop}
                   activateTargets={!isDragged && !!this.state.draggedNode}
-                  windowWidth={this.props.windowWidth}
+                  windowSize={this.props.windowSize}
                   getNodeAtPath={path =>
                     getNodeAtPath({
                       path,
@@ -949,7 +949,7 @@ export default class ThemableEventsTree extends Component<
         )}
         <SortableTree
           treeData={treeData}
-          scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}
+          scaffoldBlockPxWidth={getIndentWidth(this.props.windowSize)}
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           canDrag={false}

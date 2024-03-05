@@ -501,6 +501,22 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         );
       });
     });
+
+    it('can stay on a rotated platform when its height changes', function () {
+      const platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      platform.setAngle(-45);
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+      const oldY = object.getY();
+      expect(object.getY()).to.be.within(-40, -39);
+
+      object.setHeight(object.getHeight() - 8);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getY()).to.be(oldY + 8);
+    });
   });
 
   [0, 25].forEach((slopeMaxAngle) => {

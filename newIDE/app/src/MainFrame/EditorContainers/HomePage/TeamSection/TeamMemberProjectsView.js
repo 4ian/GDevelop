@@ -2,12 +2,13 @@
 
 import * as React from 'react';
 import SectionContainer, { SectionRow } from '../SectionContainer';
-import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+import { Trans, t } from '@lingui/macro';
 import { Column, Line } from '../../../../UI/Grid';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import AlertMessage from '../../../../UI/AlertMessage';
 import { List } from '../../../../UI/List';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   type FileMetadataAndStorageProviderName,
   type FileMetadata,
@@ -25,6 +26,11 @@ import {
   transformCloudProjectsIntoFileMetadataWithStorageProviderName,
 } from '../BuildSection/utils';
 import ProjectFileListItem from '../BuildSection/ProjectFileListItem';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../../UI/Menu/ContextMenu';
+import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
+import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
 
 const styles = {
   listItem: {
@@ -58,9 +64,9 @@ const TeamMemberProjectsView = ({
   onRefreshProjects,
   isLoadingProjects,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const skeletonLineHeight = getProjectLineHeight(windowWidth);
+  const { isMobile } = useResponsiveWindowSize();
+  const skeletonLineHeight = getProjectLineHeight({ isMobile });
+  const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
   const fileMetadataAndStorageProviderNames = projects
     ? transformCloudProjectsIntoFileMetadataWithStorageProviderName(
@@ -68,6 +74,24 @@ const TeamMemberProjectsView = ({
         user.id
       )
     : null;
+
+  const buildContextMenu = (
+    i18n: I18nType,
+    file: ?FileMetadataAndStorageProviderName
+  ): Array<MenuItemTemplate> => {
+    if (!file) return [];
+    return [{ label: i18n._(t`Open`), click: () => onOpenRecentFile(file) }];
+  };
+
+  const openContextMenu = React.useCallback(
+    (event: ClientCoordinates, file: FileMetadataAndStorageProviderName) => {
+      if (contextMenu.current) {
+        contextMenu.current.open(event.clientX, event.clientY, { file });
+      }
+    },
+    []
+  );
+
   return (
     <SectionContainer
       title={<Trans>{user.username || user.email}'s projects</Trans>}
@@ -143,10 +167,11 @@ const TeamMemberProjectsView = ({
                     file={file}
                     currentFileMetadata={currentFileMetadata}
                     key={file.fileMetadata.fileIdentifier}
+                    isLoading={false}
+                    onOpenContextMenu={openContextMenu}
                     onOpenRecentFile={onOpenRecentFile}
                     storageProviders={storageProviders}
-                    isWindowWidthMediumOrLarger={!isMobile}
-                    hideDeleteContextMenuAction={true}
+                    isWindowSizeMediumOrLarger={!isMobile}
                   />
                 ))}
               </List>
@@ -154,6 +179,10 @@ const TeamMemberProjectsView = ({
           </Column>
         </Line>
       </SectionRow>
+      <ContextMenu
+        ref={contextMenu}
+        buildMenuTemplate={(_i18n, { file }) => buildContextMenu(_i18n, file)}
+      />
     </SectionContainer>
   );
 };

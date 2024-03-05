@@ -14,7 +14,7 @@ import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Paper from '../../UI/Paper';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Silver from './Icons/Silver';
 import Gold from './Icons/Gold';
 import Startup from './Icons/Startup';
@@ -267,8 +267,7 @@ type Props = {|
 
 const PlanCard = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const planIcon = getPlanIcon(props.subscriptionPlanWithPricingSystems);
 
@@ -278,8 +277,8 @@ const PlanCard = (props: Props) => {
         <Paper
           background={props.background}
           style={{
-            paddingRight: isMobileScreen ? 8 : 32,
-            paddingLeft: !!planIcon ? 0 : isMobileScreen ? 8 : 65,
+            paddingRight: isMobile ? 8 : 32,
+            paddingLeft: !!planIcon ? 0 : isMobile ? 8 : 65,
             border: `1px solid ${gdevelopTheme.text.color.disabled}`,
             paddingTop: 16,
             paddingBottom: 16,

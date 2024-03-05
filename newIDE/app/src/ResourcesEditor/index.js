@@ -7,7 +7,7 @@ import ResourcePropertiesEditor, {
   type ResourcePropertiesEditorInterface,
 } from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
-import EditorMosaic from '../UI/EditorMosaic';
+import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -70,7 +70,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     setToolbar: () => {},
   };
   resourceExternallyChangedCallbackId: ?string;
-  editorMosaic: ?EditorMosaic = null;
+  editorMosaic: ?EditorMosaicInterface = null;
   _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesList = null;
   resourcesLoader = ResourcesLoader;

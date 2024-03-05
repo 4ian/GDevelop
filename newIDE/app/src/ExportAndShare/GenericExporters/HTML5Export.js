@@ -12,26 +12,28 @@ import GameJolt from '../../UI/CustomSvgIcons/GameJolt';
 import Poki from '../../UI/CustomSvgIcons/Poki';
 import CrazyGames from '../../UI/CustomSvgIcons/CrazyGames';
 import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
+import Check from '../../UI/CustomSvgIcons/Check';
+import Help from '../../UI/CustomSvgIcons/Help';
+import RaisedButton from '../../UI/RaisedButton';
+import { type ExportFlowProps } from '../ExportPipeline.flow';
 
-const getIconStyle = windowWidth => {
-  const isMobileScreen = windowWidth === 'small';
+const getIconStyle = ({ isMobile }: {| isMobile: boolean |}) => {
   return {
-    height: isMobileScreen ? 30 : 48,
-    width: isMobileScreen ? 30 : 48,
+    height: isMobile ? 30 : 48,
+    width: isMobile ? 30 : 48,
     margin: 10,
   };
 };
 
 export const ExplanationHeader = () => {
-  const windowWidth = useResponsiveWindowWidth();
-  const iconStyle = getIconStyle(windowWidth);
+  const { isMobile } = useResponsiveWindowSize();
+  const iconStyle = getIconStyle({ isMobile });
   return (
     <Column noMargin>
-      <DismissableTutorialMessage tutorialId="export-to-itch" />
       <Line>
-        <Text>
+        <Text align="center">
           <Trans>
             This will export your game to a folder. You can then upload it on a
             website/game hosting service and share it on marketplaces and gaming
@@ -50,80 +52,85 @@ export const ExplanationHeader = () => {
   );
 };
 
+type HTML5ExportFlowProps = {|
+  ...ExportFlowProps,
+  exportPipelineName: string,
+|};
+
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+}: HTML5ExportFlowProps) =>
+  exportStep !== 'done' ? (
+    <Line justifyContent="center">
+      <RaisedButton
+        label={
+          !isExporting ? (
+            <Trans>Export as a HTML5 game</Trans>
+          ) : (
+            <Trans>Exporting...</Trans>
+          )
+        }
+        primary
+        id={`launch-export-${exportPipelineName}-button`}
+        onClick={launchExport}
+        disabled={disabled || isExporting}
+      />
+    </Line>
+  ) : null;
+
 export const DoneFooter = ({
   renderGameButton,
 }: {|
   renderGameButton: () => React.Node,
-|}) => (
-  <Column noMargin>
-    <Text>
-      <Trans>
-        You can now upload the game to a web hosting to play to the game.
-      </Trans>
-    </Text>
-    <AlertMessage kind="warning">
-      <Trans>
-        Your game won't work if you open index.html on your computer. You must
-        upload it to a web hosting (Kongregate, Itch.io, etc...) or a web server
-        to run it.
-      </Trans>
-    </AlertMessage>
-    <Spacer />
-    {renderGameButton()}
-    <Spacer />
-    <FlatButton
-      fullWidth
-      primary
-      onClick={() =>
-        Window.openExternalURL(
-          getHelpLink('/publishing/publishing-to-gamejolt-store')
-        )
-      }
-      label={<Trans>Publish your game on Game Jolt</Trans>}
-      leftIcon={<GameJolt />}
-    />
-    <FlatButton
-      fullWidth
-      primary
-      onClick={() =>
-        Window.openExternalURL('https://gdevelop.io/page/crazy-games')
-      }
-      label={<Trans>Publish your game on CrazyGames.com</Trans>}
-      leftIcon={<CrazyGames />}
-    />
-    <FlatButton
-      fullWidth
-      primary
-      onClick={() =>
-        Window.openExternalURL(
-          getHelpLink('/publishing/publishing-to-kongregate-store')
-        )
-      }
-      label={<Trans>Publish your game on Kongregate</Trans>}
-    />
-    <FlatButton
-      fullWidth
-      primary
-      onClick={() =>
-        Window.openExternalURL(getHelpLink('/publishing/publishing-to-itch-io'))
-      }
-      label={<Trans>Publish your game on Itch.io</Trans>}
-      leftIcon={<ItchIo />}
-    />
-    <FlatButton
-      fullWidth
-      primary
-      onClick={() => Window.openExternalURL('https://gdevelop.io/page/poki')}
-      label={<Trans>Publish your game on Poki.com</Trans>}
-      leftIcon={<Poki />}
-    />
-    <FlatButton
-      fullWidth
-      onClick={() => Window.openExternalURL(getHelpLink('/publishing'))}
-      label={<Trans>Learn more about publishing</Trans>}
-    />
-  </Column>
-);
+|}) => {
+  const openLearnMore = () => {
+    Window.openExternalURL(
+      getHelpLink(
+        '/publishing/html5_game_in_a_local_folder/#3rd-party-hosting-sites'
+      )
+    );
+  };
+
+  return (
+    <Column noMargin alignItems="center">
+      <LineStackLayout noMargin justifyContent="center" alignItems="center">
+        <Check fontSize="small" />
+        <Text>
+          <Trans>Done!</Trans>
+        </Text>
+      </LineStackLayout>
+      <Text>
+        <Trans>
+          You can now upload the game to a web hosting to play to the game.
+        </Trans>
+      </Text>
+      <Spacer />
+      <ColumnStackLayout justifyContent="center">
+        <Line justifyContent="center">{renderGameButton()}</Line>
+        <FlatButton
+          label={<Trans>Learn more about publishing to platforms</Trans>}
+          primary
+          onClick={openLearnMore}
+          leftIcon={<Help />}
+        />
+      </ColumnStackLayout>
+      <Spacer />
+      <Line>
+        <AlertMessage kind="info">
+          <Trans>
+            Your game won't work if you open the index.html file on your
+            computer. You must upload it to a web hosting platform (Itch.io,
+            Poki, CrazyGames etc...) or a web server to run it.
+          </Trans>
+        </AlertMessage>
+      </Line>
+    </Column>
+  );
+};
 
 export const html5Exporter = {
   key: 'webexport',

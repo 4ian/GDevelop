@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
-import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 

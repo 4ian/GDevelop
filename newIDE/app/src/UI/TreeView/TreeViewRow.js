@@ -120,6 +120,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const {
     flattenedData,
     onOpen,
+    onClick,
     onSelect,
     onBlurField,
     onEndRenaming,
@@ -128,8 +129,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     canDrop,
     onDrop,
     onEditItem,
-    isMobileScreen,
-    shouldHideMenuIcon,
+    isMobile,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
@@ -160,7 +160,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });
 
-  const onClick = React.useCallback(
+  const onClickItem = React.useCallback(
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
@@ -168,16 +168,17 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         return;
       }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
+      onClick(node);
     },
-    [onSelect, node, onOpen]
+    [onClick, onSelect, node, onOpen]
   );
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      onClick(event);
+      onClickItem(event);
       openContextMenu(event);
     },
-    [onClick, openContextMenu]
+    [onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(
@@ -389,8 +390,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           const rightButton = node.rightButton;
 
           const shouldDisplayMenu =
-            !shouldHideMenuIcon &&
-            !isMobileScreen &&
+            !node.shouldHideMenuIcon &&
+            !isMobile &&
             !node.item.isRoot &&
             !node.item.isPlaceholder;
 
@@ -456,7 +457,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           const dropTarget = connectDropTarget(
             <div
               id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
-              onClick={onClick}
+              onClick={onClickItem}
               className={
                 'row-container' +
                 (node.selected ? ' selected' : '') +

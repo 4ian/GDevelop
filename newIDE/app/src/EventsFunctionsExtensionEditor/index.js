@@ -6,7 +6,10 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
-import EditorMosaic, { mosaicContainsNode } from '../UI/EditorMosaic';
+import EditorMosaic, {
+  type EditorMosaicInterface,
+  mosaicContainsNode,
+} from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsListWithErrorBoundary, {
@@ -21,7 +24,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ObjectMethodSelectorDialog from './ObjectMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import EditorNavigator, {
   type EditorNavigatorInterface,
 } from '../UI/EditorMosaic/EditorNavigator';
@@ -116,7 +119,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
   editor: ?EventsSheetInterface;
   eventsFunctionList: ?EventsFunctionsListInterface;
-  _editorMosaic: ?EditorMosaic;
+  _editorMosaic: ?EditorMosaicInterface;
   _editorNavigator: ?EditorNavigatorInterface;
   // Create an empty "context" of objects.
   // Avoid recreating containers if they were already created, so that
@@ -1191,6 +1194,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         noTitleBar:
           !!selectedEventsFunction ||
           (!selectedEventsBasedBehavior && !selectedEventsBasedObject),
+        noSoftKeyboardAvoidance: true,
         title: selectedEventsBasedBehavior
           ? t`Behavior Configuration`
           : selectedEventsBasedObject
@@ -1352,8 +1356,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     return (
       <React.Fragment>
         <ResponsiveWindowMeasurer>
-          {windowWidth =>
-            windowWidth === 'small' ? (
+          {({ isMobile }) =>
+            isMobile ? (
               <EditorNavigator
                 ref={editorNavigator =>
                   (this._editorNavigator = editorNavigator)

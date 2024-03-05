@@ -103,6 +103,27 @@ namespace gdjs {
     flipZ(enable: boolean): void;
 
     isFlippedZ(): boolean;
+
+    /**
+     * Return the bottom Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getUnrotatedAABBMinZ(): number;
+
+    /**
+     * Return the top Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getUnrotatedAABBMaxZ(): number;
+  }
+
+  export namespace Base3DHandler {
+    export const is3D = (
+      object: gdjs.RuntimeObject
+    ): object is gdjs.RuntimeObject & gdjs.Base3DHandler => {
+      //@ts-ignore We are checking if the methods are present.
+      return object.getZ && object.setZ;
+    };
   }
 
   /**
@@ -201,6 +222,14 @@ namespace gdjs {
 
     isFlippedZ(): boolean {
       return this.object.isFlippedZ();
+    }
+
+    getUnrotatedAABBMinZ(): number {
+      return this.object.getUnrotatedAABBMinZ();
+    }
+
+    getUnrotatedAABBMaxZ(): number {
+      return this.object.getUnrotatedAABBMaxZ();
     }
   }
 

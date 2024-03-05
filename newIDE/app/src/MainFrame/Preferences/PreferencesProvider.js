@@ -26,6 +26,7 @@ import {
   setLanguageInDOM,
   selectLanguageOrLocale,
 } from '../../Utils/Language';
+import { CHECK_APP_UPDATES_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -184,7 +185,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    setTimeout(() => this._checkUpdates(), 10000);
+    setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
   }
 
   _setLanguage(language: string) {

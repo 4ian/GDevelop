@@ -15,7 +15,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: gdProject,
@@ -38,8 +38,7 @@ export const NewResourceDialog = ({
   onClose,
   onChooseResources,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);
@@ -157,7 +156,7 @@ export const NewResourceDialog = ({
             { label: <Trans>Choose a file</Trans>, value: 'import' },
           ]}
           // Enforce scroll on very small screens, because the tabs have long names.
-          variant={isMobileScreen ? 'scrollable' : undefined}
+          variant={isMobile ? 'scrollable' : undefined}
         />
       }
     >

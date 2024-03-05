@@ -9,7 +9,7 @@ import Slider from '../../../UI/Slider';
 import ValueStateHolder from '../../ValueStateHolder';
 
 export default {
-  title: 'Slider',
+  title: 'UI Building Blocks/Slider',
   component: Slider,
   decorators: [paperDecorator, muiDecorator],
 };

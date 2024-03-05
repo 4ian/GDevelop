@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -19,13 +18,16 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineElectronExport';
+
 const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
@@ -46,6 +48,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-online-electron';
+
 export const browserOnlineElectronExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,7 +57,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-electron',
+  name: exportPipelineName,
   onlineBuildType: 'electron-build',
   limitedBuilds: true,
   packageNameWarningType: 'desktop',
@@ -75,7 +79,9 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Create installation file</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

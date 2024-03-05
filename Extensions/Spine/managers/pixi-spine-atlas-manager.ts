@@ -138,16 +138,15 @@ namespace gdjs {
         this._loadedSpineAtlases.set(resource, atlas);
         callback(null, atlas);
       };
+      const url = this._resourceLoader.getFullUrl(resource.file);
 
       PIXI.Assets.setPreferences({
         preferWorkers: false,
-        crossOrigin: this._resourceLoader.checkIfCredentialsRequired(
-          resource.file
-        )
+        crossOrigin: this._resourceLoader.checkIfCredentialsRequired(url)
           ? 'use-credentials'
           : 'anonymous',
       });
-      PIXI.Assets.add(resource.name, resource.file, { images });
+      PIXI.Assets.add(resource.name, url, { images });
       PIXI.Assets.load<pixi_spine.TextureAtlas | string>(resource.name).then(
         (atlas) => {
           /**

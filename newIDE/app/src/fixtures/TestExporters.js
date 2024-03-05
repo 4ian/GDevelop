@@ -5,6 +5,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
+  type ExportFlowProps,
 } from '../ExportAndShare/ExportPipeline.flow';
 import {
   type UrlFileDescriptor,
@@ -13,12 +14,10 @@ import {
 } from '../Utils/BrowserArchiver';
 import BrowserFileSystem from '../ExportAndShare/BrowserExporters/BrowserFileSystem';
 import { completeWebBuild } from '../fixtures/GDevelopServicesTestData';
-import {
-  ExplanationHeader,
-  OnlineGameLink,
-} from '../ExportAndShare/GenericExporters/OnlineWebExport';
+import { ExplanationHeader } from '../ExportAndShare/GenericExporters/OnlineWebExport';
 import { delay } from '../Utils/Delay';
 import assignIn from 'lodash/assignIn';
+import OnlineWebExportFlow from '../ExportAndShare/GenericExporters/OnlineWebExport/OnlineWebExportFlow';
 const gd: libGDevelop = global.gd;
 type ExportState = null;
 
@@ -40,6 +39,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-online-web';
+
 export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -47,7 +48,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-web',
+  name: exportPipelineName,
   onlineBuildType: 'web-build',
 
   getInitialExportState: () => null,
@@ -60,26 +61,10 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
+  renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => 'Generate link',
-
-  renderCustomStepsProgress: ({
-    build,
-    project,
-    onSaveProject,
-    isSavingProject,
-    errored,
-    exportStep,
-  }) => (
-    <OnlineGameLink
-      build={build}
-      project={project}
-      onSaveProject={onSaveProject}
-      isSavingProject={isSavingProject}
-      errored={errored}
-      exportStep={exportStep}
-    />
+  renderExportFlow: (props: ExportFlowProps) => (
+    <OnlineWebExportFlow {...props} exportPipelineName={exportPipelineName} />
   ),
 
   prepareExporter: async (

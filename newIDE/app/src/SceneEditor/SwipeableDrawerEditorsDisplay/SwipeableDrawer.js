@@ -7,6 +7,10 @@ import { getBackgroundColor } from '../../UI/Paper';
 import { ColumnStackLayout } from '../../UI/Layout';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import useSwipeGesture from './UseSwipeGesture';
+import {
+  getAvoidSoftKeyboardStyle,
+  useSoftKeyboardBottomOffset,
+} from '../../UI/MobileSoftKeyboard';
 
 const topMargin = 52; // This is equal to the height of the bottom bar.
 
@@ -19,7 +23,6 @@ const styles = {
     display: 'flex',
     flex: 1,
     overflowY: 'auto',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     overflowX: 'hidden',
   },
   topBarContainer: {
@@ -44,14 +47,16 @@ type SwipeableDrawerTopBarProps = {|
   onClick: () => void,
   onSwipeUp: () => void,
   onSwipeDown: () => void,
+  containerRef: {| current: ?HTMLDivElement |},
   controls: ?React.Node,
 |};
 
 const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { onTouchStart, onTouchEnd } = useSwipeGesture({
+  const { onTouchStart, onTouchEnd, onTouchMove } = useSwipeGesture({
     onSwipeUp: props.onSwipeUp,
     onSwipeDown: props.onSwipeDown,
+    containerRef: props.containerRef,
   });
 
   return (
@@ -63,6 +68,7 @@ const SwipeableDrawerTopBar = (props: SwipeableDrawerTopBarProps) => {
       onClick={props.onClick}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
+      onTouchMove={onTouchMove}
     >
       <ColumnStackLayout noMargin>
         <div style={styles.topBarHandleContainer}>
@@ -101,7 +107,26 @@ type Props = {|
   topBarControls?: ?React.Node,
 |};
 
+function useAnimationOpeningState(openingState: DrawerOpeningState) {
+  const lastOpeningState = React.useRef<DrawerOpeningState>(openingState);
+  React.useEffect(
+    () => {
+      lastOpeningState.current = openingState;
+    },
+    [openingState]
+  );
+
+  // Animate the half opening of the drawer, to give a hint that it can be opened
+  // even more.
+  if (openingState === 'halfOpen') {
+    if (lastOpeningState.current === 'closed') return 'swipe-up-ending';
+  }
+
+  return null;
+}
+
 const SwipeableDrawer = (props: Props) => {
+  const containerRef = React.useRef<?HTMLDivElement>(null);
   const { openingState, setOpeningState } = props;
   const height =
     openingState === 'closed'
@@ -110,9 +135,25 @@ const SwipeableDrawer = (props: Props) => {
       ? props.maxHeight * 0.42 // Empirical value that leaves space in both editor and canvas.
       : props.maxHeight - topMargin;
   const display = openingState === 'closed' ? 'none' : 'flex';
+  const animationOpeningState = useAnimationOpeningState(openingState);
+
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
+
   return (
-    <div style={{ ...styles.container, height, display }}>
+    <div
+      style={{
+        ...styles.container,
+        height,
+        display,
+        ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
+        animation: animationOpeningState
+          ? `${animationOpeningState} 0.4s ease-out`
+          : undefined,
+      }}
+      ref={containerRef}
+    >
       <SwipeableDrawerTopBar
+        containerRef={containerRef}
         title={props.title}
         onClick={() => setOpeningState('closed')}
         onSwipeUp={() => {

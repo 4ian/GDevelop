@@ -21,12 +21,13 @@ import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import { Trans } from '@lingui/macro';
-import ProductPriceTag, { formatProductPrice } from './ProductPriceTag';
+import ProductPriceTag, { renderProductPrice } from './ProductPriceTag';
 import { AssetCard } from './AssetCard';
 import FolderIcon from '../UI/CustomSvgIcons/Folder';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
 
 const styles = {
   priceTagContainer: {
@@ -43,6 +44,24 @@ const styles = {
     objectFit: 'cover',
     position: 'relative',
   },
+  thumbnailContainer: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  redeemableContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '4px 8px',
+    backgroundColor: '#FF8569',
+    color: '#1D1D26',
+  },
+  redeemableDiamondIcon: { height: 24 },
   promoImage: {
     width: '20%',
     minWidth: 200,
@@ -50,6 +69,8 @@ const styles = {
   },
   paper: {
     margin: 4,
+    display: 'flex',
+    flexDirection: 'column',
   },
   packTitle: {
     ...textEllipsisStyle,
@@ -73,6 +94,7 @@ const styles = {
   promoImageContainer: {
     display: 'flex',
     flex: 0,
+    justifyContent: 'center',
   },
 };
 
@@ -239,12 +261,26 @@ export const PrivateAssetPackTile = ({
       onClick={onSelect}
     >
       <Paper elevation={2} style={styles.paper} background="light">
-        <CorsAwareImage
-          key={assetPackListingData.name}
-          style={styles.previewImage}
-          src={assetPackListingData.thumbnailUrls[0]}
-          alt={`Preview image of asset pack ${assetPackListingData.name}`}
-        />
+        <div style={styles.thumbnailContainer}>
+          <CorsAwareImage
+            key={assetPackListingData.name}
+            style={styles.previewImage}
+            src={assetPackListingData.thumbnailUrls[0]}
+            alt={`Preview image of asset pack ${assetPackListingData.name}`}
+          />
+          {assetPackListingData.redeemConditions && !owned && (
+            <div style={styles.redeemableContainer}>
+              <img
+                src="res/small-diamond.svg"
+                style={styles.redeemableDiamondIcon}
+                alt="diamond"
+              />
+              <Text color="inherit" noMargin>
+                <Trans>Claim this pack</Trans>
+              </Text>
+            </div>
+          )}
+        </div>
         <div style={styles.priceTagContainer}>
           <ProductPriceTag
             productListingData={assetPackListingData}
@@ -289,16 +325,18 @@ export const PromoBundleCard = ({
               border: `2px solid ${gdevelopTheme.palette.secondary}`,
             }}
           >
-            <Line expand noMargin>
-              <CorsAwareImage
-                key={productListingData.name}
-                style={{
-                  ...styles.previewImage,
-                  ...styles.promoImage,
-                }}
-                src={productListingData.thumbnailUrls[0]}
-                alt={`Preview image of bundle ${productListingData.name}`}
-              />
+            <ResponsiveLineStackLayout expand noMargin>
+              <div style={styles.promoImageContainer}>
+                <CorsAwareImage
+                  key={productListingData.name}
+                  style={{
+                    ...styles.previewImage,
+                    ...styles.promoImage,
+                  }}
+                  src={productListingData.thumbnailUrls[0]}
+                  alt={`Preview image of bundle ${productListingData.name}`}
+                />
+              </div>
               <Column expand alignItems="flex-start" justifyContent="center">
                 <Text color="primary" size="section-title">
                   {!owned ? (
@@ -309,23 +347,25 @@ export const PromoBundleCard = ({
                     <Trans>You already own this template!</Trans>
                   )}
                 </Text>
-                <Text style={styles.packTitle} color="primary" size="body2">
+                <Text color="primary" size="body2">
                   {!owned ? (
                     productListingData.productType === 'ASSET_PACK' ? (
                       <Trans>
                         This pack is included in this bundle for{' '}
-                        {formatProductPrice({
+                        {renderProductPrice({
                           i18n,
                           productListingData,
+                          plainText: true,
                         })}
                         !
                       </Trans>
                     ) : (
                       <Trans>
                         This template is included in this bundle for{' '}
-                        {formatProductPrice({
+                        {renderProductPrice({
                           i18n,
                           productListingData,
+                          plainText: true,
                         })}
                         !
                       </Trans>
@@ -338,21 +378,23 @@ export const PromoBundleCard = ({
                 </Text>
               </Column>
               <Column justifyContent="center">
-                {!owned ? (
-                  <FlatButton
-                    label={<Trans>See this bundle</Trans>}
-                    onClick={onSelect}
-                    primary
-                  />
-                ) : (
-                  <RaisedButton
-                    label={<Trans>See this bundle</Trans>}
-                    onClick={onSelect}
-                    primary
-                  />
-                )}
+                <Line justifyContent="center">
+                  {!owned ? (
+                    <FlatButton
+                      label={<Trans>See this bundle</Trans>}
+                      onClick={onSelect}
+                      primary
+                    />
+                  ) : (
+                    <RaisedButton
+                      label={<Trans>See this bundle</Trans>}
+                      onClick={onSelect}
+                      primary
+                    />
+                  )}
+                </Line>
               </Column>
-            </Line>
+            </ResponsiveLineStackLayout>
           </div>
         </Line>
       )}

@@ -7,7 +7,10 @@ import {
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type Release } from '../../Utils/GDevelopServices/Release';
-import { type Build } from '../../Utils/GDevelopServices/Build';
+import {
+  type Build,
+  type SigningCredential,
+} from '../../Utils/GDevelopServices/Build';
 import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 import {
   type ExtensionShortHeader,
@@ -27,7 +30,10 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
 import { type Comment } from '../../Utils/GDevelopServices/Play';
-import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
+import {
+  type Announcement,
+  type Promotion,
+} from '../../Utils/GDevelopServices/Announcement';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export const indieFirebaseUser: FirebaseUser = {
@@ -1326,7 +1332,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
   message: undefined,
 };
 
-const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
+export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   loginState: 'done',
@@ -1385,6 +1391,8 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   ],
   receivedGameTemplates: [],
   receivedAssetShortHeaders: [],
+  gameTemplatePurchases: [],
+  assetPackPurchases: [],
   onLogin: async () => {},
   onLoginWithProvider: async () => {},
   onCancelLogin: () => {},
@@ -1407,6 +1415,12 @@ const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshLimits: async () => {
     console.info('This should refresh the limits');
+  },
+  onRefreshGameTemplatePurchases: async () => {
+    console.info('This should refresh the game template purchases');
+  },
+  onRefreshAssetPackPurchases: async () => {
+    console.info('This should refresh the asset pack purchases');
   },
   onPurchaseSuccessful: async () => {
     console.info('This should refresh the assets');
@@ -1435,6 +1449,7 @@ export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser 
 };
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: subscriptionForSilverUser,
   cloudProjects: tenCloudProjects,
 };
 
@@ -2463,6 +2478,7 @@ export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData 
   createdAt: '2020-01-01',
   thumbnailUrls: [],
   prices: [],
+  creditPrices: [],
   appStoreProductId: 'fake-app-store-product-id',
   includedListableProductIds: [],
   sellerStripeAccountId: 'fake-seller-stripe-account-id',
@@ -2707,7 +2723,224 @@ export const fakeAnnouncements: Announcement[] = [
     },
     markdownMessageByLocale: {
       en:
-        '[![GDevelop Android](https://resources.gdevelop.io/announcements/GDevelop_Android.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
     },
+    mobileMarkdownMessageByLocale: {
+      en:
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+    },
+  },
+];
+
+export const fakeGameTemplateLicenses = [
+  {
+    id: 'personal',
+    nameByLocale: {
+      en: 'Personal',
+    },
+    descriptionByLocale: {
+      en: 'Use this game template for personal non-monetised projects only.',
+    },
+  },
+  {
+    id: 'commercial',
+    nameByLocale: {
+      en: 'Single commercial use',
+    },
+    descriptionByLocale: {
+      en: 'Use this game template for one commercial game only.',
+    },
+  },
+  {
+    id: 'unlimited',
+    nameByLocale: {
+      en: 'Unlimited commercial use',
+    },
+    descriptionByLocale: {
+      en:
+        'Use this game template for unlimited commercial games, on an unlimited number of projects and platforms.',
+    },
+  },
+];
+
+export const fakeAssetPackLicenses = [
+  {
+    id: 'personal',
+    nameByLocale: {
+      en: 'Personal',
+    },
+    descriptionByLocale: {
+      en: 'Use these assets for personal non-monetised projects only.',
+    },
+  },
+  {
+    id: 'commercial',
+    nameByLocale: {
+      en: 'Single commercial use',
+    },
+    descriptionByLocale: {
+      en: 'Use these assets for one commercial game only.',
+    },
+  },
+  {
+    id: 'unlimited',
+    nameByLocale: {
+      en: 'Unlimited commercial use',
+    },
+    descriptionByLocale: {
+      en:
+        'Use these assets for unlimited commercial games, on an unlimited number of projects and platforms.',
+    },
+  },
+];
+
+export const fakePromotions: Promotion[] = [
+  {
+    id: 'gdevelop-mega-pack',
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg',
+    productId: '43994a30-c54b-4f5d-baf5-6e1f99b13824',
+    display: 'all',
+    type: 'asset-pack',
+  },
+  {
+    id: 'premium-featuring-bubble-dogs',
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelop_Quiz_Template.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelop_Quiz_Template_Mobile.jpg',
+    linkUrl: 'https://gd.games/gdevelop',
+    display: 'all',
+    type: 'game',
+  },
+  {
+    id: 'gdevelop-produce-farm-bundle',
+    imageUrl:
+      'https://resources.gdevelop.io/announcements/GDevelop_Produce_Farm_Bundle.png',
+    mobileImageUrl:
+      'https://resources.gdevelop.io/announcements/Produce_Farm_Bundle_Mobile.jpg',
+    productId: '30933458-99e6-41b5-a5f6-5bb220e8754f',
+    display: 'all',
+    type: 'asset-pack',
+  },
+];
+
+export const mockSigningCredentials: Array<SigningCredential> = [
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 1',
+    certificateSerial: '12345',
+    hasCertificateReady: true,
+    kind: 'distribution',
+    provisioningProfiles: [
+      {
+        uuid: '12345678',
+        name: 'My provisioning profile',
+      },
+      {
+        uuid: '12345679',
+        name: 'My other provisioning profile',
+      },
+    ],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 1',
+    certificateSerial: '22345',
+    hasCertificateReady: true,
+    kind: 'development',
+    provisioningProfiles: [
+      {
+        uuid: '22345678',
+        name: 'My dev provisioning profile',
+      },
+      {
+        uuid: '22345679',
+        name: 'My other dev provisioning profile',
+      },
+    ],
+  },
+  // No provisioning profiles
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 2',
+    certificateSerial: '12346',
+    hasCertificateReady: true,
+    kind: 'distribution',
+    provisioningProfiles: [],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 2',
+    certificateSerial: '22346',
+    hasCertificateReady: true,
+    kind: 'development',
+    provisioningProfiles: [],
+  },
+  // Not ready
+  {
+    type: 'apple-certificate',
+    name: 'Some certificate 3',
+    certificateSerial: '12347',
+    hasCertificateReady: false,
+    kind: 'distribution',
+    provisioningProfiles: [
+      {
+        uuid: '12345678',
+        name: 'My provisioning profile',
+      },
+    ],
+  },
+  {
+    type: 'apple-certificate',
+    name: 'Some dev certificate 3',
+    certificateSerial: '22347',
+    hasCertificateReady: false,
+    kind: 'development',
+    provisioningProfiles: [
+      {
+        uuid: '22345678',
+        name: 'My dev provisioning profile',
+      },
+    ],
+  },
+  // Unkown kind
+  {
+    type: 'apple-certificate',
+    name: 'Some unknown certificate 4',
+    certificateSerial: '12347',
+    hasCertificateReady: true,
+    kind: 'unknown',
+    provisioningProfiles: [
+      {
+        uuid: '12345610',
+        name: 'My yet other unknown provisioning profile',
+      },
+    ],
+  },
+
+  // Auth keys:
+  {
+    type: 'apple-auth-key',
+    name: 'Some Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE34',
+    hasAuthKeyReady: true,
+  },
+  {
+    type: 'apple-auth-key',
+    name: 'Some Not Ready Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE35',
+    hasAuthKeyReady: false,
+  },
+  {
+    type: 'apple-auth-key',
+    name: 'Some Other Auth Key',
+    apiIssuer: 'some-issuer',
+    apiKey: '12FAKE36',
+    hasAuthKeyReady: true,
   },
 ];

@@ -1,6 +1,7 @@
 // @flow
 import { type Exporter } from '../ShareDialog';
 import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport';
+import { browserOnlineCordovaIosExportPipeline } from './BrowserOnlineCordovaIosExport';
 import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport';
 import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';
 import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
@@ -12,6 +13,7 @@ import { onlineWebExporter } from '../GenericExporters/OnlineWebExport';
 import { html5Exporter } from '../GenericExporters/HTML5Export';
 import { facebookInstantGamesExporter } from '../GenericExporters/FacebookInstantGamesExport';
 import { onlineCordovaExporter } from '../GenericExporters/OnlineCordovaExport';
+import { onlineCordovaIosExporter } from '../GenericExporters/OnlineCordovaIosExport';
 import { onlineElectronExporter } from '../GenericExporters/OnlineElectronExport';
 import { electronExporter } from '../GenericExporters/ElectronExport';
 
@@ -28,6 +30,10 @@ export const browserAutomatedExporters: Array<Exporter> = [
   {
     ...onlineCordovaExporter,
     exportPipeline: browserOnlineCordovaExportPipeline,
+  },
+  {
+    ...onlineCordovaIosExporter,
+    exportPipeline: browserOnlineCordovaIosExportPipeline,
   },
   {
     ...onlineElectronExporter,

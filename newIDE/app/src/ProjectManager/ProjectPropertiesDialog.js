@@ -31,7 +31,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
 type Props = {|
@@ -212,8 +212,7 @@ const ProjectPropertiesDialog = (props: Props) => {
     setUseDeprecatedZeroAsDefaultZOrder,
   ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
 
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const defaultPackageName = 'com.example.mygame';
   const defaultVersion = '1.0.0';

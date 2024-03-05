@@ -71,7 +71,7 @@ export const DefaultMediumScreenScopeInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'medium'}
+          windowSize={'medium'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -115,7 +115,7 @@ export const DefaultSmallScreenScopeInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'small'}
+          windowSize={'small'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -156,7 +156,7 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'medium'}
+          windowSize={'medium'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -200,7 +200,7 @@ export const EmptySmallScreenScopeInALayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'small'}
+          windowSize={'small'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}

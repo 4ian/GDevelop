@@ -66,6 +66,7 @@ namespace gdjs {
           this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
       }
       this._renderer.updatePosition();
+      this._renderer.updateResolution();
     }
 
     /**

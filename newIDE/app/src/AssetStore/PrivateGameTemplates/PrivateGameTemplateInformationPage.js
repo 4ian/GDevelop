@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import {
+  buyProductWithCredits,
+  type PrivateGameTemplateListingData,
+} from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateGameTemplate,
   type PrivateGameTemplate,
@@ -15,48 +18,54 @@ import {
   LineStackLayout,
   ColumnStackLayout,
 } from '../../UI/Layout';
-import { Column, LargeSpacer, Line } from '../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
 } from '../../Utils/GDevelopServices/User';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import Link from '../../UI/Link';
-import Mark from '../../UI/CustomSvgIcons/Mark';
-import Cross from '../../UI/CustomSvgIcons/Cross';
 import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import RaisedButton from '../../UI/RaisedButton';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { sendGameTemplateBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
-import Paper from '../../UI/Paper';
 import Window from '../../Utils/Window';
 import ScrollView from '../../UI/ScrollView';
 import { shouldUseAppStoreProduct } from '../../Utils/AppStorePurchases';
-import { formatProductPrice } from '../ProductPriceTag';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import { capitalize } from 'lodash';
-import FlatButton from '../../UI/FlatButton';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-import Chip from '../../UI/Chip';
-import Lightning from '../../UI/CustomSvgIcons/Lightning';
-import { GridList } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import GridList from '@material-ui/core/GridList';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplateStoreContext';
 import {
   getBundlesContainingProductTiles,
   getOtherProductsFromSameAuthorTiles,
+  getProductMediaItems,
   getProductsIncludedInBundleTiles,
+  getUserProductPurchaseUsageType,
+  OpenProductButton,
+  PurchaseProductButtons,
 } from '../ProductPageHelper';
+import ProductLicenseOptions from '../ProductLicense/ProductLicenseOptions';
+import HelpIcon from '../../UI/HelpIcon';
+import SecureCheckout from '../SecureCheckout/SecureCheckout';
+import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageStoreContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import RaisedButton from '../../UI/RaisedButton';
+import Play from '../../UI/CustomSvgIcons/Play';
 
 const cellSpacing = 8;
 
-const getTemplateColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getTemplateColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -74,40 +83,32 @@ const styles = {
   grid: {
     margin: '0 2px', // Remove the default margin of the grid but keep the horizontal padding for focus outline.
   },
-  chip: {
-    marginRight: 2,
-    marginBottom: 2,
+  leftColumnContainer: {
+    flex: 3,
+    minWidth: 0, // This is needed for the container to take the right size.
   },
-  chipsContainer: {
-    flexWrap: 'wrap',
+  rightColumnContainer: {
+    flex: 2,
+  },
+  avatar: {
+    width: 20,
+    height: 20,
+  },
+  ownedTag: {
+    padding: '4px 8px',
+    borderRadius: 4,
+    color: 'black',
+  },
+  playIcon: {
+    width: 20,
+    height: 20,
   },
 };
-
-const licensingItems = [
-  <Trans>Personal projects</Trans>,
-  <Trans>Professional projects</Trans>,
-  <Trans>Asset modification</Trans>,
-  <Trans>Publish any number of games</Trans>,
-];
-
-const whatYouGetItems = [
-  <Trans>Game built by a GDevelop expert</Trans>,
-  <Trans>Ready to publish on mobile, web or desktop</Trans>,
-  <Trans>Leaderboard already integrated</Trans>,
-  <Trans>Easy to modify</Trans>,
-  <Trans>Features and extensions reviewed by GDevelop</Trans>,
-];
-
-const howToUseItems = [
-  <Trans>Directly accessible from your account once purchased</Trans>,
-  <Trans>Modify and publish it like a traditional GDevelop game</Trans>,
-];
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
   onOpenPurchaseDialog: () => void,
-  isPurchaseDialogOpen: boolean,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
@@ -117,7 +118,6 @@ const PrivateGameTemplateInformationPage = ({
   privateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator,
   onOpenPurchaseDialog,
-  isPurchaseDialogOpen,
   onGameTemplateOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
@@ -126,11 +126,22 @@ const PrivateGameTemplateInformationPage = ({
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
-  const { receivedGameTemplates, authenticated } = React.useContext(
-    AuthenticatedUserContext
+  const {
+    receivedGameTemplates,
+    profile,
+    limits,
+    gameTemplatePurchases,
+    getAuthorizationHeader,
+    onOpenLoginDialog,
+  } = React.useContext(AuthenticatedUserContext);
+  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
+    CreditsPackageStoreContext
   );
   const [gameTemplate, setGameTemplate] = React.useState<?PrivateGameTemplate>(
     null
+  );
+  const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
+    privateGameTemplateListingData.prices[0].usageType
   );
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
@@ -142,17 +153,30 @@ const PrivateGameTemplateInformationPage = ({
     setSellerPublicProfile,
   ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { windowSize, isLandscape, isMediumScreen } = useResponsiveWindowSize();
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const shouldUseOrSimulateAppStoreProduct =
     shouldUseAppStoreProduct() || simulateAppStoreProduct;
 
-  const isAlreadyReceived =
-    !!receivedGameTemplates &&
-    !!receivedGameTemplates.find(
-      gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
-    );
+  const userGameTemplatePurchaseUsageType = React.useMemo(
+    () =>
+      getUserProductPurchaseUsageType({
+        productId: privateGameTemplateListingData
+          ? privateGameTemplateListingData.id
+          : null,
+        receivedProducts: receivedGameTemplates,
+        productPurchases: gameTemplatePurchases,
+        allProductListingDatas: privateGameTemplateListingDatas,
+      }),
+    [
+      gameTemplatePurchases,
+      privateGameTemplateListingData,
+      privateGameTemplateListingDatas,
+      receivedGameTemplates,
+    ]
+  );
+  const isAlreadyReceived = !!userGameTemplatePurchaseUsageType;
 
   const templatesIncludedInBundleTiles = React.useMemo(
     () =>
@@ -237,7 +261,7 @@ const PrivateGameTemplateInformationPage = ({
         }
       })();
     },
-    [id, sellerId, privateGameTemplateListingData.appStoreProductId]
+    [id, sellerId]
   );
 
   const onClickBuy = React.useCallback(
@@ -249,10 +273,16 @@ const PrivateGameTemplateInformationPage = ({
       }
 
       try {
+        const price = privateGameTemplateListingData.prices.find(
+          price => price.usageType === selectedUsageType
+        );
+
         sendGameTemplateBuyClicked({
           gameTemplateId: gameTemplate.id,
           gameTemplateName: gameTemplate.name,
           gameTemplateTag: gameTemplate.tag,
+          currency: price ? price.currency : undefined,
+          usageType: selectedUsageType,
         });
 
         onOpenPurchaseDialog();
@@ -266,76 +296,93 @@ const PrivateGameTemplateInformationPage = ({
       privateGameTemplateListingData,
       isAlreadyReceived,
       onCreateWithGameTemplate,
+      selectedUsageType,
     ]
   );
 
-  const getBuyButton = i18n => {
-    if (errorText) return null;
-    if (
-      isAlreadyReceived &&
-      privateGameTemplateListingData.includedListableProductIds
-    ) {
-      // Template is a bundle and is owned, no button to display.
-      return null;
-    }
+  const onClickBuyWithCredits = React.useCallback(
+    async () => {
+      if (!privateGameTemplateListingData || !gameTemplate) return;
 
-    const label = !gameTemplate ? (
-      <Trans>Loading...</Trans>
-    ) : isAlreadyReceived ? (
-      <Trans>Open template</Trans>
-    ) : isPurchaseDialogOpen ? (
-      <Trans>Processing...</Trans>
-    ) : (
-      <Trans>
-        Buy for{' '}
-        {formatProductPrice({
-          i18n,
-          productListingData: privateGameTemplateListingData,
-        })}
-      </Trans>
-    );
+      if (!profile || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
 
-    const disabled = !gameTemplate || isPurchaseDialogOpen;
+      if (isAlreadyReceived) {
+        onCreateWithGameTemplate(privateGameTemplateListingData);
+        return;
+      }
 
-    return (
-      <Column noMargin alignItems="flex-end">
-        <RaisedButton
-          key="buy-game-template"
-          primary
-          label={label}
-          onClick={onClickBuy}
-          disabled={disabled}
-          id="buy-game-template"
-        />
-        {shouldUseOrSimulateAppStoreProduct &&
-          !isAlreadyReceived &&
-          !authenticated && (
-            <Text size="body-small">
-              <Link onClick={onClickBuy} disabled={disabled} href="">
-                <Trans>Restore a previous purchase</Trans>
-              </Link>
-            </Text>
-          )}
-      </Column>
-    );
-  };
+      sendGameTemplateBuyClicked({
+        gameTemplateId: gameTemplate.id,
+        gameTemplateName: gameTemplate.name,
+        gameTemplateTag: gameTemplate.tag,
+        usageType: selectedUsageType,
+        currency: 'CREDITS',
+      });
 
-  const mediaItems = gameTemplate
-    ? [
-        {
-          kind: 'image',
-          url:
-            (shouldUseOrSimulateAppStoreProduct &&
-              privateGameTemplateListingData.appStoreThumbnailUrls &&
-              privateGameTemplateListingData.appStoreThumbnailUrls[0]) ||
-            privateGameTemplateListingData.thumbnailUrls[0],
-        },
-        ...gameTemplate.previewImageUrls.map(url => ({
-          kind: 'image',
-          url,
-        })),
-      ]
-    : [];
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const gameTemplatePriceForUsageType = privateGameTemplateListingData.creditPrices.find(
+        price => price.usageType === selectedUsageType
+      );
+      if (!gameTemplatePriceForUsageType) {
+        console.error(
+          'Unable to find the price for the selected usage type',
+          selectedUsageType
+        );
+        return;
+      }
+      const gameTemplateCreditsAmount = gameTemplatePriceForUsageType.amount;
+      if (currentCreditsAmount < gameTemplateCreditsAmount) {
+        openCreditsPackageDialog({
+          missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,
+        });
+        return;
+      }
+
+      openCreditsUsageDialog({
+        title: <Trans>Purchase {gameTemplate.name}</Trans>,
+        message: (
+          <Trans>
+            You are about to use {gameTemplateCreditsAmount} credits to purchase
+            the game template {gameTemplate.name}. Continue?
+          </Trans>
+        ),
+        onConfirm: () =>
+          buyProductWithCredits(getAuthorizationHeader, {
+            productId: privateGameTemplateListingData.id,
+            usageType: selectedUsageType,
+            userId: profile.id,
+          }),
+        successMessage: <Trans>🎉 You can now use your template!</Trans>,
+      });
+    },
+    [
+      profile,
+      limits,
+      privateGameTemplateListingData,
+      gameTemplate,
+      onCreateWithGameTemplate,
+      isAlreadyReceived,
+      openCreditsPackageDialog,
+      selectedUsageType,
+      openCreditsUsageDialog,
+      getAuthorizationHeader,
+      onOpenLoginDialog,
+    ]
+  );
+
+  const mediaItems = React.useMemo(
+    () =>
+      getProductMediaItems({
+        product: gameTemplate,
+        productListingData: privateGameTemplateListingData,
+        shouldSimulateAppStoreProduct: simulateAppStoreProduct,
+      }),
+    [gameTemplate, privateGameTemplateListingData, simulateAppStoreProduct]
+  );
 
   return (
     <I18n>
@@ -352,187 +399,141 @@ const PrivateGameTemplateInformationPage = ({
           ) : gameTemplate && sellerPublicProfile ? (
             <Column noOverflowParent expand noMargin>
               <ScrollView autoHideScrollbar style={styles.scrollview}>
-                <Column noMargin alignItems="flex-end">
-                  <Text displayInlineAsSpan size="sub-title">
-                    <Trans>by</Trans>{' '}
-                    <Link
-                      onClick={() => setOpenSellerPublicProfileDialog(true)}
-                      href="#"
-                    >
-                      {sellerPublicProfile.username || ''}
-                    </Link>
-                  </Text>
-                </Column>
-                <ResponsiveLineStackLayout noColumnMargin noMargin>
-                  <Column useFullHeight expand noMargin noOverflowParent>
+                <ResponsiveLineStackLayout
+                  noColumnMargin
+                  noMargin
+                  // Force the columns to wrap on tablets and small screens.
+                  forceMobileLayout={isMediumScreen}
+                  // Prevent it to wrap when in landscape mode on small screens.
+                  noResponsiveLandscape
+                  useLargeSpacer
+                >
+                  <div style={styles.leftColumnContainer}>
                     <ResponsiveMediaGallery
                       mediaItems={mediaItems}
                       altTextTemplate={`Game template ${name} preview image {mediaIndex}`}
                       horizontalOuterMarginToEatOnMobile={8}
                     />
-                  </Column>
-                  <ColumnStackLayout useFullHeight expand noMargin>
-                    <Paper
-                      variant="outlined"
-                      style={{ padding: isMobileScreen ? 20 : 30 }}
-                      background="medium"
-                    >
-                      <Column noMargin>
-                        <Line
-                          noMargin
-                          expand
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          {!isAlreadyReceived ? (
-                            <Text noMargin size="block-title">
-                              {formatProductPrice({
-                                i18n,
-                                productListingData: privateGameTemplateListingData,
-                              })}
-                            </Text>
-                          ) : (
-                            <div /> // To align the buy button on the right.
-                          )}
-                          {getBuyButton(i18n)}
-                        </Line>
-                        <Line>
-                          <div style={styles.chipsContainer}>
-                            {privateGameTemplateListingData.isSellerGDevelop && (
-                              <Chip
-                                icon={<Lightning />}
-                                variant="outlined"
-                                color="secondary"
-                                size="small"
-                                style={styles.chip}
-                                label={<Trans>Ready-made</Trans>}
-                                key="premium"
-                              />
-                            )}
-                            <Chip
-                              size="small"
-                              style={styles.chip}
-                              label={<Trans>Game template</Trans>}
-                              key="game-template"
-                            />
-                            {privateGameTemplateListingData.categories.map(
-                              category => (
-                                <Chip
-                                  size="small"
-                                  style={styles.chip}
-                                  label={capitalize(category)}
-                                  key={category}
-                                />
-                              )
-                            )}
-                          </div>
-                        </Line>
-                        <Text size="body2" displayInlineAsSpan>
-                          <MarkdownText
-                            source={gameTemplate.longDescription}
-                            allowParagraphs
-                          />
+                  </div>
+                  <div style={styles.rightColumnContainer}>
+                    <ColumnStackLayout noMargin>
+                      <LineStackLayout
+                        noMargin
+                        alignItems="center"
+                        justifyContent="space-between"
+                      >
+                        <Text noMargin size="title">
+                          {gameTemplate.name}
                         </Text>
+                        {isAlreadyReceived && (
+                          <div
+                            style={{
+                              ...styles.ownedTag,
+                              backgroundColor:
+                                gdevelopTheme.statusIndicator.success,
+                            }}
+                          >
+                            <Text color="inherit" noMargin>
+                              <Trans>OWNED</Trans>
+                            </Text>
+                          </div>
+                        )}
+                      </LineStackLayout>
+                      <LineStackLayout noMargin alignItems="center">
+                        <Avatar
+                          src={sellerPublicProfile.iconUrl}
+                          style={styles.avatar}
+                        />
+                        <Text displayInlineAsSpan size="sub-title">
+                          <Link
+                            onClick={() =>
+                              setOpenSellerPublicProfileDialog(true)
+                            }
+                            href="#"
+                          >
+                            {sellerPublicProfile.username || ''}
+                          </Link>
+                        </Text>
+                      </LineStackLayout>
+                      <LineStackLayout
+                        noMargin
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Line noMargin>
+                          <Text size="sub-title">
+                            <Trans>Licensing</Trans>
+                          </Text>
+                          <HelpIcon
+                            size="small"
+                            helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
+                          />
+                        </Line>
                         {!isAlreadyReceived &&
                         !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
-                            <Line expand>
-                              <Column noMargin expand>
-                                <FlatButton
-                                  primary
-                                  label={<Trans>Try it online</Trans>}
-                                  onClick={() =>
-                                    Window.openExternalURL(
-                                      gameTemplate.gamePreviewLink
-                                    )
-                                  }
-                                />
-                              </Column>
-                            </Line>
-                          )}
-                        <ResponsiveLineStackLayout noColumnMargin>
-                          <Column noMargin expand>
-                            <Text size="sub-title">
-                              <Trans>Licensing</Trans>
-                            </Text>
-                            {licensingItems.map((item, index) => (
-                              <LineStackLayout
-                                noMargin
-                                alignItems="center"
-                                key={index}
-                              >
-                                <Mark fontSize="small" />
-                                <Text displayInlineAsSpan noMargin>
-                                  {item}
-                                </Text>
-                              </LineStackLayout>
-                            ))}
-                            <LineStackLayout noMargin alignItems="center">
-                              <Cross
-                                fontSize="small"
-                                style={styles.disabledText}
+                            <Column noMargin>
+                              <RaisedButton
+                                primary
+                                label={<Trans>Try it online</Trans>}
+                                onClick={() =>
+                                  Window.openExternalURL(
+                                    gameTemplate.gamePreviewLink
+                                  )
+                                }
+                                icon={<Play style={styles.playIcon} />}
                               />
-                              <Text
-                                displayInlineAsSpan
-                                noMargin
-                                style={styles.disabledText}
-                              >
-                                <Trans>Redistribution &amp; reselling</Trans>
-                              </Text>
-                            </LineStackLayout>
-                            <Line noMargin>
-                              <Text>
-                                <Link
-                                  onClick={() =>
-                                    Window.openExternalURL(
-                                      'https://gdevelop.io/page/asset-store-license-agreement'
-                                    )
-                                  }
-                                  href="https://gdevelop.io/page/asset-store-license-agreement"
-                                >
-                                  <Trans>See details here</Trans>
-                                </Link>
-                              </Text>
-                            </Line>
-                            {!!privateGameTemplateListingData.isSellerGDevelop && (
-                              <>
-                                <Text size="sub-title">
-                                  <Trans>What you get</Trans>
-                                </Text>
-                                {whatYouGetItems.map((item, index) => (
-                                  <LineStackLayout
-                                    noMargin
-                                    alignItems="center"
-                                    key={index}
-                                  >
-                                    <Mark fontSize="small" />
-                                    <Text displayInlineAsSpan noMargin>
-                                      {item}
-                                    </Text>
-                                  </LineStackLayout>
-                                ))}
-                              </>
-                            )}
-                            <Text size="sub-title">
-                              <Trans>How to use</Trans>
-                            </Text>
-                            {howToUseItems.map((item, index) => (
-                              <LineStackLayout
-                                noMargin
-                                alignItems="center"
-                                key={index}
-                              >
-                                <Mark fontSize="small" />
-                                <Text displayInlineAsSpan noMargin>
-                                  {item}
-                                </Text>
-                              </LineStackLayout>
-                            ))}
-                          </Column>
-                        </ResponsiveLineStackLayout>
-                      </Column>
-                    </Paper>
-                  </ColumnStackLayout>
+                            </Column>
+                          )}
+                      </LineStackLayout>
+                      <ProductLicenseOptions
+                        value={selectedUsageType}
+                        onChange={setSelectedUsageType}
+                        product={privateGameTemplateListingData}
+                        ownedLicense={userGameTemplatePurchaseUsageType}
+                      />
+                      <Spacer />
+                      {isAlreadyReceived ? (
+                        <OpenProductButton
+                          productListingData={privateGameTemplateListingData}
+                          onClick={() =>
+                            onCreateWithGameTemplate(
+                              privateGameTemplateListingData
+                            )
+                          }
+                          label={<Trans>Open template</Trans>}
+                        />
+                      ) : (
+                        <>
+                          {!shouldUseOrSimulateAppStoreProduct && (
+                            <SecureCheckout />
+                          )}
+                          {!errorText && (
+                            <PurchaseProductButtons
+                              i18n={i18n}
+                              productListingData={
+                                privateGameTemplateListingData
+                              }
+                              selectedUsageType={selectedUsageType}
+                              onUsageTypeChange={setSelectedUsageType}
+                              simulateAppStoreProduct={simulateAppStoreProduct}
+                              isAlreadyReceived={isAlreadyReceived}
+                              onClickBuy={onClickBuy}
+                              onClickBuyWithCredits={onClickBuyWithCredits}
+                            />
+                          )}
+                        </>
+                      )}
+                    </ColumnStackLayout>
+                  </div>
                 </ResponsiveLineStackLayout>
+                <Column noMargin>
+                  <Text size="body2" displayInlineAsSpan>
+                    <MarkdownText
+                      source={gameTemplate.longDescription}
+                      allowParagraphs
+                    />
+                  </Text>
+                </Column>
                 {bundlesContainingPackTiles &&
                 bundlesContainingPackTiles.length ? (
                   <>
@@ -552,7 +553,7 @@ const PrivateGameTemplateInformationPage = ({
                     </Line>
                     <Line>
                       <GridList
-                        cols={getTemplateColumns(windowWidth)}
+                        cols={getTemplateColumns(windowSize, isLandscape)}
                         cellHeight="auto"
                         spacing={cellSpacing / 2}
                         style={styles.grid}
@@ -572,7 +573,7 @@ const PrivateGameTemplateInformationPage = ({
                       </Line>
                       <Line>
                         <GridList
-                          cols={getTemplateColumns(windowWidth)}
+                          cols={getTemplateColumns(windowSize, isLandscape)}
                           cellHeight="auto"
                           spacing={cellSpacing / 2}
                           style={styles.grid}

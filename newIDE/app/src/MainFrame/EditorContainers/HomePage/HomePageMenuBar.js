@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { Column } from '../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Column, marginsSize } from '../../../UI/Grid';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
-import VerticalTabButton from '../../../UI/VerticalTabButton';
+import VerticalTabButton, {
+  verticalTabButtonSize,
+} from '../../../UI/VerticalTabButton';
 import Preferences from '../../../UI/CustomSvgIcons/Preferences';
 import GDevelopGLogo from '../../../UI/CustomSvgIcons/GDevelopGLogo';
 import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
@@ -24,12 +26,15 @@ const iconButtonPaddingHorizontal = 5;
 const iconButtonLabelPadding = 6;
 const toolbarHeight =
   iconSize + 2 * iconButtonLabelPadding + 2 * iconButtonPaddingVertical;
+export const homepageDesktopMenuBarWidth = 230;
+export const homepageMediumMenuBarWidth =
+  verticalTabButtonSize + 2 * marginsSize;
 
 export const styles = {
   desktopMenu: {
     paddingTop: 40,
     paddingBottom: 10,
-    minWidth: 230,
+    minWidth: homepageDesktopMenuBarWidth,
     display: 'flex',
     flexDirection: 'column',
   },
@@ -69,9 +74,8 @@ const HomePageMenuBar = ({
   onOpenAbout,
   onOpenHomePageMenuDrawer,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const isMobileOrSmallScreen = isMobile || windowWidth === 'medium';
+  const { isMobile, isMediumScreen } = useResponsiveWindowSize();
+  const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const theme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
   const tabsToDisplay = getTabsToDisplay({ profile });

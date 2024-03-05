@@ -24,7 +24,6 @@ const styles = {
   },
   list: {
     overflowY: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
     flex: 1,
   },
 };

@@ -1,6 +1,3 @@
-// MIT License
-// Copyright © 2010-2023 three.js authors
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -85,13 +82,14 @@ class DRACOLoader extends Loader {
 
 	}
 
-	parse( buffer, onLoad, onError ) {
+
+	parse( buffer, onLoad, onError = ()=>{} ) {
 
 		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( onError );
 
 	}
 
-	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace ) {
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace, onError = () => {} ) {
 
 		const taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
@@ -100,7 +98,7 @@ class DRACOLoader extends Loader {
 			vertexColorSpace: vertexColorSpace,
 		};
 
-		return this.decodeGeometry( buffer, taskConfig ).then( callback );
+		return this.decodeGeometry( buffer, taskConfig ).then( callback ).catch( onError );
 
 	}
 
@@ -211,6 +209,8 @@ class DRACOLoader extends Loader {
 			if ( name === 'color' ) {
 
 				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
+
+				attribute.normalized = ( array instanceof Float32Array ) === false;
 
 			}
 

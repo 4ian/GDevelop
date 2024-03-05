@@ -1939,6 +1939,102 @@ module.exports = {
         .setType('number')
         .setGroup(_('Orientation'));
     }
+    {
+      const effect = extension
+        .addEffect('HueAndSaturation')
+        .setFullName(_('Hue and saturation'))
+        .setDescription(
+          _(
+            'Adjust hue and saturation.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('hue')
+        .setValue('0')
+        .setLabel(_('Hue in degrees (between -180 and 180)'))
+        .setType('number');
+      properties
+        .getOrCreate('saturation')
+        .setValue('0')
+        .setLabel(_('Saturation (between -1 and 1)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('Exposure')
+        .setFullName(_('Exposure'))
+        .setDescription(
+          _(
+            'Adjust exposure.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ExposureEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure (positive value)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('Bloom')
+        .setFullName(_('Bloom'))
+        .setDescription(
+          _(
+            'Apply a bloom effect.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/BloomEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('strength')
+        .setValue('1')
+        .setLabel(_('Strength (between 0 and 3)'))
+        .setType('number');
+      properties
+        .getOrCreate('radius')
+        .setValue('0')
+        .setLabel(_('Radius (between 0 and 1)'))
+        .setType('number');
+      properties
+        .getOrCreate('threshold')
+        .setValue('0')
+        .setLabel(_('Threshold (between 0 and 1)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('BrightnessAndContrast')
+        .setFullName(_('Brightness and contrast.'))
+        .setDescription(
+          _(
+            'Adjust brightness and contrast.'
+          )
+        )
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('brightness')
+        .setValue('0')
+        .setLabel(_('Brightness (between -1 and 1)'))
+        .setType('number');
+      properties
+        .getOrCreate('contrast')
+        .setValue('0')
+        .setLabel(_('Contrast (between -1 and 1)'))
+        .setType('number');
+    }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.
 
@@ -2970,6 +3066,11 @@ module.exports = {
         return this.getHeight() * originPoint[1];
       }
 
+      getOriginZ() {
+        const originPoint = this.getOriginPoint();
+        return this.getDepth() * originPoint[2];
+      }
+
       getCenterX() {
         const centerPoint = this.getCenterPoint();
         return this.getWidth() * centerPoint[0];
@@ -2978,6 +3079,11 @@ module.exports = {
       getCenterY() {
         const centerPoint = this.getCenterPoint();
         return this.getHeight() * centerPoint[1];
+      }
+
+      getCenterZ() {
+        const centerPoint = this.getCenterPoint();
+        return this.getDepth() * centerPoint[2];
       }
 
       getOriginPoint() {

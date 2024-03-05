@@ -114,6 +114,18 @@ const InstructionOrExpressionSelector = <
     );
   };
 
+  React.useEffect(
+    () => {
+      if (selectedItemRef.current && scrollViewRef.current) {
+        scrollViewRef.current.scrollTo(selectedItemRef.current);
+      }
+    },
+    // When the component is mounted, if an item is already selected
+    // (this happens when a user edits an existing instruction), auto scroll
+    // to the item in the list.
+    []
+  );
+
   return (
     <div
       style={{

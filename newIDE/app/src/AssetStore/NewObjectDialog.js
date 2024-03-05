@@ -31,7 +31,7 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import Window from '../Utils/Window';
 import PrivateAssetsAuthorizationContext from './PrivateAssets/PrivateAssetsAuthorizationContext';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { enumerateAssetStoreIds } from './EnumerateAssetStoreIds';
 import PromisePool from '@supercharge/promise-pool';
 import NewObjectFromScratch from './NewObjectFromScratch';
@@ -115,8 +115,7 @@ function NewObjectDialog({
   onObjectsAddedFromAssets,
   canInstallPrivateAsset,
 }: Props) {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
@@ -459,7 +458,7 @@ function NewObjectDialog({
                   },
                 ]}
                 // Enforce scroll on mobile, because the tabs have long names.
-                variant={isMobileScreen ? 'scrollable' : undefined}
+                variant={isMobile ? 'scrollable' : undefined}
               />
             }
           >

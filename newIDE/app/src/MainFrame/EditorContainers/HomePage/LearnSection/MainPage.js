@@ -15,9 +15,9 @@ import {
 import SectionContainer, { SectionRow } from '../SectionContainer';
 import FlatButton from '../../../../UI/FlatButton';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { CardWidget, SMALL_WIDGET_SIZE } from '../CardWidget';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
@@ -36,10 +36,13 @@ const useStyles = makeStyles({
   },
 });
 
-const getHelpItemsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getHelpItemsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -51,10 +54,13 @@ const getHelpItemsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const getTutorialsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getTutorialsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 5 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -66,7 +72,7 @@ const getTutorialsColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge');
+const HELP_ITEMS_MAX_COLUMNS = getHelpItemsColumnsFromWidth('xlarge', true);
 const styles = {
   grid: {
     textAlign: 'center',
@@ -100,8 +106,8 @@ export const TutorialsRow = ({
           .map(tutorial => formatTutorialToImageTileComponent(i18n, tutorial))}
         onShowAll={() => onSelectCategory(category)}
         showAllIcon={<ChevronArrowRight fontSize="small" />}
-        getColumnsFromWidth={getTutorialsColumnsFromWidth}
-        getLimitFromWidth={getTutorialsColumnsFromWidth}
+        getColumnsFromWindowSize={getTutorialsColumnsFromWidth}
+        getLimitFromWindowSize={getTutorialsColumnsFromWidth}
       />
     )}
   </I18n>
@@ -123,10 +129,12 @@ const MainPage = ({
   selectInAppTutorial,
 }: Props) => {
   const classes = useStyles();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobile = windowWidth === 'small';
-  const isTabletOrSmallLaptop =
-    windowWidth === 'small' || windowWidth === 'medium';
+  const {
+    windowSize,
+    isMobile,
+    isLandscape,
+    isMediumScreen,
+  } = useResponsiveWindowSize();
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -162,7 +170,7 @@ const MainPage = ({
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getHelpItemsColumnsFromWidth(windowWidth)}
+            cols={getHelpItemsColumnsFromWidth(windowSize, isLandscape)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -270,7 +278,7 @@ const MainPage = ({
                   primary
                   leftIcon={<Upload />}
                   label={
-                    isTabletOrSmallLaptop ? (
+                    isMediumScreen ? (
                       <Trans>Submit an example</Trans>
                     ) : (
                       <Trans>Submit your project as an example</Trans>
@@ -288,7 +296,7 @@ const MainPage = ({
                   primary
                   leftIcon={<TranslateIcon />}
                   label={
-                    isTabletOrSmallLaptop ? (
+                    isMediumScreen ? (
                       <Trans>Submit a tutorial</Trans>
                     ) : (
                       <Trans>

@@ -24,6 +24,7 @@ import {
   type PrivateAssetPack,
   type PrivateGameTemplate,
 } from '../Utils/GDevelopServices/Asset';
+import { type Purchase } from '../Utils/GDevelopServices/Shop';
 
 export type AuthenticatedUser = {|
   authenticated: boolean,
@@ -37,6 +38,8 @@ export type AuthenticatedUser = {|
   receivedAssetPacks: ?Array<PrivateAssetPack>,
   receivedAssetShortHeaders: ?Array<AssetShortHeader>,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
+  gameTemplatePurchases: ?Array<Purchase>,
+  assetPackPurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
   limits: ?Limits,
   authenticationError: ?AuthError,
@@ -66,13 +69,15 @@ export type AuthenticatedUser = {|
   onRefreshFirebaseProfile: () => Promise<void>,
   onRefreshSubscription: () => Promise<void>,
   onRefreshLimits: () => Promise<void>,
+  onRefreshGameTemplatePurchases: () => Promise<void>,
+  onRefreshAssetPackPurchases: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
   onOpenEmailVerificationDialog: ({|
     sendEmailAutomatically: boolean,
     showSendEmailButton: boolean,
   |}) => void,
-  onAcceptGameStatsEmail: () => Promise<void>,
+  onAcceptGameStatsEmail: (value: boolean) => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
 
@@ -88,6 +93,8 @@ export const initialAuthenticatedUser = {
   receivedAssetPacks: null,
   receivedAssetShortHeaders: null,
   receivedGameTemplates: null,
+  gameTemplatePurchases: null,
+  assetPackPurchases: null,
   recommendations: null,
   subscription: null,
   usages: null,
@@ -110,6 +117,8 @@ export const initialAuthenticatedUser = {
   onRefreshFirebaseProfile: async () => {},
   onRefreshSubscription: async () => {},
   onRefreshLimits: async () => {},
+  onRefreshGameTemplatePurchases: async () => {},
+  onRefreshAssetPackPurchases: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},

@@ -27,7 +27,7 @@ import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import Add from '../../../UI/CustomSvgIcons/Add';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
@@ -134,8 +134,7 @@ export default function SpriteEditor({
   const abortControllerRef = React.useRef<?AbortController>(null);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const { showConfirmation } = useAlertDialog();
   const hasNoSprites = () => {
     for (
@@ -715,7 +714,7 @@ export default function SpriteEditor({
                 }
                 actionLabel={<Trans>Import images</Trans>}
                 secondaryActionLabel={i18n._(
-                  isMobileScreen
+                  isMobile
                     ? t`Draw`
                     : imageResourceExternalEditors[0].createDisplayName
                 )}
@@ -912,7 +911,7 @@ export default function SpriteEditor({
                   justifyContent="space-between"
                   noColumnMargin
                 >
-                  {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
+                  {!isMobile ? ( // On mobile, use only 1 button to gain space.
                     <ResponsiveLineStackLayout noMargin noColumnMargin>
                       <FlatButton
                         label={<Trans>Edit collision masks</Trans>}

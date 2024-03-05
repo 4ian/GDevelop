@@ -494,6 +494,8 @@ class GD_CORE_API InstructionMetadata : public gd::AbstractFunctionMetadata {
 
   /**
    * \brief Erase any existing include file and add the specified include.
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
    */
   InstructionMetadata &SetIncludeFile(const gd::String &includeFile) override {
     codeExtraInformation.includeFiles.clear();

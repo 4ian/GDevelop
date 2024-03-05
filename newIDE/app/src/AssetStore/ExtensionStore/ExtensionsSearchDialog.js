@@ -16,7 +16,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Add from '../../UI/CustomSvgIcons/Add';
 import ErrorBoundary from '../../UI/ErrorBoundary';
@@ -39,8 +39,7 @@ const ExtensionsSearchDialog = ({
   onExtensionInstalled,
   onCreateNew,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -117,7 +116,7 @@ const ExtensionsSearchDialog = ({
                 leftIcon={<Download />}
                 key="import"
                 label={
-                  isMobileScreen ? (
+                  isMobile ? (
                     <Trans>Import</Trans>
                   ) : (
                     <Trans>Import extension</Trans>
@@ -134,7 +133,7 @@ const ExtensionsSearchDialog = ({
                 key="create-new"
                 onClick={onCreateNew}
                 label={
-                  isMobileScreen ? (
+                  isMobile ? (
                     <Trans>Create</Trans>
                   ) : (
                     <Trans>Create a new extension</Trans>

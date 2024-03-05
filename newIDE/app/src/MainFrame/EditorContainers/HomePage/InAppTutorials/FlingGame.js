@@ -4,9 +4,9 @@ import { Trans, t } from '@lingui/macro';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { Line } from '../../../../UI/Grid';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
@@ -20,10 +20,13 @@ import Building from './Icons/Building';
 import Unboxing from './Icons/Unboxing';
 import Podium from './Icons/Podium';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getColumnsFromWindowSize = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
     case 'large':
     case 'xlarge':
@@ -32,7 +35,7 @@ const getColumnsFromWidth = (width: WidthType) => {
   }
 };
 
-const MAX_COLUMNS = getColumnsFromWidth('xlarge');
+const MAX_COLUMNS = getColumnsFromWindowSize('xlarge', true);
 const MAX_SECTION_WIDTH = (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS; // widget size + 5 padding per side
 const ITEMS_SPACING = 5;
 const styles = {
@@ -62,7 +65,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
   } = React.useContext(InAppTutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const windowWidth = useResponsiveWindowWidth();
+  const { windowSize, isLandscape } = useResponsiveWindowSize();
 
   const getTutorialPartProgress = ({
     tutorialId,
@@ -211,7 +214,9 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         ) : (
           <GridList
             cols={
-              isFlingTutorialComplete ? 1 : getColumnsFromWidth(windowWidth)
+              isFlingTutorialComplete
+                ? 1
+                : getColumnsFromWindowSize(windowSize, isLandscape)
             }
             style={styles.grid}
             cellHeight="auto"

@@ -75,15 +75,13 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     }
 
     SerializerElement assetElement;
-    std::map<gd::String, std::vector<gd::String>> resourcesFileNameMap;
+    std::vector<gd::String> usedResourceNames;
     ObjectAssetSerializer::SerializeTo(project, object, "My Object",
-                                       assetElement, resourcesFileNameMap);
+                                       assetElement, usedResourceNames);
 
-    // This mapping is used to copy resource files.
-    REQUIRE(resourcesFileNameMap.find("assets/Idle.png") !=
-            resourcesFileNameMap.end());
-    REQUIRE(resourcesFileNameMap["assets/Idle.png"].size() == 1);
-    REQUIRE(resourcesFileNameMap["assets/Idle.png"][0] == "Idle.png");
+    // This list is used to copy resource files.
+    REQUIRE(usedResourceNames.size() == 1);
+    REQUIRE(usedResourceNames[0] == "assets/Idle.png");
 
     // Check that the project is left untouched.
     REQUIRE(resourceManager.HasResource("assets/Idle.png"));
@@ -113,8 +111,8 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     REQUIRE(resourcesElement.GetChildrenCount() == 1);
     {
       auto &resourceElement = resourcesElement.GetChild(0);
-      REQUIRE(resourceElement.GetStringAttribute("name") == "Idle.png");
-      REQUIRE(resourceElement.GetStringAttribute("file") == "Idle.png");
+      REQUIRE(resourceElement.GetStringAttribute("name") == "assets/Idle.png");
+      REQUIRE(resourceElement.GetStringAttribute("file") == "assets/Idle.png");
       REQUIRE(resourceElement.GetStringAttribute("kind") == "image");
       REQUIRE(resourceElement.GetBoolAttribute("smoothed") == true);
     }
@@ -144,6 +142,6 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
     spritesElement.ConsiderAsArrayOf("sprite");
     REQUIRE(spritesElement.GetChildrenCount() == 1);
     auto &spriteElement = spritesElement.GetChild(0);
-    REQUIRE(spriteElement.GetStringAttribute("image") == "Idle.png");
+    REQUIRE(spriteElement.GetStringAttribute("image") == "assets/Idle.png");
   }
 }

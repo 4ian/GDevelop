@@ -12,6 +12,7 @@ import {
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import { BEHAVIORS_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const gd: libGDevelop = global.gd;
 
@@ -170,7 +171,7 @@ export const BehaviorStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching behaviors from extension store...');
         fetchBehaviors();
-      }, 5000);
+      }, BEHAVIORS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchBehaviors, behaviorShortHeadersByType, isLoading]

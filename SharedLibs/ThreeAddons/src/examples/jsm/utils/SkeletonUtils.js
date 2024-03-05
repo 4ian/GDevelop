@@ -1,6 +1,3 @@
-// MIT License
-// Copyright © 2010-2023 three.js authors
-
 import {
 	AnimationClip,
 	AnimationMixer,

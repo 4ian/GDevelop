@@ -36,6 +36,16 @@ export const NotLoggedIn = () => (
   </AuthenticatedUserContext.Provider>
 );
 
+export const NotLoggedInWithoutLogin = () => (
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    <GameRegistration
+      project={testProject.project}
+      onGameRegistered={() => {}}
+      hideLogin
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
 export const NotAuthorized = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
@@ -96,16 +106,16 @@ ErrorLoadingGame.parameters = {
   ],
 };
 
-export const RegisteredWithGameStatsEmail = () => (
+export const RegisteredWithAdditionalActions = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
-      suggestGameStatsEmail
+      suggestAdditionalActions
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithGameStatsEmail.parameters = {
+RegisteredWithAdditionalActions.parameters = {
   mockData: [
     {
       url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,

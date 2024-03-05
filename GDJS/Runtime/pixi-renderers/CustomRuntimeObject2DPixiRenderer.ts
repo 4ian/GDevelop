@@ -1,13 +1,12 @@
 namespace gdjs {
   /**
-   * The renderer for a {@link gdjs.CustomRuntimeObject} using Pixi.js.
+   * The renderer for a {@link gdjs.CustomRuntimeObject2D} using Pixi.js.
    */
-  export class CustomObjectPixiRenderer
+  export class CustomRuntimeObject2DPixiRenderer
     implements gdjs.RuntimeInstanceContainerPixiRenderer {
     _object: gdjs.CustomRuntimeObject;
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _pixiContainer: PIXI.Container;
-    _threeGroup: THREE.Group | null;
     _isContainerDirty: boolean = true;
     _debugDraw: PIXI.Graphics | null = null;
     _debugDrawContainer: PIXI.Container | null = null;
@@ -30,8 +29,6 @@ namespace gdjs {
       // TODO (3D) - optimization: don't create a PixiJS container if only 3D objects.
       // And same, in reverse, for 2D only objects.
       this._pixiContainer = new PIXI.Container();
-      this._threeGroup =
-        typeof THREE !== 'undefined' ? new THREE.Group() : null;
       this._debugDrawRenderedObjectsPoints = {};
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
@@ -43,9 +40,6 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
-        if (this._threeGroup) {
-          layer.getRenderer().add3DRendererObject(this._threeGroup);
-        }
       }
     }
 
@@ -60,9 +54,6 @@ namespace gdjs {
         layer
           .getRenderer()
           .addRendererObject(this._pixiContainer, object.getZOrder());
-        if (this._threeGroup) {
-          layer.getRenderer().add3DRendererObject(this._threeGroup);
-        }
       }
     }
 
@@ -71,56 +62,38 @@ namespace gdjs {
     }
 
     get3DRendererObject(): THREE.Object3D | null {
-      return this._threeGroup;
+      return null;
     }
 
     /**
      * Update the internal PIXI.Container position, angle...
      */
     _updatePIXIContainer() {
+      const scaleX = this._object.getScaleX();
+      const scaleY = this._object.getScaleY();
+      const opacity = this._object.getOpacity();
       this._pixiContainer.pivot.x = this._object.getUnscaledCenterX();
       this._pixiContainer.pivot.y = this._object.getUnscaledCenterY();
       this._pixiContainer.position.x =
-        this._object.getX() +
-        this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);
+        this._object.getX() + this._pixiContainer.pivot.x * Math.abs(scaleX);
       this._pixiContainer.position.y =
-        this._object.getY() +
-        this._pixiContainer.pivot.y * Math.abs(this._object._scaleY);
+        this._object.getY() + this._pixiContainer.pivot.y * Math.abs(scaleY);
 
       this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
-      this._pixiContainer.scale.x = this._object._scaleX;
-      this._pixiContainer.scale.y = this._object._scaleY;
+      this._pixiContainer.scale.x = scaleX;
+      this._pixiContainer.scale.y = scaleY;
       this._pixiContainer.visible = !this._object.hidden;
-      this._pixiContainer.alpha = this._object.opacity / 255;
+      this._pixiContainer.alpha = opacity / 255;
 
       this._isContainerDirty = false;
     }
 
-    _updateThreeGroup() {
-      if (!this._threeGroup) return;
-
-      const pivotX = this._object.getUnscaledCenterX();
-      const pivotY = this._object.getUnscaledCenterY();
-
-      // TODO (3D): fix the pivot point for custom objects.
-      this._threeGroup.position.x =
-        this._object.getX() + pivotX * Math.abs(this._object._scaleX);
-      this._threeGroup.position.y =
-        this._object.getY() + pivotY * Math.abs(this._object._scaleY);
-
-      this._threeGroup.rotation.z = gdjs.toRad(this._object.angle);
-      this._threeGroup.scale.x = this._object._scaleX;
-      this._threeGroup.scale.y = this._object._scaleY;
-      this._threeGroup.visible = !this._object.hidden;
-    }
-
     /**
-     * Call this to make sure the sprite is ready to be rendered.
+     * Call this to make sure the object is ready to be rendered.
      */
     ensureUpToDate() {
       if (this._isContainerDirty) {
         this._updatePIXIContainer();
-        this._updateThreeGroup();
       }
     }
 
@@ -129,40 +102,28 @@ namespace gdjs {
     }
 
     updateX(): void {
+      const scaleX = this._object.getScaleX();
       this._pixiContainer.position.x =
-        this._object.x +
-        this._pixiContainer.pivot.x * Math.abs(this._object._scaleX);
-
-      if (this._threeGroup)
-        this._threeGroup.position.x =
-          this._object.getX() +
-          /*this._threeGroup.pivot.x*/ 0.5 * Math.abs(this._object._scaleX);
+        this._object.x + this._pixiContainer.pivot.x * Math.abs(scaleX);
     }
 
     updateY(): void {
+      const scaleY = this._object.getScaleY();
       this._pixiContainer.position.y =
-        this._object.y +
-        this._pixiContainer.pivot.y * Math.abs(this._object._scaleY);
-
-      if (this._threeGroup)
-        this._threeGroup.position.y =
-          this._object.getY() +
-          /*this._threeGroup.pivot.y*/ 0.5 * Math.abs(this._object._scaleY);
+        this._object.y + this._pixiContainer.pivot.y * Math.abs(scaleY);
     }
 
     updateAngle(): void {
       this._pixiContainer.rotation = gdjs.toRad(this._object.angle);
-      if (this._threeGroup)
-        this._threeGroup.rotation.z = gdjs.toRad(this._object.angle);
     }
 
     updateOpacity(): void {
-      this._pixiContainer.alpha = this._object.opacity / 255;
+      const opacity = this._object.getOpacity();
+      this._pixiContainer.alpha = opacity / 255;
     }
 
     updateVisibility(): void {
       this._pixiContainer.visible = !this._object.hidden;
-      if (this._threeGroup) this._threeGroup.visible = !this._object.hidden;
     }
 
     getPIXIContainer() {
@@ -194,6 +155,7 @@ namespace gdjs {
   }
 
   // Register the class to let the engine use it.
-  export type CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
-  export const CustomObjectRenderer = gdjs.CustomObjectPixiRenderer;
+  export type CustomRuntimeObject2DRenderer = gdjs.CustomRuntimeObject2DPixiRenderer;
+  export const CustomRuntimeObject2DRenderer =
+    gdjs.CustomRuntimeObject2DPixiRenderer;
 }

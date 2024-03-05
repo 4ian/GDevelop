@@ -55,6 +55,7 @@ export const Default = () => {
       chosenSection={chosenExporterSection}
       chosenSubSection={chosenExporterSubSection}
       game={null}
+      gameAvailabilityError={null}
     />
   );
 };
@@ -84,6 +85,38 @@ export const OnlineWebExporterSelected = () => {
         chosenSection={chosenExporterSection}
         chosenSubSection={chosenExporterSubSection}
         game={null}
+        gameAvailabilityError={null}
+      />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const OnlineWebExporterSelectedForGameNotOwned = () => {
+  const [
+    chosenExporterSection,
+    setChosenExporterSection,
+  ] = React.useState<?ExporterSection>('browser');
+  const [
+    chosenExporterSubSection,
+    setChosenExporterSubSection,
+  ] = React.useState<?ExporterSubSection>('online');
+  return (
+    <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
+      <PublishHome
+        project={testProject.project}
+        onSaveProject={action('onSaveProject')}
+        isSavingProject={false}
+        onGameUpdated={action('onGameUpdated')}
+        onChangeSubscription={action('onChangeSubscription')}
+        isNavigationDisabled={false}
+        setIsNavigationDisabled={action('setIsNavigationDisabled')}
+        selectedExporter={onlineWebExporter}
+        onChooseSection={setChosenExporterSection}
+        onChooseSubSection={setChosenExporterSubSection}
+        chosenSection={chosenExporterSection}
+        chosenSubSection={chosenExporterSubSection}
+        game={null}
+        gameAvailabilityError="not-owned"
       />
     </AuthenticatedUserContext.Provider>
   );
@@ -114,6 +147,7 @@ export const OnlyOnlineWebExporter = () => {
         chosenSection={chosenExporterSection}
         chosenSubSection={chosenExporterSubSection}
         game={null}
+        gameAvailabilityError={null}
         showOnlineWebExporterOnly
       />
     </AuthenticatedUserContext.Provider>

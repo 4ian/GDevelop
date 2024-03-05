@@ -19,6 +19,9 @@
   },
   "build": {
     "appId": "GDJS_GAME_PACKAGE_NAME",
+    "extraFiles": [
+      "LICENSE.GDevelop.txt"
+    ],
     "directories": {
       "buildResources": "buildResources"
     }

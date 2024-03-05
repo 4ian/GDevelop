@@ -17,6 +17,7 @@ import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetS
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
 import { sendGameTemplateInformationOpened } from '../../Utils/Analytics/EventSender';
+import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -93,13 +94,11 @@ export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTe
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
-  onlyAppStorePrivateGameTemplates?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
 export const PrivateGameTemplateStoreStateProvider = ({
-  onlyAppStorePrivateGameTemplates,
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
@@ -137,11 +136,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates(
-            {
-              onlyAppStorePrivateGameTemplates,
-            }
-          );
+          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
 
           console.info(
             `Loaded ${
@@ -182,11 +177,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [
-      isLoading,
-      onlyAppStorePrivateGameTemplates,
-      privateGameTemplateListingDatas,
-    ]
+    [privateGameTemplateListingDatas]
   );
 
   // When the game templates are loaded,
@@ -254,10 +245,10 @@ export const PrivateGameTemplateStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching game templates from the store...');
         fetchGameTemplates();
-      }, 5000);
+      }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchGameTemplates, isLoading]
+    [fetchGameTemplates]
   );
 
   const privateGameTemplateListingDatasById = React.useMemo(

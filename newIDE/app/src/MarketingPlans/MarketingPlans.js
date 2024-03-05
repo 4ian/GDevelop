@@ -4,35 +4,35 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   ColumnStackLayout,
   LineStackLayout,
   ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+} from '../UI/Layout';
 import {
   buyGameFeaturing,
-  listMarketingPlans,
   listGameFeaturings,
   type Game,
   type MarketingPlan,
   type GameFeaturing,
-} from '../../Utils/GDevelopServices/Game';
-import Text from '../../UI/Text';
-import Link from '../../UI/Link';
-import Window from '../../Utils/Window';
+} from '../Utils/GDevelopServices/Game';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import Window from '../Utils/Window';
 import Basic from './Icons/Basic';
 import Pro from './Icons/Pro';
 import Premium from './Icons/Premium';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { Column, Line } from '../../UI/Grid';
-import RaisedButton from '../../UI/RaisedButton';
-import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
-import useAlertDialog from '../../UI/Alert/useAlertDialog';
-import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import PlaceholderError from '../../UI/PlaceholderError';
-import CircularProgress from '../../UI/CircularProgress';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
+import CheckCircle from '../UI/CustomSvgIcons/CheckCircle';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import PlaceholderError from '../UI/PlaceholderError';
+import { CreditsPackageStoreContext } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { MarketingPlansStoreContext } from './MarketingPlansStoreContext';
 
 const styles = {
   campaign: {
@@ -73,27 +73,25 @@ type Props = {|
 |};
 
 const MarketingPlans = ({ game }: Props) => {
-  const {
-    profile,
-    limits,
-    getAuthorizationHeader,
-    onRefreshLimits,
-  } = React.useContext(AuthenticatedUserContext);
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { showConfirmation, showAlert } = useAlertDialog();
-  const [marketingPlans, setMarketingPlans] = React.useState<
-    MarketingPlan[] | null
-  >(null);
-  const [marketingPlansError, setMarketingPlansError] = React.useState<?Error>(
-    null
+  const { profile, limits, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
   );
+  const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
+    CreditsPackageStoreContext
+  );
+  const {
+    marketingPlans,
+    error: marketingPlansError,
+    fetchMarketingPlans,
+  } = React.useContext(MarketingPlansStoreContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { showAlert } = useAlertDialog();
   const [gameFeaturings, setGameFeaturings] = React.useState<
     GameFeaturing[] | null
   >(null);
   const [gameFeaturingsError, setGameFeaturingsError] = React.useState<?Error>(
     null
   );
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const {
     activeBasicFeaturing,
@@ -145,17 +143,6 @@ const MarketingPlans = ({ game }: Props) => {
     },
     [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
   );
-
-  const fetchMarketingPlans = React.useCallback(async () => {
-    try {
-      setMarketingPlansError(null);
-      const marketingPlans = await listMarketingPlans();
-      setMarketingPlans(marketingPlans);
-    } catch (error) {
-      console.error('An error occurred while fetching marketing plans.', error);
-      setMarketingPlansError(error);
-    }
-  }, []);
 
   React.useEffect(
     () => {
@@ -224,62 +211,55 @@ const MarketingPlans = ({ game }: Props) => {
 
       const currentCreditsAmount = limits.credits.userBalance.amount;
       if (currentCreditsAmount < packCreditsAmount) {
-        await showAlert({
-          title: t`Get Featuring`,
-          message: t`You do not have enough credits to purchase the ${translatedName} game featuring. You currently have ${currentCreditsAmount} credits.`,
+        openCreditsPackageDialog({
+          missingCredits: packCreditsAmount - currentCreditsAmount,
         });
         return;
       }
 
-      const response = await showConfirmation({
-        title: activeFeaturing ? t`Extend Featuring` : t`Get Featuring`,
-        message: activeFeaturing
-          ? t`You are about to use ${packCreditsAmount} credits to extend the game featuring ${translatedName} for your game ${
-              game.gameName
-            }. Continue?`
-          : t`You are about to use ${packCreditsAmount} credits to purchase the game featuring ${translatedName} for your game ${
-              game.gameName
-            }. Continue?`,
-        confirmButtonLabel: activeFeaturing
-          ? t`Extend featuring`
-          : t`Get featuring`,
+      openCreditsUsageDialog({
+        title: activeFeaturing ? (
+          <Trans>Extend Featuring</Trans>
+        ) : (
+          <Trans>Get Featuring</Trans>
+        ),
+        message: activeFeaturing ? (
+          <Trans>
+            You are about to use {packCreditsAmount} credits to extend the game
+            featuring {translatedName} for your game {game.gameName} and push it
+            to the top of gd.games. Continue?
+          </Trans>
+        ) : (
+          <Trans>
+            You are about to use {packCreditsAmount} credits to purchase the
+            game featuring {translatedName} for your game {game.gameName}.
+            Continue?
+          </Trans>
+        ),
+        onConfirm: async () => {
+          await buyGameFeaturing(getAuthorizationHeader, {
+            gameId: game.id,
+            usageType: id,
+            userId: profile.id,
+          });
+          await fetchGameFeaturings();
+        },
+        successMessage:
+          marketingPlan.id === 'featuring-basic' ? (
+            <Trans>
+              🎉 Congrats on getting the {translatedName} featuring for your
+              game {game.gameName}! Ensure that your game is public and you have
+              configured a thumbnail for gd.games. This can take a few minutes
+              for your game to be visible on the platform.
+            </Trans>
+          ) : (
+            <Trans>
+              🎉 Congrats on getting the {translatedName} featuring for your
+              game {game.gameName}. We will get in touch with you to get the
+              campaign up!
+            </Trans>
+          ),
       });
-      if (!response) return;
-
-      try {
-        setIsLoading(true);
-        await buyGameFeaturing(getAuthorizationHeader, {
-          gameId: game.id,
-          usageType: id,
-          userId: profile.id,
-        });
-        // Refresh the game featurings and the credits.
-        await fetchGameFeaturings();
-        await onRefreshLimits();
-        if (marketingPlan.id === 'featuring-basic') {
-          showAlert({
-            title: t`Featuring purchased 🎉`,
-            message: t`Congrats on getting the ${translatedName} featuring for your game ${
-              game.gameName
-            }! Ensure that your game is public and you have configured a thumbnail for gd.games.`,
-          });
-        } else {
-          showAlert({
-            title: t`Featuring purchased 🎉`,
-            message: t`Congrats on getting the ${translatedName} featuring for your game ${
-              game.gameName
-            }. We will get in touch with you to get the campaign up!`,
-          });
-        }
-      } catch {
-        await showAlert({
-          title: t`Could not purchase featuring`,
-          message: t`An error happened while purchasing the featuring. Verify your internet connection or try again later.`,
-        });
-        return;
-      } finally {
-        setIsLoading(false);
-      }
     },
     [
       game,
@@ -287,12 +267,53 @@ const MarketingPlans = ({ game }: Props) => {
       limits,
       profile,
       showAlert,
-      showConfirmation,
       getActiveFeaturing,
       fetchGameFeaturings,
-      onRefreshLimits,
+      openCreditsPackageDialog,
+      openCreditsUsageDialog,
     ]
   );
+
+  const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
+    const requirementsErrors = [];
+    if (marketingPlan.id === 'featuring-basic') {
+      if (!game.thumbnailUrl) {
+        requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
+      }
+      if (!game.publicWebBuildId) {
+        requirementsErrors.push(
+          <Trans>Your game does not have a public build</Trans>
+        );
+      }
+      if (!game.discoverable) {
+        requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
+      }
+    }
+
+    return requirementsErrors;
+  };
+
+  const getActiveMessage = ({
+    marketingPlan,
+    activeFeaturing,
+    i18n,
+    hasErrors,
+  }: {|
+    marketingPlan: MarketingPlan,
+    activeFeaturing: GameFeaturing,
+    i18n: I18nType,
+    hasErrors: boolean,
+  |}) => {
+    if (hasErrors) {
+      return <Trans>Fix those issues to get the campaign up!</Trans>;
+    }
+
+    return activeFeaturing.featuring === 'games-platform-home' ? (
+      <Trans>Active until {i18n.date(activeFeaturing.expiresAt * 1000)}</Trans>
+    ) : (
+      <Trans>Active, we will get in touch to get the campaign up!</Trans>
+    );
+  };
 
   if (!profile) return null;
 
@@ -311,13 +332,10 @@ const MarketingPlans = ({ game }: Props) => {
               connection or try again later.
             </Trans>
           </PlaceholderError>
-        ) : !marketingPlans || !gameFeaturings ? (
+        ) : !marketingPlans ? (
           <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
-            <Text size="sub-title">
-              <Trans>Marketing Campaigns</Trans>
-            </Text>
             <Text color="secondary" noMargin>
               <Trans>
                 Get ready-made packs to make your game visible to the GDevelop
@@ -345,6 +363,10 @@ const MarketingPlans = ({ game }: Props) => {
                   bulletPointsByLocale,
                 } = marketingPlan;
                 const activeFeaturing = getActiveFeaturing(marketingPlan);
+                const requirementsErrors = activeFeaturing
+                  ? getRequirementsErrors(marketingPlan)
+                  : [];
+                const hasErrors = requirementsErrors.length > 0;
                 return (
                   <div
                     style={{
@@ -380,28 +402,45 @@ const MarketingPlans = ({ game }: Props) => {
                       </div>
 
                       <div style={styles.bulletPointsContainer}>
-                        {bulletPointsByLocale.map(
-                          (bulletPointByLocale, index) => (
-                            <Column key={index} expand noMargin>
-                              <Line noMargin alignItems="center">
-                                <CheckCircle
-                                  style={{
-                                    ...styles.bulletIcon,
-                                    ...(activeFeaturing
-                                      ? { color: gdevelopTheme.message.valid }
-                                      : {}),
-                                  }}
-                                />
-                                <Text style={{ flex: 1 }}>
-                                  {selectMessageByLocale(
-                                    i18n,
-                                    bulletPointByLocale
-                                  )}
-                                </Text>
-                              </Line>
-                            </Column>
-                          )
-                        )}
+                        {hasErrors
+                          ? requirementsErrors.map((error, index) => (
+                              <Column key={index} expand noMargin>
+                                <Line noMargin alignItems="center">
+                                  <CheckCircle
+                                    style={{
+                                      ...styles.bulletIcon,
+                                      color: gdevelopTheme.message.error,
+                                    }}
+                                  />
+                                  <Text style={{ flex: 1 }}>{error}</Text>
+                                </Line>
+                              </Column>
+                            ))
+                          : bulletPointsByLocale.map(
+                              (bulletPointByLocale, index) => (
+                                <Column key={index} expand noMargin>
+                                  <Line noMargin alignItems="center">
+                                    <CheckCircle
+                                      style={{
+                                        ...styles.bulletIcon,
+                                        ...(activeFeaturing
+                                          ? {
+                                              color:
+                                                gdevelopTheme.message.valid,
+                                            }
+                                          : {}),
+                                      }}
+                                    />
+                                    <Text style={{ flex: 1 }}>
+                                      {selectMessageByLocale(
+                                        i18n,
+                                        bulletPointByLocale
+                                      )}
+                                    </Text>
+                                  </Line>
+                                </Column>
+                              )
+                            )}
                       </div>
 
                       <Column
@@ -416,36 +455,22 @@ const MarketingPlans = ({ game }: Props) => {
                           color="secondary"
                           align="left"
                         >
-                          {activeFeaturing ? (
-                            activeFeaturing.featuring ===
-                            'games-platform-home' ? (
-                              <Trans>
-                                Active until{' '}
-                                {i18n.date(activeFeaturing.expiresAt * 1000)}
-                              </Trans>
-                            ) : (
-                              <Trans>
-                                Active, we will get in touch to get the campaign
-                                up!
-                              </Trans>
-                            )
-                          ) : (
-                            selectMessageByLocale(i18n, descriptionByLocale)
-                          )}
+                          {activeFeaturing
+                            ? getActiveMessage({
+                                activeFeaturing,
+                                marketingPlan,
+                                i18n,
+                                hasErrors,
+                              })
+                            : selectMessageByLocale(i18n, descriptionByLocale)}
                         </Text>
                       </Column>
                       <RaisedButton
                         primary={!activeFeaturing}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
-                          isLoading ? (
-                            <Column
-                              noMargin
-                              justifyContent="center"
-                              alignItems="center"
-                            >
-                              <CircularProgress size={20} />
-                            </Column>
+                          !gameFeaturings ? (
+                            <Trans>Loading...</Trans>
                           ) : activeFeaturing ? (
                             activeFeaturing.featuring ===
                             'games-platform-home' ? (
@@ -458,7 +483,7 @@ const MarketingPlans = ({ game }: Props) => {
                           )
                         }
                         fullWidth
-                        disabled={isLoading}
+                        disabled={!gameFeaturings}
                       />
                     </ColumnStackLayout>
                   </div>

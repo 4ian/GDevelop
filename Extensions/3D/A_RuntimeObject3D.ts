@@ -154,7 +154,23 @@ namespace gdjs {
      * @return The Z position of the rendered object.
      */
     getDrawableZ(): float {
-      return this.getZ();
+      return this._z;
+    }
+
+    /**
+     * Return the bottom Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getUnrotatedAABBMinZ(): number {
+      return this.getDrawableZ();
+    }
+
+    /**
+     * Return the top Z of the object.
+     * Rotations around X and Y are not taken into account.
+     */
+    getUnrotatedAABBMaxZ(): number {
+      return this.getDrawableZ() + this.getDepth();
     }
 
     /**

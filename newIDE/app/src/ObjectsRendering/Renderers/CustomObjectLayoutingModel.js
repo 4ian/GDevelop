@@ -61,6 +61,7 @@ export type ChildLayout = {
   isShown: boolean,
   horizontalLayout: AxisLayout,
   verticalLayout: AxisLayout,
+  depthLayout: AxisLayout,
 };
 
 /**
@@ -82,6 +83,7 @@ const layoutFields = [
   'AnchorDeltaY',
   'IsScaledProportionallyOnX',
   'IsScaledProportionallyOnY',
+  'IsScaledProportionallyOnZ',
   'IsScaledProportionally',
 ];
 
@@ -121,6 +123,27 @@ export const getProportionalPositionY = (
   return verticalPositionName === 'top'
     ? 0
     : verticalPositionName === 'bottom'
+    ? 1
+    : verticalPositionName === 'center'
+    ? 0.5
+    : null;
+};
+
+/**
+ * @param positionName Accepted values are: 'Zmin', 'center' or 'Zmax', but
+ * also values like 'top-left-Zmin'.
+ * @returns a value between 0 and 1.
+ */
+export const getProportionalPositionZ = (
+  positionName: string
+): number | null => {
+  const verticalPositionName = (positionName.includes('-')
+    ? positionName.split('-')[2] || ''
+    : positionName
+  ).toLowerCase();
+  return verticalPositionName === 'Zmin'
+    ? 0
+    : verticalPositionName === 'Zmax'
     ? 1
     : verticalPositionName === 'center'
     ? 0.5
@@ -285,6 +308,7 @@ export const getLayouts = (
           isShown: true,
           horizontalLayout: {},
           verticalLayout: {},
+          depthLayout: {},
         };
         layouts.set(childName, layout);
       }
@@ -308,9 +332,12 @@ export const getLayouts = (
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionallyOnY') {
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
+      } else if (layoutField === 'IsScaledProportionallyOnZ') {
+        layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else if (layoutField === 'IsScaledProportionally') {
         layout.horizontalLayout.isScaledProportionally = propertyValueBoolean;
         layout.verticalLayout.isScaledProportionally = propertyValueBoolean;
+        layout.depthLayout.isScaledProportionally = propertyValueBoolean;
       } else {
         if (
           layoutField === 'HorizontalAnchorOrigin' ||
@@ -359,16 +386,22 @@ export const getLayouts = (
 export class ChildInstance {
   x: number;
   y: number;
+  z: number;
   _hasCustomSize: boolean;
+  _hasCustomDepth: boolean;
   _customWidth: number;
   _customHeight: number;
+  _customDepth: number;
 
   constructor() {
     this.x = 0;
     this.y = 0;
+    this.z = 0;
     this._customWidth = 0;
     this._customHeight = 0;
+    this._customDepth = 0;
     this._hasCustomSize = false;
+    this._hasCustomDepth = false;
   }
 
   getX() {
@@ -380,7 +413,7 @@ export class ChildInstance {
   }
 
   getZ() {
-    return 0;
+    return this.z;
   }
 
   getAngle() {
@@ -446,8 +479,9 @@ export class ChildInstance {
   }
 
   hasCustomDepth() {
-    return false;
+    return this._hasCustomDepth;
   }
+
   setCustomWidth(width: number) {
     this._customWidth = width;
     this._hasCustomSize = true;
@@ -467,11 +501,12 @@ export class ChildInstance {
   }
 
   setCustomDepth(depth: number) {
-    // Not implemented.
+    this._customDepth = depth;
+    this._hasCustomDepth = true;
   }
 
   getCustomDepth() {
-    return 0;
+    return this._customDepth;
   }
 
   resetPersistentUuid() {
@@ -535,6 +570,7 @@ export interface LayoutedParent<
   childrenRenderedInstanceByNames: Map<string, CovariantChildRenderedInstance>;
   getWidth(): number;
   getHeight(): number;
+  getDepth(): number;
 }
 
 export const applyChildLayouts = <T: ChildRenderedInstance>(
@@ -634,6 +670,10 @@ export const applyChildLayouts = <T: ChildRenderedInstance>(
         anchorOrigin * height;
       childInstance.setCustomHeight(height);
     }
+
+    childInstance.z = 0;
+    childInstance.setCustomDepth(parent.getDepth());
+
     renderedInstance.update();
   }
 };

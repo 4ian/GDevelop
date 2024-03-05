@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import Copy from '../CustomSvgIcons/Copy';
 import IconButton from '../IconButton';
-import { TextFieldWithButtonLayout } from '../Layout';
+import { ResponsiveLineStackLayout } from '../Layout';
 import RaisedButton from '../RaisedButton';
 import TextField from '../TextField';
 import Window from '../../Utils/Window';
@@ -27,34 +27,28 @@ const ShareLink = ({ url }: Props) => {
   };
   return (
     <>
-      <TextFieldWithButtonLayout
-        noFloatingLabelText
-        renderTextField={() => (
-          <TextField
-            value={url}
-            readOnly
-            fullWidth
-            endAdornment={
-              <IconButton
-                onClick={onCopyLinkToClipboard}
-                tooltip={t`Copy`}
-                edge="end"
-              >
-                <Copy />
-              </IconButton>
-            }
-          />
-        )}
-        renderButton={style => (
-          <RaisedButton
-            primary
-            id="open-online-export-button"
-            label={<Trans>Open</Trans>}
-            onClick={onOpen}
-            style={style}
-          />
-        )}
-      />
+      <ResponsiveLineStackLayout alignItems="center" noMargin>
+        <TextField
+          value={url}
+          readOnly
+          fullWidth
+          endAdornment={
+            <IconButton
+              onClick={onCopyLinkToClipboard}
+              tooltip={t`Copy`}
+              edge="end"
+            >
+              <Copy />
+            </IconButton>
+          }
+        />
+        <RaisedButton
+          primary
+          id="open-online-export-button"
+          label={<Trans>Open</Trans>}
+          onClick={onOpen}
+        />
+      </ResponsiveLineStackLayout>
       <InfoBar
         message={<Trans>Copied to clipboard!</Trans>}
         visible={showCopiedInfoBar}

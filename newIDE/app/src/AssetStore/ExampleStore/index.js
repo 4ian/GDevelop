@@ -6,14 +6,13 @@ import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import ExampleListItem from './ExampleListItem';
-import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import {
   sendExampleDetailsOpened,
   sendGameTemplateInformationOpened,
 } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import PrivateGameTemplateListItem from '../PrivateGameTemplates/PrivateGameTemplateListItem';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
@@ -193,87 +192,83 @@ export const ExampleStore = ({
 
   return (
     <React.Fragment>
-      <ResponsiveWindowMeasurer>
-        {windowWidth => (
-          <Column expand noMargin useFullHeight>
-            <Line>
-              <Column expand noMargin>
-                <SearchBar
-                  value={searchText}
-                  onChange={setSearchText}
-                  onRequestSearch={() => {}}
-                  tagsHandler={tagsHandler}
-                  tags={defaultTags}
-                  ref={searchBarRef}
-                  placeholder={t`Search examples`}
-                />
-              </Column>
-            </Line>
-            <Line
-              expand
-              overflow={
-                'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
-              }
-              noMargin
-            >
-              <ListSearchResults
-                disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
-                onRetry={fetchGameTemplatesAndExamples}
-                error={gameTemplateStoreError || exampleStoreError}
-                searchItems={searchItems}
-                getSearchItemUniqueId={getItemUniqueId}
-                renderSearchItem={(item, onHeightComputed) => {
-                  if (item.authorIds) {
-                    // This is an ExampleShortHeader.
-                    return (
-                      <ExampleListItem
-                        isOpening={isOpening}
-                        onHeightComputed={onHeightComputed}
-                        exampleShortHeader={item}
-                        matches={getExampleShortHeaderMatches(item)}
-                        onChoose={() => {
-                          sendExampleDetailsOpened(item.slug);
-                          onSelectExampleShortHeader(item);
-                        }}
-                        onOpen={() => {
-                          onSelectExampleShortHeader(item);
-                          onOpenNewProjectSetupDialog();
-                        }}
-                      />
-                    );
-                  }
-                  if (item.listing) {
-                    // This is a PrivateGameTemplateListingData.
-                    const isTemplateOwned =
-                      !!receivedGameTemplates &&
-                      !!receivedGameTemplates.find(
-                        template => template.id === item.id
-                      );
-                    return (
-                      <PrivateGameTemplateListItem
-                        isOpening={isOpening}
-                        onHeightComputed={onHeightComputed}
-                        privateGameTemplateListingData={item}
-                        matches={getPrivateAssetPackListingDataMatches(item)}
-                        onChoose={() => {
-                          onSelectPrivateGameTemplateListingData(item);
-                          sendGameTemplateInformationOpened({
-                            gameTemplateName: item.name,
-                            gameTemplateId: item.id,
-                            source: 'examples-list',
-                          });
-                        }}
-                        owned={isTemplateOwned}
-                      />
-                    );
-                  }
-                  return null; // Should not happen.
-                }}
-              />
-            </Line>
+      <Column expand noMargin useFullHeight>
+        <Line>
+          <Column expand noMargin>
+            <SearchBar
+              value={searchText}
+              onChange={setSearchText}
+              onRequestSearch={() => {}}
+              tagsHandler={tagsHandler}
+              tags={defaultTags}
+              ref={searchBarRef}
+              placeholder={t`Search examples`}
+            />
           </Column>
-        )}
-      </ResponsiveWindowMeasurer>
+        </Line>
+        <Line
+          expand
+          overflow={
+            'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+          }
+          noMargin
+        >
+          <ListSearchResults
+            disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+            onRetry={fetchGameTemplatesAndExamples}
+            error={gameTemplateStoreError || exampleStoreError}
+            searchItems={searchItems}
+            getSearchItemUniqueId={getItemUniqueId}
+            renderSearchItem={(item, onHeightComputed) => {
+              if (item.authorIds) {
+                // This is an ExampleShortHeader.
+                return (
+                  <ExampleListItem
+                    isOpening={isOpening}
+                    onHeightComputed={onHeightComputed}
+                    exampleShortHeader={item}
+                    matches={getExampleShortHeaderMatches(item)}
+                    onChoose={() => {
+                      sendExampleDetailsOpened(item.slug);
+                      onSelectExampleShortHeader(item);
+                    }}
+                    onOpen={() => {
+                      onSelectExampleShortHeader(item);
+                      onOpenNewProjectSetupDialog();
+                    }}
+                  />
+                );
+              }
+              if (item.listing) {
+                // This is a PrivateGameTemplateListingData.
+                const isTemplateOwned =
+                  !!receivedGameTemplates &&
+                  !!receivedGameTemplates.find(
+                    template => template.id === item.id
+                  );
+                return (
+                  <PrivateGameTemplateListItem
+                    isOpening={isOpening}
+                    onHeightComputed={onHeightComputed}
+                    privateGameTemplateListingData={item}
+                    matches={getPrivateAssetPackListingDataMatches(item)}
+                    onChoose={() => {
+                      onSelectPrivateGameTemplateListingData(item);
+                      sendGameTemplateInformationOpened({
+                        gameTemplateName: item.name,
+                        gameTemplateId: item.id,
+                        source: 'examples-list',
+                      });
+                    }}
+                    owned={isTemplateOwned}
+                  />
+                );
+              }
+              return null; // Should not happen.
+            }}
+          />
+        </Line>
+      </Column>
     </React.Fragment>
   );
 };

@@ -99,13 +99,6 @@ export class MapStringString extends EmscriptenObject {
   keys(): VectorString;
 }
 
-export class MapStringVectorString extends EmscriptenObject {
-  constructor(): void;
-  get(name: string): VectorString;
-  has(name: string): boolean;
-  keys(): VectorString;
-}
-
 export class MapStringBoolean extends EmscriptenObject {
   constructor(): void;
   get(name: string): boolean;
@@ -494,6 +487,7 @@ export class Project extends EmscriptenObject {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): ExternalEvents;
   getExternalEventsAt(index: number): ExternalEvents;
@@ -502,6 +496,7 @@ export class Project extends EmscriptenObject {
   getExternalEventsCount(): number;
   insertNewExternalEvents(name: string, position: number): ExternalEvents;
   removeExternalEvents(name: string): void;
+  getExternalEventsPosition(name: string): number;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): ExternalLayout;
   getExternalLayoutAt(index: number): ExternalLayout;
@@ -510,6 +505,7 @@ export class Project extends EmscriptenObject {
   getExternalLayoutsCount(): number;
   insertNewExternalLayout(name: string, position: number): ExternalLayout;
   removeExternalLayout(name: string): void;
+  getExternalLayoutPosition(name: string): number;
   hasEventsFunctionsExtensionNamed(name: string): boolean;
   getEventsFunctionsExtension(name: string): EventsFunctionsExtension;
   getEventsFunctionsExtensionAt(index: number): EventsFunctionsExtension;
@@ -519,6 +515,7 @@ export class Project extends EmscriptenObject {
   insertNewEventsFunctionsExtension(name: string, position: number): EventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: EventsFunctionsExtension, position: number): EventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  getEventsFunctionsExtensionPosition(name: string): number;
   hasEventsBasedBehavior(type: string): boolean;
   getEventsBasedBehavior(type: string): EventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
@@ -645,7 +642,6 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  is3DObject(): boolean;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
   getEffects(): EffectsContainer;
@@ -1136,7 +1132,7 @@ export class Serializer extends EmscriptenObject {
 }
 
 export class ObjectAssetSerializer extends EmscriptenObject {
-  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, resourcesNewFileNames: MapStringVectorString): void;
+  static serializeTo(project: Project, obj: gdObject, objectFullName: string, element: SerializerElement, usedResourceNames: VectorString): void;
 }
 
 export class InstructionsList extends EmscriptenObject {

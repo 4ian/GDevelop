@@ -39,7 +39,6 @@ import {
   getPrivateAssetPackListingDataFromUserFriendlySlug,
 } from './AssetStoreUtils';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { getStableRandomArray } from '../Utils/Random';
 
 const defaultSearchText = '';
 
@@ -67,10 +66,6 @@ type AssetStoreState = {|
   filters: ?Filters,
   publicAssetPacks: ?PublicAssetPacks,
   privateAssetPackListingDatas: ?Array<PrivateAssetPackListingData>,
-  assetPackRandomOrdering: ?{|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   environment: Environment,
@@ -100,7 +95,6 @@ export const initialAssetStoreState: AssetStoreState = {
   filters: null,
   publicAssetPacks: null,
   privateAssetPackListingDatas: null,
-  assetPackRandomOrdering: null,
   authors: null,
   licenses: null,
   environment: 'live',
@@ -164,7 +158,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>(
 );
 
 type AssetStoreStateProviderProps = {|
-  onlyAppStorePrivateAssetPacks?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
@@ -187,7 +180,6 @@ const getPrivateAssetPackListingDataSearchTerms = (
 ) => privateAssetPack.name + '\n' + privateAssetPack.description;
 
 export const AssetStoreStateProvider = ({
-  onlyAppStorePrivateAssetPacks,
   shopNavigationState,
   children,
 }: AssetStoreStateProviderProps) => {
@@ -206,13 +198,6 @@ export const AssetStoreStateProvider = ({
     publicAssetPacks,
     setPublicAssetPacks,
   ] = React.useState<?PublicAssetPacks>(null);
-  const [
-    assetPackRandomOrdering,
-    setAssetPackRandomOrdering,
-  ] = React.useState<?{|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |}>(null);
   const [
     privateAssetPackListingDatas,
     setPrivateAssetPackListingDatas,
@@ -312,11 +297,7 @@ export const AssetStoreStateProvider = ({
           } = await listAllPublicAssets({ environment });
           const fetchedAuthors = await listAllAuthors({ environment });
           const fetchedLicenses = await listAllLicenses({ environment });
-          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks(
-            {
-              onlyAppStorePrivateAssetPacks,
-            }
-          );
+          const fetchedPrivateAssetPackListingDatas = await listListedPrivateAssetPacks();
 
           console.info(
             `Loaded ${
@@ -340,7 +321,7 @@ export const AssetStoreStateProvider = ({
         }
       })();
     },
-    [environment, onlyAppStorePrivateAssetPacks]
+    [environment]
   );
 
   // When the public assets or the private assets are loaded, regenerate the
@@ -484,27 +465,6 @@ export const AssetStoreStateProvider = ({
     [privateAssetPackListingDatas]
   );
 
-  // Randomize asset packs when number of asset packs and private asset packs change
-  const assetPackCount =
-    publicAssetPacks && publicAssetPacks.starterPacks
-      ? publicAssetPacks.starterPacks.length
-      : undefined;
-  const privateAssetPackCount = privateAssetPackListingDatas
-    ? privateAssetPackListingDatas.length
-    : undefined;
-  React.useEffect(
-    () => {
-      if (assetPackCount === undefined || privateAssetPackCount === undefined) {
-        return;
-      }
-      setAssetPackRandomOrdering({
-        starterPacks: getStableRandomArray(assetPackCount),
-        privateAssetPacks: getStableRandomArray(privateAssetPackCount),
-      });
-    },
-    [assetPackCount, privateAssetPackCount]
-  );
-
   const currentPage = shopNavigationState.getCurrentPage();
   const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const assetShortHeadersSearchResults: ?Array<AssetShortHeader> = useSearchItem(
@@ -603,7 +563,6 @@ export const AssetStoreStateProvider = ({
       filters,
       publicAssetPacks,
       privateAssetPackListingDatas,
-      assetPackRandomOrdering,
       authors,
       licenses,
       environment,
@@ -640,7 +599,6 @@ export const AssetStoreStateProvider = ({
       filters,
       publicAssetPacks,
       privateAssetPackListingDatas,
-      assetPackRandomOrdering,
       authors,
       licenses,
       environment,

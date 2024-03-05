@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -14,14 +13,17 @@ import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire';
 import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineCordovaExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -43,6 +45,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
+const exportPipelineName = 'local-online-cordova';
+
 export const localOnlineCordovaExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -50,7 +54,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-cordova',
+  name: exportPipelineName,
   onlineBuildType: 'cordova-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
@@ -74,7 +78,11 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
+  shouldSuggestBumpingVersionNumber: () => true,
+
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

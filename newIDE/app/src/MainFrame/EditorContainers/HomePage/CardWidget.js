@@ -3,7 +3,7 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   buttonBase: {
@@ -64,13 +64,12 @@ export const CardWidget = ({
   useDefaultDisabledStyle,
 }: Props) => {
   const classes = useStylesForWidget(useDefaultDisabledStyle);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const widgetMaxWidth =
     size === 'banner'
       ? undefined
-      : isMobileScreen
+      : isMobile
       ? undefined
       : size === 'small'
       ? SMALL_WIDGET_SIZE

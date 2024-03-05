@@ -17,6 +17,29 @@ import { MarkdownText } from '../UI/MarkdownText';
 import Paper from '../UI/Paper';
 import { getAnnouncementContent } from './AnnouncementFormatting';
 import RouterContext from '../MainFrame/RouterContext';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+
+const styles = {
+  markdownContainer: {
+    transition: 'transform 0.3s ease-in-out',
+  },
+};
+
+const useStylesForClickableContainer = () =>
+  makeStyles(theme =>
+    createStyles({
+      root: {
+        '&:hover': {
+          transform: 'scale(1.02)',
+        },
+        '&:focus': {
+          transform: 'scale(1.02)',
+          outline: 'none',
+        },
+      },
+    })
+  )();
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
@@ -31,15 +54,20 @@ export const AnnouncementsFeed = ({
   addMargins,
   hideLoader,
 }: AnnouncementsFeedProps) => {
-  const { announcements, error, fetchAnnouncements } = React.useContext(
-    AnnouncementsFeedContext
-  );
+  const {
+    announcements,
+    error,
+    fetchAnnouncementsAndPromotions,
+  } = React.useContext(AnnouncementsFeedContext);
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
   const { navigateToRoute } = React.useContext(RouterContext);
+  const { isMobile } = useResponsiveWindowSize();
+
+  const classesForClickableContainer = useStylesForClickableContainer();
 
   if (error) {
     return (
-      <PlaceholderError onRetry={fetchAnnouncements}>
+      <PlaceholderError onRetry={fetchAnnouncementsAndPromotions}>
         <Trans>
           Can't load the announcements. Verify your internet connection or try
           again later.
@@ -68,21 +96,31 @@ export const AnnouncementsFeed = ({
         <Paper square background="dark">
           <Line noMargin={!addMargins}>
             <ColumnStackLayout noMargin={!addMargins} expand>
-              {displayedAnnouncements.map(announcement => {
+              {displayedAnnouncements.map((announcement, index) => {
                 const { buttonLabelByLocale, buttonUrl } = announcement;
                 const {
                   title,
-                  message,
-                  routeNavigationParams,
+                  desktopMessage,
+                  mobileMessage,
+                  desktopRouteNavigationParams,
+                  mobileRouteNavigationParams,
+                  isClickableContent,
                 } = getAnnouncementContent(i18n, announcement);
 
-                const onClick = routeNavigationParams
-                  ? () =>
-                      navigateToRoute(
-                        routeNavigationParams.route,
-                        routeNavigationParams.params
-                      )
-                  : null;
+                const onClick =
+                  desktopRouteNavigationParams && !isMobile
+                    ? () =>
+                        navigateToRoute(
+                          desktopRouteNavigationParams.route,
+                          desktopRouteNavigationParams.params
+                        )
+                    : mobileRouteNavigationParams && isMobile
+                    ? () =>
+                        navigateToRoute(
+                          mobileRouteNavigationParams.route,
+                          mobileRouteNavigationParams.params
+                        )
+                    : undefined;
 
                 return (
                   <AlertMessage
@@ -112,8 +150,26 @@ export const AnnouncementsFeed = ({
                     markdownImageOnly={!title}
                   >
                     {title ? <Text size="block-title">{title}</Text> : null}
-                    <div onClick={onClick}>
-                      <MarkdownText source={message} allowParagraphs={false} />
+                    <div
+                      onClick={onClick}
+                      className={
+                        isClickableContent
+                          ? classesForClickableContainer.root
+                          : undefined
+                      }
+                      style={styles.markdownContainer}
+                    >
+                      {isMobile ? (
+                        <MarkdownText
+                          source={mobileMessage}
+                          allowParagraphs={false}
+                        />
+                      ) : (
+                        <MarkdownText
+                          source={desktopMessage}
+                          allowParagraphs={false}
+                        />
+                      )}
                     </div>
                   </AlertMessage>
                 );

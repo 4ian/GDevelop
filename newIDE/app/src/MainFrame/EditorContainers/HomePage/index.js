@@ -21,13 +21,11 @@ import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
-import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSource';
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
@@ -167,7 +165,6 @@ export const HomePage = React.memo<Props>(
       );
       const userSurveyStartedRef = React.useRef<boolean>(false);
       const userSurveyHiddenRef = React.useRef<boolean>(false);
-      const { announcements } = React.useContext(AnnouncementsFeedContext);
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
       const {
@@ -184,8 +181,7 @@ export const HomePage = React.memo<Props>(
         RouterContext
       );
 
-      const windowWidth = useResponsiveWindowWidth();
-      const isMobile = windowWidth === 'small';
+      const { isMobile } = useResponsiveWindowSize();
       const {
         values: { showGetStartedSectionByDefault },
       } = React.useContext(PreferencesContext);
@@ -212,12 +208,7 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const {
-        games,
-        gamesFetchingError,
-        onGameUpdated,
-        fetchGames,
-      } = useGamesList();
+      const { games, gamesFetchingError, fetchGames } = useGamesList();
       const {
         shouldDisplayNewFeatureHighlighting,
         acknowledgeNewFeature,
@@ -425,16 +416,8 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      const handleGameUpdated = React.useCallback(
-        (game: Game) => {
-          onGameUpdated(game);
-          if (openedGame) setOpenedGame(game);
-        },
-        [onGameUpdated, openedGame]
-      );
-
       const onManageGame = React.useCallback(
-        ({ gameId }: { gameId: string }) => {
+        ({ gameId }: {| gameId: string |}) => {
           if (!games) return;
           const matchingGame = games.find(game => game.id === gameId);
           if (!matchingGame) return;
@@ -445,7 +428,7 @@ export const HomePage = React.memo<Props>(
       );
 
       const canManageGame = React.useCallback(
-        ({ gameId }: { gameId: string }): boolean => {
+        ({ gameId }: {| gameId: string |}): boolean => {
           if (!games) return false;
           const matchingGameIndex = games.findIndex(game => game.id === gameId);
           return matchingGameIndex > -1;
@@ -453,26 +436,16 @@ export const HomePage = React.memo<Props>(
         [games]
       );
 
-      const shouldDisplayAnnouncements =
-        activeTab !== 'community' &&
-        // Get started page displays announcements itself.
-        activeTab !== 'get-started' &&
-        !!announcements;
-
       return (
         <I18n>
           {({ i18n }) => (
             <TeamProvider>
               <div style={isMobile ? styles.mobileContainer : styles.container}>
                 <div style={styles.scrollableContainer}>
-                  {shouldDisplayAnnouncements && (
-                    <AnnouncementsFeed canClose level="urgent" addMargins />
-                  )}
                   {activeTab === 'manage' && (
                     <ManageSection
                       project={project}
                       games={games}
-                      onGameUpdated={handleGameUpdated}
                       onRefreshGames={fetchGames}
                       gamesFetchingError={gamesFetchingError}
                       openedGame={openedGame}
@@ -504,6 +477,7 @@ export const HomePage = React.memo<Props>(
                         onPreviewPrivateGameTemplateListingData
                       }
                       onOpenRecentFile={onOpenRecentFile}
+                      onOpenExampleStore={onOpenExampleStore}
                       onManageGame={onManageGame}
                       canManageGame={canManageGame}
                       storageProviders={storageProviders}

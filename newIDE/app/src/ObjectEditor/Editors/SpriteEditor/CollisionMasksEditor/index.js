@@ -23,7 +23,7 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
@@ -309,11 +309,8 @@ const CollisionMasksEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const editorNodes = isMobileScreen
-    ? verticalMosaicNodes
-    : horizontalMosaicNodes;
+  const { isMobile } = useResponsiveWindowSize();
+  const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!objectConfiguration.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
@@ -322,6 +319,7 @@ const CollisionMasksEditor = ({
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
@@ -359,6 +357,7 @@ const CollisionMasksEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>

@@ -72,6 +72,7 @@ namespace gdjs {
             (this._game.isAntialisingEnabledOnMobile() ||
               !gdjs.evtTools.common.isMobile()),
         });
+        this._threeRenderer.useLegacyLights = true;
         this._threeRenderer.autoClear = false;
         this._threeRenderer.setSize(
           this._game.getGameResolutionWidth(),
@@ -858,10 +859,16 @@ namespace gdjs {
         const electron = this.getElectron();
         if (electron) {
           electron.shell.openExternal(url);
-        } else {
+        } else if (
           // @ts-ignore
-          const target = window.cordova ? '_system' : '_blank';
-          window.open(url, target);
+          typeof window.cordova !== 'undefined' &&
+          // @ts-ignore
+          typeof window.cordova.InAppBrowser !== 'undefined'
+        ) {
+          // @ts-ignore
+          window.cordova.InAppBrowser.open(url, '_system', 'location=yes');
+        } else {
+          window.open(url, '_blank');
         }
       }
     }

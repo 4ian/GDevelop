@@ -7,7 +7,7 @@ import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
 import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
@@ -18,6 +18,7 @@ export const navigationKeys = [
   'ArrowUp',
   'ArrowRight',
   'ArrowLeft',
+  'Enter',
 ];
 
 export type ItemBaseAttributes = {
@@ -36,6 +37,7 @@ type FlattenedNode<Item> = {|
   name: string | React.Node,
   rightComponent: ?React.Node,
   rightButton: ?MenuButton,
+  shouldHideMenuIcon: boolean,
   hasChildren: boolean,
   canHaveChildren: boolean,
   extraClass: string,
@@ -50,6 +52,7 @@ type FlattenedNode<Item> = {|
 
 export type ItemData<Item> = {|
   onOpen: (FlattenedNode<Item>) => void,
+  onClick: (FlattenedNode<Item>) => void,
   onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
   onBlurField: () => void,
   flattenedData: FlattenedNode<Item>[],
@@ -64,8 +67,7 @@ export type ItemData<Item> = {|
   canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
   onEditItem?: Item => void,
-  isMobileScreen: boolean,
-  shouldHideMenuIcon: ?boolean,
+  isMobile: boolean,
   DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
@@ -76,6 +78,7 @@ const getItemProps = memoizeOne(
   <Item>(
     flattenedData: FlattenedNode<Item>[],
     onOpen: (FlattenedNode<Item>) => void,
+    onClick: (FlattenedNode<Item>) => void,
     onSelect: ({| node: FlattenedNode<Item>, exclusive?: boolean |}) => void,
     onBlurField: () => void,
     onEndRenaming: (item: Item, newName: string) => void,
@@ -89,14 +92,14 @@ const getItemProps = memoizeOne(
     canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
     onEditItem?: Item => void,
-    isMobileScreen: boolean,
-    shouldHideMenuIcon: ?boolean,
+    isMobile: boolean,
     DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
     forceDefaultDraggingPreview?: boolean,
     shouldSelectUponContextMenuOpening?: boolean
   ): ItemData<Item> => ({
     onOpen,
+    onClick,
     onSelect,
     onBlurField,
     flattenedData,
@@ -106,8 +109,7 @@ const getItemProps = memoizeOne(
     canDrop,
     onDrop,
     onEditItem,
-    isMobileScreen,
-    shouldHideMenuIcon,
+    isMobile,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
@@ -147,6 +149,7 @@ type Props<Item> = {|
   onCollapseItem?: (Item: Item) => void,
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,
+  onClickItem?: Item => void,
   onSelectItems: (Item[]) => void,
   multiSelect: boolean,
   onRenameItem: (Item, newName: string) => void,
@@ -167,7 +170,7 @@ type Props<Item> = {|
   |},
   forceDefaultDraggingPreview?: boolean,
   shouldSelectUponContextMenuOpening?: boolean,
-  shouldHideMenuIcon?: boolean,
+  shouldHideMenuIcon?: (item: Item) => boolean,
 |};
 
 const TreeView = <Item: ItemBaseAttributes>(
@@ -187,6 +190,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     getItemRightButton,
     renderRightComponent,
     selectedItems,
+    onClickItem,
     onSelectItems,
     multiSelect,
     onRenameItem,
@@ -216,11 +220,10 @@ const TreeView = <Item: ItemBaseAttributes>(
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
   const theme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
 
-  const isMobileScreen = windowWidth === 'small';
   const isSearching = !!searchText;
   const flattenNode = React.useCallback(
     (
@@ -285,6 +288,9 @@ const TreeView = <Item: ItemBaseAttributes>(
             name,
             rightComponent,
             rightButton,
+            shouldHideMenuIcon: shouldHideMenuIcon
+              ? shouldHideMenuIcon(item)
+              : false,
             hasChildren: !!children && children.length > 0,
             canHaveChildren,
             depth,
@@ -329,6 +335,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       animatedItemId,
       getItemThumbnail,
       selectedNodeIds,
+      shouldHideMenuIcon,
     ]
   );
 
@@ -395,6 +402,15 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
     },
     [multiSelect, onSelectItems, selectedItems]
+  );
+
+  const onClick = React.useCallback(
+    (node: FlattenedNode<Item>) => {
+      if (onClickItem) {
+        onClickItem(node.item);
+      }
+    },
+    [onClickItem]
   );
 
   const onEndRenaming = (item: Item, newName: string) => {
@@ -549,6 +565,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const itemData: ItemData<Item> = getItemProps<Item>(
     flattenedData,
     onOpen,
+    onClick,
     onSelect,
     onBlurField,
     onEndRenaming,
@@ -557,8 +574,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     canMoveSelectionToItem,
     onMoveSelectionToItem,
     onEditItem,
-    isMobileScreen,
-    shouldHideMenuIcon,
+    isMobile,
     DragSourceAndDropTarget,
     getItemHtmlId,
     forceDefaultDraggingPreview,
@@ -659,6 +675,12 @@ const TreeView = <Item: ItemBaseAttributes>(
         } else {
           newFocusedItem = arrowKeyNavigationProps.onGetItemOutside(item);
         }
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const focusedNode = flattenedData[itemIndexInFlattenedData];
+        if (onClickItem) {
+          onClickItem(focusedNode.item);
+        }
       }
       if (newFocusedItem) {
         scrollToItem(newFocusedItem);
@@ -666,14 +688,15 @@ const TreeView = <Item: ItemBaseAttributes>(
       }
     },
     [
-      flattenedData,
-      arrowKeyNavigationProps,
-      getItemId,
-      onSelectItems,
       selectedItems,
-      scrollToItem,
+      arrowKeyNavigationProps,
+      flattenedData,
+      getItemId,
       openItems,
       closeItems,
+      onClickItem,
+      scrollToItem,
+      onSelectItems,
     ]
   );
 

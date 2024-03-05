@@ -100,13 +100,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           .filter(Boolean)
           .sort();
       } else if (project.hasEventsBasedObject(object.getType())) {
-        const eventsBasedObject = project.getEventsBasedObject(object.getType());
+        const eventsBasedObject = project.getEventsBasedObject(
+          object.getType()
+        );
         if (eventsBasedObject.isAnimatable()) {
           const customObjectConfiguration = gd.asCustomObjectConfiguration(
             object.getConfiguration()
           );
           const animations = customObjectConfiguration.getAnimations();
-  
+
           return mapFor(0, animations.getAnimationsCount(), index => {
             const animationName = animations.getAnimation(index).getName();
             return animationName.length > 0 ? animationName : null;

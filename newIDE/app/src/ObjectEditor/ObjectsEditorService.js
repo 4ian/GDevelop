@@ -2,7 +2,7 @@
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
 import PanelSpriteEditor from './Editors/PanelSpriteEditor';
-import SpriteEditor, { LockedSpriteEditor } from './Editors/SpriteEditor';
+import SpriteEditor from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';

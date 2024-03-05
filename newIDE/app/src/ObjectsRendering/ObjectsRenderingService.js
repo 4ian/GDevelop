@@ -9,6 +9,7 @@ import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstan
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
 import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
+import RenderedSprite3DInstance from './Renderers/RenderedSprite3DInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
@@ -102,15 +103,32 @@ const ObjectsRenderingService = {
       );
     else {
       if (project.hasEventsBasedObject(objectType)) {
-        return new RenderedCustomObjectInstance(
-          project,
-          layout,
-          instance,
-          associatedObjectConfiguration,
-          pixiContainer,
-          threeGroup,
-          PixiResourcesLoader
-        );
+        const eventsBasedObject = project.getEventsBasedObject(objectType);
+        if (
+          eventsBasedObject.isRenderedIn3D() &&
+          eventsBasedObject.isAnimatable() &&
+          eventsBasedObject.getObjectsCount() === 0
+        ) {
+          return new RenderedSprite3DInstance(
+            project,
+            layout,
+            instance,
+            associatedObjectConfiguration,
+            pixiContainer,
+            threeGroup,
+            PixiResourcesLoader
+          );
+        } else {
+          return new RenderedCustomObjectInstance(
+            project,
+            layout,
+            instance,
+            associatedObjectConfiguration,
+            pixiContainer,
+            threeGroup,
+            PixiResourcesLoader
+          );
+        }
       }
 
       console.warn(

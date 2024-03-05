@@ -41,7 +41,6 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js',
       './newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
       './newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi.js',
-      './newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi-spine.js',
       './newIDE/app/resources/GDJS/Runtime/pixi-renderers/three.js',
       './newIDE/app/resources/GDJS/Runtime/pixi-renderers/*.js',
       './newIDE/app/resources/GDJS/Runtime/howler-sound-manager/howler.min.js',
@@ -144,6 +143,10 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
       './newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/pixi-spine/pixi-spine.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/spineruntimeobject.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/spineruntimeobject-pixi-renderer.js',
+      './newIDE/app/resources/GDJS/Runtime/Extensions/Spine/managers/*.js',
 
       // Test extensions:
       './GDJS/tests/tests/Extensions/**.js',

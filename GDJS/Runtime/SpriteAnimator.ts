@@ -31,7 +31,7 @@ namespace gdjs {
           timeBetweenFrames: direction.timeBetweenFrames,
           duration: direction.timeBetweenFrames * direction.sprites.length,
           looping: direction.looping,
-          frames: direction.sprites
+          frames: direction.sprites,
         };
       });
     }
@@ -128,8 +128,10 @@ namespace gdjs {
       if (currentAnimation.looping) {
         return false;
       }
-      return this._currentFrameIndex === currentAnimation.frames.length - 1 &&
-             this._animationElapsedTime === currentAnimation.duration;
+      return (
+        this._currentFrameIndex === currentAnimation.frames.length - 1 &&
+        this._animationElapsedTime === currentAnimation.duration
+      );
     }
 
     isAnimationPaused() {
@@ -168,7 +170,9 @@ namespace gdjs {
       );
       const oldFrame = this._currentFrameIndex;
       this._currentFrameIndex = Math.min(
-        Math.floor(this._animationElapsedTime / currentAnimation.timeBetweenFrames),
+        Math.floor(
+          this._animationElapsedTime / currentAnimation.timeBetweenFrames
+        ),
         currentAnimation.frames.length - 1
       );
       if (oldFrame !== this._currentFrameIndex) {

@@ -3,9 +3,12 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
-import { type EditorProps } from './EditorProps.flow';
 
-export default function EmptyEditor({ renderObjectNameField }: EditorProps) {
+export default function EmptyEditor({
+  renderObjectNameField,
+}: {
+  renderObjectNameField?: () => React.Node,
+}) {
   return (
     <Column noMargin>
       {renderObjectNameField && renderObjectNameField()}

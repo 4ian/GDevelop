@@ -661,7 +661,7 @@ namespace gdjs {
 
     /**
      * Return the sprite animator.
-     * 
+     *
      * It returns `null` when custom objects don't have the Animatable capability.
      */
     getAnimator(): gdjs.SpriteAnimator | null {

@@ -1,6 +1,8 @@
 // @flow
 import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import { type ScrollViewInterface } from '../../UI/ScrollView';
+import * as React from 'react';
 
 /**
  * The props given to any object editor
@@ -31,6 +33,6 @@ export type EditorProps = {|
   onObjectUpdated?: () => void,
   unsavedChanges?: UnsavedChanges,
   scrollView?: ScrollViewInterface,
-  renderObjectNameField?: () => JSX.Element,
+  renderObjectNameField?: () => React.Node,
   isChildObject?: boolean,
 |};

@@ -104,7 +104,7 @@ type AnimationListProps = {|
   unsavedChanges?: UnsavedChanges,
   animations: gdSpriteAnimationList,
   isAnimationListLocked?: boolean,
-  scrollView: React.MutableRefObject<?ScrollViewInterface>,
+  scrollView: React.RefObject<?ScrollViewInterface>,
   onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 

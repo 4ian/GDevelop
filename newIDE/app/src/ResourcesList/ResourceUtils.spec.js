@@ -11,13 +11,14 @@ const addNewAnimationWithImageToSpriteObject = (
   imageName: string
 ) => {
   const spriteObject = gd.asSpriteConfiguration(object.getConfiguration());
+  const animations = spriteObject.getAnimations();
 
   const animation = new gd.Animation();
   animation.setDirectionsCount(1);
   const sprite = new gd.Sprite();
   sprite.setImageName(imageName);
   animation.getDirection(0).addSprite(sprite);
-  spriteObject.addAnimation(animation);
+  animations.addAnimation(animation);
 };
 
 describe('ResourceUtils', () => {
@@ -103,6 +104,7 @@ describe('ResourceUtils', () => {
     expect(
       gd
         .asSpriteConfiguration(globalObject.getConfiguration())
+        .getAnimations()
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0)
@@ -111,6 +113,7 @@ describe('ResourceUtils', () => {
     expect(
       gd
         .asSpriteConfiguration(object.getConfiguration())
+        .getAnimations()
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0)

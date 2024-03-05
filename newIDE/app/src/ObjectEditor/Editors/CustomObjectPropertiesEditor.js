@@ -305,53 +305,55 @@ const CustomObjectPropertiesEditor = (props: Props) => {
               )}
             </ColumnStackLayout>
           </ScrollView>
-          {eventBasedObject.isAnimatable() && !isChildObject && (
-            <Column noMargin>
-              <ResponsiveLineStackLayout
-                justifyContent="space-between"
-                noColumnMargin
-              >
-                {!isMobile ? ( // On mobile, use only 1 button to gain space.
-                  <ResponsiveLineStackLayout noMargin noColumnMargin>
-                    <FlatButton
+          {eventBasedObject &&
+            eventBasedObject.isAnimatable() &&
+            !isChildObject && (
+              <Column noMargin>
+                <ResponsiveLineStackLayout
+                  justifyContent="space-between"
+                  noColumnMargin
+                >
+                  {!isMobile ? ( // On mobile, use only 1 button to gain space.
+                    <ResponsiveLineStackLayout noMargin noColumnMargin>
+                      <FlatButton
+                        label={<Trans>Edit collision masks</Trans>}
+                        onClick={() => setCollisionMasksEditorOpen(true)}
+                        disabled={!hasAnyFrame(animations)}
+                      />
+                      <FlatButton
+                        label={<Trans>Edit points</Trans>}
+                        onClick={() => setPointsEditorOpen(true)}
+                        disabled={!hasAnyFrame(animations)}
+                      />
+                    </ResponsiveLineStackLayout>
+                  ) : (
+                    <FlatButtonWithSplitMenu
                       label={<Trans>Edit collision masks</Trans>}
                       onClick={() => setCollisionMasksEditorOpen(true)}
                       disabled={!hasAnyFrame(animations)}
+                      buildMenuTemplate={i18n => [
+                        {
+                          label: i18n._(t`Edit points`),
+                          disabled: !hasAnyFrame(animations),
+                          click: () => setPointsEditorOpen(true),
+                        },
+                      ]}
                     />
-                    <FlatButton
-                      label={<Trans>Edit points</Trans>}
-                      onClick={() => setPointsEditorOpen(true)}
-                      disabled={!hasAnyFrame(animations)}
-                    />
-                  </ResponsiveLineStackLayout>
-                ) : (
-                  <FlatButtonWithSplitMenu
-                    label={<Trans>Edit collision masks</Trans>}
-                    onClick={() => setCollisionMasksEditorOpen(true)}
-                    disabled={!hasAnyFrame(animations)}
-                    buildMenuTemplate={i18n => [
-                      {
-                        label: i18n._(t`Edit points`),
-                        disabled: !hasAnyFrame(animations),
-                        click: () => setPointsEditorOpen(true),
-                      },
-                    ]}
+                  )}
+                  <RaisedButton
+                    label={<Trans>Add an animation</Trans>}
+                    primary
+                    onClick={() => {
+                      if (!animationList.current) {
+                        return;
+                      }
+                      animationList.current.addAnimation();
+                    }}
+                    icon={<Add />}
                   />
-                )}
-                <RaisedButton
-                  label={<Trans>Add an animation</Trans>}
-                  primary
-                  onClick={() => {
-                    if (!animationList.current) {
-                      return;
-                    }
-                    animationList.current.addAnimation();
-                  }}
-                  icon={<Add />}
-                />
-              </ResponsiveLineStackLayout>
-            </Column>
-          )}
+                </ResponsiveLineStackLayout>
+              </Column>
+            )}
           {pointsEditorOpen && (
             <Dialog
               title={<Trans>Edit points</Trans>}

@@ -71,7 +71,7 @@ TEST_CASE("ObjectAssetSerializer", "[common]") {
       frame.SetImageName("assets/Idle.png");
       direction.AddSprite(frame);
 
-      spriteConfiguration->AddAnimation(animation);
+      spriteConfiguration->GetAnimations().AddAnimation(animation);
     }
 
     SerializerElement assetElement;

@@ -91,7 +91,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       sprite.SetImageName("res1");
       anim.SetDirectionsCount(1);
       anim.GetDirection(0).AddSprite(sprite);
-      spriteConfiguration.AddAnimation(anim);
+      spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
       project.InsertObject(obj, 0);
@@ -138,7 +138,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       sprite.SetImageName("res1");
       anim.SetDirectionsCount(1);
       anim.GetDirection(0).AddSprite(sprite);
-      spriteConfiguration.AddAnimation(anim);
+      spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
       layout.InsertObject(obj, 0);
@@ -437,7 +437,7 @@ TEST_CASE("ArbitraryResourceWorker", "[common][resources]") {
       sprite.SetImageName("res1");
       anim.SetDirectionsCount(1);
       anim.GetDirection(0).AddSprite(sprite);
-      spriteConfiguration.AddAnimation(anim);
+      spriteConfiguration.GetAnimations().AddAnimation(anim);
 
       gd::Object obj("myObject", "", spriteConfiguration.Clone());
       layout.InsertObject(obj, 0);

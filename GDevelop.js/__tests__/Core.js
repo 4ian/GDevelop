@@ -1589,7 +1589,7 @@ describe('libGD.js', function () {
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
-      spriteConfiguration.addAnimation(animation);
+      spriteConfiguration.getAnimations().addAnimation(animation);
 
       let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
         exposeImage: function (image) {

@@ -3,8 +3,6 @@ import * as PIXI from 'pixi.js-legacy';
 import * as THREE from 'three';
 import PixiResourcesLoader from '../PixiResourcesLoader';
 
-const gd: libGDevelop = global.gd;
-
 /**
  * Rendered3DInstance is the base class used for creating 3D renderers of instances,
  * which display on the scene editor, using Three.js, the instance of an object (see InstancesEditor).

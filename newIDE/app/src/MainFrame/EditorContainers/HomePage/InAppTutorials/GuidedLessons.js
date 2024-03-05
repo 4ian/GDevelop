@@ -190,8 +190,6 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
               Please check your internet connection or try again later.
             </Trans>
           </PlaceholderError>
-        ) : inAppTutorialShortHeaders === null ? (
-          <PlaceholderLoader />
         ) : (
           <ColumnStackLayout noMargin>
             {!lessonsIds && (
@@ -227,6 +225,7 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
                     // Phase is disabled if there's a running tutorial or if offline,
                     // because we cannot fetch the tutorial.
                     disabled={!!currentlyRunningInAppTutorial || !isOnline}
+                    loading={!inAppTutorialShortHeaders}
                   />
                 </GridListTile>
               ))}

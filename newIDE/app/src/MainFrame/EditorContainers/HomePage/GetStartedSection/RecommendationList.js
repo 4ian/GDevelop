@@ -30,6 +30,8 @@ import {
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
+import { SurveyCard } from './SurveyCard';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 
 const styles = {
   textTutorialContent: {
@@ -172,18 +174,22 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  onStartSurvey: null | (() => void),
+  hasFilledSurveyAlready: boolean,
 |};
 
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
   subscriptionPlansWithPricingSystems,
+  onStartSurvey,
+  hasFilledSurveyAlready,
 }: Props) => {
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
-  if (!recommendations) return null;
+  if (!recommendations) return <PlaceholderLoader />;
 
   const recommendedTutorials = tutorials
     ? recommendations
@@ -231,21 +237,16 @@ const RecommendationList = ({
       {({ i18n }) => {
         const items = [];
 
-        if (recommendedVideoTutorials.length) {
+        if (onStartSurvey && !hasFilledSurveyAlready)
           items.push(
-            <SectionRow key="videos">
-              <ImageTileRow
-                title={<Trans>Watch</Trans>}
-                margin="dense"
-                items={recommendedVideoTutorials.map(tutorial =>
-                  formatTutorialToImageTileComponent(i18n, tutorial)
-                )}
-                getColumnsFromWindowSize={getVideoTutorialsColumnsFromWidth}
-                getLimitFromWindowSize={getTutorialsLimitsFromWidth}
+            <SectionRow key="start-survey">
+              <SurveyCard
+                onStartSurvey={onStartSurvey}
+                hasFilledSurveyAlready={false}
               />
             </SectionRow>
           );
-        }
+
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds
             ? guidedLessonsIds
@@ -256,12 +257,7 @@ const RecommendationList = ({
           items.push(
             <SectionRow key="guided-lessons">
               <Text size="section-title" noMargin>
-                <Trans>Do</Trans>
-              </Text>
-              <Text>
-                <Trans>
-                  A selection of in-app tutorials to learn popular mechanics
-                </Trans>
+                <Trans>Build game mechanics</Trans>
               </Text>
               <GuidedLessons
                 selectInAppTutorial={selectInAppTutorial}
@@ -278,6 +274,32 @@ const RecommendationList = ({
             </SectionRow>
           );
         }
+        if (recommendedVideoTutorials.length) {
+          items.push(
+            <SectionRow key="videos">
+              <ImageTileRow
+                title={<Trans>Get started with game creation</Trans>}
+                margin="dense"
+                items={recommendedVideoTutorials.map(tutorial =>
+                  formatTutorialToImageTileComponent(i18n, tutorial)
+                )}
+                getColumnsFromWindowSize={getVideoTutorialsColumnsFromWidth}
+                getLimitFromWindowSize={getTutorialsLimitsFromWidth}
+              />
+            </SectionRow>
+          );
+        }
+
+        if (onStartSurvey && hasFilledSurveyAlready)
+          items.push(
+            <SectionRow key="start-survey">
+              <SurveyCard
+                onStartSurvey={onStartSurvey}
+                hasFilledSurveyAlready
+              />
+            </SectionRow>
+          );
+
         if (recommendedTextTutorials.length) {
           items.push(
             <SectionRow key="texts">

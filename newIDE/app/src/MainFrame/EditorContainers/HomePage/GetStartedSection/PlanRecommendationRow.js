@@ -120,7 +120,7 @@ const PlanRecommendationRow = ({
   const planDetails = planDetailsById[recommendationPlanId];
 
   return (
-    <Line justifyContent="flex-start">
+    <Line justifyContent="center">
       <Paper
         background="dark"
         style={{

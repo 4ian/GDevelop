@@ -171,7 +171,6 @@ export const HomePage = React.memo<Props>(
         fetchGameTemplates,
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
-      const [showUserChip, setShowUserChip] = React.useState<boolean>(false);
       const [openedGame, setOpenedGame] = React.useState<?Game>(null);
       const [
         gameDetailsCurrentTab,
@@ -339,7 +338,6 @@ export const HomePage = React.memo<Props>(
                 onOpenProjectManager={onOpenProjectManager}
                 onSave={onSave}
                 canSave={canSave}
-                showUserChip={showUserChip}
               />
             );
           }
@@ -352,7 +350,6 @@ export const HomePage = React.memo<Props>(
           project,
           onSave,
           canSave,
-          showUserChip,
         ]
       );
 
@@ -362,16 +359,6 @@ export const HomePage = React.memo<Props>(
           updateToolbar();
         },
         [updateToolbar]
-      );
-
-      React.useEffect(
-        () => {
-          // Always show the user chip, apart on the GetStarted page which handles it on its own.
-          if (activeTab !== 'get-started') {
-            setShowUserChip(true);
-          }
-        },
-        [activeTab]
       );
 
       const forceUpdateEditor = React.useCallback(() => {
@@ -456,7 +443,6 @@ export const HomePage = React.memo<Props>(
                   )}
                   {activeTab === 'get-started' && (
                     <GetStartedSection
-                      showUserChip={setShowUserChip}
                       selectInAppTutorial={selectInAppTutorial}
                       onUserSurveyStarted={onUserSurveyStarted}
                       onUserSurveyHidden={onUserSurveyHidden}

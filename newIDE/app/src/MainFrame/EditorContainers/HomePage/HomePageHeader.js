@@ -24,7 +24,6 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
-  showUserChip: boolean,
 |};
 
 export const HomePageHeader = ({
@@ -34,7 +33,6 @@ export const HomePageHeader = ({
   onOpenLanguageDialog,
   onSave,
   canSave,
-  showUserChip,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   return (
@@ -82,7 +80,7 @@ export const HomePageHeader = ({
                   }
                 />
               )}
-              {showUserChip && <UserChip onOpenProfile={onOpenProfile} />}
+              <UserChip onOpenProfile={onOpenProfile} />
               <TextButton
                 label={i18n.language.toUpperCase()}
                 onClick={onOpenLanguageDialog}

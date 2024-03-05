@@ -8,6 +8,7 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import {
   getUserBadges,
+  listDefaultRecommendations,
   listRecommendations,
 } from '../Utils/GDevelopServices/User';
 import Authentication, {
@@ -245,6 +246,19 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
     this._hasNotifiedUserAboutEmailVerification = false;
+
+    listDefaultRecommendations().then(
+      recommendations =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            recommendations,
+          },
+        })),
+      error => {
+        console.error('Error while loading default recommendations:', error);
+      }
+    );
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {

@@ -20,7 +20,7 @@ namespace gdjs {
       );
     }
 
-    protected _reinitializeRender(): void {
+    protected _reinitializeRenderer(): void {
       this.getRenderer().reinitialize(this, this.getParent());
     }
 

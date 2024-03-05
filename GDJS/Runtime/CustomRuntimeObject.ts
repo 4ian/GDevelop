@@ -70,13 +70,13 @@ namespace gdjs {
     protected abstract _createRender():
       | gdjs.CustomRuntimeObject2DRenderer
       | gdjs.CustomRuntimeObject3DRenderer;
-    protected abstract _reinitializeRender(): void;
+    protected abstract _reinitializeRenderer(): void;
 
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
-      this._reinitializeRender();
+      this._reinitializeRenderer();
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();

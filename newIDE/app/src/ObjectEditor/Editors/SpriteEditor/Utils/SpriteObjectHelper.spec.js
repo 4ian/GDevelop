@@ -69,8 +69,9 @@ describe('SpriteObjectHelper', () => {
 
       animation2.getDirection(0).addSprite(sprite3);
 
-      spriteObject.addAnimation(animation1);
-      spriteObject.addAnimation(animation2);
+      const animations = spriteObject.getAnimations();
+      animations.addAnimation(animation1);
+      animations.addAnimation(animation2);
 
       expect(
         allAnimationSpritesHaveSamePointsAs(originalSprite, animation1)
@@ -78,9 +79,9 @@ describe('SpriteObjectHelper', () => {
       expect(
         allAnimationSpritesHaveSamePointsAs(originalSprite, animation2)
       ).toBe(true);
-      expect(
-        allObjectSpritesHaveSamePointsAs(originalSprite, spriteObject)
-      ).toBe(true);
+      expect(allObjectSpritesHaveSamePointsAs(originalSprite, animations)).toBe(
+        true
+      );
 
       // Add new animation with sprites with new points.
       const animation3 = new gd.Animation();
@@ -91,7 +92,7 @@ describe('SpriteObjectHelper', () => {
       animation3.setDirectionsCount(1);
       animation3.getDirection(0).addSprite(sprite4);
       animation3.getDirection(0).addSprite(sprite5);
-      spriteObject.addAnimation(animation3);
+      animations.addAnimation(animation3);
 
       expect(
         allAnimationSpritesHaveSamePointsAs(originalSprite, animation1)
@@ -102,9 +103,9 @@ describe('SpriteObjectHelper', () => {
       expect(
         allAnimationSpritesHaveSamePointsAs(originalSprite, animation3)
       ).toBe(false);
-      expect(
-        allObjectSpritesHaveSamePointsAs(originalSprite, spriteObject)
-      ).toBe(false);
+      expect(allObjectSpritesHaveSamePointsAs(originalSprite, animations)).toBe(
+        false
+      );
     });
 
     it('can copy points of a sprite in all sprites of an animation', () => {

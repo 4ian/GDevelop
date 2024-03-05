@@ -126,7 +126,7 @@ CODE_NAMESPACE = CODE_NAMESPACE || {};
 /**
  * Object generated from OBJECT_FULL_NAME
  */
-CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends gdjs.CustomRuntimeObject {
+CODE_NAMESPACE.RUNTIME_OBJECT_CLASSNAME = class RUNTIME_OBJECT_CLASSNAME extends RUNTIME_OBJECT_BASE_CLASS_NAME {
   constructor(parentInstanceContainer, objectData) {
     super(parentInstanceContainer, objectData);
     this._parentInstanceContainer = parentInstanceContainer;
@@ -161,6 +161,8 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
       .FindAndReplace("OBJECT_FULL_NAME", eventsBasedObject.GetFullName())
       .FindAndReplace("RUNTIME_OBJECT_CLASSNAME",
                       eventsBasedObject.GetName())
+      .FindAndReplace("RUNTIME_OBJECT_BASE_CLASS_NAME",
+                      eventsBasedObject.IsRenderedIn3D() ? "gdjs.CustomRuntimeObject3D" : "gdjs.CustomRuntimeObject2D")
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
                       generateInitializePropertiesCode())

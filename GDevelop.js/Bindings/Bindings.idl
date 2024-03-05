@@ -717,7 +717,6 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
-    boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();
 

@@ -24,6 +24,8 @@ import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   project: gdProject,
   layout: gdLayout,
@@ -326,8 +328,10 @@ const InstancePropertiesEditor = ({
       const properties = instance.getCustomProperties(project, layout);
       if (!object) return {};
 
-      // TODO (3D): Use 3D fields if any of the selected instances is 3D.
-      const is3DInstance = object.is3DObject();
+      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D();
       const instanceSchemaForCustomProperties = propertiesMapToSchema(
         properties,
         (instance: gdInitialInstance) =>

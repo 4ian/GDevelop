@@ -749,6 +749,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "affinetransformation.js");
   InsertUnique(includesFiles, "CustomRuntimeObjectInstanceContainer.js");
   InsertUnique(includesFiles, "CustomRuntimeObject.js");
+  InsertUnique(includesFiles, "CustomRuntimeObject2D.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
@@ -802,7 +803,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/CustomObjectPixiRenderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/CustomRuntimeObject2DPixiRenderer.js");
     InsertUnique(includesFiles, "pixi-renderers/DebuggerPixiRenderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
@@ -814,6 +815,12 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(
         includesFiles,
         "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
+  }
+  if (pixiInThreeRenderers) {
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/A_RuntimeObject3DRenderer.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3D.js");
+    InsertUnique(includesFiles, "Extensions/3D/CustomRuntimeObject3DRenderer.js");
   }
 }
 

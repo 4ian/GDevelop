@@ -13,11 +13,10 @@ import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Text from '../../../UI/Text';
 import ResourcesLoader from '../../../ResourcesLoader';
-import { type EditorProps } from '../EditorProps.flow';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Trash from '../../../UI/CustomSvgIcons/Trash';
 import { makeDragSourceAndDropTarget } from '../../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { DragHandleIcon } from '../../../UI/DragHandle';
@@ -134,8 +133,7 @@ const AnimationList = React.forwardRef<
     );
     const abortControllerRef = React.useRef<?AbortController>(null);
     const forceUpdate = useForceUpdate();
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
     const { showConfirmation } = useAlertDialog();
 
     const [
@@ -626,7 +624,7 @@ const AnimationList = React.forwardRef<
                   }
                   actionLabel={<Trans>Import images</Trans>}
                   secondaryActionLabel={i18n._(
-                    isMobileScreen
+                    isMobile
                       ? t`Draw`
                       : imageResourceExternalEditors[0].createDisplayName
                   )}

@@ -38,7 +38,7 @@ import FlatButton from '../../UI/FlatButton';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../UI/CustomSvgIcons/Add';
 import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
@@ -64,8 +64,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
     isChildObject,
   } = props;
 
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const customObjectConfiguration = gd.asCustomObjectConfiguration(
     objectConfiguration
@@ -312,7 +311,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                 justifyContent="space-between"
                 noColumnMargin
               >
-                {!isMobileScreen ? ( // On mobile, use only 1 button to gain space.
+                {!isMobile ? ( // On mobile, use only 1 button to gain space.
                   <ResponsiveLineStackLayout noMargin noColumnMargin>
                     <FlatButton
                       label={<Trans>Edit collision masks</Trans>}

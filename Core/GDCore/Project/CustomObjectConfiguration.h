@@ -81,7 +81,7 @@ class CustomObjectConfiguration : public gd::ObjectConfiguration {
    */
   SpriteAnimationList& GetAnimations();
 
- protected:
+protected:
   void DoSerializeTo(SerializerElement& element) const override;
   void DoUnserializeFrom(Project& project, const SerializerElement& element) override;
 

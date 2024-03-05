@@ -13,6 +13,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Project/CustomConfigurationHelper.h"
+#include "GDCore/Project/InitialInstance.h"
 
 using namespace gd;
 
@@ -89,19 +90,28 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
 
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
-    const gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& scene) {
-  return std::map<gd::String, gd::PropertyDescriptor>();
+    const gd::InitialInstance &initialInstance, gd::Project &project,
+    gd::Layout &scene) {
+  std::map<gd::String, gd::PropertyDescriptor> properties;
+  if (!animations.HasNoAnimations()) {
+    properties["animation"] =
+        gd::PropertyDescriptor(
+            gd::String::From(initialInstance.GetRawDoubleProperty("animation")))
+            .SetLabel(_("Animation"))
+            .SetType("number");
+  }
+  return properties;
 }
 
 bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
-    gd::InitialInstance& instance,
-    const gd::String& name,
-    const gd::String& value,
-    gd::Project& project,
-    gd::Layout& scene) {
-  return false;
+    gd::InitialInstance &initialInstance, const gd::String &name,
+    const gd::String &value, gd::Project &project, gd::Layout &scene) {
+  if (name == "animation") {
+    initialInstance.SetRawDoubleProperty(
+        "animation", std::max(0, value.empty() ? 0 : value.To<int>()));
+  }
+
+  return true;
 }
 
 void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {

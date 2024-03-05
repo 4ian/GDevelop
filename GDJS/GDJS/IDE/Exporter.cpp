@@ -152,11 +152,6 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
                              scenesUsedResources);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
-    // Export a WebManifest with project metadata
-    if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
-                        helper.GenerateWebManifest(exportedProject)))
-      gd::LogError("Unable to export WebManifest.");
-
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
     helper.ExportIncludesAndLibs(resourcesFiles, exportDir, false);
 
@@ -204,6 +199,9 @@ bool Exporter::ExportWholePixiProject(const ExportOptions &options) {
       return false;
   } else {
     if (!exportProject(options.exportPath)) return false;
+
+    if (!helper.ExportHtml5Files(exportedProject, options.exportPath))
+      return false;
   }
 
   return true;

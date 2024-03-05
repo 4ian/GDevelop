@@ -57,6 +57,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
@@ -67,16 +68,16 @@ describe('libGD.js - GDJS related tests', function () {
       exporter.delete();
 
       // Check the index.html contains the include files.
-      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/index.html');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('gd.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('affinetransformation.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('data.js');
+      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/index.html');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('gd.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('affinetransformation.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('data.js');
 
       // Check the webmanifest was properly generated.
-      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/manifest.webmanifest');
-      expect(() => JSON.parse(fs.writeToFile.mock.calls[1][1])).not.toThrow();
-      expect(JSON.parse(fs.writeToFile.mock.calls[1][1])).toEqual({
+      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/manifest.webmanifest');
+      expect(() => JSON.parse(fs.writeToFile.mock.calls[2][1])).not.toThrow();
+      expect(JSON.parse(fs.writeToFile.mock.calls[2][1])).toEqual({
         "name": "My great project with spaces and \"quotes\"!",
         "short_name": "My great project with spaces and \"quotes\"!",
         "id": "com.example.gamename",
@@ -100,6 +101,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
@@ -158,6 +160,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.

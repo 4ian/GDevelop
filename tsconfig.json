@@ -48,6 +48,7 @@
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/**/JsExtension.js",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
+    "Extensions/Spine/pixi-spine/pixi-spine.js",
     "Extensions/P2P/A_peer.js"
   ]
 }

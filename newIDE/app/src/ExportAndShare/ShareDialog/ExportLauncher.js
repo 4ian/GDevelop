@@ -466,14 +466,8 @@ export default class ExportLauncher extends Component<Props, State> {
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
       if (buildQuota) {
-        const buildsCurrentlyRunning = getNumberOfBuildsCurrentlyRunning();
-        // Just in case multiple builds have been launched at the same time,
-        // min value is 0.
         const buildsRemaining = buildQuota
-          ? Math.max(
-              buildQuota.max - (buildQuota.current + buildsCurrentlyRunning),
-              0
-            )
+          ? Math.max(buildQuota.max - buildQuota.current, 0)
           : 0;
         if (!buildsRemaining) return false;
       }
@@ -581,7 +575,6 @@ export default class ExportLauncher extends Component<Props, State> {
                         subscription={authenticatedUser.subscription}
                         quota={buildQuota}
                         onChangeSubscription={this.props.onChangeSubscription}
-                        numberOfPendingBuilds={numberOfBuildsCurrentlyRunning}
                       />
                     </Column>
                   </Line>

@@ -29,23 +29,20 @@ const styles = {
 type Props = {|
   subscription: ?Subscription,
   quota: ?Quota,
-  numberOfPendingBuilds: number,
   onChangeSubscription: () => void,
 |};
 
 const CurrentUsageDisplayer = ({
   subscription,
   quota,
-  numberOfPendingBuilds,
   onChangeSubscription,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   if (!quota || !subscription) return <PlaceholderLoader />;
   const isFeatureLocked = quota.max === 0;
   const hasSubscription = hasValidSubscriptionPlan(subscription);
-  const usedBuilds = Math.min(quota.current + numberOfPendingBuilds, quota.max);
-  const remainingBuilds = Math.max(quota.max - usedBuilds, 0);
-  const usageRatio = `${usedBuilds}/${quota.max}`;
+  const remainingBuilds = Math.max(quota.max - quota.current, 0);
+  const usageRatio = `${quota.current}/${quota.max}`;
   const remainingMultipleMessage =
     quota.period === '30days' ? (
       <Trans>

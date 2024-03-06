@@ -61,20 +61,36 @@ export const listNotifications = async (
 
 export const markNotificationsAsSeen = async (
   getAuthorizationHeader: () => Promise<string>,
-  { userId, notificationIds }: {| userId: string, notificationIds: string[] |}
+  {
+    userId,
+    notificationIds,
+    allStartingFromNotificationId,
+  }: {|
+    userId: string,
+    notificationIds?: string[],
+    allStartingFromNotificationId?: string,
+  |}
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
-  await client.post(
-    '/notification/action/mark-as-seen',
-    {
+  let payload;
+  if (notificationIds) {
+    payload = {
       notifications: notificationIds.map(notificationId => ({
         notificationId,
         seen: true,
       })),
-    },
-    {
-      headers: { Authorization: authorizationHeader },
-      params: { userId },
-    }
-  );
+    };
+  } else if (allStartingFromNotificationId) {
+    payload = {
+      afterNotification: { notificationId: allStartingFromNotificationId },
+    };
+  } else {
+    throw new Error(
+      'Either parameter notificationIds or allStartingFromNotificationId must be defined.'
+    );
+  }
+  await client.post('/notification/action/mark-as-seen', payload, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
 };

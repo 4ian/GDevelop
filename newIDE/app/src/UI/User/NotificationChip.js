@@ -9,6 +9,10 @@ import Paper from '../Paper';
 import Badge from '../Badge';
 import Bell from '../CustomSvgIcons/Bell';
 
+const styles = {
+  notificationListContainer: { padding: 16 },
+};
+
 type Props = {||};
 
 const NotificationChip = (props: Props) => {
@@ -46,7 +50,14 @@ const NotificationChip = (props: Props) => {
           horizontal: 'right',
         }}
       >
-        <Paper style={{ padding: '10px 20px' }} background="medium">
+        <Paper
+          style={{
+            ...styles.notificationListContainer,
+            maxWidth: 400,
+            minWidth: 300,
+          }}
+          background="light"
+        >
           <NotificationList notifications={notifications} />
         </Paper>
       </Popover>

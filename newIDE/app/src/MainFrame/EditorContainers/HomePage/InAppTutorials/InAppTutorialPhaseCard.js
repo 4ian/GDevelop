@@ -50,6 +50,7 @@ type Props = {|
   keyPoints?: Array<MessageDescriptor>,
   onClick: () => void,
   renderImage: (props: any) => React.Node,
+  loading?: boolean,
 |};
 
 const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
@@ -65,9 +66,10 @@ const InAppTutorialPhaseCard = ({
   keyPoints,
   onClick,
   renderImage,
+  loading,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const shouldTextBeDisabled = disabled || locked;
+  const shouldTextBeDisabled = loading || disabled || locked;
   return (
     <I18n>
       {({ i18n }) => (

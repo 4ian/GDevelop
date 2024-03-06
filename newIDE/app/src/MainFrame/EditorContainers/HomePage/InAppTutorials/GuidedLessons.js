@@ -9,7 +9,6 @@ import {
 } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { Column, Line } from '../../../../UI/Grid';
 import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import { LARGE_WIDGET_SIZE } from '../CardWidget';
 import InAppTutorialPhaseCard from './InAppTutorialPhaseCard';
 import PlaceholderError from '../../../../UI/PlaceholderError';

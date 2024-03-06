@@ -6,15 +6,35 @@ import { Trans } from '@lingui/macro';
 import { type Notification } from '../../Utils/GDevelopServices/Notification';
 import { List, ListItem } from '../List';
 import NotificationListItem from './NotificationListItem';
+import LeftLoader from '../LeftLoader';
 import { Column, Line } from '../Grid';
 import Text from '../Text';
 import FlatButton from '../FlatButton';
 
 type Props = {|
   notifications: Notification[],
+  onMarkAllAsRead: () => Promise<void>,
+  canMarkAllAsRead: boolean,
 |};
 
-const NotificationList = ({ notifications }: Props) => {
+const NotificationList = ({
+  notifications,
+  onMarkAllAsRead,
+  canMarkAllAsRead,
+}: Props) => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const markAllAsRead = React.useCallback(
+    async () => {
+      setIsLoading(true);
+      try {
+        await onMarkAllAsRead();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onMarkAllAsRead]
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -23,14 +43,14 @@ const NotificationList = ({ notifications }: Props) => {
             <Text size="block-title">
               <Trans>Notifications</Trans>
             </Text>
-            <FlatButton
-              primary
-              label={<Trans>Mark all as read</Trans>}
-              disabled={notifications.every(
-                notification => !!notification.seenAt
-              )}
-              onClick={() => console.log('salut')}
-            />
+            <LeftLoader isLoading={isLoading}>
+              <FlatButton
+                primary
+                label={<Trans>Mark all as read</Trans>}
+                disabled={!canMarkAllAsRead}
+                onClick={markAllAsRead}
+              />
+            </LeftLoader>
           </Line>
           <List>
             {notifications.length > 0 ? (

@@ -8,6 +8,7 @@ import NotificationList from '../Notification/NotificationList';
 import Paper from '../Paper';
 import Badge from '../Badge';
 import Bell from '../CustomSvgIcons/Bell';
+import { markNotificationsAsSeen } from '../../Utils/GDevelopServices/Notification';
 
 const styles = {
   notificationListContainer: { padding: 16 },
@@ -16,10 +17,33 @@ const styles = {
 type Props = {||};
 
 const NotificationChip = (props: Props) => {
-  const { notifications, profile } = React.useContext(AuthenticatedUserContext);
+  const { notifications, profile, getAuthorizationHeader } = React.useContext(
+    AuthenticatedUserContext
+  );
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const isThereASingleUnseenNotification = React.useMemo<boolean>(
+    () =>
+      !!notifications &&
+      notifications.some(notification => !notification.seenAt),
+    [notifications]
+  );
 
+  const onMarkAllAsRead = React.useCallback(
+    async () => {
+      if (!notifications || !profile) return;
+
+      const mostRecentNotification = notifications[0];
+      if (!mostRecentNotification) return;
+
+      markNotificationsAsSeen(getAuthorizationHeader, {
+        allStartingFromNotificationId: mostRecentNotification.id,
+        userId: profile.id,
+      });
+    },
+    [notifications, profile, getAuthorizationHeader]
+  );
   if (!profile || !notifications) return null;
+
   return (
     <>
       <IconButton
@@ -31,7 +55,7 @@ const NotificationChip = (props: Props) => {
         <Badge
           variant="dot"
           overlap="circle"
-          invisible={notifications.every(notification => notification.seenAt)}
+          invisible={!isThereASingleUnseenNotification}
           color="primary"
         >
           <Bell color="secondary" />
@@ -58,7 +82,11 @@ const NotificationChip = (props: Props) => {
           }}
           background="light"
         >
-          <NotificationList notifications={notifications} />
+          <NotificationList
+            notifications={notifications}
+            onMarkAllAsRead={onMarkAllAsRead}
+            canMarkAllAsRead={isThereASingleUnseenNotification}
+          />
         </Paper>
       </Popover>
     </>

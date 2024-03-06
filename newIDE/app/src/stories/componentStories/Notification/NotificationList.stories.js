@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
@@ -108,7 +109,11 @@ const notifications: Notification[] = [
 export const Default = () => {
   return (
     <div style={{ maxWidth: 300 }}>
-      <NotificationList notifications={notifications} />
+      <NotificationList
+        notifications={notifications}
+        canMarkAllAsRead={true}
+        onMarkAllAsRead={action('onMarkAllAsRead')}
+      />
     </div>
   );
 };

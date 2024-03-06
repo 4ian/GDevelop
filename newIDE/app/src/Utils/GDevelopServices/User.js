@@ -282,7 +282,7 @@ export const listRecommendations = async (
 export const listDefaultRecommendations = async (): Promise<
   Array<Recommendation>
 > => {
-  const response = await client.get(`/recommendation?todo=true`);
+  const response = await client.get(`/recommendation`);
   return response.data;
 };
 

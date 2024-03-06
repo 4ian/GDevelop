@@ -1423,6 +1423,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   onRefreshAssetPackPurchases: async () => {
     console.info('This should refresh the asset pack purchases');
   },
+  onRefreshNotifications: async () => {
+    console.info('This should refresh the notifications');
+  },
   onPurchaseSuccessful: async () => {
     console.info('This should refresh the assets');
   },

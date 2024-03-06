@@ -106,6 +106,7 @@ type ListItemProps = {|
   rightIconColor?: string,
 
   secondaryTextLines?: 1 | 2,
+  secondaryTextSize?: 'body' | 'body-small',
 
   id?: ?string,
   data?: HTMLDataset,
@@ -271,9 +272,11 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             style={styles.listItemText}
             primary={props.primaryText}
             secondary={props.secondaryText}
-            secondaryTypographyProps={
-              props.isGreyed ? { color: 'inherit' } : undefined
-            }
+            secondaryTypographyProps={{
+              variant:
+                props.secondaryTextSize === 'body-small' ? 'caption' : 'body1',
+              ...(props.isGreyed ? { color: 'inherit' } : undefined),
+            }}
             primaryTypographyProps={
               props.isGreyed ? { color: 'inherit' } : undefined
             }

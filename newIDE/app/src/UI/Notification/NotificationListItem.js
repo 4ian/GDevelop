@@ -89,6 +89,7 @@ const NotificationListItem = ({ notification }: Props) => {
           displayDot={!notification.seenAt}
           dotColor={gdevelopTheme.notification.badgeColor}
           isGreyed={!!notification.seenAt}
+          secondaryTextSize="body-small"
         />
       )}
     </I18n>

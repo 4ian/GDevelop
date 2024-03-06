@@ -113,6 +113,7 @@ export const Default = () => {
         notifications={notifications}
         canMarkAllAsRead={true}
         onMarkAllAsRead={action('onMarkAllAsRead')}
+        onMarkNotificationAsSeen={action('onMarkNotificationAsSeen')}
         onCloseNotificationList={action('onCloseNotificationList')}
       />
     </div>

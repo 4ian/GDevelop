@@ -73,10 +73,12 @@ const getNotificationClickCallback = ({
   notification,
   addRouteArguments,
   onCloseNotificationList,
+  onMarkNotificationAsSeen,
 }: {
   notification: Notification,
   addRouteArguments: RouteArguments => void,
   onCloseNotificationList: () => void,
+  onMarkNotificationAsSeen: () => void,
 }): (() => void) | null => {
   if (notification.type === 'credits-drop') return null;
   if (
@@ -89,6 +91,7 @@ const getNotificationClickCallback = ({
         'game-id': notification.data.gameId,
         'games-dashboard-tab': 'feedback',
       });
+      onMarkNotificationAsSeen();
       onCloseNotificationList();
     };
   }
@@ -98,17 +101,20 @@ const getNotificationClickCallback = ({
 type Props = {|
   notification: Notification,
   onCloseNotificationList: () => void,
+  onMarkNotificationAsSeen: () => void,
 |};
 
 const NotificationListItem = ({
   notification,
   onCloseNotificationList,
+  onMarkNotificationAsSeen,
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
   const onClickNotification = getNotificationClickCallback({
     notification,
     addRouteArguments,
+    onMarkNotificationAsSeen,
     onCloseNotificationList,
   });
   return (

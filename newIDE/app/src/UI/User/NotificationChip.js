@@ -8,7 +8,10 @@ import NotificationList from '../Notification/NotificationList';
 import Paper from '../Paper';
 import Badge from '../Badge';
 import Bell from '../CustomSvgIcons/Bell';
-import { markNotificationsAsSeen } from '../../Utils/GDevelopServices/Notification';
+import {
+  markNotificationsAsSeen,
+  type Notification,
+} from '../../Utils/GDevelopServices/Notification';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
@@ -47,6 +50,19 @@ const NotificationChip = (props: Props) => {
       await onRefreshNotifications();
     },
     [notifications, profile, getAuthorizationHeader, onRefreshNotifications]
+  );
+
+  const onMarkNotificationAsSeen = React.useCallback(
+    async (notification: Notification) => {
+      if (!profile || notification.seenAt) return;
+
+      await markNotificationsAsSeen(getAuthorizationHeader, {
+        notificationIds: [notification.id],
+        userId: profile.id,
+      });
+      await onRefreshNotifications();
+    },
+    [profile, getAuthorizationHeader, onRefreshNotifications]
   );
 
   const onCloseNotificationList = React.useCallback(() => {
@@ -96,6 +112,7 @@ const NotificationChip = (props: Props) => {
           <NotificationList
             notifications={notifications}
             onMarkAllAsRead={onMarkAllAsRead}
+            onMarkNotificationAsSeen={onMarkNotificationAsSeen}
             canMarkAllAsRead={isThereASingleUnseenNotification}
             onCloseNotificationList={onCloseNotificationList}
           />

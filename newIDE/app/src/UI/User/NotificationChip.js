@@ -9,6 +9,7 @@ import Paper from '../Paper';
 import Badge from '../Badge';
 import Bell from '../CustomSvgIcons/Bell';
 import { markNotificationsAsSeen } from '../../Utils/GDevelopServices/Notification';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
   notificationListContainer: { padding: 16 },
@@ -17,6 +18,7 @@ const styles = {
 type Props = {||};
 
 const NotificationChip = (props: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { notifications, profile, getAuthorizationHeader } = React.useContext(
     AuthenticatedUserContext
   );
@@ -56,7 +58,7 @@ const NotificationChip = (props: Props) => {
           variant="dot"
           overlap="circle"
           invisible={!isThereASingleUnseenNotification}
-          color="primary"
+          forcedColor={gdevelopTheme.notification.badgeColor}
         >
           <Bell color="secondary" />
         </Badge>

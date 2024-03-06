@@ -68,7 +68,7 @@ type ListItemRightButtonProps =
       displayRemoveButton: true,
       onRemove: () => void,
     |}
-  | {| displayDot: boolean |}
+  | {| displayDot: boolean, dotColor: string |}
   | {||};
 
 // We support a subset of the props supported by Material-UI v0.x ListItem
@@ -215,7 +215,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               height: 10,
               width: 10,
               borderRadius: 5,
-              backgroundColor: '#00F',
+              backgroundColor: props.dotColor,
               flexShrink: 0,
             }}
           />

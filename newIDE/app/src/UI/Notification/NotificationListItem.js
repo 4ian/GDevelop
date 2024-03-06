@@ -9,6 +9,7 @@ import { getRelativeOrAbsoluteDisplayDate } from '../../Utils/DateDisplay';
 import CoinOutline from '../CustomSvgIcons/CoinOutline';
 import Annotation from '../CustomSvgIcons/Annotation';
 import { shortenString } from '../../Utils/StringHelpers';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 type Props = {|
   notification: Notification,
@@ -70,6 +71,7 @@ const getNotificationPrimaryTextByType = (
 };
 
 const NotificationListItem = ({ notification }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <I18n>
       {({ i18n }) => (
@@ -85,6 +87,7 @@ const NotificationListItem = ({ notification }: Props) => {
           })}
           leftIcon={notificationTypeToIcon[notification.type]}
           displayDot={!notification.seenAt}
+          dotColor={gdevelopTheme.notification.badgeColor}
           isGreyed={!!notification.seenAt}
         />
       )}

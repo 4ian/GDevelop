@@ -74,7 +74,7 @@ type ListItemRightButtonProps =
 // We support a subset of the props supported by Material-UI v0.x ListItem
 // They should be self descriptive - refer to Material UI docs otherwise.
 type ListItemProps = {|
-  onClick?: () => void | Promise<void>,
+  onClick?: ?() => void | Promise<void>,
   onDoubleClick?: (event: DoubleClickMouseEvent) => void,
   primaryText: ?React.Node,
   secondaryText?: React.Node,

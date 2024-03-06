@@ -10,6 +10,9 @@ import CoinOutline from '../CustomSvgIcons/CoinOutline';
 import Annotation from '../CustomSvgIcons/Annotation';
 import { shortenString } from '../../Utils/StringHelpers';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import RouterContext, {
+  type RouteArguments,
+} from '../../MainFrame/RouterContext';
 
 type Props = {|
   notification: Notification,
@@ -70,8 +73,35 @@ const getNotificationPrimaryTextByType = (
   return null;
 };
 
+const getNotificationClickCallback = ({
+  notification,
+  addRouteArguments,
+}: {
+  notification: Notification,
+  addRouteArguments: RouteArguments => void,
+}): (() => void) | null => {
+  if (notification.type === 'credits-drop') return null;
+  if (
+    notification.type === 'one-game-feedback-received' ||
+    notification.type === 'multiple-game-feedback-received'
+  ) {
+    return () =>
+      addRouteArguments({
+        'initial-dialog': 'games-dashboard',
+        'game-id': notification.data.gameId,
+        'games-dashboard-tab': 'feedback',
+      });
+  }
+  return null;
+};
+
 const NotificationListItem = ({ notification }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const { addRouteArguments } = React.useContext(RouterContext);
+  const onClickNotification = getNotificationClickCallback({
+    notification,
+    addRouteArguments,
+  });
   return (
     <I18n>
       {({ i18n }) => (
@@ -85,6 +115,7 @@ const NotificationListItem = ({ notification }: Props) => {
             dayBeforeFormat: 'yesterday',
             relativeLimit: 'currentWeek',
           })}
+          onClick={onClickNotification}
           leftIcon={notificationTypeToIcon[notification.type]}
           displayDot={!notification.seenAt}
           dotColor={gdevelopTheme.notification.badgeColor}

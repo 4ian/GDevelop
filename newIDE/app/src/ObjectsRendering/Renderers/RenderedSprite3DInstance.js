@@ -114,12 +114,10 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
 
     const width = this.getWidth();
     const height = this.getHeight();
-    const depth = this.getDepth();
-    const pivotX = this.getCenterX() - width / 2;
-    const pivotY = this.getCenterY() - height / 2;
-    const pivotZ = this.getCenterZ() - depth / 2;
-    const originX = this._originX - width / 2;
-    const originY = this._originY - height / 2;
+    const pivotX = this._centerX - this._textureWidth / 2;
+    const pivotY = this._centerY - this._textureHeight / 2;
+    const originX = this._originX - this._textureWidth / 2;
+    const originY = this._originY - this._textureHeight / 2;
 
     threeObject.rotation.set(
       Rendered3DInstance.toRad(this._instance.getRotationX()),
@@ -127,11 +125,15 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
       Rendered3DInstance.toRad(this._instance.getAngle())
     );
 
-    threeObject.position.set(-pivotX, -pivotY, -pivotZ);
+    threeObject.position.set(-pivotX, -pivotY, 0);
     threeObject.position.applyEuler(threeObject.rotation);
-    threeObject.position.x += this._instance.getX() + pivotX - originX;
-    threeObject.position.y += this._instance.getY() + pivotY - originY;
-    threeObject.position.z += this._instance.getZ() + pivotZ;
+    threeObject.position.x += pivotX - originX;
+    threeObject.position.y += pivotY - originY;
+    threeObject.position.x *= width / this._textureWidth;
+    threeObject.position.y *= height / this._textureHeight;
+    threeObject.position.x += this._instance.getX();
+    threeObject.position.y += this._instance.getY();
+    threeObject.position.z += this._instance.getZ();
 
     threeObject.scale.set(width, height, 1);
   }

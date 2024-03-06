@@ -15,12 +15,14 @@ type Props = {|
   notifications: Notification[],
   onMarkAllAsRead: () => Promise<void>,
   canMarkAllAsRead: boolean,
+  onCloseNotificationList: () => void,
 |};
 
 const NotificationList = ({
   notifications,
   onMarkAllAsRead,
   canMarkAllAsRead,
+  onCloseNotificationList,
 }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const markAllAsRead = React.useCallback(
@@ -58,6 +60,7 @@ const NotificationList = ({
                 <NotificationListItem
                   key={notification.id}
                   notification={notification}
+                  onCloseNotificationList={onCloseNotificationList}
                 />
               ))
             ) : (

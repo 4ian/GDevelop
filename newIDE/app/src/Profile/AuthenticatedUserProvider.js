@@ -213,6 +213,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshLimits: this._fetchUserLimits,
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({

@@ -14,10 +14,6 @@ import RouterContext, {
   type RouteArguments,
 } from '../../MainFrame/RouterContext';
 
-type Props = {|
-  notification: Notification,
-|};
-
 const notificationTypeToIcon = {
   'credits-drop': <CoinOutline />,
   'one-game-feedback-received': <Annotation />,
@@ -76,31 +72,44 @@ const getNotificationPrimaryTextByType = (
 const getNotificationClickCallback = ({
   notification,
   addRouteArguments,
+  onCloseNotificationList,
 }: {
   notification: Notification,
   addRouteArguments: RouteArguments => void,
+  onCloseNotificationList: () => void,
 }): (() => void) | null => {
   if (notification.type === 'credits-drop') return null;
   if (
     notification.type === 'one-game-feedback-received' ||
     notification.type === 'multiple-game-feedback-received'
   ) {
-    return () =>
+    return () => {
       addRouteArguments({
         'initial-dialog': 'games-dashboard',
         'game-id': notification.data.gameId,
         'games-dashboard-tab': 'feedback',
       });
+      onCloseNotificationList();
+    };
   }
   return null;
 };
 
-const NotificationListItem = ({ notification }: Props) => {
+type Props = {|
+  notification: Notification,
+  onCloseNotificationList: () => void,
+|};
+
+const NotificationListItem = ({
+  notification,
+  onCloseNotificationList,
+}: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { addRouteArguments } = React.useContext(RouterContext);
   const onClickNotification = getNotificationClickCallback({
     notification,
     addRouteArguments,
+    onCloseNotificationList,
   });
   return (
     <I18n>

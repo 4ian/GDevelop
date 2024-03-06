@@ -19,9 +19,12 @@ type Props = {||};
 
 const NotificationChip = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { notifications, profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    notifications,
+    profile,
+    getAuthorizationHeader,
+    onRefreshNotifications,
+  } = React.useContext(AuthenticatedUserContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const isThereASingleUnseenNotification = React.useMemo<boolean>(
     () =>
@@ -37,13 +40,19 @@ const NotificationChip = (props: Props) => {
       const mostRecentNotification = notifications[0];
       if (!mostRecentNotification) return;
 
-      markNotificationsAsSeen(getAuthorizationHeader, {
+      await markNotificationsAsSeen(getAuthorizationHeader, {
         allStartingFromNotificationId: mostRecentNotification.id,
         userId: profile.id,
       });
+      await onRefreshNotifications();
     },
-    [notifications, profile, getAuthorizationHeader]
+    [notifications, profile, getAuthorizationHeader, onRefreshNotifications]
   );
+
+  const onCloseNotificationList = React.useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
   if (!profile || !notifications) return null;
 
   return (
@@ -66,7 +75,7 @@ const NotificationChip = (props: Props) => {
       <Popover
         open={!!anchorEl}
         anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
+        onClose={onCloseNotificationList}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right',
@@ -88,6 +97,7 @@ const NotificationChip = (props: Props) => {
             notifications={notifications}
             onMarkAllAsRead={onMarkAllAsRead}
             canMarkAllAsRead={isThereASingleUnseenNotification}
+            onCloseNotificationList={onCloseNotificationList}
           />
         </Paper>
       </Popover>

@@ -73,6 +73,7 @@ export type AuthenticatedUser = {|
   onRefreshLimits: () => Promise<void>,
   onRefreshGameTemplatePurchases: () => Promise<void>,
   onRefreshAssetPackPurchases: () => Promise<void>,
+  onRefreshNotifications: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
   onOpenEmailVerificationDialog: ({|
@@ -122,6 +123,7 @@ export const initialAuthenticatedUser = {
   onRefreshLimits: async () => {},
   onRefreshGameTemplatePurchases: async () => {},
   onRefreshAssetPackPurchases: async () => {},
+  onRefreshNotifications: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},

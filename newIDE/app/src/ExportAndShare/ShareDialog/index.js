@@ -11,8 +11,7 @@ import { type ExportPipeline } from '../ExportPipeline.flow';
 import { Tabs } from '../../UI/Tabs';
 import InviteHome from './InviteHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
-import TutorialButton from '../../UI/TutorialButton';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../UI/TextButton';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -20,6 +19,7 @@ import { type FileMetadata, type StorageProvider } from '../../ProjectsStorage';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
+import { type GameAvailabilityError } from '../../GameDashboard/GameRegistration';
 
 export type ShareTab = 'invite' | 'publish';
 export type ExporterSection = 'browser' | 'desktop' | 'android' | 'ios';
@@ -151,9 +151,10 @@ const ShareDialog = ({
     setIsNavigationDisabled,
   ] = React.useState<boolean>(false);
   const [game, setGame] = React.useState<?Game>(null);
-  const [gameError, setGameError] = React.useState<?'not-found' | 'not-owned'>(
-    null
-  );
+  const [
+    gameAvailabilityError,
+    setGameAvailabilityError,
+  ] = React.useState<?GameAvailabilityError>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const { showAlert } = useAlertDialog();
@@ -162,9 +163,9 @@ const ShareDialog = ({
     if (!game) {
       const title = t`Cannot see the exports`;
       const message =
-        gameError === 'not-found'
+        gameAvailabilityError === 'not-found'
           ? t`Register or publish your game first to see its exports.`
-          : gameError === 'not-owned'
+          : gameAvailabilityError === 'not-owned'
           ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
           : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
 
@@ -183,7 +184,7 @@ const ShareDialog = ({
 
       const { id } = profile;
       try {
-        setGameError(null);
+        setGameAvailabilityError(null);
         const game = await getGame(
           getAuthorizationHeader,
           id,
@@ -196,13 +197,14 @@ const ShareDialog = ({
           error
         );
         if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setGameError('not-found');
+          setGameAvailabilityError('not-found');
           return;
         }
         if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-          setGameError('not-owned');
+          setGameAvailabilityError('not-owned');
           return;
         }
+        setGameAvailabilityError('unexpected');
       }
     },
     [project, getAuthorizationHeader, profile]
@@ -247,8 +249,8 @@ const ShareDialog = ({
 
   const mainActions = [
     <FlatButton
-      label={<Trans>Close</Trans>}
-      key="close"
+      label={<Trans>Cancel</Trans>}
+      key="cancel"
       primary={false}
       onClick={onClose}
       disabled={isNavigationDisabled}
@@ -260,18 +262,6 @@ const ShareDialog = ({
       ? [
           exporter ? (
             <HelpButton key="help" helpPagePath={exporter.helpPage} />
-          ) : null,
-          exporter &&
-          exporter.exportPipeline &&
-          (exporter.exportPipeline.name === 'local-html5' ||
-            exporter.exportPipeline.name === 'browser-html5') ? (
-            <TutorialButton
-              key="tutorial"
-              tutorialId="export-to-itch"
-              label={
-                isMobile ? 'Itch.io' : <Trans>How to export to Itch.io</Trans>
-              }
-            />
           ) : null,
           <TextButton
             key="exports"
@@ -320,6 +310,7 @@ const ShareDialog = ({
           ]}
         />
       }
+      flexColumnBody
     >
       {currentTab === 'invite' && (
         <InviteHome
@@ -335,7 +326,7 @@ const ShareDialog = ({
           project={project}
           onSaveProject={onSaveProject}
           isSavingProject={isSavingProject}
-          onGameUpdated={setGame}
+          onGameUpdated={loadGame}
           onChangeSubscription={onChangeSubscription}
           isNavigationDisabled={isNavigationDisabled}
           setIsNavigationDisabled={setIsNavigationDisabled}
@@ -345,6 +336,7 @@ const ShareDialog = ({
           chosenSection={chosenExporterSection}
           chosenSubSection={chosenExporterSubSection}
           game={game}
+          gameAvailabilityError={gameAvailabilityError}
           allExportersRequireOnline={allExportersRequireOnline}
           showOnlineWebExporterOnly={showOnlineWebExporterOnly}
         />
@@ -355,7 +347,7 @@ const ShareDialog = ({
           onClose={() => setBuildsDialogOpen(false)}
           authenticatedUser={authenticatedUser}
           game={game}
-          onGameUpdated={setGame}
+          onGameUpdated={loadGame}
         />
       )}
     </Dialog>

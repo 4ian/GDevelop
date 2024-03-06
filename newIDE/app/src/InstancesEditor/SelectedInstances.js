@@ -2,7 +2,7 @@
 import panable, { type PanMoveEvent } from '../Utils/PixiSimpleGesture/pan';
 import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
-import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { type ScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import {
   type ResizeGrabbingLocation,

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Button } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
-import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 type Props = {|

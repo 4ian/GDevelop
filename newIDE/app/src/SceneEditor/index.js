@@ -20,7 +20,7 @@ import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDispla
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { shortenString } from '../Utils/StringHelpers';
@@ -1365,7 +1365,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project, layout } = this.props;
 
     const object = getObjectByName(project, layout, instance.getObjectName());
-    return !!object && object.is3DObject();
+    return (
+      !!object &&
+      gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D()
+    );
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {

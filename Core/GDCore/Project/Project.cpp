@@ -102,11 +102,20 @@ std::unique_ptr<gd::Object> Project::CreateObject(
     behavior->SetDefaultBehavior(true);
   };
 
-  if (Project::HasEventsBasedObject(objectType)) {
+  if (project.HasEventsBasedObject(objectType)) {
+    // During project deserialization, event-based object metadata are not yet
+    // generated.
     addDefaultBehavior("EffectCapability::EffectBehavior");
     addDefaultBehavior("ResizableCapability::ResizableBehavior");
     addDefaultBehavior("ScalableCapability::ScalableBehavior");
     addDefaultBehavior("FlippableCapability::FlippableBehavior");
+    auto& eventBasedObject = project.GetEventsBasedObject(objectType);
+    if (eventBasedObject.IsRenderedIn3D()) {
+      addDefaultBehavior("Scene3D::Base3DBehavior");
+    }
+    else {
+      addDefaultBehavior("OpacityCapability::OpacityBehavior");
+    }
   } else {
     auto& objectMetadata =
         gd::MetadataProvider::GetObjectMetadata(platform, objectType);

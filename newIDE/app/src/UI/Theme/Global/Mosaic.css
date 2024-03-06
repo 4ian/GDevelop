@@ -13,6 +13,15 @@
   background: var(--mosaic-layout-background-color) !important;
 }
 
+/**
+ * We wrap mosaic-window in a div to allow it to move up when the soft keyboard is open.
+ * We need to apply a 100% width/height to the child, as mosaic-window does to its child.
+ */
+.mosaic-gd-theme .mosaic-window-keyboard-avoidance-wrapper > * {
+  width: 100%;
+  height: 100%;
+}
+
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
   padding-left: 8px; /* Follow same spacing as in the rest of the app. */
   color: var(--mosaic-title-color) !important;

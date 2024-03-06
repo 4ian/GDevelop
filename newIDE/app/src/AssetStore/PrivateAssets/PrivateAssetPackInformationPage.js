@@ -32,7 +32,7 @@ import ResponsiveMediaGallery from '../../UI/ResponsiveMediaGallery';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { sendAssetPackBuyClicked } from '../../Utils/Analytics/EventSender';
 import { MarkdownText } from '../../UI/MarkdownText';
 import ScrollView from '../../UI/ScrollView';

@@ -63,19 +63,11 @@ class GD_CORE_API ObjectConfiguration {
    */
   void SetType(const gd::String& type_) {
     type = type_;
-
-    // For now, as a shortcut, consider only the objects from the built-in 3D extension
-    // to be 3D object.
-    is3DObject = type.find("Scene3D::") == 0;
   }
 
   /** \brief Return the type of the object.
    */
   const gd::String& GetType() const { return type; }
-
-  /** \brief Shortcut to check if the object is a 3D object.
-   */
-  bool Is3DObject() const { return is3DObject; }
 
   /** \name Object properties
    * Reading and updating object configuration properties
@@ -180,7 +172,6 @@ class GD_CORE_API ObjectConfiguration {
  protected:
   gd::String type; ///< Which type of object is represented by this
                    ///< configuration.
-  bool is3DObject;
 
   /**
    * \brief Derived object configuration can redefine this method to load

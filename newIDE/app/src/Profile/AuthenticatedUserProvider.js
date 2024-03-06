@@ -1084,7 +1084,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     await authentication.sendFirebaseEmailVerification();
   };
 
-  _doAcceptGameStatsEmail = async () => {
+  _doAcceptGameStatsEmail = async (value: boolean) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
@@ -1095,7 +1095,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.acceptGameStatsEmail(
-        authentication.getAuthorizationHeader
+        authentication.getAuthorizationHeader,
+        value
       );
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (apiCallError) {

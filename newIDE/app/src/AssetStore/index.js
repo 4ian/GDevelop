@@ -28,8 +28,8 @@ import {
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';

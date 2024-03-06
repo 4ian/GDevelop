@@ -4,9 +4,11 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import EditorMosaic from '../../UI/EditorMosaic';
+import EditorMosaic, {
+  type EditorMosaicInterface,
+} from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
 import InstancePropertiesEditor, {
   type InstancePropertiesEditorInterface,
@@ -98,7 +100,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
-  const editorMosaicRef = React.useRef<?EditorMosaic>(null);
+  const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const forceUpdateInstancesPropertiesEditor = React.useCallback(() => {
@@ -292,6 +294,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     'instances-editor': {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <FullSizeInstancesEditorWithScrollbars
           project={project}

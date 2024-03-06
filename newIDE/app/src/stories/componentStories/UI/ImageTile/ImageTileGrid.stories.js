@@ -5,7 +5,7 @@ import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
-import { type WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   itemsWithJustImage,
   itemsWithOverlay,

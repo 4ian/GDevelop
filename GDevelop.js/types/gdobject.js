@@ -8,7 +8,6 @@ declare class gdObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  is3DObject(): boolean;
   getConfiguration(): gdObjectConfiguration;
   getVariables(): gdVariablesContainer;
   getEffects(): gdEffectsContainer;

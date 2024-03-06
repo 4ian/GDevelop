@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from './Reponsive/ResponsiveWindowMeasurer';
+} from './Responsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
@@ -25,6 +25,11 @@ import optionalRequire from '../Utils/OptionalRequire';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useWindowControlsOverlayWatcher } from '../Utils/Window';
 import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
+import {
+  getAvoidSoftKeyboardStyle,
+  useSoftKeyboardBottomOffset,
+} from './MobileSoftKeyboard';
+
 const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -336,6 +341,8 @@ const Dialog = ({
     [onCloseDialog, onApply]
   );
 
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
+
   return (
     <MuiDialog
       classes={classesForDangerousDialog}
@@ -358,6 +365,7 @@ const Dialog = ({
             : minHeight === 'sm'
             ? styles.minHeightForSmallHeightModal
             : undefined,
+          ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
         },
       }}
       maxWidth={

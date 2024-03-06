@@ -24,7 +24,7 @@ import { GridList } from '@material-ui/core';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
 import Link from '../UI/Link';

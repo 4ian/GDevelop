@@ -23,7 +23,7 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
@@ -319,6 +319,7 @@ const CollisionMasksEditor = ({
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
@@ -356,6 +357,7 @@ const CollisionMasksEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>

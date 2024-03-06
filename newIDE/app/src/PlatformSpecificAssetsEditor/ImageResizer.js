@@ -1,56 +1,55 @@
 //@flow
-import optionalLazyRequire from '../Utils/OptionalLazyRequire';
-const lazyRequireJimp = optionalLazyRequire('jimp');
+import optionalRequire from '../Utils/OptionalRequire';
 
-export const isResizeSupported = () => {
-  const Jimp = lazyRequireJimp();
-  return !!Jimp;
+const fs = optionalRequire('fs-extra');
+
+export const getImageFromPath = (path: string): Promise<HTMLImageElement> => {
+  const imageElement = document.createElement('img');
+
+  const file = fs.readFileSync(path, { encoding: 'base64' });
+
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    imageElement.addEventListener('error', (event: Event) => {
+      reject(event);
+    });
+    imageElement.addEventListener('load', () => {
+      resolve(imageElement);
+    });
+    imageElement.src = `data:image/png;base64,${file}`;
+  });
 };
 
 export const resizeImage = (
-  inputFile: string,
+  image: HTMLImageElement,
   outputFile: string,
   {
     width,
     height,
-    transparentBorderSize,
-  }: { width: number, height: number, transparentBorderSize?: number }
-): Promise<any> => {
-  const Jimp = lazyRequireJimp();
-  if (!Jimp) return Promise.resolve(false);
+    transparentBorderSize = 0,
+  }: {| width: number, height: number, transparentBorderSize?: number |}
+): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const canvasElement = document.createElement('canvas');
+    canvasElement.width = width;
+    canvasElement.height = height;
+    const ctx = canvasElement.getContext('2d');
 
-  return Jimp.read(inputFile)
-    .then(function(jimpImage) {
-      if (transparentBorderSize) {
-        // Create a new transparent image at the required size, and put the image
-        // in the center of it, according to the border size
-        return new Promise((resolve, reject) => {
-          new Jimp(width, height, (err, destinationJimpImage) => {
-            if (err) reject(err);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
-            resolve(
-              destinationJimpImage
-                .composite(
-                  jimpImage.contain(
-                    width - transparentBorderSize * 2,
-                    height - transparentBorderSize * 2
-                  ),
-                  transparentBorderSize,
-                  transparentBorderSize
-                )
-                .write(outputFile)
-            );
-          });
-        });
-      }
+    ctx.drawImage(
+      image,
+      transparentBorderSize,
+      transparentBorderSize,
+      width - 2 * transparentBorderSize,
+      height - 2 * transparentBorderSize
+    );
 
-      return jimpImage.contain(width, height).write(outputFile);
-    })
-    .then(() => {
-      return true;
-    })
-    .catch(function(err) {
-      console.error(err);
-      return false;
-    });
+    canvasElement.toBlob(blob => {
+      blob.arrayBuffer().then(buffer => {
+        fs.writeFileSync(outputFile, Buffer.from(buffer));
+        resolve(true);
+      });
+    }, 'image/png');
+  });
 };

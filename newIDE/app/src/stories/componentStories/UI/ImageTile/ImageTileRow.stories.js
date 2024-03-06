@@ -5,7 +5,7 @@ import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileRow from '../../../../UI/ImageTileRow';
-import { type WindowSizeType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import {
   itemsWithJustImage,

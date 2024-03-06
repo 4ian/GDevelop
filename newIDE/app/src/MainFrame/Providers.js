@@ -39,6 +39,7 @@ import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
 import { Trans } from '@lingui/macro';
 import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
 import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
+import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
 
 type Props = {|
   authentication: Authentication,
@@ -113,19 +114,21 @@ const Providers = ({
                                               >
                                                 <CreditsPackageStoreStateProvider>
                                                   <ProductLicenseStoreStateProvider>
-                                                    <ExtensionStoreStateProvider>
-                                                      <BehaviorStoreStateProvider>
-                                                        <TutorialStateProvider>
-                                                          <AnnouncementsFeedStateProvider>
-                                                            <PrivateAssetsAuthorizationProvider>
-                                                              {children({
-                                                                i18n,
-                                                              })}
-                                                            </PrivateAssetsAuthorizationProvider>
-                                                          </AnnouncementsFeedStateProvider>
-                                                        </TutorialStateProvider>
-                                                      </BehaviorStoreStateProvider>
-                                                    </ExtensionStoreStateProvider>
+                                                    <MarketingPlansStoreStateProvider>
+                                                      <ExtensionStoreStateProvider>
+                                                        <BehaviorStoreStateProvider>
+                                                          <TutorialStateProvider>
+                                                            <AnnouncementsFeedStateProvider>
+                                                              <PrivateAssetsAuthorizationProvider>
+                                                                {children({
+                                                                  i18n,
+                                                                })}
+                                                              </PrivateAssetsAuthorizationProvider>
+                                                            </AnnouncementsFeedStateProvider>
+                                                          </TutorialStateProvider>
+                                                        </BehaviorStoreStateProvider>
+                                                      </ExtensionStoreStateProvider>
+                                                    </MarketingPlansStoreStateProvider>
                                                   </ProductLicenseStoreStateProvider>
                                                 </CreditsPackageStoreStateProvider>
                                               </PrivateGameTemplateStoreStateProvider>

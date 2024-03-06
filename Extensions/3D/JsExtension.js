@@ -3021,6 +3021,11 @@ module.exports = {
         return this.getHeight() * originPoint[1];
       }
 
+      getOriginZ() {
+        const originPoint = this.getOriginPoint();
+        return this.getDepth() * originPoint[2];
+      }
+
       getCenterX() {
         const centerPoint = this.getCenterPoint();
         return this.getWidth() * centerPoint[0];
@@ -3029,6 +3034,11 @@ module.exports = {
       getCenterY() {
         const centerPoint = this.getCenterPoint();
         return this.getHeight() * centerPoint[1];
+      }
+
+      getCenterZ() {
+        const centerPoint = this.getCenterPoint();
+        return this.getDepth() * centerPoint[2];
       }
 
       getOriginPoint() {

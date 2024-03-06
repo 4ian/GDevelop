@@ -120,9 +120,6 @@ class GD_CORE_API Object {
    */
   const gd::String& GetType() const { return configuration->GetType(); }
 
-  /** \brief Shortcut to check if the object is a 3D object.
-   */
-  bool Is3DObject() const { return configuration->Is3DObject(); }
   ///@}
 
   /** \name Behaviors management

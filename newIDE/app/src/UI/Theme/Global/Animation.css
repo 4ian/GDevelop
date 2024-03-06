@@ -45,25 +45,42 @@
   }
 }
 
+/* Animate the element like if it was just finished being swiped up. */
+@keyframes swipe-up-ending {
+  from {
+    transform: translateY(15px);
+  }
+  to {
+    transform: translateY(0px);
+  }
+}
+
+/* Useful to hint the user that a vertical scroll is needed, in in-app tutorials. */
 @keyframes vertical-translate {
   from {
-   transform: translateY(-10px);
+    transform: translateY(-10px);
   }
   to {
     transform: translateY(10px);
   }
 }
 
+/* Useful to hint the user that a horizontal scroll is needed, in in-app tutorials. */
 @keyframes horizontal-translate {
   from {
-   transform: translateX(-10px);
+    transform: translateX(-10px);
   }
   to {
     transform: translateX(10px);
   }
 }
 
+/* Useful for loaders */
 @keyframes spin-background {
-  from {transform: translate(-50%, -50%) rotate(0);}
-  to   {transform: translate(-50%, -50%) rotate(360deg);}
+  from {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }

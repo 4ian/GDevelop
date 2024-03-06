@@ -16,7 +16,7 @@ import ImageTileRow from '../../../../UI/ImageTileRow';
 import {
   useResponsiveWindowSize,
   type WindowSizeType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
 import { Column } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';

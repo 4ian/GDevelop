@@ -26,7 +26,7 @@ import Card from '../../UI/Card';
 
 import BuildProgressAndActions from './BuildProgressAndActions';
 
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   deleteBuild,
   updateBuild,
@@ -117,7 +117,7 @@ const BUILD_DEFAULT_NAME_TIME_FORMAT = 'yyyy-MM-dd-HH-mm-ss';
 type Props = {|
   build: Build,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,

@@ -25,7 +25,7 @@ import { type ResourceManagementProps } from '../../../ResourcesList/ResourceSou
 import { AssetStoreContext } from '../../../AssetStore/AssetStoreContext';
 import TeamSection from './TeamSection';
 import TeamProvider from '../../../Profile/Team/TeamProvider';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { type PrivateGameTemplateListingData } from '../../../Utils/GDevelopServices/Shop';
 import { PrivateGameTemplateStoreContext } from '../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import PreferencesContext from '../../Preferences/PreferencesContext';
@@ -208,12 +208,7 @@ export const HomePage = React.memo<Props>(
         displayTooltipDelayed,
         setDisplayTooltipDelayed,
       ] = React.useState<boolean>(false);
-      const {
-        games,
-        gamesFetchingError,
-        onGameUpdated,
-        fetchGames,
-      } = useGamesList();
+      const { games, gamesFetchingError, fetchGames } = useGamesList();
       const {
         shouldDisplayNewFeatureHighlighting,
         acknowledgeNewFeature,
@@ -421,14 +416,6 @@ export const HomePage = React.memo<Props>(
         [authenticated]
       );
 
-      const handleGameUpdated = React.useCallback(
-        (game: Game) => {
-          onGameUpdated(game);
-          if (openedGame) setOpenedGame(game);
-        },
-        [onGameUpdated, openedGame]
-      );
-
       const onManageGame = React.useCallback(
         ({ gameId }: {| gameId: string |}) => {
           if (!games) return;
@@ -459,7 +446,6 @@ export const HomePage = React.memo<Props>(
                     <ManageSection
                       project={project}
                       games={games}
-                      onGameUpdated={handleGameUpdated}
                       onRefreshGames={fetchGames}
                       gamesFetchingError={gamesFetchingError}
                       openedGame={openedGame}

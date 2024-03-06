@@ -7,7 +7,7 @@ import { instancesEditorId } from '../../InstancesEditor';
 import {
   useScreenType,
   type ScreenType,
-} from '../Reponsive/ScreenTypeMeasurer';
+} from '../Responsive/ScreenTypeMeasurer';
 import { CorsAwareImage } from '../CorsAwareImage';
 import { type DraggedItem } from './DragSourceAndDropTarget';
 import { swipeableDrawerContainerId } from '../../SceneEditor/SwipeableDrawerEditorsDisplay';

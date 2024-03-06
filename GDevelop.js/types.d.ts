@@ -488,6 +488,7 @@ export class Project extends EmscriptenObject {
   removeLayout(name: string): void;
   setFirstLayout(name: string): void;
   getFirstLayout(): string;
+  getLayoutPosition(name: string): number;
   hasExternalEventsNamed(name: string): boolean;
   getExternalEvents(name: string): ExternalEvents;
   getExternalEventsAt(index: number): ExternalEvents;
@@ -496,6 +497,7 @@ export class Project extends EmscriptenObject {
   getExternalEventsCount(): number;
   insertNewExternalEvents(name: string, position: number): ExternalEvents;
   removeExternalEvents(name: string): void;
+  getExternalEventsPosition(name: string): number;
   hasExternalLayoutNamed(name: string): boolean;
   getExternalLayout(name: string): ExternalLayout;
   getExternalLayoutAt(index: number): ExternalLayout;
@@ -504,6 +506,7 @@ export class Project extends EmscriptenObject {
   getExternalLayoutsCount(): number;
   insertNewExternalLayout(name: string, position: number): ExternalLayout;
   removeExternalLayout(name: string): void;
+  getExternalLayoutPosition(name: string): number;
   hasEventsFunctionsExtensionNamed(name: string): boolean;
   getEventsFunctionsExtension(name: string): EventsFunctionsExtension;
   getEventsFunctionsExtensionAt(index: number): EventsFunctionsExtension;
@@ -513,6 +516,7 @@ export class Project extends EmscriptenObject {
   insertNewEventsFunctionsExtension(name: string, position: number): EventsFunctionsExtension;
   insertEventsFunctionsExtension(eventsFunctionsExtension: EventsFunctionsExtension, position: number): EventsFunctionsExtension;
   removeEventsFunctionsExtension(name: string): void;
+  getEventsFunctionsExtensionPosition(name: string): number;
   hasEventsBasedBehavior(type: string): boolean;
   getEventsBasedBehavior(type: string): EventsBasedBehavior;
   hasEventsBasedObject(type: string): boolean;
@@ -639,7 +643,6 @@ export class gdObject extends EmscriptenObject {
   getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
-  is3DObject(): boolean;
   getConfiguration(): ObjectConfiguration;
   getVariables(): VariablesContainer;
   getEffects(): EffectsContainer;

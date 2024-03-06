@@ -25,7 +25,7 @@ import {
 } from '../UI/MaterialUISpecificUtil';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
 
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',

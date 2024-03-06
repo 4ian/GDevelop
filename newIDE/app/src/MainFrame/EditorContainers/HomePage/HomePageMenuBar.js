@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { Column, marginsSize } from '../../../UI/Grid';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
 import VerticalTabButton, {

@@ -9,7 +9,7 @@ const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
-const allowedExtensions = ['.js', '.ts', '.tsx', '.html', '.json', '.xml', '.map', '.wasm'];
+const allowedExtensions = ['.js', '.ts', '.tsx', '.html', '.json', '.xml', '.map', '.wasm', '.txt'];
 
 // These extensions will be built with esbuild (the other will be copied).
 const transformIncludedExtensions = ['.js', '.ts', '.tsx'];
@@ -23,7 +23,6 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
-  'GDJS/Runtime/pixi-renderers/pixi-spine.js',
   'GDJS/Runtime/pixi-renderers/three.js',
   'GDJS/Runtime/pixi-renderers/ThreeAddons.js',
   'GDJS/Runtime/pixi-renderers/draco/gltf/draco_wasm_wrapper.js',
@@ -50,6 +49,7 @@ const untransformedPaths = [
   'Extensions/TileMap/pako/dist/pako.min.js',
   'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js',
   'Extensions/TileMap/helper/TileMapHelper.js',
+  'Extensions/Spine/pixi-spine/pixi-spine.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
 /**

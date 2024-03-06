@@ -24,7 +24,7 @@ import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
 import { mapFor } from '../Utils/MapFor';
 import { LineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import {
   EventsFunctionTreeViewItemContent,
@@ -1096,32 +1096,6 @@ const EventsFunctionsList = React.forwardRef<
       ...behaviorTreeViewItems.map(item => item.content.getId()),
     ];
 
-    const arrowKeyNavigationProps = React.useMemo(
-      () => ({
-        onGetItemInside: item => {
-          if (item.isPlaceholder || item.isRoot) return null;
-          if (!item.objectFolderOrObject.isFolder()) return null;
-          else {
-            if (item.objectFolderOrObject.getChildrenCount() === 0) return null;
-            return {
-              objectFolderOrObject: item.objectFolderOrObject.getChildAt(0),
-              global: item.global,
-            };
-          }
-        },
-        onGetItemOutside: item => {
-          if (item.isPlaceholder || item.isRoot) return null;
-          const parent = item.objectFolderOrObject.getParent();
-          if (parent.isRootFolder()) return null;
-          return {
-            objectFolderOrObject: parent,
-            global: item.global,
-          };
-        },
-      }),
-      []
-    );
-
     React.useEffect(
       () => {
         // TODO Use a map from itemId to item to avoid to rebuild the item.
@@ -1237,9 +1211,8 @@ const EventsFunctionsList = React.forwardRef<
                       canMoveSelectionToItem={canMoveSelectionTo}
                       reactDndType={extensionItemReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
-                      arrowKeyNavigationProps={arrowKeyNavigationProps}
                       forceDefaultDraggingPreview
-                      shouldHideMenuIcon
+                      shouldHideMenuIcon={() => true}
                     />
                   )}
                 </AutoSizer>

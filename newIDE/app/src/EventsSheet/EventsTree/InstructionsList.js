@@ -14,8 +14,8 @@ import {
 import DropIndicator from './DropIndicator';
 import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 

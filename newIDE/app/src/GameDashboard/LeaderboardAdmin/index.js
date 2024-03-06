@@ -55,7 +55,7 @@ import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';

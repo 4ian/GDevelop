@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import EditorMosaic from '../UI/EditorMosaic';
+import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
 import get from 'lodash/get';
 import RaisedButton from '../UI/RaisedButton';
@@ -77,7 +77,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
     rawMode: false,
   };
 
-  _editors: ?EditorMosaic = null;
+  _editors: ?EditorMosaicInterface = null;
 
   isProfilerShown = () => {
     return (

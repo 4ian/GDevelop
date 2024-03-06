@@ -371,7 +371,7 @@ module.exports = {
         'res/actions/font24.png',
         'res/actions/font.png'
       )
-      .addParameter('object', _('Bitmap text'), 'TextInputObject', false)
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
       .addParameter('fontResource', _('Font resource name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setFontResourceName');

@@ -25,11 +25,11 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Tabs } from '../UI/Tabs';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
 import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
 import Cross from '../UI/CustomSvgIcons/Cross';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,

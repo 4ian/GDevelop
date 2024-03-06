@@ -8,7 +8,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import AlertMessage from './AlertMessage';

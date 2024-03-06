@@ -11,7 +11,7 @@ import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';

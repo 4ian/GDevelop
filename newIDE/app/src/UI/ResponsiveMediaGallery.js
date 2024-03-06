@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import { CorsAwareImage } from './CorsAwareImage';
 import { Line } from './Grid';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowSize } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import Text from './Text';
 import { ColumnStackLayout } from './Layout';
 

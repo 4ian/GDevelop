@@ -6,8 +6,8 @@ import {
   type ParameterContext,
 } from '../../SelectionHandler';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
-import { type ScreenType } from '../../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WindowSizeType } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ScreenType } from '../../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 export type EventRendererProps = {
   project: gdProject,

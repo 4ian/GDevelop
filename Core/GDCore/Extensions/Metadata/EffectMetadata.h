@@ -65,6 +65,8 @@ class GD_CORE_API EffectMetadata {
 
   /**
    * \brief Clear any existing include file and add the specified include file.
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
    */
   EffectMetadata& SetIncludeFile(const gd::String& includeFile);
 

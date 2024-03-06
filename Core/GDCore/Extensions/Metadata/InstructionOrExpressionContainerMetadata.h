@@ -142,6 +142,8 @@ public:
    * \brief Erase any existing include file and add the specified include.
    * \note The requirement may vary depending on the platform: Most of the time,
    * the include file contains the declaration of the behavior.
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
    */
   virtual InstructionOrExpressionContainerMetadata &
   SetIncludeFile(const gd::String &includeFile) = 0;

@@ -4,7 +4,7 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../UI/CustomSvgIcons/Update';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|

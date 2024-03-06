@@ -15,7 +15,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: gdProject,

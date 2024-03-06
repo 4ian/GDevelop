@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import './MainFrame.css';
-import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
@@ -12,7 +11,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -74,12 +72,11 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext, {
   type InAppTutorialUserProgress,
@@ -174,7 +171,6 @@ import {
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
-import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
@@ -183,18 +179,10 @@ import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
+import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  drawerContent: {
-    width: 320,
-    overflowX: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-};
 
 const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
@@ -1659,14 +1647,14 @@ const MainFrame = (props: Props) => {
     [hasPreviewsRunning, launchPreview]
   );
 
-  const openLayout = React.useCallback(
+  const getEditorsTabStateWithScene = React.useCallback(
     (
+      editorTabs: EditorTabsState,
       name: string,
       {
-        openEventsEditor = true,
-        openSceneEditor = true,
-      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
-      editorTabs = state.editorTabs
+        openEventsEditor,
+        openSceneEditor,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean }
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
@@ -1681,17 +1669,35 @@ const MainFrame = (props: Props) => {
       const tabsWithSceneEditor = openSceneEditor
         ? openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
-      const tabsWithSceneAndEventsEditors = openEventsEditor
+      return openEventsEditor
         ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
+    },
+    [getEditorOpeningOptions]
+  );
 
+  const openLayout = React.useCallback(
+    (
+      name: string,
+      {
+        openEventsEditor = true,
+        openSceneEditor = true,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
+      editorTabs?: EditorTabsState
+    ): void => {
       setState(state => ({
         ...state,
-        editorTabs: tabsWithSceneAndEventsEditors,
+        editorTabs: getEditorsTabStateWithScene(
+          editorTabs || state.editorTabs,
+          name,
+          {
+            openEventsEditor,
+            openSceneEditor,
+          }
+        ),
       }));
-      return tabsWithSceneAndEventsEditors;
     },
-    [setState, state.editorTabs, getEditorOpeningOptions]
+    [setState, getEditorsTabStateWithScene]
   );
 
   const openExternalEvents = React.useCallback(
@@ -1703,7 +1709,6 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external events', name })
         ),
       }));
-      openProjectManager(false);
     },
     [setState, getEditorOpeningOptions]
   );
@@ -1717,9 +1722,8 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external layout', name })
         ),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openEventsFunctionsExtension = React.useCallback(
@@ -1741,9 +1745,8 @@ const MainFrame = (props: Props) => {
           },
         }),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
@@ -1967,6 +1970,32 @@ const MainFrame = (props: Props) => {
     [openLayout, i18n]
   );
 
+  const getEditorsTabStateWithAllScenes = React.useCallback(
+    (newState: {|
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    |}): EditorTabsState => {
+      const { currentProject, editorTabs } = newState;
+      if (!currentProject) return editorTabs;
+      const layoutsCount = currentProject.getLayoutsCount();
+      if (layoutsCount === 0) return editorTabs;
+
+      let editorTabsWithAllScenes = editorTabs;
+      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+        editorTabsWithAllScenes = getEditorsTabStateWithScene(
+          editorTabsWithAllScenes,
+          currentProject.getLayoutAt(layoutIndex).getName(),
+          {
+            openSceneEditor: true,
+            openEventsEditor: true,
+          }
+        );
+      }
+      return editorTabsWithAllScenes;
+    },
+    [getEditorsTabStateWithScene]
+  );
+
   const openAllScenes = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -1977,23 +2006,16 @@ const MainFrame = (props: Props) => {
       const layoutsCount = currentProject.getLayoutsCount();
       if (layoutsCount === 0) return;
 
-      let editorTabs = state.editorTabs;
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorsTabStateWithAllScenes(newState),
+      }));
 
-      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-        editorTabs = openLayout(
-          currentProject.getLayoutAt(layoutIndex).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      }
       setIsLoadingProject(false);
       setLoaderModalProgress(null, null);
       openProjectManager(false);
     },
-    [openLayout, state.editorTabs]
+    [getEditorsTabStateWithAllScenes, setState]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -3039,28 +3061,14 @@ const MainFrame = (props: Props) => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      <Drawer
-        open={projectManagerOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={toggleProjectManager}
-        {...dataObjectToProps({
-          open: projectManagerOpen ? 'true' : undefined,
-        })}
+      <ProjectManagerDrawer
+        projectManagerOpen={projectManagerOpen}
+        toggleProjectManager={toggleProjectManager}
+        title={
+          state.currentProject ? state.currentProject.getName() : 'No project'
+        }
       >
-        <DrawerTopBar
-          title={
-            state.currentProject ? state.currentProject.getName() : 'No project'
-          }
-          onClose={toggleProjectManager}
-          id="project-manager-drawer"
-        />
-        {currentProject && (
+        {currentProject ? (
           <ProjectManager
             project={currentProject}
             onChangeProjectName={onChangeProjectName}
@@ -3080,10 +3088,7 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onOpenResources={() => {
-              openResources();
-              openProjectManager(false);
-            }}
+            onOpenResources={openResources}
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }
@@ -3103,13 +3108,8 @@ const MainFrame = (props: Props) => {
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
           />
-        )}
-        {!state.currentProject && (
-          <EmptyMessage>
-            <Trans>To begin, open or create a new project.</Trans>
-          </EmptyMessage>
-        )}
-      </Drawer>
+        ) : null}
+      </ProjectManagerDrawer>
       <TabsTitlebar
         onBuildMenuTemplate={() =>
           adaptFromDeclarativeTemplate(

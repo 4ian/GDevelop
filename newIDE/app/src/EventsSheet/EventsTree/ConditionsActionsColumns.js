@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type WindowSizeType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   actionsContainer,
   conditionsContainer,

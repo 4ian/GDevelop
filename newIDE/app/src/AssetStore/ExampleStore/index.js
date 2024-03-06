@@ -12,7 +12,7 @@ import {
   sendGameTemplateInformationOpened,
 } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 import PrivateGameTemplateListItem from '../PrivateGameTemplates/PrivateGameTemplateListItem';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';

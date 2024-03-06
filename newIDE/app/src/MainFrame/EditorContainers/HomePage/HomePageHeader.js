@@ -11,7 +11,7 @@ import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { useResponsiveWindowSize } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';

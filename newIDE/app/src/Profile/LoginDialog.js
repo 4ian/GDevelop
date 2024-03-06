@@ -18,7 +18,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   formContainer: {

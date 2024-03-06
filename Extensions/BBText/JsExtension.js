@@ -423,6 +423,21 @@ module.exports = {
 
     addSettersAndGettersToObject(object, setterAndGetterProperties, 'BBText');
 
+    object
+      .addAction(
+        `SetFontFamily2`,
+        _('Font family'),
+        _('Set font family'),
+        _('Set the font of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font24.png'
+      )
+      .addParameter('object', 'BBText', 'BBText', false)
+      .addParameter('fontResource', _('Font family'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName(`setFontFamily`);
+
     const actions = object.getAllActions();
     const conditions = object.getAllConditions();
     const expressions = object.getAllExpressions();
@@ -430,6 +445,9 @@ module.exports = {
     actions.get('BBText::SetOpacity').setHidden();
     conditions.get('BBText::IsOpacity').setHidden();
     expressions.get('GetOpacity').setHidden();
+    // Action deprecated because it's using the `string` type instead of the more
+    // user-friendly `fontResource` type.
+    actions.get('BBText::SetFontFamily').setHidden();
 
     return extension;
   },

@@ -7,7 +7,7 @@ import { Trans } from '@lingui/macro';
 import Music from '../../UI/CustomSvgIcons/Music';
 import Window from '../../Utils/Window';
 import { Column } from '../../UI/Grid';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const PrivateAssetPackAudioFilesDownloadButton = ({
   assetPack,

@@ -6,6 +6,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
+import StepConnector from '@material-ui/core/StepConnector';
 import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgressAndActions from './BuildProgressAndActions';
 import { type Build } from '../../Utils/GDevelopServices/Build';
@@ -19,7 +20,7 @@ import { StepIcon } from '@material-ui/core';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 
 const styles = {
-  stepper: { flex: 1 },
+  stepper: { flex: 1, padding: 8 },
 };
 
 // We are obliged to override the StepIcon colors through StepLabel
@@ -31,6 +32,12 @@ const useStepLabelStyles = makeStyles(theme => ({
   },
   active: {
     fill: theme.palette.secondary.main,
+  },
+}));
+
+const usetStepConnectorStyles = makeStyles(theme => ({
+  root: {
+    flex: 0,
   },
 }));
 
@@ -100,6 +107,7 @@ const BuildStepsProgress = ({
         : -1,
     [exportStep, hasBuildStep]
   );
+  const stepConnectorStyles = usetStepConnectorStyles();
 
   return (
     <Stepper
@@ -109,6 +117,7 @@ const BuildStepsProgress = ({
         ...styles.stepper,
         backgroundColor: gdevelopTheme.paper.backgroundColor.medium,
       }}
+      connector={<StepConnector classes={stepConnectorStyles} />}
     >
       <Step>
         <CustomStepLabel>

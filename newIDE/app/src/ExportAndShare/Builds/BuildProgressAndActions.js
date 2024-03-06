@@ -99,7 +99,7 @@ const downloadButtons = [
 type Props = {|
   build: Build,
   game?: ?Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
   gameUpdating?: boolean,
   setGameUpdating?: boolean => void,
   onCopyToClipboard?: () => void,
@@ -165,15 +165,10 @@ const BuildProgressAndActions = ({
       if (!answer) return;
       try {
         setGameUpdating(true);
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            publicWebBuildId: buildId,
-          }
-        );
-        onGameUpdated(updatedGame);
+        await updateGame(getAuthorizationHeader, id, game.id, {
+          publicWebBuildId: buildId,
+        });
+        await onGameUpdated();
         setGameUpdating(false);
       } catch (err) {
         console.error('Unable to update the game', err);

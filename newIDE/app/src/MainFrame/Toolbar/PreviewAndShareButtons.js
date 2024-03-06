@@ -8,7 +8,7 @@ import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
 import UpdateIcon from '../../UI/CustomSvgIcons/Update';
 import PublishIcon from '../../UI/CustomSvgIcons/Publish';
 import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
-import { useResponsiveWindowSize } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import ResponsiveRaisedButton from '../../UI/ResponsiveRaisedButton';
 
 export type PreviewAndShareButtonsProps = {|

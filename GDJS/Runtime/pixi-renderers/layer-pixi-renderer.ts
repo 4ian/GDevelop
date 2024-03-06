@@ -68,9 +68,10 @@ namespace gdjs {
       this._pixiContainer.sortableChildren = true;
       this._layer = layer;
       this._isLightingLayer = layer.isLightingLayer();
-      runtimeInstanceContainerRenderer
-        .getRendererObject()
-        .addChild(this._pixiContainer);
+      const parentRendererObject = runtimeInstanceContainerRenderer.getRendererObject();
+      if (parentRendererObject) {
+        parentRendererObject.addChild(this._pixiContainer);
+      }
       this._pixiContainer.filters = [];
 
       // Setup rendering for lighting or 3D rendering:
@@ -761,9 +762,11 @@ namespace gdjs {
       this._lightingSprite = new PIXI.Sprite(this._renderTexture);
       this._lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
       const parentPixiContainer = runtimeInstanceContainerRenderer.getRendererObject();
-      const index = parentPixiContainer.getChildIndex(this._pixiContainer);
-      parentPixiContainer.addChildAt(this._lightingSprite, index);
-      parentPixiContainer.removeChild(this._pixiContainer);
+      if (parentPixiContainer) {
+        const index = parentPixiContainer.getChildIndex(this._pixiContainer);
+        parentPixiContainer.addChildAt(this._lightingSprite, index);
+        parentPixiContainer.removeChild(this._pixiContainer);
+      }
     }
   }
 

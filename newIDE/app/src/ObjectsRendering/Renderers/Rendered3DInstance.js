@@ -86,12 +86,20 @@ export default class Rendered3DInstance {
     return 0;
   }
 
+  getOriginZ() {
+    return 0;
+  }
+
   getCenterX() {
     return this.getWidth() / 2;
   }
 
   getCenterY() {
     return this.getHeight() / 2;
+  }
+
+  getCenterZ() {
+    return this.getDepth() / 2;
   }
 
   getWidth(): number {

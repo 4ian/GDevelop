@@ -12,6 +12,7 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
@@ -23,7 +24,9 @@ import {
 import {
   ExplanationHeader,
   DoneFooter,
+  ExportFlow,
 } from '../GenericExporters/CordovaExport';
+
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -46,6 +49,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-cordova';
+
 export const browserCordovaExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,7 +58,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-cordova',
+  name: exportPipelineName,
   packageNameWarningType: 'mobile',
 
   getInitialExportState: () => null,
@@ -64,7 +69,9 @@ export const browserCordovaExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -140,14 +147,13 @@ export const browserCordovaExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+  renderDoneFooter: ({ compressionOutput, exportState }) => {
     return (
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
             {blobDownloadUrl => (
               <RaisedButton
-                fullWidth
                 primary
                 onClick={() => openBlobDownloadUrl(blobDownloadUrl, 'game.zip')}
                 label={<Trans>Download the exported game</Trans>}

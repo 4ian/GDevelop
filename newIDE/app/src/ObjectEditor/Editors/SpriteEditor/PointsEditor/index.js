@@ -22,7 +22,7 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
@@ -209,6 +209,7 @@ const PointsEditor = ({
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column noMargin expand useFullHeight>
@@ -248,6 +249,7 @@ const PointsEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column noMargin expand>

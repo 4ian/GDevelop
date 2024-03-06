@@ -12,6 +12,7 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
@@ -23,7 +24,9 @@ import {
 import {
   ExplanationHeader,
   DoneFooter,
+  ExportFlow,
 } from '../GenericExporters/FacebookInstantGamesExport';
+
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -46,6 +49,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-facebook-instant-games';
+
 export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,7 +58,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-facebook-instant-games',
+  name: exportPipelineName,
 
   getInitialExportState: () => null,
 
@@ -63,7 +68,9 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Package game files</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -141,7 +148,7 @@ export const browserFacebookInstantGamesExportPipeline: ExportPipeline<
     });
   },
 
-  renderDoneFooter: ({ compressionOutput, exportState, onClose }) => {
+  renderDoneFooter: ({ compressionOutput, exportState }) => {
     return (
       <DoneFooter
         renderGameButton={() => (

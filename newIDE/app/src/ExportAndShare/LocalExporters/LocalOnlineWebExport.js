@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -16,13 +15,12 @@ import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
+  type ExportFlowProps,
 } from '../ExportPipeline.flow';
-import {
-  ExplanationHeader,
-  OnlineGameLink,
-} from '../GenericExporters/OnlineWebExport';
+import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
-import { Column } from '../../UI/Grid';
+import OnlineWebExportFlow from '../GenericExporters/OnlineWebExport/OnlineWebExportFlow';
+
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -46,6 +44,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
+const exportPipelineName = 'local-online-web';
+
 export const localOnlineWebExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,7 +53,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-web',
+  name: exportPipelineName,
   onlineBuildType: 'web-build',
 
   getInitialExportState: () => null,
@@ -66,28 +66,10 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
+  renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
-
-  renderCustomStepsProgress: ({
-    build,
-    project,
-    onSaveProject,
-    isSavingProject,
-    errored,
-    exportStep,
-  }) => (
-    <Column>
-      <OnlineGameLink
-        build={build}
-        project={project}
-        onSaveProject={onSaveProject}
-        isSavingProject={isSavingProject}
-        errored={errored}
-        exportStep={exportStep}
-      />
-    </Column>
+  renderExportFlow: (props: ExportFlowProps) => (
+    <OnlineWebExportFlow {...props} exportPipelineName={exportPipelineName} />
   ),
 
   prepareExporter: (

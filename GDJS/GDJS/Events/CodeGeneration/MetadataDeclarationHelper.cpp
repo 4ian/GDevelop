@@ -125,14 +125,18 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          // Update Project::CreateObject when default behavior are added.
+          // Update Project::CreateObject when default behaviors are added.
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
-          .AddDefaultBehavior("FlippableCapability::FlippableBehavior")
-          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
+          .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
   if (eventsBasedObject.IsRenderedIn3D()) {
-    objectMetadata.MarkAsRenderedIn3D();
+    objectMetadata
+        .MarkAsRenderedIn3D()
+        .AddDefaultBehavior("Scene3D::Base3DBehavior");
+  }
+  else {
+    objectMetadata.AddDefaultBehavior("OpacityCapability::OpacityBehavior");
   }
 
   // TODO EBO Use full type to identify object to avoid collision.
@@ -977,7 +981,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_name>", uncapitalizedLabel),
         _("Property <property_name> of _PARAM0_ is true")
             .FindAndReplace("<property_name>", uncapitalizedLabel),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(conditionMetadata);
     conditionMetadata.SetFunctionName(getterName);
@@ -992,7 +996,7 @@ void MetadataDeclarationHelper::DeclarePropertyInstructionAndExpression(
             .FindAndReplace("<property_value>",
                             "_PARAM" + gd::String::From(valueParameterIndex) +
                                 "_"),
-        eventsBasedEntity.GetFullName() || eventsBasedEntity.GetName(),
+        group,
         GetExtensionIconUrl(extension), GetExtensionIconUrl(extension));
     addObjectAndBehaviorParameters(setterActionMetadata);
     setterActionMetadata
@@ -1214,20 +1218,39 @@ void MetadataDeclarationHelper::DeclareObjectInternalInstructions(
   // Objects are identified by their name alone.
   auto &objectType = eventsBasedObject.GetName();
 
-  objectMetadata
-      .AddScopedAction(
-          "SetRotationCenter", _("Center of rotation"),
-          _("Change the center of rotation of an object relatively to the "
-            "object origin."),
-          _("Change the center of rotation of _PARAM0_ to _PARAM1_, _PARAM2_"),
-          _("Angle"), "res/actions/position24_black.png",
-          "res/actions/position_black.png")
-      .AddParameter("object", _("Object"), objectType)
-      .AddParameter("number", _("X position"))
-      .AddParameter("number", _("Y position"))
-      .MarkAsAdvanced()
-      .SetPrivate()
-      .SetFunctionName("setRotationCenter");
+  if (eventsBasedObject.IsRenderedIn3D()) {
+    objectMetadata
+        .AddScopedAction(
+            "SetRotationCenter", _("Center of rotation"),
+            _("Change the center of rotation of an object relatively to the "
+              "object origin."),
+            _("Change the center of rotation of _PARAM0_ to _PARAM1_ ; _PARAM2_ ; _PARAM3_"),
+            _("Angle"), "res/actions/position24_black.png",
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position"))
+        .AddParameter("number", _("Y position"))
+        .AddParameter("number", _("Z position"))
+        .MarkAsAdvanced()
+        .SetPrivate()
+        .SetFunctionName("setRotationCenter3D");
+  }
+  else {
+    objectMetadata
+        .AddScopedAction(
+            "SetRotationCenter", _("Center of rotation"),
+            _("Change the center of rotation of an object relatively to the "
+              "object origin."),
+            _("Change the center of rotation of _PARAM0_ to _PARAM1_ ; _PARAM2_"),
+            _("Angle"), "res/actions/position24_black.png",
+            "res/actions/position_black.png")
+        .AddParameter("object", _("Object"), objectType)
+        .AddParameter("number", _("X position"))
+        .AddParameter("number", _("Y position"))
+        .MarkAsAdvanced()
+        .SetPrivate()
+        .SetFunctionName("setRotationCenter");
+  }
 }
 
 void MetadataDeclarationHelper::AddParameter(

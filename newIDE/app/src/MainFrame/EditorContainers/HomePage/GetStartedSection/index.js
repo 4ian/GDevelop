@@ -16,7 +16,7 @@ import RaisedButton from '../../../../UI/RaisedButton';
 import FlatButton from '../../../../UI/FlatButton';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { Column, LargeSpacer, Line } from '../../../../UI/Grid';
-import { useResponsiveWindowSize } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import CircularProgress from '../../../../UI/CircularProgress';
 import BackgroundText from '../../../../UI/BackgroundText';
 import {

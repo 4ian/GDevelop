@@ -42,13 +42,13 @@
   // Exclude pre-built js code
   "exclude": [
     "GDJS/Runtime/pixi-renderers/pixi.js",
-    "GDJS/Runtime/pixi-renderers/pixi-spine.js",
     "GDJS/Runtime/Cordova",
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
     "SharedLibs/TileMapHelper/**/*",
+    "Extensions/Spine/pixi-spine/pixi-spine.js",
     "Extensions/P2P/A_peer.js"
   ]
 }

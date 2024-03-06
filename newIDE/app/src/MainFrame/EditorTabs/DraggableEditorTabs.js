@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { ScreenTypeMeasurer } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { ScreenTypeMeasurer } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { ColumnDropIndicator } from './DropIndicator';
 import {
   type EditorTabsState,

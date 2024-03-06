@@ -12,7 +12,7 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { doesPathContainDialog } from '../UI/MaterialUISpecificUtil';
-import { useResponsiveWindowSize } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   popover: {

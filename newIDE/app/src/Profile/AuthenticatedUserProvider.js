@@ -575,34 +575,46 @@ export default class AuthenticatedUserProvider extends React.Component<
       // );
       const userId = 'user-id';
 
-const ONE_MINUTE = 60 * 1000;
-const ONE_HOUR = 60 * ONE_MINUTE;
-const ONE_DAY = 24 * ONE_HOUR;
-const now = Date.now();
+      const ONE_MINUTE = 60 * 1000;
+      const ONE_HOUR = 60 * ONE_MINUTE;
+      const ONE_DAY = 24 * ONE_HOUR;
+      const now = Date.now();
 
-      const notifications=[
+      const notifications = [
         {
           id: 'notification-id-0',
           userId,
           createdAt: now - ONE_MINUTE / 2,
           type: 'credits-drop',
-          data: { amount: 150, reason: 'subscription' },
+          data: { amount: 150, reason: 'subscription-monthly-drop' },
         },
         {
           id: 'notification-id-1',
           userId,
           createdAt: now - ONE_HOUR - 5 * ONE_MINUTE,
           type: 'credits-drop',
-          data: { amount: 300, reason: 'subscription' },
+          data: { amount: 300, reason: 'subscription-monthly-drop' },
         },
         {
           id: 'notification-id-2',
           userId,
           createdAt: now - 4 * ONE_HOUR,
           type: 'credits-drop',
-          data: { amount: 200, reason: 'subscription' },
+          data: { amount: 200, reason: 'subscription-monthly-drop' },
         },
-      ]
+        {
+          id: 'notification-id-3',
+          userId,
+          createdAt: now - 2 * ONE_DAY,
+          type: 'one-game-feedback-received',
+          data: {
+            gameId: 'game-id',
+            gameName: 'Best game',
+            comment: 'hello',
+            playerName: 'Sonic',
+          },
+        },
+      ];
       this.setState(({ authenticatedUser }) => ({
         authenticatedUser: {
           ...authenticatedUser,

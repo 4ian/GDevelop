@@ -16,10 +16,36 @@ type NotificationBaseAttributes = {
 type CreditsDropNotification = {
   ...NotificationBaseAttributes,
   type: 'credits-drop',
-  data: { amount: number, reason: 'subscription' },
+  data: {
+    amount: number,
+    reason: 'subscription-monthly-drop' | 'subscription-creation',
+  },
 };
 
-export type Notification = CreditsDropNotification;
+type OneGameFeedbackReceivedNotification = {
+  ...NotificationBaseAttributes,
+  type: 'one-game-feedback-received',
+  data: {
+    gameId: string,
+    gameName: string,
+    playerName?: string,
+    comment: string,
+  },
+};
+type MultipleGameFeedbackReceivedNotification = {
+  ...NotificationBaseAttributes,
+  type: 'multiple-game-feedback-received',
+  data: {
+    gameId: string,
+    gameName: string,
+    count: number,
+  },
+};
+
+export type Notification =
+  | CreditsDropNotification
+  | OneGameFeedbackReceivedNotification
+  | MultipleGameFeedbackReceivedNotification;
 
 export const listNotifications = async (
   getAuthorizationHeader: () => Promise<string>,

@@ -90,6 +90,19 @@ namespace gdjs {
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      const animator = this.getAnimator();
+      if (initialInstanceData.numberProperties) {
+        for (
+          let i = 0, len = initialInstanceData.numberProperties.length;
+          i < len;
+          ++i
+        ) {
+          const extraData = initialInstanceData.numberProperties[i];
+          if (animator && extraData.name === 'animation') {
+            animator.setAnimationIndex(extraData.value);
+          }
+        }
+      }
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);

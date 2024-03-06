@@ -69,7 +69,7 @@ namespace gdjs {
       this._onFrameChange = callback;
     }
 
-    getCurrentFrameResourceName(): string | null {
+    getCurrentFrame(): SpriteFrameData | null {
       const currentAnimation = this._animations[this._currentAnimationIndex];
       if (!currentAnimation) {
         return null;
@@ -78,7 +78,7 @@ namespace gdjs {
       if (!currentFrame) {
         return null;
       }
-      return currentFrame.image;
+      return currentFrame;
     }
 
     getAnimationIndex(): number {

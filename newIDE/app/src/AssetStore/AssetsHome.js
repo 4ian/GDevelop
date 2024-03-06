@@ -25,6 +25,7 @@ import {
   PublicAssetPackTile,
   PrivateGameTemplateTile,
 } from './ShopTiles';
+import { useDebounce } from '../Utils/UseDebounce';
 
 const cellSpacing = 2;
 
@@ -118,6 +119,27 @@ const styles = {
     // Remove the scroll capability of the grid, the scroll view handles it.
     overflow: 'unset',
   },
+};
+
+const useProgressiveReveal = <T>({
+  list,
+  numberPerPage,
+}: {|
+  list: Array<T>,
+  numberPerPage: number,
+|}): {|
+  displayedList: Array<T>,
+  onShowMore: () => void,
+|} => {
+  const [pageCount, setPageCount] = React.useState(1);
+  const onShowMore = useDebounce(() => {
+    setPageCount(pageCount + 1);
+  }, 20);
+
+  return {
+    displayedList: list.slice(0, pageCount * numberPerPage),
+    onShowMore,
+  };
 };
 
 export type AssetsHomeInterface = {|
@@ -323,11 +345,24 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ]
     );
 
+    const {
+      displayedList: displayedStandAloneTiles,
+      onShowMore: onShowMoreStandAloneTiles,
+    } = useProgressiveReveal({
+      list: allStandAloneTiles,
+      numberPerPage: 25,
+    });
+
     return (
       <ScrollView
         ref={scrollView}
         id="asset-store-home"
         data={{ isFiltered: !!openedShopCategory ? 'true' : 'false' }}
+        onScroll={({ remainingScreensToBottom }) => {
+          if (remainingScreensToBottom <= 1.5) {
+            onShowMoreStandAloneTiles();
+          }
+        }}
       >
         {openedShopCategory ? null : (
           <>
@@ -410,7 +445,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {allStandAloneTiles}
+          {displayedStandAloneTiles}
         </GridList>
       </ScrollView>
     );

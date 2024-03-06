@@ -215,6 +215,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             style={{
               height: 10,
               width: 10,
+              marginLeft: 10,
               borderRadius: 5,
               backgroundColor: props.dotColor,
               flexShrink: 0,

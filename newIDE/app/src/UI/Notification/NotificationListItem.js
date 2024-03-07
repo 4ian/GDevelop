@@ -8,6 +8,7 @@ import { ListItem } from '../List';
 import { getRelativeOrAbsoluteDisplayDate } from '../../Utils/DateDisplay';
 import CoinOutline from '../CustomSvgIcons/CoinOutline';
 import Annotation from '../CustomSvgIcons/Annotation';
+import Cart from '../CustomSvgIcons/Cart';
 import { shortenString } from '../../Utils/StringHelpers';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import RouterContext, {
@@ -18,6 +19,7 @@ const notificationTypeToIcon = {
   'credits-drop': <CoinOutline />,
   'one-game-feedback-received': <Annotation />,
   'multiple-game-feedback-received': <Annotation />,
+  'claimable-asset-pack': <Cart />,
 };
 
 const getNotificationPrimaryTextByType = (
@@ -66,6 +68,14 @@ const getNotificationPrimaryTextByType = (
       </Trans>
     );
   }
+  if (notification.type === 'claimable-asset-pack') {
+    return (
+      <Trans>
+        The asset pack {notification.data.privateAssetPackName} is now
+        available, go claim it in the shop!
+      </Trans>
+    );
+  }
   return null;
 };
 
@@ -90,6 +100,16 @@ const getNotificationClickCallback = ({
         'initial-dialog': 'games-dashboard',
         'game-id': notification.data.gameId,
         'games-dashboard-tab': 'feedback',
+      });
+      onMarkNotificationAsSeen();
+      onCloseNotificationList();
+    };
+  }
+  if (notification.type === 'claimable-asset-pack') {
+    return () => {
+      addRouteArguments({
+        'initial-dialog': 'store',
+        'asset-pack': notification.data.privateAssetPackId,
       });
       onMarkNotificationAsSeen();
       onCloseNotificationList();

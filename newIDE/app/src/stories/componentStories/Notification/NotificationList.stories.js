@@ -37,6 +37,16 @@ const notifications: Notification[] = [
     data: { amount: 300, reason: 'subscription-monthly-drop' },
   },
   {
+    id: 'notification-id-21',
+    userId,
+    createdAt: now - 3 * ONE_HOUR,
+    type: 'claimable-asset-pack',
+    data: {
+      privateAssetPackId: 'asset-pack-id',
+      privateAssetPackName: 'Neon world enemies',
+    },
+  },
+  {
     id: 'notification-id-2',
     userId,
     createdAt: now - 4 * ONE_HOUR,

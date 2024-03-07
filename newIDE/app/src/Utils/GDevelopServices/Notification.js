@@ -32,6 +32,7 @@ type OneGameFeedbackReceivedNotification = {
     comment: string,
   },
 };
+
 type MultipleGameFeedbackReceivedNotification = {
   ...NotificationBaseAttributes,
   type: 'multiple-game-feedback-received',
@@ -42,8 +43,18 @@ type MultipleGameFeedbackReceivedNotification = {
   },
 };
 
+type ClaimableAssetPackNotification = {
+  ...NotificationBaseAttributes,
+  type: 'claimable-asset-pack',
+  data: {
+    privateAssetPackId: string,
+    privateAssetPackName: string,
+  },
+};
+
 export type Notification =
   | CreditsDropNotification
+  | ClaimableAssetPackNotification
   | OneGameFeedbackReceivedNotification
   | MultipleGameFeedbackReceivedNotification;
 

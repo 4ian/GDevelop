@@ -289,6 +289,10 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     return this._textureHeight;
   }
 
+  getDefaultDepth(): number {
+    return 0;
+  }
+
   getCenterX(): number {
     if (!this._sprite || !this._pixiObject) return 0;
     return this._centerX * this._pixiObject.scale.x;

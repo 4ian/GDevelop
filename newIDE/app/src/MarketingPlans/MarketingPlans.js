@@ -200,8 +200,8 @@ const MarketingPlans = ({ game }: Props) => {
       if (!profile || !limits) return;
 
       const { id, nameByLocale } = marketingPlan;
-      const packCreditsAmount = getMarketingPlanPrice(marketingPlan);
-      if (!packCreditsAmount) return;
+      const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
+      if (!planCreditsAmount) return;
 
       const translatedName = selectMessageByLocale(i18n, nameByLocale);
 
@@ -221,9 +221,9 @@ const MarketingPlans = ({ game }: Props) => {
       }
 
       const currentCreditsAmount = limits.credits.userBalance.amount;
-      if (currentCreditsAmount < packCreditsAmount) {
+      if (currentCreditsAmount < planCreditsAmount) {
         openCreditsPackageDialog({
-          missingCredits: packCreditsAmount - currentCreditsAmount,
+          missingCredits: planCreditsAmount - currentCreditsAmount,
         });
         return;
       }
@@ -236,13 +236,13 @@ const MarketingPlans = ({ game }: Props) => {
         ),
         message: activeFeaturing ? (
           <Trans>
-            You are about to use {packCreditsAmount} credits to extend the game
+            You are about to use {planCreditsAmount} credits to extend the game
             featuring {translatedName} for your game {game.gameName} and push it
             to the top of gd.games. Continue?
           </Trans>
         ) : (
           <Trans>
-            You are about to use {packCreditsAmount} credits to purchase the
+            You are about to use {planCreditsAmount} credits to purchase the
             game featuring {translatedName} for your game {game.gameName}.
             Continue?
           </Trans>
@@ -373,8 +373,8 @@ const MarketingPlans = ({ game }: Props) => {
                   descriptionByLocale,
                   bulletPointsByLocale,
                 } = marketingPlan;
-                const packCreditsAmount = getMarketingPlanPrice(marketingPlan);
-                if (!packCreditsAmount) {
+                const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
+                if (!planCreditsAmount) {
                   console.error(
                     `Could not find price for marketing plan ${id}, hiding it.`
                   );
@@ -414,7 +414,7 @@ const MarketingPlans = ({ game }: Props) => {
                             </Text>
                           </LineStackLayout>
                           <Text size="body-small" color="secondary">
-                            <Trans>{packCreditsAmount} credits</Trans>
+                            <Trans>{planCreditsAmount} credits</Trans>
                           </Text>
                         </LineStackLayout>
                       </div>

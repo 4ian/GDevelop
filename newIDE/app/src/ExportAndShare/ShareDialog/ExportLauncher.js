@@ -417,6 +417,7 @@ export default class ExportLauncher extends Component<Props, State> {
         );
         setStep('build');
         // Refresh limits as either the quota or the credits may have changed.
+        // No need to await for this call, as this is just to refresh the UI.
         this.props.authenticatedUser.onRefreshLimits();
         this.setState({ build }, () => {
           this._startBuildWatch(authenticatedUser);

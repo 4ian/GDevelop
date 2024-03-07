@@ -57,7 +57,7 @@ const CurrentUsageDisplayer = ({
   const usageCreditPrice = usagePrice ? usagePrice.priceInCredits : 0;
 
   const onPurchaseBuildWithCredits = React.useCallback(
-    async () => {
+    () => {
       if (!profile || !limits || !usageCreditPrice) {
         return;
       }
@@ -83,7 +83,7 @@ const CurrentUsageDisplayer = ({
           // that the ExportLauncher will handle the error if the build fails.
           onStartBuildWithCredits();
         },
-        successMessage: <Trans>🎉 Build started!</Trans>,
+        successMessage: <Trans>Build started!</Trans>,
         closeAutomaticallyAfterSuccess: true,
       });
     },
@@ -133,7 +133,7 @@ const CurrentUsageDisplayer = ({
   return (
     <ColumnStackLayout noMargin>
       {hasSubscription ? (
-        remainingBuilds !== 0 ? (
+        quota.limitReached ? (
           <div
             style={{
               ...styles.subscriptionContainer,
@@ -169,9 +169,7 @@ const CurrentUsageDisplayer = ({
                     label: (
                       <Trans>Purchase with {usageCreditPrice} credits</Trans>
                     ),
-                    onPayWithCredits: () => {
-                      onPurchaseBuildWithCredits();
-                    },
+                    onPayWithCredits: onPurchaseBuildWithCredits,
                   }
             }
             hideButton={cannotUpgradeSubscription}
@@ -210,17 +208,15 @@ const CurrentUsageDisplayer = ({
             !isFeatureLocked ? 'Build limit reached' : 'Unlock build type'
           }
           label={<Trans>Get a subscription</Trans>}
-          makeButtonRaised={remainingBuilds === 0}
+          makeButtonRaised={quota.limitReached}
           payWithCreditsOptions={
-            remainingBuilds !== 0 || hidePurchaseWithCredits
+            !quota.limitReached || hidePurchaseWithCredits
               ? undefined
               : {
                   label: (
                     <Trans>Purchase with {usageCreditPrice} credits</Trans>
                   ),
-                  onPayWithCredits: () => {
-                    onPurchaseBuildWithCredits();
-                  },
+                  onPayWithCredits: onPurchaseBuildWithCredits,
                 }
           }
         >
@@ -233,7 +229,7 @@ const CurrentUsageDisplayer = ({
                     : remainingMultipleMessage}
                 </Text>
                 <Text noMargin>
-                  {remainingBuilds === 0 ? (
+                  {quota.limitReached ? (
                     <Trans>
                       Use GDevelop credits or get a subscription to increase the
                       limits.

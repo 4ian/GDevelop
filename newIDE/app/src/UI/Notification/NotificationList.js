@@ -69,7 +69,7 @@ const NotificationList = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Column noMargin>
+        <Column noMargin expand>
           <Line justifyContent="space-between" alignItems="center" noMargin>
             <Text size="block-title">
               <Trans>Notifications</Trans>

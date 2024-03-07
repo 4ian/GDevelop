@@ -13,6 +13,10 @@ import {
   type EditorIdentifier,
   isMiniTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
+import {
+  createOrEnsureBadgeForUser,
+  getTutorialCompletedAchievementId,
+} from '../Utils/GDevelopServices/Badge';
 import InAppTutorialDialog from './InAppTutorialDialog';
 import InAppTutorialStepDisplayer from './InAppTutorialStepDisplayer';
 import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
@@ -24,8 +28,11 @@ import {
   isMuiCheckbox,
 } from '../UI/MaterialUISpecificUtil';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../Profile/AuthenticatedUserContext';
 import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import { retryIfFailed } from '../Utils/RetryIfFailed';
 
 const textInterpolationProjectDataAccessors = {
   instancesCount: 'instancesCount:',
@@ -354,6 +361,56 @@ const gatherProjectDataOnMultipleSteps = ({
     }
   }
   return newData;
+};
+
+const useGiveTrivialBadgeWhenTutorialIsFinished = ({
+  authenticatedUser,
+  displayEndDialog,
+  tutorial,
+}: {
+  authenticatedUser: AuthenticatedUser,
+  displayEndDialog: boolean,
+  tutorial: InAppTutorial,
+}) => {
+  // Destructure the user data to avoid the effect to run at every change of the user
+  // which is unrelated to badges or the user profile.
+  const {
+    badges,
+    onBadgesChanged,
+    profile,
+    getAuthorizationHeader,
+  } = authenticatedUser;
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!profile || !displayEndDialog) return;
+
+        try {
+          // Give a (trivial) badge when a tutorial is finished.
+          await retryIfFailed({ times: 3 }, () =>
+            createOrEnsureBadgeForUser(
+              { badges, onBadgesChanged, profile, getAuthorizationHeader },
+              getTutorialCompletedAchievementId(tutorial.id)
+            )
+          );
+        } catch (error) {
+          console.error(
+            `Couldn't create completion badge for tutorial ${tutorial.id}.`,
+            error
+          );
+        }
+      })();
+    },
+    [
+      displayEndDialog,
+      badges,
+      onBadgesChanged,
+      profile,
+      getAuthorizationHeader,
+      tutorial.id,
+    ]
+  );
 };
 
 type Props = {|
@@ -1064,6 +1121,12 @@ const InAppTutorialOrchestrator = React.forwardRef<
       },
       [checkIfWrongEditor, currentEditor, currentSceneName]
     );
+
+    useGiveTrivialBadgeWhenTutorialIsFinished({
+      authenticatedUser,
+      tutorial,
+      displayEndDialog,
+    });
 
     return (
       <I18n>

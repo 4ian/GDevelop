@@ -11,6 +11,7 @@ import {
   silverSubscriptionWithExpiredRedemptionCode,
   silverSubscriptionWithRedemptionCode,
   subscriptionForIndieUser,
+  subscriptionForStartupUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -19,7 +20,7 @@ export default {
   decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
 };
 
-export const Default = () => (
+export const WithSubscriptionLimitNotReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -28,11 +29,32 @@ export const Default = () => (
       limitReached: false,
       period: '1day',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const Default30Days = () => (
+export const WithoutSubscriptionLimitNotReached = () => (
+  <CurrentUsageDisplayer
+    subscription={noSubscription}
+    quota={{
+      current: 0,
+      max: 1,
+      limitReached: false,
+      period: '1day',
+    }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
+    onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
+  />
+);
+
+export const WithSubscriptionLimitNotReached30Days = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -41,11 +63,15 @@ export const Default30Days = () => (
       limitReached: false,
       period: '30days',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const With1BuildRemaining = () => (
+export const WithSubscription1BuildRemaining = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -54,11 +80,15 @@ export const With1BuildRemaining = () => (
       limitReached: false,
       period: '1day',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const With1BuildRemaining30Days = () => (
+export const WithSubscription1BuildRemaining30Days = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={{
@@ -67,11 +97,15 @@ export const With1BuildRemaining30Days = () => (
       limitReached: false,
       period: '30days',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const WithRedemptionCode = () => (
+export const WithSubscriptionRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithRedemptionCode}
     quota={{
@@ -80,11 +114,15 @@ export const WithRedemptionCode = () => (
       limitReached: false,
       period: '1day',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const WithExpiredRedemptionCode = () => (
+export const WithSubscriptionExpiredRedemptionCode = () => (
   <CurrentUsageDisplayer
     subscription={silverSubscriptionWithExpiredRedemptionCode}
     quota={{
@@ -93,22 +131,46 @@ export const WithExpiredRedemptionCode = () => (
       limitReached: false,
       period: '1day',
     }}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const LimitReached = () => (
+export const WithSubscriptionLimitReached = () => (
   <CurrentUsageDisplayer
     subscription={subscriptionForIndieUser}
     quota={limitsReached.quotas['cordova-build']}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );
 
-export const LimitsReachedWithoutSubscription = () => (
+export const WithProSubscriptionLimitReached = () => (
+  <CurrentUsageDisplayer
+    subscription={subscriptionForStartupUser}
+    quota={limitsReached.quotas['cordova-build']}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
+    onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
+  />
+);
+
+export const WithoutSubscriptionLimitsReached = () => (
   <CurrentUsageDisplayer
     subscription={noSubscription}
     quota={limitsReached.quotas['cordova-build']}
+    usagePrice={{
+      priceInCredits: 100,
+    }}
     onChangeSubscription={action('on change subscription callback')}
+    onStartBuildWithCredits={action('on start build with credits callback')}
   />
 );

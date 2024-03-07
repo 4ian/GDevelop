@@ -129,7 +129,8 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     await delay(1000);
 

@@ -19,6 +19,7 @@ type Props = {|
   message: React.Node,
   onConfirm: () => Promise<void>,
   successMessage: React.Node,
+  closeAutomaticallyAfterSuccess?: boolean,
 |};
 
 const CreditsUsageDialog = ({
@@ -27,6 +28,7 @@ const CreditsUsageDialog = ({
   message,
   onConfirm,
   successMessage,
+  closeAutomaticallyAfterSuccess,
 }: Props) => {
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [isPurchaseSuccessful, setisPurchaseSuccessful] = React.useState(false);
@@ -43,13 +45,16 @@ const CreditsUsageDialog = ({
       setIsPurchasing(true);
       try {
         await onConfirm();
-        setisPurchaseSuccessful(true);
         // We assume that the purchase was successful, so we refresh the purchases and limits,
         // no need to wait for those to complete as they are not critical to the purchase.
         onRefreshGameTemplatePurchases();
         onRefreshAssetPackPurchases();
         onPurchaseSuccessful();
         onRefreshLimits();
+        if (closeAutomaticallyAfterSuccess) onClose();
+
+        // Show a success message to the user.
+        setisPurchaseSuccessful(true);
       } catch (error) {
         console.error('An error happened while purchasing a product:', error);
         await showAlert({
@@ -67,6 +72,8 @@ const CreditsUsageDialog = ({
       onPurchaseSuccessful,
       onRefreshLimits,
       showAlert,
+      closeAutomaticallyAfterSuccess,
+      onClose,
     ]
   );
 

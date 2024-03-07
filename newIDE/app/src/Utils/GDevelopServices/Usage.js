@@ -67,10 +67,12 @@ export type Capabilities = {|
   },
 |};
 
+export type UsagePrice = {|
+  priceInCredits: number,
+|};
+
 export type UsagePrices = {|
-  [key: string]: {|
-    priceInCredits: number,
-  |},
+  [key: string]: UsagePrice,
 |};
 
 export type UsagePurchasableQuantities = {|
@@ -444,6 +446,14 @@ export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
     ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
       subscription.planId
     ) &&
+    !subscription.benefitsFromEducationPlan
+  );
+};
+
+export const canUpgradeSubscription = (subscription: ?Subscription) => {
+  return (
+    !!subscription &&
+    !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
     !subscription.benefitsFromEducationPlan
   );
 };

@@ -210,7 +210,8 @@ export const buildElectron = (
   options: {|
     gameName: string,
     gameVersion: string,
-  |}
+  |},
+  payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -222,6 +223,7 @@ export const buildElectron = (
           targets: targets.join(','),
           gameId,
           filename: getBuildExtensionlessFilename(options),
+          payWithCredits,
         },
         headers: {
           Authorization: authorizationHeader,
@@ -239,7 +241,8 @@ export const buildWeb = (
   options: {|
     gameName: string,
     gameVersion: string,
-  |}
+  |},
+  payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -250,6 +253,7 @@ export const buildWeb = (
           type: 'web-build',
           targets: 's3',
           gameId,
+          payWithCredits,
         },
         headers: {
           Authorization: authorizationHeader,
@@ -269,7 +273,8 @@ export const buildCordovaAndroid = (
   options: {|
     gameName: string,
     gameVersion: string,
-  |}
+  |},
+  payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -288,6 +293,7 @@ export const buildCordovaAndroid = (
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),
+            payWithCredits,
           },
           headers: {
             Authorization: authorizationHeader,
@@ -308,7 +314,8 @@ export const buildCordovaIos = (
   options: {|
     gameName: string,
     gameVersion: string,
-  |}
+  |},
+  payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -325,6 +332,7 @@ export const buildCordovaIos = (
             targets: targets.join(','),
             gameId,
             filename: getBuildExtensionlessFilename(options),
+            payWithCredits,
           },
           headers: {
             Authorization: authorizationHeader,

@@ -180,7 +180,8 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -192,7 +193,8 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
       uploadBucketKey,
       exportState.targets,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

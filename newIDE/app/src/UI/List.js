@@ -45,6 +45,13 @@ const styles = {
     flexDirection: 'column',
   },
   noLeftPaddingListItem: { paddingLeft: 0 },
+  dot: {
+    height: 10,
+    width: 10,
+    marginLeft: 10,
+    borderRadius: 5,
+    flexShrink: 0,
+  },
 };
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
@@ -211,16 +218,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
       }
       if (props.displayDot) {
         return (
-          <span
-            style={{
-              height: 10,
-              width: 10,
-              marginLeft: 10,
-              borderRadius: 5,
-              backgroundColor: props.dotColor,
-              flexShrink: 0,
-            }}
-          />
+          <span style={{ ...styles.dot, backgroundColor: props.dotColor }} />
         );
       }
 

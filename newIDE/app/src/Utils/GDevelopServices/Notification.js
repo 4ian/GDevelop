@@ -65,7 +65,7 @@ export const listNotifications = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await client.get('/notification', {
     headers: { Authorization: authorizationHeader },
-    params: { userId },
+    params: { userId, perPage: 25 },
   });
   return response.data;
 };

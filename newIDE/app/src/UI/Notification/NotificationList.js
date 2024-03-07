@@ -10,6 +10,8 @@ import LeftLoader from '../LeftLoader';
 import { Column, Line } from '../Grid';
 import Text from '../Text';
 import FlatButton from '../FlatButton';
+import TextButton from '../TextButton';
+import ScrollView from '../ScrollView';
 
 type Props = {|
   notifications: Notification[],
@@ -27,6 +29,8 @@ const NotificationList = ({
   onCloseNotificationList,
 }: Props) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [showAll, setShowAll] = React.useState<boolean>(false);
+
   const markAllAsRead = React.useCallback(
     async () => {
       setIsLoading(true);
@@ -58,6 +62,10 @@ const NotificationList = ({
     [onMarkNotificationAsSeen]
   );
 
+  const notificationsToDisplay = showAll
+    ? notifications
+    : notifications.slice(0, 5);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -75,24 +83,34 @@ const NotificationList = ({
               />
             </LeftLoader>
           </Line>
-          <List>
-            {notifications.length > 0 ? (
-              notifications.map(notification => (
-                <NotificationListItem
-                  key={notification.id}
-                  notification={notification}
-                  onCloseNotificationList={onCloseNotificationList}
-                  onMarkNotificationAsSeen={() => {
-                    markNotificationAsSeen(notification);
-                  }}
-                />
-              ))
-            ) : (
-              <ListItem
-                primaryText={<Trans>You have 0 notifications.</Trans>}
+          <ScrollView autoHideScrollbar>
+            <Column>
+              <List>
+                {notificationsToDisplay.length > 0 ? (
+                  notificationsToDisplay.map(notification => (
+                    <NotificationListItem
+                      key={notification.id}
+                      notification={notification}
+                      onCloseNotificationList={onCloseNotificationList}
+                      onMarkNotificationAsSeen={() => {
+                        markNotificationAsSeen(notification);
+                      }}
+                    />
+                  ))
+                ) : (
+                  <ListItem
+                    primaryText={<Trans>You have 0 notifications.</Trans>}
+                  />
+                )}
+              </List>
+              <TextButton
+                primary
+                label={<Trans>Load more...</Trans>}
+                onClick={() => setShowAll(true)}
+                disabled={showAll}
               />
-            )}
-          </List>
+            </Column>
+          </ScrollView>
         </Column>
       )}
     </I18n>

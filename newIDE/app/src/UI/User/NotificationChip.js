@@ -15,7 +15,13 @@ import {
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
-  notificationListContainer: { padding: 16 },
+  notificationListContainer: {
+    padding: 16,
+    display: 'flex',
+    maxWidth: 400,
+    minWidth: 300,
+  },
+  popoverPaper: { overflowY: 'hidden', maxHeight: '80%', display: 'flex' },
 };
 
 type Props = {||};
@@ -91,6 +97,7 @@ const NotificationChip = (props: Props) => {
       <Popover
         open={!!anchorEl}
         anchorEl={anchorEl}
+        PaperProps={{ style: styles.popoverPaper }}
         onClose={onCloseNotificationList}
         anchorOrigin={{
           vertical: 'bottom',
@@ -101,14 +108,7 @@ const NotificationChip = (props: Props) => {
           horizontal: 'right',
         }}
       >
-        <Paper
-          style={{
-            ...styles.notificationListContainer,
-            maxWidth: 400,
-            minWidth: 300,
-          }}
-          background="light"
-        >
+        <Paper style={styles.notificationListContainer} background="light">
           <NotificationList
             notifications={notifications}
             onMarkAllAsRead={onMarkAllAsRead}

@@ -15,7 +15,7 @@ namespace gdjs {
       gdjs.Flippable,
       gdjs.Animatable,
       gdjs.OpacityHandler {
-    _animator: gdjs.SpriteAnimator;
+    _animator: gdjs.SpriteAnimator<any>;
     _scaleX: number = 1;
     _scaleY: number = 1;
     _blendMode: number = 0;
@@ -37,13 +37,15 @@ namespace gdjs {
     ) {
       super(instanceContainer, spriteObjectData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
-      this._animator = new gdjs.SpriteAnimator(
-        spriteObjectData.animations,
-        instanceContainer.getGame().getImageManager()
-      );
       this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
         this,
         instanceContainer
+      );
+      this._animator = new gdjs.SpriteAnimator(
+        spriteObjectData.animations,
+        gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
+          instanceContainer.getGame().getImageManager()
+        )
       );
       this._updateAnimationFrame();
 
@@ -114,9 +116,7 @@ namespace gdjs {
       ) {
         return;
       }
-      const hasFrameChanged = this._animator.update(
-        this.getElapsedTime() / 1000
-      );
+      const hasFrameChanged = this._animator.step(this.getElapsedTime() / 1000);
       if (hasFrameChanged) {
         this._updateAnimationFrame();
       }
@@ -433,7 +433,9 @@ namespace gdjs {
      * (x and y position of the point in global coordinates).
      */
     private _transformToGlobal(x: float, y: float, result: number[]) {
-      const animationFrame = this._animator.getCurrentFrame() as SpriteAnimationFrame;
+      const animationFrame = this._animator.getCurrentFrame() as SpriteAnimationFrame<
+        any
+      >;
       let cx = animationFrame.center.x;
       let cy = animationFrame.center.y;
 

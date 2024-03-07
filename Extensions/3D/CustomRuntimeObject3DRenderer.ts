@@ -8,6 +8,7 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
+    private static _animationFrameTextureManager: ThreeAnimationFrameTextureManager;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -130,6 +131,47 @@ namespace gdjs {
 
     setLayerIndex(layer: gdjs.RuntimeLayer, index: float): void {
       // Layers are not handled for 3D custom objects.
+    }
+
+    static getAnimationFrameTextureManager(
+      imageManager: gdjs.PixiImageManager
+    ): ThreeAnimationFrameTextureManager {
+      if (!gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager) {
+        gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager = new ThreeAnimationFrameTextureManager(
+          imageManager
+        );
+      }
+      return gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager;
+    }
+  }
+
+  class ThreeAnimationFrameTextureManager
+    implements gdjs.AnimationFrameTextureManager<THREE.Material> {
+    private _imageManager: gdjs.PixiImageManager;
+
+    constructor(imageManager: gdjs.PixiImageManager) {
+      this._imageManager = imageManager;
+    }
+
+    getAnimationFrame(imageName: string) {
+      return this._imageManager.getThreeMaterial(imageName, {
+        useTransparentTexture: true,
+        forceBasicMaterial: true,
+      });
+    }
+
+    getAnimationFrameWidth(material: THREE.Material) {
+      const map = (material as
+        | THREE.MeshBasicMaterial
+        | THREE.MeshStandardMaterial).map;
+      return map ? map.image.width : 0;
+    }
+
+    getAnimationFrameHeight(material: THREE.Material) {
+      const map = (material as
+        | THREE.MeshBasicMaterial
+        | THREE.MeshStandardMaterial).map;
+      return map ? map.image.height : 0;
     }
   }
 }

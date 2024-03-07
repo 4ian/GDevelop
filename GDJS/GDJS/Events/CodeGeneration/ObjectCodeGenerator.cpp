@@ -110,6 +110,16 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
 
         return updateFromObjectCode;
       },
+      // generateInitializeAnimatableCode
+      [&]() {
+        return gd::String(R"jscode_template(
+    this._animator = new gdjs.SpriteAnimator(
+        objectData.animatable.animations,
+        gdjs.RENDERER_CLASS_NAME.getAnimationFrameTextureManager(
+            parentInstanceContainer.getGame().getImageManager()));
+)jscode_template")
+      .FindAndReplace("RENDERER_CLASS_NAME", eventsBasedObject.IsRenderedIn3D() ? "CustomRuntimeObject3DRenderer" : "CustomRuntimeObject2DRenderer");
+      },
       // generateAnimatableCode
       [&]() {
         return gd::String(R"jscode_template(
@@ -181,6 +191,7 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectTemplateCode(
     std::function<gd::String()> generatePropertiesCode,
     std::function<gd::String()> generateMethodsCode,
     std::function<gd::String()> generateUpdateFromObjectDataCode,
+    std::function<gd::String()> generateInitializeAnimatableCode,
     std::function<gd::String()> generateAnimatableCode,
     std::function<gd::String()> generateTextContainerCode) {
   return gd::String(R"jscode_template(
@@ -234,12 +245,12 @@ gdjs.registerObject("EXTENSION_NAME::OBJECT_NAME", CODE_NAMESPACE.RUNTIME_OBJECT
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
                       generateInitializePropertiesCode())
-      .FindAndReplace("UPDATE_FROM_OBJECT_DATA_CODE", generateUpdateFromObjectDataCode())
-      .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("INITIALIZE_ANIMATABLE_CODE",
                       eventsBasedObject.IsAnimatable()
-                          ? "this._animator = new gdjs.SpriteAnimator(objectData.animatable.animations);"
+                          ? generateInitializeAnimatableCode()
                           : "")
+      .FindAndReplace("UPDATE_FROM_OBJECT_DATA_CODE", generateUpdateFromObjectDataCode())
+      .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("ANIMATABLE_CODE", eventsBasedObject.IsAnimatable() ? generateAnimatableCode() : "")
       .FindAndReplace("TEXT_CONTAINER_CODE", eventsBasedObject.IsTextContainer() ? generateTextContainerCode() : "")
       .FindAndReplace("METHODS_CODE", generateMethodsCode());

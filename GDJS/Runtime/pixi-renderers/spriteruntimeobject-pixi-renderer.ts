@@ -9,6 +9,7 @@ namespace gdjs {
     _sprite: PIXI.Sprite;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
+    private static _animationFrameTextureManager: PixiAnimationFrameTextureManager;
 
     /**
      * @param runtimeObject The object
@@ -19,9 +20,8 @@ namespace gdjs {
       instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._sprite = new PIXI.Sprite(
-        instanceContainer.getGame().getImageManager().getInvalidPIXITexture()
-      );
+      const imageManager = instanceContainer.getGame().getImageManager();
+      this._sprite = new PIXI.Sprite(imageManager.getInvalidPIXITexture());
       const layer = instanceContainer.getLayer('');
       if (layer) {
         layer
@@ -97,7 +97,7 @@ namespace gdjs {
     /**
      * Update the internal texture of the PIXI sprite.
      */
-    updateFrame(animationFrame: gdjs.SpriteAnimationFrame): void {
+    updateFrame(animationFrame: gdjs.SpriteAnimationFrame<PIXI.Texture>): void {
       this._spriteDirty = true;
       this._sprite.texture = animationFrame.texture;
     }
@@ -107,7 +107,9 @@ namespace gdjs {
     }
 
     updateX(): void {
-      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame;
+      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame<
+        PIXI.Texture
+      >;
       this._sprite.position.x =
         this._object.x +
         (animationFrame.center.x - animationFrame.origin.x) *
@@ -115,7 +117,9 @@ namespace gdjs {
     }
 
     updateY(): void {
-      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame;
+      const animationFrame = this._object._animator.getCurrentFrame() as SpriteAnimationFrame<
+        PIXI.Texture
+      >;
       this._sprite.position.y =
         this._object.y +
         (animationFrame.center.y - animationFrame.origin.y) *
@@ -179,18 +183,35 @@ namespace gdjs {
       return this._sprite.texture.frame.height;
     }
 
-    static getAnimationFrame(
-      imageManager: gdjs.PixiImageManager,
-      imageName: string
-    ) {
-      return imageManager.getPIXITexture(imageName);
+    static getAnimationFrameTextureManager(
+      imageManager: gdjs.PixiImageManager
+    ): PixiAnimationFrameTextureManager {
+      if (!gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager) {
+        gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager = new PixiAnimationFrameTextureManager(
+          imageManager
+        );
+      }
+      return gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager;
+    }
+  }
+
+  class PixiAnimationFrameTextureManager
+    implements gdjs.AnimationFrameTextureManager<PIXI.Texture> {
+    private _imageManager: gdjs.PixiImageManager;
+
+    constructor(imageManager: gdjs.PixiImageManager) {
+      this._imageManager = imageManager;
     }
 
-    static getAnimationFrameWidth(pixiTexture: PIXI.Texture) {
+    getAnimationFrame(imageName: string) {
+      return this._imageManager.getPIXITexture(imageName);
+    }
+
+    getAnimationFrameWidth(pixiTexture: PIXI.Texture) {
       return pixiTexture.width;
     }
 
-    static getAnimationFrameHeight(pixiTexture: PIXI.Texture) {
+    getAnimationFrameHeight(pixiTexture: PIXI.Texture) {
       return pixiTexture.height;
     }
   }

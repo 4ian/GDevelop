@@ -75,17 +75,23 @@ namespace gdjs {
 
   export type SpriteObjectData = ObjectData & SpriteObjectDataType;
 
+  export interface AnimationFrameTextureManager<T> {
+    getAnimationFrame(imageName: string): T;
+    getAnimationFrameWidth(pixiTexture: T);
+    getAnimationFrameHeight(pixiTexture: T);
+  }
+
   /**
    * A frame used by a SpriteAnimation in a {@link gdjs.SpriteRuntimeObject}.
    *
    * It contains the texture displayed as well as information like the points position
    * or the collision mask.
    */
-  export class SpriteAnimationFrame {
+  export class SpriteAnimationFrame<T> {
     image: string;
 
     //TODO: Rename in imageName, and do not store it in the object?
-    texture: any;
+    texture: T;
     center: SpritePoint = { x: 0, y: 0 };
     origin: SpritePoint = { x: 0, y: 0 };
     hasCustomHitBoxes: boolean = false;
@@ -96,21 +102,24 @@ namespace gdjs {
      * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
      */
-    constructor(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
+    constructor(
+      frameData: SpriteFrameData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
+    ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(
-        imageManager,
-        this.image
-      );
+      this.texture = textureManager.getAnimationFrame(this.image);
       this.points = new Hashtable();
-      this.reinitialize(imageManager, frameData);
+      this.reinitialize(frameData, textureManager);
     }
 
     /**
      * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
      */
-    reinitialize(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
+    reinitialize(
+      frameData: SpriteFrameData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
+    ) {
       this.points.clear();
       for (let i = 0, len = frameData.points.length; i < len; ++i) {
         const ptData = frameData.points[i];
@@ -125,14 +134,9 @@ namespace gdjs {
         this.center.x = center.x;
         this.center.y = center.y;
       } else {
-        this.center.x =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(
-            this.texture
-          ) / 2;
+        this.center.x = textureManager.getAnimationFrameWidth(this.texture) / 2;
         this.center.y =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(
-            this.texture
-          ) / 2;
+          textureManager.getAnimationFrameHeight(this.texture) / 2;
       }
 
       //Load the custom collision mask, if any:
@@ -191,29 +195,29 @@ namespace gdjs {
    * @param imageManager The game image manager
    * @param directionData The direction data used to initialize the direction
    */
-  export class SpriteAnimationDirection {
+  export class SpriteAnimationDirection<T> {
     timeBetweenFrames: number;
     loop: boolean;
-    frames: SpriteAnimationFrame[] = [];
+    frames: SpriteAnimationFrame<T>[] = [];
 
     constructor(
-      imageManager: gdjs.PixiImageManager,
-      directionData: SpriteDirectionData
+      directionData: SpriteDirectionData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.timeBetweenFrames = directionData
         ? directionData.timeBetweenFrames
         : 1.0;
       this.loop = !!directionData.looping;
-      this.reinitialize(imageManager, directionData);
+      this.reinitialize(directionData, textureManager);
     }
 
     /**
-     * @param imageManager The game image manager
      * @param directionData The direction data used to initialize the direction
+     * @param textureManager The game image manager
      */
     reinitialize(
-      imageManager: gdjs.ImageManager,
-      directionData: SpriteDirectionData
+      directionData: SpriteDirectionData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.timeBetweenFrames = directionData
         ? directionData.timeBetweenFrames
@@ -223,10 +227,10 @@ namespace gdjs {
       for (const len = directionData.sprites.length; i < len; ++i) {
         const frameData = directionData.sprites[i];
         if (i < this.frames.length) {
-          this.frames[i].reinitialize(imageManager, frameData);
+          this.frames[i].reinitialize(frameData, textureManager);
         } else {
           this.frames.push(
-            new gdjs.SpriteAnimationFrame(imageManager, frameData)
+            new gdjs.SpriteAnimationFrame<T>(frameData, textureManager)
           );
         }
       }
@@ -240,27 +244,27 @@ namespace gdjs {
    * @param imageManager The game image manager
    * @param animData The animation data used to initialize the animation
    */
-  export class SpriteAnimation {
+  export class SpriteAnimation<T> {
     hasMultipleDirections: boolean;
     name: string;
-    directions: gdjs.SpriteAnimationDirection[] = [];
+    directions: gdjs.SpriteAnimationDirection<T>[] = [];
 
     constructor(
-      imageManager: gdjs.PixiImageManager,
-      animData: SpriteAnimationData
+      animData: SpriteAnimationData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
-      this.reinitialize(imageManager, animData);
+      this.reinitialize(animData, textureManager);
     }
 
     /**
-     * @param imageManager The game image manager
      * @param animData The animation data used to initialize the animation
+     * @param textureManager The game image manager
      */
     reinitialize(
-      imageManager: gdjs.ImageManager,
-      animData: SpriteAnimationData
+      animData: SpriteAnimationData,
+      textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.hasMultipleDirections = !!animData.useMultipleDirections;
       this.name = animData.name || '';
@@ -268,10 +272,10 @@ namespace gdjs {
       for (const len = animData.directions.length; i < len; ++i) {
         const directionData = animData.directions[i];
         if (i < this.directions.length) {
-          this.directions[i].reinitialize(imageManager, directionData);
+          this.directions[i].reinitialize(directionData, textureManager);
         } else {
           this.directions.push(
-            new gdjs.SpriteAnimationDirection(imageManager, directionData)
+            new gdjs.SpriteAnimationDirection(directionData, textureManager)
           );
         }
       }
@@ -283,16 +287,15 @@ namespace gdjs {
   /**
    *
    */
-  export class SpriteAnimator implements gdjs.Animatable {
-    _imageManager: PixiImageManager;
-    _animations: gdjs.SpriteAnimation[] = [];
+  export class SpriteAnimator<T> implements gdjs.Animatable {
+    _animations: gdjs.SpriteAnimation<T>[] = [];
     /**
      * Reference to the current SpriteAnimationFrame that is displayed.
      * Verify is `this._animationFrameDirty === true` before using it, and if so
      * call `this._updateAnimationFrame()`.
      * Can be null, so ensure that this case is handled properly.
      */
-    _animationFrame: gdjs.SpriteAnimationFrame | null = null;
+    _animationFrame: gdjs.SpriteAnimationFrame<T> | null = null;
     _animationFrameDirty: boolean = true;
 
     _currentAnimation: integer = 0;
@@ -303,15 +306,16 @@ namespace gdjs {
     _animationSpeedScale: float = 1;
     _animationPaused: boolean = false;
     _onFrameChange: (() => void) | null = null;
+    _textureManager: gdjs.AnimationFrameTextureManager<T>;
 
     constructor(
       animations: Array<SpriteAnimationData>,
-      imageManager: PixiImageManager
+      textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
-      this._imageManager = imageManager;
+      this._textureManager = textureManager;
       for (let i = 0, len = animations.length; i < len; ++i) {
         this._animations.push(
-          new gdjs.SpriteAnimation(imageManager, animations[i])
+          new gdjs.SpriteAnimation(animations[i], textureManager)
         );
       }
     }
@@ -328,10 +332,10 @@ namespace gdjs {
       for (const len = animations.length; i < len; ++i) {
         const animData = animations[i];
         if (i < this._animations.length) {
-          this._animations[i].reinitialize(this._imageManager, animData);
+          this._animations[i].reinitialize(animData, this._textureManager);
         } else {
           this._animations.push(
-            new gdjs.SpriteAnimation(this._imageManager, animData)
+            new gdjs.SpriteAnimation(animData, this._textureManager)
           );
         }
       }
@@ -349,10 +353,10 @@ namespace gdjs {
       for (const len = newObjectData.animations.length; i < len; ++i) {
         const animData = newObjectData.animations[i];
         if (i < this._animations.length) {
-          this._animations[i].reinitialize(this._imageManager, animData);
+          this._animations[i].reinitialize(animData, this._textureManager);
         } else {
           this._animations.push(
-            new gdjs.SpriteAnimation(this._imageManager, animData)
+            new gdjs.SpriteAnimation(animData, this._textureManager)
           );
         }
       }
@@ -376,7 +380,7 @@ namespace gdjs {
      * is valid).
      * If invalid, `this._animationFrame` will be `null` after calling this function.
      */
-    getCurrentFrame(): gdjs.SpriteAnimationFrame | null {
+    getCurrentFrame(): gdjs.SpriteAnimationFrame<T> | null {
       if (!this._animationFrameDirty) {
         return this._animationFrame;
       }
@@ -404,7 +408,7 @@ namespace gdjs {
      * Update the current frame of the object according to the elapsed time on the scene.
      * @param timeDelta in seconds
      */
-    update(timeDelta: float): boolean {
+    step(timeDelta: float): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=

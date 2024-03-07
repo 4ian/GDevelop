@@ -215,7 +215,7 @@ namespace gdjs {
       startY1: float,
       endX2: float,
       endY2: float,
-      fillet: float,
+      fillet: float
     ) {
       this._renderer.drawFilletRectangle(
         startX1,
@@ -225,6 +225,7 @@ namespace gdjs {
         fillet
       );
     }
+
     drawRoundedRectangle(
       startX1: float,
       startY1: float,

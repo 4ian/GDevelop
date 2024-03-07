@@ -147,8 +147,8 @@ namespace gdjs {
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
-      );   
-      //@ts-ignore from @pixi/graphics-extras   
+      );
+      //@ts-ignore from @pixi/graphics-extras
       this._graphics.drawFilletRect(x1, y1, x2 - x1, y2 - y1, fillet);
       this._graphics.closePath();
       this._graphics.endFill();

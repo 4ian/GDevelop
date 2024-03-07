@@ -103,12 +103,13 @@ const NotificationList = ({
                   />
                 )}
               </List>
-              <TextButton
-                primary
-                label={<Trans>Load more...</Trans>}
-                onClick={() => setShowAll(true)}
-                disabled={showAll}
-              />
+              {!showAll && (
+                <TextButton
+                  primary
+                  label={<Trans>Load more...</Trans>}
+                  onClick={() => setShowAll(true)}
+                />
+              )}
             </Column>
           </ScrollView>
         </Column>

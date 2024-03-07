@@ -9,6 +9,7 @@ namespace gdjs {
   };
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
+    animatable?: SpriteAnimationData[];
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
@@ -86,6 +87,13 @@ namespace gdjs {
       oldObjectData: ObjectData & CustomObjectConfiguration,
       newObjectData: ObjectData & CustomObjectConfiguration
     ): boolean {
+      const animator = this.getAnimator();
+      if (animator) {
+        animator.updateFromObjectData(
+          oldObjectData.animatable || [],
+          newObjectData.animatable || []
+        );
+      }
       return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
     }
 

@@ -75,7 +75,11 @@ namespace gdjs {
       oldObjectData: SpriteObjectData,
       newObjectData: SpriteObjectData
     ): boolean {
-      this._animator.updateFromObjectData(oldObjectData, newObjectData);
+      this._animator.updateFromObjectData(
+        oldObjectData.animations,
+        newObjectData.animations
+      );
+      this._updateIfNotVisible = !!newObjectData.updateIfNotVisible;
       this.invalidateHitboxes();
       return true;
     }

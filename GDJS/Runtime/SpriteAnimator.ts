@@ -320,6 +320,13 @@ namespace gdjs {
       }
     }
 
+    invalidateFrame() {
+      this._animationFrameDirty = true;
+      if (this._onFrameChange) {
+        this._onFrameChange();
+      }
+    }
+
     reinitialize(animations: Array<SpriteAnimationData>) {
       this._currentAnimation = 0;
       this._currentDirection = 0;
@@ -346,12 +353,12 @@ namespace gdjs {
     }
 
     updateFromObjectData(
-      oldObjectData: SpriteObjectData,
-      newObjectData: SpriteObjectData
+      oldAnimations: Array<SpriteAnimationData>,
+      newAnimations: Array<SpriteAnimationData>
     ): boolean {
       let i = 0;
-      for (const len = newObjectData.animations.length; i < len; ++i) {
-        const animData = newObjectData.animations[i];
+      for (const len = newAnimations.length; i < len; ++i) {
+        const animData = newAnimations[i];
         if (i < this._animations.length) {
           this._animations[i].reinitialize(animData, this._textureManager);
         } else {
@@ -363,7 +370,7 @@ namespace gdjs {
       this._animations.length = i;
 
       // Make sure to delete already existing animations which are not used anymore.
-      this._animationFrameDirty = true;
+      this.invalidateFrame();
       const animationFrame = this.getCurrentFrame();
       if (!animationFrame) {
         this.setAnimationIndex(0);
@@ -458,10 +465,7 @@ namespace gdjs {
         this._currentAnimation = newAnimation;
         this._currentFrame = 0;
         this._animationElapsedTime = 0;
-        this._animationFrameDirty = true;
-        if (this._onFrameChange) {
-          this._onFrameChange();
-        }
+        this.invalidateFrame();
         return true;
       }
       return false;
@@ -549,7 +553,7 @@ namespace gdjs {
       ) {
         this._currentFrame = newFrame;
         this._animationElapsedTime = newFrame * direction.timeBetweenFrames;
-        this._animationFrameDirty = true;
+        this.invalidateFrame();
         return true;
       }
       return false;
@@ -583,7 +587,7 @@ namespace gdjs {
         direction.frames.length - 1
       );
       if (oldFrame !== this._currentFrame) {
-        this._animationFrameDirty = true;
+        this.invalidateFrame();
         return true;
       }
       return false;
@@ -631,7 +635,7 @@ namespace gdjs {
         this._currentDirection = newValue;
         this._currentFrame = 0;
         this._animationElapsedTime = 0;
-        this._animationFrameDirty = true;
+        this.invalidateFrame();
         return 0;
       }
     }

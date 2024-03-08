@@ -9,7 +9,7 @@ namespace gdjs {
     _sprite: PIXI.Sprite;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
-    private static _animationFrameTextureManager: PixiAnimationFrameTextureManager;
+    private static _animationFrameTextureManager: PixiAnimationFrameTextureManager | null = null;
 
     /**
      * @param runtimeObject The object
@@ -203,7 +203,7 @@ namespace gdjs {
       this._imageManager = imageManager;
     }
 
-    getAnimationFrame(imageName: string) {
+    getAnimationFrameTexture(imageName: string) {
       return this._imageManager.getPIXITexture(imageName);
     }
 

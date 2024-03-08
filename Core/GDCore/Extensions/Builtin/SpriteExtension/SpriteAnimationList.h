@@ -18,17 +18,13 @@ class ArbitraryResourceWorker;
 namespace gd {
 
 /**
- * \brief Standard sprite object for extensions that implements the standard
- * SpriteExtension (see
- * gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension).
- *
- * A Sprite object is an object composed of animations, containing directions
- * with images.
+ * \brief A list of animations, containing directions with images and collision mask.
+ * 
+ * It's used in the configuration of object that implements image-based animations.
  *
  * \see Animation
  * \see Direction
  * \see Sprite
- * \see gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension
  * \ingroup SpriteObjectExtension
  */
 class GD_CORE_API SpriteAnimationList {

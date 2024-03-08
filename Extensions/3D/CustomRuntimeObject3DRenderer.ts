@@ -8,7 +8,7 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
-    private static _animationFrameTextureManager: ThreeAnimationFrameTextureManager;
+    private static _animationFrameTextureManager: ThreeAnimationFrameTextureManager | null = null;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -153,7 +153,7 @@ namespace gdjs {
       this._imageManager = imageManager;
     }
 
-    getAnimationFrame(imageName: string) {
+    getAnimationFrameTexture(imageName: string) {
       return this._imageManager.getThreeMaterial(imageName, {
         useTransparentTexture: true,
         forceBasicMaterial: true,

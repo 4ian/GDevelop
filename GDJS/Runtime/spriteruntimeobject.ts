@@ -4,6 +4,16 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
+  export type SpriteObjectDataType = {
+    /** Update the object even if he is not visible?. */
+    updateIfNotVisible: boolean;
+    /** The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances. */
+    animations: Array<SpriteAnimationData>;
+  };
+
+  export type SpriteObjectData = ObjectData & SpriteObjectDataType;
+
   /**
    * The SpriteRuntimeObject represents an object that can display images.
    */
@@ -279,7 +289,7 @@ namespace gdjs {
      * @param newFrame The index of the frame to be displayed
      */
     setAnimationFrame(newFrame: integer): void {
-      const hasFrameChanged = this._animator.setAnimationFrame(newFrame);
+      const hasFrameChanged = this._animator.setAnimationFrameIndex(newFrame);
       if (hasFrameChanged) {
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
@@ -291,7 +301,7 @@ namespace gdjs {
      * @return newFrame The index of the frame being displayed
      */
     getAnimationFrame(): number {
-      return this._animator.getAnimationFrame();
+      return this._animator.getAnimationFrameIndex();
     }
 
     getAnimationElapsedTime(): float {

@@ -65,18 +65,11 @@ namespace gdjs {
     directions: Array<SpriteDirectionData>;
   };
 
-  /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
-  export type SpriteObjectDataType = {
-    /** Update the object even if he is not visible?. */
-    updateIfNotVisible: boolean;
-    /** The list of {@link SpriteAnimationData} representing {@link gdjs.SpriteAnimation} instances. */
-    animations: Array<SpriteAnimationData>;
-  };
-
-  export type SpriteObjectData = ObjectData & SpriteObjectDataType;
-
+  /**
+   * Abstraction from graphic libraries texture classes.
+   */
   export interface AnimationFrameTextureManager<T> {
-    getAnimationFrame(imageName: string): T;
+    getAnimationFrameTexture(imageName: string): T;
     getAnimationFrameWidth(pixiTexture: T);
     getAnimationFrameHeight(pixiTexture: T);
   }
@@ -107,14 +100,14 @@ namespace gdjs {
       textureManager: gdjs.AnimationFrameTextureManager<T>
     ) {
       this.image = frameData ? frameData.image : '';
-      this.texture = textureManager.getAnimationFrame(this.image);
+      this.texture = textureManager.getAnimationFrameTexture(this.image);
       this.points = new Hashtable();
       this.reinitialize(frameData, textureManager);
     }
 
     /**
-     * @param imageManager The game image manager
      * @param frameData The frame data used to initialize the frame
+     * @param textureManager The game image manager
      */
     reinitialize(
       frameData: SpriteFrameData,
@@ -191,15 +184,16 @@ namespace gdjs {
 
   /**
    * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
-   *
-   * @param imageManager The game image manager
-   * @param directionData The direction data used to initialize the direction
    */
   export class SpriteAnimationDirection<T> {
     timeBetweenFrames: number;
     loop: boolean;
     frames: SpriteAnimationFrame<T>[] = [];
 
+    /**
+     * @param imageManager The game image manager
+     * @param directionData The direction data used to initialize the direction
+     */
     constructor(
       directionData: SpriteDirectionData,
       textureManager: gdjs.AnimationFrameTextureManager<T>
@@ -240,15 +234,16 @@ namespace gdjs {
 
   /**
    * Represents an animation of a {@link SpriteRuntimeObject}.
-   *
-   * @param imageManager The game image manager
-   * @param animData The animation data used to initialize the animation
    */
   export class SpriteAnimation<T> {
     hasMultipleDirections: boolean;
     name: string;
     directions: gdjs.SpriteAnimationDirection<T>[] = [];
 
+    /**
+     * @param animData The animation data used to initialize the animation
+     * @param textureManager The game image manager
+     */
     constructor(
       animData: SpriteAnimationData,
       textureManager: gdjs.AnimationFrameTextureManager<T>
@@ -285,29 +280,31 @@ namespace gdjs {
   }
 
   /**
-   *
+   * Image-base animation model.
    */
   export class SpriteAnimator<T> implements gdjs.Animatable {
     _animations: gdjs.SpriteAnimation<T>[] = [];
+    _textureManager: gdjs.AnimationFrameTextureManager<T>;
     /**
      * Reference to the current SpriteAnimationFrame that is displayed.
-     * Verify is `this._animationFrameDirty === true` before using it, and if so
-     * call `this._updateAnimationFrame()`.
      * Can be null, so ensure that this case is handled properly.
      */
-    _animationFrame: gdjs.SpriteAnimationFrame<T> | null = null;
-    _animationFrameDirty: boolean = true;
+    private _animationFrame: gdjs.SpriteAnimationFrame<T> | null = null;
+    private _animationFrameDirty: boolean = true;
 
-    _currentAnimation: integer = 0;
-    _currentDirection: integer = 0;
-    _currentFrame: integer = 0;
+    private _currentAnimation: integer = 0;
+    private _currentDirection: integer = 0;
+    private _currentFrameIndex: integer = 0;
     /** In seconds */
-    _animationElapsedTime: float = 0;
-    _animationSpeedScale: float = 1;
-    _animationPaused: boolean = false;
-    _onFrameChange: (() => void) | null = null;
-    _textureManager: gdjs.AnimationFrameTextureManager<T>;
+    private _animationElapsedTime: float = 0;
+    private _animationSpeedScale: float = 1;
+    private _animationPaused: boolean = false;
+    private _onFrameChange: (() => void) | null = null;
 
+    /**
+     * @param frameData The frame data used to initialize the frame
+     * @param textureManager The game image manager
+     */
     constructor(
       animations: Array<SpriteAnimationData>,
       textureManager: gdjs.AnimationFrameTextureManager<T>
@@ -330,7 +327,7 @@ namespace gdjs {
     reinitialize(animations: Array<SpriteAnimationData>) {
       this._currentAnimation = 0;
       this._currentDirection = 0;
-      this._currentFrame = 0;
+      this._currentFrameIndex = 0;
       this._animationElapsedTime = 0;
       this._animationSpeedScale = 1;
       this._animationPaused = false;
@@ -379,13 +376,7 @@ namespace gdjs {
     }
 
     /**
-     * Update `this._animationFrame` according to the current animation/direction/frame values
-     * (`this._currentAnimation`, `this._currentDirection`, `this._currentFrame`) and set
-     * `this._animationFrameDirty` back to false.
-     *
-     * Trigger a call to the renderer to change the texture being shown (if the animation/direction/frame
-     * is valid).
-     * If invalid, `this._animationFrame` will be `null` after calling this function.
+     * @returns Returns the current frame or null if the current animation doesn't have any frame.
      */
     getCurrentFrame(): gdjs.SpriteAnimationFrame<T> | null {
       if (!this._animationFrameDirty) {
@@ -400,8 +391,8 @@ namespace gdjs {
         const direction = this._animations[this._currentAnimation].directions[
           this._currentDirection
         ];
-        if (this._currentFrame < direction.frames.length) {
-          this._animationFrame = direction.frames[this._currentFrame];
+        if (this._currentFrameIndex < direction.frames.length) {
+          this._animationFrame = direction.frames[this._currentFrameIndex];
           return this._animationFrame;
         }
       }
@@ -447,6 +438,13 @@ namespace gdjs {
       return false;
     }
 
+    /**
+     * Register a listener to frame changes.
+     *
+     * It's useful for custom objects as they don't drive this class themselves.
+     *
+     * @param callback Called each time {@link getCurrentFrame} changes.
+     */
     setOnFrameChangeCallback(callback: () => void): void {
       this._onFrameChange = callback;
     }
@@ -463,7 +461,7 @@ namespace gdjs {
         newAnimation >= 0
       ) {
         this._currentAnimation = newAnimation;
-        this._currentFrame = 0;
+        this._currentFrameIndex = 0;
         this._animationElapsedTime = 0;
         this.invalidateFrame();
         return true;
@@ -505,7 +503,7 @@ namespace gdjs {
         return false;
       }
       return (
-        this._currentFrame === direction.frames.length - 1 &&
+        this._currentFrameIndex === direction.frames.length - 1 &&
         this._animationElapsedTime ===
           direction.frames.length * direction.timeBetweenFrames
       );
@@ -533,9 +531,9 @@ namespace gdjs {
 
     /**
      * Change the current frame displayed by the animation
-     * @param newFrame The index of the frame to be displayed
+     * @param newFrameIndex The index of the frame to be displayed
      */
-    setAnimationFrame(newFrame: number): boolean {
+    setAnimationFrameIndex(newFrameIndex: number): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -547,12 +545,13 @@ namespace gdjs {
         this._currentDirection
       ];
       if (
-        newFrame >= 0 &&
-        newFrame < direction.frames.length &&
-        newFrame !== this._currentFrame
+        newFrameIndex >= 0 &&
+        newFrameIndex < direction.frames.length &&
+        newFrameIndex !== this._currentFrameIndex
       ) {
-        this._currentFrame = newFrame;
-        this._animationElapsedTime = newFrame * direction.timeBetweenFrames;
+        this._currentFrameIndex = newFrameIndex;
+        this._animationElapsedTime =
+          newFrameIndex * direction.timeBetweenFrames;
         this.invalidateFrame();
         return true;
       }
@@ -563,8 +562,8 @@ namespace gdjs {
      * Get the index of the current frame displayed by the animation
      * @return newFrame The index of the frame being displayed
      */
-    getAnimationFrame(): number {
-      return this._currentFrame;
+    getAnimationFrameIndex(): number {
+      return this._currentFrameIndex;
     }
 
     getAnimationElapsedTime(): float {
@@ -581,12 +580,12 @@ namespace gdjs {
         this.getAnimationDuration()
       );
 
-      const oldFrame = this._currentFrame;
-      this._currentFrame = Math.min(
+      const oldFrame = this._currentFrameIndex;
+      this._currentFrameIndex = Math.min(
         Math.floor(this._animationElapsedTime / direction.timeBetweenFrames),
         direction.frames.length - 1
       );
-      if (oldFrame !== this._currentFrame) {
+      if (oldFrame !== this._currentFrameIndex) {
         this.invalidateFrame();
         return true;
       }
@@ -633,7 +632,7 @@ namespace gdjs {
           return null;
         }
         this._currentDirection = newValue;
-        this._currentFrame = 0;
+        this._currentFrameIndex = 0;
         this._animationElapsedTime = 0;
         this.invalidateFrame();
         return 0;
@@ -692,7 +691,7 @@ namespace gdjs {
     /**
      * @deprecated
      * Return true if animation has ended.
-     * Prefer using `hasAnimationEnded2`. This method returns true as soon as
+     * Prefer using {@link hasAnimationEnded}. This method returns true as soon as
      * the animation enters the last frame, not at the end of the last frame.
      */
     hasAnimationEndedLegacy(): boolean {
@@ -709,7 +708,7 @@ namespace gdjs {
       if (direction.loop) {
         return false;
       }
-      return this._currentFrame === direction.frames.length - 1;
+      return this._currentFrameIndex === direction.frames.length - 1;
     }
   }
 }

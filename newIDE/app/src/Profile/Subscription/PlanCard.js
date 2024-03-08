@@ -8,10 +8,10 @@ import {
   type SubscriptionPlanPricingSystem,
 } from '../../Utils/GDevelopServices/Usage';
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import { Trans } from '@lingui/macro';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
 import Paper from '../../UI/Paper';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -25,6 +25,12 @@ import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
+  planPricesPaper: {
+    padding: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   bulletText: { flex: 1 },
 };
 
@@ -42,22 +48,24 @@ const formatPricingSystemPriceAndCurrency = (
 const getPlanPrice = (
   pricingSystem: SubscriptionPlanPricingSystem
 ): React.Node => {
+  const price = (
+    <Column noMargin alignItems="center">
+      <b>{formatPricingSystemPriceAndCurrency(pricingSystem)}</b>
+    </Column>
+  );
+
   if (pricingSystem.period === 'week') {
     if (pricingSystem.periodCount === 1) {
       if (pricingSystem.isPerUser) {
         return (
           <Text key="week" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/week
-            </Trans>
+            <Trans>{price} per seat, each week</Trans>
           </Text>
         );
       } else {
         return (
           <Text key="week" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/week
-            </Trans>
+            <Trans>{price} per week</Trans>
           </Text>
         );
       }
@@ -66,8 +74,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
-              {pricingSystem.periodCount} weeks
+              {price} per seat, every {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
         );
@@ -75,8 +82,7 @@ const getPlanPrice = (
         return (
           <Text key="week" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
-              {pricingSystem.periodCount} weeks
+              {price} every {pricingSystem.periodCount} weeks
             </Trans>
           </Text>
         );
@@ -87,17 +93,13 @@ const getPlanPrice = (
       if (pricingSystem.isPerUser) {
         return (
           <Text key="month" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/month
-            </Trans>
+            <Trans>{price} per seat, each month</Trans>
           </Text>
         );
       } else {
         return (
           <Text key="month" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/month
-            </Trans>
+            <Trans>{price} per month</Trans>
           </Text>
         );
       }
@@ -106,8 +108,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
-              {pricingSystem.periodCount} months
+              {price} per seat, every {pricingSystem.periodCount} months
             </Trans>
           </Text>
         );
@@ -115,8 +116,7 @@ const getPlanPrice = (
         return (
           <Text key="month" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
-              {pricingSystem.periodCount} months
+              {price} every {pricingSystem.periodCount} months
             </Trans>
           </Text>
         );
@@ -127,17 +127,13 @@ const getPlanPrice = (
       if (pricingSystem.isPerUser) {
         return (
           <Text key="year" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat/year
-            </Trans>
+            <Trans>{price} per seat, each year</Trans>
           </Text>
         );
       } else {
         return (
           <Text key="year" noMargin color="secondary">
-            <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/year
-            </Trans>
+            <Trans>{price} per year</Trans>
           </Text>
         );
       }
@@ -146,8 +142,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)}/seat every{' '}
-              {pricingSystem.periodCount} years
+              {price} per seat, every {pricingSystem.periodCount} years
             </Trans>
           </Text>
         );
@@ -155,8 +150,7 @@ const getPlanPrice = (
         return (
           <Text key="year" noMargin color="secondary">
             <Trans>
-              {formatPricingSystemPriceAndCurrency(pricingSystem)} every{' '}
-              {pricingSystem.periodCount} years
+              {price} every {pricingSystem.periodCount} years
             </Trans>
           </Text>
         );
@@ -165,7 +159,7 @@ const getPlanPrice = (
   }
 };
 
-const getPlanPrices = ({
+export const getPlanPrices = ({
   pricingSystems,
   hidePrice,
 }: {
@@ -174,7 +168,16 @@ const getPlanPrices = ({
 }): React.Node => {
   if (hidePrice) return null;
   if (pricingSystems.length > 0) {
-    const displayedPricingSystems = pricingSystems.map(getPlanPrice);
+    const displayedPricingSystems = pricingSystems
+      .map((pricingSystem, index) => [
+        index !== 0 ? (
+          <Text noMargin size="body2" color="secondary">
+            <Trans>or</Trans>
+          </Text>
+        ) : null,
+        getPlanPrice(pricingSystem),
+      ])
+      .flat();
 
     return displayedPricingSystems;
   }
@@ -186,15 +189,18 @@ const getPlanPrices = ({
   );
 };
 
-const GDEVELOP_LOGO_SIZE = 25;
-const GDEVELOP_LOGO_PADDING = 20;
-// The plan logos are bigger than the GDevelop logo because they contain a glow effect,
-// so we increase the size.
-const PLAN_LOGO_SIZE = GDEVELOP_LOGO_SIZE + 2 * GDEVELOP_LOGO_PADDING;
+export const getPlanIcon = ({
+  subscriptionPlan,
+  logoSize,
+}: {
+  subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems,
+  logoSize: number,
+}): React.Node => {
+  const GDEVELOP_LOGO_PADDING = 10;
+  // The plan logos are bigger than the GDevelop logo because they contain a glow effect,
+  // so we increase the size.
+  const PLAN_LOGO_SIZE = logoSize + 2 * GDEVELOP_LOGO_PADDING;
 
-const getPlanIcon = (
-  subscriptionPlan: SubscriptionPlan | SubscriptionPlanWithPricingSystems
-): React.Node => {
   switch (subscriptionPlan.id) {
     case 'gdevelop_silver':
     case 'gdevelop_indie': // legacy
@@ -247,8 +253,8 @@ const getPlanIcon = (
       return (
         <GDevelopGLogo
           style={{
-            width: GDEVELOP_LOGO_SIZE,
-            height: GDEVELOP_LOGO_SIZE,
+            width: logoSize,
+            height: logoSize,
             padding: GDEVELOP_LOGO_PADDING,
           }}
         />
@@ -269,7 +275,10 @@ const PlanCard = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
 
-  const planIcon = getPlanIcon(props.subscriptionPlanWithPricingSystems);
+  const planIcon = getPlanIcon({
+    subscriptionPlan: props.subscriptionPlanWithPricingSystems,
+    logoSize: 25,
+  });
 
   return (
     <I18n>
@@ -277,25 +286,30 @@ const PlanCard = (props: Props) => {
         <Paper
           background={props.background}
           style={{
-            paddingRight: isMobile ? 8 : 32,
-            paddingLeft: !!planIcon ? 0 : isMobile ? 8 : 65,
+            padding: isMobile ? 8 : 16,
             border: `1px solid ${gdevelopTheme.text.color.disabled}`,
-            paddingTop: 16,
-            paddingBottom: 16,
+            maxWidth: 350,
+            minWidth: 280,
+            display: 'flex',
+            flex: 1,
             ...(props.isHighlighted
               ? {
-                  borderLeftWidth: 4,
-                  borderLeftColor: gdevelopTheme.palette.secondary,
+                  borderTopWidth: 5,
+                  borderTopColor: gdevelopTheme.palette.secondary,
                 }
               : {}),
           }}
         >
-          <Line noMargin>
-            <Column noMargin>{planIcon}</Column>
-            <Column noMargin expand>
-              <Line noMargin justifyContent="space-between" alignItems="center">
-                <Text size="block-title">
-                  <span>
+          <Column expand noMargin alignItems="stretch">
+            <Column noMargin alignItems="center">
+              {planIcon}
+              <ColumnStackLayout
+                noMargin
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Text size="block-title" noMargin>
+                  <span style={{ textTransform: 'uppercase' }}>
                     <b>
                       {selectMessageByLocale(
                         i18n,
@@ -304,57 +318,60 @@ const PlanCard = (props: Props) => {
                     </b>
                   </span>
                 </Text>
-                <Column noMargin alignItems="flex-end">
-                  {getPlanPrices({
-                    pricingSystems:
-                      props.subscriptionPlanWithPricingSystems.pricingSystems,
-                    hidePrice: props.hidePrice,
-                  })}
-                </Column>
-              </Line>
-              <Text color="secondary" noMargin>
-                {selectMessageByLocale(
-                  i18n,
-                  props.subscriptionPlanWithPricingSystems.descriptionByLocale
-                )}
-              </Text>
-              <Line>
-                <Column noMargin>
-                  {props.subscriptionPlanWithPricingSystems.bulletPointsByLocale.map(
-                    (bulletPointByLocale, index) => (
-                      <Column key={index} expand noMargin>
-                        <Line noMargin alignItems="center">
-                          {props.isHighlighted ? (
-                            <CheckCircle
-                              style={{
-                                ...styles.bulletIcon,
-                                color: gdevelopTheme.message.valid,
-                              }}
-                            />
-                          ) : (
-                            <CheckCircle style={styles.bulletIcon} />
-                          )}
-                          <Text style={styles.bulletText}>
-                            {selectMessageByLocale(i18n, bulletPointByLocale)}
-                          </Text>
-                        </Line>
-                      </Column>
-                    )
-                  )}
-                </Column>
-              </Line>
-              {props.actions && (
-                <ResponsiveLineStackLayout
-                  expand
-                  noMargin
-                  alignItems="center"
-                  justifyContent="flex-end"
-                >
-                  {props.actions}
-                </ResponsiveLineStackLayout>
-              )}
+                <Text size="section-title" noMargin align="center">
+                  <div style={{ minHeight: 82 }}>
+                    {selectMessageByLocale(
+                      i18n,
+                      props.subscriptionPlanWithPricingSystems
+                        .descriptionByLocale
+                    )}
+                  </div>
+                </Text>
+              </ColumnStackLayout>
             </Column>
-          </Line>
+            <Line expand alignItems="flex-start">
+              <Column noMargin>
+                {props.subscriptionPlanWithPricingSystems.bulletPointsByLocale.map(
+                  (bulletPointByLocale, index) => (
+                    <Column key={index} expand noMargin>
+                      <Line noMargin alignItems="center">
+                        {props.isHighlighted ? (
+                          <CheckCircle
+                            style={{
+                              ...styles.bulletIcon,
+                              color: gdevelopTheme.message.valid,
+                            }}
+                          />
+                        ) : (
+                          <CheckCircle style={styles.bulletIcon} />
+                        )}
+                        <Text style={styles.bulletText}>
+                          {selectMessageByLocale(i18n, bulletPointByLocale)}
+                        </Text>
+                      </Line>
+                    </Column>
+                  )
+                )}
+              </Column>
+            </Line>
+            <Paper background="light" style={styles.planPricesPaper}>
+              {getPlanPrices({
+                pricingSystems:
+                  props.subscriptionPlanWithPricingSystems.pricingSystems,
+                hidePrice: props.hidePrice,
+              })}
+            </Paper>
+            <Spacer />
+            {props.actions && (
+              <ColumnStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="flex-end"
+              >
+                {props.actions}
+              </ColumnStackLayout>
+            )}
+          </Column>
         </Paper>
       )}
     </I18n>

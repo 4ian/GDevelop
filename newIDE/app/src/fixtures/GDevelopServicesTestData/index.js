@@ -307,97 +307,24 @@ export const subscriptionPlansWithPricingSystems = [
   {
     id: 'free',
     isLegacy: false,
-    nameByLocale: { en: 'GDevelop Free & Open-source' },
+    nameByLocale: {
+      en: 'Free',
+    },
     descriptionByLocale: {
-      en:
-        'Use GDevelop for free, forever. We also give you access to these additional online services for free.',
-      'ar-SA':
-        'استخدم GDevelop مجانًا للأبد. نقدم لك أيضًا وصولًا إلى هذه الخدمات الإلكترونية الإضافية مجانًا.',
-      'de-DE':
-        'Verwenden Sie GDevelop kostenlos, für immer. Wir bieten Ihnen auch kostenlosen Zugang zu diesen zusätzlichen Online-Diensten.',
-      'es-ES':
-        'Usa GDevelop de forma gratuita, para siempre. También te ofrecemos acceso a estos servicios en línea adicionales de forma gratuita.',
-      'fr-FR':
-        'Utilisez GDevelop gratuitement pour toujours. Nous vous donnons également accès à ces services supplémentaires en ligne gratuitement.',
-      'it-IT':
-        "Usa GDevelop gratuitamente, per sempre. Ti offriamo anche l'accesso a questi servizi online aggiuntivi gratuitamente.",
-      'ja-JP':
-        'GDevelopを無料でずっとご利用いただけます。また、これらの追加のオンラインサービスも無料でご利用いただけます。',
-      'ko-KR':
-        'GDevelop를 무료로 영구히 사용하세요. 또한 이 추가 온라인 서비스에 무료로 액세스할 수 있습니다.',
-      'pl-PL':
-        'Korzystaj z GDevelop za darmo, na zawsze. Oferujemy również darmowy dostęp do tych dodatkowych usług online.',
-      'pt-BR':
-        'Use o GDevelop gratuitamente, para sempre. Também oferecemos acesso gratuito a esses serviços online adicionais.',
-      'ru-RU':
-        'Используйте GDevelop бесплатно, навсегда. Мы также предоставляем вам бесплатный доступ к этим дополнительным онлайн-сервисам.',
-      'sl-SI':
-        'Uporabite GDevelop brezplačno, za vedno. Prav tako vam ponujamo brezplačen dostop do teh dodatnih spletnih storitev.',
-      'uk-UA':
-        'Використовуйте GDevelop безкоштовно, назавжди. Ми також надаємо вам безкоштовний доступ до цих додаткових онлайн-сервісів.',
-      'zh-CN': '永久免费使用GDevelop。我们还免费为您提供这些额外的在线服务。',
+      en: 'Create your first game 100% free.',
     },
     bulletPointsByLocale: [
       {
-        en: '10 cloud projects with 50MB of resources per project.',
-        'ar-SA': '10 مشاريع سحابية بسعة 50 ميجابايت لكل مشروع.',
-        'de-DE': '10 Cloud-Projekte mit 50 MB Ressourcen pro Projekt.',
-        'es-ES': '10 proyectos en la nube con 50 MB de recursos por proyecto.',
-        'fr-FR': '10 projets cloud de 50 Mo de ressources par projet.',
-        'it-IT': '10 progetti cloud con 50 MB di risorse per progetto.',
-        'ja-JP':
-          '1つのプロジェクトあたり50MBのリソースを備えた10のクラウドプロジェクト。',
-        'ko-KR': '프로젝트당 50MB의 자원이 포함된 10개의 클라우드 프로젝트.',
-        'pl-PL': '10 projektów w chmurze z 50 MB zasobów na projekt.',
-        'pt-BR': '10 projetos na nuvem com 50 MB de recursos por projeto.',
-        'ru-RU': '10 проектов в облаке с ресурсами объемом 50 МБ на проект.',
-        'sl-SI': '10 oblak projektov z 50MB virov na projekt.',
-        'uk-UA': '10 хмарних проектів з ресурсами обсягом 50 МБ на проект.',
-        'zh-CN': '每个项目有50MB资源的10个云项目。',
+        en: 'Fully featured, open-source game engine',
       },
       {
-        en: '2 packagings per day for Android and for desktop.',
-        'ar-SA': '2 حزم يوميًا لنظام Android ولسطح المكتب.',
-        'de-DE': '2 Verpackungen pro Tag für Android und Desktop.',
-        'es-ES': '2 empaquetados por día para Android y para escritorio.',
-        'fr-FR': '2 packagings par jour pour Android et ordinateur.',
-        'it-IT': '2 confezioni al giorno per Android e desktop.',
-        'ja-JP': 'Androidおよびデスクトップ用に1日2回のパッケージ。',
-        'ko-KR': '하루에 안드로이드 및 데스크톱용 2개의 패키지.',
-        'pl-PL': '2 opakowania dziennie dla Androida i komputera.',
-        'pt-BR': '2 embalagens por dia para Android e desktop.',
-        'ru-RU': '2 упаковки в день для Android и настольных компьютеров.',
-        'sl-SI': '2 pakiranji na dan za Android in namizje.',
-        'uk-UA': "2 упаковки на день для Android та настільних комп'ютерів.",
-        'zh-CN': '每天为Android和桌面提供2个包装。',
+        en: 'Publish to Android/Desktop (once per day)',
       },
       {
-        en:
-          '3 leaderboards per game and 10 player feedback responses per game.',
-        'ar-SA':
-          '3 جداول الصدارة لكل لعبة و10 استجابات لتعليقات اللاعبين لكل لعبة.',
-        'de-DE':
-          '3 Bestenlisten pro Spiel und 10 Spieler-Feedback-Antworten pro Spiel.',
-        'es-ES':
-          '3 tablas de clasificación por juego y 10 respuestas de retroalimentación de jugadores por juego.',
-        'fr-FR':
-          '3 tableaux de classements par jeux et 10 retours de joueurs par jeux.',
-        'it-IT':
-          '3 classifiche per gioco e 10 risposte ai feedback dei giocatori per gioco.',
-        'ja-JP':
-          '1ゲームあたり3つのリーダーボードと1ゲームあたり10のプレイヤーフィードバックレスポンス。',
-        'ko-KR': '게임당 3개의 리더보드 및 게임당 10개의 플레이어 피드백 응답.',
-        'pl-PL':
-          '3 tabele wyników na grę i 10 odpowiedzi na opinie graczy na grę.',
-        'pt-BR':
-          '3 quadros de líderes por jogo e 10 respostas de feedback de jogadores por jogo.',
-        'ru-RU':
-          '3 таблицы лидеров на игру и 10 ответов на обратную связь от игроков на игру.',
-        'sl-SI':
-          '3 lestvice za vsako igro in 10 odgovorov na povratne informacije igralcev za vsako igro.',
-        'uk-UA':
-          '3 таблиці лідерів на гру та 10 відповідей на відгуки гравців на гру.',
-        'zh-CN': '每款游戏有3个排行榜，每款游戏有10个玩家反馈响应。',
+        en: 'Try GDevelop.io online services for free',
+      },
+      {
+        en: 'Thousands of free assets on the Asset Store',
       },
     ],
     pricingSystems: [],
@@ -405,7 +332,7 @@ export const subscriptionPlansWithPricingSystems = [
   {
     id: 'gdevelop_silver',
     isLegacy: false,
-    nameByLocale: { en: 'GDevelop Silver' },
+    nameByLocale: { en: 'Silver' },
     descriptionByLocale: {
       en: 'Build more and faster.',
       'ar-SA': 'ابنِ المزيد بسرعة أكبر.',
@@ -528,7 +455,7 @@ export const subscriptionPlansWithPricingSystems = [
   {
     id: 'gdevelop_gold',
     isLegacy: false,
-    nameByLocale: { en: 'GDevelop Gold' },
+    nameByLocale: { en: 'Gold' },
     descriptionByLocale: {
       en: 'Experimented creators, ambitious games.',
       'ar-SA': 'مبدعين مجربين، ألعاب طموحة.',
@@ -652,7 +579,7 @@ export const subscriptionPlansWithPricingSystems = [
   {
     id: 'gdevelop_startup',
     isLegacy: false,
-    nameByLocale: { en: 'GDevelop Startup' },
+    nameByLocale: { en: 'Pro' },
     descriptionByLocale: {
       en: 'Small game studios and startups',
       'ar-SA': 'الاستديوهات الصغيرة للألعاب والشركات الناشئة.',
@@ -841,7 +768,7 @@ export const subscriptionPlansWithPricingSystems = [
   {
     id: 'gdevelop_education',
     isLegacy: false,
-    nameByLocale: { en: 'GDevelop Education' },
+    nameByLocale: { en: 'Education' },
     descriptionByLocale: {
       en: 'Schools and Universities.',
       'ar-SA': 'المدارس والجامعات.',

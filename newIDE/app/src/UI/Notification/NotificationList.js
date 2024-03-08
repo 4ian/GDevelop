@@ -21,6 +21,8 @@ type Props = {|
   onCloseNotificationList: () => void,
 |};
 
+const notificationsPreviewCount = 5;
+
 const NotificationList = ({
   notifications,
   onMarkAllAsRead,
@@ -64,7 +66,9 @@ const NotificationList = ({
 
   const notificationsToDisplay = showAll
     ? notifications
-    : notifications.slice(0, 5);
+    : notifications.slice(0, notificationsPreviewCount);
+  const shouldShowLoadMoreButton =
+    notifications.length > notificationsPreviewCount && !showAll;
 
   return (
     <I18n>
@@ -103,7 +107,7 @@ const NotificationList = ({
                   />
                 )}
               </List>
-              {!showAll && (
+              {shouldShowLoadMoreButton && (
                 <TextButton
                   primary
                   label={<Trans>Load more...</Trans>}

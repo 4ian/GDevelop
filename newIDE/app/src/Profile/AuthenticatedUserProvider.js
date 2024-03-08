@@ -58,6 +58,7 @@ import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { userCancellationErrorName } from '../LoginProvider/Utils';
 import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
+import { listNotifications } from '../Utils/GDevelopServices/Notification';
 
 type Props = {|
   authentication: Authentication,
@@ -94,6 +95,7 @@ const cleanUserTracesOnDevice = async () => {
 };
 
 const TEN_SECONDS = 10 * 1000;
+const ONE_MINUTE = 6 * TEN_SECONDS;
 
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
@@ -123,6 +125,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
   _abortController: ?AbortController = null;
+  _notificationPollingIntervalId: ?IntervalID = null;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -212,6 +215,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onRefreshLimits: this._fetchUserLimits,
         onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
         onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshNotifications: this._fetchUserNotifications,
         onPurchaseSuccessful: this._fetchUserProducts,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
@@ -239,6 +243,10 @@ export default class AuthenticatedUserProvider extends React.Component<
   // - When the user logs out.
   // - When the user deletes their account.
   _markAuthenticatedUserAsLoggedOut() {
+    if (this._notificationPollingIntervalId) {
+      clearInterval(this._notificationPollingIntervalId);
+      this._notificationPollingIntervalId = null;
+    }
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -267,6 +275,10 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       const firebaseUser = await authentication.getFirebaseUser();
       if (!firebaseUser) {
+        if (this._notificationPollingIntervalId) {
+          clearInterval(this._notificationPollingIntervalId);
+          this._notificationPollingIntervalId = null;
+        }
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
@@ -503,6 +515,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       }
     );
     this._fetchUserBadges();
+    this._fetchUserNotifications();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -521,6 +534,15 @@ export default class AuthenticatedUserProvider extends React.Component<
         // Catch the error so that the user profile is still fetched.
         console.error('Error while updating the user profile:', error);
       }
+    }
+
+    if (!this._notificationPollingIntervalId) {
+      this._notificationPollingIntervalId = setInterval(() => {
+        // This property is correctly updated by Electron, browsers and capacitor.
+        if (document.visibilityState === 'visible') {
+          this._fetchUserNotifications();
+        }
+      }, 10 * ONE_MINUTE);
     }
 
     this.setState(
@@ -558,6 +580,28 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserNotifications = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const notifications = await listNotifications(
+        authentication.getAuthorizationHeader,
+        { userId: firebaseUser.uid }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          notifications,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user notifications:', error);
     }
   };
 

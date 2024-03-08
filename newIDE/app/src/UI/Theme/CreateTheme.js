@@ -604,6 +604,7 @@ export function createGdevelopTheme({
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },
       },
+      notification: { badgeColor: styles['ThemeNotificationBadgeColor'] },
       emptyMessage: {
         shadowColor: styles['ThemeMessageEmptyShadowColor'],
       },

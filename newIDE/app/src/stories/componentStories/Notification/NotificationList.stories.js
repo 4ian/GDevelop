@@ -27,14 +27,14 @@ const notifications: Notification[] = [
     userId,
     createdAt: now - ONE_MINUTE / 2,
     type: 'credits-drop',
-    data: { amount: 150, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 150, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-1',
     userId,
     createdAt: now - ONE_HOUR - 5 * ONE_MINUTE,
     type: 'credits-drop',
-    data: { amount: 300, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 300, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-21',
@@ -51,7 +51,7 @@ const notifications: Notification[] = [
     userId,
     createdAt: now - 4 * ONE_HOUR,
     type: 'credits-drop',
-    data: { amount: 200, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 200, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-3',
@@ -59,7 +59,7 @@ const notifications: Notification[] = [
     createdAt: now - 8 * ONE_HOUR,
     seenAt: now - 7 * ONE_HOUR,
     type: 'credits-drop',
-    data: { amount: 500, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 500, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-4',
@@ -67,7 +67,7 @@ const notifications: Notification[] = [
     createdAt: now - 32 * ONE_HOUR,
     seenAt: now - 30 * ONE_HOUR,
     type: 'credits-drop',
-    data: { amount: 1000, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 1000, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-41',
@@ -75,7 +75,7 @@ const notifications: Notification[] = [
     createdAt: now - 27 * ONE_HOUR,
     seenAt: now - 25 * ONE_HOUR,
     type: 'credits-drop',
-    data: { amount: 50, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 50, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-31',
@@ -96,7 +96,7 @@ const notifications: Notification[] = [
     createdAt: now - 3 * ONE_DAY,
     seenAt: now - 2 * ONE_DAY,
     type: 'credits-drop',
-    data: { amount: 800, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 800, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-6',
@@ -104,7 +104,7 @@ const notifications: Notification[] = [
     createdAt: now - 45 * ONE_DAY,
     seenAt: now - 40 * ONE_DAY,
     type: 'credits-drop',
-    data: { amount: 750, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 750, reason: 'subscription-monthly-drop' },
   },
   {
     id: 'notification-id-7',
@@ -112,7 +112,7 @@ const notifications: Notification[] = [
     createdAt: now - 400 * ONE_DAY,
     seenAt: now - 399 * ONE_DAY,
     type: 'credits-drop',
-    data: { amount: 850, reason: 'subscription-monthly-drop' },
+    data: { creditsAmount: 850, reason: 'subscription-monthly-drop' },
   },
 ];
 

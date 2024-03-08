@@ -31,7 +31,7 @@ const getNotificationPrimaryTextByType = (
   ) {
     return (
       <Trans>
-        You received {notification.data.amount} credits thanks to your
+        You received {notification.data.creditsAmount} credits thanks to your
         subscription
       </Trans>
     );

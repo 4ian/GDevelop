@@ -17,7 +17,7 @@ type CreditsDropNotification = {
   ...NotificationBaseAttributes,
   type: 'credits-drop',
   data: {
-    amount: number,
+    creditsAmount: number,
     reason: 'subscription-monthly-drop' | 'subscription-creation',
   },
 };

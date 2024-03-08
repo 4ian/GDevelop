@@ -5,6 +5,9 @@
  */
 #pragma once
 
+#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include <functional>
 #include <map>
@@ -61,7 +64,7 @@ public:
       std::map<gd::String, gd::String> &behaviorMethodMangledNames);
 
   static gd::ObjectMetadata &GenerateObjectMetadata(
-      const gd::Project &project, gd::PlatformExtension &extension,
+      gd::Project &project, gd::PlatformExtension &extension,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedObject &eventsBasedObject,
       std::map<gd::String, gd::String> &objectMethodMangledNames);
@@ -313,6 +316,10 @@ private:
       gd::MultipleInstructionMetadata &multipleInstructionMetadata,
       const int userDefinedFirstParameterIndex);
 
+  static void
+  UpdateCustomObjectDefaultBehaviors(gd::Project &project,
+                                     const gd::ObjectMetadata &objectMetadata);
+
   static gd::String RemoveTrailingDot(const gd::String &description);
 
   static gd::String
@@ -321,6 +328,20 @@ private:
   static gd::String UncapitalizeFirstLetter(const gd::String &string);
 
   std::vector<gd::MultipleInstructionMetadata> expressionAndConditions;
+};
+
+class DefaultBehaviorUpdater : public gd::ArbitraryObjectsWorker {
+
+ public:
+  DefaultBehaviorUpdater(const gd::Project &project_, const gd::ObjectMetadata &objectMetadata_)
+      : project(project_), objectMetadata(objectMetadata_){};
+  virtual ~DefaultBehaviorUpdater(){};
+
+ private:
+  void DoVisitObject(gd::Object& object) override;
+
+  const gd::Project &project;
+  const gd::ObjectMetadata &objectMetadata;
 };
 
 } // namespace gdjs

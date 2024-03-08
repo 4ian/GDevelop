@@ -7,12 +7,13 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/WholeProjectBrowser.h"
 #include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/CustomBehaviorsSharedData.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
-#include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
@@ -1510,7 +1511,7 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
 }
 
 gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
-    const gd::Project &project, gd::PlatformExtension &extension,
+    gd::Project &project, gd::PlatformExtension &extension,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedObject &eventsBasedObject,
     std::map<gd::String, gd::String> &objectMethodMangledNames) {
@@ -1545,7 +1546,46 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
       instructionOrExpression.SetPrivate();
   }
 
+  UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
+
   return objectMetadata;
+}
+
+void MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors(
+    gd::Project &project, const gd::ObjectMetadata &objectMetadata) {
+  gd::WholeProjectBrowser projectBrowser;
+  auto defaultBehaviorUpdater =
+      DefaultBehaviorUpdater(project, objectMetadata);
+  projectBrowser.ExposeObjects(project, defaultBehaviorUpdater);
+}
+
+void DefaultBehaviorUpdater::DoVisitObject(gd::Object &object) {
+
+  if (object.GetType() != objectMetadata.GetName()) {
+    return;
+  }
+
+  auto &defaultBehaviorTypes = objectMetadata.GetDefaultBehaviors();
+  for (const gd::String &behaviorName : object.GetAllBehaviorNames()) {
+    const auto &behavior = object.GetBehavior(behaviorName);
+    if (behavior.IsDefaultBehavior()) {
+      object.RemoveBehavior(behaviorName);
+    }
+  }
+  auto &platform = project.GetCurrentPlatform();
+  for (const gd::String &behaviorType : defaultBehaviorTypes) {
+    auto &behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      gd::LogWarning("Object: " + object.GetType() +
+                    " has an unknown default behavior: " + behaviorType);
+      continue;
+    }
+    const gd::String &behaviorName = behaviorMetadata.GetDefaultName();
+    auto *behavior =
+        object.AddNewBehavior(project, behaviorType, behaviorName);
+    behavior->SetDefaultBehavior(true);
+  }
 }
 
 } // namespace gdjs

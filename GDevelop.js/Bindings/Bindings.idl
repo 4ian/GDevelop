@@ -3608,7 +3608,7 @@ interface MetadataDeclarationHelper {
         [Ref] MapStringString behaviorMethodMangledNames);
 
     [Ref] ObjectMetadata STATIC_GenerateObjectMetadata(
-        [Const, Ref] Project project,
+        [Ref] Project project,
         [Ref] PlatformExtension extension,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedObject eventsBasedObject,

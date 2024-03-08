@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اللغة العربية",
-    "translationRatio": 0.9756700012350253
+    "translationRatio": 0.9755464987032234
   },
   {
     "languageCode": "az_AZ",
@@ -83,7 +83,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9819686303569223
+    "translationRatio": 0.9818451278251205
   },
   {
     "languageCode": "fa_IR",
@@ -107,7 +107,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.9573916265283439
+    "translationRatio": 0.9572681239965419
   },
   {
     "languageCode": "ha_HG",
@@ -149,13 +149,13 @@ module.exports = [
     "languageCode": "it_IT",
     "languageName": "Italian",
     "languageNativeName": "Italiano",
-    "translationRatio": 0.9799925898480919
+    "translationRatio": 0.97986908731629
   },
   {
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9848091885883661
+    "translationRatio": 0.9846856860565641
   },
   {
     "languageCode": "ka_GE",
@@ -251,7 +251,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9799925898480919
+    "translationRatio": 0.97986908731629
   },
   {
     "languageCode": "si_LK",
@@ -311,13 +311,13 @@ module.exports = [
     "languageCode": "tr_TR",
     "languageName": "Turkish",
     "languageNativeName": "Türkçe",
-    "translationRatio": 0.9885142645424231
+    "translationRatio": 0.9883907620106213
   },
   {
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.9895022847968383
+    "translationRatio": 0.9893787822650364
   },
   {
     "languageCode": "ur_PK",
@@ -347,7 +347,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9913548227738669
+    "translationRatio": 0.9922193404964802
   },
   {
     "languageCode": "zh_TW",

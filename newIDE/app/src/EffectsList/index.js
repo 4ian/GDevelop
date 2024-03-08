@@ -426,7 +426,25 @@ export default function EffectsList(props: Props) {
   );
 
   const all3DEffectMetadata = React.useMemo(
-    () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor3D),
+    () => {
+      const effectMetadata = allEffectMetadata.filter(
+        effect => effect.isMarkedAsOnlyWorkingFor3D
+      );
+      const lightEffectMetadata = effectMetadata.filter(effect =>
+        effect.type.endsWith('Light')
+      );
+      const fogEffectMetadata = effectMetadata.filter(effect =>
+        effect.type.endsWith('Fog')
+      );
+      const otherEffectMetadata = effectMetadata.filter(
+        effect => !effect.type.endsWith('Light') && !effect.type.endsWith('Fog')
+      );
+      return [
+        ...lightEffectMetadata,
+        ...fogEffectMetadata,
+        ...otherEffectMetadata,
+      ];
+    },
     [allEffectMetadata]
   );
 

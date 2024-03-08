@@ -663,6 +663,56 @@ namespace gdjs {
         : (resultVar.setString('error'), new gdjs.ResolveTask());
 
     /**
+     * Reads the contents of a directory.
+     * @param directoryPath Path to the directory.
+     * @param resultVar The variable where to store the result of the operation.
+     */
+    export const readdir = function (
+      directoryPath: string,
+      resultVar: gdjs.Variable
+    ) {
+      let result: string[] | string = 'error';
+      if (fs) {
+        try {
+          result = fs.readdirSync(directoryPath);
+        } catch (err) {
+          logger.error(
+            "Unable to read the directory: '" + directoryPath + "': ",
+            err
+          );
+          result = 'error';
+        }
+      }
+      resultVar.fromJSObject(result);
+    };
+
+    /**
+     * Read a directory's contents asynchronously.
+     * @param directoryPath Path to the directory
+     * @param resultVar The variable where to store the result of the operation
+     */
+    export const readdirAsync = (
+      directoryPath: string,
+      resultVar: gdjs.Variable
+    ) =>
+      asyncFs
+        ? new gdjs.PromiseTask(
+            asyncFs
+              .readdir(directoryPath)
+              .then((results) => {
+                resultVar.fromJSObject(results);
+              })
+              .catch((err) => {
+                resultVar.setString('error');
+                logger.error(
+                  "Unable to read the directory: '" + directoryPath + "': ",
+                  err
+                );
+              })
+          )
+        : (resultVar.setString('error'), new gdjs.ResolveTask());
+
+    /**
      * Check if the file or directory exists.
      * @param filePath The path to the file or directory
      * @return true if fhe file or directory exists

@@ -2014,7 +2014,7 @@ module.exports = {
     {
       const effect = extension
         .addEffect('BrightnessAndContrast')
-        .setFullName(_('Brightness and contrast.'))
+        .setFullName(_('Brightness and contrast'))
         .setDescription(
           _(
             'Adjust brightness and contrast.'

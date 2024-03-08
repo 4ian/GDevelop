@@ -133,7 +133,7 @@ const CurrentUsageDisplayer = ({
   return (
     <ColumnStackLayout noMargin>
       {hasSubscription ? (
-        quota.limitReached ? (
+        !quota.limitReached ? (
           <div
             style={{
               ...styles.subscriptionContainer,

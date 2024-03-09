@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -811,7 +803,6 @@ module.exports = {
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -860,7 +851,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -1100,7 +1090,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError
     Cube3DObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -1112,7 +1101,6 @@ module.exports = {
       return false;
     };
 
-    // $FlowExpectedError
     Cube3DObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -1665,7 +1653,7 @@ module.exports = {
           'Change the camera rotation to look at an object. The camera top always face the screen.'
         ),
         _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
-        _("Layers and cameras"),
+        _('Layers and cameras'),
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
@@ -1943,11 +1931,7 @@ module.exports = {
       const effect = extension
         .addEffect('HueAndSaturation')
         .setFullName(_('Hue and saturation'))
-        .setDescription(
-          _(
-            'Adjust hue and saturation.'
-          )
-        )
+        .setDescription(_('Adjust hue and saturation.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
@@ -1967,11 +1951,7 @@ module.exports = {
       const effect = extension
         .addEffect('Exposure')
         .setFullName(_('Exposure'))
-        .setDescription(
-          _(
-            'Adjust exposure.'
-          )
-        )
+        .setDescription(_('Adjust exposure.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/ExposureEffect.js');
@@ -1986,11 +1966,7 @@ module.exports = {
       const effect = extension
         .addEffect('Bloom')
         .setFullName(_('Bloom'))
-        .setDescription(
-          _(
-            'Apply a bloom effect.'
-          )
-        )
+        .setDescription(_('Apply a bloom effect.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BloomEffect.js');
@@ -2014,12 +1990,8 @@ module.exports = {
     {
       const effect = extension
         .addEffect('BrightnessAndContrast')
-        .setFullName(_('Brightness and contrast'))
-        .setDescription(
-          _(
-            'Adjust brightness and contrast.'
-          )
-        )
+        .setFullName(_('Brightness and contrast.'))
+        .setDescription(_('Adjust brightness and contrast.'))
         .markAsNotWorkingForObjects()
         .markAsOnlyWorkingFor3D()
         .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
@@ -2050,10 +2022,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -2061,17 +2030,13 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {},
+  registerEditorConfigurations: function (objectsEditorService) {},
   /**
    * Register renderers for instance of objects on the scene editor.
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const Rendered3DInstance = objectsRenderingService.Rendered3DInstance;
     const PIXI = objectsRenderingService.PIXI;
@@ -2079,39 +2044,25 @@ module.exports = {
     const THREE_ADDONS = objectsRenderingService.THREE_ADDONS;
 
     const materialIndexToFaceIndex = {
-      // $FlowFixMe
       0: 3,
-      // $FlowFixMe
       1: 2,
-      // $FlowFixMe
       2: 5,
-      // $FlowFixMe
       3: 4,
-      // $FlowFixMe
       4: 0,
-      // $FlowFixMe
       5: 1,
     };
 
     const noRepeatTextureVertexIndexToUvMapping = {
-      // $FlowFixMe
       0: [0, 0],
-      // $FlowFixMe
       1: [1, 0],
-      // $FlowFixMe
       2: [0, 1],
-      // $FlowFixMe
       3: [1, 1],
     };
 
     const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
-      // $FlowFixMe
       0: [0, 1],
-      // $FlowFixMe
       1: [0, 0],
-      // $FlowFixMe
       2: [1, 1],
-      // $FlowFixMe
       3: [1, 0],
     };
 
@@ -2157,6 +2108,11 @@ module.exports = {
     };
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _centerX = 0;
+      /** @type {number} */
+      _centerY = 0;
+
       constructor(
         project,
         layout,
@@ -2173,10 +2129,9 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        /**
-         * Name of the resource that is rendered.
-         * If no face is visible, this will be null.
-         */
+
+        // Name of the resource that is rendered.
+        // If no face is visible, this will be null.
         this._renderedResourceName = undefined;
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
@@ -2206,12 +2161,9 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const instance = this._instance;
-
-        const textureResourceName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            objectConfiguration
-          );
+        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          objectConfiguration
+        );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2223,20 +2175,18 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2494,10 +2444,9 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture =
-            this._shouldRepeatTextureOnFace[
-              materialIndexToFaceIndex[materialIndex]
-            ];
+          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
+            materialIndexToFaceIndex[materialIndex]
+          ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2532,13 +2481,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 }
               }
               break;
@@ -2568,13 +2520,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                   x = -x;
                   y = -y;
                 }
@@ -3111,7 +3066,7 @@ module.exports = {
         );
         threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
-        
+
         const shouldKeepModelOrigin = !this._originPoint;
         if (shouldKeepModelOrigin) {
           // Keep the origin as part of the model.

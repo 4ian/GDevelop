@@ -181,7 +181,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -194,7 +195,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
       exportState.targets,
       exportState.keystore,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

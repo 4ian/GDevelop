@@ -249,8 +249,8 @@ const ShareDialog = ({
 
   const mainActions = [
     <FlatButton
-      label={<Trans>Cancel</Trans>}
-      key="cancel"
+      label={<Trans>Close</Trans>}
+      key="close"
       primary={false}
       onClick={onClose}
       disabled={isNavigationDisabled}

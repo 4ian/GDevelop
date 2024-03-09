@@ -486,6 +486,11 @@
           "comment": "Palette/Purple/30"
         }
       }
+    },
+    "notification": {
+      "badge-color": {
+        "value": "#2B8CFF"
+      }
     }
   },
   "input": {

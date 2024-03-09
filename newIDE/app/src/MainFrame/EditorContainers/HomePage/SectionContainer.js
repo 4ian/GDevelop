@@ -98,7 +98,7 @@ const SectionContainer = ({
             <>
               <AnnouncementsFeed canClose level="urgent" hideLoader />
               {announcements && announcements.length > 0 && <Spacer />}
-              <Column noMargin expand>
+              <Column noMargin>
                 <PromotionsSlideshow />
               </Column>
               <Spacer />

@@ -14,6 +14,7 @@ import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/P
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import { type Recommendation } from '../Utils/GDevelopServices/User';
+import { type Notification } from '../Utils/GDevelopServices/Notification';
 import {
   type Limits,
   type Usages,
@@ -41,6 +42,7 @@ export type AuthenticatedUser = {|
   gameTemplatePurchases: ?Array<Purchase>,
   assetPackPurchases: ?Array<Purchase>,
   recommendations: ?Array<Recommendation>,
+  notifications: ?Array<Notification>,
   limits: ?Limits,
   authenticationError: ?AuthError,
   usages: ?Usages,
@@ -71,6 +73,7 @@ export type AuthenticatedUser = {|
   onRefreshLimits: () => Promise<void>,
   onRefreshGameTemplatePurchases: () => Promise<void>,
   onRefreshAssetPackPurchases: () => Promise<void>,
+  onRefreshNotifications: () => Promise<void>,
   onPurchaseSuccessful: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
   onOpenEmailVerificationDialog: ({|
@@ -96,6 +99,7 @@ export const initialAuthenticatedUser = {
   gameTemplatePurchases: null,
   assetPackPurchases: null,
   recommendations: null,
+  notifications: null,
   subscription: null,
   usages: null,
   limits: null,
@@ -119,6 +123,7 @@ export const initialAuthenticatedUser = {
   onRefreshLimits: async () => {},
   onRefreshGameTemplatePurchases: async () => {},
   onRefreshAssetPackPurchases: async () => {},
+  onRefreshNotifications: async () => {},
   onPurchaseSuccessful: async () => {},
   onSendEmailVerification: async () => {},
   onOpenEmailVerificationDialog: () => {},

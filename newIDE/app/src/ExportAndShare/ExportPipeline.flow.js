@@ -118,7 +118,8 @@ export type ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ) => Promise<Build>,
 
   /**

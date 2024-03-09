@@ -279,6 +279,13 @@ export const listRecommendations = async (
   return response.data;
 };
 
+export const listDefaultRecommendations = async (): Promise<
+  Array<Recommendation>
+> => {
+  const response = await client.get(`/recommendation`);
+  return response.data;
+};
+
 export const updateUserGroup = async (
   getAuthorizationHeader: () => Promise<string>,
   adminUserId: string,

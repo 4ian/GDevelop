@@ -18,6 +18,7 @@ type CreditsUsageDialogOptions = {|
   message: React.Node,
   onConfirm: () => Promise<void>,
   successMessage: React.Node,
+  closeAutomaticallyAfterSuccess?: boolean,
 |};
 
 type CreditsPackageStoreState = {|
@@ -148,7 +149,7 @@ export const CreditsPackageStoreStateProvider = ({
             )
           : null;
         if (
-          packageCreditsAmount > missingCredits &&
+          packageCreditsAmount >= missingCredits &&
           (!shortlistedPackageCreditsAmount ||
             packageCreditsAmount < shortlistedPackageCreditsAmount)
         ) {
@@ -220,6 +221,9 @@ export const CreditsPackageStoreStateProvider = ({
           title={creditsUsageDialogConfig.title}
           onConfirm={creditsUsageDialogConfig.onConfirm}
           successMessage={creditsUsageDialogConfig.successMessage}
+          closeAutomaticallyAfterSuccess={
+            creditsUsageDialogConfig.closeAutomaticallyAfterSuccess
+          }
         />
       )}
     </CreditsPackageStoreContext.Provider>

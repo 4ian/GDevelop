@@ -144,6 +144,19 @@ const MarketingPlans = ({ game }: Props) => {
     [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
   );
 
+  const getMarketingPlanPrice = React.useCallback(
+    (marketingPlan: MarketingPlan) => {
+      if (!profile || !limits) return null;
+
+      const prices = limits.credits.prices;
+      const usagePrice = prices[marketingPlan.id];
+      if (!usagePrice) return null;
+
+      return usagePrice.priceInCredits;
+    },
+    [limits, profile]
+  );
+
   React.useEffect(
     () => {
       fetchMarketingPlans();
@@ -186,11 +199,9 @@ const MarketingPlans = ({ game }: Props) => {
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
       if (!profile || !limits) return;
 
-      const {
-        creditsAmount: packCreditsAmount,
-        id,
-        nameByLocale,
-      } = marketingPlan;
+      const { id, nameByLocale } = marketingPlan;
+      const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
+      if (!planCreditsAmount) return;
 
       const translatedName = selectMessageByLocale(i18n, nameByLocale);
 
@@ -210,9 +221,9 @@ const MarketingPlans = ({ game }: Props) => {
       }
 
       const currentCreditsAmount = limits.credits.userBalance.amount;
-      if (currentCreditsAmount < packCreditsAmount) {
+      if (currentCreditsAmount < planCreditsAmount) {
         openCreditsPackageDialog({
-          missingCredits: packCreditsAmount - currentCreditsAmount,
+          missingCredits: planCreditsAmount - currentCreditsAmount,
         });
         return;
       }
@@ -225,13 +236,13 @@ const MarketingPlans = ({ game }: Props) => {
         ),
         message: activeFeaturing ? (
           <Trans>
-            You are about to use {packCreditsAmount} credits to extend the game
+            You are about to use {planCreditsAmount} credits to extend the game
             featuring {translatedName} for your game {game.gameName} and push it
             to the top of gd.games. Continue?
           </Trans>
         ) : (
           <Trans>
-            You are about to use {packCreditsAmount} credits to purchase the
+            You are about to use {planCreditsAmount} credits to purchase the
             game featuring {translatedName} for your game {game.gameName}.
             Continue?
           </Trans>
@@ -271,6 +282,7 @@ const MarketingPlans = ({ game }: Props) => {
       fetchGameFeaturings,
       openCreditsPackageDialog,
       openCreditsUsageDialog,
+      getMarketingPlanPrice,
     ]
   );
 
@@ -315,7 +327,7 @@ const MarketingPlans = ({ game }: Props) => {
     );
   };
 
-  if (!profile) return null;
+  if (!profile || !limits) return null;
 
   return (
     <I18n>
@@ -356,12 +368,18 @@ const MarketingPlans = ({ game }: Props) => {
             <ResponsiveLineStackLayout noColumnMargin>
               {marketingPlans.map(marketingPlan => {
                 const {
-                  creditsAmount: packCreditsAmount,
                   id,
                   nameByLocale,
                   descriptionByLocale,
                   bulletPointsByLocale,
                 } = marketingPlan;
+                const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
+                if (!planCreditsAmount) {
+                  console.error(
+                    `Could not find price for marketing plan ${id}, hiding it.`
+                  );
+                  return null;
+                }
                 const activeFeaturing = getActiveFeaturing(marketingPlan);
                 const requirementsErrors = activeFeaturing
                   ? getRequirementsErrors(marketingPlan)
@@ -396,7 +414,7 @@ const MarketingPlans = ({ game }: Props) => {
                             </Text>
                           </LineStackLayout>
                           <Text size="body-small" color="secondary">
-                            <Trans>{packCreditsAmount} credits</Trans>
+                            <Trans>{planCreditsAmount} credits</Trans>
                           </Text>
                         </LineStackLayout>
                       </div>

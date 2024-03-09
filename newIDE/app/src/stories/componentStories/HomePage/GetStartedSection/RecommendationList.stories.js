@@ -12,10 +12,7 @@ import PreferencesContext, {
   initialPreferences,
 } from '../../../../MainFrame/Preferences/PreferencesContext';
 import inAppTutorialDecorator from '../../../InAppTutorialDecorator';
-import {
-  TutorialContext,
-  TutorialStateProvider,
-} from '../../../../Tutorial/TutorialContext';
+import { TutorialStateProvider } from '../../../../Tutorial/TutorialContext';
 
 export default {
   title: 'HomePage/GetStartedSectionSection/RecommendationList',
@@ -23,29 +20,50 @@ export default {
   decorators: [paperDecorator, inAppTutorialDecorator, muiDecorator],
 };
 
-const RecommendationListStory = () => {
-  const { fetchTutorials, tutorials } = React.useContext(TutorialContext);
-  React.useEffect(
-    () => {
-      // TODO: Fix weird issue where tutorials are fetched but tutorials are never set in the context state.
-      fetchTutorials();
-    },
-    [fetchTutorials]
-  );
-  return (
-    <RecommendationList
-      key={tutorials ? tutorials.length : 0}
-      authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
-      selectInAppTutorial={action('selectInAppTutorial')}
-      subscriptionPlansWithPricingSystems={subscriptionPlansWithPricingSystems}
-    />
-  );
-};
-
 export const Default = () => (
   <PreferencesContext.Provider value={initialPreferences}>
     <TutorialStateProvider>
-      <RecommendationListStory />
+      <RecommendationList
+        authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+        selectInAppTutorial={action('selectInAppTutorial')}
+        subscriptionPlansWithPricingSystems={
+          subscriptionPlansWithPricingSystems
+        }
+        onStartSurvey={null}
+        hasFilledSurveyAlready={false}
+      />
+    </TutorialStateProvider>
+  </PreferencesContext.Provider>
+);
+
+export const WithSurvey = () => (
+  <PreferencesContext.Provider value={initialPreferences}>
+    <TutorialStateProvider>
+      <RecommendationList
+        authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+        selectInAppTutorial={action('selectInAppTutorial')}
+        subscriptionPlansWithPricingSystems={
+          subscriptionPlansWithPricingSystems
+        }
+        onStartSurvey={action('onStartSurvey')}
+        hasFilledSurveyAlready={false}
+      />
+    </TutorialStateProvider>
+  </PreferencesContext.Provider>
+);
+
+export const WithSurveyAlreadyFilled = () => (
+  <PreferencesContext.Provider value={initialPreferences}>
+    <TutorialStateProvider>
+      <RecommendationList
+        authenticatedUser={fakeAuthenticatedUserWithNoSubscription}
+        selectInAppTutorial={action('selectInAppTutorial')}
+        subscriptionPlansWithPricingSystems={
+          subscriptionPlansWithPricingSystems
+        }
+        onStartSurvey={action('onStartSurvey')}
+        hasFilledSurveyAlready={true}
+      />
     </TutorialStateProvider>
   </PreferencesContext.Provider>
 );

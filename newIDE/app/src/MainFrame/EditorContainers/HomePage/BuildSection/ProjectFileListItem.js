@@ -156,7 +156,14 @@ const ListItemLastModification = ({
             {isCurrentProjectOpened ? (
               <Trans>Modifying</Trans>
             ) : (
-              getRelativeOrAbsoluteDisplayDate(i18n, lastModifiedAt)
+              getRelativeOrAbsoluteDisplayDate({
+                i18n,
+                dateAsNumber: lastModifiedAt,
+                sameDayFormat: 'todayAndHour',
+                dayBeforeFormat: 'yesterdayAndHour',
+                relativeLimit: 'currentWeek',
+                sameWeekFormat: 'thisWeek',
+              })
             )}
           </Text>
         </LineStackLayout>

@@ -31,6 +31,7 @@
     "jsxFragmentFactory": "Fragment"
   },
   "include": [
+    "GDevelop.js/types.d.ts",
     "GDJS/Runtime/**/*",
     "Extensions/**/*.js",
     "Extensions/**/*.ts",
@@ -45,8 +46,8 @@
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
-    "Extensions/**/JsExtension.js",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
+    "SharedLibs/TileMapHelper/**/*",
     "Extensions/Spine/pixi-spine/pixi-spine.js",
     "Extensions/P2P/A_peer.js"
   ]

@@ -1,5 +1,5 @@
-// @flow
-
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /// <reference path="helper/TileMapHelper.d.ts" />
 
 /**
@@ -15,20 +15,13 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
-const defineTileMap = function (
-  extension,
-  _ /*: (string) => string */,
-  gd /*: libGDevelop */
-) {
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
+const defineTileMap = function (extension, _, gd) {
   var objectTileMap = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateProperty = function (
     objectContent,
     propertyName,
@@ -69,7 +62,6 @@ const defineTileMap = function (
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -168,7 +160,6 @@ const defineTileMap = function (
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -179,7 +170,6 @@ const defineTileMap = function (
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getInitialInstanceProperties = function (
     content,
     instance,
@@ -608,13 +598,13 @@ const defineTileMap = function (
     .setFunctionName('setHeight');
 };
 
-const defineCollisionMask = function (
-  extension,
-  _ /*: (string) => string */,
-  gd /*: libGDevelop */
-) {
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
+const defineCollisionMask = function (extension, _, gd) {
   var collisionMaskObject = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateProperty = function (
     objectContent,
     propertyName,
@@ -659,7 +649,6 @@ const defineCollisionMask = function (
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -768,7 +757,6 @@ const defineCollisionMask = function (
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -779,7 +767,6 @@ const defineCollisionMask = function (
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getInitialInstanceProperties = function (
     content,
     instance,
@@ -1033,6 +1020,7 @@ const defineCollisionMask = function (
     .setFunctionName('setHeight');
 };
 
+/** @type {ExtensionModule} */
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -1093,10 +1081,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -1104,9 +1089,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -1125,9 +1108,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -1238,33 +1219,33 @@ module.exports = {
       updateTileMap() {
         // Get the tileset resource to use
         const tilemapAtlasImage = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapAtlasImage')
           .getValue();
         const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapJsonFile')
           .getValue();
         const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilesetJsonFile')
           .getValue();
         const layerIndex = parseInt(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('layerIndex')
             .getValue(),
           10
         );
         const levelIndex = parseInt(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('levelIndex')
             .getValue(),
           10
         );
         const displayMode = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('displayMode')
           .getValue();
 
@@ -1306,7 +1287,7 @@ module.exports = {
               }
 
               /** @type {TileMapHelper.TileTextureCache} */
-              const textureCache = manager.getOrLoadTextureCache(
+              manager.getOrLoadTextureCache(
                 this._loadTileMapWithCallback.bind(this),
                 (textureName) =>
                   this._pixiResourcesLoader.getPIXITexture(
@@ -1357,14 +1338,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile
@@ -1521,43 +1502,45 @@ module.exports = {
        * This is used to reload the Tilemap
        */
       updateTileMap() {
-        // Get the tileset resource to use
+        // This might become useful in the future
+        /*
         const tilemapAtlasImage = this._associatedObjectConfiguration
           .getProperties(this.project)
           .get('tilemapAtlasImage')
           .getValue();
+        */
         const tilemapJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilemapJsonFile')
           .getValue();
         const tilesetJsonFile = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('tilesetJsonFile')
           .getValue();
         const collisionMaskTag = this._associatedObjectConfiguration
-          .getProperties(this.project)
+          .getProperties()
           .get('collisionMaskTag')
           .getValue();
         const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('outlineColor')
             .getValue()
         );
         const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
           this._associatedObjectConfiguration
-            .getProperties(this.project)
+            .getProperties()
             .get('fillColor')
             .getValue()
         );
         const outlineOpacity =
-          this._associatedObjectConfiguration
-            .getProperties(this.project)
+          +this._associatedObjectConfiguration
+            .getProperties()
             .get('outlineOpacity')
             .getValue() / 255;
         const fillOpacity =
-          this._associatedObjectConfiguration
-            .getProperties(this.project)
+          +this._associatedObjectConfiguration
+            .getProperties()
             .get('fillOpacity')
             .getValue() / 255;
         const outlineSize = 1;
@@ -1601,14 +1584,14 @@ module.exports = {
 
       async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-          const tileMapJsonData =
-            await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilemapJsonFile
-            );
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-          const tileMap =
-            TilemapHelper.TileMapManager.identify(tileMapJsonData);
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
           if (tileMap.kind === 'tiled') {
             const tilesetJsonData = tilesetJsonFile

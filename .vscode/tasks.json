@@ -8,6 +8,7 @@
       "group": "build",
       "label": "Start development server",
       "detail": "Starts the GDevelop development server.",
+      "options": { "env": { "NODE_OPTIONS": "--max-old-space-size=8192" } },
       "problemMatcher": [
         {
           "owner": "cra",

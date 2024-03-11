@@ -9,15 +9,12 @@ import {
 import CloseButton from './CloseButton';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import {
-  getAvoidSoftKeyboardStyle,
-  useSoftKeyboardBottomOffset,
-} from '../../UI/MobileSoftKeyboard';
 import { useDebounce } from '../../Utils/UseDebounce';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
+import classNames from 'classnames';
 
 export type Editor = {|
   type: 'primary' | 'secondary',
@@ -403,15 +400,18 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
     );
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
 
     return (
       <I18n>
         {({ i18n }) => (
           <MosaicWithoutDragDropContext
-            className={`${
-              gdevelopTheme.mosaicRootClassName
-            } mosaic-blueprint-theme mosaic-gd-theme`}
+            className={classNames({
+              [gdevelopTheme.mosaicRootClassName]: true,
+              'mosaic-gd-theme': true,
+              'mosaic-blueprint-theme': true,
+              // Move the entire mosaic up when the soft keyboard is open:
+              'avoid-soft-keyboard': true,
+            })}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
               if (!editor) {
@@ -421,36 +421,18 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
                 return null;
               }
 
-              const avoidSoftKeyboardStyle = editor.noSoftKeyboardAvoidance
-                ? null
-                : getAvoidSoftKeyboardStyle(softKeyboardBottomOffset);
-
               if (editor.noTitleBar) {
-                return (
-                  <div
-                    className="mosaic-window-keyboard-avoidance-wrapper"
-                    style={avoidSoftKeyboardStyle}
-                  >
-                    {editor.renderEditor()}
-                  </div>
-                );
+                return editor.renderEditor();
               }
 
               return (
-                <div
-                  className="mosaic-window-keyboard-avoidance-wrapper"
-                  style={avoidSoftKeyboardStyle}
+                <MosaicWindow
+                  path={path}
+                  title={i18n._(editor.title)}
+                  toolbarControls={editor.toolbarControls}
                 >
-                  {
-                    <MosaicWindow
-                      path={path}
-                      title={i18n._(editor.title)}
-                      toolbarControls={editor.toolbarControls}
-                    >
-                      {editor.renderEditor()}
-                    </MosaicWindow>
-                  }
-                </div>
+                  {editor.renderEditor()}
+                </MosaicWindow>
               );
             }}
             value={mosaicNode}

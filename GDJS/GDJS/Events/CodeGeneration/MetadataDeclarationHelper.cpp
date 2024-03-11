@@ -126,7 +126,6 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
@@ -136,6 +135,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
         .AddDefaultBehavior("Scene3D::Base3DBehavior");
   }
   else {
+    objectMetadata.AddDefaultBehavior("EffectCapability::EffectBehavior");
     objectMetadata.AddDefaultBehavior("OpacityCapability::OpacityBehavior");
   }
 

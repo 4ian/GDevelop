@@ -54,6 +54,13 @@ html {
   padding-left: env(safe-area-inset-left);
 }
 
+/* Helper for avoiding the soft keyboard. See also `getAvoidSoftKeyboardStyle`. */
+.avoid-soft-keyboard {
+  transform: translateY(calc(-1 * var(--softKeyboardBottomOffset)));
+  transition: transform 0.2s linear;
+  will-change: transform;
+}
+
 /* Disable selections and web-ish cursors */
 :not(input):not(textarea):not(canvas):not(code),
 :not(input):not(textarea):not(canvas):not(code)::after,

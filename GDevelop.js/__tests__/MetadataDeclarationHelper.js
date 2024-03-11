@@ -1022,7 +1022,7 @@ describe('MetadataDeclarationHelper', () => {
     },
   });
 
-  it('can create metadata for custom object default instructions and expressions', () => {
+  it('can create metadata for custom object default capabilities', () => {
     const extension = new gd.PlatformExtension();
     const project = new gd.Project();
 
@@ -1048,11 +1048,22 @@ describe('MetadataDeclarationHelper', () => {
     expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
     const objectMetadata = extension.getObjectMetadata('MyObject');
 
+    // The capabilities replaced the deprecated instructions below.
+    expectArray(
+      objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()
+    ).toContainAll([
+      "ResizableCapability::ResizableBehavior",
+      "ScalableCapability::ScalableBehavior",
+      "FlippableCapability::FlippableBehavior",
+      "OpacityCapability::OpacityBehavior",
+      "EffectCapability::EffectBehavior",
+    ]);
+
     expectArray(objectMetadata.getAllActions().keys().toJSArray()).toContainAll(
       [
         // Private
         'MyObject::SetRotationCenter',
-        // Public
+        // Deprecated
         'MyObject::Width',
         'Width',
         'MyObject::Height',
@@ -1078,6 +1089,7 @@ describe('MetadataDeclarationHelper', () => {
     expectArray(
       objectMetadata.getAllConditions().keys().toJSArray()
     ).toContainAll([
+      // Deprecated
       'MyObject::ScaleX',
       'MyObject::ScaleY',
       'MyObject::FlippedX',
@@ -1089,11 +1101,58 @@ describe('MetadataDeclarationHelper', () => {
 
     expectArray(
       objectMetadata.getAllExpressions().keys().toJSArray()
-    ).toContainAll(['ScaleX', 'ScaleY', 'Opacity']);
+    ).toContainAll([
+      // Deprecated
+      'ScaleX', 'ScaleY', 'Opacity']);
 
     expectArray(
       objectMetadata.getAllStrExpressions().keys().toJSArray()
     ).toContainAll([]);
+
+    extension.delete();
+    project.delete();
+  });
+
+  it('can create metadata for custom object with all capabilities', () => {
+    const extension = new gd.PlatformExtension();
+    const project = new gd.Project();
+
+    const eventExtension = project.insertNewEventsFunctionsExtension(
+      'MyExtension',
+      0
+    );
+    const eventsBasedObject = eventExtension
+      .getEventsBasedObjects()
+      .insertNew('MyObject', 0);
+    eventsBasedObject.markAsRenderedIn3D(true);
+    eventsBasedObject.markAsAnimatable(true);
+    eventsBasedObject.markAsTextContainer(true);
+
+    const objectMethodMangledNames = new gd.MapStringString();
+    gd.MetadataDeclarationHelper.generateObjectMetadata(
+      project,
+      extension,
+      eventExtension,
+      eventsBasedObject,
+      objectMethodMangledNames
+    );
+    objectMethodMangledNames.delete();
+
+    expect(extension.getExtensionObjectsTypes().size()).toBe(1);
+    expect(extension.getExtensionObjectsTypes().at(0)).toBe('MyObject');
+    const objectMetadata = extension.getObjectMetadata('MyObject');
+
+    expectArray(
+      objectMetadata.getDefaultBehaviors().toNewVectorString().toJSArray()
+    ).toContainAll([
+      "ResizableCapability::ResizableBehavior",
+      "ScalableCapability::ScalableBehavior",
+      "FlippableCapability::FlippableBehavior",
+      // No effect nor opacity capabilities for 3D objects.
+      "Scene3D::Base3DBehavior",
+      "AnimatableCapability::AnimatableBehavior",
+      "TextContainerCapability::TextContainerBehavior",
+    ]);
 
     extension.delete();
     project.delete();

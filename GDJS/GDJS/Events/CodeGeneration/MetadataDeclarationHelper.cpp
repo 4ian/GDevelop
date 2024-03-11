@@ -126,7 +126,6 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          // Update Project::CreateObject when default behaviors are added.
           .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")

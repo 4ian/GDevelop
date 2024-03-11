@@ -102,29 +102,17 @@ std::unique_ptr<gd::Object> Project::CreateObject(
     behavior->SetDefaultBehavior(true);
   };
 
-  if (project.HasEventsBasedObject(objectType)) {
-    // During project deserialization, event-based object metadata are not yet
-    // generated.
-    addDefaultBehavior("EffectCapability::EffectBehavior");
-    addDefaultBehavior("ResizableCapability::ResizableBehavior");
-    addDefaultBehavior("ScalableCapability::ScalableBehavior");
-    addDefaultBehavior("FlippableCapability::FlippableBehavior");
-    auto& eventBasedObject = project.GetEventsBasedObject(objectType);
-    if (eventBasedObject.IsRenderedIn3D()) {
-      addDefaultBehavior("Scene3D::Base3DBehavior");
-    }
-    else {
-      addDefaultBehavior("OpacityCapability::OpacityBehavior");
-    }
-  } else {
-    auto& objectMetadata =
-        gd::MetadataProvider::GetObjectMetadata(platform, objectType);
-    if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
-      gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
-    }
-    for (auto& behaviorType : objectMetadata.GetDefaultBehaviors()) {
-      addDefaultBehavior(behaviorType);
-    }
+  auto &objectMetadata =
+      gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  if (MetadataProvider::IsBadObjectMetadata(objectMetadata)
+      // During project deserialization, event-based object metadata are not yet
+      // generated. Default behaviors will be added by
+      // MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors
+      && !project.HasEventsBasedObject(objectType)) {
+    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
+  }
+  for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+    addDefaultBehavior(behaviorType);
   }
 
   return std::move(object);

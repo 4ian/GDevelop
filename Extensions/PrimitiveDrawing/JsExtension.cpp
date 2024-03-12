@@ -47,6 +47,11 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Ellipse"]
         .SetFunctionName("drawEllipse");
+
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FilletRectangle"]
+        .SetFunctionName("drawFilletRectangle");
+        
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RoundedRectangle"]
         .SetFunctionName("drawRoundedRectangle");

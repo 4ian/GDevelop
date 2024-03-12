@@ -124,6 +124,25 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("The height of the ellipse"))
       .SetFunctionName("DrawEllipse");
 
+  obj.AddAction("FilletRectangle",
+              _("Fillet Rectangle"),
+              _("Draw a fillet rectangle on screen"),
+              _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a fillet "
+                "rectangle (fillet: _PARAM5_)" 
+                "with _PARAM0_"),
+                _("Drawing"),
+                "res/actions/filletRectangle24.png",
+                "res/actions/filletRectangle.png")
+
+      .AddParameter("object", _("Shape Painter object"), "Drawer")
+      .AddParameter("expression", _("Left X position"))
+      .AddParameter("expression", _("Top Y position"))
+      .AddParameter("expression", _("Right X position"))
+      .AddParameter("expression", _("Bottom Y position"))
+      .AddParameter("expression", _("Fillet (in pixels)"))
+      .SetFunctionName("DrawFilletRectangle");   
+
+    
   obj.AddAction("RoundedRectangle",
                 _("Rounded rectangle"),
                 _("Draw a rounded rectangle on screen"),

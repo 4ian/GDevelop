@@ -123,7 +123,6 @@ export type MarketingPlan = {|
   nameByLocale: MessageByLocale,
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
-  creditsAmount: number,
 |};
 
 export const getCategoryName = (category: string, i18n: I18nType) => {

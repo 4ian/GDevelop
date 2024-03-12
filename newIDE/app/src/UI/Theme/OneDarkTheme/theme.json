@@ -432,6 +432,11 @@
           "comment": "Palette/Grey/70"
         }
       }
+    },
+    "notification": {
+      "badge-color": {
+        "value": "#6BAFFF"
+      }
     }
   },
   "input": {

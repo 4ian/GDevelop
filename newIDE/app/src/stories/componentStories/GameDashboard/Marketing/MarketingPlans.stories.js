@@ -25,7 +25,6 @@ const nowPlusOneDay = now + 24 * 60 * 60 * 1000;
 const marketingPlans: MarketingPlan[] = [
   {
     id: 'featuring-basic',
-    creditsAmount: 500,
     nameByLocale: {
       en: 'Basic',
     },
@@ -103,7 +102,6 @@ const marketingPlans: MarketingPlan[] = [
   },
   {
     id: 'featuring-pro',
-    creditsAmount: 1000,
     nameByLocale: {
       en: 'Pro',
     },
@@ -190,7 +188,6 @@ const marketingPlans: MarketingPlan[] = [
   },
   {
     id: 'featuring-premium',
-    creditsAmount: 2000,
     nameByLocale: {
       en: 'Premium',
     },

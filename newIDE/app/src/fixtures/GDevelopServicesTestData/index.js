@@ -1340,6 +1340,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   authenticationError: null,
   badges: null,
   cloudProjects: null,
+  notifications: null,
   recommendations: [
     {
       type: 'gdevelop-tutorial',
@@ -1421,6 +1422,9 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   },
   onRefreshAssetPackPurchases: async () => {
     console.info('This should refresh the asset pack purchases');
+  },
+  onRefreshNotifications: async () => {
+    console.info('This should refresh the notifications');
   },
   onPurchaseSuccessful: async () => {
     console.info('This should refresh the assets');

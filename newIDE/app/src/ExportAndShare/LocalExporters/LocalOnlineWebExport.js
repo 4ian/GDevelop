@@ -172,7 +172,8 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -183,7 +184,8 @@ export const localOnlineWebExportPipeline: ExportPipeline<
       firebaseUser.uid,
       uploadBucketKey,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

@@ -343,6 +343,11 @@
           "value": "#494952"
         }
       }
+    },
+    "notification": {
+      "badge-color": {
+        "value": "#6BAFFF"
+      }
     }
   },
   "input": {

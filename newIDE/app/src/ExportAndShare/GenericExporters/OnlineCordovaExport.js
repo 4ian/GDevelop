@@ -195,16 +195,18 @@ export const ExportFlow = ({
           />
         </Line>
       )}
-      <Line expand>
-        <BuildStepsProgress
-          exportStep={exportStep}
-          hasBuildStep={true}
-          build={build}
-          stepMaxProgress={stepMaxProgress}
-          stepCurrentProgress={stepCurrentProgress}
-          errored={errored}
-        />
-      </Line>
+      {isExportingOrbuildRunningOrFinished && (
+        <Line expand>
+          <BuildStepsProgress
+            exportStep={exportStep}
+            hasBuildStep={true}
+            build={build}
+            stepMaxProgress={stepMaxProgress}
+            stepCurrentProgress={stepCurrentProgress}
+            errored={errored}
+          />
+        </Line>
+      )}
     </ColumnStackLayout>
   );
 };

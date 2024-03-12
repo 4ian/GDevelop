@@ -180,7 +180,8 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, profile } = authenticatedUser;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
@@ -194,7 +195,8 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
       exportState.targets,
       exportState.signing,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

@@ -131,8 +131,8 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "rectangle (fillet: _PARAM5_)" 
                 "with _PARAM0_"),
                 _("Drawing"),
-                "res/actions/roundedRectangle24.png",
-                "res/actions/roundedRectangle.png")
+                "res/actions/filletRectangle24.png",
+                "res/actions/filletRectangle.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .AddParameter("expression", _("Left X position"))

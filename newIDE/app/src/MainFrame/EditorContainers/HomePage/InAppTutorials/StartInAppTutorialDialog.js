@@ -4,10 +4,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../../../UI/Dialog';
 import FlatButton from '../../../../UI/FlatButton';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line } from '../../../../UI/Grid';
 import { ColumnStackLayout } from '../../../../UI/Layout';
-import InAppTutorialContext from '../../../../InAppTutorial/InAppTutorialContext';
-import { getLanguageLabelForLocale } from '../../../../Utils/i18n/MessageByLocale';
 import Text from '../../../../UI/Text';
 import {
   FLING_GAME_IN_APP_TUTORIAL_ID,
@@ -43,12 +41,6 @@ const getGuidedLessonContent = ({
   <>
     <Text>
       <Trans>You're about to start this guided lesson.</Trans>
-    </Text>
-    <Text>
-      <Trans>
-        A new project will be opened, so before beginning please ensure you have
-        closed and saved your current project.
-      </Trans>
     </Text>
     <Text>
       <Trans>In this tutorial you will learn:</Trans>
@@ -105,7 +97,6 @@ const titleAndContentByKey = {
     content: getGuidedLessonContent({
       learningKeys: [
         <Trans>Add a background with parallax effect</Trans>,
-        <Trans>Add a new layer</Trans>,
         <Trans>Add an extension</Trans>,
         <Trans>Use basic camera movements to follow the player</Trans>,
       ],
@@ -117,8 +108,8 @@ const titleAndContentByKey = {
     ),
     content: getGuidedLessonContent({
       learningKeys: [
-        <Trans>Add a new layer</Trans>,
-        <Trans>Use a prefab to display the player's health bar</Trans>,
+        <Trans>Use a prefab for a health bar</Trans>,
+        <Trans>Update the health bar based on the player's health</Trans>,
       ],
     }),
   },
@@ -126,7 +117,6 @@ const titleAndContentByKey = {
     title: <Trans>Let's add mobile controls to our game</Trans>,
     content: getGuidedLessonContent({
       learningKeys: [
-        <Trans>Add a new layer</Trans>,
         <Trans>Add a joystick prefab</Trans>,
         <Trans>Add a behavior</Trans>,
       ],
@@ -138,7 +128,6 @@ const titleAndContentByKey = {
       learningKeys: [
         <Trans>Add a 3D Box</Trans>,
         <Trans>Add a behavior</Trans>,
-        <Trans>Update the elevation of a 3D box</Trans>,
       ],
     }),
   },
@@ -156,28 +145,10 @@ const StartInAppTutorialDialog = ({
   const startOverTutorial = () => startTutorial('startOver');
   const startTutorialForFirstTime = () => startTutorial('start');
 
-  const { getInAppTutorialShortHeader } = React.useContext(
-    InAppTutorialContext
-  );
-
-  const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
-    tutorialId
-  );
-
-  const availableLocales = selectedInAppTutorialShortHeader
-    ? selectedInAppTutorialShortHeader.availableLocales
-    : null;
-
   const dialogContentByCompletionStatus = {
     notStarted: {
       title: titleAndContentByKey[tutorialId].title,
       content: titleAndContentByKey[tutorialId].content,
-      availableLocalesLabels: availableLocales
-        ? availableLocales.map(locale => [
-            locale,
-            getLanguageLabelForLocale(locale),
-          ])
-        : null,
       primaryAction: {
         label: <Trans>Yes</Trans>,
         onClick: startTutorialForFirstTime,
@@ -284,20 +255,6 @@ const StartInAppTutorialDialog = ({
           </div>
         </Line>
         {content}
-        {dialogContent.availableLocalesLabels ? (
-          <Column noMargin>
-            <Text>
-              <Trans>
-                This tutorial is available in the following languages:
-              </Trans>
-            </Text>
-            {dialogContent.availableLocalesLabels.map(([locale, label]) => (
-              <Text displayAsListItem noMargin key={locale}>
-                {label}
-              </Text>
-            ))}
-          </Column>
-        ) : null}
         <Text>
           <Trans>Are you ready?</Trans>
         </Text>

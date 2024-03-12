@@ -26,7 +26,24 @@
   {
     "id": "joystick",
     "contentUrl": "https://resources.gdevelop-app.com/in-app-tutorials/joystick.json",
-    "availableLocales": ["en", "fr", "es", "pt", "th", "ar", "sq"],
+    "availableLocales": [
+      "en",
+      "fr",
+      "ar",
+      "de",
+      "es",
+      "it",
+      "ja",
+      "ko",
+      "pl",
+      "pt",
+      "th",
+      "ru",
+      "sl",
+      "sq",
+      "uk",
+      "zh"
+    ],
     "initialTemplateUrl": "https://resources.gdevelop-app.com/in-app-tutorials/templates/joystick/game.json",
     "initialProjectData": {
       "gameScene": "GameScene",

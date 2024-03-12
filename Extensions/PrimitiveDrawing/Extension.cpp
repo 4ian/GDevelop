@@ -159,7 +159,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Right X position"))
       .AddParameter("expression", _("Bottom Y position"))
       .AddParameter("expression", _("Radius (in pixels)"))
-      .SetFunctionName("DrawRoundedRectangle");       
+      .SetFunctionName("DrawRoundedRectangle");
 
   obj.AddAction("ChamferRectangle",
                 _("Chamfer Rectangle"),

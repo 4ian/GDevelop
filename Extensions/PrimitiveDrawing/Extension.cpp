@@ -140,7 +140,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Right X position"))
       .AddParameter("expression", _("Bottom Y position"))
       .AddParameter("expression", _("Fillet (in pixels)"))
-      .SetFunctionName("DrawFilletRectangle");   
+      .SetFunctionName("DrawFilletRectangle");
 
     
   obj.AddAction("RoundedRectangle",

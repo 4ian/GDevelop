@@ -80,7 +80,7 @@ namespace gdjs {
 
       threeObject3D.visible = !this._object.hidden;
 
-      this._isContainerDirty = true;
+      this._isContainerDirty = false;
     }
 
     /**

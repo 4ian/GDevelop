@@ -105,7 +105,7 @@ namespace gdjs {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this._minZ;
+      return this._z + this._minZ;
     }
 
     /**

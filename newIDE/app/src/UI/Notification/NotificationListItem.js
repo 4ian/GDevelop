@@ -83,7 +83,7 @@ const getNotificationPrimaryTextByType = (
       if (notification.data.gameId && notification.data.gameName) {
         return (
           <Trans>
-            Your game {notification.data.gameName} was played
+            Your game {notification.data.gameName} was played more than
             {notification.data.sessionsCount} times!
           </Trans>
         );
@@ -92,8 +92,8 @@ const getNotificationPrimaryTextByType = (
     if (notification.data.allGames) {
       return (
         <Trans>
-          All your games were played
-          {notification.data.sessionsCount} times in total!
+          All your games were played more than {notification.data.sessionsCount}
+          times in total!
         </Trans>
       );
     }
@@ -101,7 +101,7 @@ const getNotificationPrimaryTextByType = (
     if (Number.isInteger(gameCount)) {
       return (
         <Trans>
-          {gameCount} of your games were played
+          {gameCount} of your games were played more than
           {notification.data.sessionsCount} times in total!
         </Trans>
       );

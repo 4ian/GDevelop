@@ -24,15 +24,6 @@ const styles = {
   },
 };
 
-type Props = {|
-  open: boolean,
-  tutorialId: string,
-  onClose: () => void,
-  tutorialCompletionStatus: 'notStarted' | 'started' | 'complete',
-  isProjectOpened?: boolean,
-  startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
-|};
-
 const getGuidedLessonContent = ({
   learningKeys,
 }: {
@@ -133,6 +124,16 @@ const titleAndContentByKey = {
   },
 };
 
+type Props = {|
+  open: boolean,
+  tutorialId: string,
+  onClose: () => void,
+  tutorialCompletionStatus: 'notStarted' | 'started' | 'complete',
+  isProjectOpened?: boolean,
+  isProjectOpening: boolean,
+  startTutorial: (scenario: 'resume' | 'startOver' | 'start') => Promise<void>,
+|};
+
 const StartInAppTutorialDialog = ({
   open,
   tutorialId,
@@ -140,6 +141,7 @@ const StartInAppTutorialDialog = ({
   tutorialCompletionStatus,
   isProjectOpened,
   startTutorial,
+  isProjectOpening,
 }: Props) => {
   const resumeTutorial = () => startTutorial('resume');
   const startOverTutorial = () => startTutorial('startOver');
@@ -219,12 +221,14 @@ const StartInAppTutorialDialog = ({
       key="close"
       label={secondaryAction.label}
       onClick={secondaryAction.onClick}
+      disabled={isProjectOpening}
     />,
     <DialogPrimaryButton
       key="start"
       label={primaryAction.label}
       primary
       onClick={primaryAction.onClick}
+      disabled={isProjectOpening}
     />,
   ];
   const secondaryActions = tertiaryAction
@@ -233,6 +237,7 @@ const StartInAppTutorialDialog = ({
           key="other"
           label={tertiaryAction.label}
           onClick={tertiaryAction.onClick}
+          disabled={isProjectOpening}
         />,
       ]
     : undefined;

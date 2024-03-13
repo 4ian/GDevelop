@@ -21,6 +21,20 @@ export const Default = () => {
       tutorialCompletionStatus={'notStarted'}
       startTutorial={action('Start tutorial')}
       onClose={() => action('On close dialog')()}
+      isProjectOpening={false}
+    />
+  );
+};
+
+export const Opening = () => {
+  return (
+    <StartInAppTutorialDialog
+      open
+      tutorialId="flingGame"
+      tutorialCompletionStatus={'notStarted'}
+      startTutorial={action('Start tutorial')}
+      onClose={() => action('On close dialog')()}
+      isProjectOpening
     />
   );
 };
@@ -33,6 +47,7 @@ export const WithTutorialAlreadyStarted = () => {
       tutorialCompletionStatus={'started'}
       startTutorial={action('Start tutorial')}
       onClose={() => action('On close dialog')()}
+      isProjectOpening={false}
     />
   );
 };
@@ -44,6 +59,7 @@ export const WithTutorialCompleted = () => {
       tutorialCompletionStatus={'complete'}
       startTutorial={action('Start tutorial')}
       onClose={() => action('On close dialog')()}
+      isProjectOpening={false}
     />
   );
 };

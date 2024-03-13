@@ -55,16 +55,27 @@ type ClaimableAssetPackNotification = {
 type GameSessionsAchievementNotification = {
   ...NotificationBaseAttributes,
   type: 'game-sessions-achievement',
-  data: {
-    achievementId: string,
-    sessionsCount: number,
-    gameCount: number | 'all',
-    period: 'year',
-    /** gameId should be defined when the achievement concerns a single game */
-    gameId?: string,
-    /** gameName should be defined when the achievement concerns a single game */
-    gameName?: string,
-  },
+  data:
+    | {
+        achievementId: string,
+        sessionsCount: number,
+        gameCount: 1,
+        period: 'year',
+        gameId: string,
+        gameName: string,
+      }
+    | {
+        achievementId: string,
+        sessionsCount: number,
+        gameCount: number,
+        period: 'year',
+      }
+    | {
+        achievementId: string,
+        sessionsCount: number,
+        allGames: true,
+        period: 'year',
+      },
 };
 
 export type Notification =

@@ -89,7 +89,7 @@ const getNotificationPrimaryTextByType = (
         );
       } else return null; // should not happen.
     }
-    if (notification.data.gameCount === 'all') {
+    if (notification.data.allGames) {
       return (
         <Trans>
           All your games were played
@@ -97,10 +97,11 @@ const getNotificationPrimaryTextByType = (
         </Trans>
       );
     }
-    if (Number.isInteger(notification.data.gameCount)) {
+    const { gameCount } = notification.data;
+    if (Number.isInteger(gameCount)) {
       return (
         <Trans>
-          {notification.data.gameCount} of your games were played
+          {gameCount} of your games were played
           {notification.data.sessionsCount} times in total!
         </Trans>
       );
@@ -147,6 +148,7 @@ const getNotificationClickCallback = ({
   }
   if (notification.type === 'game-sessions-achievement') {
     if (notification.data.gameCount === 1) {
+      // $FlowIgnore - if missing, gameId and gameName will be undefined.
       const { gameId, gameName } = notification.data;
       if (gameId && gameName) {
         return () => {

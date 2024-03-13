@@ -8,6 +8,7 @@ import { ListItem } from '../List';
 import { getRelativeOrAbsoluteDisplayDate } from '../../Utils/DateDisplay';
 import CoinOutline from '../CustomSvgIcons/CoinOutline';
 import Annotation from '../CustomSvgIcons/Annotation';
+import Gaming from '../CustomSvgIcons/Gaming';
 import Cart from '../CustomSvgIcons/Cart';
 import { shortenString } from '../../Utils/StringHelpers';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
@@ -20,6 +21,7 @@ const notificationTypeToIcon = {
   'one-game-feedback-received': <Annotation />,
   'multiple-game-feedback-received': <Annotation />,
   'claimable-asset-pack': <Cart />,
+  'game-sessions-achievement': <Gaming />,
 };
 
 const getNotificationPrimaryTextByType = (
@@ -76,6 +78,34 @@ const getNotificationPrimaryTextByType = (
       </Trans>
     );
   }
+  if (notification.type === 'game-sessions-achievement') {
+    if (notification.data.gameCount === 1) {
+      if (notification.data.gameId && notification.data.gameName) {
+        return (
+          <Trans>
+            Your game {notification.data.gameName} was played
+            {notification.data.sessionsCount} times!
+          </Trans>
+        );
+      } else return null; // should not happen.
+    }
+    if (notification.data.gameCount === 'all') {
+      return (
+        <Trans>
+          All your games were played
+          {notification.data.sessionsCount} times in total!
+        </Trans>
+      );
+    }
+    if (Number.isInteger(notification.data.gameCount)) {
+      return (
+        <Trans>
+          {notification.data.gameCount} of your games were played
+          {notification.data.sessionsCount} times in total!
+        </Trans>
+      );
+    }
+  }
   return null;
 };
 
@@ -114,6 +144,35 @@ const getNotificationClickCallback = ({
       onMarkNotificationAsSeen();
       onCloseNotificationList();
     };
+  }
+  if (notification.type === 'game-sessions-achievement') {
+    if (notification.data.gameCount === 1) {
+      const { gameId, gameName } = notification.data;
+      if (gameId && gameName) {
+        return () => {
+          addRouteArguments({
+            'initial-dialog': 'games-dashboard',
+            'game-id': gameId,
+            'games-dashboard-tab': 'analytics',
+          });
+          onMarkNotificationAsSeen();
+          onCloseNotificationList();
+        };
+      } else return null; // should not happen.
+    }
+    if (
+      notification.data.gameCount === 'all' ||
+      Number.isInteger(notification.data.gameCount)
+    ) {
+      return () => {
+        addRouteArguments({
+          'initial-dialog': 'games-dashboard',
+          'games-dashboard-tab': 'analytics',
+        });
+        onMarkNotificationAsSeen();
+        onCloseNotificationList();
+      };
+    }
   }
   return null;
 };

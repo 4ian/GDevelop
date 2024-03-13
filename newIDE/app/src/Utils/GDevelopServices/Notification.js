@@ -52,11 +52,27 @@ type ClaimableAssetPackNotification = {
   },
 };
 
+type GameSessionsAchievementNotification = {
+  ...NotificationBaseAttributes,
+  type: 'game-sessions-achievement',
+  data: {
+    achievementId: string,
+    sessionsCount: number,
+    gameCount: number | 'all',
+    period: 'year',
+    /** gameId should be defined when the achievement concerns a single game */
+    gameId?: string,
+    /** gameName should be defined when the achievement concerns a single game */
+    gameName?: string,
+  },
+};
+
 export type Notification =
   | CreditsDropNotification
   | ClaimableAssetPackNotification
   | OneGameFeedbackReceivedNotification
-  | MultipleGameFeedbackReceivedNotification;
+  | MultipleGameFeedbackReceivedNotification
+  | GameSessionsAchievementNotification;
 
 export const listNotifications = async (
   getAuthorizationHeader: () => Promise<string>,

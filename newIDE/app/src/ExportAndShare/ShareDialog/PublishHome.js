@@ -370,7 +370,6 @@ const PublishHome = ({
               <TextButton
                 icon={<ChevronArrowLeft />}
                 label={<Trans>Back</Trans>}
-                primary={false}
                 onClick={onBack}
                 disabled={isNavigationDisabled}
               />

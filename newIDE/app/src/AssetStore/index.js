@@ -652,7 +652,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   <TextButton
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
-                    primary={false}
                     onClick={async () => {
                       const page = shopNavigationState.backToPreviousPage();
                       const isUpdatingSearchtext = reApplySearchTextIfNeeded(

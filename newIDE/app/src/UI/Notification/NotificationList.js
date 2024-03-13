@@ -109,7 +109,7 @@ const NotificationList = ({
               </List>
               {shouldShowLoadMoreButton && (
                 <TextButton
-                  primary
+                  secondary
                   label={<Trans>Load more...</Trans>}
                   onClick={() => setShowAll(true)}
                 />

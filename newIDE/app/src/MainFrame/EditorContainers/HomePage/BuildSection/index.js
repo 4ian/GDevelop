@@ -500,7 +500,7 @@ const BuildSection = ({
                   </Text>
                   <Spacer />
                   <TextButton
-                    primary
+                    secondary
                     label={
                       isMobile ? (
                         <Trans>Open</Trans>

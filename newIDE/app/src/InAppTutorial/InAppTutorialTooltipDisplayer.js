@@ -21,6 +21,7 @@ import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import TextButton from '../UI/TextButton';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -129,12 +130,14 @@ type TooltipBodyProps = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const TooltipBody = ({
   tooltip,
   buttonLabel,
   goToNextStep,
+  fillAutomatically,
 }: TooltipBodyProps) => {
   const { isMobile } = useResponsiveWindowSize();
   const titleAndDescription = (
@@ -182,10 +185,18 @@ const TooltipBody = ({
     </Column>
   );
 
+  const fillAutomaticallyButton = fillAutomatically && (
+    <TextButton
+      onClick={fillAutomatically}
+      label={<Trans>Fill automatically</Trans>}
+      primary
+    />
+  );
   return (
     <Column noMargin>
       {titleAndDescription}
       {imageAndButton}
+      {fillAutomaticallyButton}
     </Column>
   );
 };
@@ -287,6 +298,7 @@ type Props = {|
   progress: number,
   endTutorial: () => void,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -297,6 +309,7 @@ const InAppTutorialTooltipDisplayer = ({
   progress,
   endTutorial,
   goToNextStep,
+  fillAutomatically,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const {
@@ -388,6 +401,7 @@ const InAppTutorialTooltipDisplayer = ({
                   tooltip={tooltip}
                   buttonLabel={buttonLabel}
                   goToNextStep={goToNextStep}
+                  fillAutomatically={fillAutomatically}
                 />
               )}
             </Column>

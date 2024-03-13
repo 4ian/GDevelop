@@ -107,6 +107,17 @@ export const Default = () => (
         label="Primary Text button"
         onClick={action('onClick')()}
       />
+      <TextButton
+        secondary
+        label="Secondary Text button"
+        onClick={action('onClick')()}
+      />
+      <TextButton
+        icon={<Download />}
+        secondary
+        label="Secondary Text button"
+        onClick={action('onClick')()}
+      />
     </LineStackLayout>
     <LineStackLayout noMargin>
       <Text size="block-title">Buttons with split menus:</Text>

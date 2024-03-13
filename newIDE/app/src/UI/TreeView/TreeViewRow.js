@@ -418,6 +418,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     {node.rightComponent}
                     {rightButton && (
                       <IconButton
+                        id={rightButton.id}
                         size="small"
                         onClick={e => {
                           e.stopPropagation();

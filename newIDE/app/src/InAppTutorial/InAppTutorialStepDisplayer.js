@@ -100,7 +100,10 @@ const getWrongEditorTooltip = (
 
 export const queryElementOrItsMostVisuallySignificantParent = (
   elementToHighlightId: string
-) => {
+): {|
+  elementToHighlight: ?HTMLElement,
+  elementWithId: ?HTMLElement,
+|} => {
   let foundElement = document.querySelector(elementToHighlightId);
   if (foundElement instanceof HTMLTextAreaElement) {
     // In this case, the element to highlight is a Material UI multiline text field
@@ -108,7 +111,7 @@ export const queryElementOrItsMostVisuallySignificantParent = (
     // to highlight the parent div.
     const parentDiv = foundElement.closest('div');
     if (parentDiv instanceof HTMLElement && isElementAMuiInput(parentDiv)) {
-      foundElement = parentDiv;
+      return { elementToHighlight: parentDiv, elementWithId: foundElement };
     }
   } else if (
     foundElement instanceof HTMLInputElement &&
@@ -116,10 +119,13 @@ export const queryElementOrItsMostVisuallySignificantParent = (
   ) {
     const containerDiv = foundElement.closest('div[data-search-bar-container]');
     if (containerDiv instanceof HTMLElement) {
-      foundElement = containerDiv;
+      return { elementToHighlight: containerDiv, elementWithId: foundElement };
     }
   }
-  return foundElement;
+  return {
+    elementToHighlight: foundElement,
+    elementWithId: foundElement,
+  };
 };
 
 type Props = {|
@@ -149,6 +155,7 @@ function InAppTutorialStepDisplayer({
     elementToHighlight,
     setElementToHighlight,
   ] = React.useState<?HTMLElement>(null);
+  const [elementWithId, setElementWithId] = React.useState<?HTMLElement>(null);
   const [
     hideBehindOtherDialog,
     setHideBehindOtherDialog,
@@ -169,9 +176,12 @@ function InAppTutorialStepDisplayer({
     () => {
       if (!elementToHighlightId) return;
 
-      setElementToHighlight(
-        queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
-      );
+      const {
+        elementToHighlight,
+        elementWithId,
+      } = queryElementOrItsMostVisuallySignificantParent(elementToHighlightId);
+      setElementToHighlight(elementToHighlight);
+      setElementWithId(elementWithId);
     },
     [elementToHighlightId]
   );
@@ -262,12 +272,42 @@ function InAppTutorialStepDisplayer({
     );
   };
 
+  const getFillAutomaticallyFunction = React.useCallback(
+    () => {
+      if (!nextStepTrigger || !nextStepTrigger.valueEquals) {
+        return undefined;
+      }
+
+      if (
+        !(elementWithId instanceof HTMLInputElement) &&
+        !(elementWithId instanceof HTMLTextAreaElement)
+      ) {
+        return undefined;
+      }
+
+      const valuePropertyDescriptor = Object.getOwnPropertyDescriptor(
+        elementWithId.constructor.prototype,
+        'value'
+      );
+      if (!valuePropertyDescriptor) return undefined;
+      const valueSetter = valuePropertyDescriptor.set;
+      if (!valueSetter) return undefined;
+      return () => {
+        valueSetter.call(elementWithId, nextStepTrigger.valueEquals);
+        // Trigger blur to make sure the value is taken into account
+        // by the React input.
+        elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
+      };
+    },
+    [nextStepTrigger, elementWithId]
+  );
+
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor) {
       const anchorElement = tooltip.standalone
         ? assistantImage
         : elementToHighlight || null;
-      if (!anchorElement) return null;
+      if (!anchorElement || !elementWithId) return null;
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
@@ -281,6 +321,7 @@ function InAppTutorialStepDisplayer({
               ? nextStepTrigger.clickOnTooltipButton
               : undefined
           }
+          fillAutomatically={getFillAutomaticallyFunction()}
         />
       );
     }
@@ -290,7 +331,7 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
-          showQuitButton={!isOnClosableDialog}
+          showQuitButton // Always show the quit button when the user is on the wrong editor
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}

@@ -1039,20 +1039,20 @@ const InAppTutorialOrchestrator = React.forwardRef<
 
       let formattedStepTrigger;
       const stepTrigger = currentStep.nextStepTrigger;
-      if (stepTrigger) {
-        if (stepTrigger.clickOnTooltipButton) {
-          const formattedButtonLabel = translateAndInterpolateText({
-            text: stepTrigger.clickOnTooltipButton,
-            data,
-            i18n,
-            project,
-          });
-          formattedStepTrigger = formattedButtonLabel
-            ? {
-                clickOnTooltipButton: formattedButtonLabel,
-              }
-            : undefined;
-        }
+      if (stepTrigger && stepTrigger.clickOnTooltipButton) {
+        const formattedButtonLabel = translateAndInterpolateText({
+          text: stepTrigger.clickOnTooltipButton,
+          data,
+          i18n,
+          project,
+        });
+        formattedStepTrigger = formattedButtonLabel
+          ? {
+              clickOnTooltipButton: formattedButtonLabel,
+            }
+          : undefined;
+      } else {
+        formattedStepTrigger = stepTrigger;
       }
       const formattedStep: InAppTutorialFlowFormattedStep = {
         ...currentStep,

@@ -72,6 +72,12 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     return `scene-item-${index}`;
   }
 
+  getDataSet(): { [string]: string } {
+    return {
+      scene: this.scene.getName(),
+    };
+  }
+
   getThumbnail(): ?string {
     return 'res/icons_default/scene_black.svg';
   }

@@ -73,8 +73,9 @@ export type InAppTutorialFlowStepTrigger =
 
 export type InAppTutorialFlowStepFormattedTrigger =
   | InAppTutorialFlowStepDOMChangeTrigger
-  | {| valueEquals: string |}
+  | {| editorIsActive: string |}
   | {| valueHasChanged: true |}
+  | {| valueEquals: string |}
   | {| instanceAddedOnScene: string, instancesCount?: number |}
   | {| objectAddedInLayout: true |}
   | {| previewLaunched: true |}

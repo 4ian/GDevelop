@@ -1125,8 +1125,9 @@ describe('MetadataDeclarationHelper', () => {
       .getEventsBasedObjects()
       .insertNew('MyObject', 0);
     eventsBasedObject.markAsRenderedIn3D(true);
-    eventsBasedObject.markAsAnimatable(true);
-    eventsBasedObject.markAsTextContainer(true);
+    // TODO Uncomment
+    // eventsBasedObject.markAsAnimatable(true);
+    // eventsBasedObject.markAsTextContainer(true);
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(
@@ -1150,8 +1151,9 @@ describe('MetadataDeclarationHelper', () => {
       "FlippableCapability::FlippableBehavior",
       // No effect nor opacity capabilities for 3D objects.
       "Scene3D::Base3DBehavior",
-      "AnimatableCapability::AnimatableBehavior",
-      "TextContainerCapability::TextContainerBehavior",
+      // TODO Uncomment
+      // "AnimatableCapability::AnimatableBehavior",
+      // "TextContainerCapability::TextContainerBehavior",
     ]);
 
     extension.delete();

@@ -1125,7 +1125,7 @@ describe('MetadataDeclarationHelper', () => {
       .getEventsBasedObjects()
       .insertNew('MyObject', 0);
     eventsBasedObject.markAsRenderedIn3D(true);
-    // TODO Uncomment
+    // TODO Uncomment when the feature is done.
     // eventsBasedObject.markAsAnimatable(true);
     // eventsBasedObject.markAsTextContainer(true);
 
@@ -1151,7 +1151,7 @@ describe('MetadataDeclarationHelper', () => {
       "FlippableCapability::FlippableBehavior",
       // No effect nor opacity capabilities for 3D objects.
       "Scene3D::Base3DBehavior",
-      // TODO Uncomment
+      // TODO Uncomment when the feature is done.
       // "AnimatableCapability::AnimatableBehavior",
       // "TextContainerCapability::TextContainerBehavior",
     ]);

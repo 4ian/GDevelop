@@ -1127,7 +1127,7 @@ describe('MetadataDeclarationHelper', () => {
     eventsBasedObject.markAsRenderedIn3D(true);
     // TODO Uncomment when the feature is done.
     // eventsBasedObject.markAsAnimatable(true);
-    // eventsBasedObject.markAsTextContainer(true);
+    eventsBasedObject.markAsTextContainer(true);
 
     const objectMethodMangledNames = new gd.MapStringString();
     gd.MetadataDeclarationHelper.generateObjectMetadata(
@@ -1153,7 +1153,7 @@ describe('MetadataDeclarationHelper', () => {
       "Scene3D::Base3DBehavior",
       // TODO Uncomment when the feature is done.
       // "AnimatableCapability::AnimatableBehavior",
-      // "TextContainerCapability::TextContainerBehavior",
+      "TextContainerCapability::TextContainerBehavior",
     ]);
 
     extension.delete();

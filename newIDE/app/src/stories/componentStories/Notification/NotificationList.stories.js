@@ -62,6 +62,32 @@ const notifications: Notification[] = [
     data: { creditsAmount: 500, reason: 'subscription-monthly-drop' },
   },
   {
+    id: 'notification-id-32',
+    userId,
+    createdAt: now - 9 * ONE_HOUR,
+    seenAt: now - 7 * ONE_HOUR,
+    type: 'game-sessions-achievement',
+    data: {
+      achievementId: 'gs_1k/1/y',
+      sessionsCount: 1000,
+      gameCount: 1,
+      period: 'year',
+      gameId: 'game-id',
+      gameName: 'Sonic the hedgehog 9',
+    },
+  },
+  // $FlowIgnore - Unknown notification on purpose.
+  {
+    id: 'notification-id-33',
+    userId,
+    createdAt: now - 9 * ONE_HOUR,
+    seenAt: now - 7 * ONE_HOUR,
+    type: 'unknown-type',
+    data: {
+      what: 'ever',
+    },
+  },
+  {
     id: 'notification-id-4',
     userId,
     createdAt: now - 32 * ONE_HOUR,

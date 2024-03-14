@@ -113,7 +113,6 @@ gd::String ObjectCodeGenerator::GenerateRuntimeObjectCompleteCode(
       // generateTextContainerCode
       [&]() {
         return gd::String(R"jscode_template(
-
   // gdjs.TextContainer interface implementation
   _text = '';
   getText() {

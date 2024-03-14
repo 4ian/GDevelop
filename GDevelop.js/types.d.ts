@@ -2148,6 +2148,8 @@ export class EventsBasedObject extends AbstractEventsBasedEntity {
   getDefaultName(): string;
   markAsRenderedIn3D(isRenderedIn3D: boolean): EventsBasedObject;
   isRenderedIn3D(): boolean;
+  markAsTextContainer(isTextContainer: boolean): EventsBasedObject;
+  isTextContainer(): boolean;
   static getPropertyActionName(propertyName: string): string;
   static getPropertyConditionName(propertyName: string): string;
   static getPropertyExpressionName(propertyName: string): string;

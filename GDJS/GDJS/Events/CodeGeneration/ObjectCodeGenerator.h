@@ -74,7 +74,8 @@ class ObjectCodeGenerator {
       std::function<gd::String()> generateInitializePropertiesCode,
       std::function<gd::String()> generateMethodsCode,
       std::function<gd::String()> generatePropertiesCode,
-      std::function<gd::String()> generateUpdateFromObjectDataCode);
+      std::function<gd::String()> generateUpdateFromObjectDataCode,
+      std::function<gd::String()> generateTextContainerCode);
 
   gd::String GenerateRuntimeObjectPropertyTemplateCode(
       const gd::EventsBasedObject& eventsBasedObject,

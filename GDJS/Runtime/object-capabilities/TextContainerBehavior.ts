@@ -18,7 +18,7 @@ namespace gdjs {
   }
 
   /**
-   * A behavior that forwards the Animatable interface to its object.
+   * A behavior that forwards the TextContainer interface to its object.
    */
   export class TextContainerBehavior
     extends gdjs.RuntimeBehavior

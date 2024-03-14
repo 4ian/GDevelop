@@ -6,7 +6,6 @@ import * as React from 'react';
 import FlatButton from '../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
-import { Column, Line } from '../../UI/Grid';
 import {
   changeUserSubscription,
   getRedirectToCheckoutUrl,
@@ -32,11 +31,7 @@ import {
 import SubscriptionPendingDialog from './SubscriptionPendingDialog';
 import Window from '../../Utils/Window';
 import Text from '../../UI/Text';
-import {
-  ColumnStackLayout,
-  LineStackLayout,
-  ResponsiveLineStackLayout,
-} from '../../UI/Layout';
+import { ColumnStackLayout } from '../../UI/Layout';
 import RedemptionCodeIcon from '../../UI/CustomSvgIcons/RedemptionCode';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import RedeemCodeDialog from '../RedeemCodeDialog';
@@ -48,6 +43,10 @@ import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import Link from '../../UI/Link';
+import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
+import uniq from 'lodash/uniq';
 
 const styles = {
   descriptionText: {
@@ -61,6 +60,27 @@ const styles = {
     height: 90,
     flexShrink: 0,
     objectFit: 'contain',
+  },
+  scrollablePlanCardsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    overflowX: 'auto',
+    justifyContent: 'center',
+  },
+  planCardsContainer: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    flex: 1,
+    gap: 8,
+    alignItems: 'center',
+    overflowY: 'auto',
+  },
+  planCardsLineContainer: {
+    display: 'inline-flex',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 8,
+    overflowY: 'auto',
   },
 };
 
@@ -93,6 +113,28 @@ const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
+};
+
+const getPlanSpecificRequirements = (
+  i18n: I18nType,
+  subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
+): Array<string> => {
+  const planSpecificRequirements = subscriptionPlansWithPricingSystems
+    ? uniq(
+        subscriptionPlansWithPricingSystems
+          .map(subscriptionPlanWithPricingSystems => {
+            if (!subscriptionPlanWithPricingSystems.specificRequirementByLocale)
+              return null;
+            return selectMessageByLocale(
+              i18n,
+              subscriptionPlanWithPricingSystems.specificRequirementByLocale
+            );
+          })
+          .filter(Boolean)
+      )
+    : [];
+
+  return planSpecificRequirements;
 };
 
 type Props = {|
@@ -293,12 +335,40 @@ export default function SubscriptionDialog({
     ? authenticatedUser.subscription.planId
     : null;
 
+  const { windowSize } = useResponsiveWindowSize();
+
+  const displayedSubscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems
+    ? [
+        userLegacySubscriptionPlanWithPricingSystem,
+        ...subscriptionPlansWithPricingSystems,
+      ]
+        .filter(Boolean)
+        .filter(plan => {
+          if (filter === 'individual') {
+            return ['free', 'gdevelop_silver', 'gdevelop_gold'].includes(
+              plan.id
+            );
+          }
+          if (filter === 'team') {
+            return ['gdevelop_startup', 'gdevelop_enterprise'].includes(
+              plan.id
+            );
+          }
+          if (filter === 'education') {
+            return ['gdevelop_education'].includes(plan.id);
+          }
+
+          return plan.id !== 'gdevelop_education';
+        })
+    : null;
+
   return (
     <I18n>
       {({ i18n }) => (
         <>
           <Dialog
-            title={<Trans>GDevelop Premium</Trans>}
+            title={null}
+            maxWidth={false}
             actions={[
               <FlatButton
                 label={<Trans>Close</Trans>}
@@ -317,265 +387,256 @@ export default function SubscriptionDialog({
                 onClick={() => setRedeemCodeDialogOpen(true)}
               />,
             ]}
-            onRequestClose={onClose}
             open={open}
           >
-            {subscriptionPlansWithPricingSystems ? (
-              <ColumnStackLayout noMargin expand>
-                <LineStackLayout noMargin alignItems="center">
-                  <img
-                    src="res/diamond.svg"
-                    style={styles.diamondIcon}
-                    alt=""
-                  />
-                  <Text>
-                    <Trans>
-                      Get a subscription to unlock more one-click exports and
-                      other exclusive features as a premium creator in our
-                      community. With a subscription, you're also supporting the
-                      development of GDevelop, which is an open-source software.
-                    </Trans>
-                  </Text>
-                  <FlatButton
-                    style={{ flexShrink: 0 }}
-                    label={<Trans>Read more</Trans>}
-                    onClick={() =>
-                      Window.openExternalURL('https://gdevelop.io/pricing')
+            <ColumnStackLayout noMargin>
+              {displayedSubscriptionPlanWithPricingSystems ? (
+                <div style={styles.scrollablePlanCardsContainer}>
+                  <div
+                    style={
+                      windowSize === 'large' || windowSize === 'xlarge'
+                        ? styles.planCardsLineContainer
+                        : styles.planCardsContainer
                     }
-                  />
-                </LineStackLayout>
-                {willCancelAtPeriodEnd && (
-                  <AlertMessage kind="warning">
-                    <Trans>
-                      Your subscription is being cancelled: you will lose the
-                      benefits at the end of the period you already paid for.
-                    </Trans>
-                  </AlertMessage>
-                )}
-                {[
-                  userLegacySubscriptionPlanWithPricingSystem,
-                  ...subscriptionPlansWithPricingSystems,
-                ]
-                  .filter(Boolean)
-                  .filter(plan => {
-                    if (filter === 'individual') {
-                      return [
-                        'free',
-                        'gdevelop_silver',
-                        'gdevelop_gold',
-                      ].includes(plan.id);
-                    }
-                    if (filter === 'team') {
-                      return [
-                        'free',
-                        'gdevelop_startup',
-                        'gdevelop_enterprise',
-                      ].includes(plan.id);
-                    }
-                    if (filter === 'education') {
-                      return ['free', 'gdevelop_education'].includes(plan.id);
-                    }
-                    // No filter, show all plans.
-                    return true;
-                  })
-                  .map(subscriptionPlanWithPricingSystems => {
-                    const isFreePlan =
-                      subscriptionPlanWithPricingSystems.id === 'free';
-                    const isUserCurrentOrLegacyPlan =
-                      userPlanId === subscriptionPlanWithPricingSystems.id;
-                    let actions: React.Node = null;
-                    if (isFreePlan) {
-                      // If no plan (free usage), do not display button.
-                    } else if (
-                      subscriptionPlanWithPricingSystems.id ===
-                      'gdevelop_education'
-                    ) {
-                      if (!isUserCurrentOrLegacyPlan) {
-                        const yearlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
-                          price => price.period === 'year'
-                        );
-                        const monthlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
-                          price => price.period === 'month'
-                        );
-                        if (yearlyPlanPrice && monthlyPlanPrice) {
-                          actions = [
-                            <ResponsiveLineStackLayout
-                              key="options"
-                              expand
-                              noColumnMargin
-                              noMargin
-                            >
-                              <SemiControlledTextField
-                                value={educationPlanSeatsCount.toString()}
-                                floatingLabelFixed
-                                fullWidth
-                                floatingLabelText={
-                                  <Trans>Number of seats</Trans>
-                                }
-                                commitOnBlur
-                                type="number"
-                                onChange={value => {
-                                  const newValue = parseInt(value);
-                                  setEducationPlanSeatsCount(
-                                    Math.min(
-                                      EDUCATION_PLAN_MAX_SEATS,
-                                      Math.max(
-                                        Number.isNaN(newValue)
-                                          ? EDUCATION_PLAN_MIN_SEATS
-                                          : newValue,
-                                        EDUCATION_PLAN_MIN_SEATS
-                                      )
+                  >
+                    {willCancelAtPeriodEnd && (
+                      <AlertMessage kind="warning">
+                        <Trans>
+                          Your subscription is being cancelled: you will lose
+                          the benefits at the end of the period you already paid
+                          for.
+                        </Trans>
+                      </AlertMessage>
+                    )}
+                    {displayedSubscriptionPlanWithPricingSystems.map(
+                      subscriptionPlanWithPricingSystems => {
+                        const isFreePlan =
+                          subscriptionPlanWithPricingSystems.id === 'free';
+                        const isUserCurrentOrLegacyPlan =
+                          userPlanId === subscriptionPlanWithPricingSystems.id;
+                        let actions: React.Node = null;
+                        if (isFreePlan) {
+                          // If no plan (free usage), do not display button.
+                        } else if (
+                          subscriptionPlanWithPricingSystems.id ===
+                          'gdevelop_education'
+                        ) {
+                          if (!isUserCurrentOrLegacyPlan) {
+                            const yearlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
+                              price => price.period === 'year'
+                            );
+                            const monthlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
+                              price => price.period === 'month'
+                            );
+                            if (yearlyPlanPrice && monthlyPlanPrice) {
+                              actions = [
+                                <ColumnStackLayout
+                                  key="options"
+                                  expand
+                                  noMargin
+                                >
+                                  <SemiControlledTextField
+                                    value={educationPlanSeatsCount.toString()}
+                                    floatingLabelFixed
+                                    fullWidth
+                                    floatingLabelText={
+                                      <Trans>Number of seats</Trans>
+                                    }
+                                    commitOnBlur
+                                    type="number"
+                                    onChange={value => {
+                                      const newValue = parseInt(value);
+                                      setEducationPlanSeatsCount(
+                                        Math.min(
+                                          EDUCATION_PLAN_MAX_SEATS,
+                                          Math.max(
+                                            Number.isNaN(newValue)
+                                              ? EDUCATION_PLAN_MIN_SEATS
+                                              : newValue,
+                                            EDUCATION_PLAN_MIN_SEATS
+                                          )
+                                        )
+                                      );
+                                    }}
+                                    min={EDUCATION_PLAN_MIN_SEATS}
+                                    max={EDUCATION_PLAN_MAX_SEATS}
+                                    step={1}
+                                    helperMarkdownText={i18n._(
+                                      t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
+                                    )}
+                                  />
+                                  <SelectField
+                                    value={educationPlanPeriodicity}
+                                    floatingLabelText={
+                                      <Trans>Engagement</Trans>
+                                    }
+                                    fullWidth
+                                    onChange={(e, i, newValue) => {
+                                      // $FlowExpectedError - Flow does not infer the type given the select options.
+                                      setEducationPlanPeriodicity(newValue);
+                                    }}
+                                  >
+                                    <SelectOption
+                                      value="yearly"
+                                      label={t`Per year`}
+                                    />
+                                    <SelectOption
+                                      value="monthly"
+                                      label={t`Per month`}
+                                    />
+                                  </SelectField>
+                                </ColumnStackLayout>,
+                                <RaisedButton
+                                  primary
+                                  key="upgrade"
+                                  disabled={isLoading}
+                                  fullWidth
+                                  label={
+                                    <LeftLoader isLoading={isLoading}>
+                                      <Trans>Choose this plan</Trans>
+                                    </LeftLoader>
+                                  }
+                                  onClick={() =>
+                                    buyUpdateOrCancelPlan(
+                                      i18n,
+                                      educationPlanPeriodicity === 'yearly'
+                                        ? yearlyPlanPrice
+                                        : monthlyPlanPrice
                                     )
-                                  );
-                                }}
-                                min={EDUCATION_PLAN_MIN_SEATS}
-                                max={EDUCATION_PLAN_MAX_SEATS}
-                                step={1}
-                                helperMarkdownText={i18n._(
-                                  t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
-                                )}
-                              />
-                              <SelectField
-                                value={educationPlanPeriodicity}
-                                floatingLabelText={<Trans>Engagement</Trans>}
-                                fullWidth
-                                onChange={(e, i, newValue) => {
-                                  // $FlowExpectedError - Flow does not infer the type given the select options.
-                                  setEducationPlanPeriodicity(newValue);
-                                }}
-                              >
-                                <SelectOption
-                                  value="yearly"
-                                  label={t`Per year`}
-                                />
-                                <SelectOption
-                                  value="monthly"
-                                  label={t`Per month`}
-                                />
-                              </SelectField>
-                            </ResponsiveLineStackLayout>,
-                            <RaisedButton
-                              primary
-                              key="upgrade"
-                              disabled={isLoading}
+                                  }
+                                />,
+                              ];
+                            }
+                          } else {
+                            actions = [
+                              <Text key="contact">
+                                <Trans>Contact us for more information.</Trans>
+                              </Text>,
+                            ];
+                          }
+                        } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
+                          actions = [
+                            <FlatButton
+                              key="cancel"
+                              disabled={isLoading || willCancelAtPeriodEnd}
+                              fullWidth
                               label={
                                 <LeftLoader isLoading={isLoading}>
-                                  <Trans>Choose this plan</Trans>
+                                  {willCancelAtPeriodEnd ? (
+                                    <Trans>
+                                      Already cancelled - will expire in the
+                                      future
+                                    </Trans>
+                                  ) : (
+                                    <Trans>Cancel your subscription</Trans>
+                                  )}
                                 </LeftLoader>
                               }
-                              onClick={() =>
-                                buyUpdateOrCancelPlan(
-                                  i18n,
-                                  educationPlanPeriodicity === 'yearly'
-                                    ? yearlyPlanPrice
-                                    : monthlyPlanPrice
-                                )
-                              }
+                              onClick={() => buyUpdateOrCancelPlan(i18n, null)}
                             />,
                           ];
-                        }
-                      } else {
-                        actions = [
-                          <Text key="contact">
-                            <Trans>Contact us for more information.</Trans>
-                          </Text>,
-                        ];
-                      }
-                    } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
-                      actions = [
-                        <FlatButton
-                          key="cancel"
-                          disabled={isLoading || willCancelAtPeriodEnd}
-                          label={
-                            <LeftLoader isLoading={isLoading}>
-                              {willCancelAtPeriodEnd ? (
-                                <Trans>
-                                  Already cancelled - will expire in the future
-                                </Trans>
-                              ) : (
-                                <Trans>Cancel your subscription</Trans>
-                              )}
-                            </LeftLoader>
-                          }
-                          onClick={() => buyUpdateOrCancelPlan(i18n, null)}
-                        />,
-                      ];
-                    } else if (
-                      subscriptionPlanWithPricingSystems.id ===
-                      'gdevelop_enterprise'
-                    ) {
-                      return (
-                        <PlanCard
-                          key={subscriptionPlanWithPricingSystems.id}
-                          subscriptionPlanWithPricingSystems={
-                            subscriptionPlanWithPricingSystems
-                          }
-                          actions={
-                            <RaisedButton
-                              primary
-                              label={<Trans>Learn more</Trans>}
-                              onClick={() => {
-                                Window.openExternalURL(
-                                  'https://gdevelop.io/pricing'
-                                );
-                              }}
+                        } else if (
+                          subscriptionPlanWithPricingSystems.id ===
+                          'gdevelop_enterprise'
+                        ) {
+                          return (
+                            <PlanCard
+                              key={subscriptionPlanWithPricingSystems.id}
+                              subscriptionPlanWithPricingSystems={
+                                subscriptionPlanWithPricingSystems
+                              }
+                              actions={
+                                <RaisedButton
+                                  primary
+                                  label={<Trans>Learn more</Trans>}
+                                  onClick={() => {
+                                    Window.openExternalURL(
+                                      'https://gdevelop.io/pricing'
+                                    );
+                                  }}
+                                />
+                              }
+                              isPending={false}
+                              isHighlighted={false}
+                              background="medium"
                             />
+                          );
+                        } else {
+                          const price =
+                            subscriptionPlanWithPricingSystems
+                              .pricingSystems[0];
+                          if (price) {
+                            actions = [
+                              <RaisedButton
+                                primary
+                                key="upgrade"
+                                disabled={isLoading}
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
+                                    <Trans>Choose this plan</Trans>
+                                  </LeftLoader>
+                                }
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, price)
+                                }
+                              />,
+                            ];
                           }
-                          isPending={false}
-                          isHighlighted={false}
-                          background="medium"
-                        />
-                      );
-                    } else {
-                      const price =
-                        subscriptionPlanWithPricingSystems.pricingSystems[0];
-                      if (price) {
-                        actions = [
-                          <RaisedButton
-                            primary
-                            key="upgrade"
-                            disabled={isLoading}
-                            label={
-                              <LeftLoader isLoading={isLoading}>
-                                <Trans>Choose this plan</Trans>
-                              </LeftLoader>
-                            }
-                            onClick={() => buyUpdateOrCancelPlan(i18n, price)}
-                          />,
-                        ];
-                      }
-                    }
-
-                    return (
-                      <PlanCard
-                        key={subscriptionPlanWithPricingSystems.id || 'free'}
-                        subscriptionPlanWithPricingSystems={
-                          subscriptionPlanWithPricingSystems
                         }
-                        actions={actions}
-                        isPending={isLoading}
-                        isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
-                        background="medium"
-                      />
-                    );
-                  })}
 
-                <Column>
-                  <Line>
-                    <EmptyMessage>
-                      <Trans>
-                        Subscriptions can be stopped at any time. GDevelop uses
-                        Stripe.com and PayPal for secure payment. No credit card
-                        data is stored by GDevelop: everything is managed by
-                        Stripe.com or PayPal secure infrastructure.
-                      </Trans>
-                    </EmptyMessage>
-                  </Line>
-                </Column>
-              </ColumnStackLayout>
-            ) : (
-              <PlaceholderLoader />
-            )}
+                        return (
+                          <PlanCard
+                            key={
+                              subscriptionPlanWithPricingSystems.id || 'free'
+                            }
+                            subscriptionPlanWithPricingSystems={
+                              subscriptionPlanWithPricingSystems
+                            }
+                            actions={actions}
+                            isPending={isLoading}
+                            isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.
+                            background="medium"
+                          />
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <PlaceholderLoader />
+              )}
+              {getPlanSpecificRequirements(
+                i18n,
+                displayedSubscriptionPlanWithPricingSystems
+              ).map(planSpecificRequirements => (
+                <AlertMessage kind="info">
+                  {planSpecificRequirements}
+                </AlertMessage>
+              ))}
+              <EmptyMessage>
+                <Trans>
+                  No ties, cancel your subscription anytime. Payments done using
+                  Stripe.com and PayPal secure infrastructure.
+                </Trans>
+                <div>
+                  <Trans>
+                    Compare all the advantages of the different plans in this{' '}
+                    <Link
+                      href="https://gdevelop.io/pricing#feature-comparison"
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://gdevelop.io/pricing#feature-comparison'
+                        )
+                      }
+                    >
+                      big feature comparison table
+                    </Link>
+                    .
+                  </Trans>
+                </div>
+              </EmptyMessage>
+            </ColumnStackLayout>
           </Dialog>
           {!authenticatedUser.authenticated &&
             authenticatedUser.loginState !== 'loggingIn' && (
@@ -607,8 +668,9 @@ export default function SubscriptionDialog({
               >
                 <Text>
                   <Trans>
-                    It is free and you will get access to online services: cloud
-                    projects, leaderboards, player feedbacks, cloud builds...
+                    Create an account to get started with GDevelop and access to
+                    cloud projects, cloud builds, game analytics, leaderboards
+                    and more.
                   </Trans>
                 </Text>
               </Dialog>

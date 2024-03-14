@@ -145,6 +145,7 @@ export type SubscriptionPlan = {|
   nameByLocale: MessageByLocale,
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
+  specificRequirementByLocale?: MessageByLocale,
 |};
 
 export type SubscriptionPlanWithPricingSystems = {|

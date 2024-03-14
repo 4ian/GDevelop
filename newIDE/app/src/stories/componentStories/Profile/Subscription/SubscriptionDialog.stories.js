@@ -44,9 +44,11 @@ const SubscriptionDialogWrapper = ({
   const userLegacySubscriptionPlanWithPricingSystem = userSubscription
     ? subscriptionPlansWithPricingSystems.find(
         planWithPricingSystem =>
-          planWithPricingSystem.id === userSubscription.planId
+          planWithPricingSystem.id === userSubscription.planId &&
+          planWithPricingSystem.isLegacy
       )
     : null;
+
   return (
     <AlertProvider>
       <AuthenticatedUserContext.Provider value={authenticatedUser}>

@@ -26,7 +26,7 @@ import {
   type SubscriptionType,
 } from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
-import PlanCard from './PlanCard';
+import PlanSmallCard from './PlanSmallCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../UI/AlertMessage';
@@ -35,6 +35,8 @@ import TeamPlans from './Icons/TeamPlans';
 import EducationPlans from './Icons/EducationPlans';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import PlaceholderError from '../../UI/PlaceholderError';
+import Link from '../../UI/Link';
+import Window from '../../Utils/Window';
 
 const styles = {
   diamondIcon: {
@@ -219,8 +221,18 @@ const SubscriptionDetails = ({
           </Text>
           <Text size="body" noMargin>
             <Trans>
-              Unlock more exports, cloud projects, leaderboards, collaboration
-              features and remove the GDevelop splashscreen.
+              Publish to Android, iOS, unlock more cloud projects, leaderboards,
+              collaboration features and more online services.{' '}
+              <Link
+                href="https://gdevelop.io/pricing#feature-comparison"
+                onClick={() =>
+                  Window.openExternalURL(
+                    'https://gdevelop.io/pricing#feature-comparison'
+                  )
+                }
+              >
+                Learn more
+              </Link>
             </Trans>
           </Text>
         </Column>
@@ -267,7 +279,7 @@ const SubscriptionDetails = ({
         ) : (
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
-            <PlanCard
+            <PlanSmallCard
               subscriptionPlanWithPricingSystems={
                 userSubscriptionPlanWithPricingSystems
               }
@@ -298,7 +310,7 @@ const SubscriptionDetails = ({
                       ) : null,
                       <RaisedButton
                         key="manage"
-                        label={<Trans>Manage subscription</Trans>}
+                        label={<Trans>Change subscription</Trans>}
                         primary
                         onClick={() =>
                           openSubscriptionDialog({

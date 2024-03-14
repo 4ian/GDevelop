@@ -78,6 +78,12 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     return `extension-item-${index}`;
   }
 
+  getDataSet(): { [string]: string } {
+    return {
+      extension: this.eventsFunctionsExtension.getName(),
+    };
+  }
+
   getThumbnail(): ?string {
     return (
       this.eventsFunctionsExtension.getIconUrl() ||

@@ -269,7 +269,6 @@ const EditProfileDialog = ({
       label={<Trans>Delete my account</Trans>}
       disabled={actionInProgress}
       key="delete"
-      primary={false}
       onClick={onDeleteAccount}
     />,
   ];

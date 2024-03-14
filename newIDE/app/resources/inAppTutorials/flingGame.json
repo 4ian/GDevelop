@@ -341,8 +341,9 @@
         "description": {
           "messageByLocale": {
             "en": "Let's choose an **object** from the asset store",
-            "fr": "Nous allons choisir un objet dans le **magasin de ressources**.",
+            "fr": "Nous allons choisir un **objet** dans le magasin de ressources.",
             "es": "Vamos a elegir un **objeto** de la tienda de recursos.",
+            "pt": "Vamos escolher um objeto da loja de recursos.",
             "th": "เลือก **วัตถุ** จาก ร้านค้า asset",
             "ar": "هيّا نقوم باختيار **كائن** من متجر العناصر"
           }
@@ -2180,6 +2181,7 @@
             "en": "Add a few $(obstacle) to the **scene** to protect $(target).",
             "fr": "Ajoutez quelques $(obstacle) à la **scène** pour protéger $(target).",
             "es": "Agrega algunos $(obstacle) a la **escena** para proteger a $(target).",
+            "pt": "Adicione alguns $(obstacle) à **cena** para proteger $(target).",
             "th": "เพิ่ม $(obstacle) ปริมาณนิดหน่อยลงใน **scene** เพื่อป้องกัน $(target)",
             "ar": "إضافة بضعة $(obstacle) إلى **المشهد** لحماية $(target)."
           }

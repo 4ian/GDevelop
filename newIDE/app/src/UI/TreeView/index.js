@@ -27,6 +27,7 @@ export type ItemBaseAttributes = {
 };
 
 export type MenuButton = {|
+  id?: string,
   icon: React.Node,
   label: string,
   click: ?() => void | Promise<void>,

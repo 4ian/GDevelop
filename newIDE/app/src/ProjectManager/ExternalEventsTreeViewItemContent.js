@@ -73,6 +73,12 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     return `external-events-item-${index}`;
   }
 
+  getDataSet(): { [string]: string } {
+    return {
+      'external-events': this.externalEvents.getName(),
+    };
+  }
+
   getThumbnail(): ?string {
     return 'res/icons_default/external_events_black.svg';
   }

@@ -3480,6 +3480,7 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             setSelectedInAppTutorialInfo(null);
           }}
+          isProjectOpening={isProjectOpening}
         />
       )}
       {state.gdjsDevelopmentWatcherEnabled &&

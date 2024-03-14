@@ -99,85 +99,63 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
     return tutorialProgress.progress[0]; // guided lessons only have one part.
   };
 
-  const lessonsCompleted = guidedLessonsIds.reduce((acc, tutorialId) => {
-    const tutorialProgress = getTutorialPartProgress({ tutorialId }) || 0;
-    return tutorialProgress === 100 ? acc + 1 : acc;
-  }, 0);
+  const displayedGuidedLessonsIds = lessonsIds || guidedLessonsIds;
+
+  const lessonsCompleted = displayedGuidedLessonsIds.reduce(
+    (acc, tutorialId) => {
+      const tutorialProgress = getTutorialPartProgress({ tutorialId }) || 0;
+      return tutorialProgress === 100 ? acc + 1 : acc;
+    },
+    0
+  );
   const lessonsProgress = Math.round(
-    (lessonsCompleted / guidedLessonsIds.length) * 100
+    (lessonsCompleted / displayedGuidedLessonsIds.length) * 100
   );
 
   const guidedLessonCards = [
     {
       id: JOYSTICK_IN_APP_TUTORIAL_ID,
-      title: t`Add Joystick controls`,
+      title: t`Joystick controls`,
       description: t`Learn how to add a joystick to control the player.`,
-      keyPoints: [
-        t`Add a layer`,
-        t`Download and use a prefab`,
-        t`Use a behavior`,
-      ],
       durationInMinutes: 1,
       renderImage: props => <Joystick {...props} />,
     },
     {
       id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
-      title: t`Display a Health bar for the player`,
+      title: t`Health bar`,
       description: t`Learn how to display the health of a player on the foreground.`,
-      keyPoints: [t`Add a layer`, t`Download and use a prefab`],
       durationInMinutes: 2,
       renderImage: props => <HealthBar {...props} />,
     },
     {
       id: OBJECT_3D_IN_APP_TUTORIAL_ID,
-      title: t`Add a 3D object`,
-      description: t`Learn how to add a 3D object to your game.`,
-      keyPoints: [
-        t`Add a 3D box`,
-        t`Add a behavior`,
-        t`Update the elevation of a 3D box`,
-      ],
+      title: t`3D box`,
+      description: t`Learn how to add a 3D box to your game.`,
       durationInMinutes: 2,
       renderImage: props => <Object3D {...props} />,
     },
     {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
-      title: t`Improve background and camera`,
+      title: t`Background`,
       description: t`Learn how to create a parallax background as well as a camera that follows the player.`,
-      keyPoints: [
-        t`Add an extension`,
-        t`Add a layer`,
-        t`Use a tiled sprite`,
-        t`Control the camera`,
-      ],
       durationInMinutes: 2,
       renderImage: props => <Parallax {...props} />,
     },
     {
       id: TIMER_IN_APP_TUTORIAL_ID,
-      title: t`Use a timer`,
+      title: t`Timer`,
       description: t`Learn how to use a timer to count a score.`,
-      keyPoints: [
-        t`Create and use a timer`,
-        t`Create and modify a text`,
-        t`Build an expression`,
-      ],
       durationInMinutes: 2,
       renderImage: props => <Timer {...props} />,
     },
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
-      title: t`Add score multiplier`,
+      title: t`Score multiplier`,
       description: t`Learn how to manipulate a score by adding collectibles.`,
-      keyPoints: [
-        t`Create a variable`,
-        t`Use & manipulate a variable`,
-        t`Build an expression`,
-      ],
       durationInMinutes: 3,
       renderImage: props => <MultiplierScore {...props} />,
     },
-  ].filter(item => (lessonsIds ? lessonsIds.includes(item.id) : true));
+  ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 
   return (
     <Line>
@@ -191,20 +169,18 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
           </PlaceholderError>
         ) : (
           <ColumnStackLayout noMargin>
-            {!lessonsIds && (
-              <Column>
-                <LineStackLayout alignItems="center">
-                  {lessonsProgress !== 100 ? (
-                    <Text displayInlineAsSpan noMargin size="body2">
-                      {lessonsProgress}%
-                    </Text>
-                  ) : (
-                    <Trophy />
-                  )}
-                  <ColoredLinearProgress value={lessonsProgress} />
-                </LineStackLayout>
-              </Column>
-            )}
+            <Column>
+              <LineStackLayout alignItems="center">
+                {lessonsProgress !== 100 ? (
+                  <Text displayInlineAsSpan noMargin size="body2">
+                    {lessonsProgress}%
+                  </Text>
+                ) : (
+                  <Trophy />
+                )}
+                <ColoredLinearProgress value={lessonsProgress} />
+              </LineStackLayout>
+            </Column>
             <GridList
               cols={getColumnsFromWindowSize(windowSize, isLandscape)}
               style={styles.grid}
@@ -217,7 +193,6 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
                     title={item.title}
                     description={item.description}
                     durationInMinutes={item.durationInMinutes}
-                    keyPoints={item.keyPoints}
                     renderImage={item.renderImage}
                     progress={getTutorialPartProgress({ tutorialId: item.id })}
                     onClick={() => selectInAppTutorial(item.id)}

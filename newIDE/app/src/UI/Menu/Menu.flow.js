@@ -9,6 +9,7 @@ import { type Node as ReactNode } from 'react';
 export type MenuItemTemplate =
   // "Classic" menu item
   | {|
+      id?: string,
       label: string,
       visible?: boolean,
       enabled?: boolean,
@@ -18,11 +19,13 @@ export type MenuItemTemplate =
     |}
   // Sub menu
   | {|
+      id?: string,
       label: string,
       submenu: Array<MenuItemTemplate>,
     |}
   // Checkbox
   | {|
+      id?: string,
       type: 'checkbox',
       label: string,
       visible?: boolean,

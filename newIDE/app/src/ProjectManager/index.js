@@ -116,6 +116,7 @@ export interface TreeViewItemContent {
   getName(): string | React.Node;
   getId(): string;
   getHtmlId(index: number): ?string;
+  getDataSet(): { [string]: string };
   getThumbnail(): ?string;
   onClick(): void;
   buildMenuTemplate(i18n: I18nType, index: number): Array<MenuItemTemplate>;
@@ -182,6 +183,7 @@ class PlaceHolderTreeViewItem implements TreeViewItem {
 class LabelTreeViewItemContent implements TreeViewItemContent {
   id: string;
   label: string | React.Node;
+  dataSet: { [string]: string };
   buildMenuTemplateFunction: (
     i18n: I18nType,
     index: number
@@ -199,6 +201,7 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
       rightButton
         ? [
             {
+              id: rightButton.id,
               label: rightButton.label,
               click: rightButton.click,
             },
@@ -221,6 +224,10 @@ class LabelTreeViewItemContent implements TreeViewItemContent {
 
   getHtmlId(index: number): ?string {
     return this.id;
+  }
+
+  getDataSet(): { [string]: string } {
+    return {};
   }
 
   getThumbnail(): ?string {
@@ -307,6 +314,10 @@ class ActionTreeViewItemContent implements TreeViewItemContent {
     return this.id;
   }
 
+  getDataSet(): { [string]: string } {
+    return {};
+  }
+
   getThumbnail(): ?string {
     return this.thumbnail;
   }
@@ -358,7 +369,8 @@ const getTreeViewItemChildren = (i18n: I18nType) => (item: TreeViewItem) =>
   item.getChildren(i18n);
 const getTreeViewItemThumbnail = (item: TreeViewItem) =>
   item.content.getThumbnail();
-const getTreeViewItemData = (item: TreeViewItem) => null;
+const getTreeViewItemDataSet = (item: TreeViewItem) =>
+  item.content.getDataSet();
 const buildMenuTemplate = (i18n: I18nType) => (
   item: TreeViewItem,
   index: number
@@ -1016,6 +1028,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   const index = project.getLayoutsCount() - 1;
                   addNewScene(index, i18n);
                 },
+                id: 'add-new-scene-button',
               }
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1049,6 +1062,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 icon: <Add />,
                 label: i18n._(t`Create or search for new extensions`),
                 click: openSearchExtensionDialog,
+                id: 'project-manager-extension-search-or-create',
               }
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1086,6 +1100,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   const index = project.getExternalEventsCount() - 1;
                   addExternalEvents(index, i18n);
                 },
+                id: 'add-new-external-events-button',
               }
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1123,6 +1138,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                   const index = project.getExternalLayoutsCount() - 1;
                   addExternalLayout(index, i18n);
                 },
+                id: 'add-new-external-layout-button',
               }
             ),
             getChildren(i18n: I18nType): ?Array<TreeViewItem> {
@@ -1275,7 +1291,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         multiSelect={false}
                         getItemId={getTreeViewItemId}
                         getItemHtmlId={getTreeViewItemHtmlId}
-                        getItemDataset={getTreeViewItemData}
+                        getItemDataset={getTreeViewItemDataSet}
                         onEditItem={editItem}
                         onCollapseItem={onCollapseItem}
                         selectedItems={selectedItems}

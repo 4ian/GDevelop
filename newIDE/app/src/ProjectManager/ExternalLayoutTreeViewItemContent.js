@@ -73,6 +73,12 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     return `external-layout-item-${index}`;
   }
 
+  getDataSet(): { [string]: string } {
+    return {
+      'external-layout': this.externalLayout.getName(),
+    };
+  }
+
   getThumbnail(): ?string {
     return 'res/icons_default/external_layout_black.svg';
   }

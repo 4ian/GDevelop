@@ -93,7 +93,6 @@ export const CustomObjectPackResults = ({
           <TextButton
             icon={<ChevronArrowLeft />}
             label={<Trans>Back</Trans>}
-            primary={false}
             onClick={onBack}
             disabled={isAssetBeingInstalled}
           />

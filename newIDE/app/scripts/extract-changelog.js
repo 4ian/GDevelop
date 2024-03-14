@@ -61,6 +61,13 @@ if (!args['examplesGitPath']) {
 }
 const examplesGitPath = args['examplesGitPath'];
 
+if (!args['templatesGitPath']) {
+  shell.echo(
+    '⚠️ You should pass --templatesGitPath pointing to the git directory of GDevelop-game-templates.'
+  );
+}
+const templatesGitPath = args['templatesGitPath'];
+
 /** @typedef {{sha: string, message: string, authorEmail: string}} GitRawCommitInfo */
 /** @typedef {{
   message: string,
@@ -321,6 +328,7 @@ const formatHiddenCommitMessage = commit => {
  *   extensionsCommits: GitEnrichedCommitInfo[] | null,
  *   assetsCommits: GitEnrichedCommitInfo[] | null,
  *   examplesCommits: GitEnrichedCommitInfo[] | null,
+ *   templatesCommits: GitEnrichedCommitInfo[] | null
  * }} commits
  */
 const outputChangelog = ({
@@ -331,6 +339,7 @@ const outputChangelog = ({
   extensionsCommits,
   assetsCommits,
   examplesCommits,
+  templatesCommits,
 }) => {
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
@@ -377,6 +386,14 @@ const outputChangelog = ({
           .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
           .join('\n')
       : 'TODO: Add examples commits here.'
+  );
+  shell.echo('\n## 🕹 Premium Game Templates\n');
+  shell.echo(
+    templatesCommits
+      ? templatesCommits
+          .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
+          .join('\n')
+      : 'TODO: Add game templates commits here.'
   );
 
   if (devCommits.length > 0) {
@@ -446,6 +463,17 @@ const outputChangelog = ({
     );
   }
 
+  let templatesCommits = null;
+  if (templatesGitPath) {
+    const templatesRepoGitTools = getGitTools(templatesGitPath);
+    const templatesRawCommits = templatesRepoGitTools.extractCommitsSinceDate(
+      lastTagDate
+    );
+    templatesCommits = enrichCommits(templatesRawCommits).filter(
+      commit => !commit.hidden
+    );
+  }
+
   outputChangelog({
     hiddenCommits,
     improvementsCommits,
@@ -454,5 +482,6 @@ const outputChangelog = ({
     extensionsCommits,
     assetsCommits,
     examplesCommits,
+    templatesCommits,
   });
 })();

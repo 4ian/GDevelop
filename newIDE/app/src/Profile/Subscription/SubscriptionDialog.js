@@ -390,6 +390,14 @@ export default function SubscriptionDialog({
             open={open}
           >
             <ColumnStackLayout noMargin>
+              {willCancelAtPeriodEnd && (
+                <AlertMessage kind="warning">
+                  <Trans>
+                    Your subscription is being cancelled: you will lose the
+                    benefits at the end of the period you already paid for.
+                  </Trans>
+                </AlertMessage>
+              )}
               {displayedSubscriptionPlanWithPricingSystems ? (
                 <div style={styles.scrollablePlanCardsContainer}>
                   <div
@@ -399,15 +407,6 @@ export default function SubscriptionDialog({
                         : styles.planCardsContainer
                     }
                   >
-                    {willCancelAtPeriodEnd && (
-                      <AlertMessage kind="warning">
-                        <Trans>
-                          Your subscription is being cancelled: you will lose
-                          the benefits at the end of the period you already paid
-                          for.
-                        </Trans>
-                      </AlertMessage>
-                    )}
                     {displayedSubscriptionPlanWithPricingSystems.map(
                       subscriptionPlanWithPricingSystems => {
                         const isFreePlan =

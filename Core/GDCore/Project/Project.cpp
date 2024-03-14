@@ -104,15 +104,16 @@ std::unique_ptr<gd::Object> Project::CreateObject(
 
   auto &objectMetadata =
       gd::MetadataProvider::GetObjectMetadata(platform, objectType);
-  if (MetadataProvider::IsBadObjectMetadata(objectMetadata)
-      // During project deserialization, event-based object metadata are not yet
-      // generated. Default behaviors will be added by
-      // MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors
-      && !project.HasEventsBasedObject(objectType)) {
-    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
+  if (!MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+      addDefaultBehavior(behaviorType);
+    }
   }
-  for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
-    addDefaultBehavior(behaviorType);
+  // During project deserialization, event-based object metadata are not yet
+  // generated. Default behaviors will be added by
+  // MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors
+  else if (!project.HasEventsBasedObject(objectType)) {
+    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
 
   return std::move(object);

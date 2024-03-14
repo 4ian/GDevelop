@@ -4,7 +4,10 @@ import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../../../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import { Line, Spacer } from '../../../../UI/Grid';
-import { ColumnStackLayout } from '../../../../UI/Layout';
+import {
+  ColumnStackLayout,
+  ResponsiveLineStackLayout,
+} from '../../../../UI/Layout';
 import Text from '../../../../UI/Text';
 
 const styles = {
@@ -38,37 +41,43 @@ export const SurveyCard = ({
 
   return (
     <div style={subscriptionContainerStyle}>
-      <img src="res/start-survey.svg" style={styles.surveyIcon} alt="Survey" />
-      <Line noMargin expand>
-        <ColumnStackLayout alignItems="flex-start" expand>
-          <Text noMargin size="block-title">
-            {hasFilledSurveyAlready ? (
-              <Trans>Have you changed your usage of GDevelop?</Trans>
-            ) : (
-              <Trans>Personalize your suggested content</Trans>
-            )}
-          </Text>
-          <Text noMargin size="body">
-            <Trans>
-              Answer a 1-minute survey to personalize your “Get started”
-              content.
-            </Trans>
-          </Text>
-          <Spacer />
-          <RaisedButton
-            label={
-              hasFilledSurveyAlready ? (
-                <Trans>Redo the survey</Trans>
+      <ResponsiveLineStackLayout noMargin>
+        <img
+          src="res/start-survey.svg"
+          style={styles.surveyIcon}
+          alt="Survey"
+        />
+        <Line noMargin expand>
+          <ColumnStackLayout alignItems="flex-start" expand>
+            <Text noMargin size="block-title">
+              {hasFilledSurveyAlready ? (
+                <Trans>Have you changed your usage of GDevelop?</Trans>
               ) : (
-                <Trans>Start the survey!</Trans>
-              )
-            }
-            primary
-            onClick={onStartSurvey}
-          />
-          <Spacer />
-        </ColumnStackLayout>
-      </Line>
+                <Trans>Personalize your suggested content</Trans>
+              )}
+            </Text>
+            <Text noMargin size="body">
+              <Trans>
+                Answer a 1-minute survey to personalize your “Get started”
+                content.
+              </Trans>
+            </Text>
+            <Spacer />
+            <RaisedButton
+              label={
+                hasFilledSurveyAlready ? (
+                  <Trans>Redo the survey</Trans>
+                ) : (
+                  <Trans>Start the survey!</Trans>
+                )
+              }
+              primary
+              onClick={onStartSurvey}
+            />
+            <Spacer />
+          </ColumnStackLayout>
+        </Line>
+      </ResponsiveLineStackLayout>
     </div>
   );
 };

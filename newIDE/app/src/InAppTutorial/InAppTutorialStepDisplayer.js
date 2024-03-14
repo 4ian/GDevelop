@@ -307,7 +307,7 @@ function InAppTutorialStepDisplayer({
       const anchorElement = tooltip.standalone
         ? assistantImage
         : elementToHighlight || null;
-      if (!anchorElement || !elementWithId) return null;
+      if (!anchorElement) return null;
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}

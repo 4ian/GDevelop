@@ -56,7 +56,7 @@ namespace gdjs {
     opacity: float = 255;
     _textAlign: string = 'left';
     _wrapping: boolean = false;
-    // A wrapping of 1 make games crash on Firefox
+    // A wrapping of 1 makes games crash on Firefox
     _wrappingWidth: float = 100;
 
     _isOutlineEnabled: boolean;

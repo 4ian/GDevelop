@@ -56,7 +56,8 @@ namespace gdjs {
     opacity: float = 255;
     _textAlign: string = 'left';
     _wrapping: boolean = false;
-    _wrappingWidth: float = 1;
+    // A wrapping of 1 make games crash on Firefox
+    _wrappingWidth: float = 100;
 
     _isOutlineEnabled: boolean;
     _outlineThickness: float;
@@ -194,8 +195,8 @@ namespace gdjs {
      */
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       if (initialInstanceData.customSize) {
-        this.setWrapping(true);
         this.setWrappingWidth(initialInstanceData.width);
+        this.setWrapping(true);
       } else {
         this.setWrapping(false);
       }
@@ -513,11 +514,15 @@ namespace gdjs {
       if (width <= 1) {
         width = 1;
       }
-      if (this._wrappingWidth === width) return;
-
+      if (this._wrappingWidth === width) {
+        return;
+      }
       this._wrappingWidth = width;
-      this._renderer.updateStyle();
-      this.invalidateHitboxes();
+
+      if (this._wrapping) {
+        this._renderer.updateStyle();
+        this.invalidateHitboxes();
+      }
     }
 
     /**

@@ -86,7 +86,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   bool IsRenderedIn3D() const { return isRenderedIn3D; }
 
   /**
-   * \brief Declare an TextContainer capability.
+   * \brief Declare a TextContainer capability.
    */
   EventsBasedObject& MarkAsTextContainer(bool isTextContainer_) {
     isTextContainer = isTextContainer_;
@@ -94,7 +94,7 @@ class GD_CORE_API EventsBasedObject: public AbstractEventsBasedEntity, public Ob
   }
 
   /**
-   * \brief Return true if the object needs an TextContainer capability.
+   * \brief Return true if the object needs a TextContainer capability.
    */
   bool IsTextContainer() const { return isTextContainer; }
 

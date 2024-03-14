@@ -7,7 +7,11 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
+#include "GDCore/IDE/WholeProjectBrowser.h"
 #include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/CustomBehaviorsSharedData.h"
 #include "GDCore/Project/EventsBasedObject.h"
@@ -125,8 +129,6 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
           // Note: EventsFunctionsExtension should be used instead of
           // PlatformExtension but this line will be removed soon.
           .SetCategoryFullName(extension.GetCategory())
-          // Update Project::CreateObject when default behaviors are added.
-          .AddDefaultBehavior("EffectCapability::EffectBehavior")
           .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("FlippableCapability::FlippableBehavior");
@@ -136,6 +138,7 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
         .AddDefaultBehavior("Scene3D::Base3DBehavior");
   }
   else {
+    objectMetadata.AddDefaultBehavior("EffectCapability::EffectBehavior");
     objectMetadata.AddDefaultBehavior("OpacityCapability::OpacityBehavior");
   }
 
@@ -1510,7 +1513,7 @@ gd::BehaviorMetadata &MetadataDeclarationHelper::GenerateBehaviorMetadata(
 }
 
 gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
-    const gd::Project &project, gd::PlatformExtension &extension,
+    gd::Project &project, gd::PlatformExtension &extension,
     const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedObject &eventsBasedObject,
     std::map<gd::String, gd::String> &objectMethodMangledNames) {
@@ -1545,7 +1548,58 @@ gd::ObjectMetadata &MetadataDeclarationHelper::GenerateObjectMetadata(
       instructionOrExpression.SetPrivate();
   }
 
+  UpdateCustomObjectDefaultBehaviors(project, objectMetadata);
+
   return objectMetadata;
+}
+
+class DefaultBehaviorUpdater : public gd::ArbitraryObjectsWorker {
+
+public:
+  DefaultBehaviorUpdater(const gd::Project &project_,
+                         const gd::ObjectMetadata &objectMetadata_)
+      : project(project_), objectMetadata(objectMetadata_){};
+  virtual ~DefaultBehaviorUpdater(){};
+
+private:
+  void DoVisitObject(gd::Object &object) override {
+
+    if (object.GetType() != objectMetadata.GetName()) {
+      return;
+    }
+
+    auto &defaultBehaviorTypes = objectMetadata.GetDefaultBehaviors();
+    for (const gd::String &behaviorName : object.GetAllBehaviorNames()) {
+      const auto &behavior = object.GetBehavior(behaviorName);
+      if (behavior.IsDefaultBehavior()) {
+        object.RemoveBehavior(behaviorName);
+      }
+    }
+    auto &platform = project.GetCurrentPlatform();
+    for (const gd::String &behaviorType : defaultBehaviorTypes) {
+      auto &behaviorMetadata =
+          gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+      if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+        gd::LogWarning("Object: " + object.GetType() +
+                       " has an unknown default behavior: " + behaviorType);
+        continue;
+      }
+      const gd::String &behaviorName = behaviorMetadata.GetDefaultName();
+      auto *behavior =
+          object.AddNewBehavior(project, behaviorType, behaviorName);
+      behavior->SetDefaultBehavior(true);
+    }
+  }
+
+  const gd::Project &project;
+  const gd::ObjectMetadata &objectMetadata;
+};
+
+void MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors(
+    gd::Project &project, const gd::ObjectMetadata &objectMetadata) {
+  gd::WholeProjectBrowser projectBrowser;
+  auto defaultBehaviorUpdater = DefaultBehaviorUpdater(project, objectMetadata);
+  projectBrowser.ExposeObjects(project, defaultBehaviorUpdater);
 }
 
 } // namespace gdjs

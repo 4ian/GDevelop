@@ -1768,7 +1768,7 @@ module.exports = {
       )
       .setDefaultValue('no')
       .getCodeExtraInformation()
-      .setFunctionName('addNumberEffectPropertyTween');
+      .setFunctionName('addColorEffectPropertyTween');
 
     // deprecated
     behavior

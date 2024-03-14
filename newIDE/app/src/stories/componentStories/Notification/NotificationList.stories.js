@@ -76,6 +76,17 @@ const notifications: Notification[] = [
       gameName: 'Sonic the hedgehog 9',
     },
   },
+  // $FlowIgnore - Unknown notification on purpose.
+  {
+    id: 'notification-id-33',
+    userId,
+    createdAt: now - 9 * ONE_HOUR,
+    seenAt: now - 7 * ONE_HOUR,
+    type: 'unknown-type',
+    data: {
+      what: 'ever',
+    },
+  },
   {
     id: 'notification-id-4',
     userId,

@@ -198,11 +198,14 @@ const NotificationListItem = ({
     onMarkNotificationAsSeen,
     onCloseNotificationList,
   });
+  const primaryText = getNotificationPrimaryTextByType(notification);
+  if (!primaryText) return null;
+
   return (
     <I18n>
       {({ i18n }) => (
         <ListItem
-          primaryText={getNotificationPrimaryTextByType(notification)}
+          primaryText={primaryText}
           secondaryText={getRelativeOrAbsoluteDisplayDate({
             i18n,
             dateAsNumber: notification.createdAt,

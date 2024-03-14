@@ -102,7 +102,8 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return null;
+      // The renderer is not a Pixi Object but it implements visible.
+      return this._renderer;
     }
 
     updateFromObjectData(

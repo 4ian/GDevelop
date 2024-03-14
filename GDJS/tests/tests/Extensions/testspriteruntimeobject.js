@@ -20,7 +20,32 @@
   /** @type {?float}  */
   _customCenterY = null;
 
-  constructor(runtimeScene, objectData) {
+  constructor(runtimeScene, objectData = {
+    name: 'MySprite',
+    type: '',
+    behaviors: [],
+    effects: [],
+    animations: [
+      {
+        name: 'animation',
+        directions: [
+          {
+            sprites: [
+              {
+                originPoint: { x: 0, y: 0 },
+                centerPoint: { x: 0, y: 0 },
+                points: [
+                  { name: 'Center', x: 0, y: 0 },
+                  { name: 'Origin', x: 0, y: 0 },
+                ],
+                hasCustomCollisionMask: false,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }) {
     // *ALWAYS* call the base gdjs.RuntimeObject constructor.
     super(runtimeScene, objectData);
 
@@ -48,10 +73,6 @@
     this._customCenterX = customCenterX;
     this._customCenterY = customCenterY;
     this.invalidateHitboxes();
-  }
-
-  getRendererObject() {
-    return null;
   }
 
   getWidth() {

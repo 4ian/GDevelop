@@ -3,8 +3,7 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONVALIDATOR_H
-#define GDCORE_EXPRESSIONVALIDATOR_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -115,7 +114,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("Operators (+, -, /, *) can't be used with an object name. Remove "
             "the operator."),
             node.rightHandSide->location);
-    } else if (leftType == Type::Variable) {
+    } else if (leftType == Type::Variable || leftType == Type::LegacyVariable) {
       RaiseOperatorError(
           _("Operators (+, -, /, *) can't be used in variable names. Remove "
             "the operator from the variable name."),
@@ -162,7 +161,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
           node.location);
-    } else if (rightType == Type::Variable) {
+    } else if (rightType == Type::Variable || rightType == Type::LegacyVariable) {
       RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
             "the operator from the variable name."),
@@ -200,7 +199,19 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     ReportAnyError(node);
 
     if (parentType == Type::Variable) {
-      childType = Type::Variable;
+      childType = parentType;
+
+      // TODO Handle object variable?
+      const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+      if (!variablesContainersList.Has(node.name)) {
+        RaiseTypeError(_("No variable with this name found."), node.location);
+      }
+
+      if (node.child) {
+        node.child->Visit(*this);
+      }
+    } else if (parentType == Type::LegacyVariable) {
+      childType = parentType;
 
       if (node.child) {
         node.child->Visit(*this);
@@ -314,7 +325,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             node.location);
       }
     }
-    else if (parentType != Type::Object && parentType != Type::Variable) {
+    else if (parentType == Type::Variable) {
+      // TODO Handle object variable?
+      const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+      if (!variablesContainersList.Has(node.identifierName)) {
+        RaiseTypeError(_("No variable with this name found."), node.location);
+      }
+    }
+    else if (parentType != Type::Object && parentType != Type::LegacyVariable) {
       // It can't happen.
       RaiseTypeError(
           _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
@@ -338,7 +356,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else if (parentType == Type::String) {
       message = _(
           "You must enter a text (between quotes) or a valid expression call.");
-    } else if (parentType == Type::Variable) {
+    } else if (parentType == Type::Variable || parentType == Type::LegacyVariable) {
       message = _("You must enter a variable name.");
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
@@ -351,7 +369,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
 
  private:
-  enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
+  enum Type {Unknown = 0, Number, String, NumberOrString, Variable, LegacyVariable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
   bool ValidateObjectVariableOrVariableOrProperty(const gd::IdentifierNode& identifier);
 
@@ -412,6 +430,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   static const gd::String stringTypeString;
   static const gd::String numberOrStringTypeString;
   static const gd::String variableTypeString;
+  static const gd::String legacyVariableTypeString;
   static const gd::String objectTypeString;
   static const gd::String identifierTypeString;
   static const gd::String emptyTypeString;
@@ -428,4 +447,3 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
 }  // namespace gd
 
-#endif  // GDCORE_EXPRESSIONVALIDATOR_H

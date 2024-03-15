@@ -22,62 +22,10 @@ namespace gdjs {
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
-  GetAllConditions()["Variable"].SetCustomCodeGenerator(
-      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
-         gd::EventsCodeGenerationContext &context) {
-        gd::String varGetter =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "variable",
-                instruction.GetParameters()[0].GetPlainString());
-
-        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
-
-        gd::String expressionCode =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "number",
-                instruction.GetParameters()[2].GetPlainString());
-
-        gd::String resultingBoolean =
-            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
-
-        return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
-               codeGenerator.GenerateRelationalOperation(
-                   operatorString, varGetter, expressionCode) +
-               ");\n";
-      });
-  GetAllConditions()["VariableTxt"].SetCustomCodeGenerator(
-      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
-         gd::EventsCodeGenerationContext &context) {
-        gd::String varGetter =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "variable",
-                instruction.GetParameters()[0].GetPlainString());
-
-        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
-
-        gd::String expressionCode =
-            gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "string",
-                instruction.GetParameters()[2].GetPlainString());
-
-        gd::String resultingBoolean =
-            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
-
-        return resultingBoolean + " = " +
-               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
-               codeGenerator.GenerateRelationalOperation(
-                   operatorString, varGetter, expressionCode) +
-               ");\n";
-      });
+  GetAllConditions()["Variable"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableNumber");
+  GetAllConditions()["VariableTxt"].SetFunctionName(
+      "gdjs.evtTools.variable.getVariableString");
 
   GetAllConditions()["VarScene"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableNumber");

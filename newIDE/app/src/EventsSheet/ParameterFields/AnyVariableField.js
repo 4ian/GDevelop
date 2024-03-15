@@ -28,16 +28,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const { project, scope } = props;
     const { layout } = scope;
 
-    const onComputeAllVariableNames = React.useCallback(
-      () => [],
-      []
-    );
+    const onComputeAllVariableNames = React.useCallback(() => [], []);
 
     // TODO Handle object variable?
-    const enumerateGlobalAndSceneVariableNames = React.useCallback<Array<string>>(
+    const enumerateGlobalAndSceneVariableNames = React.useCallback<
+      Array<string>
+    >(
       () => {
-        return project && layout ? [...enumerateValidVariableNames(layout.getVariables()),
-          ...enumerateValidVariableNames(project.getVariables())] : [];
+        return project && layout
+          ? [
+              ...enumerateValidVariableNames(layout.getVariables()),
+              ...enumerateValidVariableNames(project.getVariables()),
+            ]
+          : [];
       },
       [project, layout]
     );
@@ -52,6 +55,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
+          forceDeclaration
           variablesContainers={variablesContainers}
           enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
           parameterMetadata={props.parameterMetadata}
@@ -98,6 +102,5 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-export const renderInlineAnyVariable = (
-  props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'res/types/scenevar.png', 'variable');
+export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
+  renderVariableWithIcon(props, 'res/types/scenevar.png', 'variable');

@@ -102,12 +102,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           : [],
       [objectName, globalObjectsContainer, objectsContainer]
     );
-    
-    const enumerateObjectVariableNames = React.useCallback<Array<string>>(
+
+    const enumerateVariableNames = React.useCallback<Array<string>>(
       () =>
-      variablesContainers.map(variablesContainer =>
-              enumerateValidVariableNames(variablesContainer))
-              .reduce((a, b) => intersection(a, b)),
+        variablesContainers
+          .map(variablesContainer =>
+            enumerateValidVariableNames(variablesContainer)
+          )
+          .reduce((a, b) => intersection(a, b)),
       [variablesContainers]
     );
 
@@ -125,7 +127,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariables={enumerateObjectVariableNames}
+          enumerateVariableNames={enumerateVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

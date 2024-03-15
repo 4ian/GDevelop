@@ -425,6 +425,7 @@ const gd::String ExpressionValidator::stringTypeString = "string";
 const gd::String ExpressionValidator::numberOrStringTypeString =
     "number|string";
 const gd::String ExpressionValidator::variableTypeString = "variable";
+const gd::String ExpressionValidator::legacyVariableTypeString = "legacyVariable";
 const gd::String ExpressionValidator::objectTypeString = "object";
 const gd::String ExpressionValidator::emptyTypeString = "empty";
 
@@ -440,6 +441,8 @@ const gd::String& ExpressionValidator::TypeToString(Type type) {
       return numberOrStringTypeString;
     case Type::Variable:
       return variableTypeString;
+    case Type::LegacyVariable:
+      return legacyVariableTypeString;
     case Type::Object:
       return objectTypeString;
     case Type::Empty:
@@ -466,7 +469,12 @@ ExpressionValidator::Type ExpressionValidator::StringToType(
   if (type == ExpressionValidator::variableTypeString ||
       gd::ParameterMetadata::IsExpression(
           ExpressionValidator::variableTypeString, type)) {
-    return Type::Variable;
+    if (gd::ValueTypeMetadata::IsTypeLegacyPreScopedVariable(type)) {
+      return Type::LegacyVariable;
+    }
+    else {
+      return Type::Variable;
+    }
   }
   if (type == ExpressionValidator::objectTypeString ||
       gd::ParameterMetadata::IsObject(type)) {

@@ -29,6 +29,7 @@ type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
   enumerateVariableNames: Array<string>,
+  forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
 };
 
@@ -108,6 +109,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     const {
       variablesContainers,
       enumerateVariableNames,
+      forceDeclaration,
       value,
       onChange,
       isInline,
@@ -181,10 +183,17 @@ export default React.forwardRef<Props, VariableFieldInterface>(
           formula. You can only use this for structure or arrays. For example:
           Score[3].
         </Trans>
+      ) : forceDeclaration &&
+        quicklyAnalysisResult ===
+          VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE ? (
+        <Trans>
+          This variable is not declared. Use the *variables editor* to add it.
+        </Trans>
       ) : null;
     const warningTranslatableText =
+      !forceDeclaration &&
       quicklyAnalysisResult ===
-      VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+        VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : null;
 

@@ -2,6 +2,8 @@
 declare class gdVariablesContainersList {
   static makeNewVariablesContainersListForProjectAndLayout(project: gdProject, layout: gdLayout): gdVariablesContainersList;
   static makeNewEmptyVariablesContainersList(): gdVariablesContainersList;
+  has(name: string): boolean;
+  get(name: string): gdVariable;
   delete(): void;
   ptr: number;
 };

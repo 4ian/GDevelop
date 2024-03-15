@@ -302,6 +302,8 @@ interface VariablesContainersList {
         [Const, Ref] Project project,
         [Const, Ref] Layout layout);
   [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
+  boolean Has([Const] DOMString name);
+  [Const, Ref] Variable Get([Const] DOMString name);
 };
 
 interface ObjectGroup {

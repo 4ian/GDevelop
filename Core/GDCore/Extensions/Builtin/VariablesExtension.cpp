@@ -27,9 +27,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("Variable",
-                    _("Number variable"),
+                    _("Variable value"),
                     _("Compare the number value of a variable."),
-                    _("The number of variable _PARAM0_"),
+                    _("The variable _PARAM0_"),
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -40,9 +40,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VariableTxt",
-                    _("Text variable"),
+                    _("Variable value"),
                     _("Compare the text (string) of a variable."),
-                    _("The text of variable _PARAM0_"),
+                    _("The variable _PARAM0_"),
                     "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -54,9 +54,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition(
           "VariableAsBoolean",
-          _("Boolean variable"),
+          _("Variable value"),
           _("Compare the boolean value of a variable."),
-          _("The boolean value of variable _PARAM0_ is _PARAM1_"),
+          _("The variable _PARAM0_ is _PARAM1_"),
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")

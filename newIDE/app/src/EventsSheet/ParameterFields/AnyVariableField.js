@@ -14,6 +14,47 @@ import {
 } from './ParameterFieldCommons';
 import { enumerateValidVariableNames } from './EnumerateVariables';
 
+const gd: libGDevelop = global.gd;
+
+export const isUnifiedInstruction = (type: string): boolean =>
+  type === 'VariableTxt' || type === 'VariableAsBoolean';
+
+export const getUnifiedInstructionType = (instructionType: string): string =>
+  instructionType === 'VariableTxt' || instructionType === 'VariableAsBoolean'
+    ? 'Variable'
+    : instructionType;
+
+export const switchBetweenUnifiedInstructionIfNeeded = (
+  projectScopedContainers: gdProjectScopedContainers,
+  instruction: gdInstruction
+): void => {
+  if (
+    (instruction.getType() === 'Variable' ||
+      instruction.getType() === 'VariableTxt' ||
+      instruction.getType() === 'VariableAsBoolean') &&
+    instruction.getParametersCount() > 0
+  ) {
+    const variableName = instruction.getParameter(0).getPlainString();
+    if (
+      projectScopedContainers.getVariablesContainersList().has(variableName)
+    ) {
+      const variable = projectScopedContainers
+        .getVariablesContainersList()
+        .get(variableName);
+      if (variable.getType() === gd.Variable.String) {
+        instruction.setType('VariableTxt');
+        instruction.setParametersCount(3);
+      } else if (variable.getType() === gd.Variable.Number) {
+        instruction.setType('Variable');
+        instruction.setParametersCount(3);
+      } else if (variable.getType() === gd.Variable.Boolean) {
+        instruction.setType('VariableAsBoolean');
+        instruction.setParametersCount(2);
+      }
+    }
+  }
+};
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);

@@ -48,6 +48,8 @@ import Link from '../../UI/Link';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import uniq from 'lodash/uniq';
 import CancelReasonDialog from './CancelReasonDialog';
+import { Line } from '../../UI/Grid';
+import TwoStatesButton from '../../UI/TwoStatesButton';
 
 const styles = {
   descriptionText: {
@@ -163,6 +165,7 @@ export default function SubscriptionDialog({
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
+  const [period, setPeriod] = React.useState<'yearly' | 'monthly'>('yearly');
   const [
     educationPlanPeriodicity,
     setEducationPlanPeriodicity,
@@ -396,6 +399,25 @@ export default function SubscriptionDialog({
                   </Trans>
                 </AlertMessage>
               )}
+              <Line justifyContent="space-between" alignItems="center">
+                <Text size="block-title">
+                  <Trans>Subscription plans</Trans>
+                </Text>
+                <TwoStatesButton
+                  value={period}
+                  leftButton={{
+                    label: <Trans>Monthly</Trans>,
+                    value: 'monthly',
+                  }}
+                  rightButton={{
+                    label: <Trans>Yearly</Trans>,
+                    value: 'yearly',
+                  }}
+                  // $FlowIgnore
+                  onChange={setPeriod}
+                  addDatasetEffective
+                />
+              </Line>
               {displayedSubscriptionPlanWithPricingSystems ? (
                 <div style={styles.scrollablePlanCardsContainer}>
                   <div

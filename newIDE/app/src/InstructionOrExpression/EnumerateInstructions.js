@@ -5,6 +5,7 @@ import {
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
+import { isUnifiedInstruction } from '../EventsSheet/ParameterFields/AnyVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -219,6 +220,10 @@ const enumerateFreeInstructionsWithoutExtra = (
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
+
+    if (isUnifiedInstruction(type)) {
+      continue;
+    }
 
     const isWhiteListed =
       extensionInstructionsToKeep &&

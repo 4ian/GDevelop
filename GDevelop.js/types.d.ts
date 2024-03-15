@@ -292,6 +292,8 @@ export class VariablesContainer extends EmscriptenObject {
 export class VariablesContainersList extends EmscriptenObject {
   static makeNewVariablesContainersListForProjectAndLayout(project: Project, layout: Layout): VariablesContainersList;
   static makeNewEmptyVariablesContainersList(): VariablesContainersList;
+  has(name: string): boolean;
+  get(name: string): Variable;
 }
 
 export class ObjectGroup extends EmscriptenObject {

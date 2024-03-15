@@ -30,24 +30,276 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     _("Number variable"),
                     _("Compare the number value of a variable."),
                     _("The number of variable _PARAM0_"),
-                    _("Variables"),
+                    "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("variable", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions());
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
 
   extension
       .AddCondition("VariableTxt",
                     _("Text variable"),
                     _("Compare the text (string) of a variable."),
                     _("The text of variable _PARAM0_"),
-                    _("Variables"),
+                    "",
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("variable", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "string", ParameterOptions::MakeNewOptions());
+          "string", ParameterOptions::MakeNewOptions()) 
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddCondition(
+          "VariableAsBoolean",
+          _("Boolean variable"),
+          _("Compare the boolean value of a variable."),
+          _("The boolean value of variable _PARAM0_ is _PARAM1_"),
+          "",
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .AddParameter("trueorfalse", _("Check if the value is"))
+      .SetDefaultValue("true")
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddAction("SetVariable",
+                 _("Change number variable"),
+                 _("Modify the number value of a variable."),
+                 _("the variable _PARAM0_"),
+                 "",
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddAction("SetVariableTxt",
+                 _("Change text variable"),
+                 _("Modify the text (string) of a variable."),
+                 _("the text of variable _PARAM0_"),
+                 "",
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .UseStandardOperatorParameters("string",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddAction(
+          "SetVariableAsBoolean",
+          _("Change boolean variable"),
+          _("Modify the boolean value of a variable."),
+          _("Set the boolean value of variable _PARAM0_ to _PARAM1_"),
+          "",
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .AddParameter("trueorfalse", _("New Value:"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddAction("ToggleVariableAsBoolean",
+                 _("Toggle boolean variable"),
+                 _("Toggle the boolean value of a variable.") + "\n" +
+                     _("If it was true, it will become false, and if it was "
+                       "false it will become true."),
+                 _("Toggle the boolean value of variable _PARAM0_"),
+                 "",
+                 "res/conditions/var24.png",
+                 "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddExpression("VariableChildCount2",
+                     _("Number of children"),
+                     _("Number of children in an array or "
+                       "structure variable"),
+                     _("Arrays and structures"),
+                     "res/actions/var.png")
+      .AddParameter("variable", _("Array or structure variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddCondition(
+          "VariableChildCount",
+          _("Number of children"),
+          _("Compare the number of children in an array variable."),
+          _("The number of children in the array variable _PARAM0_"),
+          _("Arrays and structures"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("VariableChildExists2",
+                    _("Child existence"),
+                    _("Check if the specified child of the structure "
+                      "variable exists."),
+                    _("Child _PARAM1_ of variable _PARAM0_ exists"),
+                    _("Arrays and structures"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .AddParameter("string", _("Name of the child"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "VariableRemoveChild2",
+          _("Remove a child"),
+          _("Remove a child from a structure variable."),
+          _("Remove child _PARAM1_ from structure variable _PARAM0_"),
+          _("Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("variable", _("Structure variable"))
+      .AddParameter("string", _("Child's name"))
+      .MarkAsAdvanced()
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddAction("VariableClearChildren2",
+                 _("Clear children"),
+                 _("Remove all the children from the structure or array "
+                   "variable."),
+                 _("Clear children from variable _PARAM0_"),
+                 _("Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Structure or array variable"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("VariablePush",
+                 _("Add existing variable"),
+                 _("Adds an existing variable at the end of an array "
+                   "variable."),
+                 _("Add variable _PARAM1_ to array variable _PARAM0_"),
+                 _("Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .AddParameter("variable", _("Variable with the content to add"))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and added at the "
+            "end of the array."))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction(
+          "VariablePushString",
+          _("Add text variable"),
+          _("Adds a text (string) at the end of a array variable."),
+          _("Add text _PARAM1_ to array variable _PARAM0_"),
+          _("Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .AddParameter("string", _("Text to add"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("VariablePushNumber",
+                 _("Add number variable"),
+                 _("Adds a number at the end of an array variable."),
+                 _("Add number _PARAM1_ to array variable _PARAM0_"),
+                 _("Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .AddParameter("expression", _("Number to add"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("VariablePushBool",
+                 _("Add boolean variable"),
+                 _("Adds a boolean at the end of an array variable."),
+                 _("Add boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("VariableRemoveAt",
+                 _("Remove variable by index"),
+                 _("Removes a variable at the specified index of an array "
+                   "variable."),
+                 _("Remove variable at index _PARAM1_ from array "
+                   "variable _PARAM0_"),
+                 _("Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .AddParameter("expression", _("Index to remove"))
+      .SetRelevantForLayoutEventsOnly()
+      .MarkAsAdvanced();
+
+  extension
+      .AddStrExpression(
+          "VariableFirstString",
+          _("First text child"),
+          _("Get the value of the first element of an array variable, if "
+            "it is a text (string)."),
+          _("Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddExpression(
+          "VariableFirstNumber",
+          _("First number child"),
+          _("Get the value of the first element of an array variable, if "
+            "it is a number."),
+          _("Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddStrExpression(
+          "VariableLastString",
+          _("Last text child"),
+          _("Get the value of the last element of an array variable, if "
+            "it is a text (string)."),
+          _("Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  extension
+      .AddExpression(
+          "VariableLastNumber",
+          _("Last number child"),
+          _("Get the value of the last element of an array variable, if "
+            "it is a number."),
+          _("Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("variable", _("Array variable"))
+      .SetRelevantForLayoutEventsOnly();
+
+  // Legacy instructions
 
   extension
       .AddCondition("VarScene",
@@ -59,7 +311,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions());
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition("VarSceneTxt",
@@ -71,7 +324,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "string", ParameterOptions::MakeNewOptions());
+          "string", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition(
@@ -84,7 +338,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true");
+      .SetDefaultValue("true")
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition("VariableChildExists",
@@ -97,6 +352,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -110,6 +366,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -135,6 +392,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -148,6 +406,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
           "string", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -161,7 +420,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true");
+      .SetDefaultValue("true")
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddCondition("VarGlobalDef",
@@ -186,7 +446,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions());
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction("ModVarSceneTxt",
@@ -198,7 +459,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .UseStandardOperatorParameters("string",
-                                     ParameterOptions::MakeNewOptions());
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction(
@@ -210,7 +472,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var24.png",
           "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
-      .AddParameter("trueorfalse", _("New Value:"));
+      .AddParameter("trueorfalse", _("New Value:"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction("ToggleSceneVariableAsBoolean",
@@ -222,7 +485,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Scene variables"),
                  "res/conditions/var24.png",
                  "res/conditions/var.png")
-      .AddParameter("scenevar", _("Variable"));
+      .AddParameter("scenevar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction("ModVarGlobal",
@@ -235,6 +499,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"))
       .UseStandardOperatorParameters("number",
                                      ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -248,6 +513,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"))
       .UseStandardOperatorParameters("string",
                                      ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -260,7 +526,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/conditions/var24.png",
           "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
-      .AddParameter("trueorfalse", _("New Value:"));
+      .AddParameter("trueorfalse", _("New Value:"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction("ToggleGlobalVariableAsBoolean",
@@ -272,7 +539,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  _("Global variables"),
                  "res/conditions/var24.png",
                  "res/conditions/var.png")
-      .AddParameter("globalvar", _("Variable"));
+      .AddParameter("globalvar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction(
@@ -285,7 +553,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction(
@@ -298,7 +567,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction("VariableClearChildren",
@@ -310,6 +580,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Structure or array variable"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -322,6 +593,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Structure or array variable"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -338,6 +610,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
             "end of the array."))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -351,6 +624,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -363,6 +637,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -375,6 +650,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -389,6 +665,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -403,6 +680,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("scenevar", _("Array variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -413,7 +691,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Scene variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("scenevar", _("Array variable"));
+      .AddParameter("scenevar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression(
@@ -423,7 +702,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Scene variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("scenevar", _("Array variable"));
+      .AddParameter("scenevar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddStrExpression(
@@ -433,7 +713,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string)."),
           _("Scene variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("scenevar", _("Array variable"));
+      .AddParameter("scenevar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression(
@@ -443,7 +724,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number."),
           _("Scene variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("scenevar", _("Array variable"));
+      .AddParameter("scenevar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddAction(
@@ -459,6 +741,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetParameterLongDescription(
           _("The content of the variable will *be copied* and added at the "
             "end of the array."))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -473,6 +756,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -486,6 +770,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -498,6 +783,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -510,6 +796,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -524,6 +811,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Array variable"))
       .UseStandardRelationalOperatorParameters(
           "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly()
       .MarkAsAdvanced();
 
   extension
@@ -533,7 +821,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                           "variable, if it is a text (string) variable."),
                         _("Global variables/Arrays and structures"),
                         "res/actions/var.png")
-      .AddParameter("globalvar", _("Array variable"));
+      .AddParameter("globalvar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression("GlobalVariableFirstNumber",
@@ -542,7 +831,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "variable, if it is a number variable"),
                      _("Global variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("globalvar", _("Array variable"));
+      .AddParameter("globalvar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddStrExpression(
@@ -552,7 +842,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a text (string) variable."),
           _("Global variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("globalvar", _("Array variable"));
+      .AddParameter("globalvar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression(
@@ -562,7 +853,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
             "it is a number variable"),
           _("Global variables/Arrays and structures"),
           "res/actions/var.png")
-      .AddParameter("globalvar", _("Array variable"));
+      .AddParameter("globalvar", _("Array variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression("GlobalVariableChildCount",
@@ -571,7 +863,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "structure variable"),
                      _("Global variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("globalvar", _("Array or structure variable"));
+      .AddParameter("globalvar", _("Array or structure variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression("VariableChildCount",
@@ -580,7 +873,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "structure variable"),
                      _("Scene variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("scenevar", _("Array or structure variable"));
+      .AddParameter("scenevar", _("Array or structure variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression("Variable",

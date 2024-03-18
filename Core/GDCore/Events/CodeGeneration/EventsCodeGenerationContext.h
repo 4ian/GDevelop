@@ -175,6 +175,12 @@ class GD_CORE_API EventsCodeGenerationContext {
     return emptyObjectsListsToBeDeclared;
   };
 
+  const std::set<gd::String>& GetUsedObjectsMapNames() const {
+    return usedObjectsMapNames;
+  };
+
+  void AddUsedObjectsMapNames(const gd::String& objectMapName);
+
   /**
    * Return the objects lists which are already declared and can be used in the
    * current context without declaration.
@@ -296,6 +302,8 @@ class GD_CORE_API EventsCodeGenerationContext {
                                                  ///< all children, so that the
                                                  ///< necessary objects can be
                                                  ///< backed up.
+
+  std::set<gd::String> usedObjectsMapNames;
 
   std::map<gd::String, unsigned int>
       depthOfLastUse;  ///< The context depth when an object was last used.

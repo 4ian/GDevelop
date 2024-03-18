@@ -6,6 +6,7 @@
 namespace gdjs {
   const logger = new gdjs.Logger('RuntimeScene');
   const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
+  type SearchArea = { minX: float; minY: float; maxX: float; maxY: float };
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
@@ -45,6 +46,12 @@ namespace gdjs {
     _cachedGameResolutionWidth: integer;
     _cachedGameResolutionHeight: integer;
 
+    _frameIndex: integer = 0;
+
+    _layersCameraCoordinates: Record<string, SearchArea> = {};
+    _layerObjectManagers = new Map<string, ObjectManager>();
+    _cameraObjects: Record<string, Array<RuntimeObject>> = {};
+
     /**
      * @param runtimeGame The game associated to this scene.
      */
@@ -79,6 +86,43 @@ namespace gdjs {
       const layer = new gdjs.Layer(layerData, this);
       this._layers.put(layerData.name, layer);
       this._orderedLayers.push(layer);
+    }
+
+    addObject(object: gdjs.RuntimeObject): void {
+      super.addObject(object);
+      this._addObjectToLayerObjectManager(object);
+    }
+
+    onObjectChangedOfLayer(object: RuntimeObject, oldLayer: RuntimeLayer) {
+      this._removeObjectFromLayerObjectManager(object, oldLayer.getName());
+      this._addObjectToLayerObjectManager(object);
+    }
+
+    private _addObjectToLayerObjectManager(object: gdjs.RuntimeObject): void {
+      const layerName = object.getLayer();
+      let objectManager = this._layerObjectManagers.get(layerName);
+      if (!objectManager) {
+        objectManager = new gdjs.ObjectManager();
+        this._layerObjectManagers.set(layerName, objectManager);
+      }
+      objectManager.addObject(object);
+    }
+
+    markObjectForDeletion(object: gdjs.RuntimeObject): void {
+      super.markObjectForDeletion(object);
+      const layerName = object.getLayer();
+      this._removeObjectFromLayerObjectManager(object, layerName);
+    }
+
+    private _removeObjectFromLayerObjectManager(
+      object: gdjs.RuntimeObject,
+      layerName: string
+    ): void {
+      let objectManager = this._layerObjectManagers.get(layerName);
+      if (!objectManager) {
+        return;
+      }
+      objectManager.deleteObject(object);
     }
 
     /**
@@ -427,6 +471,7 @@ namespace gdjs {
       if (this._profiler) {
         this._profiler.endFrame();
       }
+      this._frameIndex++;
       return !!this.getRequestedChange();
     }
 
@@ -435,6 +480,26 @@ namespace gdjs {
      */
     render() {
       this._renderer.render();
+    }
+
+    _updateLayersCameraCoordinates(scale: float) {
+      this._layersCameraCoordinates = this._layersCameraCoordinates || {};
+      for (const name in this._layers.items) {
+        if (this._layers.items.hasOwnProperty(name)) {
+          const theLayer = this._layers.items[name];
+          this._layersCameraCoordinates[name] = this._layersCameraCoordinates[
+            name
+          ] || { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+          this._layersCameraCoordinates[name].minX =
+            theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
+          this._layersCameraCoordinates[name].minY =
+            theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
+          this._layersCameraCoordinates[name].maxX =
+            theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
+          this._layersCameraCoordinates[name].maxY =
+            theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
+        }
+      }
     }
 
     /**
@@ -446,50 +511,74 @@ namespace gdjs {
      * object is too far from the camera of its layer ("culling").
      */
     _updateObjectsPreRender() {
+      // Check awake objects only once every 64 frames.
+      if ((this._frameIndex & 63) === 0) {
+        for (const objectManager of this._layerObjectManagers.values()) {
+          objectManager.updateAwakeObjects();
+        }
+      }
       if (this._timeManager.isFirstFrame()) {
-        super._updateObjectsPreRender();
-        return;
-      } else {
-        // After first frame, optimise rendering by setting only objects
-        // near camera as visible.
-        // TODO: For compatibility, pass a scale of `2`,
-        // meaning that size of cameras will be multiplied by 2 and so objects
-        // will be hidden if they are outside of this *larger* camera area.
-        // This is useful for:
-        // - objects not properly reporting their visibility AABB,
-        // (so we have a "safety margin") but these objects should be fixed
-        // instead.
-        // - objects having effects rendering outside of their visibility AABB.
-
-        // TODO (3D) culling - add support for 3D object culling?
         this._updateLayersCameraCoordinates(2);
         const allInstancesList = this.getAdhocListOfAllInstances();
         for (let i = 0, len = allInstancesList.length; i < len; ++i) {
           const object = allInstancesList[i];
           const rendererObject = object.getRendererObject();
           if (rendererObject) {
-            if (object.isHidden()) {
-              rendererObject.visible = false;
-            } else {
-              const cameraCoords = this._layersCameraCoordinates[
-                object.getLayer()
-              ];
-              if (!cameraCoords) {
-                continue;
-              }
-              const aabb = object.getVisibilityAABB();
-              rendererObject.visible =
-                // If no AABB is returned, the object should always be visible
-                !aabb ||
-                // If an AABB is there, it must be at least partially inside
-                // the camera bounds.
-                !(
-                  aabb.min[0] > cameraCoords[2] ||
-                  aabb.min[1] > cameraCoords[3] ||
-                  aabb.max[0] < cameraCoords[0] ||
-                  aabb.max[1] < cameraCoords[1]
-                );
-            }
+            rendererObject.visible = false;
+          }
+        }
+      }
+      // After first frame, optimise rendering by setting only objects
+      // near camera as visible.
+      // TODO: For compatibility, pass a scale of `2`,
+      // meaning that size of cameras will be multiplied by 2 and so objects
+      // will be hidden if they are outside of this *larger* camera area.
+      // This is useful for:
+      // - objects not properly reporting their visibility AABB,
+      // (so we have a "safety margin") but these objects should be fixed
+      // instead.
+      // - objects having effects rendering outside of their visibility AABB.
+
+      // TODO (3D) culling - add support for 3D object culling?
+      this._updateLayersCameraCoordinates(2);
+      if (this._frameIndex === 2) {
+        const allInstancesList = this.getAdhocListOfAllInstances();
+        for (let i = 0, len = allInstancesList.length; i < len; ++i) {
+          const object = allInstancesList[i];
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = false;
+          }
+        }
+      }
+      for (const layerName in this._cameraObjects) {
+        for (const object of this._cameraObjects[layerName]) {
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = false;
+          }
+        }
+      }
+      for (const layerName in this._layers.items) {
+        const cameraAABB = this._layersCameraCoordinates[layerName];
+        let cameraObjects = this._cameraObjects[layerName];
+        if (cameraObjects === undefined) {
+          cameraObjects = [];
+          this._cameraObjects[layerName] = cameraObjects;
+        }
+        if (!cameraAABB) {
+          continue;
+        }
+        const layerObjectManager = this._layerObjectManagers.get(layerName);
+        if (!layerObjectManager) {
+          continue;
+        }
+        cameraObjects.length = 0;
+        layerObjectManager.search(cameraAABB, cameraObjects);
+        for (const object of cameraObjects) {
+          const rendererObject = object.getRendererObject();
+          if (rendererObject) {
+            rendererObject.visible = !object.isHidden();
 
             // Update effects, only for visible objects.
             if (rendererObject.visible) {
@@ -733,6 +822,10 @@ namespace gdjs {
      */
     sceneJustResumed(): boolean {
       return this._isJustResumed;
+    }
+
+    getFrameIndex(): integer {
+      return this._frameIndex;
     }
   }
 

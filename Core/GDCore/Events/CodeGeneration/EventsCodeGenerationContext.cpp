@@ -103,6 +103,11 @@ void EventsCodeGenerationContext::EmptyObjectsListNeeded(
   depthOfLastUse[objectName] = GetContextDepth();
 }
 
+void EventsCodeGenerationContext::AddUsedObjectsMapNames(
+    const gd::String& objectMapName) {
+  usedObjectsMapNames.insert(objectMapName);
+}
+
 std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
     const {
   std::set<gd::String> allObjectListsToBeDeclared(

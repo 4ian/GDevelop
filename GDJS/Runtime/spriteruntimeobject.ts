@@ -348,6 +348,10 @@ namespace gdjs {
       );
       this._updateAnimationFrame();
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
@@ -450,6 +454,17 @@ namespace gdjs {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
+    }
+
+    isNeedingLifecycleFunctions(): boolean {
+      return (
+        super.isNeedingLifecycleFunctions() ||
+        (!this.isAnimationPaused() &&
+          this._animations[this._currentAnimation].directions[
+            this._currentDirection
+          ].frames.length > 1 &&
+          !this.hasAnimationEnded())
+      );
     }
 
     /**
@@ -617,6 +632,7 @@ namespace gdjs {
         this._currentAnimation = newAnimation;
         this._currentFrame = 0;
         this._animationElapsedTime = 0;
+        this.getLifecycleSleepState().wakeUp();
 
         //TODO: This may be unnecessary.
         this._renderer.update();
@@ -868,6 +884,7 @@ namespace gdjs {
 
     resumeAnimation(): void {
       this._animationPaused = false;
+      this.getLifecycleSleepState().wakeUp();
     }
 
     getAnimationSpeedScale() {

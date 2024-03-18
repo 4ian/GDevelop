@@ -211,6 +211,9 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // Update platforms locations.
+      this._manager.doStepPreEvents();
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;

@@ -218,6 +218,25 @@ namespace gdjs {
         arr.length = finalSize;
       };
 
+      /**
+       * Filter in-place the specified array to remove objects for which
+       * `pick` property is set to false.
+       */
+      export const filterPickedObjectsListWithId = function (
+        objects: gdjs.RuntimeObject[],
+        pickingId: integer
+      ) {
+        let finalSize = 0;
+        for (let k = 0, lenk = objects.length; k < lenk; ++k) {
+          const obj = objects[k];
+          if (obj.pickingId === pickingId) {
+            objects[finalSize] = obj;
+            finalSize++;
+          }
+        }
+        objects.length = finalSize;
+      };
+
       export const hitBoxesCollisionTest = function (
         objectsLists1: ObjectsLists,
         objectsLists2: ObjectsLists,

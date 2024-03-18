@@ -388,7 +388,7 @@ namespace gdjs {
       };
 
       export const cursorOnObject = function (
-        objectsLists: Hashtable<gdjs.RuntimeObject[]>,
+        objectsLists: ObjectsLists,
         instanceContainer: gdjs.RuntimeInstanceContainer,
         accurate: boolean,
         inverted: boolean

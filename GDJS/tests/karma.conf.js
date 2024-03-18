@@ -36,6 +36,7 @@ module.exports = function (config) {
 
       //GDJS game engine files: (Order is important)
       './newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js',
+      './newIDE/app/resources/GDJS/Runtime/ObjectsLists.js',
       './newIDE/app/resources/GDJS/Runtime/logger.js',
       './newIDE/app/resources/GDJS/Runtime/gd.js',
       './newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js',
@@ -53,6 +54,8 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/ResourceCache.js',
       './newIDE/app/resources/GDJS/Runtime/timemanager.js',
       './newIDE/app/resources/GDJS/Runtime/polygon.js',
+      './newIDE/app/resources/GDJS/Runtime/ObjectSleepState.js',
+      './newIDE/app/resources/GDJS/Runtime/ObjectManager.js',
       './newIDE/app/resources/GDJS/Runtime/runtimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/RuntimeInstanceContainer.js',
       './newIDE/app/resources/GDJS/Runtime/runtimescene.js',
@@ -79,6 +82,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/events-tools/inputtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/networktools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/objecttools.js',
+      './newIDE/app/resources/GDJS/Runtime/events-tools/ObjectPositionTools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/cameratools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/soundtools.js',
       './newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',

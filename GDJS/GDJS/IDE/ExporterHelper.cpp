@@ -718,6 +718,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
+  InsertUnique(includesFiles, "ObjectsLists.js");
   InsertUnique(includesFiles, "logger.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "libs/rbush.js");
@@ -729,6 +730,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "ResourceCache.js");
   InsertUnique(includesFiles, "timemanager.js");
   InsertUnique(includesFiles, "polygon.js");
+  InsertUnique(includesFiles, "ObjectSleepState.js");
+  InsertUnique(includesFiles, "ObjectManager.js");
   InsertUnique(includesFiles, "runtimeobject.js");
   InsertUnique(includesFiles, "profiler.js");
   InsertUnique(includesFiles, "RuntimeInstanceContainer.js");
@@ -757,6 +760,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");
+  InsertUnique(includesFiles, "events-tools/ObjectPositionTools.js");
   InsertUnique(includesFiles, "events-tools/cameratools.js");
   InsertUnique(includesFiles, "events-tools/soundtools.js");
   InsertUnique(includesFiles, "events-tools/storagetools.js");

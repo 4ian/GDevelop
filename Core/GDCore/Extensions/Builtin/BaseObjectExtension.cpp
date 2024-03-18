@@ -1475,10 +1475,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Position"),
                     "res/conditions/distance24.png",
                     "res/conditions/distance.png")
-      .AddParameter("objectList", _("Object"))
-      .AddParameter("objectList", _("Object 2"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object 2"))
       .AddParameter("expression", _("Distance"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .MarkAsSimple();
 
   extension
@@ -1585,10 +1586,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Collision"),
           "res/conditions/collision24.png",
           "res/conditions/collision.png")
-      .AddParameter("objectList", _("Object"))
-      .AddParameter("objectList", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object"))
       .AddCodeOnlyParameter("conditionInverted", "")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("yesorno",
                     _("Ignore objects that are touching each other on their "
                       "edges, but are not overlapping (default: no)"),

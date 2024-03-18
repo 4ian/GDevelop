@@ -408,6 +408,25 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
   }
 
+  // Flag the ObjectsLists as modified.
+  gd::ParameterMetadataTools::IterateOverParameters(
+      condition.GetParameters(), instrInfos.parameters,
+      [this, &context,
+       &conditionCode](const gd::ParameterMetadata &parameterMetadata,
+                       const gd::Expression &parameterValue,
+                       const gd::String &lastObjectName) {
+        // objectListOrEmptyWithoutPicking are only used by SceneInstancesCount
+        // and PickedInstancesCount conditions. They are not pass for one
+        // condition to another.
+        if (parameterMetadata.GetType() == "objectList" ||
+            parameterMetadata.GetType() == "objectListOrEmptyIfJustDeclared") {
+          // TODO FIXME What about groups using the object?
+          conditionCode +=
+              GetObjectMapName(parameterValue.GetPlainString(), context) +
+              ".isPicked = true;\n";
+        }
+      });
+
   return conditionCode;
 }
 

@@ -205,13 +205,13 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.getPickedInstancesCount");
 
   GetAllConditions()["CollisionNP"].SetFunctionName(
-      "gdjs.evtTools.object.hitBoxesCollisionTest");
+      "gdjs.evtTools.object.position.hitBoxesCollisionCheck");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
   GetAllConditions()["RaycastToPosition"].SetFunctionName(
       "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
-      "gdjs.evtTools.object.distanceTest");
+      "gdjs.evtTools.object.position.distanceCheck");
   GetAllConditions()["SeDirige"].SetFunctionName(
       "gdjs.evtTools.object.movesTowardTest");
   GetAllConditions()["EstTourne"].SetFunctionName(

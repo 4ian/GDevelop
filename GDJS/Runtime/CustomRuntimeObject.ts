@@ -63,6 +63,10 @@ namespace gdjs {
 
       this._instanceContainer.loadFrom(objectData);
 
+      if (this.isNeedingLifecycleFunctions()) {
+        this.getLifecycleSleepState().wakeUp();
+      }
+
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
     }
@@ -127,6 +131,10 @@ namespace gdjs {
      * This method is called when the preview is being hot-reloaded.
      */
     onHotReloading(parent: gdjs.RuntimeInstanceContainer) {}
+
+    isNeedingLifecycleFunctions(): boolean {
+      return true;
+    }
 
     // This is only to handle trigger once.
     doStepPreEvents(parent: gdjs.RuntimeInstanceContainer) {}

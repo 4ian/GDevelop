@@ -1421,6 +1421,10 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           {
             label: i18n._(t`Duplicate`),
             click: () => duplicateObject(item),
+            accelerator: getShortcutDisplayName(
+              preferences.values.userShortcutMap['DUPLICATE_SCENE_OBJECT'] ||
+                defaultShortcuts.DUPLICATE_SCENE_OBJECT
+            ),
           },
           {
             label: i18n._(t`Rename`),

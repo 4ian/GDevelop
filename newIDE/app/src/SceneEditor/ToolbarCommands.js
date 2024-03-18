@@ -16,6 +16,8 @@ type Props = {|
   toggleWindowMask: () => void,
   toggleGrid: () => void,
   setupGrid: () => void,
+  canDuplicateObject: boolean,
+  onDuplicateObject: () => void,
   canRenameObject: boolean,
   onRenameObject: () => void,
 |};
@@ -63,6 +65,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('OPEN_SETUP_GRID', true, {
     handler: props.setupGrid,
+  });
+
+  useCommand('DUPLICATE_SCENE_OBJECT', props.canDuplicateObject, {
+    handler: props.onDuplicateObject,
   });
 
   useCommand('RENAME_SCENE_OBJECT', props.canRenameObject, {

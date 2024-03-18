@@ -496,14 +496,14 @@ namespace gdjs {
         const obj = objectsContext.createObject(objectName);
         const layer = objectsContext.getLayer(layerName);
         if (obj !== null) {
-          //Do some extra setup
+          // Do some extra setup
           obj.setPosition(x, y);
           obj.setLayer(layerName);
           obj.setZOrder(layer.getDefaultZOrder());
 
-          //Let the new object be picked by next actions/conditions.
+          // Let the new object be picked by next actions/conditions.
           if (objectsLists.containsKey(objectName)) {
-            objectsLists.get(objectName).push(obj);
+            gdjs.evtTools.objectsLists.addObject(objectsLists, objectName, obj);
           }
         }
         return obj;

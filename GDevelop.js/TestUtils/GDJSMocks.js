@@ -522,17 +522,59 @@ const copyArray = function (src, dst) {
   dst.length = len;
 };
 
-const createObjectOnScene = (objectsContext, objectsLists, x, y, layer) => {
-  const objectName = objectsLists.firstKey();
+/**
+ * @param {any} objectsContext
+ * @param {string} objectName
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ * @param {number} x
+ * @param {number} y
+ * @param {string} layer
+ */
+const doCreateObjectOnScene = function (
+  objectsContext,
+  objectName,
+  objectsLists,
+  x,
+  y,
+  layerName
+) {
+  // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
+  // eventsFunctionContext. We can't directly use runtimeScene because the object name could
+  // be different than the real object name (this is the case in a function. The eventsFunctionContext
+  // will take care of this in createObject).
   const obj = objectsContext.createObject(objectName);
   if (obj !== null) {
-    // Ignore position and layer set up of the object as we're in a minimal mock of GDJS.
-
-    // Let the new object be picked by next actions/conditions.
+    //Let the new object be picked by next actions/conditions.
     if (objectsLists.containsKey(objectName)) {
+      // TODO Encapsulate this in ObjectsLists
+      if (
+        getPickedInstancesCount(objectsLists) + 1 ===
+        getVisibleInstancesCount(objectsContext, objectsLists)
+      ) {
+        clearObjectLists(objectsLists);
+      }
       objectsLists.get(objectName).push(obj);
     }
   }
+  return obj;
+};
+
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ * @param {number} x
+ * @param {number} y
+ * @param {string} layerName
+ */
+const createObjectOnScene = (objectsContext, objectsLists, x, y, layerName) => {
+  return doCreateObjectOnScene(
+    objectsContext,
+    objectsLists.firstKey(),
+    objectsLists,
+    x,
+    y,
+    layerName
+  );
 };
 
 /**
@@ -563,6 +605,37 @@ const getPickedInstancesCount = (objectsLists) => {
     count += lists[i].length;
   }
   return count;
+};
+
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const getVisibleInstancesCount = (objectsContext, objectsLists) => {
+  let count = 0;
+
+  const objectNames = [];
+  objectsLists.keys(objectNames);
+
+  const uniqueObjectNames = new Set(objectNames);
+  for (const objectName of uniqueObjectNames) {
+    const visibleObjects = objectsContext.getObjects(objectName);
+    if (visibleObjects) {
+      count += visibleObjects.length;
+    }
+  }
+  return count;
+};
+
+/**
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const clearObjectLists = (objectsLists) => {
+  const lists = [];
+  objectsLists.values(lists);
+  for (let i = 0, len = lists.length; i < len; ++i) {
+    lists[i].length = 0;
+  }
 };
 
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
@@ -706,6 +779,27 @@ class LongLivedObjectsList {
   }
 }
 
+const clearObjectsLists = (objectsLists) => {
+  for (const k in objectsLists.items) {
+    if (objectsLists.items.hasOwnProperty(k)) {
+      objectsLists.items[k].length = 0;
+    }
+  }
+};
+
+const addObject = (
+  objectsLists,
+  objectName,
+  object
+) => {
+  if (!objectsLists.isPicked) {
+    // A picking starts from empty lists.
+    clearObjectsLists(objectsLists);
+    objectsLists.isPicked = true;
+  }
+  objectsLists.get(objectName).push(object);
+};
+
 /**
  * Create a minimal mock of GDJS with a RuntimeScene (`gdjs.RuntimeScene`),
  * supporting setting a variable, using "Trigger Once" conditions
@@ -729,6 +823,8 @@ function makeMinimalGDJSMock(options) {
           createObjectOnScene,
           getSceneInstancesCount,
           getPickedInstancesCount,
+          getVisibleInstancesCount,
+          clearObjectLists,
         },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
@@ -737,6 +833,9 @@ function makeMinimalGDJSMock(options) {
         common: {
           resolveAsyncEventsFunction: ({ task }) => task.resolve(),
         },
+        objectsLists: {
+          addObject,
+        }
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;

@@ -36,6 +36,7 @@ module.exports = function (config) {
 
       //GDJS game engine files: (Order is important)
       './newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js',
+      './newIDE/app/resources/GDJS/Runtime/ObjectsLists.js',
       './newIDE/app/resources/GDJS/Runtime/logger.js',
       './newIDE/app/resources/GDJS/Runtime/gd.js',
       './newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js',

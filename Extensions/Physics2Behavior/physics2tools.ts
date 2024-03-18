@@ -1,9 +1,9 @@
 namespace gdjs {
   export namespace physics2 {
     export const objectsCollide = function (
-      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists1: ObjectsLists,
       behaviorName: string,
-      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists2: ObjectsLists,
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
@@ -16,9 +16,9 @@ namespace gdjs {
     };
 
     export const haveObjectsStartedColliding = function (
-      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists1: ObjectsLists,
       behaviorName: string,
-      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists2: ObjectsLists,
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
@@ -31,9 +31,9 @@ namespace gdjs {
     };
 
     export const haveObjectsStoppedColliding = function (
-      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists1: ObjectsLists,
       behaviorName: string,
-      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      objectsLists2: ObjectsLists,
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
@@ -45,7 +45,11 @@ namespace gdjs {
       );
     };
 
-    export const setTimeScale = function (objectsLists, behavior, timeScale) {
+    export const setTimeScale = function (
+      objectsLists: ObjectsLists,
+      behavior: gdjs.Physics2RuntimeBehavior,
+      timeScale: float
+    ) {
       const lists = gdjs.staticArray(gdjs.physics2.setTimeScale);
       objectsLists.values(lists);
       for (let i = 0, len = lists.length; i < len; i++) {

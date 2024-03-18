@@ -13,9 +13,6 @@ declare type float = number;
 /** A point in cartesian space. */
 declare type FloatPoint = [number, number];
 
-/** A Hastable with the picked objects lists. */
-declare type ObjectsLists = Hashtable<gdjs.RuntimeObject[]>;
-
 /**
  * Represents the context of the events function (or the behavior method),
  * if any. If the JavaScript code is running in a scene, this will be undefined (so you can't use this in a scene).

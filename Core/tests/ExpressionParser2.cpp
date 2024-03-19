@@ -2954,6 +2954,238 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid operators with variables having different types than the expression") {
+    SECTION("Expression/parent type is 'string'") {
+      // A trivial test (everything is a string).
+      {
+        auto node = parser.ParseExpression("\"You have \" + MySceneStringVariable + \" points\"");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A string concatenated with a number variable (will have to be casted to a string in code generation)
+      {
+        auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A string concatenated with a number variable (will have to be casted to a string in code generation)
+      // and then with a string again.
+      {
+        auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable + \" points\"");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
+      // and then with a string again.
+      {
+        auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + \" points\"");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+    }
+    SECTION("Expression/parent type is 'number'") {
+      // A trivial test (everything is a string).
+      {
+        auto node = parser.ParseExpression("123 + MySceneNumberVariable + 456");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A number concatenated with a string variable (will have to be casted to a number in code generation)
+      {
+        auto node = parser.ParseExpression("123 + MySceneStringVariable");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A number concatenated with a string variable (will have to be casted to a number in code generation)
+      // and then with a number again.
+      {
+        auto node = parser.ParseExpression("123 + MySceneStringVariable + 456");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+      // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
+      // and then with a number again.
+      {
+        auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + 456");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+        node->Visit(validator);
+
+        REQUIRE(validator.GetFatalErrors().size() == 0);
+      }
+    }
+    SECTION("Expression/parent type is 'number|string'") {
+      SECTION("Expression/parent inferred type is 'string'") {
+        // A trivial test (everything is a string).
+        {
+          auto node = parser.ParseExpression("\"You have \" + MySceneStringVariable + \" points\"");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A string concatenated with a number variable (will have to be casted to a string in code generation)
+        {
+          auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A string concatenated with a number variable (will have to be casted to a string in code generation)
+        // and then with a string again.
+        {
+          auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable + \" points\"");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A string concatenated with an unknown variable (will have to be casted to a string in code generation)
+        // and then with a string again.
+        {
+          auto node = parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + \" points\"");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+      }
+      SECTION("Expression/parent inferred type is 'number'") {
+        // A trivial test (everything is a string).
+        {
+          auto node = parser.ParseExpression("123 + MySceneNumberVariable + 456");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A number concatenated with a string variable (will have to be casted to a number in code generation)
+        {
+          auto node = parser.ParseExpression("123 + MySceneStringVariable");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A number concatenated with a string variable (will have to be casted to a number in code generation)
+        // and then with a number again.
+        {
+          auto node = parser.ParseExpression("123 + MySceneStringVariable + 456");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+        // A number concatenated with an unknown variable (will have to be casted to a number in code generation)
+        // and then with a number again.
+        {
+          auto node = parser.ParseExpression("123 + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + 456");
+          REQUIRE(node != nullptr);
+
+          gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+          node->Visit(validator);
+
+          REQUIRE(validator.GetFatalErrors().size() == 0);
+        }
+      }
+    }
+  }
+
+  SECTION("Invalid operators with variables having different types than the expression") {
+    // Try to do a sum between numbers in a string expression
+    {
+      auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable + 2 + \" points\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You entered a number, but a text was expected (in quotes).");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 38);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 39);
+    }
+    // Try to do a sum between numbers in a number|string expression (that is inferred as a string with the first operand)
+    {
+      auto node = parser.ParseExpression("\"You have \" + MySceneNumberVariable + 2 + \" points\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "string");
+      node->Visit(validator);
+
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You entered a number, but a text was expected (in quotes).");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 38);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 39);
+    }
+    // Try to do a string concatenation in a number expression
+    {
+      auto node = parser.ParseExpression("123 + MySceneStringVariable + \"hello\" + 456");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number");
+      node->Visit(validator);
+
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You entered a text, but a number was expected.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 30);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 37);
+    }
+    // Try to do a string concatenation in a number|string expression (that is inferred as a number with the first operand)
+    {
+      auto node = parser.ParseExpression("123 + MySceneStringVariable + \"hello\" + 456");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "number|string");
+      node->Visit(validator);
+
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() == "You entered a text, but a number was expected.");
+      REQUIRE(validator.GetFatalErrors()[0]->GetStartPosition() == 30);
+      REQUIRE(validator.GetFatalErrors()[0]->GetEndPosition() == 37);
+    }
+  }
+
   SECTION("Valid function call with object variable") {
     {
       // Note that in this test we need to use an expression with "objectvar",

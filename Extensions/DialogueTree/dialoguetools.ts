@@ -979,7 +979,7 @@ namespace gdjs {
    * targetting "root.actor" will return ["james", "tom"]
    * @param targetKey the key of the variable you want target
    */
-  gdjs.dialogueTree.getChildKeysOfNestedVariable = function (targetKey: key) {
+  gdjs.dialogueTree.getChildKeysOfNestedVariable = function (targetKey: string) {
     const variables = gdjs.dialogueTree.runner.variables.data;
     const result = [];
     Object.keys(variables).forEach((key) => {

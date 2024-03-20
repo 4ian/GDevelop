@@ -664,13 +664,13 @@ namespace gdjs {
    * This condition will be triggered once - when after tom's line.
    */
   gdjs.dialogueTree.hasActiveActorChanged = function () {
-    if(gdjs.dialogueTree.prevActiveActor !== gdjs.dialogueTree.activeLineActor && gdjs.dialogueTree.prevActiveActorParams !== gdjs.dialogueTree.activeLineActorParameters){
-      gdjs.dialogueTree.prevActiveActor = gdjs.dialogueTree.activeLineActor;
-      gdjs.dialogueTree.prevActiveActorParams = gdjs.dialogueTree.activeLineActorParameters;
+    if(gdjs.dialogueTree.prevActiveLineActor !== gdjs.dialogueTree.activeLineActor && gdjs.dialogueTree.prevActiveLineActorParams !== gdjs.dialogueTree.activeLineActorParameters){
+      gdjs.dialogueTree.prevActiveLineActor = gdjs.dialogueTree.activeLineActor;
+      gdjs.dialogueTree.prevActiveLineActorParams = gdjs.dialogueTree.activeLineActorParameters;
       return true;
     }
-    gdjs.dialogueTree.prevActiveActor = "";
-    gdjs.dialogueTree.prevActiveActorParams = [];
+    gdjs.dialogueTree.prevActiveLineActor = "";
+    gdjs.dialogueTree.prevActiveLineActorParams = [];
     return false;
   }
 

@@ -59,6 +59,7 @@ import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateG
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
+  displayPromotions?: boolean,
   onOpenPrivateGameTemplateListingData?: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -94,7 +95,14 @@ const identifyAssetPackKind = ({
 };
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
-  ({ hideGameTemplates, onOpenPrivateGameTemplateListingData }: Props, ref) => {
+  (
+    {
+      hideGameTemplates,
+      displayPromotions,
+      onOpenPrivateGameTemplateListingData,
+    }: Props,
+    ref
+  ) => {
     const {
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
@@ -737,6 +745,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 onCategorySelection={selectShopCategory}
                 openedShopCategory={openedShopCategory}
                 hideGameTemplates={hideGameTemplates}
+                displayPromotions={displayPromotions}
               />
             ) : (
               <PlaceholderLoader />

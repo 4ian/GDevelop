@@ -11,11 +11,11 @@ import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';
 import NotificationChip from '../../../UI/User/NotificationChip';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -36,6 +36,7 @@ export const HomePageHeader = ({
   canSave,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -73,9 +74,9 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && !isNativeMobileApp() && !isMobile && (
+              {!electron && !isNativeMobileApp() && (
                 <FlatButton
-                  label={<Trans>Download desktop app</Trans>}
+                  label={<Trans>Get the app</Trans>}
                   onClick={() =>
                     Window.openExternalURL('https://gdevelop.io/download')
                   }
@@ -83,11 +84,17 @@ export const HomePageHeader = ({
               )}
               <UserChip onOpenProfile={onOpenProfile} />
               <NotificationChip />
-              <TextButton
-                label={i18n.language.toUpperCase()}
-                onClick={onOpenLanguageDialog}
-                icon={<TranslateIcon fontSize="small" />}
-              />
+              {isMobile ? (
+                <IconButton size="small" onClick={onOpenLanguageDialog}>
+                  <TranslateIcon fontSize="small" />
+                </IconButton>
+              ) : (
+                <TextButton
+                  label={i18n.language.toUpperCase()}
+                  onClick={onOpenLanguageDialog}
+                  icon={<TranslateIcon fontSize="small" />}
+                />
+              )}
             </LineStackLayout>
           </Column>
         </LineStackLayout>

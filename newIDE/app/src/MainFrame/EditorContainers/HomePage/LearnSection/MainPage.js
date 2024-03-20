@@ -162,9 +162,6 @@ const MainPage = ({
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <SectionRow>
-        <Text>
-          <Trans>Quick search</Trans>
-        </Text>
         <WikiSearchBar />
       </SectionRow>
       <SectionRow>

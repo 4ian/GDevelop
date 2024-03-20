@@ -26,6 +26,8 @@ import {
   PrivateGameTemplateTile,
 } from './ShopTiles';
 import { useDebounce } from '../Utils/UseDebounce';
+import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
+import { ColumnStackLayout } from '../UI/Layout';
 
 const cellSpacing = 2;
 
@@ -157,6 +159,7 @@ type Props = {|
   onCategorySelection: string => void,
   openedShopCategory: string | null,
   hideGameTemplates?: boolean,
+  displayPromotions?: boolean,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -171,6 +174,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       onCategorySelection,
       openedShopCategory,
       hideGameTemplates,
+      displayPromotions,
     }: Props,
     ref
   ) => {
@@ -383,6 +387,15 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         )}
+        {displayPromotions ? (
+          <ColumnStackLayout>
+            <Text size="block-title">
+              <Trans>Promotions</Trans>
+            </Text>
+
+            <PromotionsSlideshow />
+          </ColumnStackLayout>
+        ) : null}
         {allBundleTiles.length ? (
           <>
             <Column>

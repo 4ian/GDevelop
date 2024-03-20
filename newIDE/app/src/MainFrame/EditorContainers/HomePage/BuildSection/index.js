@@ -63,6 +63,7 @@ import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../../UI/Menu/ContextMenu';
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
+import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 
@@ -419,7 +420,7 @@ const BuildSection = ({
   ) : (
     <SectionContainer
       title={<Trans>My projects</Trans>}
-      showAnnouncementsAndPromotions
+      showUrgentAnnouncements
       renderFooter={
         limits && hasTooManyCloudProjects
           ? () => (
@@ -452,6 +453,10 @@ const BuildSection = ({
           roundedImages
           displayArrowsOnDesktop
         />
+        <Spacer />
+        <Column noMargin>
+          <PromotionsSlideshow />
+        </Column>
       </SectionRow>
       <SectionRow>
         <ResponsiveLineStackLayout

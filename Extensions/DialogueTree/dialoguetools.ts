@@ -764,8 +764,7 @@ namespace gdjs {
       activeLineActorParameters.length > 0 &&
       paramIndex < activeLineActorParameters.length
     ) {
-      const result = activeLineActorParameters[paramIndex] || '';
-      return result;
+      return activeLineActorParameters[paramIndex] || '';
     }
     return '';
   };
@@ -968,7 +967,6 @@ namespace gdjs {
    * @param key The name of the variable you want to check if it exists
    */
   gdjs.dialogueTree.getVariableExists = function (key: string) {
-    // todo expose this to gd, replace where used
     return this.runner.variables && key in this.runner.variables.data;
   };
 

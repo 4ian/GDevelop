@@ -362,13 +362,23 @@ export default function SubscriptionDialog({
         })
     : null;
 
+  const dialogMaxWidth =
+    !displayedSubscriptionPlanWithPricingSystems ||
+    displayedSubscriptionPlanWithPricingSystems.length === 1
+      ? 'md'
+      : displayedSubscriptionPlanWithPricingSystems.length < 4
+      ? 'lg'
+      : displayedSubscriptionPlanWithPricingSystems.length < 5
+      ? 'xl'
+      : false;
+
   return (
     <I18n>
       {({ i18n }) => (
         <>
           <Dialog
             title={null}
-            maxWidth={false}
+            maxWidth={dialogMaxWidth}
             actions={[
               <FlatButton
                 label={<Trans>Close</Trans>}

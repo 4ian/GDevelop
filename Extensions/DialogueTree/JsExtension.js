@@ -334,7 +334,9 @@ module.exports = {
         _(
           'Create a new dialog actor, which can be used to trigger/set events said actor is active'
         ),
-        _('Create a new dialog actor with ID of _PARAM0_, name _PARAM1_ and color _PARAM2_'),
+        _(
+          'Create a new dialog actor with ID of _PARAM0_, name _PARAM1_ and color _PARAM2_'
+        ),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -367,9 +369,7 @@ module.exports = {
       .addAction(
         'DeleteActor',
         _('Delete actor'),
-        _(
-          'Delete dialog actor'
-        ),
+        _('Delete dialog actor'),
         _('Delete a dialog actor with ID of _PARAM0_'),
         '',
         'JsPlatform/Extensions/yarn32.png',
@@ -567,9 +567,7 @@ module.exports = {
     extension
       .addStrExpression(
         'TagParameterViaKey',
-        _(
-          'Get a Tag found in the dialogue branch, using a key'
-        ),
+        _('Get a Tag found in the dialogue branch, using a key'),
         _(
           'Get a Tag found in the dialogue branch, using a key. For example with tags: "bg:park", "time:lunch", asking for "bg" will return "park"'
         ),
@@ -618,7 +616,9 @@ module.exports = {
       .addExpression(
         'VariableChildKeys',
         _('Get variable number of child keys of a $nested.variable'),
-        _('Get variable number of child keys. For example with $root.actor.james.id and $root.actor.tom.id, $root.actor has 2 - tom and james'),
+        _(
+          'Get variable number of child keys. For example with $root.actor.james.id and $root.actor.tom.id, $root.actor has 2 - tom and james'
+        ),
         '',
         'JsPlatform/Extensions/yarn32.png'
       )
@@ -641,12 +641,13 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getChildKeyViaIndex');
 
-
     extension
       .addStrExpression(
         'ActiveActorId',
         _('Get the id of the active dialogue line actor'),
-        _('Get the id of the active dialogue line actor. Empty string when no actor detected'),
+        _(
+          'Get the id of the active dialogue line actor. Empty string when no actor detected'
+        ),
         '',
         'JsPlatform/Extensions/yarn32.png'
       )
@@ -656,8 +657,12 @@ module.exports = {
     extension
       .addExpression(
         'ActiveActorParametersCount',
-        _('Get the number of parameters passed after an actor id on the active line'),
-        _('Get the number of parameters passed after an actor id on the active line'),
+        _(
+          'Get the number of parameters passed after an actor id on the active line'
+        ),
+        _(
+          'Get the number of parameters passed after an actor id on the active line'
+        ),
         '',
         'JsPlatform/Extensions/yarn32.png'
       )
@@ -917,9 +922,7 @@ module.exports = {
       .addCondition(
         'DoesActorExist',
         _('Does actor with ID exist'),
-        _(
-          'Check if an actor with a specified id has been ecreated'
-        ),
+        _('Check if an actor with a specified id has been ecreated'),
         _('Actor with ID _PARAM0_ exists'),
         '',
         'JsPlatform/Extensions/yarn32.png',
@@ -933,9 +936,7 @@ module.exports = {
       .addCondition(
         'DoesVariableExist',
         _('Does variable exist'),
-        _(
-          'Check if a dialogue state variable exists or has been set'
-        ),
+        _('Check if a dialogue state variable exists or has been set'),
         _('Dialogue state variable _PARAM0_ exists'),
         '',
         'JsPlatform/Extensions/yarn32.png',

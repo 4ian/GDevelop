@@ -37,7 +37,11 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
     preferFreeVersionChecked,
     setPreferFreeVersionChecked,
   ] = React.useState(false);
+  const [missingFeatureChecked, setMissingFeatureChecked] = React.useState(
+    false
+  );
   const [qualityIssuesChecked, setQualityIssuesChecked] = React.useState(false);
+  const [otherChecked, setOtherChecked] = React.useState(false);
   const [freeText, setFreeText] = React.useState('');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
@@ -67,7 +71,9 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
               'stopped-making-games': stoppedMakingGamesChecked,
               'struggling-with-gdevelop': strugglingChecked,
               'prefer-free-version': preferFreeVersionChecked,
+              'missing-feature': missingFeatureChecked,
               'quality-issues': qualityIssuesChecked,
+              other: otherChecked,
               freeText: freeText,
             },
           }
@@ -95,6 +101,8 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
       strugglingChecked,
       preferFreeVersionChecked,
       qualityIssuesChecked,
+      missingFeatureChecked,
+      otherChecked,
     ]
   );
 
@@ -208,6 +216,13 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
                     }
                     disabled={isLoading}
                   />
+
+                  <Checkbox
+                    label={<Trans>The subscription is missing a feature</Trans>}
+                    checked={missingFeatureChecked}
+                    onCheck={(e, checked) => setMissingFeatureChecked(checked)}
+                    disabled={isLoading}
+                  />
                   <Checkbox
                     label={
                       <Trans>
@@ -216,6 +231,12 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
                     }
                     checked={qualityIssuesChecked}
                     onCheck={(e, checked) => setQualityIssuesChecked(checked)}
+                    disabled={isLoading}
+                  />
+                  <Checkbox
+                    label={<Trans>Other reason (please specify)</Trans>}
+                    checked={otherChecked}
+                    onCheck={(e, checked) => setOtherChecked(checked)}
                     disabled={isLoading}
                   />
                   <Spacer />

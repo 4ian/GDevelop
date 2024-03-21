@@ -176,6 +176,33 @@ module.exports = {
 
     extension
       .addAction(
+        'ForceRelayServer',
+        _('Disable IP address sharing'),
+        _(
+          'Disables the sharing of IP addresses with the other peers. ' +
+            'This action needs to be called BEFORE connecting to the broker server.'
+        ),
+        _('Disable IP sharing: _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter(
+        'yesorno',
+        _('Disable sharing of IP addresses'),
+        'Generally, it is recommended to keep sharing of IP addressed enabled ' +
+          'to make connections faster and more often possible. ' +
+          'Disabling IP address sharing will force all connections to pass messages through a ' +
+          'TURN relay server, you can make P2P use one by adding one as an ICE candidate.',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.forceUseRelayServer');
+
+    extension
+      .addAction(
         'UseDefaultBroker',
         _('Connect to the default broker server'),
         _('Connects to the default broker server.'),

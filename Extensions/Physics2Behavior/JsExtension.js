@@ -1416,6 +1416,26 @@ module.exports = {
       .setFunctionName('getLinearVelocityAngle');
 
     aut
+      .addAction(
+        'LinearVelocityAngle',
+        _('Linear velocity towards an angle'),
+        _('Set the linear velocity towards an angle.'),
+        _(
+          'Set the linear velocity of _PARAM0_ towards angle: _PARAM2_ degrees, speed: _PARAM3_ pixels per second'
+        ),
+        _('Velocity'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('expression', _('Angle'))
+      .addParameter('expression', _('Speed (in pixels per second)'))
+      .getCodeExtraInformation()
+      .setFunctionName('setLinearVelocityAngle')
+      .setGetter('getLinearVelocityAngle');
+
+    aut
       .addExpression(
         'LinearVelocityAngle',
         _('Linear velocity angle'),

@@ -285,6 +285,7 @@ export const changeUserSubscription = async (
       ...newSubscriptionDetails,
       prohibitSeamlessUpdate: true,
       cancelImmediately: options.cancelImmediately,
+      cancelReasons: options.cancelReasons,
     },
     {
       params: {

@@ -13,6 +13,10 @@ export type Usage = {
 };
 export type Usages = Array<Usage>;
 
+export type CancelReasons = {
+  [key: string]: boolean | string,
+};
+
 export type Subscription = {|
   userId: string,
   planId: string | null,
@@ -34,6 +38,7 @@ export type Subscription = {|
   paypalPayerId?: string,
 
   cancelAtPeriodEnd?: boolean,
+  cancelReasons?: CancelReasons,
 
   purchaselyPlan?: string,
 
@@ -270,7 +275,7 @@ export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   newSubscriptionDetails: {| planId: string | null |},
-  options: {| cancelImmediately: boolean |}
+  options: {| cancelImmediately: boolean, cancelReasons: CancelReasons |}
 ): Promise<Subscription> => {
   const authorizationHeader = await getAuthorizationHeader();
 

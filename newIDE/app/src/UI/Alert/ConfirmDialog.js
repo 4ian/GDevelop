@@ -18,6 +18,7 @@ type Props = {|
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   level: 'info' | 'warning' | 'error',
+  maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
 |};
 
@@ -78,7 +79,7 @@ function ConfirmDialog(props: Props) {
             title={i18n._(props.title)}
             open={props.open}
             actions={dialogActions}
-            maxWidth="xs"
+            maxWidth={props.maxWidth || 'xs'}
             noMobileFullScreen
             onRequestClose={props.onDismiss}
             onApply={props.onConfirm}

@@ -117,6 +117,7 @@ function ConfirmProvider({ children }: Props) {
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
           level={confirmDialogConfig.level || 'info'}
+          maxWidth={confirmDialogConfig.maxWidth}
           makeDismissButtonPrimary={
             confirmDialogConfig.makeDismissButtonPrimary
           }

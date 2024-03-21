@@ -226,7 +226,7 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
 
                   <Checkbox
                     label={
-                      <Trans>It's missing a feature (Please specify)</Trans>
+                      <Trans>It's missing a feature (please specify)</Trans>
                     }
                     checked={missingFeatureChecked}
                     onCheck={(e, checked) => setMissingFeatureChecked(checked)}

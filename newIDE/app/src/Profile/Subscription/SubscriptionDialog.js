@@ -87,14 +87,14 @@ const styles = {
 
 const cancelConfirmationTexts = {
   title: t`Cancel your subscription?`,
-  message: t`By canceling your subscription you'll be limited in cloud projects and cloud builds. Continue?`,
+  message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
   confirmButtonLabel: t`Continue`,
   dismissButtonLabel: t`Keep subscription`,
   maxWidth: 'sm',
 };
 const cancelImmediatelyConfirmationTexts = {
   title: t`Cancel your subscription?`,
-  message: t`By canceling your subscription you'll be limited in cloud projects and cloud builds. Your access to GDevelop premium features will end IMMEDIATELY. Continue?`,
+  message: t`By canceling your subscription you will lose all your premium features IMMEDIATELY. Continue?`,
   confirmButtonLabel: t`Cancel my subscription now`,
   dismissButtonLabel: t`Keep subscription`,
   maxWidth: 'sm',

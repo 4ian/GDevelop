@@ -46,7 +46,14 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
 
-  const canSubmit = freeText.trim().length > 0;
+  const canSubmit =
+    (stoppedMakingGamesChecked ||
+      strugglingChecked ||
+      preferFreeVersionChecked ||
+      qualityIssuesChecked ||
+      missingFeatureChecked ||
+      otherChecked) &&
+    ((!missingFeatureChecked && !otherChecked) || freeText.trim().length > 0);
 
   const cancelPlan = React.useCallback(
     async () => {
@@ -218,7 +225,9 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
                   />
 
                   <Checkbox
-                    label={<Trans>The subscription is missing a feature</Trans>}
+                    label={
+                      <Trans>It's missing a feature (Please specify)</Trans>
+                    }
                     checked={missingFeatureChecked}
                     onCheck={(e, checked) => setMissingFeatureChecked(checked)}
                     disabled={isLoading}

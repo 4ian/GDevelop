@@ -17,8 +17,8 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import CreateProfile from '../Profile/CreateProfile';
 import Paper from '../UI/Paper';
-import { Column, Line } from '../UI/Grid';
 import LeftLoader from '../UI/LeftLoader';
+import { Column, LargeSpacer, Line, Spacer } from '../UI/Grid';
 import {
   checkIfHasTooManyCloudProjects,
   MaxProjectCountAlertMessage,
@@ -42,7 +42,6 @@ import ResolutionOptions, {
   defaultCustomHeight,
 } from './ResolutionOptions';
 import Text from '../UI/Text';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import generatePrompt from '../Utils/ProjectPromptGenerator';
 import ProjectGeneratingDialog from './ProjectGeneratingDialog';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
@@ -53,6 +52,7 @@ import { I18n } from '@lingui/react';
 import GetSubscriptionCard from '../Profile/Subscription/GetSubscriptionCard';
 import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { Tabs } from '../UI/Tabs';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -71,6 +71,7 @@ export type NewProjectSetup = {|
 |};
 
 type Props = {|
+  initialTab?: 'ai' | 'from-scratch' | 'example',
   isOpeningProject?: boolean,
   onClose: () => void,
   onCreateEmptyProject: (newProjectSetup: NewProjectSetup) => Promise<void>,
@@ -96,6 +97,7 @@ type Props = {|
 |};
 
 const NewProjectSetupDialog = ({
+  initialTab,
   isOpeningProject,
   onClose,
   onCreateEmptyProject,
@@ -108,6 +110,10 @@ const NewProjectSetupDialog = ({
   storageProviders,
   authenticatedUser,
 }: Props): React.Node => {
+  const [currentTab, setCurrentTab] = React.useState<
+    'ai' | 'from-scratch' | 'example'
+  >(initialTab || 'ai');
+
   const generateProjectName = () =>
     selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
@@ -220,7 +226,7 @@ const NewProjectSetupDialog = ({
     ? authenticatedUser.limits.quotas['ai-project-generation']
     : null;
   const canGenerateProjectFromPrompt =
-    generationCurrentUsage && !generationCurrentUsage.limitReached;
+    !!generationCurrentUsage && !generationCurrentUsage.limitReached;
 
   const needUserAuthenticationForStorage =
     storageProvider.needUserAuthentication && !authenticatedUser.authenticated;
@@ -243,7 +249,7 @@ const NewProjectSetupDialog = ({
 
   const isLoading = isGeneratingProject || isOpeningProject;
 
-  const isStartingProjectFromScratch =
+  const isCreatingANewProject =
     !selectedExampleShortHeader && !selectedPrivateGameTemplateListingData;
 
   // On the local app, prefer to always have something saved so that the user is not blocked.
@@ -414,6 +420,24 @@ const NewProjectSetupDialog = ({
           title={<Trans>New Project</Trans>}
           id="project-pre-creation-dialog"
           maxWidth="sm"
+          fixedContent={
+            isCreatingANewProject ? (
+              <Tabs
+                value={currentTab}
+                onChange={setCurrentTab}
+                options={[
+                  {
+                    value: 'ai',
+                    label: <Trans>Create for me</Trans>,
+                  },
+                  {
+                    value: 'from-scratch',
+                    label: <Trans>Create from scratch</Trans>,
+                  },
+                ]}
+              />
+            ) : null
+          }
           actions={[
             <FlatButton
               disabled={isLoading}
@@ -436,16 +460,20 @@ const NewProjectSetupDialog = ({
           onApply={() => onValidate(i18n)}
         >
           <ColumnStackLayout noMargin>
-            {isStartingProjectFromScratch && (
-              <ResolutionOptions
-                onClick={key => setResolutionOption(key)}
-                selectedOption={resolutionOption}
-                disabled={isLoading}
-                customHeight={customHeight}
-                customWidth={customWidth}
-                onCustomHeightChange={setCustomHeight}
-                onCustomWidthChange={setCustomWidth}
-              />
+            <LargeSpacer />
+            {isCreatingANewProject && currentTab === 'from-scratch' && (
+              <>
+                <ResolutionOptions
+                  onClick={key => setResolutionOption(key)}
+                  selectedOption={resolutionOption}
+                  disabled={isLoading}
+                  customHeight={customHeight}
+                  customWidth={customWidth}
+                  onCustomHeightChange={setCustomHeight}
+                  onCustomWidthChange={setCustomWidth}
+                />
+                <Spacer />
+              </>
             )}
             <TextField
               type="text"
@@ -467,6 +495,69 @@ const NewProjectSetupDialog = ({
               autoFocus="desktop"
               maxLength={100}
             />
+            {isCreatingANewProject && currentTab === 'ai' && (
+              <ColumnStackLayout noMargin>
+                {authenticatedUser.authenticated &&
+                  !canGenerateProjectFromPrompt && (
+                    <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
+                      <Line>
+                        <Column noMargin>
+                          <Text noMargin>
+                            <Trans>
+                              You've used all your daily pre-made AI scenes!
+                              Generate as many as you want with a subscription.
+                            </Trans>
+                          </Text>
+                        </Column>
+                      </Line>
+                    </GetSubscriptionCard>
+                  )}
+                <LineStackLayout
+                  expand
+                  noMargin
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <RobotIcon />
+                  <TextField
+                    type="text"
+                    multiline
+                    maxLength={200}
+                    fullWidth
+                    disabled={
+                      isLoading ||
+                      !authenticatedUser.authenticated ||
+                      !isOnline ||
+                      !canGenerateProjectFromPrompt
+                    }
+                    value={generationPrompt}
+                    onChange={(e, text) => setGenerationPrompt(text)}
+                    floatingLabelText={<Trans>AI prompt</Trans>}
+                    floatingLabelFixed
+                    translatableHintText={
+                      !authenticatedUser.authenticated || !isOnline
+                        ? t`Log in to generate a project from a prompt`
+                        : t`Type a prompt yourself or generate a random one`
+                    }
+                    endAdornment={
+                      <IconButton
+                        size="small"
+                        onClick={() => setGenerationPrompt(generatePrompt())}
+                        tooltip={t`Generate random prompt`}
+                        disabled={
+                          isLoading ||
+                          !authenticatedUser.authenticated ||
+                          !isOnline ||
+                          !canGenerateProjectFromPrompt
+                        }
+                      >
+                        <Refresh />
+                      </IconButton>
+                    }
+                  />
+                </LineStackLayout>
+              </ColumnStackLayout>
+            )}
             <SelectField
               fullWidth
               disabled={isLoading}
@@ -533,73 +624,8 @@ const NewProjectSetupDialog = ({
                 setSaveAsLocation,
                 newProjectsDefaultFolder,
               })}
-            {isStartingProjectFromScratch && (
+            {isCreatingANewProject && currentTab === 'from-scratch' && (
               <ColumnStackLayout noMargin expand>
-                <DismissableAlertMessage
-                  kind="info"
-                  identifier="new-generate-project-from-prompt"
-                >
-                  <Trans>NEW! Generate a pre-made AI scene with assets.</Trans>
-                </DismissableAlertMessage>
-                <LineStackLayout
-                  expand
-                  noMargin
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <RobotIcon />
-                  <TextField
-                    type="text"
-                    multiline
-                    maxLength={200}
-                    fullWidth
-                    disabled={
-                      isLoading ||
-                      !authenticatedUser.authenticated ||
-                      !isOnline ||
-                      !canGenerateProjectFromPrompt
-                    }
-                    value={generationPrompt}
-                    onChange={(e, text) => setGenerationPrompt(text)}
-                    floatingLabelText={<Trans>AI prompt</Trans>}
-                    floatingLabelFixed
-                    translatableHintText={
-                      !authenticatedUser.authenticated || !isOnline
-                        ? t`Log in to generate a project from a prompt`
-                        : t`Type a prompt yourself or generate a random one`
-                    }
-                    endAdornment={
-                      <IconButton
-                        size="small"
-                        onClick={() => setGenerationPrompt(generatePrompt())}
-                        tooltip={t`Generate random prompt`}
-                        disabled={
-                          isLoading ||
-                          !authenticatedUser.authenticated ||
-                          !isOnline ||
-                          !canGenerateProjectFromPrompt
-                        }
-                      >
-                        <Refresh />
-                      </IconButton>
-                    }
-                  />
-                </LineStackLayout>
-                {authenticatedUser.authenticated &&
-                  !canGenerateProjectFromPrompt && (
-                    <GetSubscriptionCard subscriptionDialogOpeningReason="Generate project from prompt">
-                      <Line>
-                        <Column noMargin>
-                          <Text noMargin>
-                            <Trans>
-                              You've used all your daily pre-made AI scenes!
-                              Generate as many as you want with a subscription.
-                            </Trans>
-                          </Text>
-                        </Column>
-                      </Line>
-                    </GetSubscriptionCard>
-                  )}
                 <Text size="sub-title">
                   <Trans>Advanced File options</Trans>
                 </Text>

@@ -108,7 +108,7 @@ type Props = {|
   canOpen: boolean,
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
-  onOpenNewProjectSetupDialog: () => void,
+  onOpenNewProjectSetupDialog: (initialTab: 'ai' | 'from-scratch') => void,
   onSelectExampleShortHeader: (exampleShortHeader: ExampleShortHeader) => void,
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
@@ -179,6 +179,8 @@ const BuildSection = ({
     setLastModifiedInfoByProjectId,
   ] = React.useState({});
 
+  const isMediumOrSmallScreen =
+    windowSize === 'small' || windowSize === 'medium';
   const columnsCount = getItemsColumns(windowSize, isLandscape);
 
   const allGameTemplatesAndExamplesFlaggedAsGameCount = React.useMemo(
@@ -488,34 +490,41 @@ const BuildSection = ({
                 primary
                 fullWidth={!canOpen}
                 label={
-                  isMobile ? (
+                  isMediumOrSmallScreen ? (
                     <Trans>Create</Trans>
                   ) : (
                     <Trans>Create a project</Trans>
                   )
                 }
-                onClick={onOpenNewProjectSetupDialog}
+                onClick={() => onOpenNewProjectSetupDialog('from-scratch')}
                 icon={<Add fontSize="small" />}
                 id="home-create-project-button"
               />
+              <RaisedButton
+                primary
+                fullWidth={!canOpen}
+                label={
+                  isMediumOrSmallScreen ? (
+                    <Trans>✨ AI prototype</Trans>
+                  ) : (
+                    <Trans>✨ Prototype with AI</Trans>
+                  )
+                }
+                onClick={() => onOpenNewProjectSetupDialog('ai')}
+                id="home-create-project-button"
+              />
               {canOpen && (
-                <>
-                  <Text>
-                    <Trans>or</Trans>
-                  </Text>
-                  <Spacer />
-                  <TextButton
-                    secondary
-                    label={
-                      isMobile ? (
-                        <Trans>Open</Trans>
-                      ) : (
-                        <Trans>Open a project</Trans>
-                      )
-                    }
-                    onClick={onChooseProject}
-                  />
-                </>
+                <TextButton
+                  secondary
+                  label={
+                    isMediumOrSmallScreen ? (
+                      <Trans>Import</Trans>
+                    ) : (
+                      <Trans>Import a project</Trans>
+                    )
+                  }
+                  onClick={onChooseProject}
+                />
               )}
             </LineStackLayout>
           </Column>

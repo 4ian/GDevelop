@@ -12,7 +12,9 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   isProjectOpening: boolean,
-  onOpenNewProjectSetupDialog: () => void,
+  onOpenNewProjectSetupDialog: (
+    initialTab: 'from-scratch' | 'ai' | 'example'
+  ) => void,
 |};
 
 const useExampleOrGameTemplateDialogs = ({
@@ -137,7 +139,7 @@ const useExampleOrGameTemplateDialogs = ({
           <ExampleDialog
             isOpening={isProjectOpening}
             exampleShortHeader={selectedExampleShortHeader}
-            onOpen={onOpenNewProjectSetupDialog}
+            onOpen={() => onOpenNewProjectSetupDialog('example')}
             onClose={() => setSelectedExampleShortHeader(null)}
           />
         )}
@@ -148,7 +150,9 @@ const useExampleOrGameTemplateDialogs = ({
                 selectedPrivateGameTemplate.privateGameTemplateListingData
               }
               isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
-              onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
+              onCreateWithGameTemplate={() =>
+                onOpenNewProjectSetupDialog('example')
+              }
               onGameTemplateOpen={privateGameTemplateListingData =>
                 setSelectedPrivateGameTemplate({
                   privateGameTemplateListingData,

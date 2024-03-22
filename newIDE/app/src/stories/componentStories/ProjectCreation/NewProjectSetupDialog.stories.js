@@ -23,9 +23,10 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const OpenAndNotAuthenticated = () => {
+export const OpenOnAIAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
+      initialTab="ai"
       authenticatedUser={fakeNotAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -47,9 +48,59 @@ export const OpenAndNotAuthenticated = () => {
   );
 };
 
-export const OpenAndAuthenticated = () => {
+export const OpenOnAIAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
+      initialTab="ai"
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+export const OpenOnFromScratchAndNotAuthenticated = () => {
+  return (
+    <NewProjectSetupDialog
+      initialTab="from-scratch"
+      authenticatedUser={fakeNotAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+
+export const OpenOnFromScratchAndAuthenticated = () => {
+  return (
+    <NewProjectSetupDialog
+      initialTab="from-scratch"
       authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
@@ -96,9 +147,37 @@ export const Opening = () => {
   );
 };
 
-export const LimitsReached = () => {
+export const OpenOnFromScratchAndLimitsReached = () => {
   return (
     <NewProjectSetupDialog
+      initialTab="from-scratch"
+      authenticatedUser={
+        fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
+      }
+      storageProviders={[
+        CloudStorageProvider,
+        UrlStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+
+export const OpenOnAIAndLimitsReached = () => {
+  return (
+    <NewProjectSetupDialog
+      initialTab="ai"
       authenticatedUser={
         fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
       }

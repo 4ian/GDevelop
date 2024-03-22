@@ -17,7 +17,9 @@ export type ExampleStoreDialogProps = {|
   onSelectPrivateGameTemplateListingData: (
     privateGameTemplateListingData: ?PrivateGameTemplateListingData
   ) => void,
-  onOpenNewProjectSetupDialog: () => void,
+  onOpenNewProjectSetupDialog: (
+    initialTab: 'from-scratch' | 'ai' | 'example'
+  ) => void,
   isProjectOpening: boolean,
 |};
 
@@ -44,7 +46,7 @@ const ExampleStoreDialog = ({
         id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
-        onClick={onOpenNewProjectSetupDialog}
+        onClick={() => onOpenNewProjectSetupDialog('from-scratch')}
       />,
     ],
     [onClose, onOpenNewProjectSetupDialog]
@@ -59,7 +61,7 @@ const ExampleStoreDialog = ({
           title={<Trans>Create a new project</Trans>}
           actions={actions}
           onRequestClose={onClose}
-          onApply={onOpenNewProjectSetupDialog}
+          onApply={() => onOpenNewProjectSetupDialog('from-scratch')}
           open={open}
           fullHeight
           flexColumnBody
@@ -67,7 +69,9 @@ const ExampleStoreDialog = ({
           <ExampleStore
             focusOnMount
             isOpening={isProjectOpening}
-            onOpenNewProjectSetupDialog={onOpenNewProjectSetupDialog}
+            onOpenNewProjectSetupDialog={() =>
+              onOpenNewProjectSetupDialog('example')
+            }
             onSelectExampleShortHeader={onSelectExampleShortHeader}
             onSelectPrivateGameTemplateListingData={
               onSelectPrivateGameTemplateListingData

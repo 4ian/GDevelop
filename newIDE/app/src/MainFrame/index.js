@@ -359,9 +359,9 @@ const MainFrame = (props: Props) => {
     openPreferencesDialog,
   ] = React.useState<boolean>(false);
   const [
-    newProjectSetupDialogOpen,
-    setNewProjectSetupDialogOpen,
-  ] = React.useState<boolean>(false);
+    newProjectSetupDialogInitialTab,
+    setNewProjectSetupDialogInitialTab,
+  ] = React.useState<null | 'from-scratch' | 'ai' | 'example'>(null);
 
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
@@ -498,7 +498,7 @@ const MainFrame = (props: Props) => {
     openExampleStoreDialog,
   } = useExampleOrGameTemplateDialogs({
     isProjectOpening,
-    onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
+    onOpenNewProjectSetupDialog: setNewProjectSetupDialogInitialTab,
   });
 
   /**
@@ -1144,7 +1144,7 @@ const MainFrame = (props: Props) => {
     },
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
-      setNewProjectSetupDialogOpen(false);
+      setNewProjectSetupDialogInitialTab(null);
       closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       findLeaderboardsToReplace(project, oldProjectId);
       openSceneOrProjectManager({
@@ -2960,7 +2960,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onCreateBlank: () => setNewProjectSetupDialogInitialTab('from-scratch'),
     onOpenProject: () => openOpenFromStorageProviderDialog(),
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -3020,7 +3020,7 @@ const MainFrame = (props: Props) => {
     onExportProject: () => openShareDialog('publish'),
     onInviteCollaborators: () => openShareDialog('invite'),
     onCreateProject: openExampleStoreDialog,
-    onCreateBlank: () => setNewProjectSetupDialogOpen(true),
+    onCreateBlank: () => setNewProjectSetupDialogInitialTab('from-scratch'),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
     onOpenDebugger: openDebugger,
@@ -3224,9 +3224,7 @@ const MainFrame = (props: Props) => {
                     canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onOpenNewProjectSetupDialog: () => {
-                      setNewProjectSetupDialogOpen(true);
-                    },
+                    onOpenNewProjectSetupDialog: setNewProjectSetupDialogInitialTab,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
                     onOpenExampleStore: openExampleStoreDialog,
@@ -3241,7 +3239,7 @@ const MainFrame = (props: Props) => {
                         privateGameTemplateListingData,
                         openDialog: false,
                       });
-                      setNewProjectSetupDialogOpen(true);
+                      setNewProjectSetupDialogInitialTab('example');
                     },
                     onOpenProfile: () => openProfileDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
@@ -3366,11 +3364,12 @@ const MainFrame = (props: Props) => {
           }}
         />
       )}
-      {newProjectSetupDialogOpen && (
+      {newProjectSetupDialogInitialTab && (
         <NewProjectSetupDialog
+          initialTab={newProjectSetupDialogInitialTab}
           authenticatedUser={authenticatedUser}
           isOpeningProject={isProjectOpening}
-          onClose={() => setNewProjectSetupDialogOpen(false)}
+          onClose={() => setNewProjectSetupDialogInitialTab(null)}
           onCreateEmptyProject={createEmptyProject}
           onCreateFromExample={createProjectFromExample}
           onCreateProjectFromPrivateGameTemplate={

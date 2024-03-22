@@ -114,7 +114,9 @@ type Props = {|
   onOpenAbout: () => void,
 
   // Project creation
-  onOpenNewProjectSetupDialog: () => void,
+  onOpenNewProjectSetupDialog: (
+    initialTab: 'from-scratch' | 'ai' | 'example'
+  ) => void,
 
   // Project save
   onSave: () => Promise<void>,

@@ -98,7 +98,9 @@ export type RenderEditorContainerProps = {|
   canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onOpenNewProjectSetupDialog: () => void,
+  onOpenNewProjectSetupDialog: (
+    initialTab: 'from-scratch' | 'ai' | 'example'
+  ) => void,
 
   // Project save
   onSave: () => Promise<void>,

@@ -83,6 +83,7 @@ const StoreSection = ({
         onOpenPrivateGameTemplateListingData={
           onOpenPrivateGameTemplateListingData
         }
+        displayPromotions
       />
       {(openedAssetPack || openedAssetShortHeader) && (
         <Line justifyContent="flex-end">

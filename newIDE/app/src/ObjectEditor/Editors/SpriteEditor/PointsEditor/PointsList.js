@@ -26,6 +26,7 @@ type PointsListBodyProps = {|
   onSelectPoint: (pointName: string) => void,
   onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
+  spriteSize: [number, number],
 |};
 
 const PointsListBody = (props: PointsListBodyProps) => {
@@ -138,13 +139,19 @@ const PointsListBody = (props: PointsListBodyProps) => {
       selected={'Origin' === props.selectedPointName}
     />
   );
+
+  const isDefaultCenterPoint = pointsContainer.isDefaultCenterPoint();
   const centerRow = (
     <PointRow
       key={'center-point-row'}
       pointName="Center"
-      isAutomatic={pointsContainer.isDefaultCenterPoint()}
-      pointX={centerPoint.getX()}
-      pointY={centerPoint.getY()}
+      isAutomatic={isDefaultCenterPoint}
+      pointX={
+        isDefaultCenterPoint ? props.spriteSize[0] / 2 : centerPoint.getX()
+      }
+      pointY={
+        isDefaultCenterPoint ? props.spriteSize[1] / 2 : centerPoint.getY()
+      }
       onChangePointX={updateCenterPointX}
       onChangePointY={updateCenterPointY}
       onPointerEnter={props.onHoverPoint}
@@ -180,6 +187,7 @@ type PointsListProps = {|
   onSelectPoint: (pointName: ?string) => void,
   onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
+  spriteSize: [number, number],
 |};
 
 const PointsList = (props: PointsListProps) => {
@@ -207,6 +215,7 @@ const PointsList = (props: PointsListProps) => {
           selectedPointName={props.selectedPointName}
           onPointsUpdated={props.onPointsUpdated}
           onRenamedPoint={props.onRenamedPoint}
+          spriteSize={props.spriteSize}
         />
       </Table>
       <Spacer />

@@ -79,6 +79,10 @@ const PointsEditor = ({
     setHighlightedPointName,
   ] = React.useState<?string>(null);
 
+  const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
+    [number, number]
+  >([0, 0]);
+
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
 
@@ -224,6 +228,7 @@ const PointsEditor = ({
                 project,
                 resourceName
               )}
+              onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (
                   <PointsPreview
@@ -289,6 +294,7 @@ const PointsEditor = ({
                   onHoverPoint={setHighlightedPointName}
                   onSelectPoint={setSelectedPointName}
                   onRenamedPoint={onRenamedPoint}
+                  spriteSize={currentSpriteSize}
                 />
               )}
               {!sprite && (

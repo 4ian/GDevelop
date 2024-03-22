@@ -83,8 +83,9 @@ const CollisionMasksEditor = ({
     null
   );
 
-  const [spriteWidth, setSpriteWidth] = React.useState(0);
-  const [spriteHeight, setSpriteHeight] = React.useState(0);
+  const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
+    [number, number]
+  >([0, 0]);
   const forceUpdate = useForceUpdate();
 
   const { showConfirmation } = useAlertDialog();
@@ -245,11 +246,6 @@ const CollisionMasksEditor = ({
     [sameCollisionMasksForAnimations, updateCollisionMasks, showConfirmation]
   );
 
-  const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
-    setSpriteWidth(spriteWidth);
-    setSpriteHeight(spriteHeight);
-  };
-
   const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
     async value => {
       // If enabling automatic while custom was selected, then ask for confirmation.
@@ -334,7 +330,7 @@ const CollisionMasksEditor = ({
                 project,
                 resourceName
               )}
-              onSize={setCurrentSpriteSize}
+              onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (
                   <CollisionMasksPreview
@@ -410,8 +406,7 @@ const CollisionMasksEditor = ({
                       onHoverVertice={setHighlightedVerticePtr}
                       onClickVertice={setSelectedVerticePtr}
                       selectedVerticePtr={selectedVerticePtr}
-                      spriteWidth={spriteWidth}
-                      spriteHeight={spriteHeight}
+                      spriteSize={currentSpriteSize}
                     />
                   </React.Fragment>
                 )}

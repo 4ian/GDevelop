@@ -12,7 +12,6 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
-  onSize?: (number, number) => void,
 |};
 
 /**
@@ -39,7 +38,6 @@ const ResourcePreview = (props: Props) => {
             project,
             resourceName
           )}
-          onSize={props.onSize}
         />
       );
     case 'audio':

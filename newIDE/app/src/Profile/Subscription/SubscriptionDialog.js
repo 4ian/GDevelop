@@ -47,6 +47,7 @@ import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMea
 import Link from '../../UI/Link';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import uniq from 'lodash/uniq';
+import CancelReasonDialog from './CancelReasonDialog';
 
 const styles = {
   descriptionText: {
@@ -85,34 +86,39 @@ const styles = {
 };
 
 const cancelConfirmationTexts = {
-  title: t`Cancel your subscription`,
-  message: t`Are you sure you want to cancel your subscription?`,
-  confirmButtonLabel: t`Cancel my subscription`,
-  dismissButtonLabel: t`Go back`,
+  title: t`Cancel your subscription?`,
+  message: t`By canceling your subscription, you will lose all your premium features at the end of the period you already paid for. Continue?`,
+  confirmButtonLabel: t`Continue`,
+  dismissButtonLabel: t`Keep subscription`,
+  maxWidth: 'sm',
 };
 const cancelImmediatelyConfirmationTexts = {
-  title: t`Cancel your subscription`,
-  message: t`Are you sure you want to cancel your subscription? Your access to GDevelop premium features will end IMMEDIATELY.`,
+  title: t`Cancel your subscription?`,
+  message: t`By canceling your subscription you will lose all your premium features IMMEDIATELY. Continue?`,
   confirmButtonLabel: t`Cancel my subscription now`,
-  dismissButtonLabel: t`Go back`,
+  dismissButtonLabel: t`Keep subscription`,
+  maxWidth: 'sm',
 };
 const seamlesslyChangeConfirmationTexts = {
   title: t`Update your subscription`,
   message: t`Are you sure you want to change your plan? Your next payment will be pro-rated.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
+  maxWidth: 'sm',
 };
 const cancelAndChangeConfirmationTexts = {
   title: t`Update your subscription`,
   message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate but your payment will NOT be pro-rated (you will have to pay as for a new subscription).`,
   confirmButtonLabel: t`Cancel my subscription`,
   dismissButtonLabel: t`Go back`,
+  maxWidth: 'sm',
 };
 const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   title: t`Update your subscription`,
   message: t`To get this new subscription, we need to cancel your existing one before you can pay for the new one. The change will be immediate. You will also lose your redeemed code.`,
   confirmButtonLabel: t`Update my subscription`,
   dismissButtonLabel: t`Go back`,
+  maxWidth: 'sm',
 };
 
 const getPlanSpecificRequirements = (
@@ -171,7 +177,10 @@ export default function SubscriptionDialog({
   ] = React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { showConfirmation, showAlert } = useAlertDialog();
+  const { showConfirmation } = useAlertDialog();
+  const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
+    false
+  );
 
   React.useEffect(
     () => {
@@ -221,33 +230,7 @@ export default function SubscriptionDialog({
       );
       if (!answer) return;
 
-      setIsChangingSubscription(true);
-      try {
-        await changeUserSubscription(
-          getAuthorizationHeader,
-          profile.id,
-          {
-            planId: null,
-          },
-          { cancelImmediately: false }
-        );
-        await authenticatedUser.onRefreshSubscription();
-        showAlert({
-          title: t`Subscription cancelled`,
-          message: t`Your subscription is now cancelled.`,
-        });
-      } catch (rawError) {
-        await authenticatedUser.onRefreshSubscription();
-        showErrorBox({
-          message: i18n._(
-            t`Your subscription could not be cancelled. Please try again later!`
-          ),
-          rawError,
-          errorId: 'subscription-update-error',
-        });
-      } finally {
-        setIsChangingSubscription(false);
-      }
+      setCancelReasonDialogOpen(true);
       return;
     }
 
@@ -294,7 +277,12 @@ export default function SubscriptionDialog({
           {
             planId: null,
           },
-          { cancelImmediately: true }
+          {
+            cancelImmediately: true,
+            cancelReasons: {
+              'changing-subscription': true,
+            },
+          }
         );
         await authenticatedUser.onRefreshSubscription();
       } catch (rawError) {
@@ -362,13 +350,23 @@ export default function SubscriptionDialog({
         })
     : null;
 
+  const dialogMaxWidth =
+    !displayedSubscriptionPlanWithPricingSystems ||
+    displayedSubscriptionPlanWithPricingSystems.length === 1
+      ? 'md'
+      : displayedSubscriptionPlanWithPricingSystems.length < 4
+      ? 'lg'
+      : displayedSubscriptionPlanWithPricingSystems.length < 5
+      ? 'xl'
+      : false;
+
   return (
     <I18n>
       {({ i18n }) => (
         <>
           <Dialog
             title={null}
-            maxWidth={false}
+            maxWidth={dialogMaxWidth}
             actions={[
               <FlatButton
                 label={<Trans>Close</Trans>}
@@ -698,6 +696,17 @@ export default function SubscriptionDialog({
                     setSubscriptionPendingDialogOpen(true);
                   }
                 }
+              }}
+            />
+          )}
+          {cancelReasonDialogOpen && (
+            <CancelReasonDialog
+              onClose={() => {
+                setCancelReasonDialogOpen(false);
+              }}
+              onCloseAfterSuccess={() => {
+                setCancelReasonDialogOpen(false);
+                onClose();
               }}
             />
           )}

@@ -17,8 +17,8 @@ import FlatButton from '../../UI/FlatButton';
 import StarIcon from '../../UI/CustomSvgIcons/Star';
 
 type Props = {|
-  onClose: Function,
-  onCloseAfterSuccess: Function,
+  onClose: () => void,
+  onCloseAfterSuccess: () => void,
 |};
 
 const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
@@ -89,7 +89,7 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
         setHasCanceledSubscription(true);
       } catch (rawError) {
         await authenticatedUser.onRefreshSubscription();
-        console.error(rawError);
+        console.error('Error while canceling subscription:', rawError);
         showAlert({
           title: t`Could not cancel your subscription`,
           message: t`There was an error while canceling your subscription. Verify your internet connection or try again later.`,

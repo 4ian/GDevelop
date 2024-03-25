@@ -335,7 +335,7 @@ export default function SubscriptionDialog({
     ? authenticatedUser.subscription.planId
     : null;
 
-  const { windowSize } = useResponsiveWindowSize();
+  const { windowSize, isMobile } = useResponsiveWindowSize();
 
   const displayedSubscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems
     ? [
@@ -429,7 +429,13 @@ export default function SubscriptionDialog({
                       </Trans>
                     }
                     onClickRightButton={() => setPeriod('yearly')}
-                    rightButtonLabel={<Trans>See yearly subs</Trans>}
+                    rightButtonLabel={
+                      isMobile ? (
+                        <Trans>Check out</Trans>
+                      ) : (
+                        <Trans>See yearly subs</Trans>
+                      )
+                    }
                   />
                 )}
               </>

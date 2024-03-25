@@ -50,6 +50,7 @@ import uniq from 'lodash/uniq';
 import CancelReasonDialog from './CancelReasonDialog';
 import { Line } from '../../UI/Grid';
 import TwoStatesButton from '../../UI/TwoStatesButton';
+import HotMessage from '../../UI/HotMessage';
 
 const styles = {
   descriptionText: {
@@ -369,6 +370,7 @@ export default function SubscriptionDialog({
         <>
           <Dialog
             title={null}
+            fullHeight
             maxWidth={dialogMaxWidth}
             actions={[
               <FlatButton
@@ -389,6 +391,41 @@ export default function SubscriptionDialog({
               />,
             ]}
             open={open}
+            fixedContent={
+              <>
+                <Line justifyContent="space-between" alignItems="center">
+                  <Text size="block-title">
+                    <Trans>Subscription plans</Trans>
+                  </Text>
+                  <TwoStatesButton
+                    value={period}
+                    leftButton={{
+                      label: <Trans>Monthly</Trans>,
+                      value: 'monthly',
+                    }}
+                    rightButton={{
+                      label: <Trans>Yearly</Trans>,
+                      value: 'yearly',
+                    }}
+                    // $FlowIgnore
+                    onChange={setPeriod}
+                    addDatasetEffective
+                  />
+                </Line>
+                {period !== 'yearly' && (
+                  <HotMessage
+                    title={<Trans>Up to 40% discount</Trans>}
+                    message={
+                      <Trans>
+                        Get a yearly subscription and enjoy discounts up to 40%!
+                      </Trans>
+                    }
+                    onClickRightButton={() => setPeriod('yearly')}
+                    rightButtonLabel={<Trans>See yearly subs</Trans>}
+                  />
+                )}
+              </>
+            }
           >
             <ColumnStackLayout noMargin>
               {willCancelAtPeriodEnd && (
@@ -399,25 +436,6 @@ export default function SubscriptionDialog({
                   </Trans>
                 </AlertMessage>
               )}
-              <Line justifyContent="space-between" alignItems="center">
-                <Text size="block-title">
-                  <Trans>Subscription plans</Trans>
-                </Text>
-                <TwoStatesButton
-                  value={period}
-                  leftButton={{
-                    label: <Trans>Monthly</Trans>,
-                    value: 'monthly',
-                  }}
-                  rightButton={{
-                    label: <Trans>Yearly</Trans>,
-                    value: 'yearly',
-                  }}
-                  // $FlowIgnore
-                  onChange={setPeriod}
-                  addDatasetEffective
-                />
-              </Line>
               {displayedSubscriptionPlanWithPricingSystems ? (
                 <div style={styles.scrollablePlanCardsContainer}>
                   <div

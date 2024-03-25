@@ -29,6 +29,7 @@ export default class ParticleEmitterEditor extends React.Component<
       project,
       resourceManagementProps,
       objectName,
+      renderObjectNameField,
     } = this.props;
     const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
       objectConfiguration
@@ -37,6 +38,7 @@ export default class ParticleEmitterEditor extends React.Component<
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         {tutorialIds.map(tutorialId => (
           <DismissableTutorialMessage
             key={tutorialId}

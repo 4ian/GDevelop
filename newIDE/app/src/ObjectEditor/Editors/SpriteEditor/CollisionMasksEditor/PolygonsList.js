@@ -201,15 +201,13 @@ type PolygonsListProps = {|
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
-  spriteWidth: number,
-  spriteHeight: number,
+  spriteSize: [number, number],
 |};
 
 const PolygonsList = (props: PolygonsListProps) => {
   const {
     polygons,
-    spriteHeight,
-    spriteWidth,
+    spriteSize,
     onPolygonsUpdated,
     onSetFullImageCollisionMask,
     onSetAutomaticallyAdaptCollisionMasks,
@@ -218,6 +216,7 @@ const PolygonsList = (props: PolygonsListProps) => {
     selectedVerticePtr,
   } = props;
 
+  const [spriteWidth, spriteHeight] = spriteSize;
   const addCollisionMask = React.useCallback(
     () => {
       const newPolygon = gd.Polygon2d.createRectangle(

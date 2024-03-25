@@ -13,12 +13,14 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Project/CustomConfigurationHelper.h"
+#include "GDCore/Project/InitialInstance.h"
 
 using namespace gd;
 
 void CustomObjectConfiguration::Init(const gd::CustomObjectConfiguration& objectConfiguration) {
   project = objectConfiguration.project;
   objectContent = objectConfiguration.objectContent;
+  animations = objectConfiguration.animations;
 
   // There is no default copy for a map of unique_ptr like childObjectConfigurations.
   childObjectConfigurations.clear();
@@ -88,23 +90,38 @@ bool CustomObjectConfiguration::UpdateProperty(const gd::String& propertyName,
 
 std::map<gd::String, gd::PropertyDescriptor>
 CustomObjectConfiguration::GetInitialInstanceProperties(
-    const gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& scene) {
-  return std::map<gd::String, gd::PropertyDescriptor>();
+    const gd::InitialInstance &initialInstance, gd::Project &project,
+    gd::Layout &scene) {
+  std::map<gd::String, gd::PropertyDescriptor> properties;
+  if (!animations.HasNoAnimations()) {
+    properties["animation"] =
+        gd::PropertyDescriptor(
+            gd::String::From(initialInstance.GetRawDoubleProperty("animation")))
+            .SetLabel(_("Animation"))
+            .SetType("number");
+  }
+  return properties;
 }
 
 bool CustomObjectConfiguration::UpdateInitialInstanceProperty(
-    gd::InitialInstance& instance,
-    const gd::String& name,
-    const gd::String& value,
-    gd::Project& project,
-    gd::Layout& scene) {
-  return false;
+    gd::InitialInstance &initialInstance, const gd::String &name,
+    const gd::String &value, gd::Project &project, gd::Layout &scene) {
+  if (name == "animation") {
+    initialInstance.SetRawDoubleProperty(
+        "animation", std::max(0, value.empty() ? 0 : value.To<int>()));
+  }
+
+  return true;
 }
 
 void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const {
   element.AddChild("content") = objectContent;
+
+  if (!animations.HasNoAnimations()) {
+    auto &animatableElement = element.AddChild("animatable");
+    animations.SerializeTo(animatableElement);
+  }
+
   auto &childrenContentElement = element.AddChild("childrenContent");
   for (auto &pair : childObjectConfigurations) {
     auto &childName = pair.first;
@@ -116,6 +133,12 @@ void CustomObjectConfiguration::DoSerializeTo(SerializerElement& element) const 
 void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
                                                const SerializerElement& element) {
   objectContent = element.GetChild("content");
+
+  if (element.HasChild("animatable")) {
+    auto &animatableElement = element.GetChild("animatable");
+    animations.UnserializeFrom(animatableElement);
+  }
+
   auto &childrenContentElement = element.GetChild("childrenContent");
   for (auto &pair : childrenContentElement.GetAllChildren()) {
     auto &childName = pair.first;
@@ -126,6 +149,8 @@ void CustomObjectConfiguration::DoUnserializeFrom(Project& project,
 }
 
 void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+  animations.ExposeResources(worker);
+
   std::map<gd::String, gd::PropertyDescriptor> properties = GetProperties();
 
   for (auto& property : properties) {
@@ -177,4 +202,12 @@ void CustomObjectConfiguration::ExposeResources(gd::ArbitraryResourceWorker& wor
     auto &configuration = GetChildObjectConfiguration(childObject->GetName());
     configuration.ExposeResources(worker);
   }
+}
+
+const SpriteAnimationList& CustomObjectConfiguration::GetAnimations() const {
+  return animations;
+}
+
+SpriteAnimationList& CustomObjectConfiguration::GetAnimations() {
+  return animations;
 }

@@ -628,16 +628,10 @@ const GetStartedSection = ({
     return (
       <>
         <SectionContainer
-          title={
-            profile && profile.username ? (
-              <Trans>Hello {profile.username}!</Trans>
-            ) : (
-              <Trans>Hello!</Trans>
-            )
-          }
+          title={<Trans>Start making games</Trans>}
           renderSubtitle={renderSubtitle}
           flexBody
-          showAnnouncementsAndPromotions
+          showUrgentAnnouncements
         >
           <RecommendationList
             authenticatedUser={authenticatedUser}

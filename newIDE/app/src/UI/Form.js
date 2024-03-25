@@ -6,6 +6,7 @@ type Props = {|
   autoComplete?: 'on' | 'off',
   name: string,
   children: React.Node,
+  fullWidth?: boolean,
 |};
 
 const Form = ({
@@ -13,6 +14,7 @@ const Form = ({
   autoComplete = 'off', // Default to 'off' to avoid browser autofill.
   name,
   children,
+  fullWidth,
 }: Props) => {
   return (
     <form
@@ -23,6 +25,7 @@ const Form = ({
       }}
       autoComplete={autoComplete}
       name={name}
+      style={{ width: fullWidth ? '100%' : undefined }}
     >
       {children}
       {/*

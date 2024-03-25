@@ -183,16 +183,3 @@ export const compareAchievements = (
     return 0;
   }
 };
-
-export const hasPendingBadgeNotifications = (
-  authenticatedUser: AuthenticatedUser
-): boolean => {
-  if (!authenticatedUser.authenticated) return false;
-
-  const { badges } = authenticatedUser;
-  if (badges && badges.length > 0) {
-    return badges.some(badge => !badge.seen);
-  }
-
-  return false;
-};

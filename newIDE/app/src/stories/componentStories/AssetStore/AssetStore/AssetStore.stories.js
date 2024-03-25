@@ -56,10 +56,17 @@ const Wrapper = ({ children }: { children: React.Node }) => {
 
 export const Default = () => (
   <Wrapper>
-    <AssetStore />
+    <AssetStore displayPromotions />
   </Wrapper>
 );
 Default.parameters = apiDataFakePacks;
+
+export const WithoutPromotions = () => (
+  <Wrapper>
+    <AssetStore displayPromotions={false} />
+  </Wrapper>
+);
+WithoutPromotions.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
   <Wrapper>

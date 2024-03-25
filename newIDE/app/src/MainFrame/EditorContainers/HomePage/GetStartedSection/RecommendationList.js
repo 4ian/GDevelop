@@ -18,7 +18,7 @@ import {
   type WindowSizeType,
 } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
-import { Column } from '../../../../UI/Grid';
+import { Column, Spacer } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
 import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
@@ -32,6 +32,7 @@ import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
 import { SurveyCard } from './SurveyCard';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 
 const styles = {
   textTutorialContent: {
@@ -299,6 +300,16 @@ const RecommendationList = ({
               />
             </SectionRow>
           );
+
+        items.push(
+          <SectionRow key="promotions">
+            <Text size="section-title" noMargin>
+              <Trans>Discover the ecosystem</Trans>
+            </Text>
+            <Spacer />
+            <PromotionsSlideshow />
+          </SectionRow>
+        );
 
         if (recommendedTextTutorials.length) {
           items.push(

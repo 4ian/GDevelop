@@ -12,4 +12,4 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Default = () => <EmptyEditor />;
+export const Default = () => <EmptyEditor renderObjectNameField={() => null} />;

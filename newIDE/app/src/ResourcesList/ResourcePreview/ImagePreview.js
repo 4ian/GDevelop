@@ -93,7 +93,7 @@ type Props = {|
     forcedCursor: string | null,
     deactivateControls?: boolean,
   |}) => React.Node,
-  onSize?: (number, number) => void,
+  onImageSize?: ([number, number]) => void,
   hideCheckeredBackground?: boolean,
   deactivateControls?: boolean,
   isImagePrivate?: boolean,
@@ -128,7 +128,7 @@ const ImagePreview = ({
   fixedHeight,
   fixedWidth,
   renderOverlay,
-  onSize,
+  onImageSize,
   hideCheckeredBackground,
   deactivateControls,
   displaySpacedView,
@@ -418,10 +418,10 @@ const ImagePreview = ({
         : 0;
       setImageHeight(newImageHeight);
       setImageWidth(newImageWidth);
-      if (onSize) onSize(newImageWidth, newImageHeight);
+      if (onImageSize) onImageSize([newImageWidth, newImageHeight]);
       if (onImageLoaded) onImageLoaded();
     },
-    [onImageLoaded, onSize]
+    [onImageLoaded, onImageSize]
   );
 
   const onTouchEnd = React.useCallback((event: TouchEvent) => {

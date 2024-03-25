@@ -1522,7 +1522,7 @@ describe('libGD.js', function () {
       anim1.setDirectionsCount(1);
       anim1.getDirection(0).addSprite(sprite1);
 
-      gd.castObject(obj.getConfiguration(), gd.SpriteObject).addAnimation(
+      gd.castObject(obj.getConfiguration(), gd.SpriteObject).getAnimations().addAnimation(
         anim1
       );
 
@@ -1589,7 +1589,7 @@ describe('libGD.js', function () {
       const animation = new gd.Animation();
       animation.setDirectionsCount(1);
       animation.getDirection(0).addSprite(sprite1);
-      spriteConfiguration.addAnimation(animation);
+      spriteConfiguration.getAnimations().addAnimation(animation);
 
       let worker = extend(new gd.ArbitraryResourceWorkerJS(project.getResourcesManager()), {
         exposeImage: function (image) {
@@ -1620,7 +1620,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       animation.getDirection(0).addSprite(sprite2);
       animation.getDirection(0).addSprite(sprite1);
-      spriteObject.addAnimation(animation);
+      spriteObject.getAnimations().addAnimation(animation);
 
       const spriteObject2 = new gd.SpriteObject();
       const animation2 = new gd.Animation();
@@ -1628,7 +1628,7 @@ describe('libGD.js', function () {
       animation2.getDirection(0).addSprite(sprite1);
       animation2.getDirection(0).addSprite(sprite3);
       animation2.getDirection(0).addSprite(sprite1);
-      spriteObject2.addAnimation(animation2);
+      spriteObject2.getAnimations().addAnimation(animation2);
 
       const resourcesInUse = new gd.ResourcesInUseHelper();
 
@@ -1681,7 +1681,7 @@ describe('libGD.js', function () {
       animation.getDirection(0).addSprite(sprite1);
       animation.getDirection(0).addSprite(sprite2);
       animation.getDirection(0).addSprite(sprite1);
-      spriteObject.addAnimation(animation);
+      spriteObject.getAnimations().addAnimation(animation);
 
       const object2 = project.insertNewObject(
         project,
@@ -1697,7 +1697,7 @@ describe('libGD.js', function () {
       animation2.getDirection(0).addSprite(sprite1);
       animation2.getDirection(0).addSprite(sprite3);
       animation2.getDirection(0).addSprite(sprite1);
-      spriteObject2.addAnimation(animation2);
+      spriteObject2.getAnimations().addAnimation(animation2);
 
       {
         const objectsCollector = new gd.ObjectsUsingResourceCollector(project.getResourcesManager(), 'Image1');
@@ -3047,17 +3047,19 @@ describe('libGD.js', function () {
     });
 
     it('can have animations', function () {
-      let obj = new gd.SpriteObject();
-      obj.addAnimation(new gd.Animation());
-      obj.addAnimation(new gd.Animation());
-      expect(obj.getAnimationsCount()).toBe(2);
-      obj.removeAnimation(1);
-      expect(obj.getAnimationsCount()).toBe(1);
+      const obj = new gd.SpriteObject();
+      const animations = obj.getAnimations();
+      animations.addAnimation(new gd.Animation());
+      animations.addAnimation(new gd.Animation());
+      expect(animations.getAnimationsCount()).toBe(2);
+      animations.removeAnimation(1);
+      expect(animations.getAnimationsCount()).toBe(1);
     });
 
     it('can swap animations', function () {
-      let obj = new gd.SpriteObject();
-      obj.removeAllAnimations();
+      const obj = new gd.SpriteObject();
+      const animations = obj.getAnimations();
+      animations.removeAllAnimations();
       let anim1 = new gd.Animation();
       let anim2 = new gd.Animation();
       let sprite1 = new gd.Sprite();
@@ -3071,14 +3073,14 @@ describe('libGD.js', function () {
       anim1.getDirection(0).addSprite(sprite1);
       anim2.getDirection(0).addSprite(sprite2);
 
-      obj.addAnimation(anim1);
-      obj.addAnimation(anim2);
+      animations.addAnimation(anim1);
+      animations.addAnimation(anim2);
       expect(
-        obj.getAnimation(0).getDirection(0).getSprite(0).getImageName()
+        animations.getAnimation(0).getDirection(0).getSprite(0).getImageName()
       ).toBe('image1');
-      obj.swapAnimations(0, 1);
+      animations.swapAnimations(0, 1);
       expect(
-        obj.getAnimation(0).getDirection(0).getSprite(0).getImageName()
+        animations.getAnimation(0).getDirection(0).getSprite(0).getImageName()
       ).toBe('image2');
     });
 

@@ -270,6 +270,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const spriteObjectConfiguration = gd.asSpriteConfiguration(
     spriteObject.getConfiguration()
   );
+  const animations = spriteObjectConfiguration.getAnimations();
   const emptySpriteObjectConfiguration = gd.asSpriteConfiguration(
     emptySpriteObject.getConfiguration()
   );
@@ -317,7 +318,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -335,7 +336,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
     animation.getDirection(0).addSprite(sprite4);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -343,7 +344,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('pixi');
     animation.getDirection(0).addSprite(sprite1);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
 
   spriteObjectWithBehaviors.addNewBehavior(

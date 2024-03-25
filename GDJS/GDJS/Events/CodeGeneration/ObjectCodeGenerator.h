@@ -75,6 +75,8 @@ class ObjectCodeGenerator {
       std::function<gd::String()> generateMethodsCode,
       std::function<gd::String()> generatePropertiesCode,
       std::function<gd::String()> generateUpdateFromObjectDataCode,
+      std::function<gd::String()> generateInitializeAnimatableCode,
+      std::function<gd::String()> generateAnimatableCode,
       std::function<gd::String()> generateTextContainerCode);
 
   gd::String GenerateRuntimeObjectPropertyTemplateCode(
@@ -105,7 +107,8 @@ class ObjectCodeGenerator {
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& codeNamespace);
 
-  gd::String GenerateDoStepPreEventsPreludeCode();
+  gd::String GenerateDoStepPreEventsPreludeCode(
+      const gd::EventsBasedObject& eventsBasedObject);
 
   gd::Project& project;
 

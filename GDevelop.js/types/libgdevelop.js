@@ -231,6 +231,7 @@ declare class libGDevelop {
   Sprite: Class<gdSprite>;
   Direction: Class<gdDirection>;
   Animation: Class<gdAnimation>;
+  SpriteAnimationList: Class<gdSpriteAnimationList>;
   SpriteObject: Class<gdSpriteObject>;
   Model3DAnimation: Class<gdModel3DAnimation>;
   Model3DObjectConfiguration: Class<gdModel3DObjectConfiguration>;

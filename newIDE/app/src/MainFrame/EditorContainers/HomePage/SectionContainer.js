@@ -9,7 +9,6 @@ import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
 import { LineStackLayout } from '../../../UI/Layout';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
-import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 export const SECTION_PADDING = 30;
@@ -58,7 +57,7 @@ type Props = {|
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,
-  showAnnouncementsAndPromotions?: boolean,
+  showUrgentAnnouncements?: boolean,
 |};
 
 const SectionContainer = ({
@@ -71,7 +70,7 @@ const SectionContainer = ({
   flexBody,
   renderFooter,
   noScroll,
-  showAnnouncementsAndPromotions,
+  showUrgentAnnouncements,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const { announcements } = React.useContext(AnnouncementsFeedContext);
@@ -94,14 +93,10 @@ const SectionContainer = ({
     <Column useFullHeight noMargin expand>
       <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
-          {showAnnouncementsAndPromotions && (
+          {showUrgentAnnouncements && (
             <>
               <AnnouncementsFeed canClose level="urgent" hideLoader />
               {announcements && announcements.length > 0 && <Spacer />}
-              <Column noMargin>
-                <PromotionsSlideshow />
-              </Column>
-              <Spacer />
             </>
           )}
           {backAction && (

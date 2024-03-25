@@ -40,38 +40,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           .AddDefaultBehavior("ScalableCapability::ScalableBehavior")
           .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
-  // Deprecated
-  obj.AddAction("String",
-                _("Modify the text"),
-                _("Modify the text of a Text object."),
-                _("the text"),
-                "",
-                "res/actions/text24_black.png",
-                "res/actions/text_black.png")
-      .SetHidden()
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "string",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Text")))
-      .SetFunctionName("SetString")
-      .SetGetter("GetString");
-
-  // Deprecated
-  obj.AddCondition("String",
-                   _("Compare the text"),
-                   _("Compare the text of a Text object."),
-                   _("the text"),
-                   "",
-                   "res/conditions/text24_black.png",
-                   "res/conditions/text_black.png")
-      .SetHidden()
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
-          "string",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Text to compare to")))
-      .SetFunctionName("GetString");
-
   obj.AddAction("Font",
                 _("Font"),
                 _("Change the font of the text."),
@@ -83,94 +51,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("police", _("Font"))
       .SetFunctionName("ChangeFont");
-
-  // Deprecated
-  obj.AddCondition("ScaleX",
-                   _("Scale on X axis"),
-                   _("Compare the scale of the text on the X axis"),
-                   _("the scale on the X axis"),
-                   "Scale",
-                   "res/conditions/scaleWidth24_black.png",
-                   "res/conditions/scaleWidth_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Scale to compare to (1 by default)")))
-      .SetHidden()
-      .SetFunctionName("GetScaleX");
-
-  // Deprecated
-  obj.AddAction(
-         "ScaleX",
-         _("Scale on X axis"),
-         _("Modify the scale of the text on the X axis (default scale is 1)"),
-         _("the scale on the X axis"),
-         _("Scale"),
-         "res/actions/scaleWidth24_black.png",
-         "res/actions/scaleWidth_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Scale (1 by default)")))
-      .SetHidden()
-      .SetFunctionName("SetScaleX");
-
-  // Deprecated
-  obj.AddCondition("ScaleY",
-                   _("Scale on Y axis"),
-                   _("Compare the scale of the text on the Y axis"),
-                   _("the scale on the Y axis"),
-                   "Scale",
-                   "res/conditions/scaleHeight24_black.png",
-                   "res/conditions/scaleHeight_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Scale to compare to (1 by default)")))
-      .SetHidden()
-      .SetFunctionName("GetScaleY");
-
-  // Deprecated
-  obj.AddAction(
-         "ScaleY",
-         _("Scale on Y axis"),
-         _("Modify the scale of the text on the Y axis (default scale is 1)"),
-         _("the scale on the Y axis"),
-         _("Scale"),
-         "res/actions/scaleHeight24_black.png",
-         "res/actions/scaleHeight_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Scale (1 by default)")))
-      .SetHidden()
-      .SetFunctionName("SetScaleY");
-
-  // Deprecated
-  obj.AddAction(
-         "Scale",
-         _("Scale"),
-         _("Modify the scale of the specified object (default scale is 1)"),
-         _("the scale"),
-         _("Scale"),
-         "res/actions/scale24_black.png",
-         "res/actions/scale_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Scale (1 by default)")))
-      .SetHidden()
-      .SetFunctionName("SetScale");
 
   obj.AddAction(
          "ChangeColor",
@@ -355,43 +235,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Blur radius")));
 
-  // Deprecated
-  obj.AddAction("Opacity",
-                _("Text opacity"),
-                _("Change the opacity of a Text. 0 is fully transparent, 255 "
-                  "is opaque (default)."),
-                _("the opacity"),
-                "",
-                "res/actions/opacity24.png",
-                "res/actions/opacity.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity (0-255)")))
-      .SetFunctionName("SetOpacity")
-      .SetGetter("GetOpacity")
-      .SetHidden();
-
-  // Deprecated
-  obj.AddCondition("Opacity",
-                   _("Opacity"),
-                   _("Compare the opacity of a Text object, between 0 (fully "
-                     "transparent) to 255 (opaque)."),
-                   _("the opacity"),
-                   "",
-                   "res/conditions/opacity24.png",
-                   "res/conditions/opacity.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Opacity to compare to (0-255)")))
-      .SetFunctionName("GetOpacity")
-      .SetHidden();
-
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
                 _("Activate or deactivate text smoothing."),
@@ -483,37 +326,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .SetFunctionName("IsUnderlined");
-
-  obj.AddAction("Angle",
-                _("Angle"),
-                _("Modify the angle of a Text object."),
-                _("the angle"),
-                _("Rotation"),
-                "res/actions/rotate24_black.png",
-                "res/actions/rotate_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Angle (in degrees)")))
-      .SetFunctionName("SetAngle")
-      .SetGetter("GetAngle");
-
-  obj.AddCondition("Angle",
-                   _("Angle"),
-                   _("Compare the value of the angle of a Text object."),
-                   _("the angle"),
-                   _("Rotation"),
-                   "res/conditions/rotate24_black.png",
-                   "res/conditions/rotate_black.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters(
-          "number",
-          gd::ParameterOptions::MakeNewOptions().SetDescription(
-              _("Angle to compare to (in degrees)")))
-      .SetFunctionName("GetAngle");
 
   obj.AddCondition("Padding",
                    _("Padding"),
@@ -628,6 +440,143 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     "res/actions/textPadding_black.png")
       .AddParameter("object", _("Object"), "Text");
 
+  obj.AddExpressionAndConditionAndAction("number",
+                                         "FontSize",
+                                         _("Font size"),
+                                         _("the font size of a text object"),
+                                         _("the font size"),
+                                         "",
+                                         "res/conditions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
+
+  // Support for deprecated "Size" actions/conditions:
+  obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
+  obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();
+
+  // Deprecated
+  obj.AddAction("Angle",
+                _("Angle"),
+                _("Modify the angle of a Text object."),
+                _("the angle"),
+                _("Rotation"),
+                "res/actions/rotate24_black.png",
+                "res/actions/rotate_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")))
+      .SetHidden()
+      .SetFunctionName("SetAngle")
+      .SetGetter("GetAngle");
+
+  // Deprecated
+  obj.AddCondition("Angle",
+                   _("Angle"),
+                   _("Compare the value of the angle of a Text object."),
+                   _("the angle"),
+                   _("Rotation"),
+                   "res/conditions/rotate24_black.png",
+                   "res/conditions/rotate_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
+      .SetHidden()
+      .SetFunctionName("GetAngle");
+
+  // Deprecated
+  obj.AddCondition("ScaleX",
+                   _("Scale on X axis"),
+                   _("Compare the scale of the text on the X axis"),
+                   _("the scale on the X axis"),
+                   "Scale",
+                   "res/conditions/scaleWidth24_black.png",
+                   "res/conditions/scaleWidth_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale to compare to (1 by default)")))
+      .SetHidden()
+      .SetFunctionName("GetScaleX");
+
+  // Deprecated
+  obj.AddAction(
+         "ScaleX",
+         _("Scale on X axis"),
+         _("Modify the scale of the text on the X axis (default scale is 1)"),
+         _("the scale on the X axis"),
+         _("Scale"),
+         "res/actions/scaleWidth24_black.png",
+         "res/actions/scaleWidth_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .SetHidden()
+      .SetFunctionName("SetScaleX");
+
+  // Deprecated
+  obj.AddCondition("ScaleY",
+                   _("Scale on Y axis"),
+                   _("Compare the scale of the text on the Y axis"),
+                   _("the scale on the Y axis"),
+                   "Scale",
+                   "res/conditions/scaleHeight24_black.png",
+                   "res/conditions/scaleHeight_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale to compare to (1 by default)")))
+      .SetHidden()
+      .SetFunctionName("GetScaleY");
+
+  // Deprecated
+  obj.AddAction(
+         "ScaleY",
+         _("Scale on Y axis"),
+         _("Modify the scale of the text on the Y axis (default scale is 1)"),
+         _("the scale on the Y axis"),
+         _("Scale"),
+         "res/actions/scaleHeight24_black.png",
+         "res/actions/scaleHeight_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .SetHidden()
+      .SetFunctionName("SetScaleY");
+
+  // Deprecated
+  obj.AddAction(
+         "Scale",
+         _("Scale"),
+         _("Modify the scale of the specified object (default scale is 1)"),
+         _("the scale"),
+         _("Scale"),
+         "res/actions/scale24_black.png",
+         "res/actions/scale_black.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Scale (1 by default)")))
+      .SetHidden()
+      .SetFunctionName("SetScale");
+
   // Deprecated
   obj.AddExpression("ScaleX",
                     _("X Scale of a Text object"),
@@ -649,6 +598,43 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetScaleY");
 
   // Deprecated
+  obj.AddAction("Opacity",
+                _("Text opacity"),
+                _("Change the opacity of a Text. 0 is fully transparent, 255 "
+                  "is opaque (default)."),
+                _("the opacity"),
+                "",
+                "res/actions/opacity24.png",
+                "res/actions/opacity.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
+      .SetFunctionName("SetOpacity")
+      .SetGetter("GetOpacity")
+      .SetHidden();
+
+  // Deprecated
+  obj.AddCondition("Opacity",
+                   _("Opacity"),
+                   _("Compare the opacity of a Text object, between 0 (fully "
+                     "transparent) to 255 (opaque)."),
+                   _("the opacity"),
+                   "",
+                   "res/conditions/opacity24.png",
+                   "res/conditions/opacity.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
+      .SetFunctionName("GetOpacity")
+      .SetHidden();
+
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),
                     _("Opacity of a Text object"),
@@ -658,30 +644,52 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetOpacity")
       .SetHidden();
 
+  // Deprecated
   obj.AddExpression("Angle",
                     _("Angle"),
                     _("Angle"),
                     _("Rotation"),
                     "res/actions/rotate_black.png")
       .AddParameter("object", _("Object"), "Text")
+      .SetHidden()
       .SetFunctionName("GetAngle");
 
-  obj.AddExpressionAndConditionAndAction("number",
-                                         "FontSize",
-                                         _("Font size"),
-                                         _("the font size of a text object"),
-                                         _("the font size"),
-                                         "",
-                                         "res/conditions/characterSize24.png")
+  // Deprecated
+  obj.AddAction("String",
+                _("Modify the text"),
+                _("Modify the text of a Text object."),
+                _("the text"),
+                "",
+                "res/actions/text24_black.png",
+                "res/actions/text_black.png")
+      .SetHidden()
       .AddParameter("object", _("Object"), "Text")
-      .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
+      .UseStandardOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(_("Text")))
+      .SetFunctionName("SetString")
+      .SetGetter("GetString");
 
-  // Support for deprecated "Size" actions/conditions:
-  obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
-  obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();
+  // Deprecated
+  obj.AddCondition("String",
+                   _("Compare the text"),
+                   _("Compare the text of a Text object."),
+                   _("the text"),
+                   "",
+                   "res/conditions/text24_black.png",
+                   "res/conditions/text_black.png")
+      .SetHidden()
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters(
+          "string",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Text to compare to")))
+      .SetFunctionName("GetString");
 
+  // Deprecated
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
       .AddParameter("object", _("Object"), "Text")
+      .SetHidden()
       .SetFunctionName("GetString");
 }

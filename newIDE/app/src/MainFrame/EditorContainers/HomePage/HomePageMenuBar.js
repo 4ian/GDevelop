@@ -79,7 +79,7 @@ const HomePageMenuBar = ({
   const theme = React.useContext(GDevelopThemeContext);
   const { profile } = React.useContext(AuthenticatedUserContext);
   const tabsToDisplay = getTabsToDisplay({ profile });
-  const buttons: {
+  const largeScreenOnlyButtons: {
     label: React.Node,
     getIcon: GetIconFunction,
     id: string,
@@ -139,29 +139,6 @@ const HomePageMenuBar = ({
                 </IconButton>
               );
             })}
-            <span
-              style={{
-                width: 1,
-                backgroundColor: theme.home.separator.color,
-                height: '70%',
-                margin: '0 3px',
-              }}
-            />
-            {buttons.map(({ label, onClick, getIcon, id }) => (
-              <IconButton
-                color="default"
-                key={id}
-                disableRipple
-                disableFocusRipple
-                style={styles.mobileButton}
-                onClick={onClick}
-                id={id}
-              >
-                <span style={styles.buttonLabel}>
-                  {getIcon({ color: 'secondary', fontSize: 'inherit' })}
-                </span>
-              </IconButton>
-            ))}
           </ToolbarGroup>
         </Toolbar>
       </Paper>
@@ -198,7 +175,7 @@ const HomePageMenuBar = ({
 
       <div style={styles.bottomButtonsContainer}>
         <Column>
-          {buttons.map(({ label, getIcon, onClick, id }) => (
+          {largeScreenOnlyButtons.map(({ label, getIcon, onClick, id }) => (
             <VerticalTabButton
               key={id}
               label={label}

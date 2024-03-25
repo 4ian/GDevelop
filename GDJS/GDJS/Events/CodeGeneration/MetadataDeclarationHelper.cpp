@@ -141,6 +141,10 @@ gd::ObjectMetadata &MetadataDeclarationHelper::DeclareObjectMetadata(
     objectMetadata.AddDefaultBehavior("EffectCapability::EffectBehavior");
     objectMetadata.AddDefaultBehavior("OpacityCapability::OpacityBehavior");
   }
+  if (eventsBasedObject.IsAnimatable()) {
+    objectMetadata
+        .AddDefaultBehavior("AnimatableCapability::AnimatableBehavior");
+  }
   if (eventsBasedObject.IsTextContainer()) {
     objectMetadata
         .AddDefaultBehavior("TextContainerCapability::TextContainerBehavior");

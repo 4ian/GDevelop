@@ -1,10 +1,8 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
-import Text from '../../../../UI/Text';
 import { roundTo } from '../../../../Utils/Mathematics';
 import { Column } from '../../../../UI/Grid';
 import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
@@ -63,64 +61,50 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => {
       </TableRowColumn>
       <TableRowColumn style={styles.coordinateColumn} padding="none">
         <Column>
-          {!props.isAutomatic ? (
-            <SemiControlledTextField
-              margin="none"
-              inputStyle={
-                props.selected
-                  ? { color: gdevelopTheme.listItem.selectedTextColor }
-                  : undefined
-              }
-              value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
-              type="number"
-              step={0.5}
-              id="point-x"
-              onChange={value => {
-                const valueAsNumber = parseFloat(value);
-                if (!isNaN(valueAsNumber)) props.onChangePointX(valueAsNumber);
-              }}
-              onBlur={event => {
-                props.onChangePointX(
-                  parseFloat(event.currentTarget.value) || 0
-                );
-              }}
-            />
-          ) : (
-            <Text noMargin>
-              <Trans>(auto)</Trans>
-            </Text>
-          )}
+          <SemiControlledTextField
+            margin="none"
+            inputStyle={
+              props.selected
+                ? { color: gdevelopTheme.listItem.selectedTextColor }
+                : undefined
+            }
+            value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
+            type="number"
+            step={0.5}
+            id="point-x"
+            onChange={value => {
+              const valueAsNumber = parseFloat(value);
+              if (!isNaN(valueAsNumber)) props.onChangePointX(valueAsNumber);
+            }}
+            onBlur={event => {
+              props.onChangePointX(parseFloat(event.currentTarget.value) || 0);
+            }}
+            disabled={props.isAutomatic}
+          />
         </Column>
       </TableRowColumn>
       <TableRowColumn style={styles.coordinateColumn} padding="none">
         <Column>
-          {!props.isAutomatic ? (
-            <SemiControlledTextField
-              margin="none"
-              inputStyle={
-                props.selected
-                  ? { color: gdevelopTheme.listItem.selectedTextColor }
-                  : undefined
-              }
-              value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
-              type="number"
-              step={0.5}
-              id="point-y"
-              onChange={value => {
-                const valueAsNumber = parseFloat(value);
-                if (!isNaN(valueAsNumber)) props.onChangePointY(valueAsNumber);
-              }}
-              onBlur={event => {
-                props.onChangePointY(
-                  parseFloat(event.currentTarget.value) || 0
-                );
-              }}
-            />
-          ) : (
-            <Text noMargin>
-              <Trans>(auto)</Trans>
-            </Text>
-          )}
+          <SemiControlledTextField
+            margin="none"
+            inputStyle={
+              props.selected
+                ? { color: gdevelopTheme.listItem.selectedTextColor }
+                : undefined
+            }
+            value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
+            type="number"
+            step={0.5}
+            id="point-y"
+            onChange={value => {
+              const valueAsNumber = parseFloat(value);
+              if (!isNaN(valueAsNumber)) props.onChangePointY(valueAsNumber);
+            }}
+            onBlur={event => {
+              props.onChangePointY(parseFloat(event.currentTarget.value) || 0);
+            }}
+            disabled={props.isAutomatic}
+          />
         </Column>
       </TableRowColumn>
       <TableRowColumn style={styles.toolColumn}>

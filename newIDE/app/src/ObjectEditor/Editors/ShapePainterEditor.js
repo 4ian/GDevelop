@@ -20,13 +20,14 @@ export default class PanelSpriteEditor extends React.Component<
   void
 > {
   render() {
-    const { objectConfiguration } = this.props;
+    const { objectConfiguration, renderObjectNameField } = this.props;
     const shapePainterConfiguration = gd.asShapePainterConfiguration(
       objectConfiguration
     );
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <Checkbox
           label={
             <Trans>

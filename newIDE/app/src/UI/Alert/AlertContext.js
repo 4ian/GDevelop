@@ -21,6 +21,7 @@ export type ShowConfirmDialogOptions = {|
   dismissButtonLabel?: MessageDescriptor,
   message: MessageDescriptor,
   level?: 'info' | 'warning',
+  maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
 |};
 export type ShowConfirmDialogOptionsWithCallback = {|

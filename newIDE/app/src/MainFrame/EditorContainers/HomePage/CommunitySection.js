@@ -17,6 +17,7 @@ import List from '@material-ui/core/List';
 import ErrorBoundary from '../../../UI/ErrorBoundary';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
 
 const styles = {
   list: {
@@ -71,10 +72,7 @@ const CommunitySection = () => {
     announcements && announcements.length > 0;
 
   return (
-    <SectionContainer
-      title={<Trans>Community</Trans>}
-      showAnnouncementsAndPromotions
-    >
+    <SectionContainer title={<Trans>Community</Trans>} showUrgentAnnouncements>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
           {shouldDisplayAnnouncementsTitle && (
@@ -82,6 +80,7 @@ const CommunitySection = () => {
               <Trans>News and announcements</Trans>
             </Text>
           )}
+          <PromotionsSlideshow />
           <AnnouncementsFeed canClose={false} level="normal" />
           <Text size="title">
             <Trans>Join the conversation</Trans>

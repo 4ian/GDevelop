@@ -27,6 +27,7 @@ export const Default = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
+        renderObjectNameField={() => null}
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
         layout={testProject.testLayout}
@@ -43,6 +44,7 @@ export const AnimationLocked = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
+        renderObjectNameField={() => null}
         isAnimationListLocked
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
@@ -60,6 +62,7 @@ export const Empty = () => (
   <SerializedObjectDisplay object={testProject.emptySpriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
+        renderObjectNameField={() => null}
         objectConfiguration={testProject.emptySpriteObjectConfiguration}
         project={testProject.project}
         layout={testProject.testLayout}
@@ -77,7 +80,7 @@ export const Points = () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <PointsEditor
-          objectConfiguration={testProject.spriteObjectConfiguration}
+          animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
           onRenamedPoint={action('Renamed a point')}
@@ -92,7 +95,7 @@ export const CollisionMasks = () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <CollisionMasksEditor
-          objectConfiguration={testProject.spriteObjectConfiguration}
+          animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
           onCreateMatchingSpriteCollisionMask={action(

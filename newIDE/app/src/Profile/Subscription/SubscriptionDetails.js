@@ -297,10 +297,10 @@ const SubscriptionDetails = ({
                       !hasMobileAppStoreSubscriptionPlan(subscription) &&
                       !hasSubscriptionBeenManuallyAdded(subscription) ? (
                         <FlatButton
-                          key="manage-online"
+                          key="manage-payments"
                           label={
                             <LeftLoader isLoading={isManageSubscriptionLoading}>
-                              <Trans>Manage online</Trans>
+                              <Trans>Manage payments</Trans>
                             </LeftLoader>
                           }
                           primary
@@ -309,8 +309,8 @@ const SubscriptionDetails = ({
                         />
                       ) : null,
                       <RaisedButton
-                        key="manage"
-                        label={<Trans>Change subscription</Trans>}
+                        key="manage-subscription"
+                        label={<Trans>Manage subscription</Trans>}
                         primary
                         onClick={() =>
                           openSubscriptionDialog({

@@ -79,6 +79,7 @@ const Cube3DEditor = ({
   layout,
   resourceManagementProps,
   objectName,
+  renderObjectNameField,
 }: EditorProps) => {
   const forceUpdate = useForceUpdate();
   const properties = objectConfiguration.getProperties();
@@ -104,6 +105,7 @@ const Cube3DEditor = ({
 
   return (
     <ColumnStackLayout noMargin>
+      {renderObjectNameField && renderObjectNameField()}
       <Text size="block-title" noMargin>
         <Trans>Default size</Trans>
       </Text>

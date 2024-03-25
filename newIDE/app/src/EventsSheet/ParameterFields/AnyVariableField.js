@@ -18,11 +18,11 @@ import { enumerateValidVariableNames } from './EnumerateVariables';
 const gd: libGDevelop = global.gd;
 
 export const isUnifiedInstruction = (type: string): boolean =>
-  type === 'VariableTxt' || type === 'VariableAsBoolean';
+  type === 'StringVariable' || type === 'BooleanVariable';
 
 export const getUnifiedInstructionType = (instructionType: string): string =>
-  instructionType === 'VariableTxt' || instructionType === 'VariableAsBoolean'
-    ? 'Variable'
+  instructionType === 'StringVariable' || instructionType === 'BooleanVariable'
+    ? 'NumberVariable'
     : instructionType;
 
 export const switchBetweenUnifiedInstructionIfNeeded = (
@@ -30,9 +30,9 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
   instruction: gdInstruction
 ): void => {
   if (
-    (instruction.getType() === 'Variable' ||
-      instruction.getType() === 'VariableTxt' ||
-      instruction.getType() === 'VariableAsBoolean') &&
+    (instruction.getType() === 'NumberVariable' ||
+      instruction.getType() === 'StringVariable' ||
+      instruction.getType() === 'BooleanVariable') &&
     instruction.getParametersCount() > 0
   ) {
     const variableName = instruction.getParameter(0).getPlainString();
@@ -43,13 +43,13 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
         .getVariablesContainersList()
         .get(variableName);
       if (variable.getType() === gd.Variable.String) {
-        instruction.setType('VariableTxt');
+        instruction.setType('StringVariable');
         instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('Variable');
+        instruction.setType('NumberVariable');
         instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('VariableAsBoolean');
+        instruction.setType('BooleanVariable');
         instruction.setParametersCount(2);
       }
     }

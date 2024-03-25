@@ -26,7 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetIcon("res/conditions/var24.png");
 
   extension
-      .AddCondition("Variable",
+      .AddCondition("NumberVariable",
                     _("Variable value"),
                     _("Compare the number value of a variable."),
                     _("The variable _PARAM0_"),
@@ -39,7 +39,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddCondition("VariableTxt",
+      .AddCondition("StringVariable",
                     _("Variable value"),
                     _("Compare the text (string) of a variable."),
                     _("The variable _PARAM0_"),
@@ -53,7 +53,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition(
-          "VariableAsBoolean",
+          "BooleanVariable",
           _("Variable value"),
           _("Compare the boolean value of a variable."),
           _("The variable _PARAM0_ is _PARAM1_"),
@@ -66,7 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddAction("SetVariable",
+      .AddAction("SetNumberVariable",
                  _("Change number variable"),
                  _("Modify the number value of a variable."),
                  _("the variable _PARAM0_"),
@@ -79,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddAction("SetVariableTxt",
+      .AddAction("SetStringVariable",
                  _("Change text variable"),
                  _("Modify the text (string) of a variable."),
                  _("the text of variable _PARAM0_"),
@@ -93,7 +93,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction(
-          "SetVariableAsBoolean",
+          "SetBooleanVariable",
           _("Change boolean variable"),
           _("Modify the boolean value of a variable."),
           _("Set the boolean value of variable _PARAM0_ to _PARAM1_"),
@@ -105,7 +105,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddAction("ToggleVariableAsBoolean",
+      .AddAction("ToggleBooleanVariable",
                  _("Toggle boolean variable"),
                  _("Toggle the boolean value of a variable.") + "\n" +
                      _("If it was true, it will become false, and if it was "
@@ -158,7 +158,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction(
-          "VariableRemoveChild2",
+          "RemoveVariableChild",
           _("Remove a child"),
           _("Remove a child from a structure variable."),
           _("Remove child _PARAM1_ from structure variable _PARAM0_"),
@@ -171,7 +171,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddAction("VariableClearChildren2",
+      .AddAction("ClearVariableChildren",
                  _("Clear children"),
                  _("Remove all the children from the structure or array "
                    "variable."),
@@ -184,7 +184,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("VariablePush",
+      .AddAction("PushVariable",
                  _("Add existing variable"),
                  _("Adds an existing variable at the end of an array "
                    "variable."),
@@ -202,7 +202,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction(
-          "VariablePushString",
+          "PushString",
           _("Add text variable"),
           _("Adds a text (string) at the end of a array variable."),
           _("Add text _PARAM1_ to array variable _PARAM0_"),
@@ -215,7 +215,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("VariablePushNumber",
+      .AddAction("PushNumber",
                  _("Add number variable"),
                  _("Adds a number at the end of an array variable."),
                  _("Add number _PARAM1_ to array variable _PARAM0_"),
@@ -228,7 +228,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("VariablePushBool",
+      .AddAction("PushBoolean",
                  _("Add boolean variable"),
                  _("Adds a boolean at the end of an array variable."),
                  _("Add boolean _PARAM1_ to array variable _PARAM0_"),
@@ -241,7 +241,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("VariableRemoveAt",
+      .AddAction("RemoveVariableAt",
                  _("Remove variable by index"),
                  _("Removes a variable at the specified index of an array "
                    "variable."),

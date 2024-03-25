@@ -419,9 +419,8 @@ namespace gdjs {
       return;
     }
     if (this.dialogueData.select) {
-      this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
-        optionIndex
-      );
+      this.selectedOption =
+        gdjs.dialogueTree._normalizedOptionIndex(optionIndex);
       this.selectedOptionUpdated = true;
     }
   };
@@ -819,7 +818,7 @@ namespace gdjs {
   };
 
   /**
-   * Check if the currently parsed Dialogue branch title is a  query.
+   * Check if the currently parsed Dialogue branch title is a query.
    * @param title The Dialogue Branch name you want to check for.
    */
   gdjs.dialogueTree.branchTitleIs = function (title: string) {
@@ -863,6 +862,10 @@ namespace gdjs {
     this.tagParameters = [];
     if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
       return this.dialogueBranchTags.some(function (tag) {
+        if(tag.includes(":")) {
+          const splitTag = tag.split(":");
+          return splitTag[0] === query;
+        }
         const splitTag = tag.match(/([^\(]+)\(([^\)]+)\)/i);
         gdjs.dialogueTree.tagParameters = splitTag
           ? splitTag[2].split(',')
@@ -886,6 +889,30 @@ namespace gdjs {
     return '';
   };
 
+   /**
+   * Get a dialogue node tag value via a key, where the pattern of the tag is tagKey:value and what is returned is value
+   * For example if you have the tags set in yarn as: "bg:park time:noon"
+   * asking for tagKey "time" will return "noon". This is useful for nodes with alot of tags
+   * @param tagKey The key of the tag to get.
+   */
+    gdjs.dialogueTree.getTagValueViaKey = function (tagKey: string) {
+      console.log({tagKey, branchTags: this.dialogueBranchTags})
+      if (tagKey === '') {
+        return '';
+      }
+      if (this.dialogueIsRunning && this.dialogueBranchTags.length > 0) {
+        const parameterWithKey = this.dialogueBranchTags.find((tag) =>
+          tag.startsWith(`${tagKey}:`)
+        );
+        if (parameterWithKey) {
+          const [_, returnedParam] = parameterWithKey.split(':');
+          console.log({returnedParam})
+          return returnedParam ? returnedParam : '';
+        }
+      }
+      return '';
+    };
+
   /**
    * Get a list of all the titles of visited by the player Branches. Useful for debugging.
    */
@@ -908,6 +935,17 @@ namespace gdjs {
     return (
       Object.keys(this.runner.visited).includes(title) &&
       this.runner.visited[title]
+    );
+  };
+
+  /**
+   * Check if a player has visited a new Dialogue Branch.
+   */
+  gdjs.dialogueTree.branchTitleHasChanged = function () {
+    return (
+      this.dialogueIsRunning &&
+      (this.dialogueBranchTitle === '' ||
+        this.dialogueBranchTitle === this.dialogueData.data.title)
     );
   };
 
@@ -976,7 +1014,9 @@ namespace gdjs {
    * targetting "root.actor" will return ["james", "tom"]
    * @param targetKey the key of the variable you want target
    */
-  gdjs.dialogueTree.getChildKeysOfNestedVariable = function (targetKey: string) {
+  gdjs.dialogueTree.getChildKeysOfNestedVariable = function (
+    targetKey: string
+  ) {
     const variables = gdjs.dialogueTree.runner.variables.data;
     const result = [];
     Object.keys(variables).forEach((key) => {
@@ -1055,28 +1095,6 @@ namespace gdjs {
       if (parameterWithKey) {
         const [_, returnedParam] = parameterWithKey.split('=');
         console.log({ parameterWithKey, returnedParam });
-        return returnedParam ? returnedParam : '';
-      }
-    }
-    return '';
-  };
-
-  /**
-   * Get a dialogue node tag valia via a key, where the pattern of the tag is tagKey:value and what is returned is value
-   * For example if you have the tags set in yarn as: "bg:park time:noon"
-   * asking for tagKey "time" will return "noon". This is useful for nodes with alot of tags
-   * @param tagKey The key of the tag to get.
-   */
-  gdjs.dialogueTree.getTagViaKey = function (tagKey: string) {
-    if (tagKey === '') {
-      return '';
-    }
-    if (this.dialogueIsRunning && this.dialogueBranchTags.length > 0) {
-      const parameterWithKey = this.dialogueBranchTags.find((tag) =>
-        tag.startsWith(`${tagKey}:`)
-      );
-      if (parameterWithKey) {
-        const [_, returnedParam] = parameterWithKey.split(':');
         return returnedParam ? returnedParam : '';
       }
     }

@@ -169,6 +169,10 @@
   color: var(--event-sheet-instruction-parameter-var-color);
 }
 
+.gd-events-sheet .instruction-parameter.variable {
+  color: var(--event-sheet-instruction-parameter-var-color);
+}
+
 .gd-events-sheet .instruction-parameter .instruction-invalid-parameter {
   color: var(--event-sheet-instruction-parameter-error-color);
   text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;

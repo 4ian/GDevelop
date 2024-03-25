@@ -27,7 +27,7 @@ import intersection from 'lodash/intersection';
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
-  enumerateVariableNames: Array<string>,
+  enumerateVariableNames: () => Array<string>,
   forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
 };
@@ -45,6 +45,20 @@ export const VariableNameQuickAnalyzeResults = {
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
   UNDECLARED_VARIABLE: 4,
+};
+
+export const getRootVariableName = (name: string): string => {
+  const dotPosition = name.indexOf('.');
+  const squareBracketPosition = name.indexOf('[');
+  return dotPosition !== -1 || squareBracketPosition !== -1
+    ? name.substring(
+        0,
+        Math.min(
+          dotPosition === -1 ? name.length : dotPosition,
+          squareBracketPosition === -1 ? name.length : squareBracketPosition
+        )
+      )
+    : name;
 };
 
 // TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
@@ -79,23 +93,10 @@ export const quicklyAnalyzeVariableName = (
   }
 
   // Check at least the name of the root variable, it's the best we can do.
-  const dotPosition = name.indexOf('.');
-  const squareBracketPosition = name.indexOf('[');
-  const nameToCheck =
-    dotPosition !== -1 || squareBracketPosition !== -1
-      ? name.substring(
-          0,
-          Math.min(
-            dotPosition === -1 ? name.length : dotPosition,
-            squareBracketPosition === -1 ? name.length : squareBracketPosition
-          )
-        )
-      : name;
-
   if (
     variablesContainers &&
     !variablesContainers.some(variablesContainer =>
-      variablesContainer.has(nameToCheck)
+      variablesContainer.has(getRootVariableName(name))
     )
   ) {
     return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;

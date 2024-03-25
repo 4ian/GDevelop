@@ -410,6 +410,7 @@ const Instruction = (props: Props) => {
               tabIndex={0}
             >
               {ParameterRenderingService.renderInlineParameter({
+                scope,
                 value: formattedValue,
                 expressionIsValid,
                 parameterMetadata,

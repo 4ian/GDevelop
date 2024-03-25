@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
+  getRootVariableName,
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
@@ -72,9 +73,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const onComputeAllVariableNames = React.useCallback(() => [], []);
 
     // TODO Handle object variable?
-    const enumerateGlobalAndSceneVariableNames = React.useCallback<
-      Array<string>
-    >(
+    const enumerateGlobalAndSceneVariableNames = React.useCallback(
       () => {
         return project && layout
           ? [
@@ -88,7 +87,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const variablesContainers = React.useMemo(
       () => {
-        return layout ? [layout.getVariables(), project.getVariables()] : [];
+        return layout && project ? [layout.getVariables(), project.getVariables()] : [];
       },
       [layout, project]
     );
@@ -144,4 +143,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 );
 
 export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
-  renderVariableWithIcon(props, 'res/types/scenevar.png', 'variable');
+  renderVariableWithIcon(
+    props,
+    props.scope.layout &&
+      props.scope.layout.getVariables().has(getRootVariableName(props.value))
+      ? 'res/types/scenevar.png'
+      : 'res/types/globalvar.png',
+    'variable'
+  );

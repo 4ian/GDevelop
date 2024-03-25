@@ -22,7 +22,6 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
-import intersection from 'lodash/intersection';
 
 type Props = {
   ...ParameterFieldProps,

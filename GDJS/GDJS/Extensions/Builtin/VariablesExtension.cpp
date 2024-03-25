@@ -22,11 +22,11 @@ namespace gdjs {
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
-  GetAllConditions()["Variable"].SetFunctionName(
+  GetAllConditions()["NumberVariable"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableNumber");
-  GetAllConditions()["VariableTxt"].SetFunctionName(
+  GetAllConditions()["StringVariable"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableString");
-  GetAllConditions()["VariableAsBoolean"].SetFunctionName(
+  GetAllConditions()["BooleanVariable"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableBoolean");
 
   GetAllStrExpressions()["VariableFirstString"].SetFunctionName(
@@ -44,28 +44,28 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.variable.getVariableChildCount");
   GetAllConditions()["VariableChildExists2"].SetFunctionName(
       "gdjs.evtTools.variable.variableChildExists");
-  GetAllActions()["VariableRemoveChild2"].SetFunctionName(
+  GetAllActions()["RemoveVariableChild"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveChild");
-  GetAllActions()["VariableClearChildren2"].SetFunctionName(
+  GetAllActions()["ClearVariableChildren"].SetFunctionName(
       "gdjs.evtTools.variable.variableClearChildren");
 
-  GetAllActions()["VariablePush"].SetFunctionName(
+  GetAllActions()["PushVariable"].SetFunctionName(
       "gdjs.evtTools.variable.variablePushCopy");
-  GetAllActions()["VariablePushString"].SetFunctionName(
+  GetAllActions()["PushString"].SetFunctionName(
       "gdjs.evtTools.variable.valuePush");
-  GetAllActions()["VariablePushNumber"].SetFunctionName(
+  GetAllActions()["PushNumber"].SetFunctionName(
       "gdjs.evtTools.variable.valuePush");
-  GetAllActions()["VariablePushBool"].SetFunctionName(
+  GetAllActions()["PushBoolean"].SetFunctionName(
       "gdjs.evtTools.variable.valuePush");
-  GetAllActions()["VariableRemoveAt"].SetFunctionName(
+  GetAllActions()["RemoveVariableAt"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveAt");
 
-  GetAllActions()["SetVariableAsBoolean"].SetFunctionName(
+  GetAllActions()["SetBooleanVariable"].SetFunctionName(
       "gdjs.evtTools.variable.setVariableBoolean");
-  GetAllActions()["ToggleVariableAsBoolean"].SetFunctionName(
+  GetAllActions()["ToggleBooleanVariable"].SetFunctionName(
       "gdjs.evtTools.variable.toggleVariableBoolean");
 
-  GetAllActions()["SetVariable"].SetCustomCodeGenerator(
+  GetAllActions()["SetNumberVariable"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -97,7 +97,7 @@ VariablesExtension::VariablesExtension() {
         return gd::String("");
       });
 
-  GetAllActions()["SetVariableTxt"].SetCustomCodeGenerator(
+  GetAllActions()["SetStringVariable"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {

@@ -266,6 +266,22 @@ module.exports = {
 
     extension
       .addAction(
+        'DeleteVariable',
+        _('Delete dialogue state variable and its $nested.siblings'),
+        _(
+          'Delete dialogue state variable and its $nested.siblings. with $a, $c, $c.tom and $c.james, targetting "c" would result in only $a remaining'
+        ),
+        _('Delete dialogue state variable and its $nested.siblings _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('State Variable Name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.deleteDialogueStateVariable');
+
+    extension
+      .addAction(
         'SaveState',
         _('Save dialogue state'),
         _(
@@ -310,6 +326,58 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.clearState');
+
+    extension
+      .addAction(
+        'CreateNewActor',
+        _('Create a new actor'),
+        _(
+          'Create a new dialog actor, which can be used to trigger/set events said actor is active'
+        ),
+        _(
+          'Create a new dialog actor with ID of _PARAM0_, name _PARAM1_ and color _PARAM2_'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Actor ID'), '', false)
+      .addParameter('string', _('Actor name'), '', false)
+      .addParameter('color', _('Actor color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.createNewActor');
+
+    extension
+      .addAction(
+        'SetActorInfo',
+        _('Set actor variable'),
+        _(
+          'Set variable of dialog actor. Any is allowed to be set, apart of id'
+        ),
+        _('Set dialog actor with ID of _PARAM0_ variable _PARAM1_ to _PARAM2_'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Actor ID'), '', false)
+      .addParameter('string', _('Actor variable'), '', false)
+      .addParameter('string', _('Variable string value'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.setActorInfo');
+
+    extension
+      .addAction(
+        'DeleteActor',
+        _('Delete actor'),
+        _('Delete dialog actor'),
+        _('Delete a dialog actor with ID of _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Actor ID'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.deleteActor');
 
     extension
       .addStrExpression(
@@ -456,6 +524,20 @@ module.exports = {
       .setFunctionName('gdjs.dialogueTree.getCommandParameter');
 
     extension
+      .addStrExpression(
+        'CommandParameterViaKey',
+        _('Get the parameter of a command call via a key'),
+        _(
+          'Get the parameter of a command call via a key. For example: asking <<command a=22 b=3>> for a parameter with key "a" will return 22'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('parameter key'), '', true)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getCommandParameterViaKey');
+
+    extension
       .addExpression(
         'CommandParametersCount',
         _('Get the number of parameters in the currently passed command'),
@@ -481,6 +563,20 @@ module.exports = {
       .addParameter('expression', _('parameter Index Number'), '', true)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getTagParameter');
+
+    extension
+      .addStrExpression(
+        'TagValueViaKey',
+        _('Get a Tag value found in the dialogue branch, using its key where the pattern is key:value'),
+        _(
+          'Get a Tag found in the dialogue branch, using a key. For example with tags: "bg:park", "time:lunch", asking for "bg" will return "park"'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('tag key'), '', true)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getTagValueViaKey');
 
     extension
       .addStrExpression(
@@ -515,6 +611,102 @@ module.exports = {
       .addParameter('string', _('Variable Name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.getVariable');
+
+    extension
+      .addExpression(
+        'VariableChildKeys',
+        _('Get variable number of child keys of a $nested.variable'),
+        _(
+          'Get variable number of child keys. For example with $root.actor.james.id and $root.actor.tom.id, $root.actor has 2 - tom and james'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Variable Name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getKeysCount');
+
+    extension
+      .addStrExpression(
+        'GetChildKeyViaIndex',
+        _('Get a $nested.variable child key via index'),
+        _(
+          'Get a $nested.variable child key via index. For example with $c.tom.money, $c.tom.experience, targetting "c.tom" with index 1 will return "experience'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Nested Variable name'), '', false)
+      .addParameter('expression', _('index number'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getChildKeyViaIndex');
+
+    extension
+      .addStrExpression(
+        'ActiveActorId',
+        _('Get the id of the active dialogue line actor'),
+        _(
+          'Get the id of the active dialogue line actor. Empty string when no actor detected'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActiveLineActorId');
+
+    extension
+      .addExpression(
+        'ActiveActorParametersCount',
+        _(
+          'Get the number of parameters passed after an actor id on the active line'
+        ),
+        _(
+          'Get the number of parameters passed after an actor id on the active line'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActiveLineActorParametersCount');
+
+    extension
+      .addStrExpression(
+        'ActiveLineActorParameter',
+        _('Get a parameter after an actor id on the active line via its index'),
+        _(
+          'Get a parameter after an actor id on the active line via its index. For example the line "tom happy: Its my birthday!" has one parameter "happy" which you can get via index 0'
+        ),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('expression', _('index number'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActiveLineActorParameterViaIndex');
+
+    extension
+      .addExpression(
+        'ActorInfo',
+        _('Get Actor variable via actor ID'),
+        _('Get Actor variable via actor ID'),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Actor ID'), '', false)
+      .addParameter('string', _('Variable Name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActorInfo');
+
+    extension
+      .addExpression(
+        'ActiveActorInfo',
+        _('Get current active line Actor variable'),
+        _('Get current active line Actor variable'),
+        '',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Variable Name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActiveActorInfo');
 
     extension
       .addCondition(
@@ -647,6 +839,18 @@ module.exports = {
 
     extension
       .addCondition(
+        'BranchNodeHasChanged',
+        _('Branch node has changed'),
+        _('Current branch node has changed'),
+        _('Current branch node has changed'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .setFunctionName('gdjs.dialogueTree.branchTitleHasChanged');
+
+    extension
+      .addCondition(
         'CompareDialogueStateStringVariable',
         _('Compare dialogue state string variable'),
         _(
@@ -710,6 +914,49 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.hasClippedScrollingCompleted');
+
+    extension
+      .addCondition(
+        'HasActiveActorChanged',
+        _('Active Actor has changed'),
+        _(
+          'Check if the displayed dialogue text active actor has changed from the previous line.'
+        ),
+        _('Active actor has changed'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.hasActiveActorChanged');
+
+    extension
+      .addCondition(
+        'DoesActorExist',
+        _('Does actor with ID exist'),
+        _('Check if an actor with a specified id has been ecreated'),
+        _('Actor with ID _PARAM0_ exists'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Actor ID'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActorExists');
+
+    extension
+      .addCondition(
+        'DoesVariableExist',
+        _('Does variable exist'),
+        _('Check if a dialogue state variable exists or has been set'),
+        _('Dialogue state variable _PARAM0_ exists'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Variable'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getVariableExists');
 
     return extension;
   },

@@ -7,13 +7,12 @@ import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import DiscountFlame from './DiscountFlame';
 import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
   paper: {
     padding: 10,
-    color: '#000',
-    // TODO: Use a new attribute from the theme.
-    backgroundColor: '#FF5E3B',
+    color: '#1D1D26',
   },
 };
 
@@ -30,8 +29,14 @@ const HotMessage = ({
   onClickRightButton,
   rightButtonLabel,
 }: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
-    <Paper style={styles.paper}>
+    <Paper
+      style={{
+        ...styles.paper,
+        backgroundColor: gdevelopTheme.message.hot.backgroundColor,
+      }}
+    >
       <Line noMargin alignItems="center">
         <DiscountFlame fontSize="large" />
         <Column expand>

@@ -258,6 +258,11 @@
         "color": {
           "value": "#000"
         }
+      },
+      "hot": {
+        "background-color": {
+          "value": "#FF5E3B"
+        }
       }
     },
     "toolbar-separator": {

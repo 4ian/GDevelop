@@ -327,6 +327,12 @@
         "color": {
           "value": "transparent"
         }
+      },
+      "hot": {
+        "background-color": {
+          "value": "#FF5E3B",
+          "comment": "Palette/Red/50"
+        }
       }
     },
     "toolbar-separator": {

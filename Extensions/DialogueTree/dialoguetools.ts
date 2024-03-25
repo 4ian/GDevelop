@@ -723,7 +723,6 @@ namespace gdjs {
    * this will return "tom"
    */
   gdjs.dialogueTree.getActiveLineActorId = function () {
-    if (!gdjs.dialogueTree.getActorExists(actorId)) return '';
     return gdjs.dialogueTree.activeLineActor;
   };
 

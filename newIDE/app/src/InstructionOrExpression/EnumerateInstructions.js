@@ -6,6 +6,7 @@ import {
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
 import { isUnifiedInstruction } from '../EventsSheet/ParameterFields/AnyVariableField';
+import { isUnifiedObjectInstruction } from '../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -305,6 +306,11 @@ const enumerateExtensionInstructions = (
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
+
+    if (isUnifiedObjectInstruction(type)) {
+      continue;
+    }
+
     const instrMetadata = instructions.get(type);
     if (
       !instrMetadata.isHidden() &&

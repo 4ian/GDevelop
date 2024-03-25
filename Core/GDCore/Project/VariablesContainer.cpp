@@ -16,6 +16,7 @@
 
 namespace gd {
 
+gd::VariablesContainer VariablesContainer::badVariablesContainer;
 gd::Variable VariablesContainer::badVariable;
 gd::String VariablesContainer::badName;
 

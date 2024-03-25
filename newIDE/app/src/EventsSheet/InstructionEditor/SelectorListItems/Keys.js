@@ -5,6 +5,7 @@ import type {
 } from '../../../ObjectsList/EnumerateObjects';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getUnifiedInstructionType } from '../../../EventsSheet/ParameterFields/AnyVariableField';
+import { getUnifiedObjectInstructionType } from '../../../EventsSheet/ParameterFields/ObjectVariableField';
 
 // ListItem created must have consistent keys that include their type
 // (object, group, instruction) to allow them to be living
@@ -32,7 +33,9 @@ export const getInstructionListItemKey = (
   }-${instruction.type}`;
 
 export const getInstructionListItemValue = (instructionType: string) =>
-  `instruction-value-${getUnifiedInstructionType(instructionType)}`;
+  `instruction-value-${getUnifiedObjectInstructionType(
+    getUnifiedInstructionType(instructionType)
+  )}`;
 
 export const getSubheaderListItemKey = (subheader: string) =>
   `subheader-key-${subheader}`;

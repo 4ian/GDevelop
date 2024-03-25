@@ -590,6 +590,13 @@ interface Project {
     [Ref] ObjectGroupsContainer GetObjectGroups();
 };
 
+enum ObjectsContainersList_VariableExistence {
+    "ObjectsContainersList::DoesNotExist",
+    "ObjectsContainersList::Exists",
+    "ObjectsContainersList::GroupIsEmpty",
+    "ObjectsContainersList::ExistsOnlyOnSomeObjectsOfTheGroup"
+};
+
 interface ObjectsContainersList {
   [Value] ObjectsContainersList STATIC_MakeNewObjectsContainersListForProjectAndLayout(
         [Const, Ref] Project project,
@@ -602,6 +609,9 @@ interface ObjectsContainersList {
   [Const, Value] DOMString GetTypeOfBehavior([Const] DOMString name, boolean searchInGroups);
   [Value] VectorString GetBehaviorsOfObject([Const] DOMString name, boolean searchInGroups);
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
+
+  ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
+  [Const, Ref] VariablesContainer GetObjectOrGroupVariablesContainer([Const] DOMString objectName);
 };
 
 interface ProjectScopedContainers {

@@ -105,7 +105,7 @@ class GD_CORE_API ExpressionVariableParentFinder
           [&]() {
             // This is an object.
             const auto* variablesContainer =
-                projectScopedContainers.GetObjectsContainersList()
+                &projectScopedContainers.GetObjectsContainersList()
                     .GetObjectOrGroupVariablesContainer(node.name);
             if (variablesContainer)
               variableAndItsParent =
@@ -184,7 +184,7 @@ class GD_CORE_API ExpressionVariableParentFinder
                                         node.childIdentifierName);
 
             const auto* variablesContainer =
-                projectScopedContainers.GetObjectsContainersList()
+                &projectScopedContainers.GetObjectsContainersList()
                     .GetObjectOrGroupVariablesContainer(node.identifierName);
             if (variablesContainer)
               variableAndItsParent =
@@ -275,7 +275,7 @@ class GD_CORE_API ExpressionVariableParentFinder
         }
 
         legacyPrescopedVariablesContainer =
-            projectScopedContainers.GetObjectsContainersList()
+            &projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
         thisIsALegacyPrescopedVariable = true;
       } else if (parameterMetadata->GetType() == "scenevar") {

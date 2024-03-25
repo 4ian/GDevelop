@@ -36,6 +36,7 @@ import {
 import Edit from '../../UI/CustomSvgIcons/Edit';
 import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { switchBetweenUnifiedInstructionIfNeeded } from '../../EventsSheet/ParameterFields/AnyVariableField';
+import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -220,6 +221,10 @@ const InstructionParametersEditor = React.forwardRef<
       objectsContainer
     );
     switchBetweenUnifiedInstructionIfNeeded(
+      projectScopedContainers,
+      instruction
+    );
+    switchBetweenUnifiedObjectInstructionIfNeeded(
       projectScopedContainers,
       instruction
     );

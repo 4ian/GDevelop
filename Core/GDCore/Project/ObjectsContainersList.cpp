@@ -154,13 +154,13 @@ bool ObjectsContainersList::HasObjectVariablesContainer(
   return false;
 }
 
-const gd::VariablesContainer*
+const gd::VariablesContainer&
 ObjectsContainersList::GetObjectOrGroupVariablesContainer(
     const gd::String& objectOrGroupName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectOrGroupName)) {
-      return &(*it)->GetObject(objectOrGroupName).GetVariables();
+      return (*it)->GetObject(objectOrGroupName).GetVariables();
     }
     if ((*it)->GetObjectGroups().Has(objectOrGroupName)) {
       // For groups, we consider that the first object of the group defines the
@@ -173,24 +173,24 @@ ObjectsContainersList::GetObjectOrGroupVariablesContainer(
       if (!objectNames.empty()) {
         return GetObjectVariablesContainer(objectNames[0]);
       }
-      return nullptr;
+      return gd::VariablesContainer::badVariablesContainer;
     }
   }
 
-  return nullptr;
+  return gd::VariablesContainer::badVariablesContainer;
 }
 
-const gd::VariablesContainer*
+const gd::VariablesContainer&
 ObjectsContainersList::GetObjectVariablesContainer(
     const gd::String& objectName) const {
   for (auto it = objectsContainers.rbegin(); it != objectsContainers.rend();
        ++it) {
     if ((*it)->HasObjectNamed(objectName)) {
-      return &(*it)->GetObject(objectName).GetVariables();
+      return (*it)->GetObject(objectName).GetVariables();
     }
   }
 
-  return nullptr;
+  return gd::VariablesContainer::badVariablesContainer;
 }
 
 gd::Variable::Type ObjectsContainersList::GetTypeOfObjectOrGroupVariable(

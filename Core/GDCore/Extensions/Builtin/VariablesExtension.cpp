@@ -67,7 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("SetNumberVariable",
-                 _("Change number variable"),
+                 _("Change variable value"),
                  _("Modify the number value of a variable."),
                  _("the variable _PARAM0_"),
                  "",
@@ -82,7 +82,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddAction("SetStringVariable",
                  _("Change text variable"),
                  _("Modify the text (string) of a variable."),
-                 _("the text of variable _PARAM0_"),
+                 _("the variable _PARAM0_"),
                  "",
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -96,7 +96,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "SetBooleanVariable",
           _("Change boolean variable"),
           _("Modify the boolean value of a variable."),
-          _("Set the boolean value of variable _PARAM0_ to _PARAM1_"),
+          _("Set variable _PARAM0_ to _PARAM1_"),
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")

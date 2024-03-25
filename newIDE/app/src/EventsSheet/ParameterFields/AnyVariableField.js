@@ -18,11 +18,17 @@ import { enumerateValidVariableNames } from './EnumerateVariables';
 const gd: libGDevelop = global.gd;
 
 export const isUnifiedInstruction = (type: string): boolean =>
-  type === 'StringVariable' || type === 'BooleanVariable';
+  type === 'StringVariable' ||
+  type === 'BooleanVariable' ||
+  type === 'SetStringVariable' ||
+  type === 'SetBooleanVariable';
 
 export const getUnifiedInstructionType = (instructionType: string): string =>
   instructionType === 'StringVariable' || instructionType === 'BooleanVariable'
     ? 'NumberVariable'
+    : instructionType === 'SetStringVariable' ||
+      instructionType === 'SetBooleanVariable'
+    ? 'SetNumberVariable'
     : instructionType;
 
 export const switchBetweenUnifiedInstructionIfNeeded = (
@@ -50,6 +56,30 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
         instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Boolean) {
         instruction.setType('BooleanVariable');
+        instruction.setParametersCount(2);
+      }
+    }
+  } else if (
+    (instruction.getType() === 'SetNumberVariable' ||
+      instruction.getType() === 'SetStringVariable' ||
+      instruction.getType() === 'SetBooleanVariable') &&
+    instruction.getParametersCount() > 0
+  ) {
+    const variableName = instruction.getParameter(0).getPlainString();
+    if (
+      projectScopedContainers.getVariablesContainersList().has(variableName)
+    ) {
+      const variable = projectScopedContainers
+        .getVariablesContainersList()
+        .get(variableName);
+      if (variable.getType() === gd.Variable.String) {
+        instruction.setType('SetStringVariable');
+        instruction.setParametersCount(3);
+      } else if (variable.getType() === gd.Variable.Number) {
+        instruction.setType('SetNumberVariable');
+        instruction.setParametersCount(3);
+      } else if (variable.getType() === gd.Variable.Boolean) {
+        instruction.setType('SetBooleanVariable');
         instruction.setParametersCount(2);
       }
     }
@@ -87,7 +117,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const variablesContainers = React.useMemo(
       () => {
-        return layout && project ? [layout.getVariables(), project.getVariables()] : [];
+        return layout && project
+          ? [layout.getVariables(), project.getVariables()]
+          : [];
       },
       [layout, project]
     );

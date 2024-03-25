@@ -113,6 +113,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/ParameterFields/AnyVariableField';
+import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -1958,6 +1959,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       objectsContainer
                     );
                     switchBetweenUnifiedInstructionIfNeeded(
+                      projectScopedContainers,
+                      instruction
+                    );
+                    switchBetweenUnifiedObjectInstructionIfNeeded(
                       projectScopedContainers,
                       instruction
                     );

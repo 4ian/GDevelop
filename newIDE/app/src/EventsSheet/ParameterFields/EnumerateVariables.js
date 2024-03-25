@@ -31,7 +31,7 @@ export type EnumeratedVariable = {|
 
 export const enumerateValidVariableNames = (
   variablesContainer: ?gdVariablesContainer
-): Array<EnumeratedVariable> =>
+): Array<string> =>
   enumerateVariables(variablesContainer)
     .map(({ name, isValidName }) =>
       isValidName

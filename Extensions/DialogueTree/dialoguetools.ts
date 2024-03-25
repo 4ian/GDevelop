@@ -95,6 +95,14 @@ namespace gdjs {
     return this.dialogueIsRunning;
   };
 
+  gdjs.dialogueTree.getText = function () {
+    const dialogueText = gdjs.dialogueTree.dialogueText;
+    if (!gdjs.dialogueTree.dialogueIsRunning || dialogueText.length === 0)
+      return '';
+
+    return dialogueText.substring(this.clipTextStart, dialogueText.length);
+  };
+
   /**
    * Scroll the clipped text. This can be combined with a timer and user input to control how fast the dialogue line text is scrolling.
    */
@@ -171,9 +179,8 @@ namespace gdjs {
    * Used with the scrollClippedText to achieve a classic scrolling text, as well as any <<wait>> effects to pause scrolling.
    */
   gdjs.dialogueTree.getClippedLineText = function () {
-    return this.dialogueIsRunning && this.dialogueText.length
-      ? this.dialogueText.substring(0, this.clipTextEnd + 1)
-      : '';
+    const dialogueText = gdjs.dialogueTree.getText();
+    return dialogueText.substring(0, gdjs.dialogueTree.clipTextEnd + 1);
   };
 
   /**
@@ -181,9 +188,7 @@ namespace gdjs {
    * Note that using this instead getClippedLineText will skip any <<wait>> commands entirely.
    */
   gdjs.dialogueTree.getLineText = function () {
-    return this.dialogueIsRunning && this.dialogueText.length
-      ? this.dialogueText
-      : '';
+    return gdjs.dialogueTree.getText();
   };
 
   /**
@@ -548,12 +553,23 @@ namespace gdjs {
     return this.dialogueData instanceof bondage.CommandResult;
   };
 
+  gdjs.dialogueTree.clipTextStart = 0;
+  gdjs.dialogueTree.activeLineActor = '';
+  gdjs.dialogueTree.activeLineActorParameters = [];
+  gdjs.dialogueTree.resetActiveLineActor = function () {
+    gdjs.dialogueTree.clipTextStart = 0;
+    gdjs.dialogueTree.activeLineActor = '';
+    gdjs.dialogueTree.activeLineActorParameters = [];
+  };
+
   /**
    * This is the main lifecycle function.It runs once only when the user is advancing the dialogue to the next line.
    * Progress Dialogue to the next line. Hook it to your game input.
    * Note that this action can be influenced by any <<wait>> commands, but they work only if you have at least one isCommandCalled condition.
    */
   gdjs.dialogueTree.goToNextDialogueLine = function () {
+    gdjs.dialogueTree.resetActiveLineActor();
+
     if (this.pauseScrolling || !this.dialogueIsRunning) {
       return;
     }
@@ -578,6 +594,22 @@ namespace gdjs {
           this.clipTextEnd = 0;
           this.dialogueText = this.dialogueData.text;
         }
+        const text = this.dialogueData.text;
+        const splitIndex = text.indexOf(':');
+        if (splitIndex !== -1) {
+          const firstHalf = text.substring(0, splitIndex).split(' ');
+          const [actorId, ...actorParameters] = firstHalf;
+          const secondHalf = text.substring(splitIndex + 1, text.length);
+          if (gdjs.dialogueTree.getActorExists(actorId)) {
+            gdjs.dialogueTree.clipTextStart = splitIndex + 1;
+            gdjs.dialogueTree.activeLineActor = actorId;
+            gdjs.dialogueTree.activeLineActorParameters = actorParameters;
+          } else {
+            gdjs.dialogueTree.resetActiveLineActor();
+          }
+        } else {
+          gdjs.dialogueTree.resetActiveLineActor();
+        }
         this.dialogueBranchTags = this.dialogueData.data.tags;
         this.dialogueBranchTitle = this.dialogueData.data.title;
         this.dialogueBranchBody = this.dialogueData.data.body;
@@ -585,6 +617,8 @@ namespace gdjs {
         this.dialogueDataType = 'text';
         this.dialogueData = this.dialogue.next().value;
       } else {
+        gdjs.dialogueTree.resetActiveLineActor();
+
         if (gdjs.dialogueTree._isLineTypeOptions()) {
           this.commandCalls = [];
           this.dialogueDataType = 'options';
@@ -617,6 +651,161 @@ namespace gdjs {
         }
       }
     }
+  };
+
+  gdjs.dialogueTree.prevActiveLineActor = '';
+  gdjs.dialogueTree.prevActiveLineActorParams = [];
+
+  /**
+   * Condition to check if the active line actor has changed
+   * For example if you have set two actors - tom and james and these three dialogue lines in yarn
+   * tom: Hi James
+   * james: Hi, Tom.
+   * james: how are you doing?
+   * This condition will be triggered once - when after tom's line.
+   */
+  gdjs.dialogueTree.hasActiveActorChanged = function () {
+    if (
+      gdjs.dialogueTree.prevActiveLineActor !==
+        gdjs.dialogueTree.activeLineActor &&
+      gdjs.dialogueTree.prevActiveLineActorParams !==
+        gdjs.dialogueTree.activeLineActorParameters
+    ) {
+      gdjs.dialogueTree.prevActiveLineActor = gdjs.dialogueTree.activeLineActor;
+      gdjs.dialogueTree.prevActiveLineActorParams =
+        gdjs.dialogueTree.activeLineActorParameters;
+      return true;
+    }
+    gdjs.dialogueTree.prevActiveLineActor = '';
+    gdjs.dialogueTree.prevActiveLineActorParams = [];
+    return false;
+  };
+
+  /**
+   * Condition to check if an actor exists
+   * You can use it to determine if an actor has been set
+   */
+  gdjs.dialogueTree.getActorExists = function (actorId: string) {
+    return gdjs.dialogueTree.getVariableExists(`a.${actorId}.id`);
+  };
+
+  /**
+   * Command to create a new actor
+   * You can use it to initiate a new actor in a consistent manner that is acceptable to the actor api
+   * @param actorId the id that will be used to detect if an actor is talking during a dialogue line. It will also be used as the actor variables root key
+   * @param actorName use this to set the name of the actor as it will be displayed to the player
+   * @param actorColor use this to set a color for an actor which the player can associate with. For example can be used to set the text color when speaking
+   */
+  gdjs.dialogueTree.createNewActor = function (
+    actorId: string,
+    actorName: string,
+    actorColor: string
+  ) {
+    if (gdjs.dialogueTree.getActorExists(actorId)) return;
+    gdjs.dialogueTree.setVariable(`a.${actorId}.id`, actorId);
+    gdjs.dialogueTree.setVariable(`a.${actorId}.name`, actorName);
+    gdjs.dialogueTree.setVariable(`a.${actorId}.color`, actorColor);
+  };
+
+  /**
+   * Command to delete an actor
+   * You can use it to initiate a new actor in a consistent manner that is acceptable to the actor api
+   * @param actorId the id of the actor that you want deleted
+   */
+  gdjs.dialogueTree.deleteActor = function (actorId: string) {
+    gdjs.dialogueTree.deleteDialogueStateVariable(`a.${actorId}`);
+  };
+
+  /**
+   * Returns the id of the actor that is currently speaking. Useful for expressions
+   * For example if you have a line like this in yarn
+   * tom happy blink: I am feeling good today!
+   * this will return "tom"
+   */
+  gdjs.dialogueTree.getActiveLineActorId = function () {
+    if (!gdjs.dialogueTree.getActorExists(actorId)) return '';
+    return gdjs.dialogueTree.activeLineActor;
+  };
+
+  /**
+   * Returns a list of words after the active line's actor
+   * For example if you have a line like this in yarn
+   * tom happy blink: I am feeling good today!
+   * This will return ["happy", "blink"],
+   */
+  gdjs.dialogueTree.getActiveLineActorParameters = function () {
+    return gdjs.dialogueTree.activeLineActorParameters;
+  };
+
+  /**
+   * Returns length of the list of words after the active line's actor
+   * For example if you have a line like this in yarn
+   * tom happy blink: I am feeling good today!
+   * This will return 2
+   */
+  gdjs.dialogueTree.getActiveLineActorParametersCount = function () {
+    return gdjs.dialogueTree.activeLineActorParameters.length;
+  };
+
+  /**
+   * Returns a list of words after the active line's actor
+   * For example if you have a line like this in yarn
+   * tom happy blink: I am feeling good today!
+   * This will yield ["happy", "blink"] and if your paramIndex is 1, "blink" will be the result
+   * @param paramIndex the id that will be used to detect if an actor is talking during a dialogue line. It will also be used as the actor variables root key
+   */
+  gdjs.dialogueTree.getActiveLineActorParameterViaIndex = function (
+    paramIndex: number
+  ) {
+    const activeLineActorParameters =
+      gdjs.dialogueTree.activeLineActorParameters;
+    if (
+      paramIndex > -1 &&
+      activeLineActorParameters.length > 0 &&
+      paramIndex < activeLineActorParameters.length
+    ) {
+      return activeLineActorParameters[paramIndex] || '';
+    }
+    return '';
+  };
+
+  /**
+   * Set existing actor's variables. Note that you cannot change an actor's id programatically.
+   * For example if you have created an actor with id=tom, you can target him via that actorId and change any nested variable of that actor
+   * @param actorId the actor id of the actor you want to change
+   * @param infoKey the variable name of that actor you want changing. Example "color"
+   * @param newValue the new value you want to assign to that variable
+   */
+  gdjs.dialogueTree.setActorInfo = function (
+    actorId: string,
+    infoKey: string,
+    newValue: string
+  ) {
+    if (infoKey != 'id' && gdjs.dialogueTree.getActorExists(actorId)) {
+      gdjs.dialogueTree.setVariable(`a.${actorId}.${infoKey}`, newValue);
+    }
+  };
+
+  /**
+   * Get existing actor's variable value.
+   * For example if you have created an actor with id=tom, you can target him via that actorId and get any nested variable of that actor
+   * @param actorId the actor id of the actor you want to change
+   * @param infoKey the variable name of that actor you want getting. Example "color"
+   */
+  gdjs.dialogueTree.getActorInfo = function (actorId: string, infoKey: string) {
+    if (gdjs.dialogueTree.getActorExists(actorId)) {
+      return gdjs.dialogueTree.getVariable(`a.${actorId}.${infoKey}`);
+    }
+    return '';
+  };
+
+  /**
+   * Get the active actor's variable value.
+   * @param infoKey the variable name of the active actor you want getting. Example "color"
+   */
+  gdjs.dialogueTree.getActiveActorInfo = function (infoKey: string) {
+    const actorId = gdjs.dialogueTree.activeLineActor;
+    return gdjs.dialogueTree.getActorInfo(actorId, infoKey);
   };
 
   /**
@@ -771,6 +960,128 @@ namespace gdjs {
     if (this.runner.variables) {
       this.runner.variables.set(key, value);
     }
+  };
+
+  /**
+   * Check if a specific variable has been set/exists.
+   * @param key The name of the variable you want to check if it exists
+   */
+  gdjs.dialogueTree.getVariableExists = function (key: string) {
+    return this.runner.variables && key in this.runner.variables.data;
+  };
+
+  /**
+   * Get a list of all subkeys of variable with a key using a $nested.syntax
+   * for example if you have these two variables:
+   * $root.actor.james.id and $root.actor.tom.id set to something
+   * targetting "root.actor" will return ["james", "tom"]
+   * @param targetKey the key of the variable you want target
+   */
+  gdjs.dialogueTree.getChildKeysOfNestedVariable = function (targetKey: string) {
+    const variables = gdjs.dialogueTree.runner.variables.data;
+    const result = [];
+    Object.keys(variables).forEach((key) => {
+      if (key.startsWith(`${targetKey}.`)) {
+        const subpath = key.substring(targetKey.length + 1, key.length);
+        const subPathRoot = subpath.split('.')[0];
+
+        if (!result.includes(subPathRoot)) result.push(subPathRoot);
+      }
+    });
+
+    return result;
+  };
+
+  /**
+   * Delete a dialogue state variable, targetting it via key
+   * If the variable has siblings using a nested key syntax, they will also be deleted
+   * for example if you have these two variables:
+   * $root.actor.james.id and $root.actor.tom.id
+   * targetting "$root.actor" will delete both of them
+   * @param targetKey the key of the variable you want target
+   */
+  gdjs.dialogueTree.deleteDialogueStateVariable = (targetKey: string) => {
+    const variables = this.runner.variables.data;
+    Object.keys(variables).forEach((key) => {
+      if (key.startsWith(`${targetKey}.` || key === targetKey)) {
+        delete variables[key];
+      }
+    });
+  };
+
+  /**
+   * Get the number of child keys of a nested variable
+   * for example if you have these two variables:
+   * $root.actor.james.id and $root.actor.tom.id
+   * targetting "$root.actor" will return 2
+   * @param targetKey the key of the variable you want target
+   */
+  gdjs.dialogueTree.getKeysCount = function (targetKey: string) {
+    return gdjs.dialogueTree.getChildKeysOfNestedVariable(targetKey).length;
+  };
+
+  /**
+   * Get one of the child keys from a nested variable, using its index in the list
+   * for example if you have these two variables:
+   * $root.actor.james.id and $root.actor.tom.id
+   * targetting "$root.actor" with index of 1 will return "tom"
+   * @param targetKey the key of the variable you want target
+   * @param targetIndex the index of the resulting key you want
+   */
+  gdjs.dialogueTree.getChildKeyViaIndex = function (
+    targetKey: string,
+    targetIndex: index
+  ) {
+    const childKeys = gdjs.dialogueTree.getChildKeysOfNestedVariable(targetKey);
+    if (targetIndex < childKeys.length) {
+      return childKeys[targetIndex];
+    }
+    return '';
+  };
+
+  /**
+   * Get a command parameter via key, where the pattern of the parameter is key=value and what is returned is value
+   * For example if you have a command in yarn with <<createCharacter name=Thomas id=tom>> that was just triggered
+   * using the paramKey "name" will return "Thomas". This is useful for commands with a lot of parameters
+   * @param paramKey The key of the parameter to get.
+   */
+  gdjs.dialogueTree.getCommandParameterViaKey = function (paramKey: string) {
+    if (paramKey === '') {
+      return '';
+    }
+    if (this.commandParameters.length > 0) {
+      const parameterWithKey = this.commandParameters.find((parameter) =>
+        parameter.startsWith(`${paramKey}=`)
+      );
+      if (parameterWithKey) {
+        const [_, returnedParam] = parameterWithKey.split('=');
+        console.log({ parameterWithKey, returnedParam });
+        return returnedParam ? returnedParam : '';
+      }
+    }
+    return '';
+  };
+
+  /**
+   * Get a dialogue node tag valia via a key, where the pattern of the tag is tagKey:value and what is returned is value
+   * For example if you have the tags set in yarn as: "bg:park time:noon"
+   * asking for tagKey "time" will return "noon". This is useful for nodes with alot of tags
+   * @param tagKey The key of the tag to get.
+   */
+  gdjs.dialogueTree.getTagViaKey = function (tagKey: string) {
+    if (tagKey === '') {
+      return '';
+    }
+    if (this.dialogueIsRunning && this.dialogueBranchTags.length > 0) {
+      const parameterWithKey = this.dialogueBranchTags.find((tag) =>
+        tag.startsWith(`${tagKey}:`)
+      );
+      if (parameterWithKey) {
+        const [_, returnedParam] = parameterWithKey.split(':');
+        return returnedParam ? returnedParam : '';
+      }
+    }
+    return '';
   };
 
   /**

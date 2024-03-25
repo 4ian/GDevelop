@@ -44,7 +44,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
-    const enumerateVariableNames = React.useCallback<Array<string>>(
+    const enumerateVariableNames = React.useCallback(
       () => {
         return project
           ? enumerateValidVariableNames(project.getVariables())

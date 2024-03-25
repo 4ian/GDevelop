@@ -49,7 +49,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [layout]
     );
 
-    const enumerateVariableNames = React.useCallback<Array<string>>(
+    const enumerateVariableNames = React.useCallback(
       () => {
         return layout ? enumerateValidVariableNames(layout.getVariables()) : [];
       },

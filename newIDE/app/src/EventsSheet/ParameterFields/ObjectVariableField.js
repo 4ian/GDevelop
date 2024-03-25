@@ -103,7 +103,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [objectName, globalObjectsContainer, objectsContainer]
     );
 
-    const enumerateVariableNames = React.useCallback<Array<string>>(
+    const enumerateVariableNames = React.useCallback(
       () =>
         variablesContainers
           .map(variablesContainer =>

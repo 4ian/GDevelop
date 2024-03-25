@@ -667,7 +667,7 @@ namespace gdjs {
   gdjs.dialogueTree.hasActiveActorChanged = function () {
     if (
       gdjs.dialogueTree.prevActiveLineActor !==
-        gdjs.dialogueTree.activeLineActor &&
+        gdjs.dialogueTree.activeLineActor ||
       gdjs.dialogueTree.prevActiveLineActorParams !==
         gdjs.dialogueTree.activeLineActorParameters
     ) {

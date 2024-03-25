@@ -152,6 +152,14 @@ namespace gdjs {
       this._pixiContainer.removeChild(layerPixiObject);
       this._pixiContainer.addChildAt(layerPixiObject, index);
     }
+
+    static getAnimationFrameTextureManager(
+      imageManager: gdjs.PixiImageManager
+    ) {
+      return gdjs.SpriteRuntimeObjectPixiRenderer.getAnimationFrameTextureManager(
+        imageManager
+      );
+    }
   }
 
   // Register the class to let the engine use it.

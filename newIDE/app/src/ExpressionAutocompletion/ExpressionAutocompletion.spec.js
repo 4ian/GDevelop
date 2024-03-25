@@ -36,7 +36,7 @@ const makeTestContext = () => {
   animation.setName('Jump');
   animation.setDirectionsCount(1);
   animation.setDirection(direction, 0);
-  spriteConfiguration.addAnimation(animation);
+  spriteConfiguration.getAnimations().addAnimation(animation);
 
   const spriteObjectWithBehaviors = testLayout.insertNewObject(
     project,

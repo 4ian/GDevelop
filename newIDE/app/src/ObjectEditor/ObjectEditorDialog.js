@@ -231,8 +231,18 @@ const InnerDialog = (props: InnerDialogProps) => {
             true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
           }
         >
-          <Line>
-            <Column expand noMargin>
+          <EditorComponent
+            objectConfiguration={props.object.getConfiguration()}
+            project={props.project}
+            layout={props.layout}
+            object={props.object}
+            resourceManagementProps={props.resourceManagementProps}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            objectName={props.objectName}
+            onObjectUpdated={notifyOfChange}
+            renderObjectNameField={() => (
               <SemiControlledTextField
                 fullWidth
                 id="object-name"
@@ -251,19 +261,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 }}
                 autoFocus="desktop"
               />
-            </Column>
-          </Line>
-          <EditorComponent
-            objectConfiguration={props.object.getConfiguration()}
-            project={props.project}
-            layout={props.layout}
-            object={props.object}
-            resourceManagementProps={props.resourceManagementProps}
-            onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positioned*/
-            }
-            objectName={props.objectName}
-            onObjectUpdated={notifyOfChange}
+            )}
           />
         </Column>
       ) : null}

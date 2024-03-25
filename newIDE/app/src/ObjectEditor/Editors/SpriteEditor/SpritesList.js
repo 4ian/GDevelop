@@ -169,21 +169,20 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
  * Check if all sprites of the object have the same points and collision masks
  */
 const checkObjectPointsAndCollisionsMasks = (
-  spriteConfiguration: gdSpriteObject
+  animations: gdSpriteAnimationList
 ) => {
   let allObjectSpritesHaveSamePoints = false;
   let allObjectSpritesHaveSameCollisionMasks = false;
-  const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
-    .sprite;
+  const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
 
   if (firstObjectSprite) {
     allObjectSpritesHaveSamePoints = allObjectSpritesHaveSamePointsAs(
       firstObjectSprite,
-      spriteConfiguration
+      animations
     );
     allObjectSpritesHaveSameCollisionMasks = allObjectSpritesHaveSameCollisionMaskAs(
       firstObjectSprite,
-      spriteConfiguration
+      animations
     );
   }
 
@@ -194,7 +193,7 @@ const checkObjectPointsAndCollisionsMasks = (
 };
 
 export const applyPointsAndMasksToSpriteIfNecessary = (
-  spriteConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   sprite: gdSprite
 ) => {
@@ -205,12 +204,11 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
   const {
     allObjectSpritesHaveSameCollisionMasks,
     allObjectSpritesHaveSamePoints,
-  } = checkObjectPointsAndCollisionsMasks(spriteConfiguration);
+  } = checkObjectPointsAndCollisionsMasks(animations);
   const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
-    spriteConfiguration
+    animations
   );
-  const firstObjectSprite = getCurrentElements(spriteConfiguration, 0, 0, 0)
-    .sprite;
+  const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
   const firstDirectionSprite =
     direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
 
@@ -241,7 +239,7 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
 };
 
 export const addAnimationFrame = (
-  spriteConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   resource: gdResource,
   onSpriteAdded: (sprite: gdSprite) => void
@@ -249,11 +247,7 @@ export const addAnimationFrame = (
   const sprite = new gd.Sprite();
   sprite.setImageName(resource.getName());
 
-  applyPointsAndMasksToSpriteIfNecessary(
-    spriteConfiguration,
-    direction,
-    sprite
-  );
+  applyPointsAndMasksToSpriteIfNecessary(animations, direction, sprite);
 
   onSpriteAdded(sprite); // Call the callback before `addSprite`, as `addSprite` will store a copy of it.
   direction.addSprite(sprite);
@@ -261,7 +255,7 @@ export const addAnimationFrame = (
 };
 
 type Props = {|
-  spriteConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   direction: gdDirection,
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
@@ -282,7 +276,7 @@ type Props = {|
 |};
 
 const SpritesList = ({
-  spriteConfiguration,
+  animations,
   direction,
   project,
   resourcesLoader,
@@ -414,23 +408,13 @@ const SpritesList = ({
           // Use `resourcesByAnimation` because frames are sorted.
           for (const resources of resourcesByAnimation.values()) {
             for (const resource of resources) {
-              addAnimationFrame(
-                spriteConfiguration,
-                direction,
-                resource,
-                onSpriteAdded
-              );
+              addAnimationFrame(animations, direction, resource, onSpriteAdded);
             }
           }
         }
       } else {
         for (const resource of resources) {
-          addAnimationFrame(
-            spriteConfiguration,
-            direction,
-            resource,
-            onSpriteAdded
-          );
+          addAnimationFrame(animations, direction, resource, onSpriteAdded);
         }
       }
 
@@ -456,7 +440,7 @@ const SpritesList = ({
       onFirstSpriteUpdated,
       project,
       addAnimations,
-      spriteConfiguration,
+      animations,
       onSpriteAdded,
     ]
   );
@@ -464,20 +448,20 @@ const SpritesList = ({
   const deleteSprites = React.useCallback(
     async () => {
       const sprites = selectedSprites.current;
-      const firstSpritePtr = spriteConfiguration
+      const firstSpritePtr = animations
         .getAnimation(0)
         .getDirection(0)
         .getSprite(0).ptr;
       const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
 
-      const totalSpritesCount = getTotalSpritesCount(spriteConfiguration);
+      const totalSpritesCount = getTotalSpritesCount(animations);
       const isDeletingLastSprites =
         Object.keys(sprites).length === totalSpritesCount;
       const oneOfSpritesInCurrentDirection =
         direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
 
       const isUsingCustomCollisionMask =
-        !spriteConfiguration.adaptCollisionMaskAutomatically() &&
+        !animations.adaptCollisionMaskAutomatically() &&
         oneOfSpritesInCurrentDirection &&
         !oneOfSpritesInCurrentDirection.isFullImageCollisionMask();
       const shouldWarnBecauseLosingCustomCollisionMask =
@@ -493,8 +477,8 @@ const SpritesList = ({
         if (!deleteAnswer) return;
       }
 
-      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-        const animation = spriteConfiguration.getAnimation(index);
+      mapFor(0, animations.getAnimationsCount(), index => {
+        const animation = animations.getAnimation(index);
         deleteSpritesFromAnimation(animation, sprites);
       });
 
@@ -507,13 +491,13 @@ const SpritesList = ({
       if (shouldWarnBecauseLosingCustomCollisionMask) {
         // The user has deleted the last custom collision mask, so revert to automatic
         // collision mask adaptation.
-        spriteConfiguration.setAdaptCollisionMaskAutomatically(true);
+        animations.setAdaptCollisionMaskAutomatically(true);
       }
     },
     [
       onSpriteUpdated,
       onFirstSpriteUpdated,
-      spriteConfiguration,
+      animations,
       forceUpdate,
       showConfirmation,
       direction,
@@ -523,8 +507,8 @@ const SpritesList = ({
   const duplicateSprites = React.useCallback(
     () => {
       const sprites = selectedSprites.current;
-      mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-        const animation = spriteConfiguration.getAnimation(index);
+      mapFor(0, animations.getAnimationsCount(), index => {
+        const animation = animations.getAnimation(index);
         duplicateSpritesInAnimation(animation, sprites);
       });
 
@@ -533,7 +517,7 @@ const SpritesList = ({
       forceUpdate();
       if (onSpriteUpdated) onSpriteUpdated();
     },
-    [onSpriteUpdated, spriteConfiguration, forceUpdate]
+    [onSpriteUpdated, animations, forceUpdate]
   );
 
   const addSpriteToSelection = React.useCallback(

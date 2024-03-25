@@ -228,7 +228,7 @@ namespace gdjs {
         useTransparentTexture,
         forceBasicMaterial,
       }: { useTransparentTexture: boolean; forceBasicMaterial: boolean }
-    ) {
+    ): THREE.Material {
       const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
         forceBasicMaterial ? 1 : 0
       }`;

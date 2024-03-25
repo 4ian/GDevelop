@@ -15,6 +15,7 @@ EventsBasedObject::EventsBasedObject()
         gd::EventsFunctionsContainer::FunctionOwner::Object),
     ObjectsContainer(),
     isRenderedIn3D(false),
+    isAnimatable(false),
     isTextContainer(false) {
 }
 
@@ -32,6 +33,9 @@ void EventsBasedObject::SerializeTo(SerializerElement& element) const {
   if (isRenderedIn3D) {
     element.SetBoolAttribute("is3D", true);
   }
+  if (isAnimatable) {
+    element.SetBoolAttribute("isAnimatable", true);
+  }
   if (isTextContainer) {
     element.SetBoolAttribute("isTextContainer", true);
   }
@@ -45,6 +49,7 @@ void EventsBasedObject::UnserializeFrom(gd::Project& project,
                                         const SerializerElement& element) {
   defaultName = element.GetStringAttribute("defaultName");
   isRenderedIn3D = element.GetBoolAttribute("is3D", false);
+  isAnimatable = element.GetBoolAttribute("isAnimatable", false);
   isTextContainer = element.GetBoolAttribute("isTextContainer", false);
 
   AbstractEventsBasedEntity::UnserializeFrom(project, element);

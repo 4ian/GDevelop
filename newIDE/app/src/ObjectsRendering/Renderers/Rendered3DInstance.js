@@ -102,22 +102,34 @@ export default class Rendered3DInstance {
     return this.getDepth() / 2;
   }
 
+  getCustomWidth(): number {
+    return this._instance.getCustomWidth();
+  }
+
+  getCustomHeight(): number {
+    return this._instance.getCustomHeight();
+  }
+
+  getCustomDepth(): number {
+    return this._instance.getCustomDepth();
+  }
+
   getWidth(): number {
     return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
+      ? this.getCustomWidth()
       : this.getDefaultWidth();
   }
 
   getHeight(): number {
     return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
+      ? this.getCustomHeight()
       : this.getDefaultHeight();
   }
 
   getDepth(): number {
     // For compatibility, a custom depth can be used, without necessarily a custom width/height.
     return this._instance.hasCustomDepth()
-      ? this._instance.getCustomDepth()
+      ? this.getCustomDepth()
       : this.getDefaultDepth();
   }
 

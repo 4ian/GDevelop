@@ -209,6 +209,26 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (!eventBasedObject) {
       return 'res/unknown32.png';
     }
+    if (eventBasedObject.isAnimatable()) {
+      const animations = customObjectConfiguration.getAnimations();
+
+      if (
+        animations.getAnimationsCount() > 0 &&
+        animations.getAnimation(0).getDirectionsCount() > 0 &&
+        animations
+          .getAnimation(0)
+          .getDirection(0)
+          .getSpritesCount() > 0
+      ) {
+        const imageName = animations
+          .getAnimation(0)
+          .getDirection(0)
+          .getSprite(0)
+          .getImageName();
+        return resourcesLoader.getResourceFullUrl(project, imageName, {});
+      }
+      return 'res/unknown32.png';
+    }
 
     for (let i = 0; i < eventBasedObject.getObjectsCount(); i++) {
       const childObject = eventBasedObject.getObjectAt(i);
@@ -233,6 +253,9 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
   }
 
   update() {
+    // TODO For animatable custom objects, change the texture used by the child
+    // according to the current animation.
+
     applyChildLayouts(this);
 
     const originX = this.getOriginX();

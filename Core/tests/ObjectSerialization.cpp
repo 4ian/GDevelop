@@ -35,7 +35,7 @@ void SetupSpriteConfiguration(gd::ObjectConfiguration &configuration) {
   REQUIRE(spriteConfiguration != nullptr);
   gd::Animation animation;
   animation.SetName("Idle");
-  spriteConfiguration->AddAnimation(animation);
+  spriteConfiguration->GetAnimations().AddAnimation(animation);
 };
 
 gd::Object &SetupProjectWithSprite(gd::Project &project,
@@ -83,9 +83,9 @@ void CheckSpriteConfigurationInProjectElement(
 void CheckSpriteConfiguration(gd::ObjectConfiguration &configuration) {
   auto *spriteConfiguration = dynamic_cast<gd::SpriteObject *>(&configuration);
   REQUIRE(spriteConfiguration);
-  REQUIRE(spriteConfiguration->GetAnimationsCount() == 1);
+  REQUIRE(spriteConfiguration->GetAnimations().GetAnimationsCount() == 1);
 
-  auto &animation = spriteConfiguration->GetAnimation(0);
+  auto &animation = spriteConfiguration->GetAnimations().GetAnimation(0);
   REQUIRE(animation.GetName() == "Idle");
 };
 

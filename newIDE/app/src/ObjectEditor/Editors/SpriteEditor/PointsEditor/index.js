@@ -26,7 +26,6 @@ import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWin
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
-const gd: libGDevelop = global.gd;
 
 const styles = {
   leftContainer: {
@@ -54,7 +53,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  objectConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onPointsUpdated?: () => void,
@@ -62,7 +61,7 @@ type Props = {|
 |};
 
 const PointsEditor = ({
-  objectConfiguration,
+  animations,
   resourcesLoader,
   project,
   onPointsUpdated,
@@ -86,9 +85,8 @@ const PointsEditor = ({
   const forceUpdate = useForceUpdate();
   const { showConfirmation } = useAlertDialog();
 
-  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const { animation, sprite } = getCurrentElements(
-    spriteConfiguration,
+    animations,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -96,9 +94,7 @@ const PointsEditor = ({
 
   // Note: sprite should always be defined so this value will be correctly initialised.
   const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
-    sprite
-      ? allObjectSpritesHaveSamePointsAs(sprite, objectConfiguration)
-      : false
+    sprite ? allObjectSpritesHaveSamePointsAs(sprite, animations) : false
   );
   // Note: sprite & animation should always be defined so this value will be correctly initialised.
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(
@@ -111,8 +107,8 @@ const PointsEditor = ({
     (samePointsForAnimations: boolean, samePointsForSprites: boolean) => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
+          mapFor(0, animations.getAnimationsCount(), i => {
+            const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -123,7 +119,7 @@ const PointsEditor = ({
       forceUpdate(); // Refresh the preview
       if (onPointsUpdated) onPointsUpdated();
     },
-    [animation, sprite, spriteConfiguration, forceUpdate, onPointsUpdated]
+    [animation, sprite, animations, forceUpdate, onPointsUpdated]
   );
 
   const chooseAnimation = index => {
@@ -206,7 +202,7 @@ const PointsEditor = ({
   const { isMobile } = useResponsiveWindowSize();
   const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!objectConfiguration.getAnimationsCount()) return null;
+  if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
@@ -261,7 +257,7 @@ const PointsEditor = ({
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteConfiguration={spriteConfiguration}
+                  animations={animations}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}

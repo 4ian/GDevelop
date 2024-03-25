@@ -9,6 +9,7 @@ namespace gdjs {
   };
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
+    animatable?: SpriteAnimationData[];
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
@@ -86,10 +87,30 @@ namespace gdjs {
       oldObjectData: ObjectData & CustomObjectConfiguration,
       newObjectData: ObjectData & CustomObjectConfiguration
     ): boolean {
+      const animator = this.getAnimator();
+      if (animator) {
+        animator.updateFromObjectData(
+          oldObjectData.animatable || [],
+          newObjectData.animatable || []
+        );
+      }
       return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      const animator = this.getAnimator();
+      if (initialInstanceData.numberProperties) {
+        for (
+          let i = 0, len = initialInstanceData.numberProperties.length;
+          i < len;
+          ++i
+        ) {
+          const extraData = initialInstanceData.numberProperties[i];
+          if (animator && extraData.name === 'animation') {
+            animator.setAnimationIndex(extraData.value);
+          }
+        }
+      }
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
@@ -657,6 +678,15 @@ namespace gdjs {
 
     isFlippedY(): boolean {
       return this._flippedY;
+    }
+
+    /**
+     * Return the sprite animator.
+     *
+     * It returns `null` when custom objects don't have the Animatable capability.
+     */
+    getAnimator(): gdjs.SpriteAnimator<any> | null {
+      return null;
     }
   }
 

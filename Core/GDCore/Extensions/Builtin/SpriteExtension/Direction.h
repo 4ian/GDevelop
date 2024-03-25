@@ -3,12 +3,12 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_DIRECTION_H
-#define GDCORE_DIRECTION_H
+#pragma once
+
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
 namespace gd {
-class Sprite;
 class SerializerElement;
 }
 
@@ -142,4 +142,3 @@ class GD_CORE_API Direction {
 };
 
 }  // namespace gd
-#endif  // GDCORE_DIRECTION_H

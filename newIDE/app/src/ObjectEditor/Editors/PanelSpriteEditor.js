@@ -19,6 +19,7 @@ export default class PanelSpriteEditor extends React.Component<
       project,
       resourceManagementProps,
       objectName,
+      renderObjectNameField,
     } = this.props;
     const panelSpriteConfiguration = gd.asPanelSpriteConfiguration(
       objectConfiguration
@@ -26,6 +27,7 @@ export default class PanelSpriteEditor extends React.Component<
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <ResourceSelectorWithThumbnail
           project={project}
           resourceManagementProps={resourceManagementProps}

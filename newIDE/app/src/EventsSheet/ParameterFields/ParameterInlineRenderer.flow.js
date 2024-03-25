@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  type EventsScope,
-} from '../../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 export type InvalidParameterValueProps = {|
   children: React.Node,

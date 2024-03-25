@@ -20,6 +20,8 @@ import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import { enumerateValidVariableNames } from './EnumerateVariables';
 import intersection from 'lodash/intersection';
 
+const gd: libGDevelop = global.gd;
+
 // TODO Move this function to the ObjectsContainersList class.
 const getObjectOrGroupVariablesContainers = (
   globalObjectsContainer: gdObjectsContainer,
@@ -54,6 +56,88 @@ const getObjectOrGroupVariablesContainers = (
     }
   }
   return variablesContainers;
+};
+
+export const isUnifiedObjectInstruction = (type: string): boolean =>
+  type === 'VarObjetTxt' ||
+  type === 'ObjectVariableAsBoolean' ||
+  type === 'ModVarObjetTxt' ||
+  type === 'SetObjectVariableAsBoolean';
+
+export const getUnifiedObjectInstructionType = (
+  instructionType: string
+): string =>
+  instructionType === 'VarObjetTxt' ||
+  instructionType === 'ObjectVariableAsBoolean'
+    ? 'VarObjet'
+    : instructionType === 'ModVarObjetTxt' ||
+      instructionType === 'SetObjectVariableAsBoolean'
+    ? 'ModVarObjet'
+    : instructionType;
+
+export const switchBetweenUnifiedObjectInstructionIfNeeded = (
+  projectScopedContainers: gdProjectScopedContainers,
+  instruction: gdInstruction
+): void => {
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+
+  if (
+    (instruction.getType() === 'VarObjet' ||
+      instruction.getType() === 'VarObjetTxt' ||
+      instruction.getType() === 'ObjectVariableAsBoolean') &&
+    instruction.getParametersCount() > 0
+  ) {
+    const objectName = instruction.getParameter(0).getPlainString();
+    const variableName = instruction.getParameter(1).getPlainString();
+    if (
+      objectsContainersList.hasObjectOrGroupWithVariableNamed(
+        objectName,
+        variableName
+      )
+    ) {
+      const variable = objectsContainersList
+        .getObjectOrGroupVariablesContainer(objectName)
+        .get(variableName);
+      if (variable.getType() === gd.Variable.String) {
+        instruction.setType('VarObjetTxt');
+        instruction.setParametersCount(4);
+      } else if (variable.getType() === gd.Variable.Number) {
+        instruction.setType('VarObjet');
+        instruction.setParametersCount(4);
+      } else if (variable.getType() === gd.Variable.Boolean) {
+        instruction.setType('ObjectVariableAsBoolean');
+        instruction.setParametersCount(3);
+      }
+    }
+  } else if (
+    (instruction.getType() === 'ModVarObjet' ||
+      instruction.getType() === 'ModVarObjetTxt' ||
+      instruction.getType() === 'SetObjectVariableAsBoolean') &&
+    instruction.getParametersCount() > 0
+  ) {
+    const objectName = instruction.getParameter(0).getPlainString();
+    const variableName = instruction.getParameter(1).getPlainString();
+    if (
+      objectsContainersList.hasObjectOrGroupWithVariableNamed(
+        objectName,
+        variableName
+      )
+    ) {
+      const variable = objectsContainersList
+        .getObjectOrGroupVariablesContainer(objectName)
+        .get(variableName);
+      if (variable.getType() === gd.Variable.String) {
+        instruction.setType('ModVarObjetTxt');
+        instruction.setParametersCount(4);
+      } else if (variable.getType() === gd.Variable.Number) {
+        instruction.setType('ModVarObjet');
+        instruction.setParametersCount(4);
+      } else if (variable.getType() === gd.Variable.Boolean) {
+        instruction.setType('SetObjectVariableAsBoolean');
+        instruction.setParametersCount(3);
+      }
+    }
+  }
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(

@@ -27,6 +27,13 @@ export enum Variable_Type {
   Array = 4,
 }
 
+export enum ObjectsContainersList_VariableExistence {
+  DoesNotExist = 0,
+  Exists = 1,
+  GroupIsEmpty = 2,
+  ExistsOnlyOnSomeObjectsOfTheGroup = 3,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -558,6 +565,8 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectOrGroupVariablesContainer(objectName: string): VariablesContainer;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {

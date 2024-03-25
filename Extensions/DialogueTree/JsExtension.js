@@ -566,17 +566,17 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'TagParameterViaKey',
-        _('Get a Tag found in the dialogue branch, using a key'),
+        'TagValueViaKey',
+        _('Get a Tag value found in the dialogue branch, using its key where the pattern is key:value'),
         _(
           'Get a Tag found in the dialogue branch, using a key. For example with tags: "bg:park", "time:lunch", asking for "bg" will return "park"'
         ),
         '',
         'JsPlatform/Extensions/yarn32.png'
       )
-      .addParameter('string', _('parameter key'), '', true)
+      .addParameter('string', _('tag key'), '', true)
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.dialogueTree.getTagViaKey');
+      .setFunctionName('gdjs.dialogueTree.getTagValueViaKey');
 
     extension
       .addStrExpression(
@@ -836,6 +836,18 @@ module.exports = {
       .addParameter('string', _('branch title'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.branchTitleHasBeenVisited');
+
+    extension
+      .addCondition(
+        'BranchNodeHasChanged',
+        _('Branch node has changed'),
+        _('Current branch node has changed'),
+        _('Current branch node has changed'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .setFunctionName('gdjs.dialogueTree.branchTitleHasChanged');
 
     extension
       .addCondition(

@@ -288,7 +288,7 @@ const PlanCard = (props: Props) => {
           style={{
             padding: isMobile ? 8 : 16,
             border: `1px solid ${gdevelopTheme.text.color.disabled}`,
-            maxWidth: 350,
+            maxWidth: isMobile ? undefined : 350,
             minWidth: 280,
             display: 'flex',
             flex: 1,

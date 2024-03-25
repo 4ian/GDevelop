@@ -79,6 +79,14 @@ const styles = {
     alignItems: 'center',
     overflowY: 'auto',
   },
+  planCardsMobileContainer: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    flex: 1,
+    gap: 8,
+    alignItems: 'stretch',
+    overflowY: 'auto',
+  },
   planCardsLineContainer: {
     display: 'inline-flex',
     flexDirection: 'row',
@@ -442,6 +450,8 @@ export default function SubscriptionDialog({
                     style={
                       windowSize === 'large' || windowSize === 'xlarge'
                         ? styles.planCardsLineContainer
+                        : isMobile
+                        ? styles.planCardsMobileContainer
                         : styles.planCardsContainer
                     }
                   >

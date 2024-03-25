@@ -139,7 +139,7 @@ export type SubscriptionPlanPricingSystem = {|
   period: 'week' | 'month' | 'year',
   isPerUser?: true,
   currency: 'EUR' | 'USD',
-  region: 'north' | 'south' | 'everywhere',
+  region: 'eurozone' | 'default',
   amountInCents: number,
   periodCount: number,
 |};
@@ -151,6 +151,20 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
+  targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
+  fullFeatures: Array<{|
+    featureName: string,
+    pillarName: string,
+    descriptionByLocale?: MessageByLocale,
+    tooltipByLocale?: MessageByLocale,
+    enabled?: 'yes' | 'no',
+    unlimited?: true,
+    upcoming?: true,
+    trialLike?: true,
+  |}>,
+
+  pillarNamesPerLocale: { [key: string]: MessageByLocale },
+  featureNamesByLocale: { [key: string]: MessageByLocale },
 |};
 
 export type SubscriptionPlanWithPricingSystems = {|

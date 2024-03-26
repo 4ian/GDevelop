@@ -63,6 +63,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("variable", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
+      // This parameter allows to keep the operand
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   extension

@@ -70,6 +70,7 @@ module.exports = function (config) {
       './newIDE/app/resources/GDJS/Runtime/variablescontainer.js',
       './newIDE/app/resources/GDJS/Runtime/oncetriggers.js',
       './newIDE/app/resources/GDJS/Runtime/runtimebehavior.js',
+      './newIDE/app/resources/GDJS/Runtime/SpriteAnimator.js',
       './newIDE/app/resources/GDJS/Runtime/spriteruntimeobject.js',
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject.js',
       './newIDE/app/resources/GDJS/Runtime/CustomRuntimeObject2D.js',

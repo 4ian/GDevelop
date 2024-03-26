@@ -12,6 +12,7 @@ import TikTok from '../../UI/CustomSvgIcons/TikTok';
 import Twitter from '../../UI/CustomSvgIcons/Twitter';
 import YouTube from '../../UI/CustomSvgIcons/YouTube';
 import { GDevelopUserApi } from './ApiConfigs';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 
 import { type Badge } from './Badge';
 import { type Profile } from './Authentication';
@@ -140,6 +141,17 @@ export type TeamMembership = {|
   createdAt: number,
   groups?: ?Array<string>,
 |};
+
+export type UserLeaderboardEntry = {
+  count: number | null,
+  userPublicProfile: UserPublicProfile | null,
+};
+
+export type UserLeaderboard = {
+  name: string,
+  displayNameByLocale: MessageByLocale,
+  topUserCommentQualityRatings: UserLeaderboardEntry[],
+};
 
 export const client = axios.create({
   baseURL: GDevelopUserApi.baseUrl,
@@ -346,6 +358,20 @@ export const syncDiscordUsername = async (
       params: { userId },
     }
   );
+};
+
+export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
+  Array<UserLeaderboard>
+> => {
+  const response = await client.get(
+    '/user-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
+  );
+
+  if (!Array.isArray(response.data)) {
+    throw new Error('Invalid response from the user leaderboard API');
+  }
+
+  return response.data;
 };
 
 const simpleUrlRegex = /^https:\/\/[^ ]+$/;

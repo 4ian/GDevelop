@@ -18,6 +18,7 @@ import ErrorBoundary from '../../../UI/ErrorBoundary';
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
+import { UserAndGameLeaderboards } from './CommunitySection/UserAndGameLeaderboards';
 
 const styles = {
   list: {
@@ -82,6 +83,10 @@ const CommunitySection = () => {
           )}
           <PromotionsSlideshow />
           <AnnouncementsFeed canClose={false} level="normal" />
+          <Text size="title">
+            <Trans>Rankings</Trans>
+          </Text>
+          <UserAndGameLeaderboards />
           <Text size="title">
             <Trans>Join the conversation</Trans>
           </Text>

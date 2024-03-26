@@ -214,7 +214,7 @@ export const subscriptionForSilverUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
-  pricingSystemId: 'silver_1month',
+  pricingSystemId: 'silver_1month_499EUR',
 };
 
 export const subscriptionForGoldUser: Subscription = {
@@ -222,7 +222,7 @@ export const subscriptionForGoldUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'gold-user',
-  pricingSystemId: 'gold_1month',
+  pricingSystemId: 'gold_1month_999EUR',
 };
 
 export const subscriptionForStartupUser: Subscription = {
@@ -230,7 +230,7 @@ export const subscriptionForStartupUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'startup-user',
-  pricingSystemId: 'startup_1month',
+  pricingSystemId: 'startup_1month_3000EUR',
 };
 
 export const subscriptionForBusinessUser: Subscription = {
@@ -246,7 +246,7 @@ export const subscriptionForEducationPlan: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'teacher-user',
-  pricingSystemId: 'education_1month',
+  pricingSystemId: 'education_1month_299EUR',
 };
 
 export const subscriptionForGoldUserFromEducationPlan: Subscription = {
@@ -293,7 +293,7 @@ export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   cancelAtPeriodEnd: true,
-  pricingSystemId: 'silver_1month',
+  pricingSystemId: 'silver_1month_499EUR',
 };
 
 export const noSubscription: Subscription = {

@@ -99,10 +99,12 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
   SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
-    AddParameter(
-        "yesorno",
-        options.description.empty() ? _("New value") : options.description);
-    size_t valueParamIndex = parameters.size() - 1;
+    AddParameter("operator", _("Modification's sign"), expressionValueType);
+    // This parameter allows to keep the operand when the editor switch between variable instructions.
+    AddCodeOnlyParameter(
+        type,
+        options.description.empty() ? _("Value") : options.description);
+    size_t operatorParamIndex = parameters.size() - 2;
 
     if (isObjectInstruction || isBehaviorInstruction) {
       gd::String templateSentence = _("Set _PARAM0_ as <subject>: <value>");
@@ -111,7 +113,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
           templateSentence
               .FindAndReplace("<subject>", sentence)
               .FindAndReplace("<value>",
-                              "_PARAM" + gd::String::From(valueParamIndex) + "_");
+                              "_PARAM" + gd::String::From(operatorParamIndex) + "_");
     } else {
       gd::String templateSentence = _("Change <subject>: <value>");
 
@@ -119,7 +121,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
           templateSentence
               .FindAndReplace("<subject>", sentence)
               .FindAndReplace("<value>",
-                              "_PARAM" + gd::String::From(valueParamIndex) + "_");
+                              "_PARAM" + gd::String::From(operatorParamIndex) + "_");
     }
   } else {
     AddParameter("operator", _("Modification's sign"), expressionValueType);

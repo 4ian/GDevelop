@@ -60,10 +60,27 @@ VariablesExtension::VariablesExtension() {
   GetAllActions()["RemoveVariableAt"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveAt");
 
-  GetAllActions()["SetBooleanVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.setVariableBoolean");
-  GetAllActions()["ToggleBooleanVariable"].SetFunctionName(
-      "gdjs.evtTools.variable.toggleVariableBoolean");
+  GetAllActions()["SetBooleanVariable"].SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "variable",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String op = instruction.GetParameters()[1].GetPlainString();
+        if (op == "true")
+          return varGetter + ".setBoolean(true);\n";
+        else if (op == "false")
+          return varGetter + ".setBoolean(false);\n";
+        else if (op == "toggle")
+          return "gdjs.evtTools.variable.toggleVariableBoolean(" + varGetter + ");\n";
+
+        return gd::String("");
+      });
 
   GetAllActions()["SetNumberVariable"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,

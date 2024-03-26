@@ -50,13 +50,10 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
         .get(variableName);
       if (variable.getType() === gd.Variable.String) {
         instruction.setType('StringVariable');
-        instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Number) {
         instruction.setType('NumberVariable');
-        instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Boolean) {
         instruction.setType('BooleanVariable');
-        instruction.setParametersCount(2);
       }
     }
   } else if (
@@ -74,13 +71,10 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
         .get(variableName);
       if (variable.getType() === gd.Variable.String) {
         instruction.setType('SetStringVariable');
-        instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Number) {
         instruction.setType('SetNumberVariable');
-        instruction.setParametersCount(3);
       } else if (variable.getType() === gd.Variable.Boolean) {
         instruction.setType('SetBooleanVariable');
-        instruction.setParametersCount(2);
       }
     }
   }

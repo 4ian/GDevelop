@@ -16,6 +16,7 @@ import {
   EDUCATION_PLAN_MIN_SEATS,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
+  type Subscription,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -130,6 +131,25 @@ const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   maxWidth: 'sm',
 };
 
+const getSubscriptionPricingSystemPeriod = (
+  subscription: ?Subscription,
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[])
+): null | 'year' | 'month' => {
+  if (!subscription || !subscriptionPlansWithPricingSystems) return null;
+  for (let subscriptionPlanWithPricingSystems of subscriptionPlansWithPricingSystems) {
+    for (let pricingSystem of subscriptionPlanWithPricingSystems.pricingSystems) {
+      if (pricingSystem.id === subscription.pricingSystemId) {
+        if (pricingSystem.period === 'week') {
+          // TODO: Add support for weekly subscriptions when needed.
+          return null;
+        }
+        return pricingSystem.period;
+      }
+    }
+  }
+  return null;
+};
+
 const getPlanSpecificRequirements = (
   i18n: I18nType,
   subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
@@ -172,7 +192,6 @@ export default function SubscriptionDialog({
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
-  const [period, setPeriod] = React.useState<'year' | 'month'>('year');
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
@@ -183,6 +202,13 @@ export default function SubscriptionDialog({
   ] = React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [period, setPeriod] = React.useState<'year' | 'month'>(
+    getSubscriptionPricingSystemPeriod(
+      authenticatedUser.subscription,
+      subscriptionPlansWithPricingSystems
+    ) || 'year'
+  );
+
   const { showConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false

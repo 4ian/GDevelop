@@ -22,6 +22,7 @@ import Business from './Icons/Business';
 import Education from './Icons/Education';
 import GDevelopGLogo from '../../UI/CustomSvgIcons/GDevelopGLogo';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
+import DiscountFlame from '../../UI/HotMessage/DiscountFlame';
 
 const styles = {
   bulletIcon: { width: 20, height: 20, marginRight: 10 },
@@ -32,6 +33,17 @@ const styles = {
     alignItems: 'center',
   },
   bulletText: { flex: 1 },
+  discountedPrice: { textDecoration: 'line-through', opacity: 0.7 },
+  discountContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    color: '#1D1D26',
+    padding: '4px 8px',
+    borderRadius: 4,
+    display: 'flex',
+    alignItems: 'center',
+  },
 };
 
 const formatPricingSystemPriceAndCurrency = (
@@ -58,13 +70,13 @@ const getPlanPrice = (
     if (pricingSystem.periodCount === 1) {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="week" noMargin color="secondary">
+          <Text key="week" noMargin color="primary">
             <Trans>{price} per seat, each week</Trans>
           </Text>
         );
       } else {
         return (
-          <Text key="week" noMargin color="secondary">
+          <Text key="week" noMargin color="primary">
             <Trans>{price} per week</Trans>
           </Text>
         );
@@ -72,7 +84,7 @@ const getPlanPrice = (
     } else {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="week" noMargin color="secondary">
+          <Text key="week" noMargin color="primary">
             <Trans>
               {price} per seat, every {pricingSystem.periodCount} weeks
             </Trans>
@@ -80,7 +92,7 @@ const getPlanPrice = (
         );
       } else {
         return (
-          <Text key="week" noMargin color="secondary">
+          <Text key="week" noMargin color="primary">
             <Trans>
               {price} every {pricingSystem.periodCount} weeks
             </Trans>
@@ -92,13 +104,13 @@ const getPlanPrice = (
     if (pricingSystem.periodCount === 1) {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="month" noMargin color="secondary">
+          <Text key="month" noMargin color="primary">
             <Trans>{price} per seat, each month</Trans>
           </Text>
         );
       } else {
         return (
-          <Text key="month" noMargin color="secondary">
+          <Text key="month" noMargin color="primary">
             <Trans>{price} per month</Trans>
           </Text>
         );
@@ -106,7 +118,7 @@ const getPlanPrice = (
     } else {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="month" noMargin color="secondary">
+          <Text key="month" noMargin color="primary">
             <Trans>
               {price} per seat, every {pricingSystem.periodCount} months
             </Trans>
@@ -114,7 +126,7 @@ const getPlanPrice = (
         );
       } else {
         return (
-          <Text key="month" noMargin color="secondary">
+          <Text key="month" noMargin color="primary">
             <Trans>
               {price} every {pricingSystem.periodCount} months
             </Trans>
@@ -126,13 +138,13 @@ const getPlanPrice = (
     if (pricingSystem.periodCount === 1) {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="year" noMargin color="secondary">
+          <Text key="year" noMargin color="primary">
             <Trans>{price} per seat, each year</Trans>
           </Text>
         );
       } else {
         return (
-          <Text key="year" noMargin color="secondary">
+          <Text key="year" noMargin color="primary">
             <Trans>{price} per year</Trans>
           </Text>
         );
@@ -140,7 +152,7 @@ const getPlanPrice = (
     } else {
       if (pricingSystem.isPerUser) {
         return (
-          <Text key="year" noMargin color="secondary">
+          <Text key="year" noMargin color="primary">
             <Trans>
               {price} per seat, every {pricingSystem.periodCount} years
             </Trans>
@@ -148,7 +160,7 @@ const getPlanPrice = (
         );
       } else {
         return (
-          <Text key="year" noMargin color="secondary">
+          <Text key="year" noMargin color="primary">
             <Trans>
               {price} every {pricingSystem.periodCount} years
             </Trans>
@@ -159,19 +171,24 @@ const getPlanPrice = (
   }
 };
 
+const extrapolateMonthlyPricingSystemToYearlyBasis = (
+  monthlyPricingSystem: SubscriptionPlanPricingSystem
+): SubscriptionPlanPricingSystem => ({
+  ...monthlyPricingSystem,
+  amountInCents: monthlyPricingSystem.amountInCents * 12,
+  period: 'year',
+});
+
 export const getPlanPrices = ({
   pricingSystems,
-  hidePrice,
 }: {
   pricingSystems: SubscriptionPlanPricingSystem[],
-  hidePrice?: boolean,
 }): React.Node => {
-  if (hidePrice) return null;
   if (pricingSystems.length > 0) {
     const displayedPricingSystems = pricingSystems
       .map((pricingSystem, index) => [
         index !== 0 ? (
-          <Text noMargin size="body2" color="secondary">
+          <Text noMargin size="body2" color="primary">
             <Trans>or</Trans>
           </Text>
         ) : null,
@@ -183,7 +200,7 @@ export const getPlanPrices = ({
   }
 
   return (
-    <Text noMargin color="secondary">
+    <Text noMargin color="primary">
       <Trans>Free</Trans>
     </Text>
   );
@@ -262,12 +279,35 @@ export const getPlanIcon = ({
   }
 };
 
+const getYearlyDiscountDisplayText = (
+  subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems
+): string | null => {
+  const monthlyPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
+    pricingSystem => pricingSystem.period === 'month'
+  );
+  const yearlyPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
+    pricingSystem => pricingSystem.period === 'year'
+  );
+  if (!monthlyPricingSystem || !yearlyPricingSystem) return null;
+
+  return (
+    '-' +
+    ((
+      100 -
+      (yearlyPricingSystem.amountInCents /
+        (monthlyPricingSystem.amountInCents * 12)) *
+        100
+    ).toFixed(0) +
+      '%')
+  );
+};
+
 type Props = {|
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems,
   isHighlighted: boolean,
   actions?: React.Node,
   isPending?: boolean,
-  hidePrice?: boolean,
+  periodToDisplay: 'year' | 'month',
   background: 'medium' | 'dark',
 |};
 
@@ -279,6 +319,22 @@ const PlanCard = (props: Props) => {
     subscriptionPlan: props.subscriptionPlanWithPricingSystems,
     logoSize: 25,
   });
+  const mainPricingSystem = props.subscriptionPlanWithPricingSystems.pricingSystems.find(
+    pricingSystem => pricingSystem.period === props.periodToDisplay
+  );
+  const otherPricingSystem =
+    props.periodToDisplay === 'year'
+      ? props.subscriptionPlanWithPricingSystems.pricingSystems.find(
+          pricingSystem => pricingSystem.period === 'month'
+        )
+      : null;
+
+  if (!mainPricingSystem) return null;
+
+  const yearlyDiscountDisplayText =
+    props.periodToDisplay === 'year'
+      ? getYearlyDiscountDisplayText(props.subscriptionPlanWithPricingSystems)
+      : null;
 
   return (
     <I18n>
@@ -292,6 +348,7 @@ const PlanCard = (props: Props) => {
             minWidth: 280,
             display: 'flex',
             flex: 1,
+            position: 'relative',
             ...(props.isHighlighted
               ? {
                   borderTopWidth: 5,
@@ -300,6 +357,20 @@ const PlanCard = (props: Props) => {
               : {}),
           }}
         >
+          {yearlyDiscountDisplayText && (
+            <span
+              style={{
+                ...styles.discountContainer,
+                backgroundColor: gdevelopTheme.message.hot.backgroundColor,
+              }}
+            >
+              <DiscountFlame fontSize="small" />
+              <Spacer />
+              <Text color="inherit" noMargin>
+                {yearlyDiscountDisplayText}
+              </Text>
+            </span>
+          )}
           <Column expand noMargin alignItems="stretch">
             <Column noMargin alignItems="center">
               {planIcon}
@@ -355,10 +426,19 @@ const PlanCard = (props: Props) => {
               </Column>
             </Line>
             <Paper background="light" style={styles.planPricesPaper}>
+              {otherPricingSystem && (
+                <span style={styles.discountedPrice}>
+                  {getPlanPrices({
+                    pricingSystems: [
+                      extrapolateMonthlyPricingSystemToYearlyBasis(
+                        otherPricingSystem
+                      ),
+                    ],
+                  })}
+                </span>
+              )}
               {getPlanPrices({
-                pricingSystems:
-                  props.subscriptionPlanWithPricingSystems.pricingSystems,
-                hidePrice: props.hidePrice,
+                pricingSystems: [mainPricingSystem],
               })}
             </Paper>
             <Spacer />

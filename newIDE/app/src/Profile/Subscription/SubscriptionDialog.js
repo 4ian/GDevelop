@@ -174,7 +174,7 @@ export default function SubscriptionDialog({
   const [isChangingSubscription, setIsChangingSubscription] = React.useState(
     false
   );
-  const [period, setPeriod] = React.useState<'yearly' | 'monthly'>('yearly');
+  const [period, setPeriod] = React.useState<'year' | 'month'>('year');
   const [
     educationPlanPeriodicity,
     setEducationPlanPeriodicity,
@@ -409,18 +409,18 @@ export default function SubscriptionDialog({
                     value={period}
                     leftButton={{
                       label: <Trans>Monthly</Trans>,
-                      value: 'monthly',
+                      value: 'month',
                     }}
                     rightButton={{
                       label: <Trans>Yearly</Trans>,
-                      value: 'yearly',
+                      value: 'year',
                     }}
                     // $FlowIgnore
                     onChange={setPeriod}
                     addDatasetEffective
                   />
                 </Line>
-                {period !== 'yearly' && (
+                {period !== 'year' && (
                   <HotMessage
                     title={<Trans>Up to 40% discount</Trans>}
                     message={
@@ -428,7 +428,7 @@ export default function SubscriptionDialog({
                         Get a yearly subscription and enjoy discounts up to 40%!
                       </Trans>
                     }
-                    onClickRightButton={() => setPeriod('yearly')}
+                    onClickRightButton={() => setPeriod('year')}
                     rightButtonLabel={
                       isMobile ? (
                         <Trans>Check out</Trans>
@@ -609,6 +609,7 @@ export default function SubscriptionDialog({
                                   }}
                                 />
                               }
+                              periodToDisplay={period}
                               isPending={false}
                               isHighlighted={false}
                               background="medium"
@@ -646,6 +647,7 @@ export default function SubscriptionDialog({
                             subscriptionPlanWithPricingSystems={
                               subscriptionPlanWithPricingSystems
                             }
+                            periodToDisplay={period}
                             actions={actions}
                             isPending={isLoading}
                             isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.

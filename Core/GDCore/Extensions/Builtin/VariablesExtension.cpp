@@ -96,25 +96,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "SetBooleanVariable",
           _("Change boolean variable"),
           _("Modify the boolean value of a variable."),
-          _("Set variable _PARAM0_ to _PARAM1_"),
+          _("the variable _PARAM0_"),
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
       .AddParameter("variable", _("Variable"))
-      .AddParameter("trueorfalse", _("New Value:"))
-      .SetRelevantForLayoutEventsOnly();
-
-  extension
-      .AddAction("ToggleBooleanVariable",
-                 _("Toggle boolean variable"),
-                 _("Toggle the boolean value of a variable.") + "\n" +
-                     _("If it was true, it will become false, and if it was "
-                       "false it will become true."),
-                 _("Toggle the boolean value of variable _PARAM0_"),
-                 "",
-                 "res/conditions/var24.png",
-                 "res/conditions/var.png")
-      .AddParameter("variable", _("Variable"))
+      .UseStandardOperatorParameters("boolean",
+                                     ParameterOptions::MakeNewOptions())
       .SetRelevantForLayoutEventsOnly();
 
   extension

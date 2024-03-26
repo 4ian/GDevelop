@@ -17,6 +17,9 @@ const operatorLabels = {
   '-': t`- (subtract)`,
   '*': t`* (multiply by)`,
   '/': t`/ (divide by)`,
+  true: t`set to true`,
+  false: t`set to false`,
+  toggle: t`toggle`,
 };
 
 const mapTypeToOperators: { [string]: Array<string> } = {
@@ -24,6 +27,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
   color: ['=', '+'],
+  boolean: ['true', 'false', 'toggle'],
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
@@ -49,11 +53,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     React.useEffect(
       () => {
-        if (!value && comparedValueType !== 'unknown') {
-          onChange('=');
+        if (
+          operators &&
+          comparedValueType !== 'unknown' &&
+          !operators.includes(value)
+        ) {
+          onChange(operators[0]);
         }
       },
-      [value, onChange, comparedValueType]
+      [value, onChange, comparedValueType, operators]
     );
 
     return (
@@ -112,6 +120,9 @@ export const renderInlineOperator = ({
     else if (value === '/') return <Trans>divide by</Trans>;
     else if (value === '*') return <Trans>multiply by</Trans>;
   }
+  if (value === 'true') return <Trans>set to true</Trans>;
+  else if (value === 'false') return <Trans>set to false</Trans>;
+  else if (value === 'toggle') return <Trans>toggle</Trans>;
 
   return <InvalidParameterValue>{value}</InvalidParameterValue>;
 };

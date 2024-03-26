@@ -14,6 +14,7 @@ const styles = {
     padding: 10,
     color: '#1D1D26',
   },
+  buttonLabel: { fontWeight: 'bold', cursor: 'default' },
 };
 
 type Props = {|
@@ -50,7 +51,9 @@ const HotMessage = ({
         {onClickRightButton && rightButtonLabel && (
           <Line alignItems="center">
             <Link onClick={onClickRightButton} color="inherit">
-              <Typography color="inherit">{rightButtonLabel}</Typography>
+              <Typography color="inherit" style={styles.buttonLabel}>
+                {rightButtonLabel}
+              </Typography>
             </Link>
             <ChevronArrowRight />
           </Line>

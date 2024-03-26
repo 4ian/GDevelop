@@ -1,4 +1,7 @@
 namespace gdjs {
+  export interface PixiImageManager {
+    _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
+  }
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
    */
@@ -9,7 +12,6 @@ namespace gdjs {
     _sprite: PIXI.Sprite;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
-    private static _animationFrameTextureManager: PixiAnimationFrameTextureManager | null = null;
 
     /**
      * @param runtimeObject The object
@@ -186,12 +188,12 @@ namespace gdjs {
     static getAnimationFrameTextureManager(
       imageManager: gdjs.PixiImageManager
     ): PixiAnimationFrameTextureManager {
-      if (!gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager) {
-        gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager = new PixiAnimationFrameTextureManager(
+      if (!imageManager._pixiAnimationFrameTextureManager) {
+        imageManager._pixiAnimationFrameTextureManager = new PixiAnimationFrameTextureManager(
           imageManager
         );
       }
-      return gdjs.SpriteRuntimeObjectPixiRenderer._animationFrameTextureManager;
+      return imageManager._pixiAnimationFrameTextureManager;
     }
   }
 

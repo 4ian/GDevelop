@@ -1,6 +1,6 @@
 namespace gdjs {
   export interface PixiImageManager {
-    _animationFrameTextureManager: PixiAnimationFrameTextureManager;
+    _pixiAnimationFrameTextureManager: PixiAnimationFrameTextureManager;
   }
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
@@ -188,12 +188,12 @@ namespace gdjs {
     static getAnimationFrameTextureManager(
       imageManager: gdjs.PixiImageManager
     ): PixiAnimationFrameTextureManager {
-      if (!imageManager._animationFrameTextureManager) {
-        imageManager._animationFrameTextureManager = new PixiAnimationFrameTextureManager(
+      if (!imageManager._pixiAnimationFrameTextureManager) {
+        imageManager._pixiAnimationFrameTextureManager = new PixiAnimationFrameTextureManager(
           imageManager
         );
       }
-      return imageManager._animationFrameTextureManager;
+      return imageManager._pixiAnimationFrameTextureManager;
     }
   }
 

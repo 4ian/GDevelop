@@ -1,4 +1,7 @@
 namespace gdjs {
+  export interface PixiImageManager {
+    _threeAnimationFrameTextureManager: ThreeAnimationFrameTextureManager;
+  }
   /**
    * The renderer for a {@link gdjs.CustomRuntimeObject3D} using Three.js.
    */
@@ -8,7 +11,6 @@ namespace gdjs {
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isContainerDirty: boolean = true;
     _threeGroup: THREE.Group;
-    private static _animationFrameTextureManager: ThreeAnimationFrameTextureManager | null = null;
 
     constructor(
       object: gdjs.CustomRuntimeObject3D,
@@ -136,12 +138,12 @@ namespace gdjs {
     static getAnimationFrameTextureManager(
       imageManager: gdjs.PixiImageManager
     ): ThreeAnimationFrameTextureManager {
-      if (!gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager) {
-        gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager = new ThreeAnimationFrameTextureManager(
+      if (!imageManager._threeAnimationFrameTextureManager) {
+        imageManager._threeAnimationFrameTextureManager = new ThreeAnimationFrameTextureManager(
           imageManager
         );
       }
-      return gdjs.CustomRuntimeObject3DRenderer._animationFrameTextureManager;
+      return imageManager._threeAnimationFrameTextureManager;
     }
   }
 

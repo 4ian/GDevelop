@@ -8,8 +8,8 @@ import LeaderboardAppearanceDialog from '../../../GameDashboard/LeaderboardAdmin
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   fakeSilverAuthenticatedUser,
-  fakeBusinessAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
+  fakeStartupAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
@@ -58,8 +58,8 @@ export const WithSilverSubscription = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithBusinessSubscription = () => (
-  <AuthenticatedUserContext.Provider value={fakeBusinessAuthenticatedUser}>
+export const WithStartupSubscription = () => (
+  <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
       onClose={() => action('onClose')()}

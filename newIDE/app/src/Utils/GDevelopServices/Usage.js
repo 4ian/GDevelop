@@ -430,9 +430,7 @@ export const canUseCloudProjectHistory = (
 ): boolean => {
   if (!subscription) return false;
   return (
-    ['gdevelop_business', 'gdevelop_startup', 'gdevelop_education'].includes(
-      subscription.planId
-    ) ||
+    ['gdevelop_startup', 'gdevelop_education'].includes(subscription.planId) ||
     (subscription.planId === 'gdevelop_gold' &&
       !!subscription.benefitsFromEducationPlan)
   );

@@ -633,33 +633,6 @@ export default function SubscriptionDialog({
                               />,
                             ];
                           }
-                        } else if (
-                          subscriptionPlanWithPricingSystems.id ===
-                          'gdevelop_enterprise'
-                        ) {
-                          return (
-                            <PlanCard
-                              key={subscriptionPlanWithPricingSystems.id}
-                              subscriptionPlanWithPricingSystems={
-                                subscriptionPlanWithPricingSystems
-                              }
-                              actions={
-                                <RaisedButton
-                                  primary
-                                  label={<Trans>Learn more</Trans>}
-                                  onClick={() => {
-                                    Window.openExternalURL(
-                                      'https://gdevelop.io/pricing'
-                                    );
-                                  }}
-                                />
-                              }
-                              periodToDisplay={period}
-                              isPending={false}
-                              isHighlighted={false}
-                              background="medium"
-                            />
-                          );
                         } else {
                           const pricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
                             _pricingSystem => _pricingSystem.period === period

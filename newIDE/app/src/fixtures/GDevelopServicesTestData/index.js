@@ -233,14 +233,6 @@ export const subscriptionForStartupUser: Subscription = {
   pricingSystemId: 'startup_1month_3000EUR',
 };
 
-export const subscriptionForBusinessUser: Subscription = {
-  planId: 'gdevelop_business',
-  createdAt: 1515084011000,
-  updatedAt: 1515084011000,
-  userId: 'business-user',
-  pricingSystemId: 'business_1month',
-};
-
 export const subscriptionForEducationPlan: Subscription = {
   planId: 'gdevelop_education',
   createdAt: 1515084011000,
@@ -2759,11 +2751,6 @@ export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForStartupUser,
   limits: limitsForStartupUser,
-};
-export const fakeBusinessAuthenticatedUser: AuthenticatedUser = {
-  ...fakeSilverAuthenticatedUser,
-  subscription: subscriptionForBusinessUser,
-  limits: limitsForBusinessUser,
 };
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,

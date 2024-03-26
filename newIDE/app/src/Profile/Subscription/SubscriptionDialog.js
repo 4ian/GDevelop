@@ -39,8 +39,6 @@ import PlanCard from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -175,10 +173,6 @@ export default function SubscriptionDialog({
     false
   );
   const [period, setPeriod] = React.useState<'year' | 'month'>('year');
-  const [
-    educationPlanPeriodicity,
-    setEducationPlanPeriodicity,
-  ] = React.useState<'yearly' | 'monthly'>('yearly');
   const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
@@ -518,26 +512,6 @@ export default function SubscriptionDialog({
                                       t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
                                     )}
                                   />
-                                  <SelectField
-                                    value={educationPlanPeriodicity}
-                                    floatingLabelText={
-                                      <Trans>Engagement</Trans>
-                                    }
-                                    fullWidth
-                                    onChange={(e, i, newValue) => {
-                                      // $FlowExpectedError - Flow does not infer the type given the select options.
-                                      setEducationPlanPeriodicity(newValue);
-                                    }}
-                                  >
-                                    <SelectOption
-                                      value="yearly"
-                                      label={t`Per year`}
-                                    />
-                                    <SelectOption
-                                      value="monthly"
-                                      label={t`Per month`}
-                                    />
-                                  </SelectField>
                                 </ColumnStackLayout>,
                                 <RaisedButton
                                   primary
@@ -552,7 +526,7 @@ export default function SubscriptionDialog({
                                   onClick={() =>
                                     buyUpdateOrCancelPlan(
                                       i18n,
-                                      educationPlanPeriodicity === 'yearly'
+                                      period === 'year'
                                         ? yearlyPlanPrice
                                         : monthlyPlanPrice
                                     )

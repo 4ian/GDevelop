@@ -329,8 +329,6 @@ const PlanCard = (props: Props) => {
         )
       : null;
 
-  if (!mainPricingSystem) return null;
-
   const yearlyDiscountDisplayText =
     props.periodToDisplay === 'year'
       ? getYearlyDiscountDisplayText(props.subscriptionPlanWithPricingSystems)
@@ -425,22 +423,24 @@ const PlanCard = (props: Props) => {
                 )}
               </Column>
             </Line>
-            <Paper background="light" style={styles.planPricesPaper}>
-              {otherPricingSystem && (
-                <span style={styles.discountedPrice}>
-                  {getPlanPrices({
-                    pricingSystems: [
-                      extrapolateMonthlyPricingSystemToYearlyBasis(
-                        otherPricingSystem
-                      ),
-                    ],
-                  })}
-                </span>
-              )}
-              {getPlanPrices({
-                pricingSystems: [mainPricingSystem],
-              })}
-            </Paper>
+            {mainPricingSystem && (
+              <Paper background="light" style={styles.planPricesPaper}>
+                {otherPricingSystem && (
+                  <span style={styles.discountedPrice}>
+                    {getPlanPrices({
+                      pricingSystems: [
+                        extrapolateMonthlyPricingSystemToYearlyBasis(
+                          otherPricingSystem
+                        ),
+                      ],
+                    })}
+                  </span>
+                )}
+                {getPlanPrices({
+                  pricingSystems: [mainPricingSystem],
+                })}
+              </Paper>
+            )}
             <Spacer />
             {props.actions && (
               <ColumnStackLayout

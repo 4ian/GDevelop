@@ -354,6 +354,9 @@ export default function SubscriptionDialog({
   const userPlanId = authenticatedUser.subscription
     ? authenticatedUser.subscription.planId
     : null;
+  const userPricingSystemId = authenticatedUser.subscription
+    ? authenticatedUser.subscription.pricingSystemId
+    : null;
 
   const { windowSize, isMobile } = useResponsiveWindowSize();
 
@@ -487,8 +490,13 @@ export default function SubscriptionDialog({
                           subscriptionPlanWithPricingSystems.id === 'free';
                         const isUserCurrentOrLegacyPlan =
                           userPlanId === subscriptionPlanWithPricingSystems.id;
+                        const pricingSystem = isFreePlan
+                          ? null
+                          : subscriptionPlanWithPricingSystems.pricingSystems.find(
+                              _pricingSystem => _pricingSystem.period === period
+                            );
                         let actions: React.Node = null;
-                        if (isFreePlan) {
+                        if (isFreePlan || !pricingSystem) {
                           // If no plan (free usage), do not display button.
                         } else if (
                           subscriptionPlanWithPricingSystems.id ===
@@ -568,26 +576,63 @@ export default function SubscriptionDialog({
                             ];
                           }
                         } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
-                          actions = [
-                            <FlatButton
-                              key="cancel"
-                              disabled={isLoading || willCancelAtPeriodEnd}
-                              fullWidth
-                              label={
-                                <LeftLoader isLoading={isLoading}>
-                                  {willCancelAtPeriodEnd ? (
+                          const isUserCurrentPricingSystem = pricingSystem
+                            ? pricingSystem.id === userPricingSystemId
+                            : false;
+                          if (willCancelAtPeriodEnd) {
+                            actions = [
+                              <FlatButton
+                                key="cancel"
+                                disabled
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
                                     <Trans>
                                       Already cancelled - will expire in the
                                       future
                                     </Trans>
-                                  ) : (
+                                  </LeftLoader>
+                                }
+                                onClick={() => {}}
+                              />,
+                            ];
+                          } else if (isUserCurrentPricingSystem) {
+                            actions = [
+                              <FlatButton
+                                key="cancel"
+                                disabled={isLoading}
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
                                     <Trans>Cancel your subscription</Trans>
-                                  )}
-                                </LeftLoader>
-                              }
-                              onClick={() => buyUpdateOrCancelPlan(i18n, null)}
-                            />,
-                          ];
+                                  </LeftLoader>
+                                }
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, null)
+                                }
+                              />,
+                            ];
+                          } else {
+                            actions = [
+                              <RaisedButton
+                                key="switch"
+                                disabled={isLoading}
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
+                                    {period === 'year' ? (
+                                      <Trans>Switch to yearly pricing</Trans>
+                                    ) : (
+                                      <Trans>Switch to monthly pricing</Trans>
+                                    )}
+                                  </LeftLoader>
+                                }
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, pricingSystem)
+                                }
+                              />,
+                            ];
+                          }
                         } else if (
                           subscriptionPlanWithPricingSystems.id ===
                           'gdevelop_enterprise'
@@ -616,10 +661,10 @@ export default function SubscriptionDialog({
                             />
                           );
                         } else {
-                          const price =
-                            subscriptionPlanWithPricingSystems
-                              .pricingSystems[0];
-                          if (price) {
+                          const pricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
+                            _pricingSystem => _pricingSystem.period === period
+                          );
+                          if (pricingSystem) {
                             actions = [
                               <RaisedButton
                                 primary
@@ -632,7 +677,7 @@ export default function SubscriptionDialog({
                                   </LeftLoader>
                                 }
                                 onClick={() =>
-                                  buyUpdateOrCancelPlan(i18n, price)
+                                  buyUpdateOrCancelPlan(i18n, pricingSystem)
                                 }
                               />,
                             ];

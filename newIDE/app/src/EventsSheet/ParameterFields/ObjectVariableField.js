@@ -64,6 +64,15 @@ export const isUnifiedObjectInstruction = (type: string): boolean =>
   type === 'SetStringObjectVariable' ||
   type === 'SetBooleanObjectVariable';
 
+export const unifiedInstructionTypes = [
+  'NumberObjectVariable',
+  'StringObjectVariable',
+  'BooleanObjectVariable',
+  'SetNumberObjectVariable',
+  'SetStringObjectVariable',
+  'SetBooleanObjectVariable',
+];
+
 export const getUnifiedObjectInstructionType = (
   instructionType: string
 ): string =>
@@ -204,6 +213,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
+          forceDeclaration={
+            instruction &&
+            unifiedInstructionTypes.includes(instruction.getType())
+          }
           variablesContainers={variablesContainers}
           enumerateVariableNames={enumerateVariableNames}
           parameterMetadata={props.parameterMetadata}

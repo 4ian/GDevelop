@@ -2,12 +2,12 @@
  * CSS classes for a text field, inspired from Material UI, but lightweight
  * and faster to render.
  */
-.gd-simple-text-field {
+.simpleTextField {
   position: relative;
   width: 100%;
 }
 
-.gd-simple-text-field input {
+.simpleTextField input {
   font-family: var(--gdevelop-modern-font-family);
   font-size: 14px;
   outline: none;
@@ -22,11 +22,11 @@
   width: 100%;
 }
 
-.gd-simple-text-field.gd-disabled input {
+.disabled input {
   color: var(--theme-text-disabled-color);
 }
 
-.gd-simple-text-field:before {
+.simpleTextField:before {
   bottom: -1px;
   left: 0;
   right: 0;
@@ -36,20 +36,20 @@
   position: absolute;
   pointer-events: none;
 }
-.gd-simple-text-field:hover::before {
+.simpleTextField:hover::before {
   border-width: 2px;
 }
-.gd-simple-text-field:focus-within::before {
+.simpleTextField:focus-within::before {
   border-width: 2px;
 }
 
-.gd-simple-text-field.gd-disabled:before {
+.disabled:before {
   border-bottom-style: dotted;
   border-color: var(--theme-text-disabled-color);
 }
-.gd-simple-text-field.gd-disabled:hover::before {
+.disabled:hover::before {
   border-width: 1px;
 }
-.gd-simple-text-field.gd-disabled:focus-within::before {
+.disabled:focus-within::before {
   border-width: 1px;
 }

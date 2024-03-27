@@ -1429,6 +1429,23 @@ namespace gdjs {
       );
     }
 
+    setLinearVelocityAngle(angle: float, linearVelocity: float): void {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        if (!this.createBody()) return;
+      }
+      const body = this._body!;
+
+      // Set the linear velocity toward an angle
+      angle = gdjs.toRad(angle);
+      body.SetLinearVelocity(
+        this.b2Vec2(
+          linearVelocity * Math.cos(angle) * this._sharedData.invScaleX,
+          linearVelocity * Math.sin(angle) * this._sharedData.invScaleY
+        )
+      );
+    }
+
     getAngularVelocity(): float {
       // If there is no body, set a new one
       if (this._body === null) {

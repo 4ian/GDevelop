@@ -221,7 +221,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 onApply={onApply}
                 dataSource={[
                   ...autocompletionVariableNames,
-                  onOpenDialog && variablesContainers.length === 1
+                  onOpenDialog
                     ? {
                         translatableValue: t`Add or edit variables...`,
                         text: '',
@@ -236,10 +236,10 @@ export default React.forwardRef<Props, VariableFieldInterface>(
               />
             )}
             renderButton={style =>
-              onOpenDialog && !isInline ? (
+              !isInline ? (
                 <RaisedButton
                   icon={<ShareExternal />}
-                  disabled={variablesContainers.length !== 1}
+                  disabled={!onOpenDialog}
                   primary
                   style={style}
                   onClick={onOpenDialog}

@@ -125,6 +125,17 @@ export type MarketingPlan = {|
   bulletPointsByLocale: Array<MessageByLocale>,
 |};
 
+export type GameLeaderboardEntry = {
+  count: number | null,
+  publicGame: PublicGame | null,
+};
+
+export type GameLeaderboard = {
+  name: string,
+  displayNameByLocale: MessageByLocale,
+  topGameCommentQualityRatings: GameLeaderboardEntry[],
+};
+
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
     case 'action':
@@ -172,6 +183,17 @@ export const getGameUrl = (game: ?Game) => {
   return slug
     ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
     : GDevelopGamesPlatform.getGameUrl(game.id);
+};
+
+export const getPublicGameUrl = (publicGame: ?PublicGame) => {
+  if (!publicGame) return null;
+
+  return publicGame.gameSlug && publicGame.userSlug
+    ? GDevelopGamesPlatform.getGameUrlWithSlug(
+        publicGame.userSlug,
+        publicGame.gameSlug
+      )
+    : GDevelopGamesPlatform.getGameUrl(publicGame.id);
 };
 
 export const getAclsFromUserIds = (
@@ -494,5 +516,21 @@ export const listGameFeaturings = async (
 
 export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
   const response = await axios.get(`${GDevelopGameApi.baseUrl}/marketing-plan`);
+  return response.data;
+};
+
+export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
+  Array<GameLeaderboard>
+> => {
+  const response = await axios.get(
+    `${
+      GDevelopGameApi.baseUrl
+    }/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global`
+  );
+
+  if (!Array.isArray(response.data)) {
+    throw new Error('Invalid response from the game leaderboard API');
+  }
+
   return response.data;
 };

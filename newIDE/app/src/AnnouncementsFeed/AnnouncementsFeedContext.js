@@ -18,7 +18,7 @@ type AnnouncementsFeedState = {|
   announcements: ?(Announcement[]),
   promotions: ?(Promotion[]),
   error: ?Error,
-  fetchAnnouncementsAndPromotions: () => void,
+  fetchAnnouncementsAndPromotions: () => Promise<void>,
 |};
 
 export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedState>(
@@ -26,7 +26,7 @@ export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedSta
     announcements: null,
     promotions: null,
     error: null,
-    fetchAnnouncementsAndPromotions: () => {},
+    fetchAnnouncementsAndPromotions: async () => {},
   }
 );
 
@@ -44,37 +44,33 @@ export const AnnouncementsFeedStateProvider = ({
   const [promotions, setPromotions] = React.useState<?(Promotion[])>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchAnnouncementsAndPromotions = React.useCallback(() => {
+  const fetchAnnouncementsAndPromotions = React.useCallback(async () => {
     if (isLoading.current) return;
 
-    (async () => {
-      setError(null);
-      isLoading.current = true;
+    setError(null);
+    isLoading.current = true;
 
-      try {
-        const [fetchedAnnouncements, fetchedPromotions] = await Promise.all([
-          listAllAnnouncements(),
-          listAllPromotions(),
-        ]);
+    try {
+      const [fetchedAnnouncements, fetchedPromotions] = await Promise.all([
+        listAllAnnouncements(),
+        listAllPromotions(),
+      ]);
 
-        // Logic to remove once promotions are displayed to enough users.
-        // For now, we filter out promotions from the announcements.
-        const filteredAnnouncements = fetchedAnnouncements.filter(
-          announcement =>
-            !fetchedPromotions.find(
-              promotion => promotion.id === announcement.id
-            )
-        );
+      // Logic to remove once promotions are displayed to enough users.
+      // For now, we filter out promotions from the announcements.
+      const filteredAnnouncements = fetchedAnnouncements.filter(
+        announcement =>
+          !fetchedPromotions.find(promotion => promotion.id === announcement.id)
+      );
 
-        setAnnouncements(filteredAnnouncements);
-        setPromotions(fetchedPromotions);
-      } catch (error) {
-        console.error(`Unable to load the announcements from the api:`, error);
-        setError(error);
-      }
+      setAnnouncements(filteredAnnouncements);
+      setPromotions(fetchedPromotions);
+    } catch (error) {
+      console.error(`Unable to load the announcements from the api:`, error);
+      setError(error);
+    }
 
-      isLoading.current = false;
-    })();
+    isLoading.current = false;
   }, []);
 
   // Preload the announcements and promotions when the app loads.

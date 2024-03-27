@@ -53,11 +53,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     React.useEffect(
       () => {
-        if (
-          operators &&
-          comparedValueType !== 'unknown' &&
-          !operators.includes(value)
-        ) {
+        if (comparedValueType !== 'unknown' && !value) {
           onChange(operators[0]);
         }
       },
@@ -72,7 +68,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         helperMarkdownText={
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
-        value={value}
+        value={operators.includes(value) ? value : ''}
         onChange={(e, i, value: string) => onChange(value)}
         ref={field}
         translatableHintText={t`Choose an operator`}
@@ -98,8 +94,15 @@ export const renderInlineOperator = ({
   value,
   InvalidParameterValue,
   useAssignmentOperators,
+  parameterMetadata,
 }: ParameterInlineRendererProps) => {
-  if (!value) {
+  const comparedValueType = parameterMetadata
+    ? parameterMetadata.getExtraInfo()
+    : 'unknown';
+  const operators =
+    mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
+
+  if (!operators.includes(value)) {
     return (
       <InvalidParameterValue isEmpty>
         <Trans>Choose an operator</Trans>

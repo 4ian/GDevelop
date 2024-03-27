@@ -230,6 +230,35 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["PickNearest"].SetFunctionName(
       "gdjs.evtTools.object.pickNearestObject");
 
+  objectActions["SetNumberObjectVariable"]
+      .SetFunctionName("returnVariable")
+      .SetManipulatedType("number")
+      .SetMutators({
+          {"=", "setNumber"},
+          {"+", "add"},
+          {"-", "sub"},
+          {"*", "mul"},
+          {"/", "div"},
+      });
+  objectActions["SetStringObjectVariable"]
+      .SetFunctionName("returnVariable")
+      .SetManipulatedType("string")
+      .SetMutators({
+          {"=", "setString"},
+          {"+", "concatenate"},
+      });
+  objectActions["SetBooleanObjectVariable"]
+      .SetFunctionName("returnVariable")
+      .SetManipulatedType("boolean")
+      .SetMutators({
+          {"true", "setBoolean(true)"},
+          {"false", "setBoolean(false)"},
+          {"toggle", "toggle()"},
+      });
+  objectConditions["NumberObjectVariable"].SetFunctionName("getVariableNumber");
+  objectConditions["StringObjectVariable"].SetFunctionName("getVariableString");
+  objectConditions["BooleanObjectVariable"].SetFunctionName("getVariableBoolean");
+
   objectActions["ModVarObjet"]
       .SetFunctionName("returnVariable")
       .SetManipulatedType("number")
@@ -252,14 +281,6 @@ BaseObjectExtension::BaseObjectExtension() {
       "setVariableBoolean");
   objectActions["ToggleObjectVariableAsBoolean"].SetFunctionName(
       "toggleVariableBoolean");
-  objectActions["SetBooleanObjectVariable"]
-      .SetFunctionName("returnVariable")
-      .SetManipulatedType("boolean")
-      .SetMutators({
-          {"true", "setBoolean(true)"},
-          {"false", "setBoolean(false)"},
-          {"toggle", "toggle()"},
-      });
 
   objectActions["ObjectVariablePush"].SetFunctionName("variablePushCopy");
   objectActions["ObjectVariablePushString"].SetFunctionName("valuePush");

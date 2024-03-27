@@ -53,7 +53,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             rightButton={{ label: <Trans>False</Trans>, value: 'False' }}
             onChange={props.onChange}
             ref={button}
-            addDatasetEffective
           />
         </Line>
         {longDescription ? (

@@ -61,7 +61,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             }}
             onChange={props.onChange}
             ref={button}
-            addDatasetEffective
           />
         </Line>
         {longDescription ? (

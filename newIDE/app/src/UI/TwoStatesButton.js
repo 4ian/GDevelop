@@ -11,13 +11,12 @@ type Props = {|
   rightButton: {| label: React.Node, value: string, id?: string |},
   onChange: string => void,
   value: string,
-  addDatasetEffective?: boolean,
 |};
 
 export type TwoStatesButtonInterface = {| focusLeftButton: () => void |};
 
 const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
-  ({ leftButton, rightButton, onChange, value, addDatasetEffective }, ref) => {
+  ({ leftButton, rightButton, onChange, value }, ref) => {
     const leftButtonRef = React.useRef<?Button>(null);
 
     const focusLeftButton = React.useCallback(() => {
@@ -29,10 +28,8 @@ const TwoStatesButton = React.forwardRef<Props, TwoStatesButtonInterface>(
     }));
 
     const isLeft = value === leftButton.value;
-    const leftButtonDataset =
-      addDatasetEffective && isLeft ? { effective: 'true' } : undefined;
-    const rightButtonDataset =
-      addDatasetEffective && !isLeft ? { effective: 'true' } : undefined;
+    const leftButtonDataset = isLeft ? { effective: 'true' } : undefined;
+    const rightButtonDataset = !isLeft ? { effective: 'true' } : undefined;
     return (
       <ButtonGroup>
         <Button

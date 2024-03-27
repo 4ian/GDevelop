@@ -445,7 +445,6 @@ export default function SubscriptionDialog({
                     }}
                     // $FlowIgnore
                     onChange={setPeriod}
-                    addDatasetEffective
                   />
                 </Line>
                 {period !== 'year' && (

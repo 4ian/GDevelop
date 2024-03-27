@@ -57,6 +57,7 @@ type Props = {|
     // Allow to change color to easily simulate disabled text
     opacity?: number,
   |},
+  tooltip?: string,
 |};
 
 type Interface = {||};
@@ -115,6 +116,7 @@ const Text = React.forwardRef<Props, Interface>(
       allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       displayAsListItem,
+      tooltip,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
@@ -127,6 +129,7 @@ const Text = React.forwardRef<Props, Interface>(
       component={
         displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined
       }
+      title={tooltip}
       style={{
         ...style,
         display: displayInlineAsSpan

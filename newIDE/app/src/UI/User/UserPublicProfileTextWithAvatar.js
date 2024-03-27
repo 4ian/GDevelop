@@ -6,6 +6,7 @@ import { Avatar, ButtonBase } from '@material-ui/core';
 import Text from '../Text';
 import { LineStackLayout } from '../Layout';
 import { Trans } from '@lingui/macro';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 type Props = {|
   user: UserPublicProfile | null,
@@ -39,13 +40,15 @@ export const UserPublicProfileTextWithAvatar = ({
           }}
         />
         <Text size="body">
-          {user
-            ? user.username || (
-                <i>
-                  <Trans>Anonymous</Trans>
-                </i>
-              )
-            : ''}
+          {user ? (
+            user.username || (
+              <i>
+                <Trans>Anonymous</Trans>
+              </i>
+            )
+          ) : (
+            <Skeleton variant="rect" height={20} width={100} />
+          )}
         </Text>
       </LineStackLayout>
     </ButtonBase>

@@ -14,13 +14,17 @@ import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Paper from '../UI/Paper';
 import Annotation from '../UI/CustomSvgIcons/Annotation';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { ButtonBase } from '@material-ui/core';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import Skeleton from '@material-ui/lab/Skeleton';
 import Window from '../Utils/Window';
 
 type Props = {|
   gameLeaderboard: GameLeaderboard | null,
   displayEntriesCount: number,
 |};
+
+const thumbnailWidth = 100;
+const thumbnailHeight = 28;
 
 const styles = {
   avatar: {
@@ -43,16 +47,16 @@ const styles = {
     textAlign: 'center',
   },
   gameThumbnailContainer: {
-    width: 100,
-    height: 28,
+    width: thumbnailWidth,
+    height: thumbnailHeight,
     display: 'inline-block',
     overflow: 'hidden',
     verticalAlign: 'middle',
     marginRight: 5,
   },
   gameThumbnail: {
-    width: 100,
-    height: 28,
+    width: thumbnailWidth,
+    height: thumbnailHeight,
     objectFit: 'cover',
   },
   fullWidthButtonSupportingEllipsisInATable: {
@@ -114,6 +118,9 @@ export const GameFeedbackLeaderboard = ({
                   .slice(0, displayEntriesCount)
                   .map((entry, index) => {
                     const publicGameUrl = getPublicGameUrl(entry.publicGame);
+                    const title = entry.publicGame
+                      ? entry.publicGame.gameName
+                      : '';
 
                     return (
                       <tr
@@ -127,33 +134,39 @@ export const GameFeedbackLeaderboard = ({
                           <Text>{index + 1}</Text>
                         </td>
                         <td style={styles.gameColumn}>
-                          <ButtonBase
-                            onClick={
-                              publicGameUrl
-                                ? () => Window.openExternalURL(publicGameUrl)
-                                : undefined
-                            }
-                            style={
-                              styles.fullWidthButtonSupportingEllipsisInATable
-                            }
-                          >
-                            <Text style={textEllipsisStyle} noMargin>
-                              {entry.publicGame &&
-                              entry.publicGame.thumbnailUrl ? (
-                                <div style={styles.gameThumbnailContainer}>
-                                  <img
-                                    src={entry.publicGame.thumbnailUrl}
-                                    style={styles.gameThumbnail}
-                                    alt={entry.publicGame.gameName}
-                                    title={entry.publicGame.gameName}
-                                  />
-                                </div>
-                              ) : null}
-                              {entry.publicGame
-                                ? entry.publicGame.gameName
-                                : ''}
-                            </Text>
-                          </ButtonBase>
+                          {entry.publicGame ? (
+                            <ButtonBase
+                              onClick={
+                                publicGameUrl
+                                  ? () => Window.openExternalURL(publicGameUrl)
+                                  : undefined
+                              }
+                              style={
+                                styles.fullWidthButtonSupportingEllipsisInATable
+                              }
+                            >
+                              <Text
+                                style={textEllipsisStyle}
+                                noMargin
+                                tooltip={title}
+                              >
+                                {entry.publicGame &&
+                                entry.publicGame.thumbnailUrl ? (
+                                  <div style={styles.gameThumbnailContainer}>
+                                    <img
+                                      src={entry.publicGame.thumbnailUrl}
+                                      style={styles.gameThumbnail}
+                                      alt={title}
+                                      title={title}
+                                    />
+                                  </div>
+                                ) : null}
+                                {title}
+                              </Text>
+                            </ButtonBase>
+                          ) : (
+                            <Skeleton variant="rect" width={thumbnailWidth} height={thumbnailHeight} />
+                          )}
                         </td>
                         <td style={styles.scoreColumn}>
                           <Text>{entry.count ? entry.count : '-'}</Text>

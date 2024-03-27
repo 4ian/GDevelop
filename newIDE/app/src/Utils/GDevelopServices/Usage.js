@@ -342,11 +342,7 @@ export const hasMobileAppStoreSubscriptionPlan = (
 export const hasSubscriptionBeenManuallyAdded = (
   subscription: ?Subscription
 ): boolean => {
-  return (
-    !!subscription &&
-    (subscription.stripeSubscriptionId === 'MANUALLY_ADDED' ||
-      subscription.stripeCustomerId === 'MANUALLY_ADDED')
-  );
+  return !!subscription && subscription.pricingSystemId === 'MANUALLY_ADDED';
 };
 
 export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {

@@ -1,20 +1,13 @@
 // @flow
 import * as React from 'react';
-import {
-  getUserCommentQualityRatingsLeaderboards,
-  type UserLeaderboard,
-} from '../../../../Utils/GDevelopServices/User';
-import { UserFeedbackLeaderboard } from './UserFeedbackLeaderboard';
-import { GameFeedbackLeaderboard } from './GameFeedbackLeaderboard';
+import { UserFeedbackLeaderboard } from '../../../../CommunityLeaderboards/UserFeedbackLeaderboard';
+import { GameFeedbackLeaderboard } from '../../../../CommunityLeaderboards/GameFeedbackLeaderboard';
 import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { Line, Spacer } from '../../../../UI/Grid';
-import {
-  getGameCommentQualityRatingsLeaderboards,
-  type GameLeaderboard,
-} from '../../../../Utils/GDevelopServices/Game';
+import { CommunityLeaderboardsContext } from '../../../../CommunityLeaderboards/CommunityLeaderboardsContext';
 
 const styles = {
   leaderboardContainer: {
@@ -25,26 +18,18 @@ const styles = {
 };
 
 export const UserAndGameLeaderboards = () => {
-  const [userLeaderboards, setUserLeaderboards] = React.useState<
-    Array<UserLeaderboard>
-  >([]);
-  const [gameLeaderboards, setGameLeaderboards] = React.useState<
-    Array<GameLeaderboard>
-  >([]);
-  React.useEffect(() => {
-    (async () => {
-      try {
-        const [userLeaderboards, gameLeaderboards] = await Promise.all([
-          getUserCommentQualityRatingsLeaderboards(),
-          getGameCommentQualityRatingsLeaderboards(),
-        ]);
-        setUserLeaderboards(userLeaderboards);
-        setGameLeaderboards(gameLeaderboards);
-      } catch (error) {
-        console.error('Unable to fetch user leaderboards', error);
-      }
-    })();
-  }, []);
+  const {
+    fetchCommunityLeaderboards,
+    gameLeaderboards,
+    userLeaderboards,
+  } = React.useContext(CommunityLeaderboardsContext);
+
+  React.useEffect(
+    () => {
+      fetchCommunityLeaderboards();
+    },
+    [fetchCommunityLeaderboards]
+  );
 
   const { windowSize } = useResponsiveWindowSize();
 
@@ -63,9 +48,11 @@ export const UserAndGameLeaderboards = () => {
         <ResponsiveLineStackLayout noColumnMargin noMargin>
           <GameFeedbackLeaderboard
             gameLeaderboard={
-              gameLeaderboards.find(leaderboard =>
-                leaderboard.name.startsWith('daily')
-              ) || null
+              (gameLeaderboards &&
+                gameLeaderboards.find(leaderboard =>
+                  leaderboard.name.startsWith('daily')
+                )) ||
+              null
             }
             displayEntriesCount={5}
           />
@@ -81,17 +68,21 @@ export const UserAndGameLeaderboards = () => {
         <ResponsiveLineStackLayout noColumnMargin noMargin>
           <UserFeedbackLeaderboard
             userLeaderboard={
-              userLeaderboards.find(leaderboard =>
-                leaderboard.name.startsWith('weekly')
-              ) || null
+              (userLeaderboards &&
+                userLeaderboards.find(leaderboard =>
+                  leaderboard.name.startsWith('weekly')
+                )) ||
+              null
             }
             displayEntriesCount={5}
           />
           <GameFeedbackLeaderboard
             gameLeaderboard={
-              gameLeaderboards.find(leaderboard =>
-                leaderboard.name.startsWith('weekly')
-              ) || null
+              (gameLeaderboards &&
+                gameLeaderboards.find(leaderboard =>
+                  leaderboard.name.startsWith('weekly')
+                )) ||
+              null
             }
             displayEntriesCount={5}
           />
@@ -107,9 +98,11 @@ export const UserAndGameLeaderboards = () => {
         <ResponsiveLineStackLayout noColumnMargin noMargin>
           <UserFeedbackLeaderboard
             userLeaderboard={
-              userLeaderboards.find(leaderboard =>
-                leaderboard.name.startsWith('monthly')
-              ) || null
+              (userLeaderboards &&
+                userLeaderboards.find(leaderboard =>
+                  leaderboard.name.startsWith('monthly')
+                )) ||
+              null
             }
             displayEntriesCount={5}
           />

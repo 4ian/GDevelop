@@ -6,14 +6,14 @@ import { I18n } from '@lingui/react';
 import {
   type UserLeaderboard,
   type UserLeaderboardEntry,
-} from '../../../../Utils/GDevelopServices/User';
-import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
-import Text from '../../../../UI/Text';
-import { ColumnStackLayout } from '../../../../UI/Layout';
-import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import Paper from '../../../../UI/Paper';
-import Annotation from '../../../../UI/CustomSvgIcons/Annotation';
-import { UserPublicProfileTextWithAvatar } from '../../../../UI/User/UserPublicProfileTextWithAvatar';
+} from '../Utils/GDevelopServices/User';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Paper from '../UI/Paper';
+import Annotation from '../UI/CustomSvgIcons/Annotation';
+import { UserPublicProfileTextWithAvatar } from '../UI/User/UserPublicProfileTextWithAvatar';
 
 type Props = {|
   userLeaderboard: UserLeaderboard | null,
@@ -66,7 +66,7 @@ export const UserFeedbackLeaderboard = ({
                   )
                 : '-'}
             </Text>
-            <table style={{}}>
+            <table>
               <thead>
                 <tr>
                   <th style={styles.rankColumn}>

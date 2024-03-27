@@ -5,6 +5,7 @@ import PublicProfileContext from '../../Profile/PublicProfileContext';
 import { Avatar, ButtonBase } from '@material-ui/core';
 import Text from '../Text';
 import { LineStackLayout } from '../Layout';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   user: UserPublicProfile | null,
@@ -37,7 +38,15 @@ export const UserPublicProfileTextWithAvatar = ({
             height: avatarSize,
           }}
         />
-        <Text size="body">{user ? user.username : ''}</Text>
+        <Text size="body">
+          {user
+            ? user.username || (
+                <i>
+                  <Trans>Anonymous</Trans>
+                </i>
+              )
+            : ''}
+        </Text>
       </LineStackLayout>
     </ButtonBase>
   );

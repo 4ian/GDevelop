@@ -6,16 +6,16 @@ import {
   type GameLeaderboard,
   type GameLeaderboardEntry,
   getPublicGameUrl,
-} from '../../../../Utils/GDevelopServices/Game';
-import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
-import Text from '../../../../UI/Text';
-import { ColumnStackLayout } from '../../../../UI/Layout';
-import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
-import Paper from '../../../../UI/Paper';
-import Annotation from '../../../../UI/CustomSvgIcons/Annotation';
-import { textEllipsisStyle } from '../../../../UI/TextEllipsis';
+} from '../Utils/GDevelopServices/Game';
+import { selectMessageByLocale } from '../Utils/i18n/MessageByLocale';
+import Text from '../UI/Text';
+import { ColumnStackLayout } from '../UI/Layout';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Paper from '../UI/Paper';
+import Annotation from '../UI/CustomSvgIcons/Annotation';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 import { ButtonBase } from '@material-ui/core';
-import Window from '../../../../Utils/Window';
+import Window from '../Utils/Window';
 
 type Props = {|
   gameLeaderboard: GameLeaderboard | null,
@@ -88,7 +88,7 @@ export const GameFeedbackLeaderboard = ({
                   )
                 : '-'}
             </Text>
-            <table style={{}}>
+            <table>
               <thead>
                 <tr>
                   <th style={styles.rankColumn}>

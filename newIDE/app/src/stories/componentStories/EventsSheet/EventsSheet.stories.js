@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import EventsSheet from '../../../EventsSheet';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
@@ -13,7 +12,6 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'EventsSheet/EventsSheet',
   component: EventsSheet,
-  decorators: [muiDecorator],
 };
 
 export const DefaultNoScope = () => (

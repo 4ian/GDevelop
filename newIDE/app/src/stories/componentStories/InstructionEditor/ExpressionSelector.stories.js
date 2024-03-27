@@ -4,7 +4,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import paperDecorator from '../../PaperDecorator';
 import ExpressionSelector from '../../../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
@@ -13,7 +12,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 export default {
   title: 'InstructionEditor/ExpressionSelector',
   component: ExpressionSelector,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const DefaultStringNoScope = () => (

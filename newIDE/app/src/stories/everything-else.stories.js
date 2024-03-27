@@ -31,7 +31,6 @@ import YesNoField from '../EventsSheet/ParameterFields/YesNoField';
 import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplierField';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
-import muiDecorator from './ThemeDecorator';
 import paperDecorator, { getPaperDecorator } from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
@@ -129,12 +128,10 @@ configureActions({
 
 storiesOf('Welcome', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => {
     const [value, setValue] = React.useState('Hello World');
 
@@ -272,7 +269,6 @@ storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default, with text', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
@@ -525,7 +521,6 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
 
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
       initialValue={[
@@ -630,9 +625,9 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
     />
   ));
 
-storiesOf('UI Building Blocks/Layout/Grid', module)
-  .addDecorator(muiDecorator)
-  .add('Line and ScrollView in a fixed height container', () => (
+storiesOf('UI Building Blocks/Layout/Grid', module).add(
+  'Line and ScrollView in a fixed height container',
+  () => (
     <FixedHeightFlexContainer height={100}>
       <Column expand>
         <Line overflow="hidden">
@@ -655,10 +650,10 @@ storiesOf('UI Building Blocks/Layout/Grid', module)
         </Line>
       </Column>
     </FixedHeightFlexContainer>
-  ));
+  )
+);
 
 storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
-  .addDecorator(muiDecorator)
   .add('Default', () => (
     <ResponsiveLineStackLayout>
       <div>Some Div</div>
@@ -693,7 +688,6 @@ storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
 
 storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('Empty text field', () => (
     <TextFieldWithButtonLayout
       renderTextField={() => (
@@ -907,13 +901,12 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
     />
   ));
 
-storiesOf('UI Building Blocks/Background', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => <Background>Hello world</Background>);
+storiesOf('UI Building Blocks/Background', module).add('default', () => (
+  <Background>Hello world</Background>
+));
 
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <React.Fragment>
       {[0, 1, 2].map(idx => (
@@ -968,17 +961,14 @@ storiesOf('UI Building Blocks/Accordion', module)
 
 storiesOf('UI Building Blocks/PlaceholderLoader', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => <PlaceholderLoader />);
 
 storiesOf('UI Building Blocks/DragHandle', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
 
 storiesOf('UI Building Blocks/EmptyMessage', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <EmptyMessage>
       Hello World, this is an empty message, which is centered.
@@ -986,7 +976,6 @@ storiesOf('UI Building Blocks/EmptyMessage', module)
   ));
 
 storiesOf('UI Building Blocks/Text', module)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <Column>
       <Text size="title">Title text</Text>
@@ -1022,14 +1011,12 @@ storiesOf('UI Building Blocks/Text', module)
 
 storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <div>
       <ColorField
@@ -1057,7 +1044,6 @@ storiesOf('UI Building Blocks/ColorField', module)
   ));
 
 storiesOf('UI Building Blocks/EditorMosaic', module)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <EditorMosaicPlayground
       renderButtons={({ openEditor }) => (
@@ -1172,7 +1158,6 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
 
 storiesOf('UI Building Blocks/EditorNavigator', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <EditorMosaicPlayground
       renderButtons={({ openEditor }) => (
@@ -1240,17 +1225,14 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
 
 storiesOf('UI Building Blocks/HelpButton', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
 storiesOf('UI Building Blocks/HelpIcon', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('PropertiesEditor', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <PropertiesEditor
       schema={[
@@ -1398,7 +1380,6 @@ storiesOf('PropertiesEditor', module)
 
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -1707,7 +1688,6 @@ storiesOf('ParameterFields', module)
   ));
 
 storiesOf('ExpressionAutcompletionsDisplayer', module)
-  .addDecorator(muiDecorator)
   .add('autocompletions (first selected)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
@@ -1763,7 +1743,6 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
 
 storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('BuildStepsProgress (not started)', () => (
     <BuildStepsProgress
       exportStep={''}
@@ -1925,7 +1904,6 @@ storiesOf('BuildStepsProgress', module)
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
       initialValue={'Test'}
@@ -1950,7 +1928,6 @@ storiesOf('LocalFolderPicker', module)
 
 storiesOf('LocalFilePicker', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('full width', () => (
     <ValueStateHolder
       initialValue={'/test/myfile.txt'}
@@ -1974,7 +1951,6 @@ storiesOf('LocalFilePicker', module)
   ));
 
 storiesOf('DebuggerContent', module)
-  .addDecorator(muiDecorator)
   .add('with data', () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
@@ -2017,7 +1993,6 @@ storiesOf('DebuggerContent', module)
   ));
 
 storiesOf('Profiler', module)
-  .addDecorator(muiDecorator)
   .add('without profiler output', () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={550}>
@@ -2067,37 +2042,30 @@ storiesOf('Profiler', module)
     </DragAndDropContextProvider>
   ));
 
-storiesOf('MeasuresTable', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <div style={{ height: 250 }}>
-      <MeasuresTable
-        profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
-      />
-    </div>
-  ));
-
-storiesOf('AboutDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AboutDialog
-      open
-      onClose={action('close')}
-      updateStatus={{ message: '', status: 'unknown' }}
+storiesOf('MeasuresTable', module).add('default', () => (
+  <div style={{ height: 250 }}>
+    <MeasuresTable
+      profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
     />
-  ));
+  </div>
+));
 
-storiesOf('OpenConfirmDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <OpenConfirmDialog
-      onClose={action('on close')}
-      onConfirm={action('on confirm')}
-    />
-  ));
+storiesOf('AboutDialog', module).add('default', () => (
+  <AboutDialog
+    open
+    onClose={action('close')}
+    updateStatus={{ message: '', status: 'unknown' }}
+  />
+));
+
+storiesOf('OpenConfirmDialog', module).add('default', () => (
+  <OpenConfirmDialog
+    onClose={action('on close')}
+    onConfirm={action('on confirm')}
+  />
+));
 
 storiesOf('ExternalPropertiesDialog', module)
-  .addDecorator(muiDecorator)
   .add('with layout selection', () => (
     <ExternalPropertiesDialog
       title="Configure the properties"
@@ -2122,7 +2090,6 @@ storiesOf('ExternalPropertiesDialog', module)
   ));
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <EventsFunctionExtractorDialog
       project={testProject.project}
@@ -2147,7 +2114,6 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
   ));
 
 storiesOf('SearchPanel', module)
-  .addDecorator(muiDecorator)
   .add('default (no search done)', () => (
     <SearchPanel
       onSearchInEvents={() => {}}
@@ -2199,7 +2165,6 @@ storiesOf('SearchPanel', module)
 
 storiesOf('InstructionSelector', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('conditions (no scope)', () => (
     <FixedHeightFlexContainer height={400}>
       <I18n>
@@ -2233,7 +2198,6 @@ storiesOf('InstructionSelector', module)
 
 storiesOf('InstructionOrObjectSelector', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('"KeyPressed" condition chosen, scope: layout', () => (
     <ValueStateHolder
       initialValue={'free-instructions'}
@@ -2303,7 +2267,6 @@ storiesOf('InstructionOrObjectSelector', module)
 
 storiesOf('InstructionEditorDialog', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('Existing condition (scope: in a layout)', () => (
     <I18n>
       {({ i18n }) => (
@@ -2389,7 +2352,6 @@ storiesOf('InstructionEditorDialog', module)
 
 storiesOf('InstructionEditorMenu', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <Column>
       <Text>
@@ -2433,7 +2395,6 @@ storiesOf('InstructionEditorMenu', module)
   ));
 storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('without groups', () => (
     <ValueStateHolder
       initialValue={''}
@@ -2474,7 +2435,6 @@ storiesOf('ObjectSelector', module)
 
 storiesOf('Changelog', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('no breaking changes in this version (but in a previous)', () => (
     <ChangelogRenderer
       releases={[release, releaseWithBreakingChange]}
@@ -2515,7 +2475,6 @@ storiesOf('Changelog', module)
   ));
 
 storiesOf('Profile/ContributionsDetails', module)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <>
       <ExtensionsAccordion
@@ -2543,7 +2502,6 @@ storiesOf('Profile/ContributionsDetails', module)
 
 storiesOf('BrowserPreviewErrorDialog', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('generic error', () => (
     <BrowserPreviewErrorDialog
       error={new Error('fake error')}
@@ -2565,7 +2523,6 @@ storiesOf('BrowserPreviewErrorDialog', module)
 
 storiesOf('BehaviorTypeSelector', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default, for a base object', () => (
     <BehaviorTypeSelector
       project={testProject.project}
@@ -2593,7 +2550,6 @@ storiesOf('BehaviorTypeSelector', module)
 
 storiesOf('ObjectTypeSelector', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default (Sprite selected)', () => (
     <ObjectTypeSelector
       project={testProject.project}
@@ -2611,7 +2567,6 @@ storiesOf('ObjectTypeSelector', module)
   ));
 
 storiesOf('HotReloadPreviewButton', module)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
@@ -2628,7 +2583,6 @@ storiesOf('HotReloadPreviewButton', module)
   ));
 
 storiesOf('HotReloadLogsDialog', module)
-  .addDecorator(muiDecorator)
   .add('with an error', () => (
     <HotReloadLogsDialog
       logs={[
@@ -2656,7 +2610,6 @@ storiesOf('HotReloadLogsDialog', module)
 
 storiesOf('ProjectPropertiesDialog', module)
   .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <I18n>
       {({ i18n }) => (
@@ -2676,7 +2629,6 @@ storiesOf('ProjectPropertiesDialog', module)
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
   .addDecorator(getPaperDecorator('medium'))
-  .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor
       loadingScreen={testProject.project.getLoadingScreen()}
@@ -2688,12 +2640,10 @@ storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
     />
   ));
 
-storiesOf('PreferencesDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <I18n>
-      {({ i18n }) => (
-        <PreferencesDialog i18n={i18n} onClose={action('onClose')} />
-      )}
-    </I18n>
-  ));
+storiesOf('PreferencesDialog', module).add('default', () => (
+  <I18n>
+    {({ i18n }) => (
+      <PreferencesDialog i18n={i18n} onClose={action('onClose')} />
+    )}
+  </I18n>
+));

@@ -2,6 +2,7 @@
 import GDevelopJsInitializerDecorator from '../src/stories/GDevelopJsInitializerDecorator';
 import i18nProviderDecorator from '../src/stories/I18nProviderDecorator';
 import BrowserDropDownMenuDisablerDecorator from '../src/stories/BrowserDropDownMenuDisablerDecorator';
+import themeDecorator from '../src/stories/ThemeDecorator';
 import '../src/UI/icomoon-font.css'; // Styles for Icomoon font.
 import './app-level-styling.css';
 
@@ -35,6 +36,7 @@ export const parameters = {
 };
 
 export const decorators = [
+  themeDecorator,
   GDevelopJsInitializerDecorator,
   i18nProviderDecorator,
   BrowserDropDownMenuDisablerDecorator

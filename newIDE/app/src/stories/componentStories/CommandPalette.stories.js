@@ -3,8 +3,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-
 import CommandPalette from '../../CommandPalette/CommandPalette';
 import AutocompletePicker from '../../CommandPalette/CommandPalette/AutocompletePicker';
 import {
@@ -17,7 +15,7 @@ import paperDecorator from '../PaperDecorator';
 export default {
   title: 'CommandPalette',
   component: CommandPalette,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

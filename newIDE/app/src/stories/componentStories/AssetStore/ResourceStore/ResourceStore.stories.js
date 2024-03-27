@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { ResourceStoreStateProvider } from '../../../../AssetStore/ResourceStore/ResourceStoreContext';
@@ -11,7 +10,7 @@ import { ResourceStore } from '../../../../AssetStore/ResourceStore';
 export default {
   title: 'AssetStore/ResourceStore',
   component: ResourceStore,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const ImageResource = () => (

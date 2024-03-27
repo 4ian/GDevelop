@@ -3,7 +3,6 @@ import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import NewObjectDialog from '../../../AssetStore/NewObjectDialog';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
@@ -14,7 +13,7 @@ import { useShopNavigation } from '../../../AssetStore/AssetStoreNavigator';
 export default {
   title: 'AssetStore/NewObjectDialog',
   component: NewObjectDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

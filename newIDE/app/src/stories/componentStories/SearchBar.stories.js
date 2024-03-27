@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import SearchBar from '../../UI/SearchBar';
 import { useFilters } from '../../UI/Search/FiltersChooser';
@@ -12,7 +11,7 @@ import Text from '../../UI/Text';
 export default {
   title: 'UI Building Blocks/SearchBar',
   component: SearchBar,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const Vanilla = () => {

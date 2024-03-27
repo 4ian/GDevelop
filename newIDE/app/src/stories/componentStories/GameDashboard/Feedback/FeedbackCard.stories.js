@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import FeedbackCard from '../../../../GameDashboard/Feedbacks/FeedbackCard';
@@ -18,7 +17,7 @@ import {
 export default {
   title: 'GameDashboard/Feedback/FeedbackCard',
   component: FeedbackCard,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ValueStateHolder from '../../ValueStateHolder';
 
@@ -229,5 +227,4 @@ export const AllResourceFields = () => (
 export default {
   title: 'ParameterFields',
   component: AllResourceFields,
-  decorators: [muiDecorator],
 };

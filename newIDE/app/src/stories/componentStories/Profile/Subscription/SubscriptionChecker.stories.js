@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import SubscriptionChecker, {
   type SubscriptionCheckerInterface,
@@ -19,7 +18,7 @@ import subscriptionSuggestionDecorator from '../../../SubscriptionSuggestionDeco
 export default {
   title: 'Subscription/SubscriptionChecker',
   component: SubscriptionChecker,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
+  decorators: [subscriptionSuggestionDecorator, paperDecorator],
 };
 
 export const NotAuthenticatedTryMode = () => {

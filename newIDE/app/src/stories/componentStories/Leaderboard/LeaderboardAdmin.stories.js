@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { LeaderboardAdmin } from '../../../GameDashboard/LeaderboardAdmin';
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
@@ -12,7 +11,7 @@ import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 export default {
   title: 'Leaderboard/LeaderboardAdmin',
   component: LeaderboardAdmin,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const primaryLeaderboardIndex = 2;

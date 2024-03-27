@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { OnlineGameLink } from '../../../ExportAndShare/GenericExporters/OnlineWebExport';
@@ -17,7 +16,7 @@ import { GDevelopGameApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'Share/OnlineGameLink',
   component: OnlineGameLink,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
   parameters: {
     mockData: [
       {

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateAssetPackPurchaseDialog from '../../../../AssetStore/PrivateAssets/PrivateAssetPackPurchaseDialog';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
@@ -15,7 +14,7 @@ import { type PrivateAssetPackListingData } from '../../../../Utils/GDevelopServ
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackPurchaseDialog',
   component: PrivateAssetPackPurchaseDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
   parameters: {
     initialState: {
       isBuying: true,

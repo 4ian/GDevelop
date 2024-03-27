@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
@@ -20,7 +19,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'ObjectEditor/SpriteEditor',
   component: SpriteEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

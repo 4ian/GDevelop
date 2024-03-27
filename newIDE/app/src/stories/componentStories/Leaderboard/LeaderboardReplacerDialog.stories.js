@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import {
   LeaderboardReplacerProgressDialog,
@@ -14,7 +13,7 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 export default {
   title: 'Leaderboard/LeaderboardReplacerDialog',
   component: LeaderboardReplacerProgressDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const IsReplacingLeaderboards = () => (

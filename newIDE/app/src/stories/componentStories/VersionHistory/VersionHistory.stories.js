@@ -4,7 +4,6 @@ import * as React from 'react';
 
 import { type ExpandedCloudProjectVersion } from '../../../Utils/GDevelopServices/Project';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import VersionHistory from '../../../VersionHistory';
 import MockAdapter from 'axios-mock-adapter';
@@ -23,7 +22,7 @@ import OpenedVersionStatusChip from '../../../VersionHistory/OpenedVersionStatus
 export default {
   title: 'VersionHistory',
   component: VersionHistory,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';

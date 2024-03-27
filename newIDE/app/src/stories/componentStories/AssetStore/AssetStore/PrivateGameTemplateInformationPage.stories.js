@@ -3,7 +3,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateGameTemplateInformationPage from '../../../../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationPage';
 import { client as userApiAxiosClient } from '../../../../Utils/GDevelopServices/User';
@@ -32,7 +31,7 @@ import { ProductLicenseStoreStateProvider } from '../../../../AssetStore/Product
 export default {
   title: 'AssetStore/AssetStore/PrivateGameTemplateInformationPage',
   component: PrivateGameTemplateInformationPage,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const sellerPublicProfile = {

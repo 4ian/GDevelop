@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import Slideshow from '../../../UI/Slideshow/Slideshow';
@@ -10,7 +9,7 @@ import Slideshow from '../../../UI/Slideshow/Slideshow';
 export default {
   title: 'UI Building Blocks/Slideshow',
   component: Slideshow,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const items = [

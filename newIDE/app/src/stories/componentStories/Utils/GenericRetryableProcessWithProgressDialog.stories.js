@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { GenericRetryableProcessWithProgressDialog } from '../../../Utils/UseGenericRetryableProcessWithProgress';
@@ -10,7 +9,7 @@ import { GenericRetryableProcessWithProgressDialog } from '../../../Utils/UseGen
 export default {
   title: 'GenericRetryableProcessWithProgressDialog',
   component: GenericRetryableProcessWithProgressDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Starting = () => (

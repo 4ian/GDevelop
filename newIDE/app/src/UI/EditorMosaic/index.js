@@ -398,7 +398,6 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
       [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]
     );
 
-
     return (
       <I18n>
         {({ i18n }) => (

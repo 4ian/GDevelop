@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CreateAccountDialog from '../../../Profile/CreateAccountDialog';
 
 export default {
   title: 'Profile/CreateAccountDialog',
   component: CreateAccountDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const defaultProps = {

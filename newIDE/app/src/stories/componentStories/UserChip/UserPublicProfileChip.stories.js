@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { UserPublicProfileChip as UserPublicProfileChipComponent } from '../../../UI/User/UserPublicProfileChip';
@@ -9,7 +8,7 @@ import { UserPublicProfileChip as UserPublicProfileChipComponent } from '../../.
 export default {
   title: 'User chips/UserPublicProfileChip',
   component: UserPublicProfileChipComponent,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const UserPublicProfileChip = () => (

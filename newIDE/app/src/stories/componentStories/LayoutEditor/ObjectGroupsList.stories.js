@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import alertDecorator from '../../AlertDecorator';
 import ObjectGroupsList from '../../../ObjectGroupsList';
@@ -16,7 +15,7 @@ import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 export default {
   title: 'LayoutEditor/ObjectGroupsList',
   component: ObjectGroupsList,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const Default = () => (

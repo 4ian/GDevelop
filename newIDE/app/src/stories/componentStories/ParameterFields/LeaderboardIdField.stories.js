@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -15,7 +14,7 @@ import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 export default {
   title: 'ParameterFields/LeaderboardIdField',
   component: LeaderboardIdField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const mockedLeaderboards = Array(5)

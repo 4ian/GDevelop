@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { ExtensionStore } from '../../../../AssetStore/ExtensionStore';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
@@ -18,7 +17,7 @@ import PreferencesContext, {
 export default {
   title: 'AssetStore/ExtensionStore',
   component: ExtensionStore,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {

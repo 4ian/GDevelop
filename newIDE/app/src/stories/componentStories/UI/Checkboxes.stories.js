@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import InlineCheckbox from '../../../UI/InlineCheckbox';
 import paperDecorator from '../../PaperDecorator';
 import { Column, LargeSpacer } from '../../../UI/Grid';
@@ -15,7 +13,7 @@ import VisibilityOff from '../../../UI/CustomSvgIcons/VisibilityOff';
 export default {
   title: 'UI Building Blocks/Checkboxes',
   component: InlineCheckbox,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

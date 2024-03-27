@@ -5,14 +5,12 @@ import { action } from '@storybook/addon-actions';
 
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import ScenePropertiesDialog from '../../../SceneEditor/ScenePropertiesDialog';
 import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'LayoutEditor/ScenePropertiesDialog',
   component: ScenePropertiesDialog,
-  decorators: [muiDecorator],
 };
 
 export const Default = () => (

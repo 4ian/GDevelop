@@ -3,7 +3,6 @@
 import * as React from 'react';
 
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../../ThemeDecorator';
 
 import paperDecorator from '../../../PaperDecorator';
 import GameMonetization from '../../../../GameDashboard/Monetization/GameMonetization';
@@ -21,7 +20,7 @@ import MockAdapter from 'axios-mock-adapter';
 export default {
   title: 'GameDashboard/Monetization/GameMonetization',
   component: GameMonetization,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const AdsEnabled = () => {

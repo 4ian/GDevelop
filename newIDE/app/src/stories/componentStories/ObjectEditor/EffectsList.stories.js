@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
-import themeDecorator from '../../ThemeDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import EffectsList from '../../../EffectsList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
@@ -176,5 +174,5 @@ export const withoutEffectsForAnObject = () => (
 export default {
   title: 'ObjectEditor/EffectsList',
   component: EffectsList,
-  decorators: [paperDecorator, muiDecorator, themeDecorator],
+  decorators: [paperDecorator],
 };

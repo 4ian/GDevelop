@@ -3,8 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import paperDecorator from '../../PaperDecorator';
 import { GameCard } from '../../../GameDashboard/GameCard';
 import {
@@ -16,7 +14,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 export default {
   title: 'GameDashboard/GameCard',
   component: GameCard,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const DefaultGameCard = () => (

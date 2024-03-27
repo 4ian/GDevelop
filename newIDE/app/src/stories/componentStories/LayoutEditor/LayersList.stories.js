@@ -7,7 +7,6 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import LayersList from '../../../LayersList';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
@@ -15,7 +14,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 export default {
   title: 'LayoutEditor/LayersList',
   component: LayersList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

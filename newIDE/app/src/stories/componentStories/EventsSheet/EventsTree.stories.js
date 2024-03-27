@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import EventsTree from '../../../EventsSheet/EventsTree';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
@@ -15,7 +14,6 @@ import { type Tutorial } from '../../../Utils/GDevelopServices/Tutorial';
 export default {
   title: 'EventsSheet/EventsTree',
   component: EventsTree,
-  decorators: [muiDecorator],
 };
 
 const eventsTreeTutorials: Array<Tutorial> = [

@@ -4,7 +4,6 @@ import * as React from 'react';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import {
@@ -21,7 +20,7 @@ import Toggle from '../../../../UI/Toggle';
 export default {
   title: 'ExportAndShare/SigningCredentials/IosSigningCredentialsSelector',
   component: IosSigningCredentialsSelector,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const Errored = () => {

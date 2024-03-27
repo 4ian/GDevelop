@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import NotificationList from '../../../UI/Notification/NotificationList';
 import { type Notification } from '../../../Utils/GDevelopServices/Notification';
@@ -11,7 +10,7 @@ import { type Notification } from '../../../Utils/GDevelopServices/Notification'
 export default {
   title: 'Notification/NotificationList',
   component: NotificationList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const userId = 'user-id';

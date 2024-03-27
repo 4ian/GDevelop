@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { Column, Line } from '../../../UI/Grid';
@@ -11,7 +10,7 @@ import Breadcrumbs from '../../../UI/Breadcrumbs';
 export default {
   title: 'UI Building Blocks/Breadcrumbs',
   component: Breadcrumbs,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

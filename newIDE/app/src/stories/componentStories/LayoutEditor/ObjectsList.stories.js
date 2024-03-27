@@ -7,7 +7,6 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import alertDecorator from '../../AlertDecorator';
 import ObjectsList from '../../../ObjectsList';
@@ -18,7 +17,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'LayoutEditor/ObjectsList',
   component: ObjectsList,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const Default = () => (

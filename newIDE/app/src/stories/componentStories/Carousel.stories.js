@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import Carousel from '../../UI/Carousel';
@@ -12,7 +11,7 @@ import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 export default {
   title: 'Carousel',
   component: Carousel,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const LoadingWithoutTitleSkeleton = () => (

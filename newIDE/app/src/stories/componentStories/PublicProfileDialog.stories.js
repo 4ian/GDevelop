@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
@@ -24,7 +23,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
 export default {
   title: 'Profile/PublicProfileDialog',
   component: PublicProfileDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const userId = 'user-id';

@@ -12,7 +12,6 @@ import {
   projectResourcesClient as resourcesAxiosClient,
 } from '../../../Utils/GDevelopServices/Project';
 import CloudProjectRecoveryDialog from '../../../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
-import muiDecorator from '../../ThemeDecorator';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeSilverAuthenticatedUserWithCloudProjects } from '../../../fixtures/GDevelopServicesTestData';
 import {
@@ -24,7 +23,6 @@ import { createZipWithSingleTextFile } from '../../../Utils/Zip.js/Utils';
 export default {
   title: 'Storage Providers/CloudStorageProvider/CloudProjectRecoveryDialog',
   component: CloudProjectRecoveryDialog,
-  decorators: [muiDecorator],
 };
 
 export const Default = () => {

@@ -3,8 +3,6 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 
-import muiDecorator from '../../../ThemeDecorator';
-
 import GameFeedback from '../../../../GameDashboard/Feedbacks/GameFeedback';
 
 import {
@@ -25,7 +23,7 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [getPaperDecorator('medium'), muiDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 export const DefaultGameFeedback = () => {

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
@@ -24,7 +23,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
 export default {
   title: 'Profile/ProfileDetails',
   component: ProfileDetails,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const getAssetPacksListingData = (

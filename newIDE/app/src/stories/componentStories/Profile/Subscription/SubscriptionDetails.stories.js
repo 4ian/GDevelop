@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import {
   subscriptionPlansWithPricingSystems,
@@ -25,7 +24,7 @@ import AlertProvider from '../../../../UI/Alert/AlertProvider';
 export default {
   title: 'Subscription/SubscriptionDetails',
   component: SubscriptionDetails,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
+  decorators: [subscriptionSuggestionDecorator, paperDecorator],
   argTypes: {
     authenticated: {
       options: ['no', 'loading', 'yes'],

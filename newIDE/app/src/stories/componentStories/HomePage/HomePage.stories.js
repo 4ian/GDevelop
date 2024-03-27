@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import { HomePage } from '../../../MainFrame/EditorContainers/HomePage';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -158,7 +157,7 @@ const WrappedHomePage = ({
 export default {
   title: 'HomePage',
   component: WrappedHomePage,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [GDevelopJsInitializerDecorator],
 };
 
 export const BuildSectionLoading = () => (

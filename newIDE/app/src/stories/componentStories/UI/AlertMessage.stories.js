@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import { getPaperDecorator } from '../../PaperDecorator';
 
 import AlertMessage from '../../../UI/AlertMessage';
@@ -10,7 +9,7 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/AlertMessage',
   component: AlertMessage,
-  decorators: [getPaperDecorator('medium'), muiDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 export const Default = () => (

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
@@ -15,7 +14,7 @@ import {
 export default {
   title: 'UI Building Blocks/ImageTile/ImageTileGrid',
   component: ImageTileGrid,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {

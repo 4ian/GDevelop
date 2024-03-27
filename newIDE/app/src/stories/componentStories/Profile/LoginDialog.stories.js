@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import LoginDialog from '../../../Profile/LoginDialog';
 
 export default {
   title: 'Profile/LoginDialog',
   component: LoginDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const defaultProps = {

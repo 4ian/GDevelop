@@ -124,6 +124,16 @@ namespace gdjs {
       return this.getY() + originOffset.y;
     }
 
+    getCenterX(): float {
+      const originOffset = this._renderer.getOriginOffset();
+      return -originOffset.x;
+    }
+
+    getCenterY(): float {
+      const originOffset = this._renderer.getOriginOffset();
+      return -originOffset.y;
+    }
+
     onDestroyed(): void {
       super.onDestroyed();
       this._renderer.onDestroy();

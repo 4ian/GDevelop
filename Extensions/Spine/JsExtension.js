@@ -148,6 +148,9 @@ module.exports = {
           this._instance.getX(),
           this._instance.getY()
         );
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
 
         this.setAnimation(this._instance.getRawDoubleProperty('animation'));
 
@@ -186,6 +189,14 @@ module.exports = {
        */
       getOriginY() {
         return -this._spineOriginOffsetY;
+      }
+
+      getCenterX() {
+        return this.getOriginX();
+      }
+
+      getCenterY() {
+        return this.getOriginY();
       }
 
       /**

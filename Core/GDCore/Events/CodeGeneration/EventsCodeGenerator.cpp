@@ -254,12 +254,12 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
   }
 
   gd::String operatorStr = arguments[operatorIndex];
-  if (operatorStr.size() > 2)
+  if (operatorStr.size() > 2 && operatorStr[0] == '\"') {
     operatorStr = operatorStr.substr(
         1,
         operatorStr.length() - 1 -
             1);  // Operator contains quote which must be removed.
-
+  }
   auto mutators = instrInfos.codeExtraInformation.optionalMutators;
   auto mutator = mutators.find(operatorStr);
   if (mutator == mutators.end()) {
@@ -278,6 +278,9 @@ gd::String EventsCodeGenerator::GenerateMutatorCall(
       if (!argumentsStr.empty()) argumentsStr += ", ";
       argumentsStr += arguments[i];
     }
+  }
+  if (instrInfos.GetManipulatedType() == "boolean") {
+    return callStartString + "(" + argumentsStr + ")." + mutator->second;
   }
 
   return callStartString + "(" + argumentsStr + ")." + mutator->second + "(" +
@@ -695,7 +698,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();
     if (argOutput != "=" && argOutput != "+" && argOutput != "-" &&
-        argOutput != "/" && argOutput != "*") {
+        argOutput != "/" && argOutput != "*" && argOutput != "true" &&
+        argOutput != "false" && argOutput != "toggle") {
       cout << "Warning: Bad operator: Set to = by default." << endl;
       argOutput = "=";
     }
@@ -1067,7 +1071,8 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
   // Generate call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string") {
+      instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(

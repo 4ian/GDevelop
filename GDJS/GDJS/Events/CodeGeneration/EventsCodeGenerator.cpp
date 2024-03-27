@@ -875,7 +875,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   // Create call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
-      instrInfos.codeExtraInformation.type == "string") {
+      instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(
@@ -936,7 +937,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
-       instrInfos.codeExtraInformation.type == "string")) {
+       instrInfos.codeExtraInformation.type == "string" || 
+      instrInfos.codeExtraInformation.type == "boolean")) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
       call = GenerateOperatorCall(

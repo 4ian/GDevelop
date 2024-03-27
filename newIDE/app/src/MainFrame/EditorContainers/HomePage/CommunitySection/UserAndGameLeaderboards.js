@@ -8,6 +8,7 @@ import Paper from '../../../../UI/Paper';
 import Text from '../../../../UI/Text';
 import { Line, Spacer } from '../../../../UI/Grid';
 import { CommunityLeaderboardsContext } from '../../../../CommunityLeaderboards/CommunityLeaderboardsContext';
+import { Trans } from '@lingui/macro';
 
 const styles = {
   leaderboardContainer: {
@@ -41,7 +42,9 @@ export const UserAndGameLeaderboards = () => {
       <div style={{ ...styles.leaderboardContainer, flex: 1 }}>
         <Paper background="light">
           <Line expand justifyContent="center" noMargin>
-            <Text>Daily</Text>
+            <Text>
+              <Trans>Daily</Trans>
+            </Text>
           </Line>
         </Paper>
         <Spacer />
@@ -61,7 +64,9 @@ export const UserAndGameLeaderboards = () => {
       <div style={{ ...styles.leaderboardContainer, flex: 2 }}>
         <Paper background="light">
           <Line expand justifyContent="center" noMargin>
-            <Text>Weekly</Text>
+            <Text>
+              <Trans>Weekly</Trans>
+            </Text>
           </Line>
         </Paper>
         <Spacer />
@@ -91,7 +96,9 @@ export const UserAndGameLeaderboards = () => {
       <div style={{ ...styles.leaderboardContainer, flex: 1 }}>
         <Paper background="light">
           <Line expand justifyContent="center" noMargin>
-            <Text>Monthly</Text>
+            <Text>
+              <Trans>Monthly</Trans>
+            </Text>
           </Line>
         </Paper>
         <Spacer />

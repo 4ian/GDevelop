@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { UserFeedbackLeaderboard } from '../../../CommunityLeaderboards/UserFeedbackLeaderboard';
 import { fakeUserLeaderboards } from '../../../fixtures/GDevelopServicesTestData/FakeUserLeaderboards';
@@ -8,7 +7,7 @@ import { fakeUserLeaderboards } from '../../../fixtures/GDevelopServicesTestData
 export default {
   title: 'CommunityLeaderboards/UserFeedbackLeaderboard',
   component: UserFeedbackLeaderboard,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

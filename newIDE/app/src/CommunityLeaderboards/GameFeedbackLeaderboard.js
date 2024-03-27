@@ -165,7 +165,11 @@ export const GameFeedbackLeaderboard = ({
                               </Text>
                             </ButtonBase>
                           ) : (
-                            <Skeleton variant="rect" width={thumbnailWidth} height={thumbnailHeight} />
+                            <Skeleton
+                              variant="rect"
+                              width={thumbnailWidth}
+                              height={thumbnailHeight}
+                            />
                           )}
                         </td>
                         <td style={styles.scoreColumn}>

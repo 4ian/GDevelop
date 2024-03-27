@@ -2,7 +2,8 @@
 import * as React from 'react';
 import { type UserPublicProfile } from '../../Utils/GDevelopServices/User';
 import PublicProfileContext from '../../Profile/PublicProfileContext';
-import { Avatar, ButtonBase } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../Text';
 import { LineStackLayout } from '../Layout';
 import { Trans } from '@lingui/macro';

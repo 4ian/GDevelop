@@ -13,7 +13,7 @@ type CommunityLeaderboardsState = {|
   userLeaderboards: Array<UserLeaderboard> | null,
   gameLeaderboards: Array<GameLeaderboard> | null,
   error: ?Error,
-  fetchCommunityLeaderboards: () => void,
+  fetchCommunityLeaderboards: () => Promise<void>,
 |};
 
 export const CommunityLeaderboardsContext = React.createContext<CommunityLeaderboardsState>(
@@ -21,7 +21,7 @@ export const CommunityLeaderboardsContext = React.createContext<CommunityLeaderb
     userLeaderboards: null,
     gameLeaderboards: null,
     error: null,
-    fetchCommunityLeaderboards: () => {},
+    fetchCommunityLeaderboards: async () => {},
   }
 );
 
@@ -42,30 +42,28 @@ export const CommunityLeaderboardsStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchCommunityLeaderboards = React.useCallback(() => {
+  const fetchCommunityLeaderboards = React.useCallback(async () => {
     if (isLoading.current) return;
 
-    (async () => {
-      setError(null);
-      isLoading.current = true;
+    setError(null);
+    isLoading.current = true;
 
-      try {
-        const [userLeaderboards, gameLeaderboards] = await Promise.all([
-          getUserCommentQualityRatingsLeaderboards(),
-          getGameCommentQualityRatingsLeaderboards(),
-        ]);
-        setUserLeaderboards(userLeaderboards);
-        setGameLeaderboards(gameLeaderboards);
-      } catch (error) {
-        console.error(
-          `Unable to load the community leaderboards from the api:`,
-          error
-        );
-        setError(error);
-      }
+    try {
+      const [userLeaderboards, gameLeaderboards] = await Promise.all([
+        getUserCommentQualityRatingsLeaderboards(),
+        getGameCommentQualityRatingsLeaderboards(),
+      ]);
+      setUserLeaderboards(userLeaderboards);
+      setGameLeaderboards(gameLeaderboards);
+    } catch (error) {
+      console.error(
+        `Unable to load the community leaderboards from the api:`,
+        error
+      );
+      setError(error);
+    }
 
-      isLoading.current = false;
-    })();
+    isLoading.current = false;
   }, []);
 
   const communityLeaderboardsState = React.useMemo(

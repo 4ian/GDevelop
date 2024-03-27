@@ -529,7 +529,7 @@ export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
   );
 
   if (!Array.isArray(response.data)) {
-    throw new Error('Invalid response from the user leaderboard API');
+    throw new Error('Invalid response from the game leaderboard API');
   }
 
   return response.data;

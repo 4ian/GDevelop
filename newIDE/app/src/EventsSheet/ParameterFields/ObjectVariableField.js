@@ -59,20 +59,20 @@ const getObjectOrGroupVariablesContainers = (
 };
 
 export const isUnifiedObjectInstruction = (type: string): boolean =>
-  type === 'VarObjetTxt' ||
-  type === 'ObjectVariableAsBoolean' ||
-  type === 'ModVarObjetTxt' ||
+  type === 'StringObjectVariable' ||
+  type === 'BooleanObjectVariable' ||
+  type === 'SetStringObjectVariable' ||
   type === 'SetBooleanObjectVariable';
 
 export const getUnifiedObjectInstructionType = (
   instructionType: string
 ): string =>
-  instructionType === 'VarObjetTxt' ||
-  instructionType === 'ObjectVariableAsBoolean'
-    ? 'VarObjet'
-    : instructionType === 'ModVarObjetTxt' ||
+  instructionType === 'StringObjectVariable' ||
+  instructionType === 'BooleanObjectVariable'
+    ? 'NumberObjectVariable'
+    : instructionType === 'SetStringObjectVariable' ||
       instructionType === 'SetBooleanObjectVariable'
-    ? 'ModVarObjet'
+    ? 'SetNumberObjectVariable'
     : instructionType;
 
 export const switchBetweenUnifiedObjectInstructionIfNeeded = (
@@ -82,9 +82,9 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
   const objectsContainersList = projectScopedContainers.getObjectsContainersList();
 
   if (
-    (instruction.getType() === 'VarObjet' ||
-      instruction.getType() === 'VarObjetTxt' ||
-      instruction.getType() === 'ObjectVariableAsBoolean') &&
+    (instruction.getType() === 'NumberObjectVariable' ||
+      instruction.getType() === 'StringObjectVariable' ||
+      instruction.getType() === 'BooleanObjectVariable') &&
     instruction.getParametersCount() > 0
   ) {
     const objectName = instruction.getParameter(0).getPlainString();
@@ -99,19 +99,16 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
         .getObjectOrGroupVariablesContainer(objectName)
         .get(variableName);
       if (variable.getType() === gd.Variable.String) {
-        instruction.setType('VarObjetTxt');
-        instruction.setParametersCount(4);
+        instruction.setType('StringObjectVariable');
       } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('VarObjet');
-        instruction.setParametersCount(4);
+        instruction.setType('NumberObjectVariable');
       } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('ObjectVariableAsBoolean');
-        instruction.setParametersCount(3);
+        instruction.setType('BooleanObjectVariable');
       }
     }
   } else if (
-    (instruction.getType() === 'ModVarObjet' ||
-      instruction.getType() === 'ModVarObjetTxt' ||
+    (instruction.getType() === 'SetNumberObjectVariable' ||
+      instruction.getType() === 'SetStringObjectVariable' ||
       instruction.getType() === 'SetBooleanObjectVariable') &&
     instruction.getParametersCount() > 0
   ) {
@@ -127,14 +124,11 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
         .getObjectOrGroupVariablesContainer(objectName)
         .get(variableName);
       if (variable.getType() === gd.Variable.String) {
-        instruction.setType('ModVarObjetTxt');
-        instruction.setParametersCount(4);
+        instruction.setType('SetStringObjectVariable');
       } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('ModVarObjet');
-        instruction.setParametersCount(4);
+        instruction.setType('SetNumberObjectVariable');
       } else if (variable.getType() === gd.Variable.Boolean) {
         instruction.setType('SetBooleanObjectVariable');
-        instruction.setParametersCount(3);
       }
     }
   }
@@ -219,7 +213,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={() => setEditorOpen(true)}
+          // There is no variable editor for groups.
+          onOpenDialog={
+            variablesContainers.length === 1 ? () => setEditorOpen(true) : null
+          }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           scope={scope}
@@ -229,33 +226,30 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen &&
-          // There is no variable editor for groups.
-          variablesContainers.length === 1 &&
-          project && (
-            <VariablesEditorDialog
-              project={project}
-              title={<Trans>Object Variables</Trans>}
-              open={editorOpen}
-              variablesContainer={variablesContainers[0]}
-              emptyPlaceholderTitle={
-                <Trans>Add your first object variable</Trans>
-              }
-              emptyPlaceholderDescription={
-                <Trans>
-                  These variables hold additional information on an object.
-                </Trans>
-              }
-              helpPagePath={'/all-features/variables/object-variables'}
-              onComputeAllVariableNames={onComputeAllVariableNames}
-              onCancel={() => setEditorOpen(false)}
-              onApply={() => {
-                setEditorOpen(false);
-                if (field.current) field.current.updateAutocompletions();
-              }}
-              preventRefactoringToDeleteInstructions
-            />
-          )}
+        {editorOpen && project && (
+          <VariablesEditorDialog
+            project={project}
+            title={<Trans>Object Variables</Trans>}
+            open={editorOpen}
+            variablesContainer={variablesContainers[0]}
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
+            }
+            emptyPlaceholderDescription={
+              <Trans>
+                These variables hold additional information on an object.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/object-variables'}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            onCancel={() => setEditorOpen(false)}
+            onApply={() => {
+              setEditorOpen(false);
+              if (field.current) field.current.updateAutocompletions();
+            }}
+            preventRefactoringToDeleteInstructions
+          />
+        )}
       </React.Fragment>
     );
   }

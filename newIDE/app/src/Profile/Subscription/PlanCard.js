@@ -181,9 +181,12 @@ const extrapolateMonthlyPricingSystemToYearlyBasis = (
 
 export const getPlanPrices = ({
   pricingSystems,
-}: {
+  hidePrice,
+}: {|
   pricingSystems: SubscriptionPlanPricingSystem[],
-}): React.Node => {
+  hidePrice?: boolean,
+|}): React.Node => {
+  if (hidePrice) return null;
   if (pricingSystems.length > 0) {
     const displayedPricingSystems = pricingSystems
       .map((pricingSystem, index) => [

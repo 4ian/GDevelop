@@ -139,7 +139,7 @@ export type SubscriptionPlanPricingSystem = {|
   period: 'week' | 'month' | 'year',
   isPerUser?: true,
   currency: 'EUR' | 'USD',
-  region: 'eurozone' | 'default',
+  region: string,
   amountInCents: number,
   periodCount: number,
 |};

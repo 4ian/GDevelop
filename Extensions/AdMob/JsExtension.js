@@ -34,6 +34,14 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/admobicon24.png');
 
     extension
+      .addDependency()
+      .setName('Consent Cordova plugin')
+      .setDependencyType('cordova')
+      .setExportName('cordova-plugin-consent')
+      .setVersion('2.4.0')
+      .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
+
+    extension
       .registerProperty('AdMobAppIdAndroid')
       .setLabel(_('AdMob Android App ID'))
       .setDescription('ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY')
@@ -62,13 +70,6 @@ module.exports = {
         new gd.PropertyDescriptor('AdMobAppIdIos').setType('ExtensionProperty')
       )
       .onlyIfSomeExtraSettingsNonEmpty();
-
-    extension
-      .addDependency()
-      .setName('Consent Cordova plugin')
-      .setDependencyType('cordova')
-      .setExportName('cordova-plugin-consent')
-      .onlyIfOtherDependencyIsExported('AdMob Cordova plugin');
 
     extension
       .addAction(

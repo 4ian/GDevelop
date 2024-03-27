@@ -273,7 +273,7 @@ class InstancesList extends Component<Props, State> {
                     key={tableKey}
                     headerHeight={30}
                     height={height}
-                    className={`gd-table ${gdevelopTheme.tableRootClassName}`}
+                    className={`gd-table`}
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}

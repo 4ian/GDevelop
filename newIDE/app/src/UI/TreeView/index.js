@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { FixedSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
-import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
 import './TreeView.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
@@ -220,7 +219,6 @@ const TreeView = <Item: ItemBaseAttributes>(
     openedDuringSearchNodeIds,
     setOpenedDuringSearchNodeIds,
   ] = React.useState<string[]>([]);
-  const theme = React.useContext(GDevelopThemeContext);
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
@@ -705,7 +703,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     <>
       <div
         tabIndex={0}
-        className={`${treeView} ${theme.treeViewRootClassName}`}
+        className={treeView}
         onKeyDown={onKeyDown}
         ref={containerRef}
       >

@@ -47,7 +47,6 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
@@ -231,12 +230,9 @@ const EventContainer = (props: EventsContainerProps) => {
 };
 
 const SortableTree = ({ className, ...otherProps }) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <SortableTreeWithoutDndContext
-      className={`${eventsTree} ${
-        gdevelopTheme.eventsSheetRootClassName
-      } ${className}`}
+      className={`${eventsTree} ${className}`}
       {...otherProps}
     />
   );

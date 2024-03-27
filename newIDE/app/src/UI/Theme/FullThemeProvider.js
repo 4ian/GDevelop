@@ -24,14 +24,27 @@ export const FullThemeProvider = ({ children, forcedThemeName }: Props) => {
   const { themeName, language } = values;
   const { isMobile } = useResponsiveWindowSize();
 
+  const themeNameToUse = forcedThemeName || themeName;
+
   const theme = React.useMemo(
-    () =>
-      getFullTheme({
-        themeName: forcedThemeName || themeName,
+    () => {
+      const fullTheme = getFullTheme({
+        themeName: themeNameToUse,
         language,
         isMobile,
-      }),
-    [forcedThemeName, themeName, language, isMobile]
+      });
+
+      try {
+        const { body } = document;
+        if (!body) throw new Error('Document has no body.');
+        body.className = fullTheme.gdevelopTheme.uiRootClassName;
+      } catch (error) {
+        console.error('An error occurred while changing global theme:', error);
+      }
+
+      return fullTheme;
+    },
+    [themeNameToUse, language, isMobile]
   );
 
   return (

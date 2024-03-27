@@ -7,7 +7,6 @@ import {
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
-import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { useDebounce } from '../../Utils/UseDebounce';
 
@@ -399,14 +398,12 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
       [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]
     );
 
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
       <I18n>
         {({ i18n }) => (
           <MosaicWithoutDragDropContext
             className={classNames({
-              [gdevelopTheme.mosaicRootClassName]: true,
               'mosaic-gd-theme': true,
               'mosaic-blueprint-theme': true,
               // Move the entire mosaic up when the soft keyboard is open:

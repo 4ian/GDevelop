@@ -4,7 +4,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import classNames from 'classnames';
 import Window from '../Utils/Window';
 
@@ -52,7 +51,6 @@ type Props = {|
  * Display a markdown text
  */
 export const MarkdownText = (props: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const markdownCustomComponents = React.useMemo(
     () =>
       makeMarkdownCustomComponents(
@@ -79,7 +77,6 @@ export const MarkdownText = (props: Props) => {
 
   const className = classNames({
     'gd-markdown': true,
-    [gdevelopTheme.markdownRootClassName]: true,
     'standalone-text-container': props.isStandaloneText,
   });
 

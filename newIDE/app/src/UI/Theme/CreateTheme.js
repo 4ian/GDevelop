@@ -7,17 +7,6 @@ const closeableTabSizeOverrides = {
   closeButtonWidth: 24,
 };
 
-export function getRootClassNames(theme: string) {
-  return {
-    mosaicRootClassName: theme,
-    eventsSheetRootClassName: theme,
-    treeViewRootClassName: theme,
-    tableRootClassName: theme,
-    markdownRootClassName: theme,
-    uiRootClassName: theme,
-  };
-}
-
 export function getMuiOverrides({
   tabTextColor,
   tabSelectedTextColor,
@@ -617,7 +606,7 @@ export function createGdevelopTheme({
           styles['ThemeIconButtonSelectedBackgroundColor'],
         selectedColor: styles['ThemeIconButtonSelectedColor'],
       },
-      ...getRootClassNames(rootClassNameIdentifier),
+      uiRootClassName: rootClassNameIdentifier,
       logo: {
         src: 'res/GD-logo-big.png',
       },

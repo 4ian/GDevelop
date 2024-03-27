@@ -252,6 +252,14 @@ BaseObjectExtension::BaseObjectExtension() {
       "setVariableBoolean");
   objectActions["ToggleObjectVariableAsBoolean"].SetFunctionName(
       "toggleVariableBoolean");
+  objectActions["SetBooleanObjectVariable"]
+      .SetFunctionName("returnVariable")
+      .SetManipulatedType("boolean")
+      .SetMutators({
+          {"true", "setBoolean(true)"},
+          {"false", "setBoolean(false)"},
+          {"toggle", "toggle()"},
+      });
 
   objectActions["ObjectVariablePush"].SetFunctionName("variablePushCopy");
   objectActions["ObjectVariablePushString"].SetFunctionName("valuePush");

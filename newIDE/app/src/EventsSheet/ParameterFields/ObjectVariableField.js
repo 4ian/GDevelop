@@ -62,7 +62,7 @@ export const isUnifiedObjectInstruction = (type: string): boolean =>
   type === 'VarObjetTxt' ||
   type === 'ObjectVariableAsBoolean' ||
   type === 'ModVarObjetTxt' ||
-  type === 'SetObjectVariableAsBoolean';
+  type === 'SetBooleanObjectVariable';
 
 export const getUnifiedObjectInstructionType = (
   instructionType: string
@@ -71,7 +71,7 @@ export const getUnifiedObjectInstructionType = (
   instructionType === 'ObjectVariableAsBoolean'
     ? 'VarObjet'
     : instructionType === 'ModVarObjetTxt' ||
-      instructionType === 'SetObjectVariableAsBoolean'
+      instructionType === 'SetBooleanObjectVariable'
     ? 'ModVarObjet'
     : instructionType;
 
@@ -112,7 +112,7 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
   } else if (
     (instruction.getType() === 'ModVarObjet' ||
       instruction.getType() === 'ModVarObjetTxt' ||
-      instruction.getType() === 'SetObjectVariableAsBoolean') &&
+      instruction.getType() === 'SetBooleanObjectVariable') &&
     instruction.getParametersCount() > 0
   ) {
     const objectName = instruction.getParameter(0).getPlainString();
@@ -133,7 +133,7 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
         instruction.setType('ModVarObjet');
         instruction.setParametersCount(4);
       } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('SetObjectVariableAsBoolean');
+        instruction.setType('SetBooleanObjectVariable');
         instruction.setParametersCount(3);
       }
     }

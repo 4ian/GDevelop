@@ -1,0 +1,58 @@
+.compactTextField {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(
+    --theme-surface-alternate-canvas-light-background-color
+  );
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+}
+
+.compactTextField.disabled {
+  color: var(--theme-text-disabled-color);
+}
+
+.compactTextField.errored:not(.disabled) {
+  border: none;
+  outline: 1px solid var(--theme-error-color);
+}
+
+.compactTextField::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: '';
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.compactTextField:not(.disabled):not(.errored):hover::before {
+  border-bottom: 1px solid var(--theme-search-bar-hovered-border-color);
+}
+.compactTextField:not(.disabled):not(.errored):focus-within::before {
+  border-bottom: 1px solid var(--theme-secondary-dark);
+}
+
+.compactTextField input {
+  outline: none;
+  border: none;
+  padding: 2px 8px;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: inherit;
+  flex: 1;
+  caret-color: var(--theme-secondary-dark);
+}
+
+.compactTextField input::placeholder {
+  color: var(--theme-text-disabled-color);
+}

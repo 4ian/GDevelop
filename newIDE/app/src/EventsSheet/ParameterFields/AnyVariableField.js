@@ -96,7 +96,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const onComputeAllVariableNames = React.useCallback(() => [], []);
 
-    // TODO Handle object variable?
     const enumerateGlobalAndSceneVariableNames = React.useCallback(
       () => {
         return project && layout

@@ -2757,6 +2757,11 @@ export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   subscription: subscriptionForEducationPlan,
   limits: limitsForGoldUser,
 };
+export const fakeAuthenticatedGoldUserFromEducationPlan: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForGoldUserFromEducationPlan,
+  limits: limitsForGoldUser,
+};
 
 export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,

@@ -136,18 +136,23 @@ const getSubscriptionPricingSystemPeriod = (
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[])
 ): null | 'year' | 'month' => {
   if (!subscription || !subscriptionPlansWithPricingSystems) return null;
-  for (let subscriptionPlanWithPricingSystems of subscriptionPlansWithPricingSystems) {
-    for (let pricingSystem of subscriptionPlanWithPricingSystems.pricingSystems) {
-      if (pricingSystem.id === subscription.pricingSystemId) {
-        if (pricingSystem.period === 'week') {
-          // TODO: Add support for weekly subscriptions when needed.
-          return null;
-        }
-        return pricingSystem.period;
-      }
-    }
+  const allPricingSystems = subscriptionPlansWithPricingSystems
+    .map(
+      subscriptionPlanWithPricingSystems =>
+        subscriptionPlanWithPricingSystems.pricingSystems
+    )
+    .flat();
+  const subscriptionPricingSystem = allPricingSystems.find(
+    pricingSystem => pricingSystem.id === subscription.pricingSystemId
+  );
+  if (
+    !subscriptionPricingSystem ||
+    // TODO: Add support for weekly subscriptions when needed.
+    subscriptionPricingSystem.period === 'week'
+  ) {
+    return null;
   }
-  return null;
+  return subscriptionPricingSystem.period;
 };
 
 const getPlanSpecificRequirements = (

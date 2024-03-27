@@ -87,7 +87,6 @@ export const Default = ({
     | 'team member'
     | 'manually added',
 |}) => {
-  console.log(authenticated)
   const authenticatedUser =
     authenticated === 'no'
       ? fakeNotAuthenticatedUser

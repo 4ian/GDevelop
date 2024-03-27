@@ -107,20 +107,20 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     size_t operatorParamIndex = parameters.size() - 2;
 
     if (isObjectInstruction || isBehaviorInstruction) {
-      gd::String templateSentence = _("Set _PARAM0_ as <subject>: <value>");
+      gd::String templateSentence = _("Change <subject> of _PARAM0_: <operator>");
 
       sentence =
           templateSentence
               .FindAndReplace("<subject>", sentence)
-              .FindAndReplace("<value>",
+              .FindAndReplace("<operator>",
                               "_PARAM" + gd::String::From(operatorParamIndex) + "_");
     } else {
-      gd::String templateSentence = _("Change <subject>: <value>");
+      gd::String templateSentence = _("Change <subject>: <operator>");
 
       sentence =
           templateSentence
               .FindAndReplace("<subject>", sentence)
-              .FindAndReplace("<value>",
+              .FindAndReplace("<operator>",
                               "_PARAM" + gd::String::From(operatorParamIndex) + "_");
     }
   } else {

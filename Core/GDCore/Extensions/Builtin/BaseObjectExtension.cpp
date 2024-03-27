@@ -454,7 +454,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("trueorfalse", _("New Value:"));
+      .AddParameter("trueorfalse", _("New Value:"))
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction(
          "ToggleObjectVariableAsBoolean",
@@ -469,7 +470,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"));
+      .AddParameter("objectvar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
+
+  obj.AddAction("SetBooleanObjectVariable",
+                _("Change boolean variable"),
+                _("Modify the boolean value of an object variable."),
+                _("the variable _PARAM1_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardOperatorParameters("boolean",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("ObjectVariableChildExists",
                    _("Child existence"),
@@ -683,7 +698,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true");
+      .SetDefaultValue("true")
+      // This parameter allows to keep the operand
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"));
 
   obj.AddCondition("VarObjetDef",
                    "Variable defined",

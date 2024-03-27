@@ -38,7 +38,6 @@ const styles = {
     position: 'absolute',
     top: 10,
     right: 10,
-    color: '#1D1D26',
     padding: '4px 8px',
     borderRadius: 4,
     display: 'flex',
@@ -363,6 +362,7 @@ const PlanCard = (props: Props) => {
               style={{
                 ...styles.discountContainer,
                 backgroundColor: gdevelopTheme.message.hot.backgroundColor,
+                color: gdevelopTheme.message.hot.color,
               }}
             >
               <DiscountFlame fontSize="small" />

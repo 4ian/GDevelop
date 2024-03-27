@@ -469,6 +469,7 @@ export function createGdevelopTheme({
         valid: styles['ThemeMessageValidColor'],
         hot: {
           backgroundColor: styles['ThemeMessageHotBackgroundColor'],
+          color: styles['ThemeMessageHotColor'],
         },
       },
       titlebar: {

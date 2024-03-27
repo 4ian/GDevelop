@@ -10,10 +10,7 @@ import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
 
 const styles = {
-  paper: {
-    padding: 10,
-    color: '#1D1D26',
-  },
+  paper: { padding: 10 },
   buttonLabel: { fontWeight: 'bold', cursor: 'default' },
 };
 
@@ -36,6 +33,7 @@ const HotMessage = ({
       style={{
         ...styles.paper,
         backgroundColor: gdevelopTheme.message.hot.backgroundColor,
+        color: gdevelopTheme.message.hot.color,
       }}
     >
       <Line noMargin alignItems="center">

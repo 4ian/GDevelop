@@ -332,6 +332,9 @@
         "background-color": {
           "value": "#FF5E3B",
           "comment": "Palette/Red/50"
+        },
+        "color": {
+          "value": "#1D1D26"
         }
       }
     },

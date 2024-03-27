@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CreateProfile from '../../../Profile/CreateProfile';
 
 export default {
   title: 'Profile/CreateProfile',
   component: CreateProfile,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

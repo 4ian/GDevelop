@@ -7,7 +7,6 @@ import { I18n } from '@lingui/react';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import InstancePropertiesEditor from '../../../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
@@ -15,7 +14,7 @@ import SerializedObjectDisplay from '../../SerializedObjectDisplay';
 export default {
   title: 'LayoutEditor/InstancePropertiesEditor',
   component: InstancePropertiesEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

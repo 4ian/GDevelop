@@ -5,7 +5,6 @@ import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import { fakeSilverAuthenticatedUser } from '../../../../fixtures/GDevelopServicesTestData';
@@ -17,7 +16,7 @@ import alertDecorator from '../../../AlertDecorator';
 export default {
   title: 'ExportAndShare/SigningCredentials/CreateIosSigningCredentialsDialog',
   component: CreateIosSigningCredentialsDialog,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const AlwaysError = () => {

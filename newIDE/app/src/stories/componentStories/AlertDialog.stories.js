@@ -2,9 +2,7 @@
 import * as React from 'react';
 import { t } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
-import themeDecorator from '../ThemeDecorator';
 import alertDecorator from '../AlertDecorator';
 import RaisedButton from '../../UI/RaisedButton';
 import AlertDialog from '../../UI/Alert/AlertDialog';
@@ -100,5 +98,5 @@ export const Default = () => {
 export default {
   title: 'UI Building Blocks/AlertDialog',
   component: AlertDialog,
-  decorators: [paperDecorator, alertDecorator, muiDecorator, themeDecorator],
+  decorators: [paperDecorator, alertDecorator],
 };

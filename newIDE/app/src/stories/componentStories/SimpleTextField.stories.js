@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-
 import { SimpleTextField } from '../../UI/SimpleTextField';
 import { ColumnStackLayout } from '../../UI/Layout';
 import paperDecorator from '../PaperDecorator';
@@ -11,7 +9,7 @@ import paperDecorator from '../PaperDecorator';
 export default {
   title: 'UI Building Blocks/SimpleTextField',
   component: SimpleTextField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

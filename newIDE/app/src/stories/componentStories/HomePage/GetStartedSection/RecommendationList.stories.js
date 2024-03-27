@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import {
   fakeAuthenticatedUserWithNoSubscription,
@@ -17,7 +16,7 @@ import { TutorialStateProvider } from '../../../../Tutorial/TutorialContext';
 export default {
   title: 'HomePage/GetStartedSectionSection/RecommendationList',
   component: RecommendationList,
-  decorators: [paperDecorator, inAppTutorialDecorator, muiDecorator],
+  decorators: [paperDecorator, inAppTutorialDecorator],
 };
 
 export const Default = () => (

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { type Exporter } from '../../../../ExportAndShare/ShareDialog';
 
@@ -20,7 +19,7 @@ import { fakeStartupAuthenticatedUser } from '../../../../fixtures/GDevelopServi
 export default {
   title: 'Share/PublishHome',
   component: PublishHome,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 const onlineWebExporter: Exporter = {

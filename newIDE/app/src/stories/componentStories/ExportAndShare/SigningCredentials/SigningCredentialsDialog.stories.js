@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import {
@@ -17,7 +16,7 @@ import alertDecorator from '../../../AlertDecorator';
 export default {
   title: 'ExportAndShare/SigningCredentials/SigningCredentialsDialog',
   component: SigningCredentialsDialog,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const Loading = () => {

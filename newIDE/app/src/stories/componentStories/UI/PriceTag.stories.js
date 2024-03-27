@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import PriceTag from '../../../UI/PriceTag';
@@ -12,7 +11,7 @@ import Text from '../../../UI/Text';
 export default {
   title: 'UI Building Blocks/PriceTag',
   component: PriceTag,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

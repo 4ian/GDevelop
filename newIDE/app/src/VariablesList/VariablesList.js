@@ -1682,7 +1682,6 @@ const VariablesList = (props: Props) => {
                   style={{ flex: 1, display: 'flex', minHeight: 0 }}
                   onKeyDown={keyboardShortcuts.onKeyDown}
                   onKeyUp={keyboardShortcuts.onKeyUp}
-                  className={gdevelopTheme.uiRootClassName}
                 >
                   <Column expand useFullHeight noMargin>
                     {isNarrow ? null : toolbar}

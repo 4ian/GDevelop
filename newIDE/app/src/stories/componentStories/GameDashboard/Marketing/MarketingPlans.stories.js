@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import MarketingPlans from '../../../../MarketingPlans/MarketingPlans';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
@@ -15,7 +14,7 @@ import { GDevelopGameApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'GameDashboard/Marketing/MarketingPlans',
   component: MarketingPlans,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const now = Date.now();

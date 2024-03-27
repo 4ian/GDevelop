@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import NewProjectSetupDialog from '../../../ProjectCreation/NewProjectSetupDialog';
 import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
@@ -20,7 +19,7 @@ import {
 export default {
   title: 'Project Creation/NewProjectSetupDialog',
   component: NewProjectSetupDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const OpenAndNotAuthenticated = () => {

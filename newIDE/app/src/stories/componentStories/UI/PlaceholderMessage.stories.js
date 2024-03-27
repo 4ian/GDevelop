@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import PlaceholderMessage from '../../../UI/PlaceholderMessage';
@@ -9,7 +8,7 @@ import PlaceholderMessage from '../../../UI/PlaceholderMessage';
 export default {
   title: 'UI Building Blocks/PlaceholderMessage',
   component: PlaceholderMessage,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

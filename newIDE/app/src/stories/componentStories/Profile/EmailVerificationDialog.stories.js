@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EmailVerificationDialog from '../../../Profile/EmailVerificationDialog';
 import {
@@ -13,7 +12,7 @@ import {
 export default {
   title: 'Profile/EmailVerificationDialog',
   component: EmailVerificationDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const EmailAlreadySentNoButton = () => (

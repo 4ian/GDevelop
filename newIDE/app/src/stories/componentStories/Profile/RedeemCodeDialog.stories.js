@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../ThemeDecorator';
 import { action } from '@storybook/addon-actions';
 import RedeemCodeDialog from '../../../Profile/RedeemCodeDialog';
 import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
@@ -11,7 +10,6 @@ import { GDevelopUsageApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'Profile/RedeemCodeDialog',
   component: RedeemCodeDialog,
-  decorators: [muiDecorator],
 };
 
 export const WorkingCode = () => {

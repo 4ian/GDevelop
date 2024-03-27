@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
@@ -24,7 +23,7 @@ import { getAvailableSubscriptionPlansWithPrices } from '../../../../Utils/UseSu
 export default {
   title: 'Subscription/SubscriptionDialog',
   component: SubscriptionDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
   argTypes: {
     authenticated: {
       options: ['no', 'loading', 'yes'],

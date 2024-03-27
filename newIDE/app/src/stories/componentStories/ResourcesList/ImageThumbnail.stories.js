@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ImageThumbnail from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import ResourcesLoader from '../../../ResourcesLoader';
@@ -9,7 +8,7 @@ import ResourcesLoader from '../../../ResourcesLoader';
 export default {
   title: 'ResourcesList/ImageThumbnail',
   component: ImageThumbnail,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

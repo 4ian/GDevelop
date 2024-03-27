@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
@@ -14,7 +13,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'ResourcesList/ResourceSelector',
   component: ResourceSelector,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const ImageNotSelected = () => (

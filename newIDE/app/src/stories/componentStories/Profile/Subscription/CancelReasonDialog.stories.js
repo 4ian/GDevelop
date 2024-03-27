@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
@@ -14,7 +13,7 @@ import CancelReasonDialog from '../../../../Profile/Subscription/CancelReasonDia
 export default {
   title: 'Subscription/CancelReasonDialog',
   component: CancelReasonDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Loading = () => (

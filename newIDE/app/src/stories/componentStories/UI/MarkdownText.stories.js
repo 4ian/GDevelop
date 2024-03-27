@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { MarkdownText } from '../../../UI/MarkdownText';
@@ -9,7 +8,7 @@ import { MarkdownText } from '../../../UI/MarkdownText';
 export default {
   title: 'UI Building Blocks/MarkdownText',
   component: MarkdownText,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

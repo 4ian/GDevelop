@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CurrentUsageDisplayer from '../../../Profile/CurrentUsageDisplayer';
 import subscriptionSuggestionDecorator from '../../SubscriptionSuggestionDecorator';
@@ -17,7 +16,7 @@ import {
 export default {
   title: 'Profile/CurrentUsageDisplayer',
   component: CurrentUsageDisplayer,
-  decorators: [subscriptionSuggestionDecorator, paperDecorator, muiDecorator],
+  decorators: [subscriptionSuggestionDecorator, paperDecorator],
 };
 
 export const WithSubscriptionLimitNotReached = () => (

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { AssetCard } from '../../../../AssetStore/AssetCard';
 import { fakeAssetShortHeader1 } from '../../../../fixtures/GDevelopServicesTestData';
@@ -9,7 +8,7 @@ import { fakeAssetShortHeader1 } from '../../../../fixtures/GDevelopServicesTest
 export default {
   title: 'AssetStore/AssetStore/AssetCard',
   component: AssetCard,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

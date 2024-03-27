@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import ResponsiveMediaGallery from '../../../UI/ResponsiveMediaGallery';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
@@ -12,7 +10,6 @@ import Paper from '../../../UI/Paper';
 export default {
   title: 'UI Building Blocks/ResponsiveMediaGallery',
   component: ResponsiveMediaGallery,
-  decorators: [muiDecorator],
 };
 
 export const Default = () => (

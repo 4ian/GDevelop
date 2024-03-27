@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CreditsPackagesDialog from '../../../Credits/CreditsPackagesDialog';
 import { CreditsPackageStoreContext } from '../../../AssetStore/CreditsPackages/CreditsPackageStoreContext';
@@ -10,7 +9,7 @@ import { type CreditsPackageListingData } from '../../../Utils/GDevelopServices/
 export default {
   title: 'Credits/CreditsPackagesDialog',
   component: CreditsPackagesDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const creditsPackageListingDatas: CreditsPackageListingData[] = [

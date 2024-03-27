@@ -5,14 +5,13 @@ import * as React from 'react';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ObjectGroupEditor from '../../../ObjectGroupEditor';
 
 export default {
   title: 'LayoutEditor/ObjectGroupEditor',
   component: ObjectGroupEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

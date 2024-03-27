@@ -6,7 +6,6 @@ import { AutoSizer, Table, Column } from 'react-virtualized';
 import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
 import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 import ChevronArrowBottom from '../../UI/CustomSvgIcons/ChevronArrowBottom';
 
@@ -34,7 +33,6 @@ type ProfilerRowData = {|
 
 const MeasuresTable = (props: Props) => {
   const [collapsedPaths, setCollapsedPaths] = React.useState({});
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const convertToDataRows = (
     name: string,
@@ -134,7 +132,7 @@ const MeasuresTable = (props: Props) => {
         <Table
           headerHeight={30}
           height={height}
-          className={`gd-table ${gdevelopTheme.tableRootClassName}`}
+          className={`gd-table`}
           headerClassName={'tableHeaderColumn'}
           rowCount={dataRows.length}
           rowGetter={({ index }) => dataRows[index]}

@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { AssetDetails } from '../../../../AssetStore/AssetDetails';
 import {
@@ -16,7 +15,7 @@ import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
   component: AssetDetails,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const Wrapper = ({ children }: { children: React.Node }) => {

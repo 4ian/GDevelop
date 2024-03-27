@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { AssetStoreStateProvider } from '../../../AssetStore/AssetStoreContext';
 import { CustomObjectPackResults } from '../../../AssetStore/NewObjectFromScratch';
@@ -12,7 +11,7 @@ import { useShopNavigation } from '../../../AssetStore/AssetStoreNavigator';
 export default {
   title: 'AssetStore/CustomObjectPackResults',
   component: CustomObjectPackResults,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const Wrapper = ({ children }: { children: React.Node }) => {

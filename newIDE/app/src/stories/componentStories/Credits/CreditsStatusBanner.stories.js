@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import CreditsStatusBanner from '../../../Credits/CreditsStatusBanner';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -14,7 +13,7 @@ import {
 export default {
   title: 'Credits/CreditsStatusBanner',
   component: CreditsStatusBanner,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Loading = () => {

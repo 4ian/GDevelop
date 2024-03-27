@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -18,7 +17,7 @@ import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'GameDashboard/GameRegistration',
   component: GameRegistration,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const NoProjectLoaded = () => (

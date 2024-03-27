@@ -6,14 +6,13 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EventsBasedBehaviorEditor from '../../../EventsBasedBehaviorEditor/';
 
 export default {
   title: 'EventsBasedBehaviorEditor/index',
   component: EventsBasedBehaviorEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

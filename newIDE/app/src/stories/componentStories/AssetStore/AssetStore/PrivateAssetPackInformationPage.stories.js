@@ -3,7 +3,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import MockAdapter from 'axios-mock-adapter';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import PrivateAssetPackInformationPage from '../../../../AssetStore/PrivateAssets/PrivateAssetPackInformationPage';
 import {
@@ -32,7 +31,7 @@ import { type AuthenticatedUser } from '../../../../Profile/AuthenticatedUserCon
 export default {
   title: 'AssetStore/AssetStore/PrivateAssetPackInformationPage',
   component: PrivateAssetPackInformationPage,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const sellerPublicProfile = {

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import { getPaperDecorator } from '../../PaperDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
@@ -19,7 +18,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 export default {
   title: 'UI Building Blocks/TreeView',
   component: TreeView,
-  decorators: [getPaperDecorator('dark'), muiDecorator],
+  decorators: [getPaperDecorator('dark')],
 };
 
 type Node = {|

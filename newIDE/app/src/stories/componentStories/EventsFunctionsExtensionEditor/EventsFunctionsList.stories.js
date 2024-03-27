@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import alertDecorator from '../../AlertDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import EventsFunctionsListWithErrorBoundary from '../../../EventsFunctionsList';
@@ -15,7 +14,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 export default {
   title: 'EventsFunctionsExtensionEditor/EventsFunctionsList',
   component: EventsFunctionsListWithErrorBoundary,
-  decorators: [muiDecorator, alertDecorator],
+  decorators: [alertDecorator],
 };
 
 export const Default = () => (

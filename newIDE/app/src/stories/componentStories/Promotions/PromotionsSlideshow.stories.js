@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
@@ -15,7 +14,7 @@ import {
 export default {
   title: 'PromotionsSlideshow',
   component: PromotionsSlideshow,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

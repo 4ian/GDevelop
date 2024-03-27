@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileRow from '../../../../UI/ImageTileRow';
@@ -16,7 +15,7 @@ import {
 export default {
   title: 'UI Building Blocks/ImageTile/ImageTileRow',
   component: ImageTileRow,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {

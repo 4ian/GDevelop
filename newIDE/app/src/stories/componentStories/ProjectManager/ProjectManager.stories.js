@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { action } from '@storybook/addon-actions';
 import ProjectManager from '../../../ProjectManager';
@@ -15,7 +14,7 @@ import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 export default {
   title: 'Project Creation/ProjectManager',
   component: ProjectManager,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 export const Default = () => (
   <DragAndDropContextProvider>

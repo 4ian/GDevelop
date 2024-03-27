@@ -16,6 +16,7 @@ import {
   EDUCATION_PLAN_MIN_SEATS,
   type SubscriptionPlanWithPricingSystems,
   type SubscriptionPlanPricingSystem,
+  type Subscription,
 } from '../../Utils/GDevelopServices/Usage';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -39,8 +40,6 @@ import PlanCard from './PlanCard';
 import LeftLoader from '../../UI/LeftLoader';
 import RaisedButton from '../../UI/RaisedButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
 import AlertMessage from '../../UI/AlertMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
@@ -48,6 +47,9 @@ import Link from '../../UI/Link';
 import { selectMessageByLocale } from '../../Utils/i18n/MessageByLocale';
 import uniq from 'lodash/uniq';
 import CancelReasonDialog from './CancelReasonDialog';
+import { Line } from '../../UI/Grid';
+import TwoStatesButton from '../../UI/TwoStatesButton';
+import HotMessage from '../../UI/HotMessage';
 
 const styles = {
   descriptionText: {
@@ -74,6 +76,14 @@ const styles = {
     flex: 1,
     gap: 8,
     alignItems: 'center',
+    overflowY: 'auto',
+  },
+  planCardsMobileContainer: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    flex: 1,
+    gap: 8,
+    alignItems: 'stretch',
     overflowY: 'auto',
   },
   planCardsLineContainer: {
@@ -121,6 +131,30 @@ const cancelAndChangeWithValidRedeemedCodeConfirmationTexts = {
   maxWidth: 'sm',
 };
 
+const getSubscriptionPricingSystemPeriod = (
+  subscription: ?Subscription,
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[])
+): null | 'year' | 'month' => {
+  if (!subscription || !subscriptionPlansWithPricingSystems) return null;
+  const allPricingSystems = subscriptionPlansWithPricingSystems
+    .map(
+      subscriptionPlanWithPricingSystems =>
+        subscriptionPlanWithPricingSystems.pricingSystems
+    )
+    .flat();
+  const subscriptionPricingSystem = allPricingSystems.find(
+    pricingSystem => pricingSystem.id === subscription.pricingSystemId
+  );
+  if (
+    !subscriptionPricingSystem ||
+    // TODO: Add support for weekly subscriptions when needed.
+    subscriptionPricingSystem.period === 'week'
+  ) {
+    return null;
+  }
+  return subscriptionPricingSystem.period;
+};
+
 const getPlanSpecificRequirements = (
   i18n: I18nType,
   subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
@@ -164,10 +198,6 @@ export default function SubscriptionDialog({
     false
   );
   const [
-    educationPlanPeriodicity,
-    setEducationPlanPeriodicity,
-  ] = React.useState<'yearly' | 'monthly'>('yearly');
-  const [
     educationPlanSeatsCount,
     setEducationPlanSeatsCount,
   ] = React.useState<number>(20);
@@ -177,6 +207,13 @@ export default function SubscriptionDialog({
   ] = React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const [period, setPeriod] = React.useState<'year' | 'month'>(
+    getSubscriptionPricingSystemPeriod(
+      authenticatedUser.subscription,
+      subscriptionPlansWithPricingSystems
+    ) || 'year'
+  );
+
   const { showConfirmation } = useAlertDialog();
   const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
     false
@@ -322,8 +359,11 @@ export default function SubscriptionDialog({
   const userPlanId = authenticatedUser.subscription
     ? authenticatedUser.subscription.planId
     : null;
+  const userPricingSystemId = authenticatedUser.subscription
+    ? authenticatedUser.subscription.pricingSystemId
+    : null;
 
-  const { windowSize } = useResponsiveWindowSize();
+  const { windowSize, isMobile } = useResponsiveWindowSize();
 
   const displayedSubscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems
     ? [
@@ -366,6 +406,7 @@ export default function SubscriptionDialog({
         <>
           <Dialog
             title={null}
+            fullHeight
             maxWidth={dialogMaxWidth}
             actions={[
               <FlatButton
@@ -386,6 +427,46 @@ export default function SubscriptionDialog({
               />,
             ]}
             open={open}
+            fixedContent={
+              <>
+                <Line justifyContent="space-between" alignItems="center">
+                  <Text size="block-title">
+                    <Trans>Subscription plans</Trans>
+                  </Text>
+                  <TwoStatesButton
+                    value={period}
+                    leftButton={{
+                      label: <Trans>Monthly</Trans>,
+                      value: 'month',
+                    }}
+                    rightButton={{
+                      label: <Trans>Yearly</Trans>,
+                      value: 'year',
+                    }}
+                    // $FlowIgnore
+                    onChange={setPeriod}
+                  />
+                </Line>
+                {period !== 'year' && (
+                  <HotMessage
+                    title={<Trans>Up to 40% discount</Trans>}
+                    message={
+                      <Trans>
+                        Get a yearly subscription and enjoy discounts up to 40%!
+                      </Trans>
+                    }
+                    onClickRightButton={() => setPeriod('year')}
+                    rightButtonLabel={
+                      isMobile ? (
+                        <Trans>Check out</Trans>
+                      ) : (
+                        <Trans>See yearly subs</Trans>
+                      )
+                    }
+                  />
+                )}
+              </>
+            }
           >
             <ColumnStackLayout noMargin>
               {willCancelAtPeriodEnd && (
@@ -402,6 +483,8 @@ export default function SubscriptionDialog({
                     style={
                       windowSize === 'large' || windowSize === 'xlarge'
                         ? styles.planCardsLineContainer
+                        : isMobile
+                        ? styles.planCardsMobileContainer
                         : styles.planCardsContainer
                     }
                   >
@@ -411,8 +494,13 @@ export default function SubscriptionDialog({
                           subscriptionPlanWithPricingSystems.id === 'free';
                         const isUserCurrentOrLegacyPlan =
                           userPlanId === subscriptionPlanWithPricingSystems.id;
+                        const pricingSystem = isFreePlan
+                          ? null
+                          : subscriptionPlanWithPricingSystems.pricingSystems.find(
+                              _pricingSystem => _pricingSystem.period === period
+                            );
                         let actions: React.Node = null;
-                        if (isFreePlan) {
+                        if (isFreePlan || !pricingSystem) {
                           // If no plan (free usage), do not display button.
                         } else if (
                           subscriptionPlanWithPricingSystems.id ===
@@ -462,26 +550,6 @@ export default function SubscriptionDialog({
                                       t`As a teacher, you will use one seat in the plan so make sure to include yourself!`
                                     )}
                                   />
-                                  <SelectField
-                                    value={educationPlanPeriodicity}
-                                    floatingLabelText={
-                                      <Trans>Engagement</Trans>
-                                    }
-                                    fullWidth
-                                    onChange={(e, i, newValue) => {
-                                      // $FlowExpectedError - Flow does not infer the type given the select options.
-                                      setEducationPlanPeriodicity(newValue);
-                                    }}
-                                  >
-                                    <SelectOption
-                                      value="yearly"
-                                      label={t`Per year`}
-                                    />
-                                    <SelectOption
-                                      value="monthly"
-                                      label={t`Per month`}
-                                    />
-                                  </SelectField>
                                 </ColumnStackLayout>,
                                 <RaisedButton
                                   primary
@@ -496,7 +564,7 @@ export default function SubscriptionDialog({
                                   onClick={() =>
                                     buyUpdateOrCancelPlan(
                                       i18n,
-                                      educationPlanPeriodicity === 'yearly'
+                                      period === 'year'
                                         ? yearlyPlanPrice
                                         : monthlyPlanPrice
                                     )
@@ -512,57 +580,68 @@ export default function SubscriptionDialog({
                             ];
                           }
                         } else if (isUserCurrentOrLegacyPlan && isPlanValid) {
-                          actions = [
-                            <FlatButton
-                              key="cancel"
-                              disabled={isLoading || willCancelAtPeriodEnd}
-                              fullWidth
-                              label={
-                                <LeftLoader isLoading={isLoading}>
-                                  {willCancelAtPeriodEnd ? (
+                          const isUserCurrentPricingSystem = pricingSystem
+                            ? pricingSystem.id === userPricingSystemId
+                            : false;
+                          if (willCancelAtPeriodEnd) {
+                            actions = [
+                              <FlatButton
+                                key="cancel"
+                                disabled
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
                                     <Trans>
                                       Already cancelled - will expire in the
                                       future
                                     </Trans>
-                                  ) : (
+                                  </LeftLoader>
+                                }
+                                onClick={() => {}}
+                              />,
+                            ];
+                          } else if (isUserCurrentPricingSystem) {
+                            actions = [
+                              <FlatButton
+                                key="cancel"
+                                disabled={isLoading}
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
                                     <Trans>Cancel your subscription</Trans>
-                                  )}
-                                </LeftLoader>
-                              }
-                              onClick={() => buyUpdateOrCancelPlan(i18n, null)}
-                            />,
-                          ];
-                        } else if (
-                          subscriptionPlanWithPricingSystems.id ===
-                          'gdevelop_enterprise'
-                        ) {
-                          return (
-                            <PlanCard
-                              key={subscriptionPlanWithPricingSystems.id}
-                              subscriptionPlanWithPricingSystems={
-                                subscriptionPlanWithPricingSystems
-                              }
-                              actions={
-                                <RaisedButton
-                                  primary
-                                  label={<Trans>Learn more</Trans>}
-                                  onClick={() => {
-                                    Window.openExternalURL(
-                                      'https://gdevelop.io/pricing'
-                                    );
-                                  }}
-                                />
-                              }
-                              isPending={false}
-                              isHighlighted={false}
-                              background="medium"
-                            />
-                          );
+                                  </LeftLoader>
+                                }
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, null)
+                                }
+                              />,
+                            ];
+                          } else {
+                            actions = [
+                              <RaisedButton
+                                key="switch"
+                                disabled={isLoading}
+                                fullWidth
+                                label={
+                                  <LeftLoader isLoading={isLoading}>
+                                    {period === 'year' ? (
+                                      <Trans>Switch to yearly pricing</Trans>
+                                    ) : (
+                                      <Trans>Switch to monthly pricing</Trans>
+                                    )}
+                                  </LeftLoader>
+                                }
+                                onClick={() =>
+                                  buyUpdateOrCancelPlan(i18n, pricingSystem)
+                                }
+                              />,
+                            ];
+                          }
                         } else {
-                          const price =
-                            subscriptionPlanWithPricingSystems
-                              .pricingSystems[0];
-                          if (price) {
+                          const pricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
+                            _pricingSystem => _pricingSystem.period === period
+                          );
+                          if (pricingSystem) {
                             actions = [
                               <RaisedButton
                                 primary
@@ -575,7 +654,7 @@ export default function SubscriptionDialog({
                                   </LeftLoader>
                                 }
                                 onClick={() =>
-                                  buyUpdateOrCancelPlan(i18n, price)
+                                  buyUpdateOrCancelPlan(i18n, pricingSystem)
                                 }
                               />,
                             ];
@@ -590,6 +669,7 @@ export default function SubscriptionDialog({
                             subscriptionPlanWithPricingSystems={
                               subscriptionPlanWithPricingSystems
                             }
+                            periodToDisplay={period}
                             actions={actions}
                             isPending={isLoading}
                             isHighlighted={isUserCurrentOrLegacyPlan} // highlight the plan even if it's expired.

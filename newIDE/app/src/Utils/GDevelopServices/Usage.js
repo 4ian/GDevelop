@@ -139,7 +139,7 @@ export type SubscriptionPlanPricingSystem = {|
   period: 'week' | 'month' | 'year',
   isPerUser?: true,
   currency: 'EUR' | 'USD',
-  region: 'north' | 'south' | 'everywhere',
+  region: string,
   amountInCents: number,
   periodCount: number,
 |};
@@ -151,6 +151,20 @@ export type SubscriptionPlan = {|
   descriptionByLocale: MessageByLocale,
   bulletPointsByLocale: Array<MessageByLocale>,
   specificRequirementByLocale?: MessageByLocale,
+  targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
+  fullFeatures: Array<{|
+    featureName: string,
+    pillarName: string,
+    descriptionByLocale?: MessageByLocale,
+    tooltipByLocale?: MessageByLocale,
+    enabled?: 'yes' | 'no',
+    unlimited?: true,
+    upcoming?: true,
+    trialLike?: true,
+  |}>,
+
+  pillarNamesPerLocale: { [key: string]: MessageByLocale },
+  featureNamesByLocale: { [key: string]: MessageByLocale },
 |};
 
 export type SubscriptionPlanWithPricingSystems = {|
@@ -328,11 +342,7 @@ export const hasMobileAppStoreSubscriptionPlan = (
 export const hasSubscriptionBeenManuallyAdded = (
   subscription: ?Subscription
 ): boolean => {
-  return (
-    !!subscription &&
-    (subscription.stripeSubscriptionId === 'MANUALLY_ADDED' ||
-      subscription.stripeCustomerId === 'MANUALLY_ADDED')
-  );
+  return !!subscription && subscription.pricingSystemId === 'MANUALLY_ADDED';
 };
 
 export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
@@ -416,9 +426,7 @@ export const canUseCloudProjectHistory = (
 ): boolean => {
   if (!subscription) return false;
   return (
-    ['gdevelop_business', 'gdevelop_startup', 'gdevelop_education'].includes(
-      subscription.planId
-    ) ||
+    ['gdevelop_startup', 'gdevelop_education'].includes(subscription.planId) ||
     (subscription.planId === 'gdevelop_gold' &&
       !!subscription.benefitsFromEducationPlan)
   );

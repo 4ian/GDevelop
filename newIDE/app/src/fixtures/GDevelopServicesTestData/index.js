@@ -3,6 +3,7 @@ import {
   type Usages,
   type Subscription,
   type Limits,
+  type SubscriptionPlanWithPricingSystems,
 } from '../../Utils/GDevelopServices/Usage';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
@@ -213,7 +214,7 @@ export const subscriptionForSilverUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'silver-user',
-  pricingSystemId: 'silver_1month',
+  pricingSystemId: 'silver_1month_499EUR',
 };
 
 export const subscriptionForGoldUser: Subscription = {
@@ -221,7 +222,7 @@ export const subscriptionForGoldUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'gold-user',
-  pricingSystemId: 'gold_1month',
+  pricingSystemId: 'gold_1month_999EUR',
 };
 
 export const subscriptionForStartupUser: Subscription = {
@@ -229,15 +230,7 @@ export const subscriptionForStartupUser: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'startup-user',
-  pricingSystemId: 'startup_1month',
-};
-
-export const subscriptionForBusinessUser: Subscription = {
-  planId: 'gdevelop_business',
-  createdAt: 1515084011000,
-  updatedAt: 1515084011000,
-  userId: 'business-user',
-  pricingSystemId: 'business_1month',
+  pricingSystemId: 'startup_1month_3000EUR',
 };
 
 export const subscriptionForEducationPlan: Subscription = {
@@ -245,7 +238,7 @@ export const subscriptionForEducationPlan: Subscription = {
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'teacher-user',
-  pricingSystemId: 'education_1month',
+  pricingSystemId: 'education_1month_299EUR',
 };
 
 export const subscriptionForGoldUserFromEducationPlan: Subscription = {
@@ -292,7 +285,7 @@ export const silverSubscriptionButCancelAtPeriodEnd: Subscription = {
   updatedAt: 1515084011000,
   userId: 'silver-user',
   cancelAtPeriodEnd: true,
-  pricingSystemId: 'silver_1month',
+  pricingSystemId: 'silver_1month_499EUR',
 };
 
 export const noSubscription: Subscription = {
@@ -303,12 +296,140 @@ export const noSubscription: Subscription = {
   pricingSystemId: null,
 };
 
-export const subscriptionPlansWithPricingSystems = [
+export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[] = [
   {
     id: 'free',
     isLegacy: false,
     nameByLocale: {
       en: 'Free',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
     },
     descriptionByLocale: {
       en: 'Create your first game 100% free.',
@@ -327,467 +448,1461 @@ export const subscriptionPlansWithPricingSystems = [
         en: 'Thousands of free assets on the Asset Store',
       },
     ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: 'Nag screen',
+        },
+        trialLike: true,
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '3',
+        },
+        tooltipByLocale: {
+          en:
+            '10 for early bird accounts, created and verified before Feb 2024.',
+        },
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'no',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '1 per day',
+        },
+        trialLike: true,
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
+        },
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '1 per day',
+        },
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
+        },
+        trialLike: true,
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '1 per day',
+        },
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
+        },
+        trialLike: true,
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '3 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '1 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
+      },
+    ],
     pricingSystems: [],
   },
   {
     id: 'gdevelop_silver',
     isLegacy: false,
-    nameByLocale: { en: 'Silver' },
+    nameByLocale: {
+      en: 'Silver',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
     descriptionByLocale: {
-      en: 'Build more and faster.',
-      'ar-SA': 'ابنِ المزيد بسرعة أكبر.',
-      'de-DE': 'Baue mehr und schneller.',
-      'es-ES': 'Construye más y más rápido.',
-      'fr-FR': "Construire d'avantage et plus rapidement.",
-      'it-IT': 'Costruisci di più e più velocemente.',
-      'ja-JP': 'もっと多く、もっと速く建設する。',
-      'ko-KR': '더 많이 빨리 더 많이 건설하십시오.',
-      'pl-PL': 'Buduj więcej i szybciej.',
-      'pt-BR': 'Construa mais e mais rápido.',
-      'ru-RU': 'Стройте больше и быстрее.',
-      'sl-SI': 'Gradite več in hitreje.',
-      'uk-UA': 'Будуйте більше та швидше.',
-      'zh-CN': '更多、更快地构建。',
+      en: 'Publish your first games on Android.',
+    },
+    specificRequirementByLocale: {
+      en:
+        "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
     },
     bulletPointsByLocale: [
       {
-        en: '50 cloud projects with 250MB of resources per project.',
-        'ar-SA': '50 مشروع سحابي بسعة 250 ميجابايت لكل مشروع.',
-        'de-DE': '50 Cloud-Projekte mit 250 MB Ressourcen pro Projekt.',
-        'es-ES': '50 proyectos en la nube con 250 MB de recursos por proyecto.',
-        'fr-FR': '50 projets cloud de 250 Mo de ressources par projet.',
-        'it-IT': '50 progetti cloud con 250 MB di risorse per progetto.',
-        'ja-JP':
-          '1つのプロジェクトあたり250MBのリソースを備えた50のクラウドプロジェクト。',
-        'ko-KR': '프로젝트당 250MB의 자원이 포함된 50개의 클라우드 프로젝트.',
-        'pl-PL': '50 projektów w chmurze z 250 MB zasobów na projekt.',
-        'pt-BR': '50 projetos na nuvem com 250 MB de recursos por projeto.',
-        'ru-RU': '50 проектов в облаке с ресурсами объемом 250 МБ на проект.',
-        'sl-SI': '50 oblak projektov z 250MB virov na projekt.',
-        'uk-UA': '50 хмарних проектів з ресурсами обсягом 250 МБ на проект.',
-        'zh-CN': '每个项目有250MB资源的50个云项目。',
+        en: 'Publish on Google Play, desktop and on the web',
       },
       {
-        en: '10 packagings per day for Android and for desktop.',
-        'ar-SA': '10 حزم يوميًا لنظام Android ولسطح المكتب.',
-        'de-DE': '10 Verpackungen pro Tag für Android und Desktop.',
-        'es-ES': '10 empaquetados por día para Android y para escritorio.',
-        'fr-FR': '10 packagings par jour pour Android et ordinateur.',
-        'it-IT': '10 confezioni al giorno per Android e desktop.',
-        'ja-JP': 'Androidおよびデスクトップ用に1日10回のパッケージ。',
-        'ko-KR': '하루에 안드로이드 및 데스크톱용 10개의 패키지.',
-        'pl-PL': '10 opakowań dziennie dla Androida i komputera.',
-        'pt-BR': '10 embalagens por dia para Android e desktop.',
-        'ru-RU': '10 упаковок в день для Android и настольных компьютеров.',
-        'sl-SI': '10 pakiranj na dan za Android in namizje.',
-        'uk-UA': "10 упаковок на день для Android та настільних комп'ютерів.",
-        'zh-CN': '每天为Android和桌面提供10个包装。',
+        en: 'Access GDevelop mobile app (iOS/Android)',
       },
       {
-        en: 'Unlimited leaderboards and unlimited player feedback responses.',
-        'ar-SA': 'لا حدود للجداول الصدارة ولا حدود لاستجابات تعليقات اللاعبين.',
-        'de-DE':
-          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
-        'es-ES':
-          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
-        'fr-FR':
-          'Aucune limite sur les tableaux de classements et les retours de joueurs',
-        'it-IT':
-          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
-        'ja-JP':
-          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
-        'ko-KR': '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
-        'pl-PL':
-          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
-        'pt-BR':
-          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
-        'ru-RU':
-          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
-        'sl-SI':
-          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
-        'uk-UA':
-          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
-        'zh-CN': '无限排行榜和无限玩家反馈响应。',
+        en: 'Analytics to follow your game virality',
       },
       {
-        en:
-          'Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.',
-        'ar-SA':
-          'تعمل على اختفاء علامة GDevelop أو شعار GDevelop عند تحميل اللعبة لتغمر لاعبيك باللعبة.',
-        'de-DE':
-          'Tauchen Sie Ihre Spieler ein, indem Sie das GDevelop-Wasserzeichen oder das GDevelop-Logo beim Laden des Spiels entfernen.',
-        'es-ES':
-          'Sumérgete a tus jugadores eliminando la marca de agua de GDevelop o el logotipo de GDevelop cuando se carga el juego.',
-        'fr-FR':
-          'Immergez vos joueurs en supprimant le filigrane GDevelop ou le logo GDevelop lors du chargement du jeu.',
-        'it-IT':
-          'Immergi i tuoi giocatori rimuovendo il watermark di GDevelop o il logo GDevelop quando il gioco si carica.',
-        'ja-JP':
-          'ゲームの読み込み時にGDevelopのウォーターマークまたはGDevelopロゴを削除して、プレイヤーを没入させます。',
-        'ko-KR':
-          '게임 로딩 시 GDevelop 워터마크 또는 GDevelop 로고를 제거하여 플레이어를 몰입시킵니다.',
-        'pl-PL':
-          'Zanurz swoich graczy, usuwając znak wodny GDevelop lub logo GDevelop podczas ładowania gry.',
-        'pt-BR':
-          "Mergulhe seus jogadores removendo a marca d'água do GDevelop ou o logotipo do GDevelop quando o jogo é carregado.",
-        'ru-RU':
-          'Погрузите своих игроков, удалив водяной знак GDevelop или логотип GDevelop при загрузке игры.',
-        'sl-SI':
-          'Potopite svoje igralce, tako da odstranite GDevelop watermark ali logotip GDevelop, ko se igra naloži.',
-        'uk-UA':
-          'Занурте своїх гравців, видаливши водяний знак GDevelop або логотип GDevelop під час завантаження гри.',
-        'zh-CN':
-          '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
+        en: '100 credits per month',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '50',
+        },
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '10 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '1 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '100 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
       },
     ],
     pricingSystems: [
       {
-        id: 'silver_1month',
+        id: 'silver_1month_499EUR',
         planId: 'gdevelop_silver',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 499,
-        region: 'everywhere',
+        region: 'eurozone',
+      },
+      {
+        id: 'silver_1year_3599EUR',
+        planId: 'gdevelop_silver',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 3599,
+        region: 'eurozone',
       },
     ],
   },
   {
     id: 'gdevelop_gold',
     isLegacy: false,
-    nameByLocale: { en: 'Gold' },
+    nameByLocale: {
+      en: 'Gold',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
     descriptionByLocale: {
-      en: 'Experimented creators, ambitious games.',
-      'ar-SA': 'مبدعين مجربين، ألعاب طموحة.',
-      'de-DE': 'Erfahrene Entwickler, ambitionierte Spiele.',
-      'es-ES': 'Creadores experimentados, juegos ambiciosos.',
-      'fr-FR': 'Créateurs expérimentés, jeux ambitieux.',
-      'it-IT': 'Creatori esperti, giochi ambiziosi.',
-      'ja-JP': '経験豊富なクリエイター、野心的なゲーム。',
-      'ko-KR': '경험 많은 개발자, 야심 찬 게임.',
-      'pl-PL': 'Doświadczeni twórcy, ambitne gry.',
-      'pt-BR': 'Criadores experientes, jogos ambiciosos.',
-      'ru-RU': 'Опытные создатели, амбициозные игры.',
-      'sl-SI': 'Izkušeni ustvarjalci, ambiciozne igre.',
-      'uk-UA': 'Досвідчені розробники, амбіційні ігри.',
-      'zh-CN': '有经验的创作者，有抱负的游戏。',
+      en: 'Full creation and marketing features. Publish anywhere.',
+    },
+    specificRequirementByLocale: {
+      en:
+        "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
     },
     bulletPointsByLocale: [
       {
-        en: '100 cloud projects with 500MB of resources per project.',
-        'ar-SA': '100 مشروع سحابي بسعة 500 ميجابايت لكل مشروع.',
-        'de-DE': '100 Cloud-Projekte mit 500 MB Ressourcen pro Projekt.',
-        'es-ES':
-          '100 proyectos en la nube con 500 MB de recursos por proyecto.',
-        'fr-FR': '100 projets cloud de 500 Mo de ressources par projet.',
-        'it-IT': '100 progetti cloud con 500 MB di risorse per progetto.',
-        'ja-JP':
-          '1つのプロジェクトあたり500MBのリソースを備えた100のクラウドプロジェクト。',
-        'ko-KR': '프로젝트당 500MB의 자원이 포함된 100개의 클라우드 프로젝트.',
-        'pl-PL': '100 projektów w chmurze z 500 MB zasobów na projekt.',
-        'pt-BR': '100 projetos na nuvem com 500 MB de recursos por projeto.',
-        'ru-RU': '100 проектов в облаке с ресурсами объемом 500 МБ на проект.',
-        'sl-SI': '100 oblak projektov z 500MB virov na projekt.',
-        'uk-UA': '100 хмарних проектів з ресурсами обсягом 500 МБ на проект.',
-        'zh-CN': '每个项目有500MB资源的100个云项目。',
+        en: 'Publish your game on iOS',
       },
       {
-        en: '20 packagings per day for Android and for desktop.',
-        'ar-SA': '20 حزم يوميًا لنظام Android ولسطح المكتب.',
-        'de-DE': '20 Verpackungen pro Tag für Android und Desktop.',
-        'es-ES': '20 empaquetados por día para Android y para escritorio.',
-        'fr-FR': '20 packagings par jour pour Android et ordinateur.',
-        'it-IT': '20 confezioni al giorno per Android e desktop.',
-        'ja-JP': 'Androidおよびデスクトップ用に1日20回のパッケージ。',
-        'ko-KR': '하루에 안드로이드 및 데스크톱용 20개의 패키지.',
-        'pl-PL': '20 opakowań dziennie dla Androida i komputera.',
-        'pt-BR': '20 embalagens por dia para Android e desktop.',
-        'ru-RU': '20 упаковок в день для Android и настольных компьютеров.',
-        'sl-SI': '20 pakiranj na dan za Android in namizje.',
-        'uk-UA': "20 упаковок на день для Android та настільних комп'ютерів.",
-        'zh-CN': '每天为Android和桌面提供20个包装。',
+        en: 'Dedicated channel on Discord',
       },
       {
-        en: 'Unlimited leaderboards and unlimited player feedback responses.',
-        'ar-SA': 'لا حدود للجداول الصدارة ولا حدود لاستجابات تعليقات اللاعبين.',
-        'de-DE':
-          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
-        'es-ES':
-          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
-        'fr-FR':
-          'Aucune limite sur les tableaux de classements et les retours de joueurs',
-        'it-IT':
-          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
-        'ja-JP':
-          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
-        'ko-KR': '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
-        'pl-PL':
-          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
-        'pt-BR':
-          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
-        'ru-RU':
-          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
-        'sl-SI':
-          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
-        'uk-UA':
-          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
-        'zh-CN': '无限排行榜和无限玩家反馈响应。',
+        en: 'Unlimited leaderboards and player feedbacks',
       },
       {
-        en:
-          'Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.',
-        'ar-SA':
-          'تعمل على اختفاء علامة GDevelop أو شعار GDevelop عند تحميل اللعبة لتغمر لاعبيك باللعبة.',
-        'de-DE':
-          'Tauchen Sie Ihre Spieler ein, indem Sie das GDevelop-Wasserzeichen oder das GDevelop-Logo beim Laden des Spiels entfernen.',
-        'es-ES':
-          'Sumérgete a tus jugadores eliminando la marca de agua de GDevelop o el logotipo de GDevelop cuando se carga el juego.',
-        'fr-FR':
-          'Immergez vos joueurs en supprimant le filigrane GDevelop ou le logo GDevelop lors du chargement du jeu.',
-        'it-IT':
-          'Immergi i tuoi giocatori rimuovendo il watermark di GDevelop o il logo GDevelop quando il gioco si carica.',
-        'ja-JP':
-          'ゲームの読み込み時にGDevelopのウォーターマークまたはGDevelopロゴを削除して、プレイヤーを没入させます。',
-        'ko-KR':
-          '게임 로딩 시 GDevelop 워터마크 또는 GDevelop 로고를 제거하여 플레이어를 몰입시킵니다.',
-        'pl-PL':
-          'Zanurz swoich graczy, usuwając znak wodny GDevelop lub logo GDevelop podczas ładowania gry.',
-        'pt-BR':
-          "Mergulhe seus jogadores removendo a marca d'água do GDevelop ou o logotipo do GDevelop quando o jogo é carregado.",
-        'ru-RU':
-          'Погрузите своих игроков, удалив водяной знак GDevelop или логотип GDevelop при загрузке игры.',
-        'sl-SI':
-          'Potopite svoje igralce, tako da odstranite GDevelop watermark ali logotip GDevelop, ko se igra naloži.',
-        'uk-UA':
-          'Занурте своїх гравців, видаливши водяний знак GDevelop або логотип GDevelop під час завантаження гри.',
-        'zh-CN':
-          '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
+        en: '300 credits per month, to promote your game or use in asset store',
+      },
+      {
+        en: '1 free asset pack to claim per month',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '100',
+        },
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '5 per month',
+        },
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: 'Custom colors',
+        },
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '300 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        descriptionByLocale: {
+          en: '1 per month',
+        },
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
       },
     ],
     pricingSystems: [
       {
-        id: 'gold_1month',
+        id: 'gold_1month_999EUR',
         planId: 'gdevelop_gold',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 999,
-        region: 'everywhere',
+        region: 'eurozone',
+      },
+      {
+        id: 'gold_1year_7199EUR',
+        planId: 'gdevelop_gold',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 7199,
+        region: 'eurozone',
       },
     ],
   },
   {
     id: 'gdevelop_startup',
     isLegacy: false,
-    nameByLocale: { en: 'Pro' },
+    nameByLocale: {
+      en: 'Pro',
+    },
+    targetAudiences: ['PRO'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
     descriptionByLocale: {
-      en: 'Small game studios and startups',
-      'ar-SA': 'الاستديوهات الصغيرة للألعاب والشركات الناشئة.',
-      'de-DE': 'Kleine Spielestudios und Startups.',
-      'es-ES': 'Pequeños estudios de juegos y startups.',
-      'fr-FR': 'Petits studios de jeux et startups.',
-      'it-IT': 'Piccoli studi di giochi e start-up.',
-      'ja-JP': '小規模ゲームスタジオとスタートアップ。',
-      'ko-KR': '소규모 게임 스튜디오 및 스타트업.',
-      'pl-PL': 'Małe studia gier i start-upy.',
-      'pt-BR': 'Pequenos estúdios de jogos e startups.',
-      'ru-RU': 'Маленькие студии игр и стартапы.',
-      'sl-SI': 'Mala studia iger in začetniki.',
-      'uk-UA': 'Малі студії ігор та стартапи.',
-      'zh-CN': '小型游戏工作室和初创企业。',
+      en: 'Full professional features.',
     },
     bulletPointsByLocale: [
       {
-        en: '500 cloud projects with 5GB of resources per project.',
-        'ar-SA': '500 مشروع سحابي بسعة 5 غيغابايت لكل مشروع.',
-        'de-DE': '500 Cloud-Projekte mit 5 GB Ressourcen pro Projekt.',
-        'es-ES': '500 proyectos en la nube con 5 GB de recursos por proyecto.',
-        'fr-FR': '500 projets cloud de 5 Go de ressources par projet.',
-        'it-IT': '500 progetti cloud con 5 GB di risorse per progetto.',
-        'ja-JP':
-          '1つのプロジェクトあたり5GBのリソースを備えた500のクラウドプロジェクト。',
-        'ko-KR': '프로젝트당 5GB의 자원이 포함된 500개의 클라우드 프로젝트.',
-        'pl-PL': '500 projektów w chmurze z 5 GB zasobów na projekt.',
-        'pt-BR': '500 projetos na nuvem com 5 GB de recursos por projeto.',
-        'ru-RU': '500 проектов в облаке с ресурсами объемом 5 ГБ на проект.',
-        'sl-SI': '500 oblak projektov z 5GB virov na projekt.',
-        'uk-UA': '500 хмарних проектів з ресурсами обсягом 5 ГБ на проект.',
-        'zh-CN': '每个项目有5GB资源的500个云项目。',
+        en: 'Dedicated support channel on Discord for pros',
       },
       {
-        en: 'Unlimited packagings per day for Android, web, and desktop.',
-        'ar-SA':
-          'عدد غير محدود من التعبئة يوميًا لنظام Android والويب وسطح المكتب.',
-        'de-DE':
-          'Unbegrenzte Verpackungen pro Tag für Android, Web und Desktop.',
-        'es-ES':
-          'Empaquetados ilimitados por día para Android, web y escritorio.',
-        'fr-FR':
-          'Emballages illimités par jour pour Android, le web et le bureau.',
-        'it-IT': 'Confezioni illimitate al giorno per Android, web e desktop.',
-        'ja-JP': 'Android、Web、デスクトップ向けの1日無制限のパッケージ。',
-        'ko-KR': '안드로이드, 웹 및 데스크톱용으로 하루에 무제한 패키징.',
-        'pl-PL':
-          'Nieograniczone opakowania dziennie dla Androida, sieci i komputera.',
-        'pt-BR': 'Embalagens ilimitadas por dia para Android, web e desktop.',
-        'ru-RU':
-          'Неограниченное количество упаковок в день для Android, веба и рабочего стола.',
-        'sl-SI': 'Neomejeno pakiranje na dan za Android, splet in namizje.',
-        'uk-UA':
-          'Необмежена кількість упаковок на день для Android, вебу та робочого столу.',
-        'zh-CN': '每天为Android、Web和桌面提供无限次打包。',
+        en: 'Collaboration: share projects with teammates',
       },
       {
-        en: 'Unlimited leaderboards and unlimited player feedback responses.',
-        'ar-SA':
-          'الجداول الصدارة غير المحدودة وردود فعل اللاعبين غير المحدودة.',
-        'de-DE':
-          'Unbegrenzte Bestenlisten und unbegrenzte Spieler-Feedback-Antworten.',
-        'es-ES':
-          'Tablas de clasificación ilimitadas y respuestas ilimitadas de retroalimentación de jugadores.',
-        'fr-FR':
-          'Classements illimités et réponses illimitées aux commentaires des joueurs.',
-        'it-IT':
-          'Classifiche illimitate e risposte illimitate ai feedback dei giocatori.',
-        'ja-JP':
-          '無制限のリーダーボードと無制限のプレイヤーフィードバックレスポンス。',
-        'ko-KR': '무제한 리더보드 및 무제한 플레이어 피드백 응답.',
-        'pl-PL':
-          'Nieograniczone tabele wyników i nieograniczone odpowiedzi na opinie graczy.',
-        'pt-BR':
-          'Quadros de líderes ilimitados e respostas ilimitadas de feedback de jogadores.',
-        'ru-RU':
-          'Неограниченные таблицы лидеров и неограниченные ответы на обратную связь от игроков.',
-        'sl-SI':
-          'Neomejene lestvice in neomejeni odgovori na povratne informacije igralcev.',
-        'uk-UA':
-          'Необмежені таблиці лідерів і необмежені відповіді на відгуки гравців.',
-        'zh-CN': '无限排行榜和无限玩家反馈响应。',
+        en: 'Version history for projects',
       },
       {
-        en:
-          'Immerse your players by removing the GDevelop watermark or the GDevelop logo when the game loads.',
-        'ar-SA':
-          'تعمل على اختفاء علامة GDevelop أو شعار GDevelop عند تحميل اللعبة لتغمر لاعبيك باللعبة.',
-        'de-DE':
-          'Tauchen Sie Ihre Spieler ein, indem Sie das GDevelop-Wasserzeichen oder das GDevelop-Logo beim Laden des Spiels entfernen.',
-        'es-ES':
-          'Sumérgete a tus jugadores eliminando la marca de agua de GDevelop o el logotipo de GDevelop cuando se carga el juego.',
-        'fr-FR':
-          'Immergez vos joueurs en supprimant le filigrane GDevelop ou le logo GDevelop lors du chargement du jeu.',
-        'it-IT':
-          'Immergi i tuoi giocatori rimuovendo il watermark di GDevelop o il logo GDevelop quando il gioco si carica.',
-        'ja-JP':
-          'ゲームの読み込み時にGDevelopのウォーターマークまたはGDevelopロゴを削除して、プレイヤーを没入させます。',
-        'ko-KR':
-          '게임 로딩 시 GDevelop 워터마크 또는 GDevelop 로고를 제거하여 플레이어를 몰입시킵니다.',
-        'pl-PL':
-          'Zanurz swoich graczy, usuwając znak wodny GDevelop lub logo GDevelop podczas ładowania gry.',
-        'pt-BR':
-          "Mergulhe seus jogadores removendo a marca d'água do GDevelop ou o logotipo do GDevelop quando o jogo é carregado.",
-        'ru-RU':
-          'Погрузите своих игроков, удалив водяной знак GDevelop или логотип GDevelop при загрузке игры.',
-        'sl-SI':
-          'Potopite svoje igralce, tako da odstranite GDevelop watermark ali logotip GDevelop, ko se igra naloži.',
-        'uk-UA':
-          'Занурте своїх гравців, видаливши водяний знак GDevelop або логотип GDevelop під час завантаження гри.',
-        'zh-CN':
-          '在游戏加载时去除GDevelop水印或GDevelop标志，让您的玩家沉浸其中。',
+        en: 'Unlimited cloud projects',
       },
       {
-        en:
-          'Access your cloud projects history and easily get back to a previous version.',
-        'ar-SA':
-          'الوصول إلى تاريخ مشاريعك في السحابة والعودة بسهولة إلى إصدار سابق.',
-        'de-DE':
-          'Zugriff auf die Historie Ihrer Cloud-Projekte und einfaches Zurückkehren zu einer früheren Version.',
-        'es-ES':
-          'Accede al historial de tus proyectos en la nube y vuelve fácilmente a una versión anterior.',
-        'fr-FR':
-          "Accédez à l'historique de vos projets cloud et revenez facilement à une version précédente.",
-        'it-IT':
-          'Accedi alla cronologia dei tuoi progetti cloud e torna facilmente a una versione precedente.',
-        'ja-JP':
-          'クラウドプロジェクトの履歴にアクセスし、以前のバージョンに簡単に戻ります。',
-        'ko-KR':
-          '클라우드 프로젝트 기록에 액세스하고 이전 버전으로 쉽게 돌아갑니다.',
-        'pl-PL':
-          'Otrzymuj dostęp do historii projektów w chmurze i łatwo wracaj do poprzednich wersji.',
-        'pt-BR':
-          'Acesse o histórico de seus projetos na nuvem e volte facilmente para uma versão anterior.',
-        'ru-RU':
-          'Получайте доступ к истории ваших проектов в облаке и легко возвращайтесь к предыдущей версии.',
-        'sl-SI':
-          'Dostopajte do zgodovine svojih projektov v oblaku in se enostavno vrnete na prejšnjo različico.',
-        'uk-UA':
-          'Отримуйте доступ до історії ваших проектів в хмарі та легко повертайтесь до попередньої версії.',
-        'zh-CN': '访问您的云项目历史记录并轻松返回以前的版本。',
+        en: 'Access to the upcoming pro marketplace',
       },
       {
-        en:
-          'Add 1 guest user or unlimited startup team members to collaborate on every project.',
-        'ar-SA':
-          'أضف مستخدم ضيف واحد أو أعضاء فريق بدء التشغيل غير المحددين للتعاون في كل مشروع.',
-        'de-DE':
-          'Fügen Sie 1 Gastbenutzer oder unbegrenzte Teammitglieder des Startups hinzu, um an jedem Projekt zusammenzuarbeiten.',
-        'es-ES':
-          'Agrega 1 usuario invitado o miembros ilimitados del equipo de inicio para colaborar en cada proyecto.',
-        'fr-FR':
-          "Ajoutez 1 utilisateur invité ou un nombre illimité de membres de l'équipe de démarrage pour collaborer sur chaque projet.",
-        'it-IT':
-          'Aggiungi 1 utente ospite o membri illimitati del team di startup per collaborare su ogni progetto.',
-        'ja-JP':
-          'ゲストユーザー1人または無制限のスタートアップチームメンバーを追加して、すべてのプロジェクトで協力します。',
-        'ko-KR':
-          '모든 프로젝트에서 협력할 수 있도록 게스트 사용자 1명 또는 무제한 스타트업 팀 멤버를 추가하세요.',
-        'pl-PL':
-          'Dodaj 1 gościa lub nieograniczoną liczbę członków zespołu startupowego do współpracy przy każdym projekcie.',
-        'pt-BR':
-          'Adicione 1 usuário convidado ou membros ilimitados da equipe de startups para colaborar em cada projeto.',
-        'ru-RU':
-          'Добавьте 1 гостевого пользователя или неограниченное количество участников стартап-команды для совместной работы над каждым проектом.',
-        'sl-SI':
-          'Dodajte 1 gostu ali neomejeno število članov ekipe začetnega zagona za sodelovanje pri vsakem projektu.',
-        'uk-UA':
-          'Додайте 1 гостевого користувача або необмежену кількість учасників команди стартапу для співпраці в кожному проекті.',
-        'zh-CN': '添加1个访客用户或无限的初创团队成员，共同合作每个项目。',
+        en: 'Billing/invoices available',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        unlimited: true,
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '15 per month',
+        },
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: 'Custom CSS/styling',
+        },
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '1000 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        descriptionByLocale: {
+          en: '1 per month',
+        },
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
       },
     ],
     pricingSystems: [
       {
-        id: 'startup_1month',
+        id: 'startup_1month_3000EUR',
         planId: 'gdevelop_startup',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 3000,
-        region: 'everywhere',
+        region: 'eurozone',
+      },
+      {
+        id: 'startup_1year_30900EUR',
+        planId: 'gdevelop_startup',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 30900,
+        region: 'eurozone',
       },
     ],
   },
   {
     id: 'gdevelop_education',
     isLegacy: false,
-    nameByLocale: { en: 'Education' },
+    nameByLocale: {
+      en: 'Education',
+    },
+    targetAudiences: ['EDUCATION'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
     descriptionByLocale: {
-      en: 'Schools and Universities.',
-      'ar-SA': 'المدارس والجامعات.',
-      'de-DE': 'Schulen und Universitäten.',
-      'es-ES': 'Escuelas y universidades.',
-      'fr-FR': 'Écoles et universités.',
-      'it-IT': 'Scuole e università.',
-      'ja-JP': '学校と大学。',
-      'ko-KR': '학교 및 대학.',
-      'pl-PL': 'Szkoły i uniwersytety.',
-      'pt-BR': 'Escolas e universidades.',
-      'ru-RU': 'Школы и университеты.',
-      'sl-SI': 'Šole in univerze.',
-      'uk-UA': 'Школи і університети.',
-      'zh-CN': '学校和大学。',
+      en: 'Teach logic, coding and game creation.',
     },
     bulletPointsByLocale: [
       {
-        en: 'Students anonymity.',
+        en: 'Full anonymous accounts for students',
         'ar-SA': 'سرية الطلاب.',
         'de-DE': 'Anonymität der Schüler.',
         'es-ES': 'Anonimato de los estudiantes.',
@@ -803,7 +1918,10 @@ export const subscriptionPlansWithPricingSystems = [
         'zh-CN': '学生匿名性。',
       },
       {
-        en: 'Organize students per classroom.',
+        en: 'NDPA or custom privacy agreements',
+      },
+      {
+        en: 'Organize students per classroom',
         'ar-SA': 'تنظيم الطلاب حسب الصف.',
         'de-DE': 'Schüler pro Klassenzimmer organisieren.',
         'es-ES': 'Organizar estudiantes por aulas.',
@@ -819,7 +1937,7 @@ export const subscriptionPlansWithPricingSystems = [
         'zh-CN': '根据教室组织学生。',
       },
       {
-        en: "Access your students' projects",
+        en: 'Access students projects',
         'ar-SA': 'الوصول إلى مشاريع الطلاب الخاصة بك',
         'de-DE': 'Zugriff auf die Projekte Ihrer Schüler.',
         'es-ES': 'Acceda a los proyectos de sus estudiantes.',
@@ -835,86 +1953,189 @@ export const subscriptionPlansWithPricingSystems = [
         'zh-CN': '访问您的学生项目。',
       },
       {
-        en: 'You and your students receive a Gold subscription.',
-        'ar-SA': 'أنت وطلابك تتلقون اشتراكًا ذهبيًا.',
-        'de-DE': 'Sie und Ihre Schüler erhalten ein Gold-Abonnement.',
-        'es-ES': 'Usted y sus estudiantes reciben una suscripción Gold.',
-        'fr-FR': 'Vous et vos étudiants recevrez un abonnement Gold.',
-        'it-IT': 'Tu e i tuoi studenti riceverete un abbonamento Gold.',
-        'ja-JP':
-          'あなたとあなたの生徒はゴールドサブスクリプションを受け取ります。',
-        'ko-KR': '당신과 당신의 학생들은 골드 구독을 받습니다.',
-        'pl-PL': 'Ty i Twoi uczniowie otrzymają subskrypcję Gold.',
-        'pt-BR': 'Você e seus alunos recebem uma assinatura Gold.',
-        'ru-RU': 'Вы и ваши студенты получите золотую подписку.',
-        'sl-SI': 'Vi in vaši študenti boste prejeli zlato naročnino.',
-        'uk-UA': 'Ви і ваші студенти отримаєте золоту підписку.',
-        'zh-CN': '您和您的学生将收到金牌订阅。',
+        en: 'Version history for all projects',
       },
       {
-        en: 'You and your students can use the cloud project version history.',
-        'ar-SA': 'يمكنك وطلابك استخدام تاريخ إصدار مشروع السحابة.',
-        'de-DE':
-          'Sie und Ihre Schüler können die Versionsgeschichte des Cloud-Projekts verwenden.',
-        'es-ES':
-          'Usted y sus estudiantes pueden utilizar el historial de versiones del proyecto en la nube.',
-        'fr-FR':
-          "Vous et vos étudiants pouvez utiliser l'historique des versions du projet cloud.",
-        'it-IT':
-          'Tu e i tuoi studenti possono utilizzare la cronologia delle versioni del progetto cloud.',
-        'ja-JP':
-          'あなたとあなたの生徒はクラウドプロジェクトのバージョン履歴を使用できます。',
-        'ko-KR':
-          '당신과 당신의 학생들은 클라우드 프로젝트 버전 히스토리를 사용할 수 있습니다.',
-        'pl-PL':
-          'Ty i Twoi uczniowie możecie korzystać z historii wersji projektu w chmurze.',
-        'pt-BR':
-          'Você e seus alunos podem usar o histórico de versões do projeto na nuvem.',
-        'ru-RU':
-          'Вы и ваши студенты можете использовать историю версий проекта в облаке.',
-        'sl-SI':
-          'Vi in vaši študenti lahko uporabljate zgodovino različic projekta v oblaku.',
-        'uk-UA':
-          'Ви і ваші студенти можете використовувати історію версій проекту в хмарі.',
-        'zh-CN': '您和您的学生可以使用云项目版本历史。',
+        en: 'Publishing to any platform',
+      },
+      {
+        en: 'GDevelop mobile app full access',
       },
     ],
+    fullFeatures: [],
     pricingSystems: [
       {
-        id: 'education_1month',
+        id: 'education_1month_299EUR',
         planId: 'gdevelop_education',
         period: 'month',
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 299,
         isPerUser: true,
-        region: 'everywhere',
+        region: 'eurozone',
       },
       {
-        id: 'education_1year',
+        id: 'education_1year_2999EUR',
         planId: 'gdevelop_education',
         period: 'year',
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 2999,
         isPerUser: true,
-        region: 'everywhere',
+        region: 'eurozone',
       },
     ],
   },
   {
     id: 'gdevelop_indie',
     isLegacy: true,
-    nameByLocale: { en: 'GDevelop Indie (Legacy)' },
-    descriptionByLocale: { en: 'Build more and faster' },
+    nameByLocale: {
+      en: 'Silver (Legacy)',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Build more and faster',
+    },
     bulletPointsByLocale: [
       {
         en:
           '50 cloud projects with 250MB of resources per project and 3-month version history.',
       },
-      { en: '10 packagings per day for Android and for desktop.' },
-      { en: 'Unlimited leaderboards and unlimited player feedback responses.' },
+      {
+        en: '10 packagings per day for Android and for desktop.',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+      },
     ],
+    fullFeatures: [],
     pricingSystems: [
       {
         id: 'indie_1month',
@@ -923,27 +2144,164 @@ export const subscriptionPlansWithPricingSystems = [
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 200,
-        region: 'everywhere',
+        region: 'default',
       },
     ],
   },
   {
     id: 'gdevelop_pro',
     isLegacy: true,
-    nameByLocale: { en: 'GDevelop Pro (Legacy)' },
-    descriptionByLocale: { en: 'Experimented creators, ambitious games' },
+    nameByLocale: {
+      en: 'Gold (Legacy)',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Experimented creators, ambitious games',
+    },
     bulletPointsByLocale: [
       {
         en:
           '100 cloud projects with 500MB of resources per project and one-year version history.',
       },
-      { en: '70 packagings per day for Android and for desktop.' },
-      { en: 'Unlimited leaderboards and unlimited player feedback responses.' },
+      {
+        en: '70 packagings per day for Android and for desktop.',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+      },
       {
         en:
           'Immerse your players by removing GDevelop logo when the game loads.',
       },
     ],
+    fullFeatures: [],
     pricingSystems: [
       {
         id: 'pro_1month',
@@ -952,7 +2310,7 @@ export const subscriptionPlansWithPricingSystems = [
         periodCount: 1,
         currency: 'EUR',
         amountInCents: 700,
-        region: 'everywhere',
+        region: 'default',
       },
     ],
   },
@@ -1394,14 +2752,14 @@ export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForStartupUser,
   limits: limitsForStartupUser,
 };
-export const fakeBusinessAuthenticatedUser: AuthenticatedUser = {
-  ...fakeSilverAuthenticatedUser,
-  subscription: subscriptionForBusinessUser,
-  limits: limitsForBusinessUser,
-};
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForEducationPlan,
+  limits: limitsForGoldUser,
+};
+export const fakeAuthenticatedGoldUserFromEducationPlan: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForGoldUserFromEducationPlan,
   limits: limitsForGoldUser,
 };
 

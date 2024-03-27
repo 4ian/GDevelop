@@ -467,6 +467,10 @@ export function createGdevelopTheme({
         warning: styles['ThemeMessageWarningColor'],
         error: styles['ThemeMessageErrorColor'],
         valid: styles['ThemeMessageValidColor'],
+        hot: {
+          backgroundColor: styles['ThemeMessageHotBackgroundColor'],
+          color: styles['ThemeMessageHotColor'],
+        },
       },
       titlebar: {
         backgroundColor: styles['ThemeSurfaceTitlebarBackgroundColor'],

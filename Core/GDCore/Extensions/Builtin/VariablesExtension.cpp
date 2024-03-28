@@ -63,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("variable", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
-      // This parameter allows to keep the operand
+      // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("boolean", _("Value"))
       .SetRelevantForLayoutEventsOnly();
@@ -99,13 +99,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "SetBooleanVariable",
           _("Change boolean variable"),
           _("Modify the boolean value of a variable."),
-          _("the variable _PARAM0_"),
+          _("Change the variable _PARAM0_: _PARAM1_"),
           "",
           "res/conditions/var24.png",
           "res/conditions/var.png")
       .AddParameter("variable", _("Variable"))
-      .UseStandardOperatorParameters("boolean",
-                                     ParameterOptions::MakeNewOptions())
+      .AddParameter("operator", _("Value"), "boolean")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   extension

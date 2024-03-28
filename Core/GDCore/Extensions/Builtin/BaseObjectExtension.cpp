@@ -448,14 +448,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetBooleanObjectVariable",
                 _("Change boolean variable"),
                 _("Modify the boolean value of an object variable."),
-                _("the variable _PARAM1_"),
+                _("Change the variable _PARAM1_ of _PARAM0_: _PARAM2_"),
                 _("Variables"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .UseStandardOperatorParameters("boolean",
-                                     ParameterOptions::MakeNewOptions())
+      .AddParameter("operator", _("Value"), "boolean")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("NumberObjectVariable",
@@ -497,7 +499,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
       .SetDefaultValue("true")
-      // This parameter allows to keep the operand
+      // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
       .AddCodeOnlyParameter("boolean", _("Value"))
       .SetRelevantForLayoutEventsOnly();

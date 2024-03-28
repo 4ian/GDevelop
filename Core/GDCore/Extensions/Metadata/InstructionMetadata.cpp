@@ -99,29 +99,27 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
   SetManipulatedType(expressionValueType);
 
   if (type == "boolean") {
-    AddParameter("operator", _("Modification's sign"), expressionValueType);
-    // This parameter allows to keep the operand when the editor switch between variable instructions.
-    AddCodeOnlyParameter(
-        type,
-        options.description.empty() ? _("Value") : options.description);
-    size_t operatorParamIndex = parameters.size() - 2;
+    AddParameter(
+        "yesorno",
+        options.description.empty() ? _("New value") : options.description);
+    size_t valueParamIndex = parameters.size() - 1;
 
     if (isObjectInstruction || isBehaviorInstruction) {
-      gd::String templateSentence = _("Change <subject> of _PARAM0_: <operator>");
+      gd::String templateSentence = _("Set _PARAM0_ as <subject>: <value>");
 
       sentence =
           templateSentence
               .FindAndReplace("<subject>", sentence)
-              .FindAndReplace("<operator>",
-                              "_PARAM" + gd::String::From(operatorParamIndex) + "_");
+              .FindAndReplace("<value>",
+                              "_PARAM" + gd::String::From(valueParamIndex) + "_");
     } else {
-      gd::String templateSentence = _("Change <subject>: <operator>");
+      gd::String templateSentence = _("Change <subject>: <value>");
 
       sentence =
           templateSentence
               .FindAndReplace("<subject>", sentence)
-              .FindAndReplace("<operator>",
-                              "_PARAM" + gd::String::From(operatorParamIndex) + "_");
+              .FindAndReplace("<value>",
+                              "_PARAM" + gd::String::From(valueParamIndex) + "_");
     }
   } else {
     AddParameter("operator", _("Modification's sign"), expressionValueType);

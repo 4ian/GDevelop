@@ -664,6 +664,8 @@ namespace gdjs {
    * This condition will be triggered once - when after tom's line.
    */
   gdjs.dialogueTree.hasActiveActorChanged = function () {
+    if (!this.dialogueIsRunning || this.dialogueDataType !== 'text')
+      return false;
     if (
       gdjs.dialogueTree.prevActiveLineActor !==
         gdjs.dialogueTree.activeLineActor ||
@@ -862,8 +864,8 @@ namespace gdjs {
     this.tagParameters = [];
     if (this.dialogueIsRunning && this.dialogueBranchTags.length) {
       return this.dialogueBranchTags.some(function (tag) {
-        if(tag.includes(":")) {
-          const splitTag = tag.split(":");
+        if (tag.includes(':')) {
+          const splitTag = tag.split(':');
           return splitTag[0] === query;
         }
         const splitTag = tag.match(/([^\(]+)\(([^\)]+)\)/i);
@@ -889,29 +891,29 @@ namespace gdjs {
     return '';
   };
 
-   /**
+  /**
    * Get a dialogue node tag value via a key, where the pattern of the tag is tagKey:value and what is returned is value
    * For example if you have the tags set in yarn as: "bg:park time:noon"
    * asking for tagKey "time" will return "noon". This is useful for nodes with alot of tags
    * @param tagKey The key of the tag to get.
    */
-    gdjs.dialogueTree.getTagValueViaKey = function (tagKey: string) {
-      console.log({tagKey, branchTags: this.dialogueBranchTags})
-      if (tagKey === '') {
-        return '';
-      }
-      if (this.dialogueIsRunning && this.dialogueBranchTags.length > 0) {
-        const parameterWithKey = this.dialogueBranchTags.find((tag) =>
-          tag.startsWith(`${tagKey}:`)
-        );
-        if (parameterWithKey) {
-          const [_, returnedParam] = parameterWithKey.split(':');
-          console.log({returnedParam})
-          return returnedParam ? returnedParam : '';
-        }
-      }
+  gdjs.dialogueTree.getTagValueViaKey = function (tagKey: string) {
+    console.log({ tagKey, branchTags: this.dialogueBranchTags });
+    if (tagKey === '') {
       return '';
-    };
+    }
+    if (this.dialogueIsRunning && this.dialogueBranchTags.length > 0) {
+      const parameterWithKey = this.dialogueBranchTags.find((tag) =>
+        tag.startsWith(`${tagKey}:`)
+      );
+      if (parameterWithKey) {
+        const [_, returnedParam] = parameterWithKey.split(':');
+        console.log({ returnedParam });
+        return returnedParam ? returnedParam : '';
+      }
+    }
+    return '';
+  };
 
   /**
    * Get a list of all the titles of visited by the player Branches. Useful for debugging.
@@ -1099,6 +1101,20 @@ namespace gdjs {
       }
     }
     return '';
+  };
+
+  /**
+   * Check if the currently executed <<command>> contains a specific parameter.
+   * @param parameter The name of the Dialogue Branch tag you want to check.
+   */
+  gdjs.dialogueTree.commandHasParameter = function (query: string) {
+    this.tagParameters = [];
+    if (this.commandParameters.length > 0) {
+      return this.commandParameters.some(function (parameter) {
+        return parameter === query || parameter.startsWith(`${query}=`);
+      });
+    }
+    return false;
   };
 
   /**

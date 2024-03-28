@@ -948,6 +948,23 @@ module.exports = {
 
     extension
       .addCondition(
+        'ActiveActorLineHasParameter',
+        _('Active Actor line has parameter'),
+        _(
+          'Check if the displayed dialogue text active actor has a parameter. example "tom left: I am on the left!" the parameter "left" exists'
+        ),
+        _('Active actor line has a parameter _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Active Actor Line Parameter'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.getActiveLineParameterExists');
+
+
+    extension
+      .addCondition(
         'DoesActorExist',
         _('Does actor with ID exist'),
         _('Check if an actor with a specified id has been ecreated'),

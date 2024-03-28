@@ -1024,17 +1024,17 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Valid variables (upcoming, new 'variable' type working for any variable)") {
-    // When implemented, copy the test cases from the next section, like this:
-    // SECTION("simple variable") {
-    //   REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-    //               codeGenerator, context, "variable", "MySceneVariable", "")
-    //           == "getLayoutVariable(MySceneVariable)");
-    // }
-    // SECTION("simple (global) variable") {
-    //   REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-    //               codeGenerator, context, "variable", "MyGlobalNumberVariable", "")
-    //           == "getProjectVariable(MyGlobalNumberVariable)");
-    // }
+    // TODO When implemented, copy the test cases from the next section, like this:
+    SECTION("simple variable") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "variable", "MySceneVariable", "")
+              == "getLayoutVariable(MySceneVariable)");
+    }
+    SECTION("simple (global) variable") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "variable", "MyGlobalNumberVariable", "")
+              == "getProjectVariable(MyGlobalNumberVariable)");
+    }
   }
   SECTION("Valid variables (legacy, pre-scoped variables)") {
     SECTION("simple variable") {

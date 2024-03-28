@@ -51,6 +51,7 @@ export type ParameterFieldProps = {|
 
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
+  onInstructionTypeChanged?: () => void,
 |};
 
 export type FieldFocusFunction = (

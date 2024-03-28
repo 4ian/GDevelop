@@ -16,6 +16,10 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import { enumerateValidVariableNames } from './EnumerateVariables';
+import intersection from 'lodash/intersection';
+
+const gd: libGDevelop = global.gd;
 
 // TODO Move this function to the ObjectsContainersList class.
 const getObjectOrGroupVariablesContainers = (
@@ -53,6 +57,36 @@ const getObjectOrGroupVariablesContainers = (
   return variablesContainers;
 };
 
+export const switchBetweenUnifiedObjectInstructionIfNeeded = (
+  projectScopedContainers: gdProjectScopedContainers,
+  instruction: gdInstruction
+): void => {
+  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+  if (
+    instruction.getParametersCount() > 0 &&
+    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+      instruction.getType()
+    )
+  ) {
+    const objectName = instruction.getParameter(0).getPlainString();
+    const variableName = instruction.getParameter(1).getPlainString();
+    if (
+      objectsContainersList.hasObjectOrGroupWithVariableNamed(
+        objectName,
+        variableName
+      )
+    ) {
+      const variable = objectsContainersList
+        .getObjectOrGroupVariablesContainer(objectName)
+        .get(variableName);
+      gd.VariableInstructionSwitcher.switchVariableInstructionType(
+        instruction,
+        variable.getType()
+      );
+    }
+  }
+};
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
@@ -74,6 +108,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       expressionMetadata,
       expression,
       parameterIndex,
+      onInstructionTypeChanged,
     } = props;
 
     const objectName = getLastObjectParameterValue({
@@ -100,6 +135,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [objectName, globalObjectsContainer, objectsContainer]
     );
 
+    const enumerateVariableNames = React.useCallback(
+      () =>
+        variablesContainers
+          .map(variablesContainer =>
+            enumerateValidVariableNames(variablesContainer)
+          )
+          .reduce((a, b) => intersection(a, b)),
+      [variablesContainers]
+    );
+
     const onComputeAllVariableNames = () =>
       project && layout && object
         ? EventsRootVariablesFinder.findAllObjectVariables(
@@ -113,7 +158,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <React.Fragment>
         <VariableField
+          forceDeclaration={
+            instruction &&
+            gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+              instruction.getType()
+            )
+          }
           variablesContainers={variablesContainers}
+          enumerateVariableNames={enumerateVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -121,7 +173,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onRequestClose={props.onRequestClose}
           onApply={props.onApply}
           ref={field}
-          onOpenDialog={() => setEditorOpen(true)}
+          // There is no variable editor for groups.
+          onOpenDialog={
+            variablesContainers.length === 1 ? () => setEditorOpen(true) : null
+          }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
           scope={scope}
@@ -131,33 +186,31 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               : undefined
           }
         />
-        {editorOpen &&
-          // There is no variable editor for groups.
-          variablesContainers.length === 1 &&
-          project && (
-            <VariablesEditorDialog
-              project={project}
-              title={<Trans>Object Variables</Trans>}
-              open={editorOpen}
-              variablesContainer={variablesContainers[0]}
-              emptyPlaceholderTitle={
-                <Trans>Add your first object variable</Trans>
-              }
-              emptyPlaceholderDescription={
-                <Trans>
-                  These variables hold additional information on an object.
-                </Trans>
-              }
-              helpPagePath={'/all-features/variables/object-variables'}
-              onComputeAllVariableNames={onComputeAllVariableNames}
-              onCancel={() => setEditorOpen(false)}
-              onApply={() => {
-                setEditorOpen(false);
-                if (field.current) field.current.updateAutocompletions();
-              }}
-              preventRefactoringToDeleteInstructions
-            />
-          )}
+        {editorOpen && project && (
+          <VariablesEditorDialog
+            project={project}
+            title={<Trans>Object Variables</Trans>}
+            open={editorOpen}
+            variablesContainer={variablesContainers[0]}
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
+            }
+            emptyPlaceholderDescription={
+              <Trans>
+                These variables hold additional information on an object.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/object-variables'}
+            onComputeAllVariableNames={onComputeAllVariableNames}
+            onCancel={() => setEditorOpen(false)}
+            onApply={() => {
+              setEditorOpen(false);
+              if (onInstructionTypeChanged) onInstructionTypeChanged();
+              if (field.current) field.current.updateAutocompletions();
+            }}
+            preventRefactoringToDeleteInstructions
+          />
+        )}
       </React.Fragment>
     );
   }

@@ -34,6 +34,9 @@ import {
   type FieldFocusFunction,
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
+import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { switchBetweenUnifiedInstructionIfNeeded } from '../../EventsSheet/ParameterFields/AnyVariableField';
+import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -212,7 +215,22 @@ const InstructionParametersEditor = React.forwardRef<
       [focus, focusOnMount]
     );
 
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
+    switchBetweenUnifiedInstructionIfNeeded(
+      projectScopedContainers,
+      instruction
+    );
+    switchBetweenUnifiedObjectInstructionIfNeeded(
+      projectScopedContainers,
+      instruction
+    );
+
     const instructionType = instruction.getType();
+
     const instructionMetadata = getInstructionMetadata({
       instructionType,
       isCondition,
@@ -343,6 +361,7 @@ const InstructionParametersEditor = React.forwardRef<
                             forceUpdate();
                           }
                         }}
+                        onInstructionTypeChanged={forceUpdate}
                         project={project}
                         scope={scope}
                         globalObjectsContainer={globalObjectsContainer}

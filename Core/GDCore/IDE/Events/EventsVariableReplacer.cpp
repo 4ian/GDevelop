@@ -20,6 +20,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/IDE/VariableInstructionSwitcher.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
@@ -250,7 +251,7 @@ class GD_CORE_API ExpressionVariableReplacer
               node.objectName,
               *node.parameters[parameterIndex].get());
           forcedInitialVariablesContainer =
-              projectScopedContainers.GetObjectsContainersList()
+              &projectScopedContainers.GetObjectsContainersList()
                   .GetObjectOrGroupVariablesContainer(objectName);
         }
 
@@ -307,7 +308,7 @@ EventsVariableReplacer::FindForcedVariablesContainerIfAny(
   // Handle legacy pre-scoped variable parameters: in this case, we
   // force the "scope" at which starts the evalution of variables.
   if (type == "objectvar") {
-    return GetProjectScopedContainers()
+    return &GetProjectScopedContainers()
         .GetObjectsContainersList()
         .GetObjectOrGroupVariablesContainer(lastObjectName);
   } else if (type == "globalvar") {
@@ -362,6 +363,16 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
           } else if (renamer.HasDoneRenaming()) {
             instruction.SetParameter(
                 parameterIndex, ExpressionParser2NodePrinter::PrintNode(*node));
+          }
+        }
+
+        if (gd::ParameterMetadata::IsExpression("variable", type)) {
+          const auto &variableName = instruction.GetParameter(parameterIndex).GetPlainString();
+          auto itr = variableNewTypes.find(variableName);
+          if (itr != variableNewTypes.end()) {
+            const gd::Variable::Type variableType = itr->second;
+            gd::VariableInstructionSwitcher::SwitchVariableInstructionType(
+                instruction, variableType);
           }
         }
       });

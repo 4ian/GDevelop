@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/Project/Variable.h"
+
 namespace gd {
 class Platform;
 class Project;
@@ -41,6 +43,7 @@ namespace gd {
 struct VariablesChangeset {
   std::unordered_set<gd::String> removedVariableNames;
   std::unordered_map<gd::String, gd::String> oldToNewVariableNames;
+  std::unordered_map<gd::String, gd::Variable::Type> variableNewTypes;
 
   bool HasRemovedVariables() { return !removedVariableNames.empty(); }
 

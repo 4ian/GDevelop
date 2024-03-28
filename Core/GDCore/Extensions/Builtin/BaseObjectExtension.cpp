@@ -417,6 +417,93 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("\"\"")
       .MarkAsAdvanced();
 
+  obj.AddAction("SetNumberObjectVariable",
+                _("Change variable value"),
+                _("Modify the number value of an object variable."),
+                _("the variable _PARAM1_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardOperatorParameters("number",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddAction("SetStringObjectVariable",
+                _("Change text variable"),
+                _("Modify the text of an object variable."),
+                _("the variable _PARAM1_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardOperatorParameters("string",
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddAction("SetBooleanObjectVariable",
+                _("Change boolean variable"),
+                _("Modify the boolean value of an object variable."),
+                _("Change the variable _PARAM1_ of _PARAM0_: _PARAM2_"),
+                _("Variables"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("operator", _("Value"), "boolean")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"))
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddCondition("NumberObjectVariable",
+                   _("Variable value"),
+                   _("Compare the number value of an object variable."),
+                   _("the variable _PARAM1_"),
+                   _("Variables"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddCondition("StringObjectVariable",
+                   _("Text variable"),
+                   _("Compare the text of an object variable."),
+                   _("the variable _PARAM1_"),
+                   _("Variables"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .UseStandardRelationalOperatorParameters(
+          "string", ParameterOptions::MakeNewOptions())
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddCondition("BooleanObjectVariable",
+                   _("Boolean variable"),
+                   _("Compare the boolean value of an object variable."),
+                   _("The variable _PARAM1_ is _PARAM2_"),
+                   _("Variables"),
+                   "res/conditions/var24.png",
+                   "res/conditions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Variable"))
+      .AddParameter("trueorfalse", _("Check if the value is"))
+      .SetDefaultValue("true")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("boolean", _("Value"))
+      .SetRelevantForLayoutEventsOnly();
+
   obj.AddAction("ModVarObjet",
                 _("Change number variable"),
                 _("Modify the number value of an object variable."),
@@ -428,7 +515,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("number",
-                                     ParameterOptions::MakeNewOptions());
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction("ModVarObjetTxt",
                 _("Change text variable"),
@@ -441,7 +529,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardOperatorParameters("string",
-                                     ParameterOptions::MakeNewOptions());
+                                     ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction("SetObjectVariableAsBoolean",
                 _("Change boolean variable"),
@@ -454,7 +543,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
-      .AddParameter("trueorfalse", _("New Value:"));
+      .AddParameter("trueorfalse", _("New Value:"))
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction(
          "ToggleObjectVariableAsBoolean",
@@ -469,7 +559,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/actions/var.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("objectvar", _("Variable"));
+      .AddParameter("objectvar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("ObjectVariableChildExists",
                    _("Child existence"),
@@ -657,7 +748,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "number", ParameterOptions::MakeNewOptions());
+          "number", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("VarObjetTxt",
                    _("Text variable"),
@@ -670,7 +762,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .UseStandardRelationalOperatorParameters(
-          "string", ParameterOptions::MakeNewOptions());
+          "string", ParameterOptions::MakeNewOptions())
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("ObjectVariableAsBoolean",
                    _("Boolean variable"),
@@ -683,7 +776,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Variable"))
       .AddParameter("trueorfalse", _("Check if the value is"))
-      .SetDefaultValue("true");
+      .SetDefaultValue("true")
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddCondition("VarObjetDef",
                    "Variable defined",

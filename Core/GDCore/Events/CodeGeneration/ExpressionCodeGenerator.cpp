@@ -110,11 +110,13 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     // The node is a variable inside an expression waiting for a *variable* to be returned, not its value.
     EventsCodeGenerator::VariableScope scope =
-        type == "globalvar"
+        type == "variable"
+            ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "globalvar"
             ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-            : ((type == "scenevar")
+            : type == "scenevar"
                   ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+                  : gd::EventsCodeGenerator::OBJECT_VARIABLE;
 
     auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
                                           codeGenerator.GetObjectsContainersList(),
@@ -209,11 +211,13 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         codeGenerator.GenerateObject(node.identifierName, type, context);
   } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       EventsCodeGenerator::VariableScope scope =
-          type == "globalvar"
+        type == "variable"
+            ? gd::EventsCodeGenerator::ANY_VARIABLE
+        : type == "globalvar"
               ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-              : ((type == "scenevar")
+              : type == "scenevar"
                     ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
-                    : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+                    : gd::EventsCodeGenerator::OBJECT_VARIABLE;
 
       auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
                                             codeGenerator.GetObjectsContainersList(),

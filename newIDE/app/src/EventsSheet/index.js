@@ -112,6 +112,8 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
+import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/ParameterFields/AnyVariableField';
+import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -1950,6 +1952,21 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       return;
                     }
                     instruction.setParameter(parameterIndex, value);
+
+                    const projectScopedContainers = getProjectScopedContainersFromScope(
+                      scope,
+                      globalObjectsContainer,
+                      objectsContainer
+                    );
+                    switchBetweenUnifiedInstructionIfNeeded(
+                      projectScopedContainers,
+                      instruction
+                    );
+                    switchBetweenUnifiedObjectInstructionIfNeeded(
+                      projectScopedContainers,
+                      instruction
+                    );
+
                     // Ask the component to re-render, so that the new parameter
                     // set for the instruction in the state
                     // is taken into account for the InlineParameterEditor.

@@ -13,6 +13,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import { enumerateValidVariableNames } from './EnumerateVariables';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
@@ -42,10 +43,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
+    const enumerateVariableNames = React.useCallback(
+      () => {
+        return project
+          ? enumerateValidVariableNames(project.getVariables())
+          : [];
+      },
+      [project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
+          enumerateVariableNames={enumerateVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

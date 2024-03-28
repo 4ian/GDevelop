@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
+  getRootVariableName,
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
@@ -12,8 +13,35 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import { enumerateValidVariableNames } from './EnumerateVariables';
+
+const gd: libGDevelop = global.gd;
+
+export const switchBetweenUnifiedInstructionIfNeeded = (
+  projectScopedContainers: gdProjectScopedContainers,
+  instruction: gdInstruction
+): void => {
+  if (
+    instruction.getParametersCount() > 0 &&
+    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+      instruction.getType()
+    )
+  ) {
+    const variableName = instruction.getParameter(0).getPlainString();
+    if (
+      projectScopedContainers.getVariablesContainersList().has(variableName)
+    ) {
+      const variable = projectScopedContainers
+        .getVariablesContainersList()
+        .get(variableName);
+
+      gd.VariableInstructionSwitcher.switchVariableInstructionType(
+        instruction,
+        variable.getType()
+      );
+    }
+  }
+};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -26,40 +54,38 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope } = props;
+    const { project, scope, onInstructionTypeChanged } = props;
     const { layout } = scope;
 
-    const onComputeAllVariableNames = React.useCallback(
-      () =>
-        project && layout
-          ? EventsRootVariablesFinder.findAllLayoutVariables(
-              project.getCurrentPlatform(),
-              project,
-              layout
-            )
-          : [],
+    const onComputeAllVariableNames = React.useCallback(() => [], []);
+
+    const enumerateGlobalAndSceneVariableNames = React.useCallback(
+      () => {
+        return project && layout
+          ? [
+              ...enumerateValidVariableNames(layout.getVariables()),
+              ...enumerateValidVariableNames(project.getVariables()),
+            ]
+          : [];
+      },
       [project, layout]
     );
 
     const variablesContainers = React.useMemo(
       () => {
-        return layout ? [layout.getVariables()] : [];
+        return layout && project
+          ? [layout.getVariables(), project.getVariables()]
+          : [];
       },
-      [layout]
-    );
-
-    const enumerateVariableNames = React.useCallback(
-      () => {
-        return layout ? enumerateValidVariableNames(layout.getVariables()) : [];
-      },
-      [layout]
+      [layout, project]
     );
 
     return (
       <React.Fragment>
         <VariableField
+          forceDeclaration
           variablesContainers={variablesContainers}
-          enumerateVariableNames={enumerateVariableNames}
+          enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}
@@ -86,6 +112,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onCancel={() => setEditorOpen(false)}
             onApply={() => {
               setEditorOpen(false);
+              if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
             emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
@@ -104,6 +131,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   }
 );
 
-export const renderInlineSceneVariable = (
-  props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'res/types/scenevar.png', 'scene variable');
+export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
+  renderVariableWithIcon(
+    props,
+    props.scope.layout &&
+      props.scope.layout.getVariables().has(getRootVariableName(props.value))
+      ? 'res/types/scenevar.png'
+      : 'res/types/globalvar.png',
+    'variable'
+  );

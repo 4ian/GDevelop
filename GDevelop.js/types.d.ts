@@ -27,6 +27,13 @@ export enum Variable_Type {
   Array = 4,
 }
 
+export enum ObjectsContainersList_VariableExistence {
+  DoesNotExist = 0,
+  Exists = 1,
+  GroupIsEmpty = 2,
+  ExistsOnlyOnSomeObjectsOfTheGroup = 3,
+}
+
 export enum ExpressionCompletionDescription_CompletionKind {
   Object = 0,
   BehaviorWithPrefix = 1,
@@ -233,6 +240,12 @@ export class PairStringVariable extends EmscriptenObject {
   getVariable(): Variable;
 }
 
+export class VariableInstructionSwitcher extends EmscriptenObject {
+  static isSwitchableVariableInstruction(instructionType: string): boolean;
+  static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
+  static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
+}
+
 export class Variable extends EmscriptenObject {
   constructor();
   static isPrimitive(type: Variable_Type): boolean;
@@ -292,6 +305,8 @@ export class VariablesContainer extends EmscriptenObject {
 export class VariablesContainersList extends EmscriptenObject {
   static makeNewVariablesContainersListForProjectAndLayout(project: Project, layout: Layout): VariablesContainersList;
   static makeNewEmptyVariablesContainersList(): VariablesContainersList;
+  has(name: string): boolean;
+  get(name: string): Variable;
 }
 
 export class ObjectGroup extends EmscriptenObject {
@@ -556,6 +571,8 @@ export class ObjectsContainersList extends EmscriptenObject {
   getTypeOfBehavior(name: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
+  hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
+  getObjectOrGroupVariablesContainer(objectName: string): VariablesContainer;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {

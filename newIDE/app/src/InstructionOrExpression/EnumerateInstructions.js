@@ -220,6 +220,15 @@ const enumerateFreeInstructionsWithoutExtra = (
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
 
+    // Instructions that are merged together are hidden
+    // apart from the one that represent them all.
+    const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
+      type
+    );
+    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
+      continue;
+    }
+
     const isWhiteListed =
       extensionInstructionsToKeep &&
       extensionInstructionsToKeep.indexOf(type) !== -1;
@@ -300,6 +309,16 @@ const enumerateExtensionInstructions = (
   //... and add each instruction
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
+
+    // Instructions that are merged together are hidden
+    // apart from the one that represent them all.
+    const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
+      type
+    );
+    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
+      continue;
+    }
+
     const instrMetadata = instructions.get(type);
     if (
       !instrMetadata.isHidden() &&

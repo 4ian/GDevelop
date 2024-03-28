@@ -57,6 +57,7 @@
 #include <GDCore/IDE/ProjectBrowserHelper.h>
 #include <GDCore/IDE/PropertyFunctionGenerator.h>
 #include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
+#include <GDCore/IDE/VariableInstructionSwitcher.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/CustomObjectConfiguration.h>
@@ -667,6 +668,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllLayoutVariables FindAllLayoutVariables
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_FindAllIdentifierExpressions FindAllIdentifierExpressions
+#define STATIC_SwitchVariableInstructionType SwitchVariableInstructionType
+#define STATIC_IsSwitchableVariableInstruction IsSwitchableVariableInstruction
+#define STATIC_GetSwitchableVariableInstructionIdentifier GetSwitchableVariableInstructionIdentifier
 
 #define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
 #define STATIC_IsBehaviorFunctionOnlyCallingItself \

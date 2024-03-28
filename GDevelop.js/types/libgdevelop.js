@@ -65,6 +65,7 @@ declare class libGDevelop {
   JsPlatform: Class<gdJsPlatform>;
   PairStringVariable: Class<gdPairStringVariable>;
   Variable_Type: Class<Variable_Type>;
+  VariableInstructionSwitcher: Class<gdVariableInstructionSwitcher>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;

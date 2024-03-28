@@ -180,6 +180,11 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
         changeset.oldToNewVariableNames[oldName] = variableName;
       }
 
+      const auto &oldVariable = oldVariablesContainer.Get(oldName);
+      if (variable.GetType() != oldVariable.GetType()) {
+        changeset.variableNewTypes[variableName] = variable.GetType();
+      }
+
       // Renamed or not, this is not a removed variable.
       removedUuidAndNames.erase(variable.GetPersistentUuid());
     }
@@ -197,7 +202,8 @@ void WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
     const gd::VariablesChangeset &changeset) {
   gd::EventsVariableReplacer eventsVariableReplacer(
       project.GetCurrentPlatform(), newVariablesContainer,
-      changeset.oldToNewVariableNames, changeset.removedVariableNames);
+      changeset.oldToNewVariableNames, changeset.removedVariableNames,
+      changeset.variableNewTypes);
   gd::ProjectBrowserHelper::ExposeProjectEvents(project,
                                                 eventsVariableReplacer);
 }

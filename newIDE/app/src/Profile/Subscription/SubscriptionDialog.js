@@ -726,7 +726,10 @@ export default function SubscriptionDialog({
                 i18n,
                 displayedSubscriptionPlanWithPricingSystems
               ).map(planSpecificRequirements => (
-                <AlertMessage kind="info">
+                <AlertMessage
+                  kind="info"
+                  key={planSpecificRequirements.substring(0, 25)}
+                >
                   {planSpecificRequirements}
                 </AlertMessage>
               ))}

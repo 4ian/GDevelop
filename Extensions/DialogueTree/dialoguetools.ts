@@ -769,6 +769,20 @@ namespace gdjs {
     return '';
   };
 
+   /**
+   * Checks if active actor line has a specific parameter
+   * for example if the line is:
+   * tom left: I am now standing on the left side
+   * if we search for the parameter "left" this will return true
+   * @param query the parameter to look for
+   */
+   gdjs.dialogueTree.getActiveLineParameterExists = function (
+    query: string
+  ) {
+    if(this.dialogueDataType !== 'text') return false;
+    return gdjs.dialogueTree.activeLineActorParameters.some(parameter=> parameter === query)
+  };
+
   /**
    * Set existing actor's variables. Note that you cannot change an actor's id programatically.
    * For example if you have created an actor with id=tom, you can target him via that actorId and change any nested variable of that actor
@@ -898,7 +912,6 @@ namespace gdjs {
    * @param tagKey The key of the tag to get.
    */
   gdjs.dialogueTree.getTagValueViaKey = function (tagKey: string) {
-    console.log({ tagKey, branchTags: this.dialogueBranchTags });
     if (tagKey === '') {
       return '';
     }
@@ -908,7 +921,6 @@ namespace gdjs {
       );
       if (parameterWithKey) {
         const [_, returnedParam] = parameterWithKey.split(':');
-        console.log({ returnedParam });
         return returnedParam ? returnedParam : '';
       }
     }
@@ -945,7 +957,7 @@ namespace gdjs {
    */
   gdjs.dialogueTree.branchTitleHasChanged = function () {
     return (
-      this.dialogueIsRunning &&
+      this.dialogueIsRunning && this.dialogueData.data &&
       (this.dialogueBranchTitle === '' ||
         this.dialogueBranchTitle === this.dialogueData.data.title)
     );
@@ -1090,13 +1102,12 @@ namespace gdjs {
     if (paramKey === '') {
       return '';
     }
-    if (this.commandParameters.length > 0) {
+    if (this.commandParameters && this.commandParameters.length > 0) {
       const parameterWithKey = this.commandParameters.find((parameter) =>
         parameter.startsWith(`${paramKey}=`)
       );
       if (parameterWithKey) {
         const [_, returnedParam] = parameterWithKey.split('=');
-        console.log({ parameterWithKey, returnedParam });
         return returnedParam ? returnedParam : '';
       }
     }
@@ -1108,8 +1119,7 @@ namespace gdjs {
    * @param parameter The name of the Dialogue Branch tag you want to check.
    */
   gdjs.dialogueTree.commandHasParameter = function (query: string) {
-    this.tagParameters = [];
-    if (this.commandParameters.length > 0) {
+    if (this.commandParameters && this.commandParameters.length > 0) {
       return this.commandParameters.some(function (parameter) {
         return parameter === query || parameter.startsWith(`${query}=`);
       });

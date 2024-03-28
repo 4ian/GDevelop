@@ -1,0 +1,92 @@
+.compactSelectField {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(
+    --theme-surface-alternate-canvas-light-background-color
+  );
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+}
+
+.compactSelectField.disabled {
+  color: var(--theme-text-disabled-color);
+}
+
+.compactSelectField.errored:not(.disabled) {
+  border: none;
+  outline: 1px solid var(--theme-error-color);
+}
+
+.compactSelectField::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: '';
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.compactSelectField:not(.disabled):not(.errored):hover::before {
+  border-bottom: 1px solid var(--theme-search-bar-hovered-border-color);
+}
+.compactSelectField:not(.disabled):not(.errored):focus-within::before {
+  border-bottom: 1px solid var(--theme-secondary-dark);
+}
+
+.compactSelectField select {
+  appearance: none;
+  outline: none;
+  border: none;
+  padding: 2px 8px;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: inherit;
+  flex: 1;
+  caret-color: var(--theme-secondary-dark);
+}
+
+.compactSelectField select::placeholder {
+  color: var(--theme-text-disabled-color);
+}
+
+.arrowContainer {
+  pointer-events: none;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  border-radius: 4px;
+  transition: background-color 0.1s linear;
+}
+
+.arrow {
+  flex: 1;
+  mask-size: 18px;
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='currentColor' fill-rule='evenodd' clip-rule='evenodd' d='M5.49303 6.80023C5.69538 6.61233 6.01175 6.62405 6.19965 6.8264L7.99992 8.76515L9.80019 6.8264C9.98809 6.62405 10.3045 6.61233 10.5068 6.80023C10.7092 6.98813 10.7209 7.3045 10.533 7.50685L8.36632 9.84019C8.27171 9.94207 8.13896 9.99996 7.99992 9.99996C7.86089 9.99996 7.72813 9.94207 7.63352 9.84019L5.46686 7.50685C5.27896 7.3045 5.29067 6.98813 5.49303 6.80023Z'/%3E%3C/svg%3E");
+  background-color: var(--theme-text-secondary-color);
+  transition: background-color 0.1s linear;
+}
+.compactSelectField.disabled .arrow {
+  background-color: var(--theme-text-disabled-color);
+}
+
+.compactSelectField:not(.disabled) .arrowContainer {
+  background-color: none;
+}
+.compactSelectField:not(.disabled):hover .arrowContainer {
+  background-color: rgba(221, 209, 255, 0.16); /* TODO: Put in theme*/
+}
+.compactSelectField:not(.disabled):hover .arrow {
+  background-color: var(--theme-text-default-color);
+}

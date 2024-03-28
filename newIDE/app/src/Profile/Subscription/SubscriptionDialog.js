@@ -155,6 +155,37 @@ const getSubscriptionPricingSystemPeriod = (
   return subscriptionPricingSystem.period;
 };
 
+const getMaximumYearlyDiscountOverPlans = ({
+  subscriptionPlansWithPricingSystems,
+}: {|
+  subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>,
+|}): number => {
+  if (!subscriptionPlansWithPricingSystems) return 0;
+  let maximumDiscount = 0;
+  subscriptionPlansWithPricingSystems.forEach(
+    subscriptionPlanWithPricingSystems => {
+      if (subscriptionPlanWithPricingSystems.isLegacy) return;
+      const { pricingSystems } = subscriptionPlanWithPricingSystems;
+      const monthlyPricingSystem = pricingSystems.find(
+        pricingSystem => pricingSystem.period === 'month'
+      );
+      const yearlyPricingSystem = pricingSystems.find(
+        pricingSystem => pricingSystem.period === 'year'
+      );
+      if (!monthlyPricingSystem || !yearlyPricingSystem) return;
+      const discount =
+        100 -
+        (yearlyPricingSystem.amountInCents /
+          (monthlyPricingSystem.amountInCents * 12)) *
+          100;
+      if (discount > maximumDiscount) {
+        maximumDiscount = discount;
+      }
+    }
+  );
+  return maximumDiscount;
+};
+
 const getPlanSpecificRequirements = (
   i18n: I18nType,
   subscriptionPlansWithPricingSystems: ?Array<SubscriptionPlanWithPricingSystems>
@@ -399,6 +430,9 @@ export default function SubscriptionDialog({
       : displayedSubscriptionPlanWithPricingSystems.length < 5
       ? 'xl'
       : false;
+  const maximumDiscount = getMaximumYearlyDiscountOverPlans({
+    subscriptionPlansWithPricingSystems,
+  });
 
   return (
     <I18n>
@@ -447,12 +481,17 @@ export default function SubscriptionDialog({
                     onChange={setPeriod}
                   />
                 </Line>
-                {period !== 'year' && (
+                {period !== 'year' && maximumDiscount > 0 && (
                   <HotMessage
-                    title={<Trans>Up to 40% discount</Trans>}
+                    title={
+                      <Trans>
+                        Up to {maximumDiscount.toFixed(0)}% discount
+                      </Trans>
+                    }
                     message={
                       <Trans>
-                        Get a yearly subscription and enjoy discounts up to 40%!
+                        Get a yearly subscription and enjoy discounts up to
+                        {maximumDiscount.toFixed(0)}%!
                       </Trans>
                     }
                     onClickRightButton={() => setPeriod('year')}
@@ -687,7 +726,10 @@ export default function SubscriptionDialog({
                 i18n,
                 displayedSubscriptionPlanWithPricingSystems
               ).map(planSpecificRequirements => (
-                <AlertMessage kind="info">
+                <AlertMessage
+                  kind="info"
+                  key={planSpecificRequirements.substring(0, 25)}
+                >
                   {planSpecificRequirements}
                 </AlertMessage>
               ))}

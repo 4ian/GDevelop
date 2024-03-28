@@ -726,6 +726,22 @@ module.exports = {
 
     extension
       .addCondition(
+        'IsCommandParameterPresent',
+        _('Command is called with a specific parameter'),
+        _(
+          'Check if a specific parameter is present in the Command that was called. If it is a <<command withParameter or anotherParameter=123>>, you can check if withParameter or anotherParameter exists.'
+        ),
+        _('Command is called with parameter _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .addParameter('string', _('Command Parameter'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.commandHasParameter');
+
+    extension
+      .addCondition(
         'IsDialogueLineType',
         _('Dialogue line type'),
         _(

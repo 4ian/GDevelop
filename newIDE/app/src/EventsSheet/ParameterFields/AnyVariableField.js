@@ -17,29 +17,15 @@ import { enumerateValidVariableNames } from './EnumerateVariables';
 
 const gd: libGDevelop = global.gd;
 
-export const isUnifiedInstruction = (type: string): boolean =>
-  type === 'StringVariable' ||
-  type === 'BooleanVariable' ||
-  type === 'SetStringVariable' ||
-  type === 'SetBooleanVariable';
-
-export const getUnifiedInstructionType = (instructionType: string): string =>
-  instructionType === 'StringVariable' || instructionType === 'BooleanVariable'
-    ? 'NumberVariable'
-    : instructionType === 'SetStringVariable' ||
-      instructionType === 'SetBooleanVariable'
-    ? 'SetNumberVariable'
-    : instructionType;
-
 export const switchBetweenUnifiedInstructionIfNeeded = (
   projectScopedContainers: gdProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
   if (
-    (instruction.getType() === 'NumberVariable' ||
-      instruction.getType() === 'StringVariable' ||
-      instruction.getType() === 'BooleanVariable') &&
-    instruction.getParametersCount() > 0
+    instruction.getParametersCount() > 0 &&
+    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+      instruction.getType()
+    )
   ) {
     const variableName = instruction.getParameter(0).getPlainString();
     if (
@@ -48,34 +34,11 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
       const variable = projectScopedContainers
         .getVariablesContainersList()
         .get(variableName);
-      if (variable.getType() === gd.Variable.String) {
-        instruction.setType('StringVariable');
-      } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('NumberVariable');
-      } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('BooleanVariable');
-      }
-    }
-  } else if (
-    (instruction.getType() === 'SetNumberVariable' ||
-      instruction.getType() === 'SetStringVariable' ||
-      instruction.getType() === 'SetBooleanVariable') &&
-    instruction.getParametersCount() > 0
-  ) {
-    const variableName = instruction.getParameter(0).getPlainString();
-    if (
-      projectScopedContainers.getVariablesContainersList().has(variableName)
-    ) {
-      const variable = projectScopedContainers
-        .getVariablesContainersList()
-        .get(variableName);
-      if (variable.getType() === gd.Variable.String) {
-        instruction.setType('SetStringVariable');
-      } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('SetNumberVariable');
-      } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('SetBooleanVariable');
-      }
+
+      gd.VariableInstructionSwitcher.switchVariableInstructionType(
+        instruction,
+        variable.getType()
+      );
     }
   }
 };
@@ -91,7 +54,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope } = props;
+    const { project, scope, onInstructionTypeChanged } = props;
     const { layout } = scope;
 
     const onComputeAllVariableNames = React.useCallback(() => [], []);
@@ -149,6 +112,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onCancel={() => setEditorOpen(false)}
             onApply={() => {
               setEditorOpen(false);
+              if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
             emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}

@@ -58,43 +58,16 @@ const getObjectOrGroupVariablesContainers = (
   return variablesContainers;
 };
 
-export const isUnifiedObjectInstruction = (type: string): boolean =>
-  type === 'StringObjectVariable' ||
-  type === 'BooleanObjectVariable' ||
-  type === 'SetStringObjectVariable' ||
-  type === 'SetBooleanObjectVariable';
-
-export const unifiedInstructionTypes = [
-  'NumberObjectVariable',
-  'StringObjectVariable',
-  'BooleanObjectVariable',
-  'SetNumberObjectVariable',
-  'SetStringObjectVariable',
-  'SetBooleanObjectVariable',
-];
-
-export const getUnifiedObjectInstructionType = (
-  instructionType: string
-): string =>
-  instructionType === 'StringObjectVariable' ||
-  instructionType === 'BooleanObjectVariable'
-    ? 'NumberObjectVariable'
-    : instructionType === 'SetStringObjectVariable' ||
-      instructionType === 'SetBooleanObjectVariable'
-    ? 'SetNumberObjectVariable'
-    : instructionType;
-
 export const switchBetweenUnifiedObjectInstructionIfNeeded = (
   projectScopedContainers: gdProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
   const objectsContainersList = projectScopedContainers.getObjectsContainersList();
-
   if (
-    (instruction.getType() === 'NumberObjectVariable' ||
-      instruction.getType() === 'StringObjectVariable' ||
-      instruction.getType() === 'BooleanObjectVariable') &&
-    instruction.getParametersCount() > 0
+    instruction.getParametersCount() > 0 &&
+    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+      instruction.getType()
+    )
   ) {
     const objectName = instruction.getParameter(0).getPlainString();
     const variableName = instruction.getParameter(1).getPlainString();
@@ -107,38 +80,10 @@ export const switchBetweenUnifiedObjectInstructionIfNeeded = (
       const variable = objectsContainersList
         .getObjectOrGroupVariablesContainer(objectName)
         .get(variableName);
-      if (variable.getType() === gd.Variable.String) {
-        instruction.setType('StringObjectVariable');
-      } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('NumberObjectVariable');
-      } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('BooleanObjectVariable');
-      }
-    }
-  } else if (
-    (instruction.getType() === 'SetNumberObjectVariable' ||
-      instruction.getType() === 'SetStringObjectVariable' ||
-      instruction.getType() === 'SetBooleanObjectVariable') &&
-    instruction.getParametersCount() > 0
-  ) {
-    const objectName = instruction.getParameter(0).getPlainString();
-    const variableName = instruction.getParameter(1).getPlainString();
-    if (
-      objectsContainersList.hasObjectOrGroupWithVariableNamed(
-        objectName,
-        variableName
-      )
-    ) {
-      const variable = objectsContainersList
-        .getObjectOrGroupVariablesContainer(objectName)
-        .get(variableName);
-      if (variable.getType() === gd.Variable.String) {
-        instruction.setType('SetStringObjectVariable');
-      } else if (variable.getType() === gd.Variable.Number) {
-        instruction.setType('SetNumberObjectVariable');
-      } else if (variable.getType() === gd.Variable.Boolean) {
-        instruction.setType('SetBooleanObjectVariable');
-      }
+      gd.VariableInstructionSwitcher.switchVariableInstructionType(
+        instruction,
+        variable.getType()
+      );
     }
   }
 };
@@ -164,6 +109,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       expressionMetadata,
       expression,
       parameterIndex,
+      onInstructionTypeChanged,
     } = props;
 
     const objectName = getLastObjectParameterValue({
@@ -215,7 +161,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         <VariableField
           forceDeclaration={
             instruction &&
-            unifiedInstructionTypes.includes(instruction.getType())
+            gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+              instruction.getType()
+            )
           }
           variablesContainers={variablesContainers}
           enumerateVariableNames={enumerateVariableNames}
@@ -258,6 +206,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             onCancel={() => setEditorOpen(false)}
             onApply={() => {
               setEditorOpen(false);
+              if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
             preventRefactoringToDeleteInstructions

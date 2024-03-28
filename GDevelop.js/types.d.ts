@@ -240,6 +240,12 @@ export class PairStringVariable extends EmscriptenObject {
   getVariable(): Variable;
 }
 
+export class VariableInstructionSwitcher extends EmscriptenObject {
+  static isSwitchableVariableInstruction(instructionType: string): boolean;
+  static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
+  static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
+}
+
 export class Variable extends EmscriptenObject {
   constructor();
   static isPrimitive(type: Variable_Type): boolean;

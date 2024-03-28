@@ -232,6 +232,13 @@ enum Variable_Type {
     "Variable::Array"
 };
 
+interface VariableInstructionSwitcher {
+    boolean STATIC_IsSwitchableVariableInstruction([Const] DOMString instructionType);
+    [Const, Ref] DOMString STATIC_GetSwitchableVariableInstructionIdentifier([Const] DOMString instructionType);
+    void STATIC_SwitchVariableInstructionType(
+    [Ref] Instruction instruction, [Const] Variable_Type variableType);
+};
+
 interface Variable {
     void Variable();
 

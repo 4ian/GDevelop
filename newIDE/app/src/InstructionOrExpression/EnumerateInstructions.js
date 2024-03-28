@@ -5,8 +5,6 @@ import {
   type InstructionOrExpressionScope,
 } from './EnumeratedInstructionOrExpressionMetadata';
 import { translateExtensionCategory } from '../Utils/Extension/ExtensionCategories.js';
-import { isUnifiedInstruction } from '../EventsSheet/ParameterFields/AnyVariableField';
-import { isUnifiedObjectInstruction } from '../EventsSheet/ParameterFields/ObjectVariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -222,7 +220,12 @@ const enumerateFreeInstructionsWithoutExtra = (
     const type = instructionsTypes.at(j);
     const instrMetadata = instructions.get(type);
 
-    if (isUnifiedInstruction(type)) {
+    // Instructions that are merged together are hidden
+    // apart from the one that represent them all.
+    const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
+      type
+    );
+    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
       continue;
     }
 
@@ -307,7 +310,12 @@ const enumerateExtensionInstructions = (
   for (let j = 0; j < instructionsTypes.size(); ++j) {
     const type = instructionsTypes.at(j);
 
-    if (isUnifiedObjectInstruction(type)) {
+    // Instructions that are merged together are hidden
+    // apart from the one that represent them all.
+    const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
+      type
+    );
+    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
       continue;
     }
 

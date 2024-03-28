@@ -361,6 +361,7 @@ const InstructionParametersEditor = React.forwardRef<
                             forceUpdate();
                           }
                         }}
+                        onInstructionTypeChanged={forceUpdate}
                         project={project}
                         scope={scope}
                         globalObjectsContainer={globalObjectsContainer}

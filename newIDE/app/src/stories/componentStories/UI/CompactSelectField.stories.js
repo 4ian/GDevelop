@@ -31,12 +31,11 @@ export const Default = () => {
       <CompactSelectField value={value1} onChange={setValue1} errored>
         {options}
       </CompactSelectField>
-      <CompactSelectField
-        value={value2}
-        onChange={setValue2}
-        placeholder="With placeholder"
-      >
-        {options}
+      <CompactSelectField value={value2} onChange={setValue2}>
+        {[
+          <option style={{ display: 'none' }}>Select an option</option>,
+          ...options,
+        ]}
       </CompactSelectField>
       <CompactSelectField disabled value={'disabled field'} onChange={() => {}}>
         {options}

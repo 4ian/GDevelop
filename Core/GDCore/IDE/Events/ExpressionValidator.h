@@ -86,8 +86,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitOperatorNode(OperatorNode& node) override {
     ReportAnyError(node);
 
+    // The "required" type ("parentType")  will be used when visiting the first operand.
+    // Note that it may be refined thanks to this first operand (see later).
     node.leftHandSide->Visit(*this);
-    const Type leftType = childType;
+    const Type leftType = childType; // Store the type of the first operand.
 
     if (leftType == Type::Number) {
       if (node.op == ' ') {
@@ -120,15 +122,19 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             node.rightHandSide->location);
     }
 
-    parentType = leftType;
+    // The "required" type ("parentType") of the second operator is decided by:
+    // - the parent type. Unless it can (`number|string`) or should (`unknown`) be refined, then:
+    // - the first operand.
+    parentType = ShouldTypeBeRefined(parentType) ? leftType : parentType;
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
 
-    // The type is decided by the first operand, unless it can (`number|string`)
-    // or should (`unknown`) be refined, in which case we go for the right
-    // operand (which got visited knowing the type of the first operand, so it's
+    // The type of the overall operator ("childType") is decided by:
+    // - the parent type. Unless it can (`number|string`) or should (`unknown`) be refined, then:
+    // - the first operand. Unless it can (`number|string`) or should (`unknown`) be refined, then:
+    // - the right operand (which got visited knowing the type of the first operand, so it's
     // equal or strictly more precise than the left operand).
-    childType = (leftType == Type::Unknown || leftType == Type::NumberOrString) ? leftType : rightType;
+    childType = ShouldTypeBeRefined(parentType) ? (ShouldTypeBeRefined(leftType) ? leftType : rightType) : parentType;
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     ReportAnyError(node);
@@ -393,6 +399,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else {
       // Nothing - we don't know the precise type (this could be used as a string or as a number).
     }
+  }
+
+  static bool ShouldTypeBeRefined(Type type) {
+    return (type == Type::Unknown || type == Type::NumberOrString);
   }
 
   static Type StringToType(const gd::String &type);

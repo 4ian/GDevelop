@@ -30,6 +30,21 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   layout1.GetVariables().InsertNew("MySceneBooleanVariable").SetBool(true);
   layout1.GetVariables().InsertNew("MySceneStructureVariable").GetChild("MyChild");
   layout1.GetVariables().InsertNew("MySceneStructureVariable2").GetChild("MyChild");
+  layout1.GetVariables().InsertNew("MySceneEmptyArrayVariable").CastTo(gd::Variable::Type::Array);
+  {
+    auto& variable = layout1.GetVariables().InsertNew("MySceneNumberArrayVariable");
+    variable.CastTo(gd::Variable::Type::Array);
+    variable.PushNew().SetValue(1);
+    variable.PushNew().SetValue(2);
+    variable.PushNew().SetValue(3);
+  }
+  {
+    auto& variable = layout1.GetVariables().InsertNew("MySceneStringArrayVariable");
+    variable.CastTo(gd::Variable::Type::Array);
+    variable.PushNew().SetString("1");
+    variable.PushNew().SetString("2");
+    variable.PushNew().SetString("3");
+  }
 
   auto &mySpriteObject = layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
   mySpriteObject.GetVariables().InsertNew("MyNumberVariable").SetValue(123);
@@ -1293,6 +1308,221 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       // This seems "obvious", but we had cases where MyOtherSpriteObject could have been interpreted as an object
       // when the code generation is not properly recognizing "objectvar".
       REQUIRE(output == "getVariableForObject(MySpriteObject, MyOtherSpriteObject).getChild(\"Child\").getChild(\"Grandchild\")");
+    }
+  }
+  SECTION("Type conversions (valid operators with variables having different types than the expression)") {
+    SECTION("Expression/parent type is 'string'") {
+      {
+        auto node =
+          parser.ParseExpression("\"You have \" + MySceneVariable + \" points\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getLayoutVariable(MySceneVariable).getAsString() + \" points\"");
+      }
+      {
+        auto node =
+          parser.ParseExpression("MySceneVariable + MySceneStringVariable");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneStringVariable).getAsString()");
+      }
+    }
+    SECTION("Expression/parent type is 'string' (with an unknown variable)") {
+      {
+        auto node =
+          parser.ParseExpression("\"You have \" + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + \" points\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsString() + \" points\"");
+      }
+    }
+    SECTION("Expression/parent type is 'string' (2 number variables)") {
+      {
+        auto node =
+          parser.ParseExpression("MySceneVariable + MySceneVariable2 + \"world\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneVariable2).getAsString() + \"world\"");
+      }
+      {
+        auto node =
+          parser.ParseExpression("MySceneVariable + MySceneVariable2 + MySceneStringVariable");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneVariable2).getAsString() + getLayoutVariable(MySceneStringVariable).getAsString()");
+      }
+    }
+    SECTION("Expression/parent type is 'string' (array variable)") {
+      {
+        auto node =
+          parser.ParseExpression("\"hello\" + MySceneNumberArrayVariable[2] + \"world\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(2).getAsString() + \"world\"");
+      }
+      {
+        auto node =
+          parser.ParseExpression("\"hello\" + MySceneEmptyArrayVariable[2] + \"world\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneEmptyArrayVariable).getChild(2).getAsString() + \"world\"");
+      }
+    }
+
+    SECTION("Expression/parent type is 'number'") {
+      {
+        auto node =
+          parser.ParseExpression("123 + MySceneVariable + 456");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneVariable).getAsNumber() + 456");
+      }
+      {
+        auto node =
+          parser.ParseExpression("MySceneStringVariable + MySceneVariable");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneVariable).getAsNumber()");
+      }
+    }
+    SECTION("Expression/parent type is 'string' (with an unknown variable)") {
+      {
+        auto node =
+          parser.ParseExpression("123 + MySceneStructureVariable.MyChild.CantKnownTheTypeSoStayGeneric + 456");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumber() + 456");
+      }
+    }
+    SECTION("Expression/parent type is 'number' (2 string variables)") {
+      {
+        auto node =
+          parser.ParseExpression("MySceneStringVariable + MySceneStringVariable + 456");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneStringVariable).getAsNumber() + 456");
+      }
+      {
+        auto node =
+          parser.ParseExpression("MySceneStringVariable + MySceneStringVariable + MySceneVariable");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneVariable).getAsNumber()");
+      }
+    }
+    SECTION("Expression/parent type is 'number' (array variable)") {
+      {
+        auto node =
+          parser.ParseExpression("123 + MySceneNumberArrayVariable[2] + 456");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneNumberArrayVariable).getChild(2).getAsNumber() + 456");
+      }
+      {
+        auto node =
+          parser.ParseExpression("123 + MySceneEmptyArrayVariable[2] + 456");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneEmptyArrayVariable).getChild(2).getAsNumber() + 456");
+      }
+    }
+
+
+    SECTION("Multiple type conversions in sub expressions or same expression") {
+      {
+        auto node =
+          parser.ParseExpression("\"hello\" + MySceneNumberArrayVariable[2 + MySceneStringVariable] + \"world\" + MySceneVariable + \"world 2\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(2 + getLayoutVariable(MySceneStringVariable).getAsNumber()).getAsString() + \"world\" + getLayoutVariable(MySceneVariable).getAsString() + \"world 2\"");
+      }
+      {
+        auto node =
+          parser.ParseExpression("\"hello\" + MySceneNumberArrayVariable[\"foo\" + MySceneVariable + \"bar\"] + \"world\" + MySceneVariable + \"world 2\"");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(\"foo\" + getLayoutVariable(MySceneVariable).getAsString() + \"bar\").getAsString() + \"world\" + getLayoutVariable(MySceneVariable).getAsString() + \"world 2\"");
+      }
     }
   }
   SECTION("Mixed test (1)") {

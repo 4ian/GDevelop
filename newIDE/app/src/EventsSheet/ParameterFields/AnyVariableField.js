@@ -18,6 +18,7 @@ import { enumerateValidVariableNames } from './EnumerateVariables';
 const gd: libGDevelop = global.gd;
 
 export const switchBetweenUnifiedInstructionIfNeeded = (
+  platform: gdPlatform,
   projectScopedContainers: gdProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
@@ -27,19 +28,16 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
       instruction.getType()
     )
   ) {
-    const variableName = instruction.getParameter(0).getPlainString();
-    if (
-      projectScopedContainers.getVariablesContainersList().has(variableName)
-    ) {
-      const variable = projectScopedContainers
-        .getVariablesContainersList()
-        .get(variableName);
+    const variableType = gd.ExpressionVariableTypeFinder.getVariableType(
+      platform,
+      projectScopedContainers,
+      instruction.getParameter(0).getRootNode()
+    );
 
-      gd.VariableInstructionSwitcher.switchVariableInstructionType(
-        instruction,
-        variable.getType()
-      );
-    }
+    gd.VariableInstructionSwitcher.switchVariableInstructionType(
+      instruction,
+      variableType
+    );
   }
 };
 

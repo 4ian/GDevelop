@@ -246,6 +246,11 @@ export class VariableInstructionSwitcher extends EmscriptenObject {
   static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
 }
 
+export class ExpressionVariableTypeFinder extends EmscriptenObject {
+  static getVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode): Variable_Type;
+  static getObjectVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode, objectName: string): Variable_Type;
+}
+
 export class Variable extends EmscriptenObject {
   constructor();
   static isPrimitive(type: Variable_Type): boolean;

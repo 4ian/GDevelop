@@ -221,10 +221,12 @@ const InstructionParametersEditor = React.forwardRef<
       objectsContainer
     );
     switchBetweenUnifiedInstructionIfNeeded(
+      project.getCurrentPlatform(),
       projectScopedContainers,
       instruction
     );
     switchBetweenUnifiedObjectInstructionIfNeeded(
+      project.getCurrentPlatform(),
       projectScopedContainers,
       instruction
     );

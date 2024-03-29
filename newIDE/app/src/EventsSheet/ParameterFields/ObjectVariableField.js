@@ -59,32 +59,29 @@ const getObjectOrGroupVariablesContainers = (
 };
 
 export const switchBetweenUnifiedObjectInstructionIfNeeded = (
+  platform: gdPlatform,
   projectScopedContainers: gdProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
-  const objectsContainersList = projectScopedContainers.getObjectsContainersList();
   if (
-    instruction.getParametersCount() > 0 &&
+    instruction.getParametersCount() > 1 &&
     gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
       instruction.getType()
     )
   ) {
     const objectName = instruction.getParameter(0).getPlainString();
-    const variableName = instruction.getParameter(1).getPlainString();
-    if (
-      objectsContainersList.hasObjectOrGroupWithVariableNamed(
-        objectName,
-        variableName
-      )
-    ) {
-      const variable = objectsContainersList
-        .getObjectOrGroupVariablesContainer(objectName)
-        .get(variableName);
-      gd.VariableInstructionSwitcher.switchVariableInstructionType(
-        instruction,
-        variable.getType()
-      );
-    }
+
+    const variableType = gd.ExpressionVariableTypeFinder.getObjectVariableType(
+      platform,
+      projectScopedContainers,
+      instruction.getParameter(1).getRootNode(),
+      objectName
+    );
+
+    gd.VariableInstructionSwitcher.switchVariableInstructionType(
+      instruction,
+      variableType
+    );
   }
 };
 

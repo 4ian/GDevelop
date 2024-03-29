@@ -30,6 +30,8 @@ class GD_CORE_API Variable {
  public:
   static gd::Variable badVariable;
   enum Type {
+    Unknown,
+    
     // Primitive types
     String,
     Number,

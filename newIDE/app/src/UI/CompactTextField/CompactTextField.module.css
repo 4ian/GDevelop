@@ -69,12 +69,16 @@
   color: var(--theme-text-disabled-color);
 }
 
+.leftIconContainer {
+  display: flex;
+  margin-right: 4px;
+}
+
 /* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
 svg.leftIcon {
   font-size: 20px;
   color: var(--theme-text-disabled-color);
-  transition: color 0.1s linear !important;
-  margin-right: 4px;
+  transition: color 0.1s linear;
 }
 
 .container:not(.disabled):hover .leftIcon {

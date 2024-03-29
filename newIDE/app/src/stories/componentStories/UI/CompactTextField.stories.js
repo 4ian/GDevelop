@@ -7,6 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import CompactTextField from '../../../UI/CompactTextField';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import Angle from '../../../UI/CustomSvgIcons/Angle';
+import Text from '../../../UI/Text';
 
 export default {
   title: 'UI Building Blocks/CompactTextField',
@@ -35,24 +36,28 @@ export const Default = () => {
         value={value3}
         onChange={setValue3}
         renderLeftIcon={className => <Angle className={className} />}
+        leftIconTooltip={'Angle'}
       />
       <CompactTextField
         value={value4}
         onChange={setValue4}
         errored
         renderLeftIcon={className => <Angle className={className} />}
+        leftIconTooltip={'Angle'}
       />
       <CompactTextField
         value={value5}
         onChange={setValue5}
         placeholder="With placeholder"
         renderLeftIcon={className => <Angle className={className} />}
+        leftIconTooltip={'Angle'}
       />
       <CompactTextField
         disabled
         value={'disabled field'}
         onChange={() => {}}
         renderLeftIcon={className => <Angle className={className} />}
+        leftIconTooltip={'Angle'}
       />
     </ColumnStackLayout>
   );

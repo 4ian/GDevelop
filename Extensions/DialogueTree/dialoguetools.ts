@@ -654,7 +654,6 @@ namespace gdjs {
 
   gdjs.dialogueTree.prevActiveLineActor = '';
   gdjs.dialogueTree.prevActiveLineActorParams = [];
-
   /**
    * Condition to check if the active line actor has changed
    * For example if you have set two actors - tom and james and these three dialogue lines in yarn
@@ -672,15 +671,29 @@ namespace gdjs {
       gdjs.dialogueTree.prevActiveLineActorParams !==
         gdjs.dialogueTree.activeLineActorParameters
     ) {
-      gdjs.dialogueTree.prevActiveLineActor = gdjs.dialogueTree.activeLineActor;
-      gdjs.dialogueTree.prevActiveLineActorParams =
-        gdjs.dialogueTree.activeLineActorParameters;
       return true;
     }
-    gdjs.dialogueTree.prevActiveLineActor = '';
-    gdjs.dialogueTree.prevActiveLineActorParams = [];
     return false;
   };
+
+  gdjs.dialogueTree.prevDialogueBranchTitle = '';
+  /**
+   * Check if a player has visited a new Dialogue Branch.
+   */
+  gdjs.dialogueTree.branchTitleHasChanged = function () {
+    return (
+      this.dialogueIsRunning &&
+      this.dialogueBranchTitle !== gdjs.dialogueTree.prevDialogueBranchTitle
+    );
+  };
+
+  gdjs.registerRuntimeScenePostEventsCallback(() => {
+    gdjs.dialogueTree.prevActiveLineActor = gdjs.dialogueTree.activeLineActor;
+    gdjs.dialogueTree.prevActiveLineActorParams =
+      gdjs.dialogueTree.activeLineActorParameters;
+    gdjs.dialogueTree.prevDialogueBranchTitle =
+      gdjs.dialogueTree.dialogueBranchTitle;
+  });
 
   /**
    * Condition to check if an actor exists
@@ -769,18 +782,18 @@ namespace gdjs {
     return '';
   };
 
-   /**
+  /**
    * Checks if active actor line has a specific parameter
    * for example if the line is:
    * tom left: I am now standing on the left side
    * if we search for the parameter "left" this will return true
    * @param query the parameter to look for
    */
-   gdjs.dialogueTree.getActiveLineParameterExists = function (
-    query: string
-  ) {
-    if(this.dialogueDataType !== 'text') return false;
-    return gdjs.dialogueTree.activeLineActorParameters.some(parameter=> parameter === query)
+  gdjs.dialogueTree.getActiveLineParameterExists = function (query: string) {
+    if (this.dialogueDataType !== 'text') return false;
+    return gdjs.dialogueTree.activeLineActorParameters.some(
+      (parameter) => parameter === query
+    );
   };
 
   /**
@@ -949,17 +962,6 @@ namespace gdjs {
     return (
       Object.keys(this.runner.visited).includes(title) &&
       this.runner.visited[title]
-    );
-  };
-
-  /**
-   * Check if a player has visited a new Dialogue Branch.
-   */
-  gdjs.dialogueTree.branchTitleHasChanged = function () {
-    return (
-      this.dialogueIsRunning && this.dialogueData.data &&
-      (this.dialogueBranchTitle === '' ||
-        this.dialogueBranchTitle === this.dialogueData.data.title)
     );
   };
 

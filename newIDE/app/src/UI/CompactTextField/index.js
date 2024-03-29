@@ -11,6 +11,7 @@ type Props = {|
   disabled?: boolean,
   errored?: boolean,
   placeholder?: string,
+  renderLeftIcon?: (className: string) => React.Node,
 |};
 
 const CompactTextField = ({
@@ -20,22 +21,30 @@ const CompactTextField = ({
   disabled,
   errored,
   placeholder,
+  renderLeftIcon,
 }: Props) => {
   return (
     <div
       className={classNames({
-        [classes.compactTextField]: true,
+        [classes.container]: true,
         [classes.disabled]: disabled,
         [classes.errored]: errored,
       })}
     >
-      <input
-        id={id}
-        disabled={disabled}
-        value={value}
-        onChange={e => onChange(e.currentTarget.value)}
-        placeholder={placeholder}
-      />
+      {renderLeftIcon && renderLeftIcon(classes.leftIcon)}
+      <div
+        className={classNames({
+          [classes.compactTextField]: true,
+        })}
+      >
+        <input
+          id={id}
+          disabled={disabled}
+          value={value}
+          onChange={e => onChange(e.currentTarget.value)}
+          placeholder={placeholder}
+        />
+      </div>
     </div>
   );
 };

@@ -1,3 +1,7 @@
+.container {
+  display: flex;
+}
+
 .compactTextField {
   border-radius: 4px;
   color: var(--theme-text-default-color);
@@ -7,17 +11,21 @@
   transition: box-shadow 0.1s;
   position: relative;
   display: flex;
+  flex: 1;
 }
 
-.compactTextField.disabled {
+.container.disabled .compactTextField {
   color: var(--theme-text-disabled-color);
 }
 
-.compactTextField.errored:not(.disabled) {
+.container.errored:not(.disabled) .compactTextField {
   border: none;
   outline: 1px solid var(--theme-error-color);
 }
-.compactTextField.errored:not(.disabled):hover {
+.container.errored:not(.disabled):hover .compactTextField {
+  outline: 1px solid var(--theme-error-light);
+}
+.container.errored:not(.disabled):focus-within .compactTextField {
   outline: 1px solid var(--theme-error-light);
 }
 
@@ -32,10 +40,10 @@
   pointer-events: none;
 }
 
-.compactTextField:not(.disabled):not(.errored):hover::before {
+.container:not(.disabled):not(.errored):hover .compactTextField::before {
   border-bottom: 1px solid var(--theme-search-bar-hovered-border-color);
 }
-.compactTextField:not(.disabled):not(.errored):focus-within::before {
+.container:not(.disabled):not(.errored):focus-within .compactTextField::before {
   border-bottom: 1px solid var(--theme-secondary-dark);
 }
 
@@ -58,4 +66,17 @@
 
 .compactTextField input::placeholder {
   color: var(--theme-text-disabled-color);
+}
+
+.leftIcon {
+  height: 20px;
+  color: var(--theme-text-disabled-color);
+  transition: color 0.1s linear !important;
+}
+
+.container:not(.disabled):hover .leftIcon {
+  color: var(--theme-text-default-color);
+}
+.container:not(.disabled):focus-within .leftIcon {
+  color: var(--theme-text-default-color);
 }

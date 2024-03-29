@@ -62,8 +62,12 @@ export const Default = () => {
       />
       <Text>Numbers</Text>
       <CompactTextField
+        type="number"
         value={value6}
-        onChange={setValue6}
+        onChange={valueAsString => {
+          if (!valueAsString) setValue6(valueAsString);
+          else setValue6(parseInt(valueAsString, 10) || 0);
+        }}
         renderLeftIcon={className => <Angle className={className} />}
         leftIconTooltip={'Angle'}
         useLeftIconAsNumberControl

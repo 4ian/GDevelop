@@ -7,9 +7,20 @@ import classes from './CompactTextField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
 import useClickDragAsControl from './UseClickDragAsControl';
 
-type Props<T> = {|
-  onChange: T => void,
-  value: T,
+type ValueProps =
+  | {|
+      type?: 'text',
+      onChange: string => void,
+      value: string,
+    |}
+  | {|
+      type: 'number',
+      onChange: number => void,
+      value: number,
+    |};
+
+type Props = {|
+  ...ValueProps,
   id?: string,
   disabled?: boolean,
   errored?: boolean,
@@ -19,7 +30,8 @@ type Props<T> = {|
   useLeftIconAsNumberControl?: boolean,
 |};
 
-const CompactTextField = <T: string | number>({
+const CompactTextField = ({
+  type,
   value,
   onChange,
   id,
@@ -29,7 +41,7 @@ const CompactTextField = <T: string | number>({
   renderLeftIcon,
   leftIconTooltip,
   useLeftIconAsNumberControl,
-}: Props<T>) => {
+}: Props) => {
   const controlProps = useClickDragAsControl({
     // $FlowExpectedError - Click drag controls should not be used if value type is not number.
     onChange,
@@ -81,6 +93,7 @@ const CompactTextField = <T: string | number>({
       >
         <input
           id={id}
+          type={type || 'text'}
           disabled={disabled}
           value={value}
           onChange={e => onChange(e.currentTarget.value)}

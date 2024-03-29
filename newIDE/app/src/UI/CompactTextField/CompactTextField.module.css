@@ -91,3 +91,16 @@ svg.leftIcon {
 .container:not(.disabled):focus-within .leftIcon {
   color: var(--theme-text-default-color);
 }
+
+/* Chrome, Safari, Edge, Opera */
+.compactTextField input::-webkit-outer-spin-button,
+.compactTextField input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.compactTextField input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

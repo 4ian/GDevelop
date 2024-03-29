@@ -17,6 +17,9 @@
   border: none;
   outline: 1px solid var(--theme-error-color);
 }
+.compactTextField.errored:not(.disabled):hover {
+  outline: 1px solid var(--theme-error-light);
+}
 
 .compactTextField::before {
   position: absolute;

@@ -17,6 +17,12 @@
   border: none;
   outline: 1px solid var(--theme-error-color);
 }
+.compactSelectField.errored:not(.disabled):hover {
+  outline: 1px solid var(--theme-error-light);
+}
+.compactSelectField.errored:not(.disabled):focus-within {
+  outline: 1px solid var(--theme-error-light);
+}
 
 .compactSelectField::before {
   position: absolute;

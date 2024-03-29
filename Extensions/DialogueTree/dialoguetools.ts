@@ -731,6 +731,19 @@ namespace gdjs {
   };
 
   /**
+   * Detect is the currently active line contains a registered character
+   */
+  gdjs.dialogueTree.lineHasActiveActor = function () {
+    if (this.dialogueIsRunning && this.dialogueDataType === 'text') {
+      return (
+        gdjs.dialogueTree.activeLineActor != null &&
+        gdjs.dialogueTree.activeLineActor !== ''
+      );
+    }
+    return false;
+  };
+
+  /**
    * Returns the id of the actor that is currently speaking. Useful for expressions
    * For example if you have a line like this in yarn
    * tom happy blink: I am feeling good today!

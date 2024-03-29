@@ -644,9 +644,9 @@ module.exports = {
     extension
       .addStrExpression(
         'ActiveActorId',
-        _('Get the id of the active dialogue line actor'),
+        _('Get the Active Actor Id of the current dialogue line'),
         _(
-          'Get the id of the active dialogue line actor. Empty string when no actor detected'
+          'Get the Active Actor Id of the current dialogue line. Empty string when no actor detected'
         ),
         '',
         'JsPlatform/Extensions/yarn32.png'
@@ -945,6 +945,22 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setFunctionName('gdjs.dialogueTree.hasActiveActorChanged');
+    
+      extension
+      .addCondition(
+        'LineHasActiveActor',
+        _('An Actor is currently present in the dialog line'),
+        _(
+          'An Actor is currently present in the dialog line'
+        ),
+        _('Actor is present in current dialog line'),
+        '',
+        'JsPlatform/Extensions/yarn32.png',
+        'JsPlatform/Extensions/yarn32.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.dialogueTree.lineHasActiveActor');
+
 
     extension
       .addCondition(

@@ -10,17 +10,22 @@ import useClickDragAsControl from './UseClickDragAsControl';
 type ValueProps =
   | {|
       type?: 'text',
-      onChange: string => void,
       value: string,
+      onChange: string => void,
     |}
   | {|
       type: 'number',
-      onChange: number => void,
       value: number,
+      onChange: number => void,
     |};
 
-type Props = {|
+type OtherProps = {|
+  onBlur?: (number | string) => void,
+|};
+
+export type CompactTextFieldProps = {|
   ...ValueProps,
+  ...OtherProps,
   id?: string,
   disabled?: boolean,
   errored?: boolean,
@@ -41,7 +46,8 @@ const CompactTextField = ({
   renderLeftIcon,
   leftIconTooltip,
   useLeftIconAsNumberControl,
-}: Props) => {
+  onBlur,
+}: CompactTextFieldProps) => {
   const controlProps = useClickDragAsControl({
     // $FlowExpectedError - Click drag controls should not be used if value type is not number.
     onChange,
@@ -98,6 +104,7 @@ const CompactTextField = ({
           value={value}
           onChange={e => onChange(e.currentTarget.value)}
           placeholder={placeholder}
+          onBlur={onBlur}
         />
       </div>
     </div>

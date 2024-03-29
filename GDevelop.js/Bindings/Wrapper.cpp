@@ -36,6 +36,7 @@
 #include <GDCore/IDE/Events/EventsRemover.h>
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
+#include <GDCore/IDE/Events/ExpressionVariableTypeFinder.h>
 #include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
 #include <GDCore/IDE/Events/ExpressionNodeLocationFinder.h>
 #include <GDCore/IDE/Events/ExpressionTypeFinder.h>
@@ -671,6 +672,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_SwitchVariableInstructionType SwitchVariableInstructionType
 #define STATIC_IsSwitchableVariableInstruction IsSwitchableVariableInstruction
 #define STATIC_GetSwitchableVariableInstructionIdentifier GetSwitchableVariableInstructionIdentifier
+#define STATIC_GetVariableType GetVariableType
+#define STATIC_GetObjectVariableType GetObjectVariableType
 
 #define STATIC_IsFreeFunctionOnlyCallingItself IsFreeFunctionOnlyCallingItself
 #define STATIC_IsBehaviorFunctionOnlyCallingItself \

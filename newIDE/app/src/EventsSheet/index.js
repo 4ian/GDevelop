@@ -1959,10 +1959,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       objectsContainer
                     );
                     switchBetweenUnifiedInstructionIfNeeded(
+                      project.getCurrentPlatform(),
                       projectScopedContainers,
                       instruction
                     );
                     switchBetweenUnifiedObjectInstructionIfNeeded(
+                      project.getCurrentPlatform(),
                       projectScopedContainers,
                       instruction
                     );

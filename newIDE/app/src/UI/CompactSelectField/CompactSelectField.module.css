@@ -1,3 +1,8 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
 .compactSelectField {
   border-radius: 4px;
   color: var(--theme-text-default-color);
@@ -7,20 +12,21 @@
   transition: box-shadow 0.1s;
   position: relative;
   display: flex;
+  flex: 1;
 }
 
-.compactSelectField.disabled {
+.container.disabled .compactSelectField {
   color: var(--theme-text-disabled-color);
 }
 
-.compactSelectField.errored:not(.disabled) {
+.container.errored:not(.disabled) .compactSelectField {
   border: none;
   outline: 1px solid var(--theme-error-color);
 }
-.compactSelectField.errored:not(.disabled):hover {
+.container.errored:not(.disabled):hover .compactSelectField {
   outline: 1px solid var(--theme-error-light);
 }
-.compactSelectField.errored:not(.disabled):focus-within {
+.container.errored:not(.disabled):focus-within .compactSelectField {
   outline: 1px solid var(--theme-error-light);
 }
 
@@ -35,10 +41,11 @@
   pointer-events: none;
 }
 
-.compactSelectField:not(.disabled):not(.errored):hover::before {
+.container:not(.disabled):not(.errored):hover .compactSelectField::before {
   border-bottom: 1px solid var(--theme-search-bar-hovered-border-color);
 }
-.compactSelectField:not(.disabled):not(.errored):focus-within::before {
+.container:not(.disabled):not(.errored):focus-within
+  .compactSelectField::before {
   border-bottom: 1px solid var(--theme-secondary-dark);
 }
 
@@ -83,16 +90,38 @@
   background-color: var(--theme-text-secondary-color);
   transition: background-color 0.1s linear;
 }
-.compactSelectField.disabled .arrow {
+
+.container.disabled .arrow {
   background-color: var(--theme-text-disabled-color);
 }
 
-.compactSelectField:not(.disabled) .arrowContainer {
+.container:not(.disabled) .arrowContainer {
   background-color: none;
 }
-.compactSelectField:not(.disabled):hover .arrowContainer {
+.container:not(.disabled):hover .arrowContainer {
   background-color: rgba(221, 209, 255, 0.16); /* TODO: Put in theme*/
 }
-.compactSelectField:not(.disabled):hover .arrow {
+.container:not(.disabled):focus-within .arrowContainer {
+  background-color: rgba(221, 209, 255, 0.16); /* TODO: Put in theme*/
+}
+.container:not(.disabled):hover .arrow {
   background-color: var(--theme-text-default-color);
+}
+.container:not(.disabled):focus-within .arrow {
+  background-color: var(--theme-text-default-color);
+}
+
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.leftIcon {
+  font-size: 18px;
+  color: var(--theme-text-disabled-color);
+  transition: color 0.1s linear !important;
+  margin-right: 4px;
+}
+
+.container:not(.disabled):hover .leftIcon {
+  color: var(--theme-text-default-color);
+}
+.container:not(.disabled):focus-within .leftIcon {
+  color: var(--theme-text-default-color);
 }

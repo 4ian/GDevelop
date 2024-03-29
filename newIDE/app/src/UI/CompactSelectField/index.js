@@ -12,6 +12,7 @@ type Props = {|
   errored?: boolean,
   placeholder?: string,
   children: React.Node,
+  renderLeftIcon?: (className: string) => React.Node,
 |};
 
 const CompactSelectField = ({
@@ -22,25 +23,33 @@ const CompactSelectField = ({
   errored,
   placeholder,
   children,
+  renderLeftIcon,
 }: Props) => {
   return (
     <div
       className={classNames({
-        [classes.compactSelectField]: true,
+        [classes.container]: true,
         [classes.disabled]: disabled,
         [classes.errored]: errored,
       })}
     >
-      <select
-        id={id}
-        disabled={disabled}
-        value={value}
-        onChange={e => onChange(e.currentTarget.value)}
+      {renderLeftIcon && renderLeftIcon(classes.leftIcon)}
+      <div
+        className={classNames({
+          [classes.compactSelectField]: true,
+        })}
       >
-        {children}
-      </select>
-      <div className={classNames({ [classes.arrowContainer]: true })}>
-        <span className={classNames({ [classes.arrow]: true })} />
+        <select
+          id={id}
+          disabled={disabled}
+          value={value}
+          onChange={e => onChange(e.currentTarget.value)}
+        >
+          {children}
+        </select>
+        <div className={classNames({ [classes.arrowContainer]: true })}>
+          <span className={classNames({ [classes.arrow]: true })} />
+        </div>
       </div>
     </div>
   );

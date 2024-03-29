@@ -15,6 +15,14 @@
   flex: 1;
 }
 
+/* Style dropdown options on Windows */
+.compactSelectField select option {
+  color: var(--theme-text-default-color);
+  background-color: var(
+    --theme-surface-alternate-canvas-light-background-color
+  );
+}
+
 .container.disabled .compactSelectField {
   color: var(--theme-text-disabled-color);
 }

@@ -5,19 +5,21 @@ import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import classes from './CompactTextField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
+import useClickDragAsControl from './UseClickDragAsControl';
 
-type Props = {|
-  onChange: string => void,
-  value: string,
+type Props<T> = {|
+  onChange: T => void,
+  value: T,
   id?: string,
   disabled?: boolean,
   errored?: boolean,
   placeholder?: string,
   renderLeftIcon?: (className: string) => React.Node,
   leftIconTooltip?: React.Node,
+  useLeftIconAsNumberControl?: boolean,
 |};
 
-const CompactTextField = ({
+const CompactTextField = <T: string | number>({
   value,
   onChange,
   id,
@@ -26,7 +28,15 @@ const CompactTextField = ({
   placeholder,
   renderLeftIcon,
   leftIconTooltip,
-}: Props) => {
+  useLeftIconAsNumberControl,
+}: Props<T>) => {
+  const controlProps = useClickDragAsControl({
+    // $FlowExpectedError - Click drag controls should not be used if value type is not number.
+    onChange,
+    // $FlowExpectedError
+    onGetInitialValue: () => value,
+  });
+
   return (
     <div
       className={classNames({
@@ -53,7 +63,13 @@ const CompactTextField = ({
             },
           }}
         >
-          <div className={classes.leftIconContainer}>
+          <div
+            className={classNames({
+              [classes.leftIconContainer]: true,
+              [classes.control]: !!useLeftIconAsNumberControl,
+            })}
+            {...(useLeftIconAsNumberControl ? controlProps : {})}
+          >
             {renderLeftIcon(classes.leftIcon)}
           </div>
         </Tooltip>

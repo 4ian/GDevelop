@@ -74,6 +74,10 @@
   margin-right: 4px;
 }
 
+.leftIconContainer.control {
+  cursor: ew-resize;
+}
+
 /* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
 svg.leftIcon {
   font-size: 20px;

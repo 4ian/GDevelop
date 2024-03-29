@@ -22,6 +22,7 @@ export const Default = () => {
   const [value3, setValue3] = React.useState<string>('');
   const [value4, setValue4] = React.useState<string>('');
   const [value5, setValue5] = React.useState<string>('');
+  const [value6, setValue6] = React.useState<number>(0);
   return (
     <ColumnStackLayout expand>
       <CompactTextField value={value} onChange={setValue} />
@@ -58,6 +59,14 @@ export const Default = () => {
         onChange={() => {}}
         renderLeftIcon={className => <Angle className={className} />}
         leftIconTooltip={'Angle'}
+      />
+      <Text>Numbers</Text>
+      <CompactTextField
+        value={value6}
+        onChange={setValue6}
+        renderLeftIcon={className => <Angle className={className} />}
+        leftIconTooltip={'Angle'}
+        useLeftIconAsNumberControl
       />
     </ColumnStackLayout>
   );

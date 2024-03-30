@@ -734,7 +734,7 @@ namespace gdjs {
    * Detect is the currently active line contains a registered character
    */
   gdjs.dialogueTree.lineHasActiveActor = function () {
-    if (this.dialogueIsRunning && this.dialogueDataType === 'text') {
+    if (this.dialogueIsRunning) {
       return (
         gdjs.dialogueTree.activeLineActor != null &&
         gdjs.dialogueTree.activeLineActor !== ''

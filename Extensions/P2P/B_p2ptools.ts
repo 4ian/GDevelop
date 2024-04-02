@@ -423,6 +423,17 @@ namespace gdjs {
       };
 
       /**
+       * Forces the usage of a relay (TURN) server, to avoid sharing IP addresses with the other peers.
+       * @param shouldUseRelayServer Whether relay-only should be enabled or disabled.
+       */
+      export const forceUseRelayServer = (shouldUseRelayServer: boolean) => {
+        peerConfig.config = peerConfig.config || {};
+        peerConfig.config.iceTransportPolicy = shouldUseRelayServer
+          ? 'relay'
+          : 'all';
+      };
+
+      /**
        * Overrides the default peer ID. Must be called before connecting to a broker.
        * Overriding the ID may have unwanted consequences. Do not use this feature
        * unless you really know what you are doing.

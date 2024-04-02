@@ -112,7 +112,7 @@ type Props = {|
 |};
 
 const variableRowStyles = {
-  chevron: { width: 15 },
+  chevron: { width: 15, alignSelf: 'stretch' },
 };
 
 type VariableRowProps = {|

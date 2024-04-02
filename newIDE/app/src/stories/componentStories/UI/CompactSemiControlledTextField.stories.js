@@ -7,7 +7,7 @@ import paperDecorator from '../../PaperDecorator';
 import CompactSemiControlledTextField from '../../../UI/CompactSemiControlledTextField';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import Angle from '../../../UI/CustomSvgIcons/Angle';
-import Text from '../../../UI/Text';
+import { Column } from '../../../UI/Grid';
 
 export default {
   title: 'UI Building Blocks/CompactSemiControlledTextField',
@@ -22,56 +22,81 @@ export const Default = () => {
   const [value3, setValue3] = React.useState<string>('');
   const [value4, setValue4] = React.useState<string>('');
   const [value5, setValue5] = React.useState<string>('');
-  const [value6, setValue6] = React.useState<number>(0);
   return (
-    <ColumnStackLayout expand>
-      <CompactSemiControlledTextField value={value} onChange={setValue} />
-      <CompactSemiControlledTextField value={value1} onChange={setValue1} errored />
-      <CompactSemiControlledTextField
-        value={value2}
-        onChange={setValue2}
-        placeholder="With placeholder"
-      />
-      <CompactSemiControlledTextField disabled value={'disabled field'} onChange={() => {}} />
-      <CompactSemiControlledTextField
-        value={value3}
-        onChange={setValue3}
-        renderLeftIcon={className => <Angle className={className} />}
-        leftIconTooltip={'Angle'}
-      />
-      <CompactSemiControlledTextField
-        value={value4}
-        onChange={setValue4}
-        errored
-        renderLeftIcon={className => <Angle className={className} />}
-        leftIconTooltip={'Angle'}
-      />
-      <CompactSemiControlledTextField
-        value={value5}
-        onChange={setValue5}
-        placeholder="With placeholder"
-        renderLeftIcon={className => <Angle className={className} />}
-        leftIconTooltip={'Angle'}
-      />
-      <CompactSemiControlledTextField
-        disabled
-        value={'disabled field'}
-        onChange={() => {}}
-        renderLeftIcon={className => <Angle className={className} />}
-        leftIconTooltip={'Angle'}
-      />
-      <Text>Numbers</Text>
-      <CompactSemiControlledTextField
-        type="number"
-        value={value6}
-        onChange={valueAsString => {
-          if (!valueAsString) setValue6(valueAsString);
-          else setValue6(parseInt(valueAsString, 10) || 0);
-        }}
-        renderLeftIcon={className => <Angle className={className} />}
-        leftIconTooltip={'Angle'}
-        useLeftIconAsNumberControl
-      />
+    <ColumnStackLayout expand useLargeSpacer>
+      <Column noMargin>
+        <CompactSemiControlledTextField value={value} onChange={setValue} />
+
+        <div>State value is {value}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          value={value1}
+          onChange={setValue1}
+          errored
+          errorText={"This value cannot be used"}
+        />
+
+        <div>State value is {value1}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          value={value2}
+          onChange={setValue2}
+          placeholder="With placeholder"
+        />
+
+        <div>State value is {value2}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          disabled
+          value={'disabled field'}
+          onChange={() => {}}
+        />
+        <div>Disabled field</div>
+      </Column>
+
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          value={value3}
+          onChange={setValue3}
+          renderLeftIcon={className => <Angle className={className} />}
+          leftIconTooltip={'Angle'}
+        />
+        <div>State value is {value3}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          value={value4}
+          onChange={setValue4}
+          errored
+          errorText={"An error occurred."}
+          renderLeftIcon={className => <Angle className={className} />}
+          leftIconTooltip={'Angle'}
+        />
+        <div>State value is {value4}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          value={value5}
+          onChange={setValue5}
+          placeholder="With placeholder"
+          renderLeftIcon={className => <Angle className={className} />}
+          leftIconTooltip={'Angle'}
+        />
+        <div>State value is {value5}</div>
+      </Column>
+      <Column noMargin>
+        <CompactSemiControlledTextField
+          disabled
+          value={'disabled field'}
+          onChange={() => {}}
+          renderLeftIcon={className => <Angle className={className} />}
+          leftIconTooltip={'Angle'}
+        />
+        <div>Disabled field</div>
+      </Column>
     </ColumnStackLayout>
   );
 };

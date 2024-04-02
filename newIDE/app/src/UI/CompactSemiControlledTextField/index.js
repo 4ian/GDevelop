@@ -1,17 +1,27 @@
 // @flow
 
 import * as React from 'react';
-import CompactTextField, {
-  type CompactTextFieldProps,
-} from '../CompactTextField';
+import CompactTextField from '../CompactTextField';
+import classes from './CompactSemiControlledTextField.module.css';
 
 type Props = {|
-  ...CompactTextFieldProps,
+  id?: string,
+  type?: 'text',
+  value: string,
+  onChange: string => void,
+  disabled?: boolean,
+  errored?: boolean,
+  placeholder?: string,
+  renderLeftIcon?: (className: string) => React.Node,
+  leftIconTooltip?: React.Node,
+
+  errorText?: React.Node,
 |};
 
 const CompactSemiControlledTextField = ({
   value,
   onChange,
+  errorText,
   ...otherProps
 }: Props) => {
   const [temporaryValue, setTemporaryValue] = React.useState<string>(
@@ -20,15 +30,18 @@ const CompactSemiControlledTextField = ({
   const onBlur = () => {
     onChange(temporaryValue);
   };
-  console.log(value)
 
   return (
-    <CompactTextField
-      value={temporaryValue}
-      onChange={setTemporaryValue}
-      onBlur={onBlur}
-      {...otherProps}
-    />
+    <div className={classes.container}>
+      <CompactTextField
+        type="text"
+        value={temporaryValue}
+        onChange={setTemporaryValue}
+        onBlur={onBlur}
+        {...otherProps}
+      />
+      {errorText && <div className={classes.error}>{errorText}</div>}
+    </div>
   );
 };
 

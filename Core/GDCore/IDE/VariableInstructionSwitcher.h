@@ -36,6 +36,13 @@ public:
   GetSwitchableVariableInstructionIdentifier(const gd::String &instructionType);
 
   /**
+   * \brief Return the variable type for primitive variable getter or
+   * setter.
+   */
+  static const gd::Variable::Type
+  GetSwitchableInstructionVariableType(const gd::String &instructionType);
+
+  /**
    * \brief Modify the instruction type to match the given variable type.
    */
   static void

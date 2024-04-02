@@ -225,6 +225,7 @@ interface PairStringVariable {
 };
 
 enum Variable_Type {
+    "Variable::Unknown",
     "Variable::String",
     "Variable::Number",
     "Variable::Boolean",
@@ -235,16 +236,13 @@ enum Variable_Type {
 interface VariableInstructionSwitcher {
     boolean STATIC_IsSwitchableVariableInstruction([Const] DOMString instructionType);
     [Const, Ref] DOMString STATIC_GetSwitchableVariableInstructionIdentifier([Const] DOMString instructionType);
+    [Const] Variable_Type STATIC_GetSwitchableInstructionVariableType([Const] DOMString instructionType);
     void STATIC_SwitchVariableInstructionType(
     [Ref] Instruction instruction, [Const] Variable_Type variableType);
 };
 
 interface ExpressionVariableTypeFinder {
     [Const] Variable_Type STATIC_GetVariableType(
-      [Const, Ref] Platform platform,
-      [Const, Ref] ProjectScopedContainers projectScopedContainers,
-      [Ref] ExpressionNode node);
-    [Const] Variable_Type STATIC_GetObjectVariableType(
       [Const, Ref] Platform platform,
       [Const, Ref] ProjectScopedContainers projectScopedContainers,
       [Ref] ExpressionNode node,

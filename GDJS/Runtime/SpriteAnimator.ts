@@ -347,6 +347,7 @@ namespace gdjs {
 
       // Make sure to delete already existing animations which are not used anymore.
       this._animationFrame = null;
+      this.invalidateFrame();
     }
 
     updateFromObjectData(
@@ -476,16 +477,17 @@ namespace gdjs {
       return this._animations[this._currentAnimation].name;
     }
 
-    setAnimationName(newAnimationName: string): void {
+    setAnimationName(newAnimationName: string): boolean {
       if (!newAnimationName) {
-        return;
+        return false;
       }
       for (let i = 0; i < this._animations.length; ++i) {
         if (this._animations[i].name === newAnimationName) {
           this.setAnimationIndex(i);
-          return;
+          return true;
         }
       }
+      return false;
     }
 
     hasAnimationEnded(): boolean {

@@ -10,6 +10,7 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import paperDecorator from '../../PaperDecorator';
 import InstancePropertiesEditor from '../../../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
+import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export default {
   title: 'LayoutEditor/InstancePropertiesEditor',
@@ -18,19 +19,21 @@ export default {
 };
 
 export const Default = () => (
-  <I18n>
-    {({ i18n }) => (
-      <SerializedObjectDisplay object={testProject.testLayout}>
-        <InstancePropertiesEditor
-          i18n={i18n}
-          project={testProject.project}
-          layout={testProject.testLayout}
-          instances={[testProject.testLayoutInstance1]}
-          editInstanceVariables={action('edit instance variables')}
-          onGetInstanceSize={() => [100, 101, 102]}
-          onEditObjectByName={action('edit object')}
-        />
-      </SerializedObjectDisplay>
-    )}
-  </I18n>
+  <DragAndDropContextProvider>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.testLayout}>
+          <InstancePropertiesEditor
+            i18n={i18n}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testSpriteObjectInstance]}
+            editInstanceVariables={action('edit instance variables')}
+            onGetInstanceSize={() => [100, 101, 102]}
+            onEditObjectByName={action('edit object')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
+  </DragAndDropContextProvider>
 );

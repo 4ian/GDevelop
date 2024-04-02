@@ -476,16 +476,17 @@ namespace gdjs {
       return this._animations[this._currentAnimation].name;
     }
 
-    setAnimationName(newAnimationName: string): void {
+    setAnimationName(newAnimationName: string): boolean {
       if (!newAnimationName) {
-        return;
+        return false;
       }
       for (let i = 0; i < this._animations.length; ++i) {
         if (this._animations[i].name === newAnimationName) {
           this.setAnimationIndex(i);
-          return;
+          return true;
         }
       }
+      return false;
     }
 
     hasAnimationEnded(): boolean {

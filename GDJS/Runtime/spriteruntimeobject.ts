@@ -237,7 +237,15 @@ namespace gdjs {
     }
 
     setAnimationName(newAnimationName: string): void {
-      this._animator.setAnimationName(newAnimationName);
+      const hasAnimationChanged = this._animator.setAnimationName(
+        newAnimationName
+      );
+      if (hasAnimationChanged) {
+        //TODO: This may be unnecessary.
+        this._renderer.update();
+        this._animationFrameDirty = true;
+        this.invalidateHitboxes();
+      }
     }
 
     /**

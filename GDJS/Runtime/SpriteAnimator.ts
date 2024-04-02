@@ -347,6 +347,7 @@ namespace gdjs {
 
       // Make sure to delete already existing animations which are not used anymore.
       this._animationFrame = null;
+      this.invalidateFrame();
     }
 
     updateFromObjectData(

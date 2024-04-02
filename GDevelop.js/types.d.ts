@@ -20,11 +20,12 @@ declare class EmscriptenObject {
 }
 
 export enum Variable_Type {
-  String = 0,
-  Number = 1,
-  Boolean = 2,
-  Structure = 3,
-  Array = 4,
+  Unknown = 0,
+  String = 1,
+  Number = 2,
+  Boolean = 3,
+  Structure = 4,
+  Array = 5,
 }
 
 export enum ObjectsContainersList_VariableExistence {
@@ -243,12 +244,12 @@ export class PairStringVariable extends EmscriptenObject {
 export class VariableInstructionSwitcher extends EmscriptenObject {
   static isSwitchableVariableInstruction(instructionType: string): boolean;
   static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
+  static getSwitchableInstructionVariableType(instructionType: string): Variable_Type;
   static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
 }
 
 export class ExpressionVariableTypeFinder extends EmscriptenObject {
-  static getVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode): Variable_Type;
-  static getObjectVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode, objectName: string): Variable_Type;
+  static getVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode, objectName: string): Variable_Type;
 }
 
 export class Variable extends EmscriptenObject {

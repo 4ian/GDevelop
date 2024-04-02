@@ -16,7 +16,8 @@ const gd::String VariableInstructionSwitcher::objectVariableGetterIdentifier = "
 const gd::String VariableInstructionSwitcher::objectVariableSetterIdentifier = "SetNumberObjectVariable";
 const gd::String VariableInstructionSwitcher::unknownInstructionIdentifier = "";
 
-bool VariableInstructionSwitcher::IsSwitchableVariableInstruction(const gd::String& instructionType) {
+bool VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+    const gd::String &instructionType) {
   return instructionType == "NumberVariable" ||
       instructionType == "StringVariable" ||
       instructionType == "BooleanVariable" ||
@@ -31,7 +32,9 @@ bool VariableInstructionSwitcher::IsSwitchableVariableInstruction(const gd::Stri
       instructionType == "SetBooleanObjectVariable";
 }
 
-const gd::String& VariableInstructionSwitcher::GetSwitchableVariableInstructionIdentifier(const gd::String& instructionType) {
+const gd::String &
+VariableInstructionSwitcher::GetSwitchableVariableInstructionIdentifier(
+    const gd::String &instructionType) {
   return instructionType == "NumberVariable" ||
       instructionType == "StringVariable" ||
       instructionType == "BooleanVariable"
@@ -49,6 +52,26 @@ const gd::String& VariableInstructionSwitcher::GetSwitchableVariableInstructionI
       instructionType == "SetBooleanObjectVariable"
       ? VariableInstructionSwitcher::objectVariableSetterIdentifier :
       VariableInstructionSwitcher::unknownInstructionIdentifier;
+}
+
+const gd::Variable::Type
+VariableInstructionSwitcher::GetSwitchableInstructionVariableType(const gd::String &instructionType) {
+  return instructionType == "NumberVariable" ||
+      instructionType == "SetNumberVariable" ||
+      instructionType == "NumberObjectVariable" ||
+      instructionType == "SetNumberObjectVariable"
+      ? gd::Variable::Number :
+      instructionType == "StringVariable" ||
+      instructionType == "SetStringVariable" ||
+      instructionType == "StringObjectVariable" ||
+      instructionType == "SetStringObjectVariable"
+      ? gd::Variable::String :
+      instructionType == "BooleanVariable" ||
+      instructionType == "SetBooleanVariable" ||
+      instructionType == "BooleanObjectVariable" ||
+      instructionType == "SetBooleanObjectVariable"
+      ? gd::Variable::Boolean :
+      gd::Variable::Unknown;
 }
 
 void VariableInstructionSwitcher::SwitchVariableInstructionType(

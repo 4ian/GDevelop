@@ -2,6 +2,7 @@
 declare class gdVariableInstructionSwitcher {
   static isSwitchableVariableInstruction(instructionType: string): boolean;
   static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
+  static getSwitchableInstructionVariableType(instructionType: string): Variable_Type;
   static switchVariableInstructionType(instruction: gdInstruction, variableType: Variable_Type): void;
   delete(): void;
   ptr: number;

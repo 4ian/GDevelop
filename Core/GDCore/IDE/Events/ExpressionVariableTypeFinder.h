@@ -41,16 +41,6 @@ class GD_CORE_API ExpressionVariableTypeFinder
   static const gd::Variable::Type GetVariableType(
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers,
-      gd::ExpressionNode& node) {
-    gd::ExpressionVariableTypeFinder typeFinder(platform,
-                                                  projectScopedContainers);
-    node.Visit(typeFinder);
-    return typeFinder.variable ? typeFinder.variable->GetType() : gd::Variable::Unknown;
-  }
-
-  static const gd::Variable::Type GetObjectVariableType(
-      const gd::Platform& platform,
-      const gd::ProjectScopedContainers& projectScopedContainers,
       gd::ExpressionNode& node, const gd::String& objectName) {
     gd::ExpressionVariableTypeFinder typeFinder(platform,
                                                   projectScopedContainers, objectName);
@@ -91,7 +81,8 @@ class GD_CORE_API ExpressionVariableTypeFinder
             childVariableNames);
       }
     } else {
-      if (objectsContainersList.hasObjectOrGroupWithVariableNamed(objectName,
+      const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+      if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
                                                                   node.name)) {
         const auto &variableContainer =
             projectScopedContainers.GetObjectsContainersList()
@@ -132,7 +123,8 @@ class GD_CORE_API ExpressionVariableTypeFinder
             childVariableNames);
       }
     } else {
-      if (objectsContainersList.hasObjectOrGroupWithVariableNamed(
+      const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+      if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
               objectName, node.identifierName)) {
         const auto &variableContainer =
             projectScopedContainers.GetObjectsContainersList()

@@ -137,7 +137,7 @@
     background-image: url('./unfold.png');
     background-position: 11px 3px !important;
 }
-.gd-events-sheet .DefaultLightTheme .rst__expandButton {
+.gd-events-sheet .light-theme .rst__expandButton {
     background-image: url('./unfoldDark.png');
 }
 
@@ -145,7 +145,7 @@
     background-image: url('./fold.png');
     background-position: center 7px !important;
 }
-.gd-events-sheet .DefaultLightTheme .rst__collapseButton {
+.gd-events-sheet .light-theme .rst__collapseButton {
     background-image: url('./foldDark.png');
 }
 

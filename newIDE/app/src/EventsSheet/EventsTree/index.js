@@ -50,6 +50,7 @@ import { isDescendant, type MoveFunctionArguments } from './helpers';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -230,9 +231,12 @@ const EventContainer = (props: EventsContainerProps) => {
 };
 
 const SortableTree = ({ className, ...otherProps }) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <SortableTreeWithoutDndContext
-      className={`${eventsTree} ${className}`}
+      className={`${eventsTree} ${
+        gdevelopTheme.palette.type === 'light' ? 'light-theme' : 'dark-theme'
+      } ${className}`}
       {...otherProps}
     />
   );

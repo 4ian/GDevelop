@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import classes from './CompactTextField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
 import useClickDragAsControl from './UseClickDragAsControl';
+import { makeTimestampedId } from '../../Utils/TimestampedId';
 
 type ValueProps =
   | {|
@@ -48,6 +49,7 @@ const CompactTextField = ({
   useLeftIconAsNumberControl,
   onBlur,
 }: CompactTextFieldProps) => {
+  const idToUse = React.useRef<string>(id || makeTimestampedId());
   const controlProps = useClickDragAsControl({
     // $FlowExpectedError - Click drag controls should not be used if value type is not number.
     onChange,
@@ -88,7 +90,9 @@ const CompactTextField = ({
             })}
             {...(useLeftIconAsNumberControl ? controlProps : {})}
           >
-            {renderLeftIcon(classes.leftIcon)}
+            <label for={idToUse.current} className={classes.label}>
+              {renderLeftIcon(classes.leftIcon)}
+            </label>
           </div>
         </Tooltip>
       )}
@@ -98,7 +102,7 @@ const CompactTextField = ({
         })}
       >
         <input
-          id={id}
+          id={idToUse.current}
           type={type || 'text'}
           disabled={disabled}
           value={value}

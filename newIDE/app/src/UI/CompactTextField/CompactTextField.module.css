@@ -74,7 +74,12 @@
   margin-right: 4px;
 }
 
-.leftIconContainer.control {
+.label {
+  display: flex;
+  cursor: inherit;
+}
+
+.container:not(.disabled) .leftIconContainer.control {
   cursor: ew-resize;
 }
 

@@ -153,7 +153,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           .map(variablesContainer =>
             enumerateValidVariableNames(variablesContainer)
           )
-          .reduce((a, b) => intersection(a, b)),
+          .reduce((a, b) => intersection(a, b), []),
       [variablesContainers]
     );
 

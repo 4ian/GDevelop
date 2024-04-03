@@ -37,6 +37,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '../UI/CustomSvgIcons/Edit';
+import IconButton from '../UI/IconButton';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -45,7 +46,6 @@ export type Instances = Array<Instance>;
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
   name: string,
-  renderLeftIcon?: () => React.Node,
   getLabel?: Instance => string,
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
@@ -65,6 +65,7 @@ export type PrimitiveValueField =
         label: string,
         tooltipContent: React.Node,
       |},
+      renderLeftIcon?: () => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -76,10 +77,18 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
+      renderLeftIcon?: () => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'boolean',
+      getValue: Instance => boolean,
+      setValue: (instance: Instance, newValue: boolean) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'booleanIcon',
+      renderIcon: (value: boolean) => React.Node,
       getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
@@ -104,6 +113,7 @@ type ResourceField = {|
   fallbackResourceKind?: ResourceKind,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
+  renderLeftIcon?: () => React.Node,
   ...ValueFieldCommonProperties,
 |};
 
@@ -385,6 +395,24 @@ const CompactPropertiesEditor = ({
               }}
             />
           </Column>
+        );
+      } else if (field.valueType === 'booleanIcon') {
+        const value = getFieldValue({ instances, field })
+        console.log(value, typeof value)
+        return (
+          <IconButton
+            key={field.name}
+            id={field.name}
+            size="small"
+            tooltip={getFieldLabel({ instances, field })}
+            selected={value}
+            onClick={(event) => {
+              instances.forEach(i => field.setValue(i, !value));
+              _onInstancesModified(instances);
+            }}
+          >
+            {field.renderIcon(value)}
+          </IconButton>
         );
       } else if (field.valueType === 'textarea') {
         const { setValue } = field;

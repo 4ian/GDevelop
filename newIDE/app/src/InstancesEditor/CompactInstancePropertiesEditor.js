@@ -32,6 +32,10 @@ import LetterW from '../UI/CustomSvgIcons/LetterW';
 import Depth from '../UI/CustomSvgIcons/Depth';
 import LetterZ from '../UI/CustomSvgIcons/LetterZ';
 import Instance from '../UI/CustomSvgIcons/Instance';
+import LockOpen from '../UI/CustomSvgIcons/LockOpen';
+import Lock from '../UI/CustomSvgIcons/Lock';
+import Link from '../UI/CustomSvgIcons/Link';
+import Unlink from '../UI/CustomSvgIcons/Unlink';
 
 const gd: libGDevelop = global.gd;
 
@@ -77,7 +81,7 @@ const makeSchema = ({
 
   const fields: Schema = [
     {
-      name: 'Position',
+      name: 'Title',
       type: 'row',
       children: [
         {
@@ -178,40 +182,6 @@ const makeSchema = ({
       : null,
 
     {
-      name: 'Prevent instance selection',
-      getLabel: () => i18n._(t`Prevent selection in the editor`),
-      valueType: 'boolean',
-      disabled: (instances: gdInitialInstance[]) => {
-        return instances.some(instance => !instance.isLocked());
-      },
-      getValue: (instance: gdInitialInstance) => instance.isSealed(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setSealed(newValue),
-    },
-    {
-      name: 'Custom size',
-      getLabel: () => i18n._(t`Custom size`),
-      valueType: 'boolean',
-      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        if (
-          instance.getCustomHeight() === 0 &&
-          instance.getCustomWidth() === 0 &&
-          instance.getCustomDepth() === 0
-        ) {
-          // The instance custom dimensions have never been set before.
-          // To avoid setting setting all the dimensions to 0 when enabling
-          // the instance custom size flag, the current instance dimensions are used.
-          instance.setCustomWidth(getInstanceWidth(instance));
-          instance.setCustomHeight(getInstanceHeight(instance));
-          instance.setCustomDepth(getInstanceDepth(instance));
-        }
-        instance.setHasCustomSize(newValue);
-        instance.setHasCustomDepth(newValue);
-        forceUpdate();
-      },
-    },
-    {
       name: 'custom-size-row',
       type: 'row',
       children: [
@@ -233,21 +203,58 @@ const makeSchema = ({
           renderLeftIcon: className => <LetterW className={className} />,
         },
         {
-          name: 'Height',
-          getLabel: () => i18n._(t`Height`),
-          valueType: 'number',
-          getValue: getInstanceHeight,
-          setValue: (instance: gdInitialInstance, newValue: number) => {
-            instance.setCustomWidth(getInstanceWidth(instance));
-            instance.setCustomHeight(Math.max(newValue, 0));
-            instance.setCustomDepth(getInstanceDepth(instance));
+          name: 'height-and-custom-size',
+          type: 'row',
+          children: [
+            {
+              name: 'Height',
+              getLabel: () => i18n._(t`Height`),
+              valueType: 'number',
+              getValue: getInstanceHeight,
+              setValue: (instance: gdInitialInstance, newValue: number) => {
+                instance.setCustomWidth(getInstanceWidth(instance));
+                instance.setCustomHeight(Math.max(newValue, 0));
+                instance.setCustomDepth(getInstanceDepth(instance));
 
-            // This must be done after reading the size.
-            instance.setHasCustomSize(true);
-            instance.setHasCustomDepth(true);
-            forceUpdate();
-          },
-          renderLeftIcon: className => <LetterH className={className} />,
+                // This must be done after reading the size.
+                instance.setHasCustomSize(true);
+                instance.setHasCustomDepth(true);
+                forceUpdate();
+              },
+              renderLeftIcon: className => <LetterH className={className} />,
+            },
+            !is3DInstance
+              ? {
+                  name: 'Custom size',
+                  getLabel: () => i18n._(t`Custom size`),
+                  valueType: 'booleanIcon',
+                  renderIcon: value => (value ? <Link /> : <Unlink />),
+                  getValue: (instance: gdInitialInstance) =>
+                    instance.hasCustomSize(),
+                  setValue: (
+                    instance: gdInitialInstance,
+                    newValue: boolean
+                  ) => {
+                    console.log(newValue);
+                    if (
+                      instance.getCustomHeight() === 0 &&
+                      instance.getCustomWidth() === 0 &&
+                      instance.getCustomDepth() === 0
+                    ) {
+                      // The instance custom dimensions have never been set before.
+                      // To avoid setting setting all the dimensions to 0 when enabling
+                      // the instance custom size flag, the current instance dimensions are used.
+                      instance.setCustomWidth(getInstanceWidth(instance));
+                      instance.setCustomHeight(getInstanceHeight(instance));
+                      instance.setCustomDepth(getInstanceDepth(instance));
+                    }
+                    instance.setHasCustomSize(newValue);
+                    instance.setHasCustomDepth(newValue);
+                    forceUpdate();
+                  },
+                }
+              : null,
+          ].filter(Boolean),
         },
         is3DInstance
           ? {
@@ -288,6 +295,7 @@ const makeSchema = ({
         {
           name: i18n._(t`Rotation`),
           nonFieldType: 'sectionTitle',
+          getValue: undefined,
         },
         {
           name: 'Angles',

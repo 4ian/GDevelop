@@ -455,7 +455,8 @@ namespace gdjs {
     }
 
     setAnimationIndex(newAnimation: number): boolean {
-      newAnimation = newAnimation || 0;
+      // Truncate the index.
+      newAnimation = newAnimation | 0;
       if (
         newAnimation < this._animations.length &&
         this._currentAnimation !== newAnimation &&

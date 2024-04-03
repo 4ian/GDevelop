@@ -149,11 +149,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const enumerateVariableNames = React.useCallback(
       () =>
-        variablesContainers
-          .map(variablesContainer =>
-            enumerateValidVariableNames(variablesContainer)
-          )
-          .reduce((a, b) => intersection(a, b), []),
+        variablesContainers.length > 0
+          ? variablesContainers
+              .map(variablesContainer =>
+                enumerateValidVariableNames(variablesContainer)
+              )
+              .reduce((a, b) => intersection(a, b))
+          : [],
       [variablesContainers]
     );
 

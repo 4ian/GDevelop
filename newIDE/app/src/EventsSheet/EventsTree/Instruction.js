@@ -48,6 +48,7 @@ import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/Extension
 import { getRequiredBehaviorTypes } from '../ParameterFields/ObjectField';
 import { checkHasRequiredCapability } from '../../ObjectsList/ObjectSelector';
 import Warning from '../../UI/CustomSvgIcons/Warning';
+import { getRootVariableName } from '../../EventsSheet/ParameterFields/VariableField';
 
 const gd: libGDevelop = global.gd;
 
@@ -300,6 +301,36 @@ const Instruction = (props: Props) => {
               expressionIsValid =
                 expressionValidator.getAllErrors().size() === 0;
               expressionValidator.delete();
+
+              // New object variable instructions require the variable to be
+              // declared while legacy ones don't.
+              // This is why it's done here instead of in the parser directly.
+              if (
+                parameterType === 'objectvar' &&
+                gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+                  instruction.getType()
+                )
+              ) {
+                const projectScopedContainers = getProjectScopedContainersFromScope(
+                  scope,
+                  globalObjectsContainer,
+                  objectsContainer
+                );
+                // Check at least the name of the root variable, it's the best we can do.
+                const objectsContainersList = projectScopedContainers.getObjectsContainersList();
+                const objectName = instruction.getParameter(0).getPlainString();
+                const variableName = instruction
+                  .getParameter(parameterIndex)
+                  .getPlainString();
+                if (
+                  !objectsContainersList.hasObjectOrGroupWithVariableNamed(
+                    objectName,
+                    getRootVariableName(variableName)
+                  )
+                ) {
+                  expressionIsValid = false;
+                }
+              }
             } else if (gd.ParameterMetadata.isObject(parameterType)) {
               const objectOrGroupName = instruction
                 .getParameter(parameterIndex)

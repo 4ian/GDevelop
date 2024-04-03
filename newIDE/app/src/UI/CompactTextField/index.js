@@ -90,7 +90,7 @@ const CompactTextField = ({
             })}
             {...(useLeftIconAsNumberControl ? controlProps : {})}
           >
-            <label for={idToUse.current} className={classes.label}>
+            <label htmlFor={idToUse.current} className={classes.label}>
               {renderLeftIcon(classes.leftIcon)}
             </label>
           </div>

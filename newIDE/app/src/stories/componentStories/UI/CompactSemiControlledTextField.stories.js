@@ -34,7 +34,7 @@ export const Default = () => {
           value={value1}
           onChange={setValue1}
           errored
-          errorText={"This value cannot be used"}
+          errorText={'This value cannot be used'}
         />
 
         <div>State value is {value1}</div>
@@ -71,7 +71,7 @@ export const Default = () => {
           value={value4}
           onChange={setValue4}
           errored
-          errorText={"An error occurred."}
+          errorText={'An error occurred.'}
           renderLeftIcon={className => <Angle className={className} />}
           leftIconTooltip={'Angle'}
         />

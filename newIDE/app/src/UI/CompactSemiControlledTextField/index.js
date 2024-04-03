@@ -6,7 +6,6 @@ import classes from './CompactSemiControlledTextField.module.css';
 
 type Props = {|
   id?: string,
-  type?: 'text',
   value: string,
   onChange: string => void,
   disabled?: boolean,

@@ -1,6 +1,5 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
@@ -20,10 +19,6 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import { enumerateValidVariableNames } from './EnumerateVariables';
 import intersection from 'lodash/intersection';
-import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
-import { ColumnStackLayout } from '../../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -172,79 +167,41 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
-    const variableType =
-      project && instruction
-        ? getVariableTypeFromParameters(
-            project.getCurrentPlatform(),
-            projectScopedContainers,
-            instruction
-          )
-        : null;
-    const needManualTypeSwitcher = variableType === gd.Variable.Unknown;
-
     return (
       <React.Fragment>
-        <ColumnStackLayout noMargin>
-          <VariableField
-            forceDeclaration={
-              instruction &&
-              gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-                instruction.getType()
-              )
-            }
-            variablesContainers={variablesContainers}
-            enumerateVariableNames={enumerateVariableNames}
-            parameterMetadata={props.parameterMetadata}
-            value={props.value}
-            onChange={props.onChange}
-            isInline={props.isInline}
-            onRequestClose={props.onRequestClose}
-            onApply={props.onApply}
-            ref={field}
-            // There is no variable editor for groups.
-            onOpenDialog={
-              variablesContainers.length === 1
-                ? () => setEditorOpen(true)
-                : null
-            }
-            globalObjectsContainer={props.globalObjectsContainer}
-            objectsContainer={props.objectsContainer}
-            scope={scope}
-            id={
-              props.parameterIndex !== undefined
-                ? `parameter-${props.parameterIndex}-object-variable-field`
-                : undefined
-            }
-            getVariableTypeFromParameters={getVariableTypeFromParameters}
-          />
-          {needManualTypeSwitcher && instruction && onInstructionTypeChanged && (
-            <SelectField
-              floatingLabelText={<Trans>Use as...</Trans>}
-              value={(() => {
-                const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
-                  instruction.getType()
-                );
-                return type === gd.Variable.Unknown ? gd.Variable.Number : type;
-              })()}
-              onChange={(e, i, value: any) => {
-                gd.VariableInstructionSwitcher.switchVariableInstructionType(
-                  instruction,
-                  value
-                );
-                onInstructionTypeChanged();
-              }}
-            >
-              <SelectOption value={gd.Variable.Number} label={t`Number`} />
-              <SelectOption value={gd.Variable.String} label={t`String`} />
-              <SelectOption value={gd.Variable.Boolean} label={t`Boolean`} />
-            </SelectField>
-          )}
-        </ColumnStackLayout>
+        <VariableField
+          forceDeclaration={
+            instruction &&
+            gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+              instruction.getType()
+            )
+          }
+          project={project}
+          instruction={instruction}
+          variablesContainers={variablesContainers}
+          enumerateVariableNames={enumerateVariableNames}
+          parameterMetadata={props.parameterMetadata}
+          value={props.value}
+          onChange={props.onChange}
+          isInline={props.isInline}
+          onRequestClose={props.onRequestClose}
+          onApply={props.onApply}
+          ref={field}
+          // There is no variable editor for groups.
+          onOpenDialog={
+            variablesContainers.length === 1 ? () => setEditorOpen(true) : null
+          }
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
+          scope={scope}
+          id={
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-object-variable-field`
+              : undefined
+          }
+          getVariableTypeFromParameters={getVariableTypeFromParameters}
+          onInstructionTypeChanged={onInstructionTypeChanged}
+        />
         {editorOpen && project && (
           <VariablesEditorDialog
             project={project}

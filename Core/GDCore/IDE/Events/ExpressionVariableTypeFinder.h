@@ -85,10 +85,10 @@ class GD_CORE_API ExpressionVariableTypeFinder
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
                                                                   node.name) !=
           gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-        const auto &variableContainer =
+        const auto *variableContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
-        variable = WalkUntilLastChild(variableContainer.Get(node.name),
+        variable = WalkUntilLastChild(variableContainer->Get(node.name),
                                       childVariableNames);
       }
     }
@@ -128,11 +128,11 @@ class GD_CORE_API ExpressionVariableTypeFinder
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
               objectName, node.identifierName) !=
           gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-        const auto &variableContainer =
+        const auto *variableContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
         variable = WalkUntilLastChild(
-            variableContainer.Get(node.identifierName), childVariableNames);
+            variableContainer->Get(node.identifierName), childVariableNames);
       }
     }
   }

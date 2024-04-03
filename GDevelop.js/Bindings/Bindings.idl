@@ -628,7 +628,6 @@ interface ObjectsContainersList {
   [Const, Value] DOMString GetTypeOfBehaviorInObjectOrGroup([Const] DOMString objectOrGroupName, [Const] DOMString behaviorName, boolean searchInGroups);
 
   ObjectsContainersList_VariableExistence HasObjectOrGroupWithVariableNamed([Const] DOMString objectName, [Const] DOMString variableName);
-  [Const, Ref] VariablesContainer GetObjectOrGroupVariablesContainer([Const] DOMString objectName);
 };
 
 interface ProjectScopedContainers {

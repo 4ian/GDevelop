@@ -588,7 +588,7 @@ class GD_CORE_API ExpressionCompletionFinder
             IsCaretOn(node.childIdentifierNameLocation)) {
           // Complete a potential child variable:
           const auto* variablesContainer =
-              &objectsContainersList.GetObjectOrGroupVariablesContainer(
+              objectsContainersList.GetObjectOrGroupVariablesContainer(
                   objectName);
           if (variablesContainer &&
               variablesContainer->Has(node.identifierName)) {

@@ -93,6 +93,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [layout, project]
     );
 
+    const isGlobal = layout && project &&
+      !layout.getVariables().has(getRootVariableName(props.value)) &&
+      project.getVariables().has(getRootVariableName(props.value));
+
     return (
       <React.Fragment>
         <VariableField
@@ -123,16 +127,30 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         {editorOpen && layout && project && (
           <VariablesEditorDialog
             project={project}
-            title={<Trans>{layout.getName()} variables</Trans>}
+            title={
+              isGlobal ? (
+                <Trans>Global Variables</Trans>
+              ) : (
+                <Trans>{layout.getName()} variables</Trans>
+              )
+            }
             open
-            variablesContainer={layout.getVariables()}
+            variablesContainer={
+              isGlobal ? project.getVariables() : layout.getVariables()
+            }
             onCancel={() => setEditorOpen(false)}
             onApply={() => {
               setEditorOpen(false);
               if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
-            emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
+            emptyPlaceholderTitle={
+              isGlobal ? (
+                <Trans>Add your first global variable</Trans>
+              ) : (
+                <Trans>Add your first scene variable</Trans>
+              )
+            }
             emptyPlaceholderDescription={
               <Trans>
                 These variables hold additional information on a scene.

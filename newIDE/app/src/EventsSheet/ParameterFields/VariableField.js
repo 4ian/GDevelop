@@ -235,7 +235,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <ColumnStackLayout noMargin>
+          <ColumnStackLayout noMargin expand>
             <TextFieldWithButtonLayout
               renderTextField={() => (
                 <SemiControlledAutoComplete
@@ -282,30 +282,36 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 ) : null
               }
             />
-            {needManualTypeSwitcher && instruction && onInstructionTypeChanged && (
-              <SelectField
-                floatingLabelText={<Trans>Use as...</Trans>}
-                value={(() => {
-                  const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
-                    instruction.getType()
-                  );
-                  return type === gd.Variable.Unknown
-                    ? gd.Variable.Number
-                    : type;
-                })()}
-                onChange={(e, i, value: any) => {
-                  gd.VariableInstructionSwitcher.switchVariableInstructionType(
-                    instruction,
-                    value
-                  );
-                  onInstructionTypeChanged();
-                }}
-              >
-                <SelectOption value={gd.Variable.Number} label={t`Number`} />
-                <SelectOption value={gd.Variable.String} label={t`String`} />
-                <SelectOption value={gd.Variable.Boolean} label={t`Boolean`} />
-              </SelectField>
-            )}
+            {!isInline &&
+              needManualTypeSwitcher &&
+              instruction &&
+              onInstructionTypeChanged && (
+                <SelectField
+                  floatingLabelText={<Trans>Use as...</Trans>}
+                  value={(() => {
+                    const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                      instruction.getType()
+                    );
+                    return type === gd.Variable.Unknown
+                      ? gd.Variable.Number
+                      : type;
+                  })()}
+                  onChange={(e, i, value: any) => {
+                    gd.VariableInstructionSwitcher.switchVariableInstructionType(
+                      instruction,
+                      value
+                    );
+                    onInstructionTypeChanged();
+                  }}
+                >
+                  <SelectOption value={gd.Variable.Number} label={t`Number`} />
+                  <SelectOption value={gd.Variable.String} label={t`String`} />
+                  <SelectOption
+                    value={gd.Variable.Boolean}
+                    label={t`Boolean`}
+                  />
+                </SelectField>
+              )}
           </ColumnStackLayout>
         )}
       </I18n>

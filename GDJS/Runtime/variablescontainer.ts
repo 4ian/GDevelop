@@ -241,6 +241,7 @@ namespace gdjs {
         return true;
       },
       setValue: () => {},
+      toggle: () => {},
       getValue: () => 0,
       getChild: () => gdjs.VariablesContainer.badVariable,
       getChildAt: () => gdjs.VariablesContainer.badVariable,

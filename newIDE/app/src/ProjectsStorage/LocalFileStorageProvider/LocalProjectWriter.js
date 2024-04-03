@@ -24,6 +24,29 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
+const deleteExistingFilesFromDirs = (projectPath: string) => {
+  const entries = fs.readdirSync(projectPath);
+  return new Promise((resolve, reject) => {
+    //Project file
+    if (entries.length === 1) resolve();
+
+    //If multiFile enabled in settings and directories exist!
+    entries.forEach(entry => {
+      let dirPath = projectPath.concat('\\', entry);
+      if (fs.statSync(dirPath).isDirectory()) {
+        const filenames = fs.readdirSync(dirPath);
+        filenames.forEach(file => {
+          let result = dirPath.concat('\\', file);
+          fs.unlink(result, (err => {
+            if (err) return reject(err);
+          }));
+        });
+      }
+    });
+    resolve();
+  });
+};
+
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
   return new Promise((resolve, reject) => {
@@ -142,6 +165,12 @@ export const onSaveProject = (
   };
 
   const projectPath = path.dirname(filePath);
+
+  deleteExistingFilesFromDirs(projectPath).catch(err => {
+    console.error('Unable to delete files in the project:', err);
+    throw err;
+  });
+
   return writeProjectFiles(project, filePath, projectPath).then(() => {
     return { wasSaved: true, fileMetadata: newFileMetadata }; // Save was properly done
   });

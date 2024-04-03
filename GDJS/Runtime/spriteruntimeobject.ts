@@ -26,9 +26,9 @@ namespace gdjs {
       gdjs.Animatable,
       gdjs.OpacityHandler {
     _animator: gdjs.SpriteAnimator<any>;
-    _scaleX: number = 1;
-    _scaleY: number = 1;
-    _blendMode: number = 0;
+    _scaleX: float = 1;
+    _scaleY: float = 1;
+    _blendMode: integer = 0;
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     opacity: float = 255;
@@ -220,11 +220,11 @@ namespace gdjs {
      * @param newAnimation The index of the new animation to be played
      * @deprecated Use `setAnimationIndex` instead
      */
-    setAnimation(newAnimation: number): void {
+    setAnimation(newAnimation: integer): void {
       this.setAnimationIndex(newAnimation);
     }
 
-    setAnimationIndex(newAnimation: number): void {
+    setAnimationIndex(newAnimation: integer): void {
       const hasAnimationChanged = this._animator.setAnimationIndex(
         newAnimation
       );
@@ -253,11 +253,11 @@ namespace gdjs {
      * @return The index of the new animation being played
      * @deprecated Use `getAnimationIndex` instead
      */
-    getAnimation(): number {
+    getAnimation(): integer {
       return this.getAnimationIndex();
     }
 
-    getAnimationIndex(): number {
+    getAnimationIndex(): integer {
       return this._animator.getAnimationIndex();
     }
 
@@ -308,7 +308,7 @@ namespace gdjs {
      * Get the index of the current frame displayed by the animation
      * @return newFrame The index of the frame being displayed
      */
-    getAnimationFrame(): number {
+    getAnimationFrame(): integer {
       return this._animator.getAnimationFrameIndex();
     }
 
@@ -324,11 +324,11 @@ namespace gdjs {
       }
     }
 
-    getAnimationDuration(): number {
+    getAnimationDuration(): float {
       return this._animator.getAnimationDuration();
     }
 
-    getAnimationFrameCount(): number {
+    getAnimationFrameCount(): integer {
       return this._animator.getAnimationFrameCount();
     }
 
@@ -454,7 +454,7 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in global coordinates).
      */
-    private _transformToGlobal(x: float, y: float, result: number[]) {
+    private _transformToGlobal(x: float, y: float, result: float[]) {
       const animationFrame = this._animator.getCurrentFrame() as SpriteAnimationFrame<
         any
       >;
@@ -656,7 +656,7 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    getOpacity(): number {
+    getOpacity(): float {
       return this.opacity;
     }
 

@@ -51,7 +51,7 @@ VariableInstructionSwitcher::GetSwitchableVariableInstructionIdentifier(
       instructionType == "SetStringObjectVariable" ||
       instructionType == "SetBooleanObjectVariable"
       ? VariableInstructionSwitcher::objectVariableSetterIdentifier :
-      VariableInstructionSwitcher::unknownInstructionIdentifier;
+      instructionType;
 }
 
 const gd::Variable::Type

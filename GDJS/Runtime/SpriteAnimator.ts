@@ -2,9 +2,9 @@ namespace gdjs {
   /** Represents a point in a coordinate system. */
   export type SpritePoint = {
     /** X position of the point. */
-    x: number;
+    x: float;
     /** Y position of the point. */
-    y: number;
+    y: float;
   };
 
   /** Represents a custom point in a frame. */
@@ -12,9 +12,9 @@ namespace gdjs {
     /** Name of the point. */
     name: string;
     /** X position of the point. */
-    x: number;
+    x: float;
     /** Y position of the point. */
-    y: number;
+    y: float;
   };
 
   /** Represents the center point in a frame. */
@@ -24,9 +24,9 @@ namespace gdjs {
     /** Is the center automatically computed? */
     automatic: boolean;
     /** X position of the point. */
-    x: number;
+    x: float;
     /** Y position of the point. */
-    y: number;
+    y: float;
   };
 
   /** Represents a {@link gdjs.SpriteAnimationFrame}. */
@@ -48,7 +48,7 @@ namespace gdjs {
   /** Represents the data of a {@link gdjs.SpriteAnimationDirection}. */
   export type SpriteDirectionData = {
     /** Time between each frame, in seconds. */
-    timeBetweenFrames: number;
+    timeBetweenFrames: float;
     /** Is the animation looping? */
     looping: boolean;
     /** The list of frames. */
@@ -186,7 +186,7 @@ namespace gdjs {
    * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
    */
   export class SpriteAnimationDirection<T> {
-    timeBetweenFrames: number;
+    timeBetweenFrames: float;
     loop: boolean;
     frames: SpriteAnimationFrame<T>[] = [];
 
@@ -450,12 +450,13 @@ namespace gdjs {
       this._onFrameChange = callback;
     }
 
-    getAnimationIndex(): number {
+    getAnimationIndex(): integer {
       return this._currentAnimation;
     }
 
-    setAnimationIndex(newAnimation: number): boolean {
-      newAnimation = newAnimation || 0;
+    setAnimationIndex(newAnimation: integer): boolean {
+      // Truncate the index.
+      newAnimation = newAnimation | 0;
       if (
         newAnimation < this._animations.length &&
         this._currentAnimation !== newAnimation &&
@@ -535,7 +536,7 @@ namespace gdjs {
      * Change the current frame displayed by the animation
      * @param newFrameIndex The index of the frame to be displayed
      */
-    setAnimationFrameIndex(newFrameIndex: number): boolean {
+    setAnimationFrameIndex(newFrameIndex: integer): boolean {
       if (
         this._currentAnimation >= this._animations.length ||
         this._currentDirection >=
@@ -564,7 +565,7 @@ namespace gdjs {
      * Get the index of the current frame displayed by the animation
      * @return newFrame The index of the frame being displayed
      */
-    getAnimationFrameIndex(): number {
+    getAnimationFrameIndex(): integer {
       return this._currentFrameIndex;
     }
 
@@ -601,7 +602,7 @@ namespace gdjs {
       return direction.frames.length * direction.timeBetweenFrames;
     }
 
-    getAnimationFrameCount(): number {
+    getAnimationFrameCount(): integer {
       if (this._currentAnimation >= this._animations.length) {
         return 0;
       }
@@ -617,7 +618,7 @@ namespace gdjs {
      * @param The new angle (or direction index) to be applied
      * @deprecated
      */
-    setDirectionOrAngle(oldValue: float, newValue: float): number | null {
+    setDirectionOrAngle(oldValue: float, newValue: float): float | null {
       if (this._currentAnimation >= this._animations.length) {
         return null;
       }

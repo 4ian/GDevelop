@@ -27,7 +27,7 @@ public:
 
   /**
    * \brief Return the common identifier for primitive variable getter or
-   * setter.
+   * setter or the given type otherwise.
    *
    * The instruction type of the "number" one is actually used as the common
    * identifier.

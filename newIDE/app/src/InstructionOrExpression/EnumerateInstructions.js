@@ -225,7 +225,7 @@ const enumerateFreeInstructionsWithoutExtra = (
     const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
       type
     );
-    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
+    if (unifiedInstructionType !== type) {
       continue;
     }
 
@@ -315,7 +315,7 @@ const enumerateExtensionInstructions = (
     const unifiedInstructionType = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
       type
     );
-    if (unifiedInstructionType.length > 0 && unifiedInstructionType !== type) {
+    if (unifiedInstructionType !== type) {
       continue;
     }
 

@@ -4,7 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#pragma once
+#ifndef GDCORE_VARIABLESCONTAINER_H
+#define GDCORE_VARIABLESCONTAINER_H
 #include <memory>
 #include <vector>
 #include "GDCore/Project/Variable.h"
@@ -88,6 +89,7 @@ class GD_CORE_API VariablesContainer {
    */
   const gd::String& GetNameAt(std::size_t index) const;
 
+#if defined(GD_IDE_ONLY)
   /**
    * \brief return the position of the variable called "name" in the variable
    * list
@@ -129,6 +131,7 @@ class GD_CORE_API VariablesContainer {
    * \brief Move the specified variable at a new position in the list.
    */
   void Move(std::size_t oldIndex, std::size_t newIndex);
+#endif
 
   /**
    * \brief Clear all variables of the container.
@@ -174,8 +177,6 @@ class GD_CORE_API VariablesContainer {
   const gd::String& GetPersistentUuid() const { return persistentUuid; };
   ///@}
 
-  static VariablesContainer badVariablesContainer;
-
  private:
   std::vector<std::pair<gd::String, std::shared_ptr<gd::Variable>>> variables;
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
@@ -192,3 +193,4 @@ class GD_CORE_API VariablesContainer {
 
 }  // namespace gd
 
+#endif  // GDCORE_VARIABLESCONTAINER_H

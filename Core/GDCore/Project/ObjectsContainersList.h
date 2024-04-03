@@ -69,7 +69,7 @@ class GD_CORE_API ObjectsContainersList {
    * \brief Return the container of the variables for the specified object or
    * group of objects.
    */
-  const gd::VariablesContainer& GetObjectOrGroupVariablesContainer(
+  const gd::VariablesContainer* GetObjectOrGroupVariablesContainer(
       const gd::String& objectOrGroupName) const;
 
   /**
@@ -169,7 +169,7 @@ class GD_CORE_API ObjectsContainersList {
       const gd::String& objectName,
       const gd::VariablesContainer& variablesContainer) const;
 
-  const gd::VariablesContainer& GetObjectVariablesContainer(
+  const gd::VariablesContainer* GetObjectVariablesContainer(
       const gd::String& objectName) const;
 
   gd::Variable::Type GetTypeOfObjectVariable(const gd::String& objectName, const gd::String& variableName) const;

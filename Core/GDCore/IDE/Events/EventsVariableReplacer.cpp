@@ -251,7 +251,7 @@ class GD_CORE_API ExpressionVariableReplacer
               node.objectName,
               *node.parameters[parameterIndex].get());
           forcedInitialVariablesContainer =
-              &projectScopedContainers.GetObjectsContainersList()
+              projectScopedContainers.GetObjectsContainersList()
                   .GetObjectOrGroupVariablesContainer(objectName);
         }
 
@@ -308,7 +308,7 @@ EventsVariableReplacer::FindForcedVariablesContainerIfAny(
   // Handle legacy pre-scoped variable parameters: in this case, we
   // force the "scope" at which starts the evalution of variables.
   if (type == "objectvar") {
-    return &GetProjectScopedContainers()
+    return GetProjectScopedContainers()
         .GetObjectsContainersList()
         .GetObjectOrGroupVariablesContainer(lastObjectName);
   } else if (type == "globalvar") {

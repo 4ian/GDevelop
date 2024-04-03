@@ -12,7 +12,6 @@ declare class gdObjectsContainersList {
   getBehaviorsOfObject(name: string, searchInGroups: boolean): gdVectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
-  getObjectOrGroupVariablesContainer(objectName: string): gdVariablesContainer;
   delete(): void;
   ptr: number;
 };

@@ -578,7 +578,6 @@ export class ObjectsContainersList extends EmscriptenObject {
   getBehaviorsOfObject(name: string, searchInGroups: boolean): VectorString;
   getTypeOfBehaviorInObjectOrGroup(objectOrGroupName: string, behaviorName: string, searchInGroups: boolean): string;
   hasObjectOrGroupWithVariableNamed(objectName: string, variableName: string): ObjectsContainersList_VariableExistence;
-  getObjectOrGroupVariablesContainer(objectName: string): VariablesContainer;
 }
 
 export class ProjectScopedContainers extends EmscriptenObject {

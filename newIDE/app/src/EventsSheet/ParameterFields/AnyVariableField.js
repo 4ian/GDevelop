@@ -1,6 +1,5 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
@@ -15,10 +14,6 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateValidVariableNames } from './EnumerateVariables';
-import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
-import { ColumnStackLayout } from '../../UI/Layout';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,14 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const {
-      project,
-      globalObjectsContainer,
-      objectsContainer,
-      scope,
-      onInstructionTypeChanged,
-      instruction,
-    } = props;
+    const { project, scope, instruction, onInstructionTypeChanged } = props;
     const { layout } = scope;
 
     const onComputeAllVariableNames = React.useCallback(() => [], []);
@@ -105,69 +93,33 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [layout, project]
     );
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
-    const variableType =
-      project && instruction
-        ? getVariableTypeFromParameters(
-            project.getCurrentPlatform(),
-            projectScopedContainers,
-            instruction
-          )
-        : null;
-    const needManualTypeSwitcher = variableType === gd.Variable.Unknown;
-
     return (
       <React.Fragment>
-        <ColumnStackLayout noMargin>
-          <VariableField
-            forceDeclaration
-            variablesContainers={variablesContainers}
-            enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
-            parameterMetadata={props.parameterMetadata}
-            value={props.value}
-            onChange={props.onChange}
-            isInline={props.isInline}
-            onRequestClose={props.onRequestClose}
-            onApply={props.onApply}
-            ref={field}
-            onOpenDialog={() => setEditorOpen(true)}
-            globalObjectsContainer={props.globalObjectsContainer}
-            objectsContainer={props.objectsContainer}
-            scope={scope}
-            id={
-              props.parameterIndex !== undefined
-                ? `parameter-${props.parameterIndex}-scene-variable-field`
-                : undefined
-            }
-            getVariableTypeFromParameters={getVariableTypeFromParameters}
-          />
-          {needManualTypeSwitcher && instruction && onInstructionTypeChanged && (
-            <SelectField
-              floatingLabelText={<Trans>Use as...</Trans>}
-              value={(() => {
-                const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
-                  instruction.getType()
-                );
-                return type === gd.Variable.Unknown ? gd.Variable.Number : type;
-              })()}
-              onChange={(e, i, value: any) => {
-                gd.VariableInstructionSwitcher.switchVariableInstructionType(
-                  instruction,
-                  value
-                );
-                onInstructionTypeChanged();
-              }}
-            >
-              <SelectOption value={gd.Variable.Number} label={t`Number`} />
-              <SelectOption value={gd.Variable.String} label={t`String`} />
-              <SelectOption value={gd.Variable.Boolean} label={t`Boolean`} />
-            </SelectField>
-          )}
-        </ColumnStackLayout>
+        <VariableField
+          forceDeclaration
+          project={project}
+          instruction={instruction}
+          variablesContainers={variablesContainers}
+          enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
+          parameterMetadata={props.parameterMetadata}
+          value={props.value}
+          onChange={props.onChange}
+          isInline={props.isInline}
+          onRequestClose={props.onRequestClose}
+          onApply={props.onApply}
+          ref={field}
+          onOpenDialog={() => setEditorOpen(true)}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
+          scope={scope}
+          id={
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-scene-variable-field`
+              : undefined
+          }
+          getVariableTypeFromParameters={getVariableTypeFromParameters}
+          onInstructionTypeChanged={onInstructionTypeChanged}
+        />
         {editorOpen && layout && project && (
           <VariablesEditorDialog
             project={project}

@@ -24,6 +24,12 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import intersection from 'lodash/intersection';
 import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
+import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
+import { ColumnStackLayout } from '../../UI/Layout';
+
+const gd: libGDevelop = global.gd;
 
 type Props = {
   ...ParameterFieldProps,
@@ -31,6 +37,11 @@ type Props = {
   enumerateVariableNames: () => Array<string>,
   forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
+  getVariableTypeFromParameters?: (
+    platform: gdPlatform,
+    projectScopedContainers: gdProjectScopedContainers,
+    instruction: gdInstruction
+  ) => Variable_Type | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
@@ -108,8 +119,13 @@ export const quicklyAnalyzeVariableName = (
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      scope,
       variablesContainers,
       enumerateVariableNames,
+      instruction,
       forceDeclaration,
       value,
       onChange,
@@ -119,6 +135,8 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       onRequestClose,
       onApply,
       id,
+      onInstructionTypeChanged,
+      getVariableTypeFromParameters,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -198,55 +216,97 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : null;
 
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
+    const variableType =
+      project && instruction && getVariableTypeFromParameters
+        ? getVariableTypeFromParameters(
+            project.getCurrentPlatform(),
+            projectScopedContainers,
+            instruction
+          )
+        : null;
+    const needManualTypeSwitcher =
+      variableType === gd.Variable.Unknown && !errorText && value;
+
     return (
       <I18n>
         {({ i18n }) => (
-          <TextFieldWithButtonLayout
-            renderTextField={() => (
-              <SemiControlledAutoComplete
-                margin={isInline ? 'none' : 'dense'}
-                floatingLabelText={description}
-                helperMarkdownText={
-                  warningTranslatableText
-                    ? i18n._(warningTranslatableText)
-                    : parameterMetadata
-                    ? parameterMetadata.getLongDescription()
-                    : undefined
-                }
-                errorText={errorText}
-                fullWidth
-                value={value}
-                onChange={onChange}
-                onRequestClose={onRequestClose}
-                onApply={onApply}
-                dataSource={[
-                  ...autocompletionVariableNames,
-                  onOpenDialog
-                    ? {
-                        translatableValue: t`Add or edit variables...`,
-                        text: '',
-                        value: '',
-                        onClick: onOpenDialog,
-                      }
-                    : null,
-                ].filter(Boolean)}
-                openOnFocus={!isInline}
-                ref={field}
-                id={id}
-              />
-            )}
-            renderButton={style =>
-              !isInline ? (
-                <RaisedButton
-                  icon={<ShareExternal />}
-                  disabled={!onOpenDialog}
-                  primary
-                  style={style}
-                  onClick={onOpenDialog}
+          <ColumnStackLayout noMargin>
+            <TextFieldWithButtonLayout
+              renderTextField={() => (
+                <SemiControlledAutoComplete
+                  margin={isInline ? 'none' : 'dense'}
+                  floatingLabelText={description}
+                  helperMarkdownText={
+                    warningTranslatableText
+                      ? i18n._(warningTranslatableText)
+                      : parameterMetadata
+                      ? parameterMetadata.getLongDescription()
+                      : undefined
+                  }
+                  errorText={errorText}
+                  fullWidth
+                  value={value}
+                  onChange={onChange}
+                  onRequestClose={onRequestClose}
+                  onApply={onApply}
+                  dataSource={[
+                    ...autocompletionVariableNames,
+                    onOpenDialog
+                      ? {
+                          translatableValue: t`Add or edit variables...`,
+                          text: '',
+                          value: '',
+                          onClick: onOpenDialog,
+                        }
+                      : null,
+                  ].filter(Boolean)}
+                  openOnFocus={!isInline}
+                  ref={field}
+                  id={id}
                 />
-              ) : null
-            }
-          />
+              )}
+              renderButton={style =>
+                !isInline ? (
+                  <RaisedButton
+                    icon={<ShareExternal />}
+                    disabled={!onOpenDialog}
+                    primary
+                    style={style}
+                    onClick={onOpenDialog}
+                  />
+                ) : null
+              }
+            />
+            {needManualTypeSwitcher && instruction && onInstructionTypeChanged && (
+              <SelectField
+                floatingLabelText={<Trans>Use as...</Trans>}
+                value={(() => {
+                  const type = gd.VariableInstructionSwitcher.getSwitchableInstructionVariableType(
+                    instruction.getType()
+                  );
+                  return type === gd.Variable.Unknown
+                    ? gd.Variable.Number
+                    : type;
+                })()}
+                onChange={(e, i, value: any) => {
+                  gd.VariableInstructionSwitcher.switchVariableInstructionType(
+                    instruction,
+                    value
+                  );
+                  onInstructionTypeChanged();
+                }}
+              >
+                <SelectOption value={gd.Variable.Number} label={t`Number`} />
+                <SelectOption value={gd.Variable.String} label={t`String`} />
+                <SelectOption value={gd.Variable.Boolean} label={t`Boolean`} />
+              </SelectField>
+            )}
+          </ColumnStackLayout>
         )}
       </I18n>
     );

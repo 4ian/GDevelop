@@ -83,7 +83,8 @@ class GD_CORE_API ExpressionVariableTypeFinder
     } else {
       const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
-                                                                  node.name)) {
+                                                                  node.name) !=
+          gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
         const auto &variableContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
@@ -125,7 +126,8 @@ class GD_CORE_API ExpressionVariableTypeFinder
     } else {
       const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
-              objectName, node.identifierName)) {
+              objectName, node.identifierName) !=
+          gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
         const auto &variableContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);

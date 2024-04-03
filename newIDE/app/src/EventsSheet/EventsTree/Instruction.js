@@ -323,10 +323,10 @@ const Instruction = (props: Props) => {
                   .getParameter(parameterIndex)
                   .getPlainString();
                 if (
-                  !objectsContainersList.hasObjectOrGroupWithVariableNamed(
+                  objectsContainersList.hasObjectOrGroupWithVariableNamed(
                     objectName,
                     getRootVariableName(variableName)
-                  )
+                  ) === gd.ObjectsContainersList.DoesNotExist
                 ) {
                   expressionIsValid = false;
                 }

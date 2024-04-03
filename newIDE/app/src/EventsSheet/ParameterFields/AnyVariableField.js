@@ -93,7 +93,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [layout, project]
     );
 
-    const isGlobal = layout && project &&
+    const isGlobal =
+      layout &&
+      project &&
       !layout.getVariables().has(getRootVariableName(props.value)) &&
       project.getVariables().has(getRootVariableName(props.value));
 

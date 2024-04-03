@@ -351,4 +351,48 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
+  {
+    const extension = new gd.PlatformExtension();
+    extension
+      .setExtensionInformation(
+        'FakeScene3D',
+        'Fake 3D',
+        'Fake support for 3D in GDevelop.',
+        '',
+        'MIT'
+      )
+      .setCategory('General');
+    extension
+      .addInstructionOrExpressionGroupMetadata('3D')
+      .setIcon('res/conditions/3d_box.svg');
+    const Cube3DObject = new gd.ObjectJsImplementation();
+    // $FlowExpectedError
+    Cube3DObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+    // $FlowExpectedError
+    Cube3DObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+
+    extension
+      .addObject(
+        'Cube3DObject',
+        '3D Box',
+        'A box with images for each face',
+        'JsPlatform/Extensions/3d_box.svg',
+        Cube3DObject
+      )
+      .setCategoryFullName('General')
+      .markAsRenderedIn3D();
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
 };

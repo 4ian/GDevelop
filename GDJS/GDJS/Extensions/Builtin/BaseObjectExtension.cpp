@@ -286,6 +286,9 @@ BaseObjectExtension::BaseObjectExtension() {
   objectActions["ObjectVariablePushString"].SetFunctionName("valuePush");
   objectActions["ObjectVariablePushNumber"].SetFunctionName("valuePush");
   objectActions["ObjectVariablePushBool"].SetFunctionName("valuePush");
+  objectActions["PushStringToObjectVariable"].SetFunctionName("valuePush");
+  objectActions["PushNumberToObjectVariable"].SetFunctionName("valuePush");
+  objectActions["PushBooleanToObjectVariable"].SetFunctionName("valuePush");
   objectActions["ObjectVariableRemoveAt"].SetFunctionName("variableRemoveAt");
   objectConditions["ObjectVariableChildCount"].SetFunctionName(
       "getVariableChildCount");

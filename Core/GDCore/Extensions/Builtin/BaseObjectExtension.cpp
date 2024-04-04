@@ -792,6 +792,47 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();  // Deprecated.
 
   obj.AddAction(
+         "PushStringToObjectVariable",
+         _("Add text variable"),
+         _("Adds a text (string) to the end of an object array variable."),
+         _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("string", _("Text to add"))
+      .MarkAsAdvanced()
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddAction("PushNumberToObjectVariable",
+                _("Add variable array value"),
+                _("Adds a number to the end of an object array variable."),
+                _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+                _("Variables/Arrays and structures"),
+                "res/actions/var24.png",
+                "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("expression", _("Number to add"))
+      .MarkAsAdvanced()
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddAction(
+         "PushBooleanToObjectVariable",
+         _("Add boolean variable"),
+         _("Adds a boolean to the end of an object array variable."),
+         _("Add value _PARAM2_ to array variable _PARAM1_ of _PARAM0_"),
+         _("Variables/Arrays and structures"),
+         "res/actions/var24.png",
+         "res/actions/var.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectvar", _("Array variable"))
+      .AddParameter("trueorfalse", _("Boolean to add"))
+      .MarkAsAdvanced()
+      .SetRelevantForLayoutEventsOnly();
+
+  obj.AddAction(
          "ObjectVariablePush",
          _("Add existing variable"),
          _("Adds an existing variable to the end of an object array variable."),
@@ -818,7 +859,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("string", _("Text to add"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction("ObjectVariablePushNumber",
                 _("Add number variable"),
@@ -830,7 +872,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("expression", _("Number to add"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction(
          "ObjectVariablePushBool",
@@ -843,7 +886,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("trueorfalse", _("Boolean to add"))
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRelevantForFunctionEventsOnly();
 
   obj.AddAction(
          "ObjectVariableRemoveAt",

@@ -198,7 +198,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "PushString",
           _("Add text variable"),
           _("Adds a text (string) at the end of a array variable."),
-          _("Add text _PARAM1_ to array variable _PARAM0_"),
+          _("Add the value _PARAM1_ to array variable _PARAM0_"),
           _("Arrays and structures"),
           "res/actions/var24.png",
           "res/actions/var.png")
@@ -209,9 +209,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("PushNumber",
-                 _("Add number variable"),
+                 _("Add array value"),
                  _("Adds a number at the end of an array variable."),
-                 _("Add number _PARAM1_ to array variable _PARAM0_"),
+                 _("Add the value _PARAM1_ to array variable _PARAM0_"),
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -224,7 +224,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddAction("PushBoolean",
                  _("Add boolean variable"),
                  _("Adds a boolean at the end of an array variable."),
-                 _("Add boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Add the value _PARAM1_ to array variable _PARAM0_"),
                  _("Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")

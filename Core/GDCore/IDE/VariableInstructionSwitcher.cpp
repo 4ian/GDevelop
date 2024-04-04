@@ -12,6 +12,7 @@ namespace gd {
 
 const gd::String VariableInstructionSwitcher::variableGetterIdentifier = "NumberVariable";
 const gd::String VariableInstructionSwitcher::variableSetterIdentifier = "SetNumberVariable";
+const gd::String VariableInstructionSwitcher::variablePushIdentifier = "PushNumber";
 const gd::String VariableInstructionSwitcher::objectVariableGetterIdentifier = "NumberObjectVariable";
 const gd::String VariableInstructionSwitcher::objectVariableSetterIdentifier = "SetNumberObjectVariable";
 const gd::String VariableInstructionSwitcher::unknownInstructionIdentifier = "";
@@ -21,12 +22,19 @@ bool VariableInstructionSwitcher::IsSwitchableVariableInstruction(
   return instructionType == "NumberVariable" ||
       instructionType == "StringVariable" ||
       instructionType == "BooleanVariable" ||
+
       instructionType == "SetNumberVariable" ||
       instructionType == "SetStringVariable" ||
       instructionType == "SetBooleanVariable" ||
+
+      instructionType == "PushNumber" ||
+      instructionType == "PushString" ||
+      instructionType == "PushBoolean" ||
+
       instructionType == "NumberObjectVariable" ||
       instructionType == "StringObjectVariable" ||
       instructionType == "BooleanObjectVariable" ||
+
       instructionType == "SetNumberObjectVariable" ||
       instructionType == "SetStringObjectVariable" ||
       instructionType == "SetBooleanObjectVariable";
@@ -39,18 +47,27 @@ VariableInstructionSwitcher::GetSwitchableVariableInstructionIdentifier(
       instructionType == "StringVariable" ||
       instructionType == "BooleanVariable"
       ? VariableInstructionSwitcher::variableGetterIdentifier :
+
       instructionType == "SetNumberVariable" ||
       instructionType == "SetStringVariable" ||
       instructionType == "SetBooleanVariable"
       ? VariableInstructionSwitcher::variableSetterIdentifier :
+
+      instructionType == "PushNumber" ||
+      instructionType == "PushString" ||
+      instructionType == "PushBoolean"
+      ? VariableInstructionSwitcher::variablePushIdentifier :
+
       instructionType == "NumberObjectVariable" ||
       instructionType == "StringObjectVariable" ||
       instructionType == "BooleanObjectVariable"
       ? VariableInstructionSwitcher::objectVariableGetterIdentifier :
+
       instructionType == "SetNumberObjectVariable" ||
       instructionType == "SetStringObjectVariable" ||
       instructionType == "SetBooleanObjectVariable"
       ? VariableInstructionSwitcher::objectVariableSetterIdentifier :
+
       VariableInstructionSwitcher::unknownInstructionIdentifier;
 }
 
@@ -58,19 +75,25 @@ const gd::Variable::Type
 VariableInstructionSwitcher::GetSwitchableInstructionVariableType(const gd::String &instructionType) {
   return instructionType == "NumberVariable" ||
       instructionType == "SetNumberVariable" ||
+      instructionType == "PushNumber" ||
       instructionType == "NumberObjectVariable" ||
       instructionType == "SetNumberObjectVariable"
       ? gd::Variable::Number :
+
       instructionType == "StringVariable" ||
       instructionType == "SetStringVariable" ||
+      instructionType == "PushString" ||
       instructionType == "StringObjectVariable" ||
       instructionType == "SetStringObjectVariable"
       ? gd::Variable::String :
+
       instructionType == "BooleanVariable" ||
       instructionType == "SetBooleanVariable" ||
+      instructionType == "PushBoolean" ||
       instructionType == "BooleanObjectVariable" ||
       instructionType == "SetBooleanObjectVariable"
       ? gd::Variable::Boolean :
+
       gd::Variable::Unknown;
 }
 
@@ -100,6 +123,19 @@ void VariableInstructionSwitcher::SwitchVariableInstructionType(
     }
     else if (variableType == gd::Variable::Type::Boolean) {
       instruction.SetType("SetBooleanVariable");
+    }
+  }
+  else if (instruction.GetType() == "PushNumber" ||
+      instruction.GetType() == "PushString" ||
+      instruction.GetType() == "PushBoolean") {
+    if (variableType == gd::Variable::Type::Number) {
+      instruction.SetType("PushNumber");
+    }
+    else if (variableType == gd::Variable::Type::String) {
+      instruction.SetType("PushString");
+    }
+    else if (variableType == gd::Variable::Type::Boolean) {
+      instruction.SetType("PushBoolean");
     }
   }
   else if (instruction.GetType() == "NumberObjectVariable" ||

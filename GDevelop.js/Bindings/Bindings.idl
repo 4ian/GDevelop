@@ -247,6 +247,11 @@ interface ExpressionVariableTypeFinder {
       [Const, Ref] ProjectScopedContainers projectScopedContainers,
       [Ref] ExpressionNode node,
       [Const] DOMString objectName);
+    [Const] Variable_Type STATIC_GetArrayVariableType(
+      [Const, Ref] Platform platform,
+      [Const, Ref] ProjectScopedContainers projectScopedContainers,
+      [Ref] ExpressionNode node,
+      [Const] DOMString objectName);
 };
 
 interface Variable {

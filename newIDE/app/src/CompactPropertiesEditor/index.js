@@ -30,6 +30,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
+import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -123,6 +124,12 @@ type SectionTitle = {|
   getValue: typeof undefined,
 |};
 
+type VerticalCenterWithBar = {|
+  name: string,
+  nonFieldType: 'verticalCenterWithBar',
+  child: PrimitiveValueField,
+|};
+
 type ActionButton = {|
   label: string,
   disabled: 'onValuesDifferent',
@@ -141,6 +148,7 @@ export type Field =
   | SectionTitle
   | Title
   | ActionButton
+  | VerticalCenterWithBar
   | {|
       name: string,
       type: 'row' | 'column',
@@ -583,6 +591,14 @@ const CompactPropertiesEditor = ({
     );
   };
 
+  const renderVerticalCenterWithBar = (field: Field) => (
+    <VerticallyCenterWithBar>
+      {field.child && field.child.getValue
+        ? renderInputField(field.child)
+        : 'TODO'}
+    </VerticallyCenterWithBar>
+  );
+
   const renderContainer =
     mode === 'row'
       ? (fields: React.Node) =>
@@ -667,6 +683,8 @@ const CompactPropertiesEditor = ({
           return renderSectionTitle(field);
         } else if (field.nonFieldType === 'button') {
           return renderButton(field);
+        } else if (field.nonFieldType === 'verticalCenterWithBar') {
+          return renderVerticalCenterWithBar(field);
         }
         return null;
       } else if (field.children) {

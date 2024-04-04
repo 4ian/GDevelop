@@ -6,7 +6,6 @@ import type { PrivateGameTemplateListingData } from '../Utils/GDevelopServices/S
 import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import PrivateGameTemplateInformationDialog from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateInformationDialog';
-import PrivateGameTemplatePurchaseDialog from '../AssetStore/PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
 import { PrivateGameTemplateStoreContext } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
@@ -42,10 +41,6 @@ const useExampleOrGameTemplateDialogs = ({
      */
     openDialog: boolean,
   |}>(null);
-  const [
-    purchasingGameTemplateListingData,
-    setPurchasingGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(null);
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -147,7 +142,6 @@ const useExampleOrGameTemplateDialogs = ({
               privateGameTemplateListingData={
                 selectedPrivateGameTemplate.privateGameTemplateListingData
               }
-              isPurchaseDialogOpen={!!purchasingGameTemplateListingData}
               onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
               onGameTemplateOpen={privateGameTemplateListingData =>
                 setSelectedPrivateGameTemplate({
@@ -155,23 +149,12 @@ const useExampleOrGameTemplateDialogs = ({
                   openDialog: true,
                 })
               }
-              onOpenPurchaseDialog={() => {
-                setPurchasingGameTemplateListingData(
-                  selectedPrivateGameTemplate.privateGameTemplateListingData
-                );
-              }}
               onClose={() => setSelectedPrivateGameTemplate(null)}
               privateGameTemplateListingDatasFromSameCreator={
                 privateGameTemplateListingDatasFromSameCreator
               }
             />
           )}
-        {!!purchasingGameTemplateListingData && (
-          <PrivateGameTemplatePurchaseDialog
-            privateGameTemplateListingData={purchasingGameTemplateListingData}
-            onClose={() => setPurchasingGameTemplateListingData(null)}
-          />
-        )}
       </>
     );
   };

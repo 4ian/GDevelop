@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import {
-  listUserPurchases,
-  type PrivateAssetPackListingData,
-} from '../../Utils/GDevelopServices/Shop';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
@@ -28,22 +25,25 @@ import PasswordPromptDialog from '../PasswordPromptDialog';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
+  usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateAssetPackPurchaseDialog = ({
   privateAssetPackListingData,
+  usageType,
   onClose,
   simulateAppStoreProduct,
 }: Props) => {
   const {
     profile,
-    getAuthorizationHeader,
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
     receivedAssetPacks,
     onPurchaseSuccessful,
+    onRefreshAssetPackPurchases,
+    assetPackPurchases,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
@@ -78,12 +78,24 @@ const PrivateAssetPackPurchaseDialog = ({
       return;
     }
 
+    const price = privateAssetPackListingData.prices.find(
+      price => price.usageType === usageType
+    );
+    if (!price) {
+      console.error('Unable to find the price for the usage type', usageType);
+      await showAlert({
+        title: t`An error happened`,
+        message: t`Unable to find the price for this asset pack. Please try again later.`,
+      });
+      return;
+    }
+
     // Purchase with web.
     try {
       setIsPurchasing(true);
       const checkoutUrl = getPurchaseCheckoutUrl({
         productId: privateAssetPackListingData.id,
-        priceName: privateAssetPackListingData.prices[0].name,
+        priceName: price.name,
         userId: profile.id,
         userEmail: profile.email,
         ...(password ? { password } : undefined),
@@ -130,45 +142,36 @@ const PrivateAssetPackPurchaseDialog = ({
     []
   );
 
-  const checkUserPurchases = React.useCallback(
-    async () => {
-      if (!profile) return;
-      try {
-        const userPurchases = await listUserPurchases(getAuthorizationHeader, {
-          userId: profile.id,
-          productType: 'asset-pack',
-          role: 'receiver',
-        });
+  React.useEffect(
+    () => {
+      const checkIfPurchaseIsDone = async () => {
         if (
-          userPurchases.find(
+          isPurchasing &&
+          assetPackPurchases &&
+          assetPackPurchases.find(
             userPurchase =>
               userPurchase.productId === privateAssetPackListingData.id
           )
         ) {
           // We found the purchase, the user has bought the asset pack.
-          // We do not close the dialog yet, as we need to trigger a refresh of the asset store.
+          // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
         }
-      } catch (error) {
-        console.error('Unable to get the user purchases', error);
-        await showAlert({
-          title: t`An error happened`,
-          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your asset pack!`,
-        });
-      }
+      };
+      checkIfPurchaseIsDone();
     },
     [
-      profile,
-      getAuthorizationHeader,
+      isPurchasing,
+      assetPackPurchases,
       privateAssetPackListingData,
       onPurchaseSuccessful,
-      showAlert,
+      onRefreshAssetPackPurchases,
     ]
   );
 
   useInterval(
     () => {
-      checkUserPurchases();
+      onRefreshAssetPackPurchases();
     },
     isPurchasing ? 3900 : null
   );

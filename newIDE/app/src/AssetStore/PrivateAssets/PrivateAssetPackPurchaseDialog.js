@@ -153,7 +153,7 @@ const PrivateAssetPackPurchaseDialog = ({
               userPurchase.productId === privateAssetPackListingData.id
           )
         ) {
-          // We found the purchase, the user has bought the game template.
+          // We found the purchase, the user has bought the asset pack.
           // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
         }

@@ -1,0 +1,208 @@
+// @flow
+import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
+
+import * as React from 'react';
+import Background from '../../UI/Background';
+import EmptyMessage from '../../UI/EmptyMessage';
+import CompactPropertiesEditor from '../../CompactPropertiesEditor';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import { type Schema } from '../../CompactPropertiesEditor';
+import getObjectByName from '../../Utils/GetObjectByName';
+import IconButton from '../../UI/IconButton';
+import { Line, Column } from '../../UI/Grid';
+import Text from '../../UI/Text';
+import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import ScrollView from '../../UI/ScrollView';
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import VariablesList, {
+  type HistoryHandler,
+} from '../../VariablesList/VariablesList';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import ErrorBoundary from '../../UI/ErrorBoundary';
+import { makeSchema } from './CompactPropertiesSchema';
+
+const gd: libGDevelop = global.gd;
+
+type Props = {|
+  project: gdProject,
+  layout: gdLayout,
+  instances: Array<gdInitialInstance>,
+  onEditObjectByName: string => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
+  onGetInstanceSize: gdInitialInstance => [number, number, number],
+  editInstanceVariables: gdInitialInstance => void,
+  unsavedChanges?: ?UnsavedChanges,
+  i18n: I18nType,
+  historyHandler?: HistoryHandler,
+|};
+
+export type CompactInstancePropertiesEditorInterface = {|
+  forceUpdate: () => void,
+|};
+
+
+const CompactInstancePropertiesEditor = ({
+  instances,
+  i18n,
+  project,
+  layout,
+  unsavedChanges,
+  historyHandler,
+  onEditObjectByName,
+  onGetInstanceSize,
+  editInstanceVariables,
+  onInstancesModified,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+
+  const schemaFor2D: Schema = React.useMemo(
+    () =>
+      makeSchema({
+        i18n,
+        is3DInstance: false,
+        onGetInstanceSize,
+        onEditObjectByName,
+        layout,
+        forceUpdate,
+      }),
+    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
+  );
+
+  const schemaFor3D: Schema = React.useMemo(
+    () =>
+      makeSchema({
+        i18n,
+        is3DInstance: true,
+        onGetInstanceSize,
+        onEditObjectByName,
+        layout,
+        forceUpdate,
+      }),
+    [i18n, onGetInstanceSize, onEditObjectByName, layout, forceUpdate]
+  );
+
+  // TODO: multiple instances support.
+  const instance = instances[0];
+
+  const { object, instanceSchema } = React.useMemo<{|
+    object?: gdObject,
+    instanceSchema?: Schema,
+  |}>(
+    () => {
+      if (!instance) return { object: undefined, instanceSchema: undefined };
+
+      const associatedObjectName = instance.getObjectName();
+      const object = getObjectByName(project, layout, associatedObjectName);
+      const properties = instance.getCustomProperties(project, layout);
+      if (!object) return { object: undefined, instanceSchema: undefined };
+
+      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D();
+      const instanceSchemaForCustomProperties = propertiesMapToSchema(
+        properties,
+        (instance: gdInitialInstance) =>
+          instance.getCustomProperties(project, layout),
+        (instance: gdInitialInstance, name, value) =>
+          instance.updateCustomProperty(name, value, project, layout)
+      );
+
+      return {
+        object,
+        instanceSchema: is3DInstance
+          ? schemaFor3D.concat(instanceSchemaForCustomProperties)
+          : schemaFor2D.concat(instanceSchemaForCustomProperties),
+      };
+    },
+    [project, layout, instance, schemaFor2D, schemaFor3D]
+  );
+
+  if (!object || !instance || !instanceSchema) return null;
+
+  return (
+    <ErrorBoundary
+      componentTitle={<Trans>Instance properties</Trans>}
+      scope="scene-editor-instance-properties"
+    >
+      <ScrollView
+        autoHideScrollbar
+        key={instances
+          .map((instance: gdInitialInstance) => '' + instance.ptr)
+          .join(';')}
+      >
+        {/* TODO: Make sure the editor is correctly highlighted when an in-app tutorial is running */}
+        <Column expand noMargin id="instance-properties-editor">
+          <Column>
+            <CompactPropertiesEditor
+              unsavedChanges={unsavedChanges}
+              schema={instanceSchema}
+              instances={instances}
+              onInstancesModified={onInstancesModified}
+            />
+            <Line alignItems="center" justifyContent="space-between">
+              <Text>
+                <Trans>Instance Variables</Trans>
+              </Text>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  editInstanceVariables(instance);
+                }}
+              >
+                <ShareExternal />
+              </IconButton>
+            </Line>
+          </Column>
+          {object ? (
+            <VariablesList
+              directlyStoreValueChangesWhileEditing
+              inheritedVariablesContainer={object.getVariables()}
+              variablesContainer={instance.getVariables()}
+              size="small"
+              onComputeAllVariableNames={() =>
+                object
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                  : []
+              }
+              historyHandler={historyHandler}
+            />
+          ) : null}
+        </Column>
+      </ScrollView>
+    </ErrorBoundary>
+  );
+};
+
+const CompactInstancePropertiesEditorContainer = React.forwardRef<
+  Props,
+  CompactInstancePropertiesEditorInterface
+>((props, ref) => {
+  const forceUpdate = useForceUpdate();
+  React.useImperativeHandle(ref, () => ({
+    forceUpdate,
+  }));
+
+  return (
+    <Background>
+      {!props.instances || !props.instances.length ? (
+        <EmptyMessage>
+          <Trans>
+            Click on an instance in the scene to display its properties
+          </Trans>
+        </EmptyMessage>
+      ) : (
+        <CompactInstancePropertiesEditor {...props} />
+      )}
+    </Background>
+  );
+});
+
+export default CompactInstancePropertiesEditorContainer;

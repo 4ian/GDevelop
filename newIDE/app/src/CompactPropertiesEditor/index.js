@@ -638,7 +638,7 @@ const CompactPropertiesEditor = ({
       return (
         <LineStackLayout key={`section-title-${field.name}`}>
           {renderLeftIcon()}
-          <Text displayInlineAsSpan>{field.name}</Text>
+          <Text displayInlineAsSpan size="sub-title">{field.name}</Text>
         </LineStackLayout>
       );
     },
@@ -684,7 +684,7 @@ const CompactPropertiesEditor = ({
           );
           if (field.title) {
             return [
-              <Text key={field.name + '-title'} size="block-title">
+              <Text key={field.name + '-title'} size="sub-title">
                 {field.title}
               </Text>,
               contentView,

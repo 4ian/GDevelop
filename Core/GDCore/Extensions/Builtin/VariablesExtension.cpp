@@ -209,7 +209,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("PushNumber",
-                 _("Add array value"),
+                 _("Add variable array value"),
                  _("Adds a number at the end of an array variable."),
                  _("Add the value _PARAM1_ to array variable _PARAM0_"),
                  _("Arrays and structures"),

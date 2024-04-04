@@ -55,6 +55,7 @@ private:
   static const gd::String variablePushIdentifier;
   static const gd::String objectVariableGetterIdentifier;
   static const gd::String objectVariableSetterIdentifier;
+  static const gd::String objectVariablePushIdentifier;
   static const gd::String unknownInstructionIdentifier;
 };
 } // namespace gd

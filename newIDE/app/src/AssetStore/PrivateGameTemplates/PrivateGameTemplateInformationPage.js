@@ -56,6 +56,7 @@ import { CreditsPackageStoreContext } from '../CreditsPackages/CreditsPackageSto
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import RaisedButton from '../../UI/RaisedButton';
 import Play from '../../UI/CustomSvgIcons/Play';
+import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplatePurchaseDialog';
 
 const cellSpacing = 8;
 
@@ -108,7 +109,6 @@ const styles = {
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
-  onOpenPurchaseDialog: () => void,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
@@ -117,7 +117,6 @@ type Props = {|
 const PrivateGameTemplateInformationPage = ({
   privateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator,
-  onOpenPurchaseDialog,
   onGameTemplateOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
@@ -143,6 +142,10 @@ const PrivateGameTemplateInformationPage = ({
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
     privateGameTemplateListingData.prices[0].usageType
   );
+  const [
+    purchasingPrivateGameTemplateListingData,
+    setPurchasingPrivateGameTemplateListingData,
+  ] = React.useState<?PrivateGameTemplateListingData>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [
     openSellerPublicProfileDialog,
@@ -285,14 +288,15 @@ const PrivateGameTemplateInformationPage = ({
           usageType: selectedUsageType,
         });
 
-        onOpenPurchaseDialog();
+        setPurchasingPrivateGameTemplateListingData(
+          privateGameTemplateListingData
+        );
       } catch (e) {
         console.warn('Unable to send event', e);
       }
     },
     [
       gameTemplate,
-      onOpenPurchaseDialog,
       privateGameTemplateListingData,
       isAlreadyReceived,
       onCreateWithGameTemplate,
@@ -590,6 +594,15 @@ const PrivateGameTemplateInformationPage = ({
             <PublicProfileDialog
               userId={sellerId}
               onClose={() => setOpenSellerPublicProfileDialog(false)}
+            />
+          )}
+          {!!purchasingPrivateGameTemplateListingData && (
+            <PrivateGameTemplatePurchaseDialog
+              privateGameTemplateListingData={
+                purchasingPrivateGameTemplateListingData
+              }
+              usageType={selectedUsageType}
+              onClose={() => setPurchasingPrivateGameTemplateListingData(null)}
             />
           )}
         </>

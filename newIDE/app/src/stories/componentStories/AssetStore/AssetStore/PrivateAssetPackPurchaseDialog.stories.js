@@ -61,6 +61,7 @@ export const NotLoggedIn = () => {
     <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
+        usageType="commercial"
         onClose={() => action('close')()}
       />
     </AuthenticatedUserContext.Provider>
@@ -72,6 +73,7 @@ export const LoggedIn = () => {
     <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <PrivateAssetPackPurchaseDialog
         privateAssetPackListingData={privateAssetPackListingData}
+        usageType="commercial"
         onClose={() => action('close')()}
       />
     </AuthenticatedUserContext.Provider>

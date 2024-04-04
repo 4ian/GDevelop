@@ -41,7 +41,6 @@ import PrivateAssetPackInformationPage from './PrivateAssets/PrivateAssetPackInf
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
 import {
   isHomePage,
@@ -54,7 +53,6 @@ import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAss
 import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
-import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 type Props = {|
@@ -155,14 +153,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [isMobile]
     );
 
-    const [
-      purchasingPrivateAssetPackListingData,
-      setPurchasingPrivateAssetPackListingData,
-    ] = React.useState<?PrivateAssetPackListingData>(null);
-    const [
-      purchasingPrivateGameTemplateListingData,
-      setPurchasingPrivateGameTemplateListingData,
-    ] = React.useState<?PrivateGameTemplateListingData>(null);
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
     );
@@ -450,44 +440,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         shopNavigationState.openShopCategoryPage(category);
       },
       [shopNavigationState, saveScrollPosition]
-    );
-
-    // If the user has received the pack they are currently viewing,
-    // we update the window to show it if they are not already on the pack page.
-    React.useEffect(
-      () => {
-        if (!purchasingPrivateAssetPackListingData) return;
-        // Ensure the user is not already on the pack page, to trigger the effect only once.
-        const isOnPrivatePackPage =
-          currentPage.openedAssetPack &&
-          currentPage.openedAssetPack.id &&
-          currentPage.openedAssetPack.id ===
-            purchasingPrivateAssetPackListingData.id;
-        if (receivedAssetPacks && !isOnPrivatePackPage) {
-          const receivedAssetPack = receivedAssetPacks.find(
-            pack => pack.id === purchasingPrivateAssetPackListingData.id
-          );
-          if (receivedAssetPack) {
-            // The user has received the pack, close the pack information dialog, and open the pack in the search.
-            setSearchText('');
-            shopNavigationState.clearPreviousPageFromHistory(); // Clear the previous page from history to avoid going back to the pack information page.
-            shopNavigationState.openPackPage({
-              assetPack: receivedAssetPack,
-              previousSearchText: '', // We were on a pack page.
-            });
-            openFiltersPanelIfAppropriate();
-          }
-        }
-      },
-      [
-        receivedAssetPacks,
-        purchasingPrivateAssetPackListingData,
-        shopNavigationState,
-        currentPage,
-        saveScrollPosition,
-        setSearchText,
-        openFiltersPanelIfAppropriate,
-      ]
     );
 
     // When a tag is selected from the asset details page,
@@ -782,11 +734,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           ) : !!openedPrivateAssetPackListingData ? (
             <PrivateAssetPackInformationPage
               privateAssetPackListingData={openedPrivateAssetPackListingData}
-              onOpenPurchaseDialog={() =>
-                setPurchasingPrivateAssetPackListingData(
-                  openedPrivateAssetPackListingData
-                )
-              }
               onAssetPackOpen={selectPrivateAssetPack}
               privateAssetPackListingDatasFromSameCreator={
                 privateAssetPackListingDatasFromSameCreator
@@ -796,11 +743,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
             <PrivateGameTemplateInformationPage
               privateGameTemplateListingData={
                 openedPrivateGameTemplateListingData
-              }
-              onOpenPurchaseDialog={() =>
-                setPurchasingPrivateGameTemplateListingData(
-                  openedPrivateGameTemplateListingData
-                )
               }
               onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
@@ -814,22 +756,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               }
             />
           ) : null}
-          {!!purchasingPrivateAssetPackListingData && (
-            <PrivateAssetPackPurchaseDialog
-              privateAssetPackListingData={
-                purchasingPrivateAssetPackListingData
-              }
-              onClose={() => setPurchasingPrivateAssetPackListingData(null)}
-            />
-          )}
-          {!!purchasingPrivateGameTemplateListingData && (
-            <PrivateGameTemplatePurchaseDialog
-              privateGameTemplateListingData={
-                purchasingPrivateGameTemplateListingData
-              }
-              onClose={() => setPurchasingPrivateGameTemplateListingData(null)}
-            />
-          )}
           {canShowFiltersPanel && (
             <ResponsivePaperOrDrawer
               onClose={() => setIsFiltersPanelOpen(false)}

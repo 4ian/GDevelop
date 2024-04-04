@@ -9,8 +9,6 @@ import PrivateGameTemplateInformationPage from './PrivateGameTemplateInformation
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
-  onOpenPurchaseDialog: () => void,
-  isPurchaseDialogOpen: boolean,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
   onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   onClose: () => void,
@@ -19,8 +17,6 @@ type Props = {|
 const PrivateGameTemplateInformationDialog = ({
   privateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator,
-  onOpenPurchaseDialog,
-  isPurchaseDialogOpen,
   onGameTemplateOpen,
   onCreateWithGameTemplate,
   onClose,
@@ -34,7 +30,6 @@ const PrivateGameTemplateInformationDialog = ({
           label={<Trans>Back</Trans>}
           primary={false}
           onClick={onClose}
-          disabled={isPurchaseDialogOpen}
         />,
       ]}
       open
@@ -47,7 +42,6 @@ const PrivateGameTemplateInformationDialog = ({
         privateGameTemplateListingDatasFromSameCreator={
           privateGameTemplateListingDatasFromSameCreator
         }
-        onOpenPurchaseDialog={onOpenPurchaseDialog}
         onGameTemplateOpen={onGameTemplateOpen}
         onCreateWithGameTemplate={onCreateWithGameTemplate}
       />

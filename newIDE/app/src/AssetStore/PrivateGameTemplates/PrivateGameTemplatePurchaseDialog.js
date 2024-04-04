@@ -25,12 +25,14 @@ import PasswordPromptDialog from '../PasswordPromptDialog';
 
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
+  usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateGameTemplatePurchaseDialog = ({
   privateGameTemplateListingData,
+  usageType,
   onClose,
   simulateAppStoreProduct,
 }: Props) => {
@@ -76,12 +78,24 @@ const PrivateGameTemplatePurchaseDialog = ({
       return;
     }
 
+    const price = privateGameTemplateListingData.prices.find(
+      price => price.usageType === usageType
+    );
+    if (!price) {
+      console.error('Unable to find the price for the usage type', usageType);
+      await showAlert({
+        title: t`An error happened`,
+        message: t`Unable to find the price for this game template. Please try again later.`,
+      });
+      return;
+    }
+
     // Purchase with web.
     try {
       setIsPurchasing(true);
       const checkoutUrl = getPurchaseCheckoutUrl({
         productId: privateGameTemplateListingData.id,
-        priceName: privateGameTemplateListingData.prices[0].name,
+        priceName: price.name,
         userId: profile.id,
         userEmail: profile.email,
         ...(password ? { password } : undefined),
@@ -153,6 +167,7 @@ const PrivateGameTemplatePurchaseDialog = ({
       gameTemplatePurchases,
       privateGameTemplateListingData,
       onPurchaseSuccessful,
+      onRefreshGameTemplatePurchases,
     ]
   );
 

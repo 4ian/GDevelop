@@ -301,7 +301,6 @@ const PrivateGameTemplateInformationPageStory = ({
           <ProductLicenseStoreStateProvider>
             <PrivateGameTemplateInformationPage
               privateGameTemplateListingData={privateGameTemplateListingData}
-              onOpenPurchaseDialog={() => action('open purchase dialog')()}
               onGameTemplateOpen={() => action('open game template')()}
               onCreateWithGameTemplate={() =>
                 action('create with game template')()

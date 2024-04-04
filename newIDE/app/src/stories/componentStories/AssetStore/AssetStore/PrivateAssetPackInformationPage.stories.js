@@ -297,7 +297,6 @@ const PrivateAssetPackInformationPageStory = ({
           <ProductLicenseStoreStateProvider>
             <PrivateAssetPackInformationPage
               privateAssetPackListingData={privateAssetPackListingData}
-              onOpenPurchaseDialog={() => action('open purchase dialog')()}
               onAssetPackOpen={() => action('open asset pack')()}
               privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
                 assetPackListingData =>

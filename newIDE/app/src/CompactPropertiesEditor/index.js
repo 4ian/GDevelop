@@ -591,7 +591,7 @@ const CompactPropertiesEditor = ({
   const renderContainer =
     mode === 'row'
       ? (fields: React.Node) => (
-          <ResponsiveLineStackLayout noMargin alignItems="center">
+          <ResponsiveLineStackLayout noMargin alignItems="center" expand>
             {fields}
           </ResponsiveLineStackLayout>
         )

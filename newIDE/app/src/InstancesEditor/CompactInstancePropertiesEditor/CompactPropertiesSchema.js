@@ -390,3 +390,24 @@ export const makeSchema = ({
     getLayerField({ i18n, layout }),
   ];
 };
+
+export const reorderInstanceSchemaForCustomProperties = (
+  schema: Schema,
+  i18n: I18nType
+): Schema => {
+  const newSchema = [...schema];
+  const animationFieldIndex = newSchema.findIndex(
+    field => field.name && field.name === 'animation'
+  );
+  if (animationFieldIndex === -1) return newSchema;
+
+  const [animationField] = newSchema.splice(animationFieldIndex, 1);
+  console.log(animationField)
+  newSchema.unshift({
+    name: 'Animation',
+    type: 'row',
+    title: i18n._(t`Animation`),
+    children: [animationField],
+  });
+  return newSchema;
+};

@@ -21,7 +21,10 @@ import VariablesList, {
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { makeSchema } from './CompactPropertiesSchema';
+import {
+  makeSchema,
+  reorderInstanceSchemaForCustomProperties,
+} from './CompactPropertiesSchema';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,7 +44,6 @@ type Props = {|
 export type CompactInstancePropertiesEditorInterface = {|
   forceUpdate: () => void,
 |};
-
 
 const CompactInstancePropertiesEditor = ({
   instances,
@@ -110,14 +112,19 @@ const CompactInstancePropertiesEditor = ({
           instance.updateCustomProperty(name, value, project, layout)
       );
 
+      const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
+        instanceSchemaForCustomProperties,
+        i18n
+      );
+
       return {
         object,
         instanceSchema: is3DInstance
-          ? schemaFor3D.concat(instanceSchemaForCustomProperties)
-          : schemaFor2D.concat(instanceSchemaForCustomProperties),
+          ? schemaFor3D.concat(reorderedInstanceSchemaForCustomProperties)
+          : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
       };
     },
-    [project, layout, instance, schemaFor2D, schemaFor3D]
+    [project, layout, instance, schemaFor2D, schemaFor3D, i18n]
   );
 
   if (!object || !instance || !instanceSchema) return null;

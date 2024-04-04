@@ -31,6 +31,7 @@ export const Line = (props: {|
       // all the height (if set to flex: 1) and to *not* grow
       // larger than the parent.
       minHeight: props.useFullHeight ? '0' : undefined,
+      minWidth: 0,
     }}
   >
     {props.children}

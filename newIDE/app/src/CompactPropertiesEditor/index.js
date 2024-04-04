@@ -187,7 +187,7 @@ const styles = {
   subHeader: {
     paddingLeft: 0,
   },
-  container: { flex: 1 },
+  container: { flex: 1, minWidth: 0 },
 };
 
 const getDisabled = ({

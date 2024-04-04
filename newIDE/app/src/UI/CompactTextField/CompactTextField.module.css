@@ -64,6 +64,7 @@
   color: inherit;
   flex: 1;
   caret-color: var(--theme-secondary-dark);
+  min-width: 0px;
 }
 
 .compactTextField input::placeholder {

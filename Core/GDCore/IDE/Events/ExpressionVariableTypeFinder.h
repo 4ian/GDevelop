@@ -48,6 +48,18 @@ class GD_CORE_API ExpressionVariableTypeFinder
     return typeFinder.variable ? typeFinder.variable->GetType() : gd::Variable::Unknown;
   }
 
+  static const gd::Variable::Type GetArrayVariableType(
+      const gd::Platform& platform,
+      const gd::ProjectScopedContainers& projectScopedContainers,
+      gd::ExpressionNode& node, const gd::String& objectName) {
+    gd::ExpressionVariableTypeFinder typeFinder(platform,
+                                                  projectScopedContainers, objectName);
+    node.Visit(typeFinder);
+    return typeFinder.variable && typeFinder.variable->GetChildrenCount() > 0
+               ? typeFinder.variable->GetAtIndex(0).GetType()
+               : gd::Variable::Unknown;
+  }
+
   virtual ~ExpressionVariableTypeFinder(){};
 
  protected:

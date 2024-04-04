@@ -250,6 +250,7 @@ export class VariableInstructionSwitcher extends EmscriptenObject {
 
 export class ExpressionVariableTypeFinder extends EmscriptenObject {
   static getVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode, objectName: string): Variable_Type;
+  static getArrayVariableType(platform: Platform, projectScopedContainers: ProjectScopedContainers, node: ExpressionNode, objectName: string): Variable_Type;
 }
 
 export class Variable extends EmscriptenObject {

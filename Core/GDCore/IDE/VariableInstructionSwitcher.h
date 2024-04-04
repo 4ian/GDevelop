@@ -52,6 +52,7 @@ public:
 private:
   static const gd::String variableGetterIdentifier;
   static const gd::String variableSetterIdentifier;
+  static const gd::String variablePushIdentifier;
   static const gd::String objectVariableGetterIdentifier;
   static const gd::String objectVariableSetterIdentifier;
   static const gd::String unknownInstructionIdentifier;

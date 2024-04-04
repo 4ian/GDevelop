@@ -28,12 +28,21 @@ const getVariableTypeFromParameters = (
       instruction.getType()
     )
   ) {
-    return gd.ExpressionVariableTypeFinder.getVariableType(
+    const variableType = gd.ExpressionVariableTypeFinder.getVariableType(
       platform,
       projectScopedContainers,
       instruction.getParameter(0).getRootNode(),
       ''
     );
+    return variableType === gd.Variable.Array
+      ? // "Push" actions need the child type to be able to switch.
+        gd.ExpressionVariableTypeFinder.getArrayVariableType(
+          platform,
+          projectScopedContainers,
+          instruction.getParameter(0).getRootNode(),
+          ''
+        )
+      : variableType;
   }
   return null;
 };

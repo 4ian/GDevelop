@@ -228,7 +228,12 @@ const makeSchema = ({
                   name: 'Custom size',
                   getLabel: () => i18n._(t`Custom size`),
                   valueType: 'booleanIcon',
-                  renderIcon: value => (value ? <Link /> : <Unlink />),
+                  renderIcon: value =>
+                    value ? (
+                      <Link fontSize="small" />
+                    ) : (
+                      <Unlink fontSize="small" />
+                    ),
                   getValue: (instance: gdInitialInstance) =>
                     instance.hasCustomSize(),
                   setValue: (

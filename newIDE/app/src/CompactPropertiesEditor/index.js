@@ -38,6 +38,7 @@ import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import IconButton from '../UI/IconButton';
+import FlatButton from '../UI/FlatButton';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -397,8 +398,7 @@ const CompactPropertiesEditor = ({
           </Column>
         );
       } else if (field.valueType === 'booleanIcon') {
-        const value = getFieldValue({ instances, field })
-        console.log(value, typeof value)
+        const value = getFieldValue({ instances, field });
         return (
           <IconButton
             key={field.name}
@@ -406,7 +406,7 @@ const CompactPropertiesEditor = ({
             size="small"
             tooltip={getFieldLabel({ instances, field })}
             selected={value}
-            onClick={(event) => {
+            onClick={event => {
               instances.forEach(i => field.setValue(i, !value));
               _onInstancesModified(instances);
             }}
@@ -541,11 +541,11 @@ const CompactPropertiesEditor = ({
           }) === DIFFERENT_VALUES;
       }
       return (
-        <RaisedButton
+        <FlatButton
           key={`button-${field.label}`}
           fullWidth
           primary
-          icon={<Edit />}
+          leftIcon={<Edit fontSize="small" />}
           disabled={disabled}
           label={field.label}
           onClick={() => {
@@ -591,7 +591,7 @@ const CompactPropertiesEditor = ({
   const renderContainer =
     mode === 'row'
       ? (fields: React.Node) => (
-          <ResponsiveLineStackLayout noMargin>
+          <ResponsiveLineStackLayout noMargin alignItems="center">
             {fields}
           </ResponsiveLineStackLayout>
         )
@@ -619,13 +619,16 @@ const CompactPropertiesEditor = ({
           <LineStackLayout
             alignItems="center"
             key={`section-title-${field.name}`}
+            noMargin
           >
             {renderLeftIcon()}
-            <Text displayInlineAsSpan>{field.name}</Text>
-            <Text allowSelection displayInlineAsSpan size="body2">
+            <Text displayInlineAsSpan noMargin>
+              {field.name}
+            </Text>
+            <Text allowSelection displayInlineAsSpan size="body2" noMargin>
               -
             </Text>
-            <Text allowSelection displayInlineAsSpan size="body2">
+            <Text allowSelection displayInlineAsSpan size="body2" noMargin>
               {additionalText}
             </Text>
           </LineStackLayout>

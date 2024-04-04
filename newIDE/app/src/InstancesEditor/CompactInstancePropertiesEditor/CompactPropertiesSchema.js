@@ -329,13 +329,56 @@ export const makeSchema = ({
       {
         name: 'Position',
         type: 'row',
+        preventWrap: true,
         children: [...getXAndYFields({ i18n }), getZField({ i18n })],
+      },
+      {
+        name: 'Size',
+        type: 'row',
+        preventWrap: true,
+        children: [
+          {
+            name: 'Custom size',
+            type: 'column',
+            children: [
+              getWidthField({
+                i18n,
+                getInstanceWidth,
+                getInstanceHeight,
+                getInstanceDepth,
+                forceUpdate,
+              }),
+              getHeightField({
+                i18n,
+                getInstanceWidth,
+                getInstanceHeight,
+                getInstanceDepth,
+                forceUpdate,
+              }),
+              getDepthField({
+                i18n,
+                getInstanceWidth,
+                getInstanceHeight,
+                getInstanceDepth,
+                forceUpdate,
+              }),
+            ],
+          },
+          getCustomSizeField({
+            i18n,
+            getInstanceWidth,
+            getInstanceHeight,
+            getInstanceDepth,
+            forceUpdate,
+          }),
+        ],
       },
       getLayerField({ i18n, layout }),
       {
         name: 'Rotation',
         type: 'row',
         title: i18n._(t`Rotation`),
+        preventWrap: true,
         children: [
           ...getRotationXAndRotationYFields({ i18n }),
           getRotationZField({ i18n, label: t`Z`, Icon: LetterZ }),
@@ -350,12 +393,14 @@ export const makeSchema = ({
     {
       name: 'Position',
       type: 'row',
+      preventWrap: true,
       children: getXAndYFields({ i18n }),
     },
     getZOrderField({ i18n }),
     {
       name: 'custom-size-row',
       type: 'row',
+      preventWrap: true,
       children: [
         getWidthField({
           i18n,
@@ -367,6 +412,7 @@ export const makeSchema = ({
         {
           name: 'height-and-custom-size',
           type: 'row',
+          preventWrap: true,
           children: [
             getHeightField({
               i18n,
@@ -402,7 +448,6 @@ export const reorderInstanceSchemaForCustomProperties = (
   if (animationFieldIndex === -1) return newSchema;
 
   const [animationField] = newSchema.splice(animationFieldIndex, 1);
-  console.log(animationField)
   newSchema.unshift({
     name: 'Animation',
     type: 'row',

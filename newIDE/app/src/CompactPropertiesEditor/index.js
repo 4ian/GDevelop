@@ -1,25 +1,21 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
-import Subheader from '../UI/Subheader';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
 import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
   type ResourceManagementProps,
 } from '../ResourcesList/ResourceSource';
 import {
-  TextFieldWithButtonLayout,
   ResponsiveLineStackLayout,
   ColumnStackLayout,
   LineStackLayout,
@@ -27,15 +23,10 @@ import {
 import CompactSelectField from '../UI/CompactSelectField';
 import CompactSemiControlledTextField from '../UI/CompactSemiControlledTextField';
 import CompactSemiControlledNumberField from '../UI/CompactSemiControlledNumberField';
-import RaisedButton from '../UI/RaisedButton';
-import UnsavedChangesContext, {
-  type UnsavedChanges,
-} from '../MainFrame/UnsavedChangesContext';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
-import Tooltip from '@material-ui/core/Tooltip';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
@@ -153,6 +144,7 @@ export type Field =
   | {|
       name: string,
       type: 'row' | 'column',
+      preventWrap?: boolean,
       title?: ?string,
       children: Array<Field>,
     |};
@@ -165,6 +157,7 @@ type Props = {|
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
+  preventWrap?: boolean,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -194,6 +187,7 @@ const styles = {
   subHeader: {
     paddingLeft: 0,
   },
+  container: { flex: 1 },
 };
 
 const getDisabled = ({
@@ -274,6 +268,7 @@ const CompactPropertiesEditor = ({
   unsavedChanges,
   project,
   resourceManagementProps,
+  preventWrap,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -590,13 +585,20 @@ const CompactPropertiesEditor = ({
 
   const renderContainer =
     mode === 'row'
-      ? (fields: React.Node) => (
-          <ResponsiveLineStackLayout noMargin alignItems="center" expand>
-            {fields}
-          </ResponsiveLineStackLayout>
-        )
+      ? (fields: React.Node) =>
+          preventWrap ? (
+            <LineStackLayout noMargin alignItems="center" expand>
+              {fields}
+            </LineStackLayout>
+          ) : (
+            <ResponsiveLineStackLayout noMargin alignItems="center" expand>
+              {fields}
+            </ResponsiveLineStackLayout>
+          )
       : (fields: React.Node) => (
-          <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
+          <ColumnStackLayout noMargin expand>
+            {fields}
+          </ColumnStackLayout>
         );
 
   const renderTitle = React.useCallback(
@@ -638,7 +640,9 @@ const CompactPropertiesEditor = ({
       return (
         <LineStackLayout key={`section-title-${field.name}`}>
           {renderLeftIcon()}
-          <Text displayInlineAsSpan size="sub-title">{field.name}</Text>
+          <Text displayInlineAsSpan size="sub-title">
+            {field.name}
+          </Text>
         </LineStackLayout>
       );
     },
@@ -668,19 +672,18 @@ const CompactPropertiesEditor = ({
       } else if (field.children) {
         if (field.type === 'row') {
           const contentView = (
-            <UnsavedChangesContext.Consumer key={field.name}>
-              {unsavedChanges => (
-                <CompactPropertiesEditor
-                  project={project}
-                  resourceManagementProps={resourceManagementProps}
-                  schema={field.children}
-                  instances={instances}
-                  mode="row"
-                  unsavedChanges={unsavedChanges}
-                  onInstancesModified={onInstancesModified}
-                />
-              )}
-            </UnsavedChangesContext.Consumer>
+            <React.Fragment key={field.name}>
+              <CompactPropertiesEditor
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                schema={field.children}
+                instances={instances}
+                mode="row"
+                unsavedChanges={unsavedChanges}
+                onInstancesModified={onInstancesModified}
+                preventWrap={field.preventWrap}
+              />
+            </React.Fragment>
           );
           if (field.title) {
             return [
@@ -694,21 +697,19 @@ const CompactPropertiesEditor = ({
         }
 
         return (
-          <div key={field.name}>
-            <Subheader>{field.name}</Subheader>
-            <UnsavedChangesContext.Consumer key={field.name}>
-              {unsavedChanges => (
-                <CompactPropertiesEditor
-                  project={project}
-                  resourceManagementProps={resourceManagementProps}
-                  schema={field.children}
-                  instances={instances}
-                  mode="column"
-                  unsavedChanges={unsavedChanges}
-                  onInstancesModified={onInstancesModified}
-                />
-              )}
-            </UnsavedChangesContext.Consumer>
+          <div key={field.name} style={styles.container}>
+            <React.Fragment key={field.name}>
+              <CompactPropertiesEditor
+                project={project}
+                resourceManagementProps={resourceManagementProps}
+                schema={field.children}
+                instances={instances}
+                mode="column"
+                unsavedChanges={unsavedChanges}
+                onInstancesModified={onInstancesModified}
+                preventWrap={field.preventWrap}
+              />
+            </React.Fragment>
           </div>
         );
       } else if (field.valueType === 'resource') {

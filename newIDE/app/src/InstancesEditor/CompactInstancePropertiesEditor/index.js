@@ -6,7 +6,7 @@ import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactPropertiesEditor from '../../CompactPropertiesEditor';
-import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type Schema } from '../../CompactPropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';

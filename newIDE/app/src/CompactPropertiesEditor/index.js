@@ -1,15 +1,8 @@
 // @flow
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
-import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
-import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import ColorField from '../UI/ColorField';
-import { MarkdownText } from '../UI/MarkdownText';
-import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -24,7 +17,7 @@ import CompactSelectField from '../UI/CompactSelectField';
 import CompactSemiControlledTextField from '../UI/CompactSemiControlledTextField';
 import CompactSemiControlledNumberField from '../UI/CompactSemiControlledNumberField';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { Column, Line } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Edit from '../UI/CustomSvgIcons/Edit';
@@ -319,36 +312,37 @@ const CompactPropertiesEditor = ({
       if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
       if (field.valueType === 'boolean') {
-        const { setValue } = field;
-        const description = getFieldDescription(field);
         return 'TODO';
-        return (
-          <InlineCheckbox
-            label={
-              !description ? (
-                getFieldLabel({ instances, field })
-              ) : (
-                <React.Fragment>
-                  <Line noMargin>{getFieldLabel({ instances, field })}</Line>
-                  <FormHelperText style={{ display: 'inline' }}>
-                    <MarkdownText source={description} />
-                  </FormHelperText>
-                </React.Fragment>
-              )
-            }
-            key={field.name}
-            id={field.name}
-            checked={getFieldValue({ instances, field })}
-            onCheck={(event, newValue) => {
-              instances.forEach(i => setValue(i, !!newValue));
-              _onInstancesModified(instances);
-            }}
-            disabled={getDisabled({ instances, field })}
-          />
-        );
+        // const { setValue } = field;
+        // const description = getFieldDescription(field);
+        // return (
+        //   <InlineCheckbox
+        //     label={
+        //       !description ? (
+        //         getFieldLabel({ instances, field })
+        //       ) : (
+        //         <React.Fragment>
+        //           <Line noMargin>{getFieldLabel({ instances, field })}</Line>
+        //           <FormHelperText style={{ display: 'inline' }}>
+        //             <MarkdownText source={description} />
+        //           </FormHelperText>
+        //         </React.Fragment>
+        //       )
+        //     }
+        //     key={field.name}
+        //     id={field.name}
+        //     checked={getFieldValue({ instances, field })}
+        //     onCheck={(event, newValue) => {
+        //       instances.forEach(i => setValue(i, !!newValue));
+        //       _onInstancesModified(instances);
+        //     }}
+        //     disabled={getDisabled({ instances, field })}
+        //   />
+        // );
       } else if (field.valueType === 'number') {
-        const { setValue, getEndAdornment } = field;
-        const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
+        const { setValue } = field;
+        // TODO: Support end adornment
+        // const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
 
         return (
           <CompactSemiControlledNumberField
@@ -380,26 +374,26 @@ const CompactPropertiesEditor = ({
           />
         );
       } else if (field.valueType === 'color') {
-        const { setValue } = field;
         return 'TODO';
-        return (
-          <Column key={field.name} expand noMargin>
-            <ColorField
-              id={field.name}
-              floatingLabelText={getFieldLabel({ instances, field })}
-              helperMarkdownText={getFieldDescription(field)}
-              disableAlpha
-              fullWidth
-              color={getFieldValue({ instances, field })}
-              onChange={color => {
-                const rgbString =
-                  color.length === 0 ? '' : rgbOrHexToRGBString(color);
-                instances.forEach(i => setValue(i, rgbString));
-                _onInstancesModified(instances);
-              }}
-            />
-          </Column>
-        );
+        // const { setValue } = field;
+        // return (
+        //   <Column key={field.name} expand noMargin>
+        //     <ColorField
+        //       id={field.name}
+        //       floatingLabelText={getFieldLabel({ instances, field })}
+        //       helperMarkdownText={getFieldDescription(field)}
+        //       disableAlpha
+        //       fullWidth
+        //       color={getFieldValue({ instances, field })}
+        //       onChange={color => {
+        //         const rgbString =
+        //           color.length === 0 ? '' : rgbOrHexToRGBString(color);
+        //         instances.forEach(i => setValue(i, rgbString));
+        //         _onInstancesModified(instances);
+        //       }}
+        //     />
+        //   </Column>
+        // );
       } else if (field.valueType === 'booleanIcon') {
         const value = getFieldValue({ instances, field });
         return (
@@ -418,29 +412,29 @@ const CompactPropertiesEditor = ({
           </IconButton>
         );
       } else if (field.valueType === 'textarea') {
-        const { setValue } = field;
         return 'TODO';
-        return (
-          <SemiControlledTextField
-            key={field.name}
-            id={field.name}
-            onChange={text => {
-              instances.forEach(i => setValue(i, text || ''));
-              _onInstancesModified(instances);
-            }}
-            value={getFieldValue({ instances, field })}
-            floatingLabelText={getFieldLabel({ instances, field })}
-            floatingLabelFixed
-            helperMarkdownText={getFieldDescription(field)}
-            multiline
-            style={styles.field}
-          />
-        );
+        // const { setValue } = field;
+        // return (
+        //   <SemiControlledTextField
+        //     key={field.name}
+        //     id={field.name}
+        //     onChange={text => {
+        //       instances.forEach(i => setValue(i, text || ''));
+        //       _onInstancesModified(instances);
+        //     }}
+        //     value={getFieldValue({ instances, field })}
+        //     floatingLabelText={getFieldLabel({ instances, field })}
+        //     floatingLabelFixed
+        //     helperMarkdownText={getFieldDescription(field)}
+        //     multiline
+        //     style={styles.field}
+        //   />
+        // );
       } else {
         const {
           // TODO: Still support onEditButtonClick & onEditButtonBuildMenuTemplate ?
-          onEditButtonBuildMenuTemplate,
-          onEditButtonClick,
+          // onEditButtonBuildMenuTemplate,
+          // onEditButtonClick,
           setValue,
         } = field;
         return (
@@ -464,7 +458,7 @@ const CompactPropertiesEditor = ({
         );
       }
     },
-    [instances, getFieldDescription, _onInstancesModified]
+    [instances, _onInstancesModified]
   );
 
   const renderSelectField = React.useCallback(
@@ -484,23 +478,21 @@ const CompactPropertiesEditor = ({
 
       if (field.valueType === 'number') {
         const { setValue } = field;
-        return 'TODO';
         return (
-          <SelectField
+          <CompactSelectField
             value={getFieldValue({ instances, field })}
             key={field.name}
             id={field.name}
-            floatingLabelText={getFieldLabel({ instances, field })}
-            helperMarkdownText={getFieldDescription(field)}
-            onChange={(event, index, newValue: string) => {
+            // floatingLabelText={getFieldLabel({ instances, field })}
+            // helperMarkdownText={getFieldDescription(field)}
+            onChange={(newValue: string) => {
               instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
-            style={styles.field}
             disabled={field.disabled}
           >
             {children}
-          </SelectField>
+          </CompactSelectField>
         );
       } else if (field.valueType === 'string') {
         const { setValue } = field;
@@ -528,7 +520,7 @@ const CompactPropertiesEditor = ({
         );
       }
     },
-    [instances, _onInstancesModified, getFieldDescription]
+    [instances, _onInstancesModified]
   );
 
   const renderButton = React.useCallback(
@@ -654,7 +646,7 @@ const CompactPropertiesEditor = ({
       }
 
       return (
-        <LineStackLayout key={`section-title-${field.name}`}>
+        <LineStackLayout key={`title-${field.name}`}>
           {renderLeftIcon()}
           <Text displayInlineAsSpan size="sub-title">
             {field.name}

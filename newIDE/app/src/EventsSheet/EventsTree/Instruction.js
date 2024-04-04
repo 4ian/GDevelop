@@ -133,6 +133,16 @@ const formatValue = ({
     ? i18n._(t`Base layer`)
     : value;
 
+const isInstructionVisible = (scope, instructionMetadata) =>
+  (instructionMetadata.isRelevantForLayoutEvents() &&
+    (scope.layout || scope.externalEvents)) ||
+  (instructionMetadata.isRelevantForFunctionEvents() && scope.eventsFunction) ||
+  (instructionMetadata.isRelevantForAsynchronousFunctionEvents() &&
+    scope.eventsFunction &&
+    scope.eventsFunction.isAsync()) ||
+  (instructionMetadata.isRelevantForCustomObjectEvents() &&
+    scope.eventsBasedObject);
+
 const InstructionMissing = (props: {|
   instructionType: string,
   isCondition: boolean,
@@ -525,7 +535,8 @@ const Instruction = (props: Props) => {
                   [selectableArea]: true,
                   [selectedArea]: props.selected,
                   [warningInstruction]:
-                    showDeprecatedInstructionWarning && metadata.isHidden(),
+                    showDeprecatedInstructionWarning &&
+                    !isInstructionVisible(scope, metadata),
                 })}
                 onClick={e => {
                   e.stopPropagation();

@@ -491,7 +491,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("BooleanObjectVariable",
                    _("Boolean variable"),
                    _("Compare the boolean value of an object variable."),
-                   _("The variable _PARAM1_ is _PARAM2_"),
+                   _("The variable _PARAM1_ of _PARAM0_ is _PARAM2_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")

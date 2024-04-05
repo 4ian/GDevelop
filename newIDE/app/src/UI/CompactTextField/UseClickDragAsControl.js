@@ -11,6 +11,7 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
   const clickDragOrigin = React.useRef<?{|
     initialValue: number,
     accumulatedValue: number,
+    previouslyChangedValue: ?number,
   |}>(null);
 
   const start = React.useCallback(
@@ -21,6 +22,7 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
         clickDragOrigin.current = {
           initialValue: onGetInitialValue(),
           accumulatedValue: 0,
+          previouslyChangedValue: null,
         };
       }
     },
@@ -29,16 +31,19 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
 
   const onMove = React.useCallback(
     (e: MouseEvent) => {
-      if (clickDragOrigin.current) {
-        const { initialValue } = clickDragOrigin.current;
-        clickDragOrigin.current.accumulatedValue +=
-          e.movementX /
-          // Sensitivity setting
-          2;
-        // TODO: Do not call onChange when not necessary (if there is no sensible change) for performance reasons.
-        onChange(
-          Math.round(clickDragOrigin.current.accumulatedValue) + initialValue
-        );
+      if (!clickDragOrigin.current) return;
+
+      const { initialValue, previouslyChangedValue } = clickDragOrigin.current;
+      clickDragOrigin.current.accumulatedValue +=
+        e.movementX /
+        // Sensitivity setting
+        2;
+      const newValue =
+        Math.round(clickDragOrigin.current.accumulatedValue) + initialValue;
+      if (newValue !== previouslyChangedValue) {
+        if (!clickDragOrigin.current) return;
+        clickDragOrigin.current.previouslyChangedValue = newValue;
+        onChange(newValue);
       }
     },
     [onChange]

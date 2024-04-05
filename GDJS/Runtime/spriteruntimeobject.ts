@@ -133,6 +133,8 @@ namespace gdjs {
       const hasFrameChanged = this._animator.step(this.getElapsedTime() / 1000);
       if (hasFrameChanged) {
         this._updateAnimationFrame();
+        // TODO: Hitboxes may not need an update if every frames has the same ones.
+        this.invalidateHitboxes();
       }
       this._renderer.ensureUpToDate();
     }

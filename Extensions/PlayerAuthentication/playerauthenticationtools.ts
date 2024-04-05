@@ -25,9 +25,8 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _websocket: WebSocket | null = null;
 
     type AuthenticationWindowStatus = 'logged' | 'errored' | 'dismissed';
@@ -596,6 +595,7 @@ namespace gdjs {
 
     const setupWebsocketForAuthenticationWindow = (
       runtimeScene: gdjs.RuntimeScene,
+      gameId: string,
       onOpenAuthenticationWindow: (options: {
         connectionId: string;
         resolve: (AuthenticationWindowStatus) => void;
@@ -606,8 +606,8 @@ namespace gdjs {
         const wsPlayApi = runtimeScene
           .getGame()
           .isUsingGDevelopDevelopmentEnvironment()
-          ? 'wss://api-ws-dev.gdevelop.io/play'
-          : 'wss://api-ws.gdevelop.io/play';
+          ? `wss://api-ws-dev.gdevelop.io/play?gameId=${gameId}&connectionType=login`
+          : `wss://api-ws.gdevelop.io/play?gameId=${gameId}&connectionType=login`;
         _websocket = new WebSocket(wsPlayApi);
         _websocket.onopen = () => {
           logger.info('Opened authentication websocket connection.');
@@ -682,6 +682,7 @@ namespace gdjs {
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
+        gameId,
         ({ connectionId }) => {
           const targetUrl = getAuthWindowUrl({
             runtimeGame: runtimeScene.getGame(),
@@ -714,6 +715,7 @@ namespace gdjs {
     ) =>
       setupWebsocketForAuthenticationWindow(
         runtimeScene,
+        gameId,
         ({ connectionId, resolve }) => {
           const targetUrl = getAuthWindowUrl({
             runtimeGame: runtimeScene.getGame(),
@@ -947,13 +949,10 @@ namespace gdjs {
           if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
           const playerAuthPlatform = getPlayerAuthPlatform(runtimeScene);
-          const {
-            rootContainer,
-            loaderContainer,
-            iframeContainer,
-          } = authComponents.computeAuthenticationContainer(
-            onAuthenticationContainerDismissed
-          );
+          const { rootContainer, loaderContainer, iframeContainer } =
+            authComponents.computeAuthenticationContainer(
+              onAuthenticationContainerDismissed
+            );
           _authenticationRootContainer = rootContainer;
           _authenticationLoaderContainer = loaderContainer;
           _authenticationIframeContainer = iframeContainer;
@@ -982,12 +981,13 @@ namespace gdjs {
                     )
                 : null; // Only show a link if we're on electron.
 
-              _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-                _authenticationLoaderContainer,
-                playerAuthPlatform,
-                isGameRegistered,
-                wikiOpenAction
-              );
+              _authenticationTextContainer =
+                authComponents.addAuthenticationTextsToLoadingContainer(
+                  _authenticationLoaderContainer,
+                  playerAuthPlatform,
+                  isGameRegistered,
+                  wikiOpenAction
+                );
             }
             if (!isGameRegistered) return;
 

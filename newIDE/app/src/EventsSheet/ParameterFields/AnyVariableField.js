@@ -14,6 +14,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateValidVariableNames } from './EnumerateVariables';
+import uniq from 'lodash/uniq';
 
 const gd: libGDevelop = global.gd;
 
@@ -84,10 +85,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const enumerateGlobalAndSceneVariableNames = React.useCallback(
       () => {
         return project && layout
-          ? [
+          ? uniq([
               ...enumerateValidVariableNames(layout.getVariables()),
               ...enumerateValidVariableNames(project.getVariables()),
-            ]
+            ])
           : [];
       },
       [project, layout]

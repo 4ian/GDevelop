@@ -85,7 +85,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             open
             variablesContainer={layout.getVariables()}
             onCancel={() => setEditorOpen(false)}
-            onApply={() => {
+            onApply={(selectedVariableName: string | null) => {
+              if (
+                selectedVariableName &&
+                selectedVariableName.startsWith(props.value)
+              ) {
+                props.onChange(selectedVariableName);
+              }
               setEditorOpen(false);
               if (field.current) field.current.updateAutocompletions();
             }}

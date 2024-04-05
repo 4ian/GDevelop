@@ -13,6 +13,7 @@ import {
 } from './InstancesResizer';
 import { type InstanceMeasurer } from './InstancesRenderer';
 import Rectangle from '../Utils/Rectangle';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 
 type Props = {|
   instancesSelection: InstancesSelection,
@@ -27,6 +28,9 @@ type Props = {|
   onRotateEnd: () => void,
   toCanvasCoordinates: (x: number, y: number) => [number, number],
   screenType: ScreenType,
+  keyboardShortcuts: KeyboardShortcuts,
+  onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void,
+  onPanEnd: () => void,
 |};
 
 const getButtonSizes = (screenType: ScreenType) => {
@@ -77,6 +81,9 @@ export default class SelectedInstances {
   onRotateEnd: () => void;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   _screenType: ScreenType;
+  keyboardShortcuts: KeyboardShortcuts;
+  onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void;
+  onPanEnd: () => void;
 
   pixiContainer = new PIXI.Container();
   rectanglesContainer = new PIXI.Container();
@@ -93,6 +100,9 @@ export default class SelectedInstances {
     onRotateEnd,
     toCanvasCoordinates,
     screenType,
+    keyboardShortcuts,
+    onPanMove,
+    onPanEnd,
   }: Props) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
@@ -102,6 +112,9 @@ export default class SelectedInstances {
     this.toCanvasCoordinates = toCanvasCoordinates;
     this.instancesSelection = instancesSelection;
     this._screenType = screenType;
+    this.keyboardShortcuts = keyboardShortcuts;
+    this.onPanMove = onPanMove;
+    this.onPanEnd = onPanEnd;
 
     this.pixiContainer.addChild(this.rectanglesContainer);
 
@@ -116,6 +129,17 @@ export default class SelectedInstances {
         () => {
           this.onResizeEnd();
         },
+        event => {
+          this.onPanMove(
+            event.deltaX,
+            event.deltaY,
+            event.data.global.x,
+            event.data.global.y
+          );
+        },
+        () => {
+          this.onPanEnd();
+        },
         resizeGrabbingIconNames[resizeGrabbingLocation]
       );
     }
@@ -126,6 +150,17 @@ export default class SelectedInstances {
       },
       () => {
         this.onRotateEnd();
+      },
+      event => {
+        this.onPanMove(
+          event.deltaX,
+          event.deltaY,
+          event.data.global.x,
+          event.data.global.y
+        );
+      },
+      () => {
+        this.onPanEnd();
       },
       'url("res/actions/rotate24_black.png"),auto'
     );
@@ -139,14 +174,44 @@ export default class SelectedInstances {
     objectButton: PIXI.Graphics,
     onMove: (event: PanMoveEvent) => void,
     onEnd: () => void,
+    onPanMove: (event: PanMoveEvent) => void,
+    onPanEnd: () => void,
     cursor: string
   ) {
     objectButton.eventMode = 'static';
     objectButton.buttonMode = true;
     objectButton.cursor = cursor;
     panable(objectButton);
-    objectButton.addEventListener('panmove', onMove);
-    objectButton.addEventListener('panend', onEnd);
+
+    // change cursor style if space is pressed
+    objectButton.addEventListener('mousemove', event => {
+      if (this.keyboardShortcuts.shouldMoveView()) {
+        objectButton.cursor = 'grab';
+      } else {
+        objectButton.cursor = cursor;
+      }
+    });
+
+    let isPanMoveEvent = false;
+    // call the appropriate function based on the key pressed
+    objectButton.addEventListener('panmove', event => {
+      if (this.keyboardShortcuts.shouldMoveView()) {
+        onPanMove(event);
+        isPanMoveEvent = true;
+      } else {
+        onMove(event);
+        isPanMoveEvent = false;
+      }
+    });
+
+    // call the corresponding end function
+    objectButton.addEventListener('panend', event => {
+      if (isPanMoveEvent) {
+        onPanEnd();
+      } else {
+        onEnd();
+      }
+    });
     this.pixiContainer.addChild(objectButton);
   }
 

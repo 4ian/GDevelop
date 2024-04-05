@@ -17,13 +17,14 @@ import CompactSelectField from '../UI/CompactSelectField';
 import CompactSemiControlledTextField from '../UI/CompactSemiControlledTextField';
 import CompactSemiControlledNumberField from '../UI/CompactSemiControlledNumberField';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { Line } from '../UI/Grid';
+import { Line, marginsSize } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Edit from '../UI/CustomSvgIcons/Edit';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -189,6 +190,24 @@ const styles = {
     paddingLeft: 0,
   },
   container: { flex: 1, minWidth: 0 },
+  separator: {
+    marginRight: -marginsSize,
+    marginLeft: -marginsSize,
+    marginTop: marginsSize,
+    borderTop: '1px solid black',
+  },
+};
+
+export const Separator = () => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  return (
+    <div
+      style={{
+        ...styles.separator,
+        borderColor: gdevelopTheme.listItem.separatorColor,
+      }}
+    />
+  );
 };
 
 const getDisabled = ({
@@ -629,7 +648,6 @@ const CompactPropertiesEditor = ({
           <LineStackLayout
             alignItems="center"
             key={`section-title-${field.name}`}
-            noMargin
           >
             {renderLeftIcon()}
             <Text displayInlineAsSpan noMargin>
@@ -657,13 +675,13 @@ const CompactPropertiesEditor = ({
     [instances]
   );
   const renderSectionTitle = React.useCallback((field: SectionTitle) => {
-    return (
+    return [
       <Line key={`section-title-${field.name}`}>
         <Text displayInlineAsSpan size="sub-title" noMargin>
           {field.name}
         </Text>
-      </Line>
-    );
+      </Line>,
+    ];
   }, []);
 
   return renderContainer(
@@ -697,6 +715,7 @@ const CompactPropertiesEditor = ({
           );
           if (field.title) {
             return [
+              <Separator key={field.name + '-separator'} />,
               <Text key={field.name + '-title'} size="sub-title" noMargin>
                 {field.title}
               </Text>,

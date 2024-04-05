@@ -5,7 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
-import CompactPropertiesEditor from '../../CompactPropertiesEditor';
+import CompactPropertiesEditor, {
+  Separator,
+} from '../../CompactPropertiesEditor';
 import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapToCompactSchema';
 import { type Schema } from '../../CompactPropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -148,6 +150,7 @@ const CompactInstancePropertiesEditor = ({
               instances={instances}
               onInstancesModified={onInstancesModified}
             />
+            <Separator />
             <Line alignItems="center" justifyContent="space-between">
               <Text size="sub-title" noMargin>
                 <Trans>Instance Variables</Trans>
@@ -158,7 +161,7 @@ const CompactInstancePropertiesEditor = ({
                   editInstanceVariables(instance);
                 }}
               >
-                <ShareExternal />
+                <ShareExternal fontSize="small" />
               </IconButton>
             </Line>
           </Column>

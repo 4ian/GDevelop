@@ -24,6 +24,7 @@ const ObjectPropertiesEditor = (props: Props) => {
     project,
     resourceManagementProps,
     unsavedChanges,
+    renderObjectNameField,
   } = props;
 
   // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
@@ -53,6 +54,7 @@ const ObjectPropertiesEditor = (props: Props) => {
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
+          {renderObjectNameField && renderObjectNameField()}
           {tutorialIds.map(tutorialId => (
             <DismissableTutorialMessage
               key={tutorialId}

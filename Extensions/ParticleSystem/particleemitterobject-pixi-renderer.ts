@@ -347,7 +347,7 @@ namespace gdjs {
     }
 
     setFlow(flow: number, tank: number): void {
-      this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
+      this.emitter.frequency = flow < 0 ? 0 : 1.0 / flow;
       this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
         flow,
         tank
@@ -418,6 +418,25 @@ namespace gdjs {
 
     hasStarted(): boolean {
       return this.started;
+    }
+
+    /**
+     * @returns `true` at the end of emission or at the start if its paused
+     * or never if there is no limit.
+     */
+    _mayHaveEndedEmission(): boolean {
+      return (
+        // No end can be reached if there is no flow.
+        this.emitter.frequency > 0 &&
+        // No end can be reached when there is no limit.
+        this.emitter.emitterLifetime >= 0 &&
+        // Pixi stops the emission at the end.
+        !this.emitter.emit &&
+        // Pixi reset `_emitterLife` to `emitterLifetime` at the end of emission
+        // so there is no way to know if it is the end or the start.
+        // @ts-ignore Use a private attribute.
+        this.emitter._emitterLife === this.emitter.emitterLifetime
+      );
     }
 
     static computeLifetime(flow: number, tank: number): float {

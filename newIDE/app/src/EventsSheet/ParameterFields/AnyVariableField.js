@@ -150,7 +150,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               isGlobal ? project.getVariables() : layout.getVariables()
             }
             onCancel={() => setEditorOpen(false)}
-            onApply={() => {
+            onApply={(selectedVariableName: string | null) => {
+              if (
+                selectedVariableName &&
+                selectedVariableName.startsWith(props.value)
+              ) {
+                props.onChange(selectedVariableName);
+              }
               setEditorOpen(false);
               if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();

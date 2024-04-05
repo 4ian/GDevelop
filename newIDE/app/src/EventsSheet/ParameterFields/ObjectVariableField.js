@@ -230,7 +230,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onCancel={() => setEditorOpen(false)}
-            onApply={() => {
+            onApply={(selectedVariableName: string | null) => {
+              if (
+                selectedVariableName &&
+                selectedVariableName.startsWith(props.value)
+              ) {
+                props.onChange(selectedVariableName);
+              }
               setEditorOpen(false);
               if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();

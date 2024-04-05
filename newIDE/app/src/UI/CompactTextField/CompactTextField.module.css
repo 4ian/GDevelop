@@ -65,6 +65,7 @@
   flex: 1;
   caret-color: var(--theme-secondary-dark);
   min-width: 0px;
+  border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
 }
 
 .compactTextField input::placeholder {

@@ -140,7 +140,6 @@ const CompactInstancePropertiesEditor = ({
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        {/* TODO: Make sure the editor is correctly highlighted when an in-app tutorial is running */}
         <Column expand noMargin id="instance-properties-editor">
           <Column>
             <CompactPropertiesEditor

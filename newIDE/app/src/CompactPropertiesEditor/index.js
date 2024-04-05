@@ -648,7 +648,7 @@ const CompactPropertiesEditor = ({
       return (
         <LineStackLayout key={`title-${field.name}`}>
           {renderLeftIcon()}
-          <Text displayInlineAsSpan size="sub-title">
+          <Text displayInlineAsSpan size="sub-title" noMargin>
             {field.name}
           </Text>
         </LineStackLayout>
@@ -659,7 +659,7 @@ const CompactPropertiesEditor = ({
   const renderSectionTitle = React.useCallback((field: SectionTitle) => {
     return (
       <Line key={`section-title-${field.name}`}>
-        <Text displayInlineAsSpan size="sub-title">
+        <Text displayInlineAsSpan size="sub-title" noMargin>
           {field.name}
         </Text>
       </Line>
@@ -697,7 +697,7 @@ const CompactPropertiesEditor = ({
           );
           if (field.title) {
             return [
-              <Text key={field.name + '-title'} size="sub-title">
+              <Text key={field.name + '-title'} size="sub-title" noMargin>
                 {field.title}
               </Text>,
               contentView,

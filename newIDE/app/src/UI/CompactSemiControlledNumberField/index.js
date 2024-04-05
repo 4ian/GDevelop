@@ -18,7 +18,7 @@ type Props = {|
   errorText?: React.Node,
 |};
 
-const CompactSemiControlledTextField = ({
+const CompactSemiControlledNumberField = ({
   value,
   onChange,
   errorText,
@@ -28,6 +28,7 @@ const CompactSemiControlledTextField = ({
   const onBlur = () => {
     onChange(temporaryValue);
   };
+  React.useEffect(() => setTemporaryValue(value), [value]);
 
   return (
     <div className={classes.container}>
@@ -46,4 +47,4 @@ const CompactSemiControlledTextField = ({
   );
 };
 
-export default CompactSemiControlledTextField;
+export default CompactSemiControlledNumberField;

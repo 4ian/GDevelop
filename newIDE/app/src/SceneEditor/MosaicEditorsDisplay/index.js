@@ -10,9 +10,6 @@ import EditorMosaic, {
   type EditorMosaicInterface,
 } from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
-import InstancePropertiesEditor, {
-  type InstancePropertiesEditorInterface,
-} from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import FullSizeInstancesEditorWithScrollbars from '../../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import CloseButton from '../../UI/EditorMosaic/CloseButton';
@@ -31,6 +28,9 @@ import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,
 } from '../EditorsDisplay.flow';
+import CompactInstancePropertiesEditorContainer, {
+  type CompactInstancePropertiesEditorInterface,
+} from '../../InstancesEditor/CompactInstancePropertiesEditor';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -93,7 +93,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   } = React.useContext(PreferencesContext);
   const selectedInstances = props.instancesSelection.getSelectedInstances();
 
-  const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
@@ -242,7 +242,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       renderEditor: () => (
         <I18n>
           {({ i18n }) => (
-            <InstancePropertiesEditor
+            <CompactInstancePropertiesEditorContainer
               i18n={i18n}
               project={project}
               layout={layout}

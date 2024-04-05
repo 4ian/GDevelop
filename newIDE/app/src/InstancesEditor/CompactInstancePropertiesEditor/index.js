@@ -149,7 +149,7 @@ const CompactInstancePropertiesEditor = ({
               onInstancesModified={onInstancesModified}
             />
             <Line alignItems="center" justifyContent="space-between">
-              <Text>
+              <Text size="sub-title" noMargin>
                 <Trans>Instance Variables</Trans>
               </Text>
               <IconButton
@@ -197,7 +197,7 @@ const CompactInstancePropertiesEditorContainer = React.forwardRef<
   }));
 
   return (
-    <Background>
+    <Background minWidth={0}>
       {!props.instances || !props.instances.length ? (
         <EmptyMessage>
           <Trans>

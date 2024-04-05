@@ -29,6 +29,7 @@ const CompactSemiControlledTextField = ({
   const onBlur = () => {
     onChange(temporaryValue);
   };
+  React.useEffect(() => setTemporaryValue(value), [value]);
 
   return (
     <div className={classes.container}>

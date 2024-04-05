@@ -5,9 +5,6 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import InstancesEditor from '../../InstancesEditor';
-import InstancePropertiesEditor, {
-  type InstancePropertiesEditorInterface,
-} from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList, {
@@ -31,6 +28,9 @@ import {
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import CompactInstancePropertiesEditorContainer, {
+  type CompactInstancePropertiesEditorInterface,
+} from '../../InstancesEditor/CompactInstancePropertiesEditor';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -66,7 +66,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const { values } = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
-  const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
@@ -328,7 +328,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               {selectedEditorId === 'properties' && (
                 <I18n>
                   {({ i18n }) => (
-                    <InstancePropertiesEditor
+                    <CompactInstancePropertiesEditorContainer
                       i18n={i18n}
                       project={project}
                       layout={layout}

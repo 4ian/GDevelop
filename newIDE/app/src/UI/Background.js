@@ -15,6 +15,7 @@ const styles = {
 type Props = {|
   children: React.Node,
   maxWidth?: boolean,
+  minWidth?: number,
   width?: number | string,
   /** Sometimes required on Safari */
   noFullHeight?: boolean,
@@ -34,6 +35,7 @@ const Background = (props: Props) => (
       width: props.width ? props.width : undefined,
       flex: props.noExpand ? undefined : 1,
       ...(props.maxWidth ? styles.maxWidth : undefined),
+      minWidth: props.minWidth,
     }}
     background="dark"
   >

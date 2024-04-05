@@ -4,25 +4,25 @@ import * as React from 'react';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import CompactSemiControlledTextField from '../../../UI/CompactSemiControlledTextField';
+import CompactSemiControlledNumberField from '../../../UI/CompactSemiControlledNumberField';
 import { ColumnStackLayout } from '../../../UI/Layout';
 import Angle from '../../../UI/CustomSvgIcons/Angle';
 import { Column } from '../../../UI/Grid';
 import ElementHighlighterProvider from '../../ElementHighlighterProvider';
 
 export default {
-  title: 'UI Building Blocks/CompactSemiControlledTextField',
-  component: CompactSemiControlledTextField,
+  title: 'UI Building Blocks/CompactSemiControlledNumberField',
+  component: CompactSemiControlledNumberField,
   decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => {
-  const [value, setValue] = React.useState<string>('');
-  const [value1, setValue1] = React.useState<string>('');
-  const [value2, setValue2] = React.useState<string>('');
-  const [value3, setValue3] = React.useState<string>('');
-  const [value4, setValue4] = React.useState<string>('');
-  const [value5, setValue5] = React.useState<string>('');
+  const [value, setValue] = React.useState<number>(45);
+  const [value1, setValue1] = React.useState<number>(1);
+  const [value2, setValue2] = React.useState<number>(25);
+  const [value3, setValue3] = React.useState<number>(-12);
+  const [value4, setValue4] = React.useState<number>(566560);
+  const [value5, setValue5] = React.useState<number>(334);
 
   return (
     <ElementHighlighterProvider
@@ -33,7 +33,7 @@ export const Default = () => {
     >
       <ColumnStackLayout expand useLargeSpacer>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             commitOnBlur
             value={value}
             onChange={setValue}
@@ -43,7 +43,7 @@ export const Default = () => {
           <div>State value is {value}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             commitOnBlur
             value={value1}
             onChange={setValue1}
@@ -54,7 +54,7 @@ export const Default = () => {
           <div>State value is {value1}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             commitOnBlur
             value={value2}
             onChange={setValue2}
@@ -64,54 +64,56 @@ export const Default = () => {
           <div>State value is {value2}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             disabled
-            value={'disabled field'}
+            value={666}
             onChange={() => {}}
           />
           <div>Disabled field</div>
         </Column>
 
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             id="with-icon"
-            commitOnBlur
             value={value3}
             onChange={setValue3}
             renderLeftIcon={className => <Angle className={className} />}
+            useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
           <div>State value is {value3}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
-            commitOnBlur
+          <CompactSemiControlledNumberField
             value={value4}
             onChange={setValue4}
             errored
             errorText={'An error occurred.'}
             renderLeftIcon={className => <Angle className={className} />}
+            useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
           <div>State value is {value4}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             commitOnBlur
             value={value5}
             onChange={setValue5}
             placeholder="With placeholder"
             renderLeftIcon={className => <Angle className={className} />}
+            useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
-          <div>State value is {value5}</div>
+          <div>Commits on blur: state value is {value5}</div>
         </Column>
         <Column noMargin>
-          <CompactSemiControlledTextField
+          <CompactSemiControlledNumberField
             disabled
-            value={'disabled field'}
+            value={777}
             onChange={() => {}}
             renderLeftIcon={className => <Angle className={className} />}
+            useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
           <div>Disabled field</div>

@@ -12,16 +12,26 @@ type ValueProps =
   | {|
       type?: 'text',
       value: string,
-      onChange: string => void,
+      onChange: (newValue: string, reason: 'keyInput') => void,
     |}
   | {|
       type: 'number',
-      value: number,
-      onChange: number => void,
+      value: ?number, // null value corresponds to an empty input.
+      onChange: (newValue: number, reason: 'keyInput' | 'iconControl') => void,
     |};
 
 type OtherProps = {|
-  onBlur?: () => void,
+  onBlur?: ({
+    currentTarget: {
+      value: string,
+    },
+  }) => void,
+  onFocus?: ({
+    currentTarget: {
+      value: string,
+    },
+    preventDefault: () => void,
+  }) => void,
 |};
 
 export type CompactTextFieldProps = {|
@@ -48,14 +58,28 @@ const CompactTextField = ({
   leftIconTooltip,
   useLeftIconAsNumberControl,
   onBlur,
+  onFocus,
 }: CompactTextFieldProps) => {
   const idToUse = React.useRef<string>(id || makeTimestampedId());
   const controlProps = useClickDragAsControl({
     // $FlowExpectedError - Click drag controls should not be used if value type is not number.
-    onChange,
+    onChange: value => onChange(value, 'iconControl'),
     // $FlowExpectedError
     onGetInitialValue: () => value,
   });
+
+  const onBlurInput = React.useCallback(
+    event => {
+      if (onBlur) onBlur(event);
+    },
+    [onBlur]
+  );
+  const onFocusInput = React.useCallback(
+    event => {
+      if (onFocus) onFocus(event);
+    },
+    [onFocus]
+  );
 
   return (
     <div
@@ -105,10 +129,11 @@ const CompactTextField = ({
           id={idToUse.current}
           type={type || 'text'}
           disabled={disabled}
-          value={value}
-          onChange={e => onChange(e.currentTarget.value)}
+          value={value === null ? '' : value}
+          onChange={e => onChange(e.currentTarget.value, 'keyInput')}
           placeholder={placeholder}
-          onBlur={onBlur}
+          onBlur={onBlurInput}
+          onFocus={onFocusInput}
         />
       </div>
     </div>

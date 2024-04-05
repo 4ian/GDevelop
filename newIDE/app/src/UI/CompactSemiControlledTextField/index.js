@@ -8,6 +8,7 @@ type Props = {|
   id?: string,
   value: string,
   onChange: string => void,
+  commitOnBlur?: boolean,
   disabled?: boolean,
   errored?: boolean,
   placeholder?: string,
@@ -21,23 +22,30 @@ const CompactSemiControlledTextField = ({
   value,
   onChange,
   errorText,
+  commitOnBlur,
   ...otherProps
 }: Props) => {
-  const [temporaryValue, setTemporaryValue] = React.useState<string>(
-    value.toString()
-  );
-  const onBlur = () => {
-    onChange(temporaryValue);
-  };
-  React.useEffect(() => setTemporaryValue(value), [value]);
+  const [focused, setFocused] = React.useState<boolean>(false);
+  const [text, setText] = React.useState<string>('');
 
   return (
     <div className={classes.container}>
       <CompactTextField
         type="text"
-        value={temporaryValue}
-        onChange={setTemporaryValue}
-        onBlur={onBlur}
+        value={focused ? text : value}
+        onFocus={event => {
+          setFocused(true);
+          setText(value);
+        }}
+        onChange={newValue => {
+          setText(newValue);
+          if (!commitOnBlur) onChange(newValue);
+        }}
+        onBlur={event => {
+          onChange(event.currentTarget.value);
+          setFocused(false);
+          setText('');
+        }}
         {...otherProps}
       />
       {errorText && <div className={classes.error}>{errorText}</div>}

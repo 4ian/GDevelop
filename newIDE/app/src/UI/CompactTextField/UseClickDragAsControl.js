@@ -35,6 +35,7 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
           e.movementX /
           // Sensitivity setting
           2;
+        // TODO: Do not call onChange when not necessary (if there is no sensible change) for performance reasons.
         onChange(
           Math.round(clickDragOrigin.current.accumulatedValue) + initialValue
         );

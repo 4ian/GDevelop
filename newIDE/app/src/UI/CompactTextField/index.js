@@ -21,7 +21,7 @@ type ValueProps =
     |};
 
 type OtherProps = {|
-  onBlur?: (number | string) => void,
+  onBlur?: () => void,
 |};
 
 export type CompactTextFieldProps = {|

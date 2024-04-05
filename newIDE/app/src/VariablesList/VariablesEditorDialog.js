@@ -11,12 +11,26 @@ import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessag
 import { Column, Line } from '../UI/Grid';
 import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
+import { getVariableContextFromNodeId } from './VariableToTreeNodeHandling';
 
 const gd: libGDevelop = global.gd;
 
+const getVariablePathFromNodeId = (
+  nodeId: string,
+  variablesContainer: gdVariablesContainer
+): string => {
+  const variableContext = getVariableContextFromNodeId(
+    nodeId,
+    variablesContainer
+  );
+  const variablePath = variableContext.lineage.map(variable => variable.name);
+  variablePath.push(variableContext.name);
+  return variablePath.join('.');
+};
+
 type Props = {|
   onCancel: () => void,
-  onApply: () => void,
+  onApply: (selectedVariableName: string | null) => void,
   open: boolean,
   onEditObjectVariables?: () => void,
   title: React.Node,
@@ -73,6 +87,12 @@ const VariablesEditorDialog = ({
     'intro-variables'
   );
 
+  const lastSelectedVariableNodeId = React.useRef<string | null>(null);
+  const onSelectedVariableChange = React.useCallback((nodes: Array<string>) => {
+    lastSelectedVariableNodeId.current =
+      nodes.length > 0 ? nodes[nodes.length - 1] : null;
+  }, []);
+
   const onRefactorAndApply = React.useCallback(
     async () => {
       if (inheritedVariablesContainer) {
@@ -106,7 +126,14 @@ const VariablesEditorDialog = ({
       }
 
       variablesContainer.clearPersistentUuid();
-      onApply();
+
+      onApply(
+        lastSelectedVariableNodeId.current &&
+          getVariablePathFromNodeId(
+            lastSelectedVariableNodeId.current,
+            variablesContainer
+          )
+      );
     },
     [
       onApply,
@@ -175,6 +202,7 @@ const VariablesEditorDialog = ({
           onComputeAllVariableNames={onComputeAllVariableNames}
           helpPagePath={helpPagePath}
           onVariablesUpdated={notifyOfChange}
+          onSelectedVariableChange={onSelectedVariableChange}
         />
       </Column>
     </Dialog>

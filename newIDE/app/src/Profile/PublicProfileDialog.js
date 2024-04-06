@@ -4,82 +4,67 @@ import React from 'react';
 
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import { GdGamesFrame, type GdGamesMessageEventData } from '../UI/GdGamesFrame';
 import {
-  getUserPublicProfile,
-  type UserPublicProfile,
-} from '../Utils/GDevelopServices/User';
-import {
+  type PrivateGameTemplateListingData,
   type PrivateAssetPackListingData,
-  listSellerAssetPacks,
 } from '../Utils/GDevelopServices/Shop';
-import ProfileDetails from './ProfileDetails';
+import { useStableUpToDateCallback } from '../Utils/UseStableUpToDateCallback';
 
 type Props = {|
   userId: string,
   onClose: () => void,
-  onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
+  onAssetPackOpen?: (
+    privateAssetPackListingData: PrivateAssetPackListingData
+  ) => void,
+  onGameTemplateOpen?: (
+    privateAssetPackListingData: PrivateGameTemplateListingData
+  ) => void,
 |};
 
-const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
-  const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
-  const [
-    assetPacksListingDatas,
-    setAssetPacksListingDatas,
-  ] = React.useState<?(PrivateAssetPackListingData[])>(null);
-  const [error, setError] = React.useState<?Error>(null);
+const PublicProfileDialog = ({
+  userId,
+  onClose,
+  onAssetPackOpen,
+  onGameTemplateOpen,
+}: Props) => {
+  const callbacks = React.useMemo(
+    () => ({
+      openAssetPack: onAssetPackOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.privateAssetPackListingData) {
+              onAssetPackOpen(data.privateAssetPackListingData);
+            }
+          }
+        : null,
+      openGameTemplate: onGameTemplateOpen
+        ? (data: GdGamesMessageEventData) => {
+            if (data.privateGameTemplateListingData) {
+              onGameTemplateOpen(data.privateGameTemplateListingData);
+            }
+          }
+        : null,
+    }),
+    [onAssetPackOpen, onGameTemplateOpen]
+  );
 
-  const fetchProfile = React.useCallback(
-    async () => {
-      if (!userId) return;
-      setProfile(null);
-      try {
-        const profile = await getUserPublicProfile(userId);
-        setProfile(profile);
-      } catch (error) {
-        setError(error);
+  const onMessageReceived = React.useCallback(
+    (data: GdGamesMessageEventData) => {
+      if (data.id && callbacks[data.id]) {
+        callbacks[data.id](data);
       }
     },
-    [userId]
+    [callbacks]
   );
 
-  const fetchUserPacks = React.useCallback(
-    async () => {
-      if (!userId) return;
-      setAssetPacksListingDatas(null);
-      try {
-        // Will return an empty array if the user is not a seller.
-        const packs = await listSellerAssetPacks({
-          sellerId: userId,
-        });
-        setAssetPacksListingDatas(packs);
-      } catch (error) {
-        setError(error);
-      }
-    },
-    [userId]
-  );
-
-  React.useEffect(
-    () => {
-      fetchProfile();
-      fetchUserPacks();
-    },
-    [userId, fetchProfile, fetchUserPacks]
-  );
-
-  const onRetry = () => {
-    setError(null);
-    fetchProfile();
-  };
-
-  const dialogSize =
-    assetPacksListingDatas && assetPacksListingDatas.length > 4 ? 'md' : 'sm';
+  const stableOnMessageReceived = useStableUpToDateCallback(onMessageReceived);
 
   return (
     <Dialog
       title={null} // Specific case where the title is handled by the content.
       open
-      maxWidth={dialogSize}
+      fullHeight
+      maxWidth={'md'}
       actions={[
         <FlatButton
           key="close"
@@ -88,14 +73,21 @@ const PublicProfileDialog = ({ userId, onClose, onAssetPackOpen }: Props) => {
           onClick={onClose}
         />,
       ]}
+      flexColumnBody
       onRequestClose={onClose}
     >
-      <ProfileDetails
-        profile={profile}
-        error={error}
-        onRetry={onRetry}
-        assetPacksListingDatas={assetPacksListingDatas}
-        onAssetPackOpen={onAssetPackOpen}
+      <GdGamesFrame
+        path={`/embedded/user/${userId}`}
+        loadErrorMessage={
+          <Trans>
+            Can't load the profile. Verify your internet connection or try again
+            later.
+          </Trans>
+        }
+        supportedMessageIds={Object.entries(callbacks)
+          .filter(([key, value]) => !!value)
+          .map(([key]) => key)}
+        onMessageReceived={stableOnMessageReceived}
       />
     </Dialog>
   );

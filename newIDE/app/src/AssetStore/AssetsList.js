@@ -966,6 +966,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             !isAssetPackAudioOnly(openedAssetPack)) &&
           noResultComponent}
         {onPrivateAssetPackSelection &&
+          onPrivateGameTemplateSelection &&
           openAuthorPublicProfileDialog &&
           authorPublicProfile && (
             <PublicProfileDialog
@@ -973,6 +974,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               onClose={() => setOpenAuthorPublicProfileDialog(false)}
               onAssetPackOpen={assetPackListingData => {
                 onPrivateAssetPackSelection(assetPackListingData);
+                setOpenAuthorPublicProfileDialog(false);
+                setAuthorPublicProfile(null);
+              }}
+              onGameTemplateOpen={gameTemplateListingData => {
+                onPrivateGameTemplateSelection(gameTemplateListingData);
                 setOpenAuthorPublicProfileDialog(false);
                 setAuthorPublicProfile(null);
               }}

@@ -49,9 +49,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [layout]
     );
 
-    const enumerateVariableNames = React.useCallback(
+    const enumerateSceneVariables = React.useCallback(
       () => {
-        return layout ? enumerateValidVariableNames(layout.getVariables()) : [];
+        return layout
+          ? enumerateVariables(layout.getVariables()).map(variable => ({
+              ...variable,
+              renderIcon: () => <SceneIcon />,
+            }))
+          : [];
       },
       [layout]
     );
@@ -60,7 +65,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariableNames={enumerateVariableNames}
+          enumerateVariables={enumerateSceneVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

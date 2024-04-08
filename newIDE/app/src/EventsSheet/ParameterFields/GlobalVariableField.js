@@ -44,10 +44,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project]
     );
 
-    const enumerateVariableNames = React.useCallback(
+    const enumerateGlobaleVariables = React.useCallback(
       () => {
         return project
-          ? enumerateValidVariableNames(project.getVariables())
+          ? enumerateVariables(project.getVariables()).map(variable => ({
+              ...variable,
+              renderIcon: () => <GlobalIcon />,
+            }))
           : [];
       },
       [project]
@@ -57,7 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       <React.Fragment>
         <VariableField
           variablesContainers={variablesContainers}
-          enumerateVariableNames={enumerateVariableNames}
+          enumerateVariables={enumerateGlobaleVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

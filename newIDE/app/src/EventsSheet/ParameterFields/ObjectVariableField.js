@@ -156,14 +156,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [objectName, globalObjectsContainer, objectsContainer]
     );
 
-    const enumerateVariableNames = React.useCallback(
+    const enumerateObjectVariables = React.useCallback(
       () =>
         variablesContainers.length > 0
           ? variablesContainers
-              .map(variablesContainer =>
-                enumerateValidVariableNames(variablesContainer)
-              )
+              .map(variablesContainer => enumerateVariables(variablesContainer))
               .reduce((a, b) => intersection(a, b))
+              .map(variable => ({
+                ...variable,
+                renderIcon: () => <ObjectIcon />,
+              }))
           : [],
       [variablesContainers]
     );
@@ -190,7 +192,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           project={project}
           instruction={instruction}
           variablesContainers={variablesContainers}
-          enumerateVariableNames={enumerateVariableNames}
+          enumerateVariables={enumerateObjectVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

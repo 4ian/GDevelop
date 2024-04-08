@@ -28,13 +28,28 @@ import { getProjectScopedContainersFromScope } from '../../InstructionOrExpressi
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ColumnStackLayout } from '../../UI/Layout';
+import VariableStringIcon from '../../VariablesList/Icons/VariableStringIcon';
+import VariableNumberIcon from '../../VariablesList/Icons/VariableNumberIcon';
+import VariableBooleanIcon from '../../VariablesList/Icons/VariableBooleanIcon';
+import VariableArrayIcon from '../../VariablesList/Icons/VariableArrayIcon';
+import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIcon';
+import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
+import { type EnumeratedVariable } from './EnumerateVariables';
+import { LineStackLayout } from '../../UI/Layout';
+import ListIcon from '../../UI/ListIcon';
+import SvgIcon from '@material-ui/core/SvgIcon';
 
 const gd: libGDevelop = global.gd;
+
+export type EnumeratedVariableWithIcon = {
+  ...EnumeratedVariable,
+  renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
+};
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
-  enumerateVariableNames: () => Array<string>,
+  enumerateVariables: () => Array<EnumeratedVariableWithIcon>,
   forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
   getVariableTypeFromParameters?: (
@@ -116,6 +131,23 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
+const getVariableTypeIcon = (variableType: Variable_Type) => {
+  switch (variableType) {
+    case gd.Variable.Number:
+      return VariableNumberIcon;
+    case gd.Variable.String:
+      return VariableStringIcon;
+    case gd.Variable.Boolean:
+      return VariableBooleanIcon;
+    case gd.Variable.Array:
+      return VariableArrayIcon;
+    case gd.Variable.Structure:
+      return VariableStructureIcon;
+    default:
+      return UnknownTypeIcon;
+  }
+};
+
 export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
@@ -124,7 +156,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       objectsContainer,
       scope,
       variablesContainers,
-      enumerateVariableNames,
+      enumerateVariables,
       instruction,
       forceDeclaration,
       value,
@@ -150,13 +182,33 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     const updateAutocompletions = React.useCallback(
       () => {
         setAutocompletionVariableNames(
-          enumerateVariableNames().map(name => ({
-            text: name,
-            value: name,
-          }))
+          enumerateVariables()
+            .map(variable =>
+              variable.isValidName
+                ? variable
+                : // Hide invalid variable names - they would not
+                  // be parsed correctly anyway.
+                  null
+            )
+            .filter(Boolean)
+            .map(variable => ({
+              text: variable.name,
+              value: variable.name,
+              renderIcon: () => {
+                const VariableTypeIcon = getVariableTypeIcon(variable.type);
+                return variable.renderIcon ? (
+                  <LineStackLayout>
+                    {variable.renderIcon()}
+                    <VariableTypeIcon />
+                  </LineStackLayout>
+                ) : (
+                  <VariableTypeIcon />
+                );
+              },
+            }))
         );
       },
-      [enumerateVariableNames]
+      [enumerateVariables]
     );
 
     const focus: FieldFocusFunction = options => {

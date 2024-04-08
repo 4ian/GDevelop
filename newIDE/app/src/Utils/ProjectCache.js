@@ -23,6 +23,7 @@ class ProjectCache {
         const db = event.target.result;
         const transaction = db.transaction(objectStoreScope, 'readwrite');
         transaction.objectStore(objectStoreScope).clear();
+        resolve();
       };
     });
   }
@@ -49,6 +50,7 @@ class ProjectCache {
         };
         request.onerror = event => {
           console.error('IndexedDB could not be opened:', event);
+          reject(event);
         };
         request.onupgradeneeded = event => {
           const db = event.target.result;

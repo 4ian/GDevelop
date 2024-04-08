@@ -13,8 +13,11 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateValidVariableNames } from './EnumerateVariables';
-import uniq from 'lodash/uniq';
+import { enumerateVariables } from './EnumerateVariables';
+import uniqBy from 'lodash/uniqBy';
+import sortBy from 'lodash/sortBy';
+import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 
 const gd: libGDevelop = global.gd;
 
@@ -66,6 +69,8 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
   }
 };
 
+const variableSort = [variable => variable.name.toLowerCase()];
+
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
@@ -82,13 +87,29 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const onComputeAllVariableNames = React.useCallback(() => [], []);
 
-    const enumerateGlobalAndSceneVariableNames = React.useCallback(
+    const enumerateGlobalAndSceneVariables = React.useCallback(
       () => {
         return project && layout
-          ? uniq([
-              ...enumerateValidVariableNames(layout.getVariables()),
-              ...enumerateValidVariableNames(project.getVariables()),
-            ])
+          ? sortBy(
+              uniqBy(
+                [
+                  ...enumerateVariables(layout.getVariables()).map(
+                    variable => ({
+                      ...variable,
+                      renderIcon: () => <SceneIcon />,
+                    })
+                  ),
+                  ...enumerateVariables(project.getVariables()).map(
+                    variable => ({
+                      ...variable,
+                      renderIcon: () => <GlobalIcon />,
+                    })
+                  ),
+                ],
+                'name'
+              ),
+              variableSort
+            )
           : [];
       },
       [project, layout]
@@ -116,7 +137,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           project={project}
           instruction={instruction}
           variablesContainers={variablesContainers}
-          enumerateVariableNames={enumerateGlobalAndSceneVariableNames}
+          enumerateVariables={enumerateGlobalAndSceneVariables}
           parameterMetadata={props.parameterMetadata}
           value={props.value}
           onChange={props.onChange}

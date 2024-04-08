@@ -1059,10 +1059,10 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSaveFileMetadata = await checkForAutosave();
         let content;
         let openingError: Error | null = null;
         try {
+          const autoSaveFileMetadata = await checkForAutosave();
           const result = await onOpen(
             autoSaveFileMetadata,
             setLoaderModalProgress

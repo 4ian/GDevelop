@@ -125,19 +125,27 @@ export const generateGetAutoSaveCreationDate = (
         const { profile } = authenticatedUser;
         if (!profile) return null;
 
-        const cloudProjectId = fileMetadata.fileIdentifier;
-        const projectCache = getProjectCache();
-        const autoSavedTime = await projectCache.getCreationDate({
-          userId: profile.id,
-          cloudProjectId,
-        });
-        if (!autoSavedTime) return null;
-        if (!compareLastModified) return autoSavedTime;
+        try {
+          const cloudProjectId = fileMetadata.fileIdentifier;
+          const projectCache = getProjectCache();
+          const autoSavedTime = await projectCache.getCreationDate({
+            userId: profile.id,
+            cloudProjectId,
+          });
+          if (!autoSavedTime) return null;
+          if (!compareLastModified) return autoSavedTime;
 
-        const saveTime = fileMetadata.lastModifiedDate;
-        if (!saveTime) return null;
+          const saveTime = fileMetadata.lastModifiedDate;
+          if (!saveTime) return null;
 
-        return autoSavedTime > saveTime + 5000 ? autoSavedTime : null;
+          return autoSavedTime > saveTime + 5000 ? autoSavedTime : null;
+        } catch (error) {
+          console.error(
+            'An error occurred while getting autosave creation date:',
+            error
+          );
+          return null;
+        }
       }
     : undefined;
 

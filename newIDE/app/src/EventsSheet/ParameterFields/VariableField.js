@@ -357,7 +357,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                   }}
                 >
                   <SelectOption value={gd.Variable.Number} label={t`Number`} />
-                  <SelectOption value={gd.Variable.String} label={t`String`} />
+                  <SelectOption value={gd.Variable.String} label={t`Text`} />
                   <SelectOption
                     value={gd.Variable.Boolean}
                     label={t`Boolean`}

@@ -31,7 +31,7 @@ const getOptions = () => {
     options = [
       <SelectOption
         key="string"
-        label={t`String`}
+        label={t`Text`}
         value={gd.Variable.String}
       />,
       <SelectOption

@@ -875,7 +875,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("Number value of a scene variable"),
                      _("Scene variables"),
                      "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"));
+      .AddParameter("scenevar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddStrExpression("VariableString",
@@ -883,7 +884,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Text of a scene variable"),
                         _("Scene variables"),
                         "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"));
+      .AddParameter("scenevar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddExpression("GlobalVariable",
@@ -891,7 +893,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                      _("Number value of a global variable"),
                      _("Global variables"),
                      "res/actions/var.png")
-      .AddParameter("globalvar", _("Name of the global variable"));
+      .AddParameter("globalvar", _("Name of the global variable"))
+      .SetRelevantForFunctionEventsOnly();
 
   extension
       .AddStrExpression("GlobalVariableString",
@@ -899,7 +902,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Text of a global variable"),
                         _("Global variables"),
                         "res/actions/var.png")
-      .AddParameter("globalvar", _("Variable"));
+      .AddParameter("globalvar", _("Variable"))
+      .SetRelevantForFunctionEventsOnly();
 }
 
 }  // namespace gd

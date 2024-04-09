@@ -22,6 +22,7 @@ import Unlink from '../../UI/CustomSvgIcons/Unlink';
 import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import Restore from '../../UI/CustomSvgIcons/Restore';
 
 const getEditObjectButton = ({
   i18n,
@@ -212,6 +213,12 @@ const getWidthField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <LetterW className={className} />,
+  getEndAdornmentIcon: className => <Restore className={className} />,
+  onClickEndAdornment: (instance: gdInitialInstance) => {
+    instance.setHasCustomSize(false);
+    instance.setHasCustomDepth(false);
+    forceUpdate();
+  },
 });
 const getHeightField = ({
   i18n,
@@ -241,6 +248,12 @@ const getHeightField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <LetterH className={className} />,
+  getEndAdornmentIcon: className => <Restore className={className} />,
+  onClickEndAdornment: (instance: gdInitialInstance) => {
+    instance.setHasCustomSize(false);
+    instance.setHasCustomDepth(false);
+    forceUpdate();
+  },
 });
 const getDepthField = ({
   i18n,
@@ -270,6 +283,12 @@ const getDepthField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <Depth className={className} />,
+  getEndAdornmentIcon: className => <Restore className={className} />,
+  onClickEndAdornment: (instance: gdInitialInstance) => {
+    instance.setHasCustomSize(false);
+    instance.setHasCustomDepth(false);
+    forceUpdate();
+  },
 });
 const getCustomSizeField = ({
   i18n,

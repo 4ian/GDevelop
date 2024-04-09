@@ -53,7 +53,9 @@ export type PrimitiveValueField =
         label: string,
         tooltipContent: React.Node,
       |},
-      renderLeftIcon?: () => React.Node,
+      getEndAdornmentIcon?: () => React.Node,
+      onClickEndAdornment?: Instance => void,
+      renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -65,7 +67,9 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      renderLeftIcon?: () => React.Node,
+      getEndAdornmentIcon?: () => React.Node,
+      onClickEndAdornment?: Instance => void,
+      renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -102,13 +106,13 @@ type ResourceField = {|
   fallbackResourceKind?: ResourceKind,
   getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
-  renderLeftIcon?: () => React.Node,
+  renderLeftIcon?: (className?: string) => React.Node,
   ...ValueFieldCommonProperties,
 |};
 
 type Title = {|
   name: string,
-  renderLeftIcon: () => React.Node,
+  renderLeftIcon: (className?: string) => React.Node,
   getValue?: Instance => string,
   nonFieldType: 'title',
   defaultValue?: string,
@@ -361,7 +365,7 @@ const CompactPropertiesEditor = ({
         //   />
         // );
       } else if (field.valueType === 'number') {
-        const { setValue } = field;
+        const { setValue, onClickEndAdornment } = field;
         // TODO: Support end adornment
         // const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
 
@@ -382,6 +386,12 @@ const CompactPropertiesEditor = ({
             disabled={getDisabled({ instances, field })}
             renderLeftIcon={field.renderLeftIcon}
             leftIconTooltip={getFieldLabel({ instances, field })}
+            renderEndAdornmentOnHover={field.getEndAdornmentIcon}
+            onClickEndAdornment={() => {
+              if (!onClickEndAdornment) return;
+              instances.forEach(i => onClickEndAdornment(i));
+              _onInstancesModified(instances);
+            }}
             useLeftIconAsNumberControl
             // endAdornment={
             //   endAdornment && (
@@ -451,12 +461,15 @@ const CompactPropertiesEditor = ({
         //     style={styles.field}
         //   />
         // );
+      } else if (field.valueType === 'resource') {
+        return 'TODO';
       } else {
         const {
           // TODO: Still support onEditButtonClick & onEditButtonBuildMenuTemplate ?
           // onEditButtonBuildMenuTemplate,
           // onEditButtonClick,
           setValue,
+          onClickEndAdornment,
         } = field;
         return (
           <CompactSemiControlledTextField
@@ -475,6 +488,12 @@ const CompactPropertiesEditor = ({
             disabled={getDisabled({ instances, field })}
             renderLeftIcon={field.renderLeftIcon}
             leftIconTooltip={getFieldLabel({ instances, field })}
+            renderEndAdornmentOnHover={field.getEndAdornmentIcon || undefined}
+            onClickEndAdornment={() => {
+              if (!onClickEndAdornment) return;
+              instances.forEach(i => onClickEndAdornment(i));
+              _onInstancesModified(instances);
+            }}
           />
         );
       }

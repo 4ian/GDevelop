@@ -22,7 +22,6 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
-import intersection from 'lodash/intersection';
 import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
 import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
 import SelectField from '../../UI/SelectField';
@@ -37,7 +36,6 @@ import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
 import { type EnumeratedVariable } from './EnumerateVariables';
 import { LineStackLayout } from '../../UI/Layout';
 import ListIcon from '../../UI/ListIcon';
-import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
 
 const gd: libGDevelop = global.gd;
 

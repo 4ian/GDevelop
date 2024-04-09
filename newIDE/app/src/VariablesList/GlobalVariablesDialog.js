@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   open: boolean,
   project: gdProject,
-  layout: gdLayout,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -19,9 +18,8 @@ type Props = {|
   preventRefactoringToDeleteInstructions?: boolean,
 |};
 
-const SceneVariablesDialog = ({
+const GlobalVariablesDialog = ({
   project,
-  layout,
   open,
   onCancel,
   onApply,
@@ -31,40 +29,42 @@ const SceneVariablesDialog = ({
   const tabs = React.useMemo(
     () => [
       {
-        id: 'scene-variables',
-        label: <Trans>Scene variables</Trans>,
-        variablesContainer: layout.getVariables(),
-        emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
+        id: 'global-variables',
+        label: <Trans>Global variables</Trans>,
+        variablesContainer: project.getVariables(),
+        emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
         emptyPlaceholderDescription: (
-          <Trans>These variables hold additional information on a scene.</Trans>
+          <Trans>
+            These variables hold additional information on a project.
+          </Trans>
         ),
       },
     ],
-    [layout]
+    [project]
   );
+
   return (
     <VariablesEditorDialog
       project={project}
       open={open}
       onCancel={onCancel}
       onApply={onApply}
-      title={<Trans>{layout.getName()} variables</Trans>}
+      title={<Trans>Global variables</Trans>}
       tabs={tabs}
-      helpPagePath={'/all-features/variables/scene-variables'}
+      helpPagePath={'/all-features/variables/global-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       onComputeAllVariableNames={() =>
-        EventsRootVariablesFinder.findAllLayoutVariables(
+        EventsRootVariablesFinder.findAllGlobalVariables(
           project.getCurrentPlatform(),
-          project,
-          layout
+          project
         )
       }
       preventRefactoringToDeleteInstructions={
         preventRefactoringToDeleteInstructions
       }
-      id="scene-variables-dialog"
+      id="global-variables-dialog"
     />
   );
 };
 
-export default SceneVariablesDialog;
+export default GlobalVariablesDialog;

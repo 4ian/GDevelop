@@ -1865,19 +1865,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                   <VariablesEditorDialog
                     project={project}
                     open
-                    variablesContainer={this.state.variablesEditedInstance.getVariables()}
-                    inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}
                     onCancel={() => this.editInstanceVariables(null)}
                     onApply={() => this.editInstanceVariables(null)}
-                    emptyPlaceholderTitle={
-                      <Trans>Add your first instance variable</Trans>
-                    }
-                    emptyPlaceholderDescription={
-                      <Trans>
-                        Instance variables overwrite the default values of the
-                        variables of the object.
-                      </Trans>
-                    }
+                    tabs={[
+                      {
+                        id: 'instance-variables',
+                        label: <Trans>Scene variables</Trans>,
+                        variablesContainer: this.state.variablesEditedInstance.getVariables(),
+                        inheritedVariablesContainer: variablesEditedAssociatedObject.getVariables(),
+                        emptyPlaceholderTitle: (
+                          <Trans>Add your first instance variable</Trans>
+                        ),
+                        emptyPlaceholderDescription: (
+                          <Trans>
+                            Instance variables overwrite the default values of
+                            the variables of the object.
+                          </Trans>
+                        ),
+                      },
+                    ]}
                     helpPagePath={'/all-features/variables/instance-variables'}
                     title={<Trans>Instance Variables</Trans>}
                     onEditObjectVariables={
@@ -1961,7 +1967,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                   project={project}
                   layout={layout}
                   onApply={() => this.editLayoutVariables(false)}
-                  onClose={() => this.editLayoutVariables(false)}
+                  onCancel={() => this.editLayoutVariables(false)}
                   hotReloadPreviewButtonProps={
                     this.props.hotReloadPreviewButtonProps
                   }

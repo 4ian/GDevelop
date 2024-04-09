@@ -142,3 +142,153 @@ export const useSerializableObjectCancelableEditor = ({
     getOriginalContentSerializedElement,
   };
 };
+
+type SerializableObjectsCancelableEditorProps = {|
+  serializableObjects: Map<string, gdSerializable>,
+  useProjectToUnserialize?: ?gdProject,
+  onCancel: () => void | Promise<void>,
+
+  /**
+   * In the future, most serializable objects will be able to have
+   * persistent UUID to identify them uniquely. In the meantime, some
+   * UUIDs are used to check for changes in a serialized object, but must
+   * not be persisted in the project file. In this case, this will
+   * reset the UUIDs (which are probabably not set) and clear them when cancelled.
+   * If you must manually clear them if changes are applied.
+   */
+  resetThenClearPersistentUuid?: boolean,
+|};
+
+/**
+ * Custom hook serializing the object and allowing to restore back
+ * the object to this serialized state later, by calling the function
+ * returned by the hook.
+ */
+export const useSerializableObjectsCancelableEditor = ({
+  serializableObjects,
+  useProjectToUnserialize,
+  onCancel,
+  resetThenClearPersistentUuid,
+}: SerializableObjectsCancelableEditorProps) => {
+  const serializedElementsRef = React.useRef<Map<string, gdSerializerElement>>(
+    new Map()
+  );
+  const numberOfChangesRef = React.useRef(0);
+  const { showConfirmation } = useAlertDialog();
+  const preferences = React.useContext(PreferencesContext);
+  const backdropClickBehavior = preferences.values.backdropClickBehavior;
+
+  React.useEffect(
+    () => {
+      console.log('Backup');
+      const serializedElements = serializedElementsRef.current;
+      for (const [id, serializableObject] of serializableObjects) {
+        // Serialize the content of the object, to be used in case the user
+        // want to cancel their changes.
+        {
+          const serializedElement = serializedElements.get(id);
+          if (serializedElement) {
+            serializedElement.delete();
+            serializedElements.delete(id);
+          }
+        }
+        if (resetThenClearPersistentUuid) {
+          serializableObject.resetPersistentUuid();
+        }
+        const serializedElement = new gd.SerializerElement();
+        serializableObject.serializeTo(serializedElement);
+        serializedElements.set(id, serializedElement);
+      }
+      return () => {
+        for (const [id, serializedElement] of serializedElements) {
+          serializedElement.delete();
+          serializedElements.delete(id);
+        }
+      };
+    },
+    [serializableObjects, resetThenClearPersistentUuid]
+  );
+
+  const getOriginalContentSerializedElements = React.useCallback(() => {
+    if (!serializedElementsRef.current) {
+      throw new Error('serializedElementRef should always be non null.');
+    }
+    return serializedElementsRef.current;
+  }, []);
+
+  const notifyOfChange = React.useCallback(() => {
+    numberOfChangesRef.current++;
+  }, []);
+
+  const hasUnsavedChanges = React.useCallback(() => {
+    return numberOfChangesRef.current > 0;
+  }, []);
+
+  const onCancelChanges = React.useCallback(
+    async () => {
+      console.log('Cancel');
+      // Use the value that was serialized to cancel the changes
+      // made to the object
+      const serializedElements = serializedElementsRef.current;
+      if (!serializedElements) return;
+
+      let continueCanceling = false;
+      const hasCancelBackdropPreference = backdropClickBehavior === 'cancel';
+
+      // We show a warning if:
+      // - the user has not set the backdrop click behavior to "cancel", as we assume they know what they are doing
+      // and if the user has made a significant number of changes
+      const shouldShowWarning =
+        !hasCancelBackdropPreference &&
+        numberOfChangesRef.current >= changesBeforeShowingWarning;
+
+      if (shouldShowWarning) {
+        const answer = await showConfirmation({
+          title: t`Cancel your changes?`,
+          message: t`All your changes will be lost. Are you sure you want to cancel?`,
+          confirmButtonLabel: t`Cancel`,
+          dismissButtonLabel: t`Continue editing`,
+        });
+        if (answer) continueCanceling = true;
+      } else {
+        continueCanceling = true;
+      }
+      if (!continueCanceling) return;
+
+      for (const [id, serializableObject] of serializableObjects) {
+        const serializedElement = serializedElements.get(id);
+        console.log('Cancel: ' + id);
+
+        if (useProjectToUnserialize) {
+          serializableObject.unserializeFrom(
+            useProjectToUnserialize,
+            serializedElement
+          );
+        } else {
+          serializableObject.unserializeFrom(serializedElement);
+        }
+
+        if (resetThenClearPersistentUuid) {
+          serializableObject.clearPersistentUuid();
+        }
+      }
+
+      onCancel();
+    },
+    [
+      backdropClickBehavior,
+      onCancel,
+      showConfirmation,
+      serializableObjects,
+      useProjectToUnserialize,
+      resetThenClearPersistentUuid,
+    ]
+  );
+
+  return {
+    onCancelChanges,
+    notifyOfChange,
+    hasUnsavedChanges,
+    getOriginalContentSerializedElements,
+  };
+};

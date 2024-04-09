@@ -16,6 +16,7 @@ import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 
 // TODO Move this function to the ObjectsContainersList class.
 const getObjectOrGroupVariablesContainers = (
@@ -165,5 +166,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) =>
-  renderVariableWithIcon(props, 'res/types/objectvar.png', 'object variable');
+) => renderVariableWithIcon(props, ObjectIcon, 'object variable');

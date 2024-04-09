@@ -13,6 +13,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -97,4 +98,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineSceneVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, 'res/types/scenevar.png', 'scene variable');
+) => renderVariableWithIcon(props, SceneIcon, 'scene variable');

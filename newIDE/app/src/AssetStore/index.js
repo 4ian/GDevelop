@@ -730,11 +730,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onOpenDetails={onOpenDetails}
               onAssetLoaded={() => applyBackScrollPosition(currentPage)}
               onPrivateAssetPackSelection={selectPrivateAssetPack}
+              onPrivateGameTemplateSelection={selectPrivateGameTemplate}
             />
           ) : !!openedPrivateAssetPackListingData ? (
             <PrivateAssetPackInformationPage
               privateAssetPackListingData={openedPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
+              onGameTemplateOpen={selectPrivateGameTemplate}
               privateAssetPackListingDatasFromSameCreator={
                 privateAssetPackListingDatasFromSameCreator
               }
@@ -750,6 +752,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     openedPrivateGameTemplateListingData
                   );
               }}
+              onAssetPackOpen={selectPrivateAssetPack}
               onGameTemplateOpen={selectPrivateGameTemplate}
               privateGameTemplateListingDatasFromSameCreator={
                 privateGameTemplateListingDatasFromSameCreator

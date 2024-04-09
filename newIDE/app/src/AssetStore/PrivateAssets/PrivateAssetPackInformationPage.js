@@ -5,6 +5,7 @@ import {
   buyProductWithCredits,
   redeemPrivateAssetPack,
   type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
   getCalloutToGetSubscriptionOrClaimAssetPack,
 } from '../../Utils/GDevelopServices/Shop';
 import {
@@ -143,6 +144,12 @@ type Props = {|
       forceProductPage?: boolean,
     |}
   ) => void,
+  onGameTemplateOpen: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    options?: {|
+      forceProductPage?: boolean,
+    |}
+  ) => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -150,6 +157,7 @@ const PrivateAssetPackInformationPage = ({
   privateAssetPackListingData,
   privateAssetPackListingDatasFromSameCreator,
   onAssetPackOpen,
+  onGameTemplateOpen,
   simulateAppStoreProduct,
 }: Props) => {
   const { id, name, sellerId } = privateAssetPackListingData;
@@ -736,6 +744,10 @@ const PrivateAssetPackInformationPage = ({
               onClose={() => setOpenSellerPublicProfileDialog(false)}
               onAssetPackOpen={assetPackListingData => {
                 onAssetPackOpen(assetPackListingData);
+                setOpenSellerPublicProfileDialog(false);
+              }}
+              onGameTemplateOpen={gameTemplateListingData => {
+                onGameTemplateOpen(gameTemplateListingData);
                 setOpenSellerPublicProfileDialog(false);
               }}
             />

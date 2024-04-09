@@ -7,9 +7,9 @@ import * as React from 'react';
  * of calling a stale callback function after some asynchronous work (i.e: after a `await`,
  * a component could risk calling a stale callback, but not with this hook).
  */
-export function useStableUpToDateCallback<ReturnType>(
-  callback: () => ReturnType
-): () => ReturnType {
+export function useStableUpToDateCallback<ReturnType, ArgTypes>(
+  callback: (...args: ArgTypes[]) => ReturnType
+): (...args: ArgTypes[]) => ReturnType {
   const callbackRef = React.useRef<() => ReturnType>(callback);
 
   // Whenever the callback changes, store the latest version in a ref.
@@ -23,8 +23,8 @@ export function useStableUpToDateCallback<ReturnType>(
   // This function will never change, but will always call the latest
   // callback that was created in a render, so it's fine to call it even
   // from an asynchronous function.
-  const stableCallback = React.useCallback(() => {
-    return callbackRef.current();
+  const stableCallback = React.useCallback((...args) => {
+    return callbackRef.current(...args);
   }, []);
 
   return stableCallback;

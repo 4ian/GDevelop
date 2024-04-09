@@ -37,6 +37,7 @@ export const PublicAsset = () => {
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
         onPrivateAssetPackSelection={() => {}}
+        onPrivateGameTemplateSelection={() => {}}
       />
     </Wrapper>
   );
@@ -61,6 +62,7 @@ export const PrivateAsset = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onOpenDetails={assetShortHeader => {}}
       onPrivateAssetPackSelection={() => {}}
+      onPrivateGameTemplateSelection={() => {}}
     />
   </Wrapper>
 );
@@ -114,6 +116,7 @@ export const AssetWithMultipleAuthors = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onOpenDetails={assetShortHeader => {}}
       onPrivateAssetPackSelection={() => {}}
+      onPrivateGameTemplateSelection={() => {}}
     />
   </Wrapper>
 );

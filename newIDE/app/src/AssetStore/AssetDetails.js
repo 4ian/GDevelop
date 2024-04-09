@@ -13,7 +13,10 @@ import {
   isPixelArt,
   isPrivateAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../Utils/GDevelopServices/Shop';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
@@ -84,6 +87,9 @@ type Props = {|
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
   onAssetLoaded?: () => void,
   onPrivateAssetPackSelection: (assetPack: PrivateAssetPackListingData) => void,
+  onPrivateGameTemplateSelection: (
+    assetPack: PrivateGameTemplateListingData
+  ) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -111,6 +117,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       onOpenDetails,
       onAssetLoaded,
       onPrivateAssetPackSelection,
+      onPrivateGameTemplateSelection,
     }: Props,
     ref
   ) => {
@@ -572,6 +579,10 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               onClose={() => setSelectedAuthorPublicProfile(null)}
               onAssetPackOpen={assetPack => {
                 onPrivateAssetPackSelection(assetPack);
+                setSelectedAuthorPublicProfile(null);
+              }}
+              onGameTemplateOpen={gameTemplate => {
+                onPrivateGameTemplateSelection(gameTemplate);
                 setSelectedAuthorPublicProfile(null);
               }}
             />

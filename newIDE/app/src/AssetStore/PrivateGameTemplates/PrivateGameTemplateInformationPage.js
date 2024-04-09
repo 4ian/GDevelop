@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import {
   buyProductWithCredits,
   type PrivateGameTemplateListingData,
+  type PrivateAssetPackListingData,
 } from '../../Utils/GDevelopServices/Shop';
 import {
   getPrivateGameTemplate,
@@ -110,6 +111,7 @@ type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
   onGameTemplateOpen: PrivateGameTemplateListingData => void,
+  onAssetPackOpen?: PrivateAssetPackListingData => void,
   onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
 |};
@@ -118,6 +120,7 @@ const PrivateGameTemplateInformationPage = ({
   privateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator,
   onGameTemplateOpen,
+  onAssetPackOpen,
   onCreateWithGameTemplate,
   simulateAppStoreProduct,
 }: Props) => {
@@ -594,6 +597,22 @@ const PrivateGameTemplateInformationPage = ({
             <PublicProfileDialog
               userId={sellerId}
               onClose={() => setOpenSellerPublicProfileDialog(false)}
+              onGameTemplateOpen={
+                onGameTemplateOpen
+                  ? (gameTemplate: PrivateGameTemplateListingData) => {
+                      setOpenSellerPublicProfileDialog(false);
+                      onGameTemplateOpen(gameTemplate);
+                    }
+                  : undefined
+              }
+              onAssetPackOpen={
+                onAssetPackOpen
+                  ? (assetPack: PrivateAssetPackListingData) => {
+                      setOpenSellerPublicProfileDialog(false);
+                      onAssetPackOpen(assetPack);
+                    }
+                  : undefined
+              }
             />
           )}
           {!!purchasingPrivateGameTemplateListingData && (

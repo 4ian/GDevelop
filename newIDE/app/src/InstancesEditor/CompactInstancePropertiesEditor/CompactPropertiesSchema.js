@@ -203,9 +203,19 @@ const getWidthField = ({
   valueType: 'number',
   getValue: getInstanceWidth,
   setValue: (instance: gdInitialInstance, newValue: number) => {
-    instance.setCustomWidth(Math.max(newValue, 0));
-    instance.setCustomHeight(getInstanceHeight(instance));
-    instance.setCustomDepth(getInstanceDepth(instance));
+    const shouldKeepRatio = instance.shouldKeepRatio();
+    const newWidth = Math.max(newValue, 0);
+    if (shouldKeepRatio) {
+      const initialWidth = getInstanceWidth(instance) || 1;
+      const ratio = newWidth / initialWidth;
+      instance.setCustomWidth(newWidth);
+      instance.setCustomHeight(getInstanceHeight(instance) * ratio);
+      instance.setCustomDepth(getInstanceDepth(instance) * ratio);
+    } else {
+      instance.setCustomWidth(newWidth);
+      instance.setCustomHeight(getInstanceHeight(instance));
+      instance.setCustomDepth(getInstanceDepth(instance));
+    }
 
     // This must be done after reading the size.
     instance.setHasCustomSize(true);
@@ -238,9 +248,19 @@ const getHeightField = ({
   valueType: 'number',
   getValue: getInstanceHeight,
   setValue: (instance: gdInitialInstance, newValue: number) => {
-    instance.setCustomWidth(getInstanceWidth(instance));
-    instance.setCustomHeight(Math.max(newValue, 0));
-    instance.setCustomDepth(getInstanceDepth(instance));
+    const shouldKeepRatio = instance.shouldKeepRatio();
+    const newHeight = Math.max(newValue, 0);
+    if (shouldKeepRatio) {
+      const initialHeight = getInstanceHeight(instance) || 1;
+      const ratio = newHeight / initialHeight;
+      instance.setCustomWidth(getInstanceWidth(instance) * ratio);
+      instance.setCustomHeight(newHeight);
+      instance.setCustomDepth(getInstanceDepth(instance) * ratio);
+    } else {
+      instance.setCustomWidth(getInstanceWidth(instance));
+      instance.setCustomHeight(newHeight);
+      instance.setCustomDepth(getInstanceDepth(instance));
+    }
 
     // This must be done after reading the size.
     instance.setHasCustomSize(true);
@@ -273,9 +293,19 @@ const getDepthField = ({
   valueType: 'number',
   getValue: getInstanceDepth,
   setValue: (instance: gdInitialInstance, newValue: number) => {
-    instance.setCustomWidth(getInstanceWidth(instance));
-    instance.setCustomHeight(getInstanceHeight(instance));
-    instance.setCustomDepth(Math.max(newValue, 0));
+    const shouldKeepRatio = instance.shouldKeepRatio();
+    const newDepth = Math.max(newValue, 0);
+    if (shouldKeepRatio) {
+      const initialDepth = getInstanceDepth(instance) || 1;
+      const ratio = newDepth / initialDepth;
+      instance.setCustomWidth(getInstanceWidth(instance) * ratio);
+      instance.setCustomHeight(getInstanceHeight(instance) * ratio);
+      instance.setCustomDepth(newDepth);
+    } else {
+      instance.setCustomWidth(getInstanceWidth(instance));
+      instance.setCustomHeight(getInstanceHeight(instance));
+      instance.setCustomDepth(newDepth);
+    }
 
     // This must be done after reading the size.
     instance.setHasCustomSize(true);
@@ -303,30 +333,15 @@ const getCustomSizeField = ({
   getInstanceDepth: gdInitialInstance => number,
   forceUpdate: () => void,
 |}) => ({
-  name: 'Custom size',
-  getLabel: () => i18n._(t`Custom size`),
+  name: 'Keep ratio',
+  getLabel: () => i18n._(t`Keep ratio`),
   valueType: 'enumIcon',
   isHighlighted: value => value,
   renderIcon: value =>
     value ? <Link fontSize="small" /> : <Unlink fontSize="small" />,
-  getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
-  setValue: (instance: gdInitialInstance, newValue: boolean) => {
-    if (
-      instance.getCustomHeight() === 0 &&
-      instance.getCustomWidth() === 0 &&
-      instance.getCustomDepth() === 0
-    ) {
-      // The instance custom dimensions have never been set before.
-      // To avoid setting setting all the dimensions to 0 when enabling
-      // the instance custom size flag, the current instance dimensions are used.
-      instance.setCustomWidth(getInstanceWidth(instance));
-      instance.setCustomHeight(getInstanceHeight(instance));
-      instance.setCustomDepth(getInstanceDepth(instance));
-    }
-    instance.setHasCustomSize(newValue);
-    instance.setHasCustomDepth(newValue);
-    forceUpdate();
-  },
+  getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
+  setValue: (instance: gdInitialInstance, newValue: boolean) =>
+    instance.setShouldKeepRatio(newValue),
 });
 
 export const makeSchema = ({

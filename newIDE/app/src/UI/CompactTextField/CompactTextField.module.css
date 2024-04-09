@@ -67,6 +67,9 @@
   min-width: 0px;
   border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
 }
+.compactTextField.withEndAdornment input {
+  padding-right: 16px;
+}
 
 .compactTextField input::placeholder {
   color: var(--theme-text-disabled-color);
@@ -97,6 +100,42 @@ svg.leftIcon {
   color: var(--theme-text-default-color);
 }
 .container:not(.disabled):focus-within .leftIcon {
+  color: var(--theme-text-default-color);
+}
+
+.endAdornmentButton {
+  outline: 0;
+  border: 0;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 17px;
+  height: 17px;
+  display: none;
+  padding: 1px;
+  border-radius: 4px;
+  background-color: unset;
+}
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.endAdornmentIcon {
+  font-size: 15px;
+  color: var(--theme-text-disabled-color);
+  transition: color 0.1s linear;
+}
+.container:not(.disabled):hover .endAdornmentButton,
+.container:not(.disabled):focus-within .endAdornmentButton {
+  display: flex;
+}
+.container:not(.disabled):hover .endAdornmentButton:hover,
+.container:not(.disabled):focus-within .endAdornmentButton:hover,
+.container:not(.disabled):hover .endAdornmentButton:focus,
+.container:not(.disabled):focus-within .endAdornmentButton:focus {
+  background-color: rgba(221, 209, 255, 0.16); /* TODO: Put in theme*/
+}
+.container:not(.disabled):hover .endAdornmentButton:hover .endAdornmentIcon,
+.container:not(.disabled):focus-within .endAdornmentButton:hover .endAdornmentIcon,
+.container:not(.disabled):hover .endAdornmentButton:focus .endAdornmentIcon,
+.container:not(.disabled):focus-within .endAdornmentButton:focus .endAdornmentIcon {
   color: var(--theme-text-default-color);
 }
 

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
@@ -9,6 +10,8 @@ import { ColumnStackLayout } from '../../../UI/Layout';
 import Angle from '../../../UI/CustomSvgIcons/Angle';
 import { Column } from '../../../UI/Grid';
 import ElementHighlighterProvider from '../../ElementHighlighterProvider';
+import Text from '../../../UI/Text';
+import Restore from '../../../UI/CustomSvgIcons/Restore';
 
 export default {
   title: 'UI Building Blocks/CompactSemiControlledTextField',
@@ -23,12 +26,14 @@ export const Default = () => {
   const [value3, setValue3] = React.useState<string>('');
   const [value4, setValue4] = React.useState<string>('');
   const [value5, setValue5] = React.useState<string>('');
+  const [value6, setValue6] = React.useState<string>('');
 
   return (
     <ElementHighlighterProvider
       elements={[
         { label: 'With icon', id: 'with-icon' },
         { label: 'Without icon', id: 'without-icon' },
+        { label: 'With end adornment', id: 'with-end-adornment' },
       ]}
     >
       <ColumnStackLayout expand useLargeSpacer>
@@ -115,6 +120,34 @@ export const Default = () => {
             leftIconTooltip={'Angle'}
           />
           <div>Disabled field</div>
+        </Column>
+        <Text>With end adornment</Text>
+        <Column>
+          <CompactSemiControlledTextField
+            value={value6}
+            onChange={setValue6}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle'}
+            id="with-end-adornment"
+            renderEndAdornmentOnHover={className => (
+              <Restore className={className} />
+            )}
+            onClickEndAdornment={action('onClickEndAdornment')}
+          />
+          <div>State value is {value6}</div>
+        </Column>
+        <Column>
+          <CompactSemiControlledTextField
+            disabled
+            value={'Disabled field'}
+            onChange={valueAsString => {}}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle disabled'}
+            renderEndAdornmentOnHover={className => (
+              <Restore className={className} />
+            )}
+            onClickEndAdornment={action('onClickEndAdornment')}
+          />
         </Column>
       </ColumnStackLayout>
     </ElementHighlighterProvider>

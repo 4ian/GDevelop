@@ -44,6 +44,8 @@ export type CompactTextFieldProps = {|
   renderLeftIcon?: (className: string) => React.Node,
   leftIconTooltip?: React.Node,
   useLeftIconAsNumberControl?: boolean,
+  renderEndAdornmentOnHover?: (className: string) => React.Node,
+  onClickEndAdornment?: () => void,
 |};
 
 const CompactTextField = ({
@@ -57,6 +59,8 @@ const CompactTextField = ({
   renderLeftIcon,
   leftIconTooltip,
   useLeftIconAsNumberControl,
+  renderEndAdornmentOnHover,
+  onClickEndAdornment,
   onBlur,
   onFocus,
 }: CompactTextFieldProps) => {
@@ -123,6 +127,7 @@ const CompactTextField = ({
       <div
         className={classNames({
           [classes.compactTextField]: true,
+          [classes.withEndAdornment]: !!renderEndAdornmentOnHover,
         })}
       >
         <input
@@ -135,6 +140,14 @@ const CompactTextField = ({
           onBlur={onBlurInput}
           onFocus={onFocusInput}
         />
+        {renderEndAdornmentOnHover && (
+          <button
+            onClick={onClickEndAdornment}
+            className={classes.endAdornmentButton}
+          >
+            {renderEndAdornmentOnHover(classes.endAdornmentIcon)}
+          </button>
+        )}
       </div>
     </div>
   );

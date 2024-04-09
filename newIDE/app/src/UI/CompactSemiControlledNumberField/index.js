@@ -15,6 +15,8 @@ type Props = {|
   renderLeftIcon?: (className: string) => React.Node,
   leftIconTooltip?: React.Node,
   useLeftIconAsNumberControl?: boolean,
+  renderEndAdornmentOnHover?: (className: string) => React.Node,
+  onClickEndAdornment?: () => void,
 
   errorText?: React.Node,
 |};

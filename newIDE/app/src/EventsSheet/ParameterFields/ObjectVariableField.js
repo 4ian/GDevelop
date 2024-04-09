@@ -17,8 +17,8 @@ import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
-import { enumerateValidVariableNames } from './EnumerateVariables';
 import intersection from 'lodash/intersection';
+import { enumerateVariables } from './EnumerateVariables';
 
 const gd: libGDevelop = global.gd;
 

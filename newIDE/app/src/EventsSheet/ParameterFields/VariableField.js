@@ -37,7 +37,7 @@ import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
 import { type EnumeratedVariable } from './EnumerateVariables';
 import { LineStackLayout } from '../../UI/Layout';
 import ListIcon from '../../UI/ListIcon';
-import SvgIcon from '@material-ui/core/SvgIcon';
+import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
 
 const gd: libGDevelop = global.gd;
 

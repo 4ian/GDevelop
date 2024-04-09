@@ -120,7 +120,9 @@ export const Default = () => {
           leftIconTooltip={'Angle'}
           useLeftIconAsNumberControl
           id="text-with-end-adornment"
-          renderEndAdornmentOnHover={className => <Restore className={className} />}
+          renderEndAdornmentOnHover={className => (
+            <Restore className={className} />
+          )}
           onClickEndAdornment={action('onClickEndAdornment')}
         />
         <CompactTextField
@@ -130,7 +132,9 @@ export const Default = () => {
           renderLeftIcon={className => <Angle className={className} />}
           leftIconTooltip={'Angle disabled'}
           useLeftIconAsNumberControl
-          renderEndAdornmentOnHover={className => <Restore className={className} />}
+          renderEndAdornmentOnHover={className => (
+            <Restore className={className} />
+          )}
           onClickEndAdornment={action('onClickEndAdornment')}
         />
       </ColumnStackLayout>

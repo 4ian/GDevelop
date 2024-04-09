@@ -25,6 +25,7 @@ import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -74,10 +75,11 @@ export type PrimitiveValueField =
       ...ValueFieldCommonProperties,
     |}
   | {|
-      valueType: 'booleanIcon',
-      renderIcon: (value: boolean) => React.Node,
-      getValue: Instance => boolean,
-      setValue: (instance: Instance, newValue: boolean) => void,
+      valueType: 'enumIcon',
+      renderIcon: (value: any) => React.Node,
+      getValue: Instance => any,
+      isHighlighted: (value: any) => boolean,
+      setValue: (instance: Instance, newValue: any) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -413,7 +415,7 @@ const CompactPropertiesEditor = ({
         //     />
         //   </Column>
         // );
-      } else if (field.valueType === 'booleanIcon') {
+      } else if (field.valueType === 'enumIcon') {
         const value = getFieldValue({ instances, field });
         return (
           <IconButton
@@ -421,7 +423,7 @@ const CompactPropertiesEditor = ({
             id={field.name}
             size="small"
             tooltip={getFieldLabel({ instances, field })}
-            selected={value}
+            selected={field.isHighlighted(value)}
             onClick={event => {
               instances.forEach(i => field.setValue(i, !value));
               _onInstancesModified(instances);
@@ -648,6 +650,7 @@ const CompactPropertiesEditor = ({
           <LineStackLayout
             alignItems="center"
             key={`section-title-${field.name}`}
+            expand
           >
             {renderLeftIcon()}
             <Text displayInlineAsSpan noMargin>
@@ -656,7 +659,13 @@ const CompactPropertiesEditor = ({
             <Text allowSelection displayInlineAsSpan size="body2" noMargin>
               -
             </Text>
-            <Text allowSelection displayInlineAsSpan size="body2" noMargin>
+            <Text
+              allowSelection
+              displayInlineAsSpan
+              size="body2"
+              noMargin
+              style={textEllipsisStyle}
+            >
               {additionalText}
             </Text>
           </LineStackLayout>

@@ -19,6 +19,9 @@ import LetterZ from '../../UI/CustomSvgIcons/LetterZ';
 import Instance from '../../UI/CustomSvgIcons/Instance';
 import Link from '../../UI/CustomSvgIcons/Link';
 import Unlink from '../../UI/CustomSvgIcons/Unlink';
+import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
+import Lock from '../../UI/CustomSvgIcons/Lock';
+import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 
 const getEditObjectButton = ({
   i18n,
@@ -130,6 +133,7 @@ const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
 const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
   name: 'Title',
   type: 'row',
+  preventWrap: true,
   children: [
     {
       name: i18n._(t`Instance`),
@@ -141,26 +145,40 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
       defaultValue: i18n._(t`Different objects`),
     },
     {
-      name: 'Prevent instance selection',
-      getLabel: () => i18n._(t`Prevent selection in the editor`),
-      valueType: 'boolean',
-      disabled: (instances: gdInitialInstance[]) => {
-        return instances.some(instance => !instance.isLocked());
-      },
-      getValue: (instance: gdInitialInstance) => instance.isSealed(),
-      setValue: (instance: gdInitialInstance, newValue: boolean) =>
-        instance.setSealed(newValue),
-    },
-    {
-      name: 'Lock instance position angle',
-      getLabel: () => i18n._(t`Lock position/angle in the editor`),
-      valueType: 'boolean',
-      getValue: (instance: gdInitialInstance) => instance.isLocked(),
+      name: 'Lock instance',
+      getLabel: (instance: gdInitialInstance) =>
+        instance.isSealed()
+          ? i18n._(t`Free instance`)
+          : instance.isLocked()
+          ? i18n._(t`Prevent selection in the editor`)
+          : i18n._(t`Lock position/angle in the editor`),
+      valueType: 'enumIcon',
+      renderIcon: value =>
+        value === 'sealed' ? (
+          <RemoveCircle fontSize="small" />
+        ) : value === 'locked' ? (
+          <Lock fontSize="small" />
+        ) : (
+          <LockOpen fontSize="small" />
+        ),
+      isHighlighted: value => value === 'locked' || value === 'sealed',
+      getValue: (instance: gdInitialInstance) =>
+        instance.isSealed()
+          ? 'sealed'
+          : instance.isLocked()
+          ? 'locked'
+          : 'free',
       setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        instance.setLocked(newValue);
-        if (!newValue) {
-          instance.setSealed(newValue);
+        if (instance.isSealed()) {
+          instance.setSealed(false);
+          instance.setLocked(false);
+          return;
         }
+        if (instance.isLocked()) {
+          instance.setSealed(true);
+          return;
+        }
+        instance.setLocked(true);
       },
     },
   ],
@@ -268,12 +286,12 @@ const getCustomSizeField = ({
 |}) => ({
   name: 'Custom size',
   getLabel: () => i18n._(t`Custom size`),
-  valueType: 'booleanIcon',
+  valueType: 'enumIcon',
+  isHighlighted: value => value,
   renderIcon: value =>
     value ? <Link fontSize="small" /> : <Unlink fontSize="small" />,
   getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
   setValue: (instance: gdInitialInstance, newValue: boolean) => {
-    console.log(newValue);
     if (
       instance.getCustomHeight() === 0 &&
       instance.getCustomWidth() === 0 &&

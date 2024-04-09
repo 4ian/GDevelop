@@ -532,13 +532,18 @@ const VariablesList = (props: Props) => {
   const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>([]);
   const setSelectedNodes = React.useCallback(
     (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
-      nodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
-      doSetSelectedNodes(nodes);
-      if (onSelectedVariableChange) {
-        onSelectedVariableChange(nodes);
-      }
+      // Use the functional update form to access the current state directly
+      doSetSelectedNodes(currentSelectedNodes => {
+        const newNodes = Array.isArray(nodes)
+          ? nodes
+          : nodes(currentSelectedNodes);
+        if (onSelectedVariableChange) {
+          onSelectedVariableChange(newNodes);
+        }
+        return newNodes;
+      });
     },
-    [onSelectedVariableChange, selectedNodes]
+    [onSelectedVariableChange]
   );
 
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<

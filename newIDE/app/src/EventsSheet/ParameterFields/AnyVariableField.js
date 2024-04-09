@@ -224,7 +224,7 @@ export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
     props,
     props.scope.layout &&
       props.scope.layout.getVariables().has(getRootVariableName(props.value))
-      ? 'res/types/scenevar.png'
-      : 'res/types/globalvar.png',
+      ? SceneIcon
+      : GlobalIcon,
     'variable'
   );

@@ -1175,6 +1175,8 @@ interface InitialInstance {
     void SetLocked(boolean lock);
     boolean IsSealed();
     void SetSealed(boolean seal);
+    boolean ShouldKeepRatio();
+    void SetShouldKeepRatio(boolean keepRatio);
     long GetZOrder();
     void SetZOrder(long zOrder);
     [Const, Ref] DOMString GetLayer();
@@ -1855,7 +1857,7 @@ interface BehaviorMetadata {
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
-    
+
     [Value] MapStringPropertyDescriptor GetProperties();
     [Value] MapStringPropertyDescriptor GetSharedProperties();
 };

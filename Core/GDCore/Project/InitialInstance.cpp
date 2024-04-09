@@ -15,7 +15,7 @@
 
 namespace gd {
 
-gd::String* InitialInstance::badStringProperyValue = NULL;
+gd::String* InitialInstance::badStringPropertyValue = NULL;
 
 InitialInstance::InitialInstance()
     : objectName(""),
@@ -34,6 +34,7 @@ InitialInstance::InitialInstance()
       depth(0),
       locked(false),
       sealed(false),
+      keepRatio(true),
       persistentUuid(UUID::MakeUuid4()) {}
 
 void InitialInstance::UnserializeFrom(const SerializerElement& element) {
@@ -58,6 +59,7 @@ void InitialInstance::UnserializeFrom(const SerializerElement& element) {
   SetLayer(element.GetStringAttribute("layer"));
   SetLocked(element.GetBoolAttribute("locked", false));
   SetSealed(element.GetBoolAttribute("sealed", false));
+  SetShouldKeepRatio(element.GetBoolAttribute("keepRatio", false));
 
   persistentUuid = element.GetStringAttribute("persistentUuid");
   if (persistentUuid.empty()) ResetPersistentUuid();
@@ -120,6 +122,7 @@ void InitialInstance::SerializeTo(SerializerElement& element) const {
   if (HasCustomDepth()) element.SetAttribute("depth", GetCustomDepth());
   if (IsLocked()) element.SetAttribute("locked", IsLocked());
   if (IsSealed()) element.SetAttribute("sealed", IsSealed());
+  if (ShouldKeepRatio()) element.SetAttribute("keepRatio", ShouldKeepRatio());
 
   if (persistentUuid.empty()) persistentUuid = UUID::MakeUuid4();
   element.SetStringAttribute("persistentUuid", persistentUuid);
@@ -188,10 +191,10 @@ double InitialInstance::GetRawDoubleProperty(const gd::String& name) const {
 
 const gd::String& InitialInstance::GetRawStringProperty(
     const gd::String& name) const {
-  if (!badStringProperyValue) badStringProperyValue = new gd::String("");
+  if (!badStringPropertyValue) badStringPropertyValue = new gd::String("");
 
   const auto& it = stringProperties.find(name);
-  return it != stringProperties.end() ? it->second : *badStringProperyValue;
+  return it != stringProperties.end() ? it->second : *badStringPropertyValue;
 }
 
 void InitialInstance::SetRawDoubleProperty(const gd::String& name,

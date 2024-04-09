@@ -1,20 +1,18 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
-import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import GlobalVariablesDialog from '../../VariablesList/GlobalVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import { enumerateVariables } from './EnumerateVariables';
 import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
-import { enumerateValidVariableNames } from './EnumerateVariables';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
@@ -28,14 +26,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const { project, scope } = props;
-
-    const onComputeAllVariableNames = () =>
-      project
-        ? EventsRootVariablesFinder.findAllGlobalVariables(
-            project.getCurrentPlatform(),
-            project
-          )
-        : [];
 
     const variablesContainers = React.useMemo(
       () => {
@@ -74,11 +64,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           scope={scope}
         />
         {editorOpen && project && (
-          <VariablesEditorDialog
+          <GlobalVariablesDialog
             project={project}
-            title={<Trans>Global Variables</Trans>}
             open={editorOpen}
-            variablesContainer={project.getVariables()}
             onCancel={() => setEditorOpen(false)}
             onApply={(selectedVariableName: string | null) => {
               if (
@@ -90,16 +78,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               setEditorOpen(false);
               if (field.current) field.current.updateAutocompletions();
             }}
-            emptyPlaceholderTitle={
-              <Trans>Add your first global variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on a project.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/global-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
             preventRefactoringToDeleteInstructions
           />
         )}

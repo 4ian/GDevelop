@@ -180,6 +180,23 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
+    const objectVariablesDialogTabs = React.useMemo(
+      () => [
+        {
+          id: 'object-variables',
+          label: <Trans>Object variables</Trans>,
+          variablesContainer: variablesContainers[0],
+          emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
+          emptyPlaceholderDescription: (
+            <Trans>
+              These variables hold additional information on an object.
+            </Trans>
+          ),
+        },
+      ],
+      [variablesContainers]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -220,15 +237,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             project={project}
             title={<Trans>Object Variables</Trans>}
             open={editorOpen}
-            variablesContainer={variablesContainers[0]}
-            emptyPlaceholderTitle={
-              <Trans>Add your first object variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on an object.
-              </Trans>
-            }
+            tabs={objectVariablesDialogTabs}
             helpPagePath={'/all-features/variables/object-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             onCancel={() => setEditorOpen(false)}

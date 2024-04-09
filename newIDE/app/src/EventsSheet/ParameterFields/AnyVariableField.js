@@ -130,6 +130,37 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       !layout.getVariables().has(getRootVariableName(props.value)) &&
       project.getVariables().has(getRootVariableName(props.value));
 
+    const globalAndSceneVariableDialogTabs = React.useMemo(
+      () =>
+        [
+          layout && {
+            id: 'scene-variables',
+            label: <Trans>Scene variables</Trans>,
+            variablesContainer: layout.getVariables(),
+            emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
+            emptyPlaceholderDescription: (
+              <Trans>
+                These variables hold additional information on a scene.
+              </Trans>
+            ),
+          },
+          project && {
+            id: 'global-variables',
+            label: <Trans>Global variables</Trans>,
+            variablesContainer: project.getVariables(),
+            emptyPlaceholderTitle: (
+              <Trans>Add your first global variable</Trans>
+            ),
+            emptyPlaceholderDescription: (
+              <Trans>
+                These variables hold additional information on a project.
+              </Trans>
+            ),
+          },
+        ].filter(Boolean),
+      [layout, project]
+    );
+
     return (
       <React.Fragment>
         <VariableField
@@ -160,17 +191,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         {editorOpen && layout && project && (
           <VariablesEditorDialog
             project={project}
-            title={
-              isGlobal ? (
-                <Trans>Global Variables</Trans>
-              ) : (
-                <Trans>{layout.getName()} variables</Trans>
-              )
-            }
+            title={<Trans>{layout.getName()} variables</Trans>}
             open
-            variablesContainer={
-              isGlobal ? project.getVariables() : layout.getVariables()
-            }
             onCancel={() => setEditorOpen(false)}
             onApply={(selectedVariableName: string | null) => {
               if (
@@ -183,18 +205,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
-            emptyPlaceholderTitle={
-              isGlobal ? (
-                <Trans>Add your first global variable</Trans>
-              ) : (
-                <Trans>Add your first scene variable</Trans>
-              )
+            initiallyOpenTabId={
+              isGlobal ? 'global-variables' : 'scene-variables'
             }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on a scene.
-              </Trans>
-            }
+            tabs={globalAndSceneVariableDialogTabs}
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
             preventRefactoringToDeleteInstructions

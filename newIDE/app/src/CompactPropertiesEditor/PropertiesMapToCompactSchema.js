@@ -274,7 +274,10 @@ const isPropertyVisible = (
 };
 
 /**
- * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
+ * Transform a MapStringPropertyDescriptor to a schema that can be used
+ * in CompactPropertiesEditor.
+ * This method is similar to PropertiesMapToSchema.propertiesMapToSchema but returns
+ * fields compatible with CompactPropertiesEditor.
  *
  * @param properties The properties to use
  * @param getProperties The function called to read again the properties

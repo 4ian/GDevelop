@@ -25,7 +25,7 @@ type Props = {|
 
 const VerticallyCenterWithBar = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  console.log(gdevelopTheme);
+
   return (
     <div style={styles.container}>
       <div

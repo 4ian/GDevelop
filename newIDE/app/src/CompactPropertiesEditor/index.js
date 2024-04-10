@@ -276,7 +276,7 @@ const getFieldLabel = ({
 |}): any => {
   if (!instances[0]) {
     console.log(
-      'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+      'CompactPropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
     );
     return field.name;
   }
@@ -315,7 +315,7 @@ const CompactPropertiesEditor = ({
     (field: ValueField): ?string => {
       if (!instances[0]) {
         console.log(
-          'PropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+          'CompactPropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
         );
         return undefined;
       }

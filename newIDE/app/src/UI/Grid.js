@@ -31,6 +31,9 @@ export const Line = (props: {|
       // all the height (if set to flex: 1) and to *not* grow
       // larger than the parent.
       minHeight: props.useFullHeight ? '0' : undefined,
+      // Setting min-width to 0 prevents the line to keep a minimum width
+      // in some rare cases (CompactInstancePropertiesEditor when in the
+      // mosaic editor for instance).
       minWidth: 0,
     }}
   >

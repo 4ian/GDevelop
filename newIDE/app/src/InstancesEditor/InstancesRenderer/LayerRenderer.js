@@ -182,6 +182,9 @@ export default class LayerRenderer {
 
         if (renderedInstance instanceof Rendered3DInstance) {
           const threeObject = renderedInstance.getThreeObject();
+          if (threeObject) {
+            threeObject.visible = isVisible;
+          }
           if (this._threeGroup && threeObject) {
             this._threeGroup.add(threeObject);
           }

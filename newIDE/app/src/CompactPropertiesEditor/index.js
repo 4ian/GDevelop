@@ -630,13 +630,14 @@ const CompactPropertiesEditor = ({
     );
   };
 
-  const renderVerticalCenterWithBar = (field: Field) => (
-    <VerticallyCenterWithBar>
-      {field.child && field.child.getValue
-        ? renderInputField(field.child)
-        : 'TODO'}
-    </VerticallyCenterWithBar>
-  );
+  const renderVerticalCenterWithBar = (field: Field) =>
+    field.child && field.child.getValue ? (
+      <VerticallyCenterWithBar key={field.name}>
+        {renderInputField(field.child)}
+      </VerticallyCenterWithBar>
+    ) : (
+      'TODO'
+    );
 
   const renderContainer =
     mode === 'row'

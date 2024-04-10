@@ -55,7 +55,11 @@ const ElementHighlighterProvider = (props: Props) => {
               onChange={setElementToHighlightId}
             >
               {props.elements.map(element => (
-                <option label={element.label} value={element.id} />
+                <option
+                  label={element.label}
+                  value={element.id}
+                  key={element.id}
+                />
               ))}
             </CompactSelectField>
           </Column>

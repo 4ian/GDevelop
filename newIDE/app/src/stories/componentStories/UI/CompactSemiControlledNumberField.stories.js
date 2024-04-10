@@ -45,7 +45,7 @@ export const Default = () => {
             id="without-icon"
           />
 
-          <div>State value is {value}</div>
+          <div>Commits on blur: state value is {value}</div>
         </Column>
         <Column noMargin>
           <CompactSemiControlledNumberField
@@ -56,7 +56,7 @@ export const Default = () => {
             errorText={'This value cannot be used'}
           />
 
-          <div>State value is {value1}</div>
+          <div>Commits on blur: state value is {value1}</div>
         </Column>
         <Column noMargin>
           <CompactSemiControlledNumberField
@@ -66,7 +66,7 @@ export const Default = () => {
             placeholder="With placeholder"
           />
 
-          <div>State value is {value2}</div>
+          <div>Commits on blur: state value is {value2}</div>
         </Column>
         <Column noMargin>
           <CompactSemiControlledNumberField

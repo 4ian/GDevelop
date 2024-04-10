@@ -7,6 +7,7 @@ import classes from './CompactTextField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
 import useClickDragAsControl from './UseClickDragAsControl';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
+import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
 
 type ValueProps =
   | {|
@@ -134,7 +135,13 @@ const CompactTextField = ({
           id={idToUse.current}
           type={type || 'text'}
           disabled={disabled}
-          value={value === null ? '' : value}
+          value={
+            value === null
+              ? ''
+              : typeof value === 'number'
+              ? toFixedWithoutTrailingZeros(value, 2)
+              : value
+          }
           onChange={e => onChange(e.currentTarget.value, 'keyInput')}
           placeholder={placeholder}
           onBlur={onBlurInput}

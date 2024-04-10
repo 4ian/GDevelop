@@ -3049,6 +3049,25 @@ module.exports = {
         return this._centerPoint || this._modelOriginPoint;
       }
 
+      /**
+       * Applies ratio to value without intermediary value to avoid precision issues.
+       */
+      applyRatio({
+        oldReferenceValue,
+        newReferenceValue,
+        valueToApplyTo,
+        precision = 0,
+      }) {
+        const newValue =
+          (newReferenceValue / oldReferenceValue) *
+          valueToApplyTo *
+          10 ** precision;
+        const roundedNewValue = Math.round(newValue);
+        if (Math.abs(roundedNewValue - newValue) < 0.001)
+          return roundedNewValue / 10 ** precision;
+        return newValue / 10 ** precision;
+      }
+
       _updateDefaultTransformation(
         threeObject,
         rotationX,
@@ -3134,14 +3153,43 @@ module.exports = {
             modelDepth < epsilon
               ? Number.POSITIVE_INFINITY
               : originalDepth / modelDepth;
-          let scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
-          if (!Number.isFinite(scaleRatio)) {
-            scaleRatio = 1;
-          }
+          let minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          if (!Number.isFinite(minScaleRatio)) {
+            this._defaultWidth = modelWidth;
+            this._defaultHeight = modelHeight;
+            this._defaultDepth = modelDepth;
+          } else {
+            let oldReferenceValue, newReferenceValue;
+            if (widthRatio === minScaleRatio) {
+              oldReferenceValue = modelWidth;
+              newReferenceValue = originalWidth;
+            } else if (heightRatio === minScaleRatio) {
+              oldReferenceValue = modelHeight;
+              newReferenceValue = originalHeight;
+            } else {
+              oldReferenceValue = modelDepth;
+              newReferenceValue = originalDepth;
+            }
 
-          this._defaultWidth = scaleRatio * modelWidth;
-          this._defaultHeight = scaleRatio * modelHeight;
-          this._defaultDepth = scaleRatio * modelDepth;
+            this._defaultWidth = this.applyRatio({
+              oldReferenceValue,
+              newReferenceValue,
+              valueToApplyTo: modelWidth,
+              precision: 1,
+            });
+            this._defaultHeight = this.applyRatio({
+              oldReferenceValue,
+              newReferenceValue,
+              valueToApplyTo: modelHeight,
+              precision: 1,
+            });
+            this._defaultDepth = this.applyRatio({
+              oldReferenceValue,
+              newReferenceValue,
+              valueToApplyTo: modelDepth,
+              precision: 1,
+            });
+          }
         }
       }
 

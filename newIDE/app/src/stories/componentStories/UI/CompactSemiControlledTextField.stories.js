@@ -122,7 +122,7 @@ export const Default = () => {
           <div>Disabled field</div>
         </Column>
         <Text>With end adornment</Text>
-        <Column>
+        <Column noMargin>
           <CompactSemiControlledTextField
             value={value6}
             onChange={setValue6}
@@ -136,7 +136,7 @@ export const Default = () => {
           />
           <div>State value is {value6}</div>
         </Column>
-        <Column>
+        <Column noMargin>
           <CompactSemiControlledTextField
             disabled
             value={'Disabled field'}

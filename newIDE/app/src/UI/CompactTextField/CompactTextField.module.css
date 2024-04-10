@@ -66,7 +66,7 @@
   border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
 }
 .compactTextField.withEndAdornment input {
-  padding-right: 16px;
+  padding-right: 20px;
 }
 
 .compactTextField input::placeholder {

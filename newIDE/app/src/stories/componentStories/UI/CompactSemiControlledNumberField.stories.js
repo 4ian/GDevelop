@@ -124,30 +124,36 @@ export const Default = () => {
           <div>Disabled field</div>
         </Column>
         <Text>With end adornment</Text>
-        <CompactSemiControlledNumberField
-          value={value6}
-          onChange={setValue6}
-          renderLeftIcon={className => <Angle className={className} />}
-          leftIconTooltip={'Angle'}
-          useLeftIconAsNumberControl
-          id="with-end-adornment"
-          renderEndAdornmentOnHover={className => (
-            <Restore className={className} />
-          )}
-          onClickEndAdornment={action('onClickEndAdornment')}
-        />
-        <CompactSemiControlledNumberField
-          disabled
-          value={45.1}
-          onChange={() => {}}
-          renderLeftIcon={className => <Angle className={className} />}
-          leftIconTooltip={'Angle disabled'}
-          useLeftIconAsNumberControl
-          renderEndAdornmentOnHover={className => (
-            <Restore className={className} />
-          )}
-          onClickEndAdornment={action('onClickEndAdornment')}
-        />
+        <Column noMargin>
+          <CompactSemiControlledNumberField
+            value={value6}
+            onChange={setValue6}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle'}
+            useLeftIconAsNumberControl
+            id="with-end-adornment"
+            renderEndAdornmentOnHover={className => (
+              <Restore className={className} />
+            )}
+            onClickEndAdornment={action('onClickEndAdornment')}
+          />
+          <div>State value is {value6}</div>
+        </Column>
+        <Column noMargin>
+          <CompactSemiControlledNumberField
+            disabled
+            value={45.1}
+            onChange={() => {}}
+            renderLeftIcon={className => <Angle className={className} />}
+            leftIconTooltip={'Angle disabled'}
+            useLeftIconAsNumberControl
+            renderEndAdornmentOnHover={className => (
+              <Restore className={className} />
+            )}
+            onClickEndAdornment={action('onClickEndAdornment')}
+          />
+          <div>Disabled field</div>
+        </Column>
       </ColumnStackLayout>
     </ElementHighlighterProvider>
   );

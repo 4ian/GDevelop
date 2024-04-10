@@ -49,6 +49,21 @@ export default class Rendered3DInstance {
   }
 
   /**
+   * Applies ratio to value without intermediary value to avoid precision issues.
+   */
+  static applyRatio({
+    oldReferenceValue,
+    newReferenceValue,
+    valueToApplyTo,
+  }: {|
+    oldReferenceValue: number,
+    newReferenceValue: number,
+    valueToApplyTo: number,
+  |}) {
+    return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
+  }
+
+  /**
    * Called when the scene editor is rendered.
    */
   update() {

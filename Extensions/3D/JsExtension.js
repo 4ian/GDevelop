@@ -3049,13 +3049,6 @@ module.exports = {
         return this._centerPoint || this._modelOriginPoint;
       }
 
-      /**
-       * Applies ratio to value without intermediary value to avoid precision issues.
-       */
-      applyRatio({ oldReferenceValue, newReferenceValue, valueToApplyTo }) {
-        return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
-      }
-
       _updateDefaultTransformation(
         threeObject,
         rotationX,
@@ -3149,36 +3142,36 @@ module.exports = {
           } else {
             if (widthRatio === minScaleRatio) {
               this._defaultWidth = originalWidth;
-              this._defaultHeight = this.applyRatio({
+              this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
                 newReferenceValue: originalWidth,
                 valueToApplyTo: modelHeight,
               });
-              this._defaultDepth = this.applyRatio({
+              this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelWidth,
                 newReferenceValue: originalWidth,
                 valueToApplyTo: modelDepth,
               });
             } else if (heightRatio === minScaleRatio) {
-              this._defaultWidth = this.applyRatio({
+              this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
                 newReferenceValue: originalHeight,
                 valueToApplyTo: modelWidth,
               });
 
               this._defaultHeight = originalHeight;
-              this._defaultDepth = this.applyRatio({
+              this._defaultDepth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelHeight,
                 newReferenceValue: originalHeight,
                 valueToApplyTo: modelDepth,
               });
             } else {
-              this._defaultWidth = this.applyRatio({
+              this._defaultWidth = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
                 newReferenceValue: originalDepth,
                 valueToApplyTo: modelWidth,
               });
-              this._defaultHeight = this.applyRatio({
+              this._defaultHeight = Rendered3DInstance.applyRatio({
                 oldReferenceValue: modelDepth,
                 newReferenceValue: originalDepth,
                 valueToApplyTo: modelHeight,

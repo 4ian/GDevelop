@@ -135,6 +135,7 @@ type ActionButton = {|
   disabled: 'onValuesDifferent',
   getValue: Instance => string,
   nonFieldType: 'button',
+  getIcon?: ({| fontSize: string |}) => React.Node,
   onClick: (instance: Instance) => void,
 |};
 
@@ -580,7 +581,13 @@ const CompactPropertiesEditor = ({
           key={`button-${field.label}`}
           fullWidth
           primary
-          leftIcon={<Edit fontSize="small" />}
+          leftIcon={
+            field.getIcon ? (
+              field.getIcon({ fontSize: 'small' })
+            ) : (
+              <Edit fontSize="small" />
+            )
+          }
           disabled={disabled}
           label={field.label}
           onClick={() => {

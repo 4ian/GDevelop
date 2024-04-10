@@ -23,6 +23,8 @@ import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
 import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Restore from '../../UI/CustomSvgIcons/Restore';
+import Object3d from '../../UI/CustomSvgIcons/Object3d';
+import Object2d from '../../UI/CustomSvgIcons/Object2d';
 
 /**
  * Applies ratio to value without intermediary value to avoid precision issues.
@@ -49,13 +51,18 @@ const applyRatio = ({
 const getEditObjectButton = ({
   i18n,
   onEditObjectByName,
+  is3DInstance,
 }: {|
   i18n: I18nType,
   onEditObjectByName: (name: string) => void,
+  is3DInstance: boolean,
 |}) => ({
   label: i18n._(t`Edit object`),
   disabled: 'onValuesDifferent',
   nonFieldType: 'button',
+  getIcon: is3DInstance
+    ? props => <Object3d {...props} />
+    : props => <Object2d {...props} />,
   getValue: (instance: gdInitialInstance) => instance.getObjectName(),
   onClick: (instance: gdInitialInstance) =>
     onEditObjectByName(instance.getObjectName()),
@@ -438,7 +445,7 @@ export const makeSchema = ({
   if (is3DInstance) {
     return [
       getTitleRow({ i18n }),
-      getEditObjectButton({ i18n, onEditObjectByName }),
+      getEditObjectButton({ i18n, onEditObjectByName, is3DInstance }),
       {
         name: 'Position',
         type: 'row',
@@ -506,7 +513,7 @@ export const makeSchema = ({
 
   return [
     getTitleRow({ i18n }),
-    getEditObjectButton({ i18n, onEditObjectByName }),
+    getEditObjectButton({ i18n, onEditObjectByName, is3DInstance }),
     {
       name: 'Position',
       type: 'row',

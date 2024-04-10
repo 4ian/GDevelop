@@ -3052,20 +3052,8 @@ module.exports = {
       /**
        * Applies ratio to value without intermediary value to avoid precision issues.
        */
-      applyRatio({
-        oldReferenceValue,
-        newReferenceValue,
-        valueToApplyTo,
-        precision = 0,
-      }) {
-        const newValue =
-          (newReferenceValue / oldReferenceValue) *
-          valueToApplyTo *
-          10 ** precision;
-        const roundedNewValue = Math.round(newValue);
-        if (Math.abs(roundedNewValue - newValue) < 0.001)
-          return roundedNewValue / 10 ** precision;
-        return newValue / 10 ** precision;
+      applyRatio({ oldReferenceValue, newReferenceValue, valueToApplyTo }) {
+        return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
       }
 
       _updateDefaultTransformation(
@@ -3153,42 +3141,50 @@ module.exports = {
             modelDepth < epsilon
               ? Number.POSITIVE_INFINITY
               : originalDepth / modelDepth;
-          let minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
           if (!Number.isFinite(minScaleRatio)) {
             this._defaultWidth = modelWidth;
             this._defaultHeight = modelHeight;
             this._defaultDepth = modelDepth;
           } else {
-            let oldReferenceValue, newReferenceValue;
             if (widthRatio === minScaleRatio) {
-              oldReferenceValue = modelWidth;
-              newReferenceValue = originalWidth;
+              this._defaultWidth = originalWidth;
+              this._defaultHeight = this.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = this.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelDepth,
+              });
             } else if (heightRatio === minScaleRatio) {
-              oldReferenceValue = modelHeight;
-              newReferenceValue = originalHeight;
-            } else {
-              oldReferenceValue = modelDepth;
-              newReferenceValue = originalDepth;
-            }
+              this._defaultWidth = this.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelWidth,
+              });
 
-            this._defaultWidth = this.applyRatio({
-              oldReferenceValue,
-              newReferenceValue,
-              valueToApplyTo: modelWidth,
-              precision: 1,
-            });
-            this._defaultHeight = this.applyRatio({
-              oldReferenceValue,
-              newReferenceValue,
-              valueToApplyTo: modelHeight,
-              precision: 1,
-            });
-            this._defaultDepth = this.applyRatio({
-              oldReferenceValue,
-              newReferenceValue,
-              valueToApplyTo: modelDepth,
-              precision: 1,
-            });
+              this._defaultHeight = originalHeight;
+              this._defaultDepth = this.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelDepth,
+              });
+            } else {
+              this._defaultWidth = this.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelWidth,
+              });
+              this._defaultHeight = this.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = originalDepth;
+            }
           }
         }
       }

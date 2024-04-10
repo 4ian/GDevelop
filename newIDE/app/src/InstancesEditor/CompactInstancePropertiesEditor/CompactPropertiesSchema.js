@@ -33,19 +33,12 @@ const applyRatio = ({
   oldReferenceValue,
   newReferenceValue,
   valueToApplyTo,
-  precision = 0,
 }: {|
   oldReferenceValue: number,
   newReferenceValue: number,
   valueToApplyTo: number,
-  precision?: number,
 |}) => {
-  const newValue =
-    (newReferenceValue / oldReferenceValue) * valueToApplyTo * 10 ** precision;
-  const roundedNewValue = Math.round(newValue);
-  if (Math.abs(roundedNewValue - newValue) < 0.001)
-    return roundedNewValue / 10 ** precision;
-  return newValue / 10 ** precision;
+  return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
 };
 
 const getEditObjectButton = ({
@@ -239,7 +232,6 @@ const getWidthField = ({
       instance.setCustomWidth(newWidth);
       instance.setCustomHeight(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialWidth,
           newReferenceValue: newWidth,
           valueToApplyTo: getInstanceHeight(instance),
@@ -247,7 +239,6 @@ const getWidthField = ({
       );
       instance.setCustomDepth(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialWidth,
           newReferenceValue: newWidth,
           valueToApplyTo: getInstanceDepth(instance),
@@ -296,7 +287,6 @@ const getHeightField = ({
       const initialHeight = getInstanceHeight(instance) || 1;
       instance.setCustomWidth(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialHeight,
           newReferenceValue: newHeight,
           valueToApplyTo: getInstanceWidth(instance),
@@ -305,7 +295,6 @@ const getHeightField = ({
       instance.setCustomHeight(newHeight);
       instance.setCustomDepth(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialHeight,
           newReferenceValue: newHeight,
           valueToApplyTo: getInstanceDepth(instance),
@@ -354,7 +343,6 @@ const getDepthField = ({
       const initialDepth = getInstanceDepth(instance) || 1;
       instance.setCustomWidth(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialDepth,
           newReferenceValue: newDepth,
           valueToApplyTo: getInstanceWidth(instance),
@@ -362,7 +350,6 @@ const getDepthField = ({
       );
       instance.setCustomHeight(
         applyRatio({
-          precision: 2,
           oldReferenceValue: initialDepth,
           newReferenceValue: newDepth,
           valueToApplyTo: getInstanceHeight(instance),

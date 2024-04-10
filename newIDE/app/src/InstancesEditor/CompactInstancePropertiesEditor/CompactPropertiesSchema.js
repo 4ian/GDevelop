@@ -24,6 +24,28 @@ import Lock from '../../UI/CustomSvgIcons/Lock';
 import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Restore from '../../UI/CustomSvgIcons/Restore';
 
+/**
+ * Applies ratio to value without intermediary value to avoid precision issues.
+ */
+const applyRatio = ({
+  oldReferenceValue,
+  newReferenceValue,
+  valueToApplyTo,
+  precision = 0,
+}: {|
+  oldReferenceValue: number,
+  newReferenceValue: number,
+  valueToApplyTo: number,
+  precision?: number,
+|}) => {
+  const newValue =
+    (newReferenceValue / oldReferenceValue) * valueToApplyTo * 10 ** precision;
+  const roundedNewValue = Math.round(newValue);
+  if (Math.abs(roundedNewValue - newValue) < 0.001)
+    return roundedNewValue / 10 ** precision;
+  return newValue / 10 ** precision;
+};
+
 const getEditObjectButton = ({
   i18n,
   onEditObjectByName,
@@ -207,10 +229,23 @@ const getWidthField = ({
     const newWidth = Math.max(newValue, 0);
     if (shouldKeepRatio) {
       const initialWidth = getInstanceWidth(instance) || 1;
-      const ratio = newWidth / initialWidth;
       instance.setCustomWidth(newWidth);
-      instance.setCustomHeight(getInstanceHeight(instance) * ratio);
-      instance.setCustomDepth(getInstanceDepth(instance) * ratio);
+      instance.setCustomHeight(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialWidth,
+          newReferenceValue: newWidth,
+          valueToApplyTo: getInstanceHeight(instance),
+        })
+      );
+      instance.setCustomDepth(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialWidth,
+          newReferenceValue: newWidth,
+          valueToApplyTo: getInstanceDepth(instance),
+        })
+      );
     } else {
       instance.setCustomWidth(newWidth);
       instance.setCustomHeight(getInstanceHeight(instance));
@@ -252,10 +287,23 @@ const getHeightField = ({
     const newHeight = Math.max(newValue, 0);
     if (shouldKeepRatio) {
       const initialHeight = getInstanceHeight(instance) || 1;
-      const ratio = newHeight / initialHeight;
-      instance.setCustomWidth(getInstanceWidth(instance) * ratio);
+      instance.setCustomWidth(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialHeight,
+          newReferenceValue: newHeight,
+          valueToApplyTo: getInstanceWidth(instance),
+        })
+      );
       instance.setCustomHeight(newHeight);
-      instance.setCustomDepth(getInstanceDepth(instance) * ratio);
+      instance.setCustomDepth(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialHeight,
+          newReferenceValue: newHeight,
+          valueToApplyTo: getInstanceDepth(instance),
+        })
+      );
     } else {
       instance.setCustomWidth(getInstanceWidth(instance));
       instance.setCustomHeight(newHeight);
@@ -297,9 +345,22 @@ const getDepthField = ({
     const newDepth = Math.max(newValue, 0);
     if (shouldKeepRatio) {
       const initialDepth = getInstanceDepth(instance) || 1;
-      const ratio = newDepth / initialDepth;
-      instance.setCustomWidth(getInstanceWidth(instance) * ratio);
-      instance.setCustomHeight(getInstanceHeight(instance) * ratio);
+      instance.setCustomWidth(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialDepth,
+          newReferenceValue: newDepth,
+          valueToApplyTo: getInstanceWidth(instance),
+        })
+      );
+      instance.setCustomHeight(
+        applyRatio({
+          precision: 2,
+          oldReferenceValue: initialDepth,
+          newReferenceValue: newDepth,
+          valueToApplyTo: getInstanceHeight(instance),
+        })
+      );
       instance.setCustomDepth(newDepth);
     } else {
       instance.setCustomWidth(getInstanceWidth(instance));

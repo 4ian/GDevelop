@@ -567,6 +567,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   MakeNewObjectsContainersListForProjectAndLayout
 #define STATIC_MakeNewObjectsContainersListForContainers \
   MakeNewObjectsContainersListForContainers
+#define STATIC_MakeNewEmptyProjectScopedContainers \
+  MakeNewEmptyProjectScopedContainers
 #define STATIC_MakeNewProjectScopedContainersForProjectAndLayout \
   MakeNewProjectScopedContainersForProjectAndLayout
 #define STATIC_MakeNewProjectScopedContainersFor \

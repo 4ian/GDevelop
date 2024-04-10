@@ -6,6 +6,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
+import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -78,6 +79,16 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       return <div>No layout called {projectItemName} found!</div>;
     }
 
+    const scope = {
+      project,
+      layout,
+    };
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      project,
+      layout
+    );
+
     return (
       <EventsSheet
         ref={editor => (this.editor = editor)}
@@ -89,12 +100,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
         unsavedChanges={this.props.unsavedChanges}
         project={project}
-        scope={{
-          project,
-          layout,
-        }}
+        scope={scope}
         globalObjectsContainer={project}
         objectsContainer={layout}
+        projectScopedContainers={projectScopedContainers}
         events={layout.getEvents()}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
         isActive={this.props.isActive}

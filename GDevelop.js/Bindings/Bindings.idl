@@ -636,6 +636,7 @@ interface ObjectsContainersList {
 };
 
 interface ProjectScopedContainers {
+  [Value] ProjectScopedContainers STATIC_MakeNewEmptyProjectScopedContainers();
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
         [Const, Ref] Project project,
         [Const, Ref] Layout layout);

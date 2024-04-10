@@ -22,6 +22,7 @@ export const DefaultNoScope = () => (
         scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainers={testProject.testSceneProjectScopedContainers}
         events={testProject.testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
         resourceManagementProps={fakeResourceManagementProps}
@@ -48,6 +49,7 @@ export const EmptyNoScope = () => (
         }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.emptyLayout}
+        projectScopedContainers={testProject.emptySceneProjectScopedContainers}
         events={testProject.emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
         resourceManagementProps={fakeResourceManagementProps}

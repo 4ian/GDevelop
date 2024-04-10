@@ -90,6 +90,17 @@ export const getLastSelectedEventContextWhichCanHaveSubEvents = (
   return candidates[candidates.length - 1];
 };
 
+export const getLastSelectedEventContextWhichCanHaveVariables = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedEvents.filter(({ event }) =>
+    event.canHaveVariables()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1];
+};
+
 export const getSelectedTopMostOnlyEventContexts = (
   selection: SelectionState
 ): Array<EventContext> => {
@@ -174,6 +185,17 @@ export const getLastSelectedInstructionEventContextWhichCanHaveSubEvents = (
 ): EventContext | null => {
   const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
     eventContext.event.canHaveSubEvents()
+  );
+  if (!candidates.length) return null;
+
+  return candidates[candidates.length - 1].eventContext;
+};
+
+export const getLastSelectedInstructionEventContextWhichCanHaveVariables = (
+  selection: SelectionState
+): EventContext | null => {
+  const candidates = selection.selectedInstructions.filter(({ eventContext }) =>
+    eventContext.event.canHaveVariables()
   );
   if (!candidates.length) return null;
 

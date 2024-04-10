@@ -57,6 +57,9 @@ void StandardEvent::SerializeTo(SerializerElement& element) const {
   if (!events.IsEmpty())
     gd::EventsListSerialization::SerializeEventsTo(events,
                                                   element.AddChild("events"));
+  if (HasVariables()) {
+    variables.SerializeTo(element.AddChild("variables"));
+  }
 }
 
 void StandardEvent::UnserializeFrom(gd::Project& project,
@@ -70,6 +73,11 @@ void StandardEvent::UnserializeFrom(gd::Project& project,
   if (element.HasChild("events", "Events")) {
     gd::EventsListSerialization::UnserializeEventsFrom(
         project, events, element.GetChild("events", 0, "Events"));
+  }
+
+  variables.Clear();
+  if (element.HasChild("variables")) {
+    variables.UnserializeFrom(element.GetChild("variables"));
   }
 }
 

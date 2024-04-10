@@ -2087,9 +2087,15 @@ interface BaseEvent {
     [Const, Ref] DOMString GetType();
     void SetType([Const] DOMString type);
     boolean IsExecutable();
+
     boolean CanHaveSubEvents();
     boolean HasSubEvents();
     [Ref] EventsList GetSubEvents();
+
+    boolean CanHaveVariables();
+    boolean HasVariables();
+    [Ref] VariablesContainer GetVariables();
+
     boolean IsDisabled();
     void SetDisabled(boolean disable);
     boolean IsFolded();
@@ -2104,23 +2110,8 @@ interface StandardEvent {
 
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
-
-    //Inherited from BaseEvent:
-    StandardEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+StandardEvent implements BaseEvent;
 
 interface RepeatEvent {
     void RepeatEvent();
@@ -2129,23 +2120,8 @@ interface RepeatEvent {
     [Ref] InstructionsList GetActions();
     void SetRepeatExpression([Const] DOMString expr);
     [Const, Ref] DOMString GetRepeatExpression();
-
-    //Inherited from BaseEvent:
-    RepeatEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+RepeatEvent implements BaseEvent;
 
 interface WhileEvent {
     void WhileEvent();
@@ -2153,23 +2129,8 @@ interface WhileEvent {
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetWhileConditions();
     [Ref] InstructionsList GetActions();
-
-    //Inherited from BaseEvent:
-    WhileEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+WhileEvent implements BaseEvent;
 
 interface ForEachEvent {
     void ForEachEvent();
@@ -2178,23 +2139,8 @@ interface ForEachEvent {
     [Const, Ref] DOMString GetObjectToPick();
     [Ref] InstructionsList GetConditions();
     [Ref] InstructionsList GetActions();
-
-    //Inherited from BaseEvent:
-    ForEachEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+ForEachEvent implements BaseEvent;
 
 interface ForEachChildVariableEvent {
     void ForEachChildVariableEvent();
@@ -2208,23 +2154,8 @@ interface ForEachChildVariableEvent {
     void SetIterableVariableName([Const] DOMString newName);
     void SetKeyIteratorVariableName([Const] DOMString newName);
     void SetValueIteratorVariableName([Const] DOMString newName);
-
-    //Inherited from BaseEvent:
-    ForEachChildVariableEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+ForEachChildVariableEvent implements BaseEvent;
 
 interface CommentEvent {
     void CommentEvent();
@@ -2241,23 +2172,8 @@ interface CommentEvent {
     unsigned long GetTextColorRed();
     unsigned long GetTextColorGreen();
     unsigned long GetTextColorBlue();
-
-    //Inherited from BaseEvent:
-    CommentEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+CommentEvent implements BaseEvent;
 
 interface GroupEvent {
     void GroupEvent();
@@ -2273,23 +2189,8 @@ interface GroupEvent {
     [Ref] VectorString GetCreationParameters();
     unsigned long GetCreationTimestamp();
     void SetCreationTimestamp(unsigned long ts);
-
-    //Inherited from BaseEvent:
-    GroupEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+GroupEvent implements BaseEvent;
 
 interface LinkEvent {
     void LinkEvent();
@@ -2304,23 +2205,8 @@ interface LinkEvent {
     void SetIncludeStartAndEnd(unsigned long start, unsigned long end);
     unsigned long GetIncludeStart();
     unsigned long GetIncludeEnd();
-
-    //Inherited from BaseEvent:
-    LinkEvent Clone();
-    [Const, Ref] DOMString GetType();
-    void SetType([Const] DOMString type);
-    boolean IsExecutable();
-    boolean CanHaveSubEvents();
-    boolean HasSubEvents();
-    [Ref] EventsList GetSubEvents();
-    boolean IsDisabled();
-    void SetDisabled(boolean disable);
-    boolean IsFolded();
-    void SetFolded(boolean folded);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
+LinkEvent implements BaseEvent;
 
 interface EventsRemover {
     void EventsRemover();

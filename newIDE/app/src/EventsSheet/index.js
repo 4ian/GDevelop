@@ -55,6 +55,8 @@ import {
   getLastSelectedEventContextWhichCanHaveSubEvents,
   getLastSelectedInstructionContext,
   getLastSelectedInstructionEventContextWhichCanHaveSubEvents,
+  getLastSelectedEventContextWhichCanHaveVariables,
+  getLastSelectedInstructionEventContextWhichCanHaveVariables,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 import EventsContextAnalyzerDialog, {
@@ -114,6 +116,7 @@ import {
 } from '../MainFrame/ResourcesWatcher';
 import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/ParameterFields/AnyVariableField';
 import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
+import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -446,6 +449,42 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const eventContext =
       getLastSelectedEventContextWhichCanHaveSubEvents(this.state.selection) ||
       getLastSelectedInstructionEventContextWhichCanHaveSubEvents(
+        this.state.selection
+      );
+    return !!eventContext;
+  };
+
+  addLocalVariable = () => {
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveVariables(
+        this.state.selection
+      );
+    if (!eventContext) return;
+
+    const variablesContainer = eventContext.event.getVariables();
+    const { name: newName, variable } = insertInVariablesContainer(
+      variablesContainer,
+      'Variable',
+      null,
+      variablesContainer.count(),
+      null
+    );
+
+    this._eventsTree &&
+      this._eventsTree.forceEventsUpdate(() => {
+        const positions = this._getChangedEventRows([eventContext.event]);
+        this._saveChangesToHistory('ADD', {
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
+        });
+      });
+  };
+
+  _selectionCanHaveLocalVariables = () => {
+    const eventContext =
+      getLastSelectedEventContextWhichCanHaveVariables(this.state.selection) ||
+      getLastSelectedInstructionEventContextWhichCanHaveVariables(
         this.state.selection
       );
     return !!eventContext;
@@ -814,6 +853,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           enabled: this._selectionCanHaveSubEvents(),
           accelerator: getShortcutDisplayName(
             this.props.shortcutMap['ADD_SUBEVENT']
+          ),
+        },
+        {
+          label: i18n._(t`Add Local Variable`),
+          click: () => this.addLocalVariable(),
+          enabled: this._selectionCanHaveLocalVariables(),
+          accelerator: getShortcutDisplayName(
+            this.props.shortcutMap['ADD_LOCAL_VARIABLE']
           ),
         },
         {

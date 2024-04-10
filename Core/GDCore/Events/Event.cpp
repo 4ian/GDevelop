@@ -17,6 +17,7 @@
 namespace gd {
 
 EventsList BaseEvent::badSubEvents;
+VariablesContainer BaseEvent::badLocalVariables;
 std::vector<gd::String> BaseEvent::emptyDependencies;
 gd::String BaseEvent::emptySourceFile;
 
@@ -27,6 +28,8 @@ BaseEvent::BaseEvent()
       folded(false) {}
 
 bool BaseEvent::HasSubEvents() const { return !GetSubEvents().IsEmpty(); }
+
+bool BaseEvent::HasVariables() const { return GetVariables().Count() > 0; }
 
 gd::String BaseEvent::GenerateEventCode(
     gd::EventsCodeGenerator& codeGenerator,

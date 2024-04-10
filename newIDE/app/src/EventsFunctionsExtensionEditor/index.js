@@ -38,6 +38,8 @@ import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 import Tune from '../UI/CustomSvgIcons/Tune';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { getProjectScopedContainersFromScope } from '../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 export type ExtensionItemConfigurationAttribute =
@@ -1109,6 +1111,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   render() {
     const { project, eventsFunctionsExtension } = this.props;
+
     const {
       selectedEventsFunction,
       selectedEventsBasedBehavior,
@@ -1118,6 +1121,21 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       objectMethodSelectorDialogOpen,
       extensionFunctionSelectorDialogOpen,
     } = this.state;
+
+    const scope = {
+      project,
+      layout: null,
+      externalEvents: null,
+      eventsFunctionsExtension,
+      eventsBasedBehavior: selectedEventsBasedBehavior,
+      eventsBasedObject: selectedEventsBasedObject,
+      eventsFunction: selectedEventsFunction,
+    };
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      this._globalObjectsContainer,
+      this._objectsContainer
+    );
 
     const selectedEventsBasedEntity =
       selectedEventsBasedBehavior || selectedEventsBasedObject;
@@ -1210,17 +1228,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 key={selectedEventsFunction.ptr}
                 ref={editor => (this.editor = editor)}
                 project={project}
-                scope={{
-                  project,
-                  layout: null,
-                  externalEvents: null,
-                  eventsFunctionsExtension,
-                  eventsBasedBehavior: selectedEventsBasedBehavior,
-                  eventsBasedObject: selectedEventsBasedObject,
-                  eventsFunction: selectedEventsFunction,
-                }}
+                scope={scope}
                 globalObjectsContainer={this._globalObjectsContainer}
                 objectsContainer={this._objectsContainer}
+                projectScopedContainers={projectScopedContainers}
                 events={selectedEventsFunction.getEvents()}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}

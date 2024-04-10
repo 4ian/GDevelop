@@ -79,10 +79,7 @@ import PreferencesContext, {
 } from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
-import {
-  getProjectScopedContainersFromScope,
-  type EventsScope,
-} from '../InstructionOrExpression/EventsScope.flow';
+import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
   pasteEventsFromClipboardInSelection,
   copySelectionToClipboard,
@@ -132,6 +129,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
@@ -1519,13 +1517,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const { scope, globalObjectsContainer, objectsContainer } = this.props;
+    const { projectScopedContainers } = this.props;
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get()
     );
@@ -2000,19 +1993,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     instruction.setParameter(parameterIndex, value);
 
-                    const projectScopedContainers = getProjectScopedContainersFromScope(
-                      scope,
-                      globalObjectsContainer,
-                      objectsContainer
-                    );
                     switchBetweenUnifiedInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      projectScopedContainers,
+                      this.props.projectScopedContainers,
                       instruction
                     );
                     switchBetweenUnifiedObjectInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      projectScopedContainers,
+                      this.props.projectScopedContainers,
                       instruction
                     );
 

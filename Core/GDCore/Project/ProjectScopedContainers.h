@@ -39,6 +39,16 @@ class ProjectScopedContainers {
   virtual ~ProjectScopedContainers(){};
 
   static ProjectScopedContainers
+  MakeNewEmptyProjectScopedContainers() {
+    ProjectScopedContainers projectScopedContainers(
+        ObjectsContainersList::MakeNewEmptyObjectsContainersList(),
+        VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+        PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+    return projectScopedContainers;
+  }
+
+  static ProjectScopedContainers
   MakeNewProjectScopedContainersForProjectAndLayout(const gd::Project &project,
                                                     const gd::Layout &layout) {
     ProjectScopedContainers projectScopedContainers(

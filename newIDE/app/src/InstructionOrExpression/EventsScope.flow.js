@@ -12,7 +12,7 @@ export type EventsScope = {|
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
-  eventsFunction?: gdEventsFunction,
+  eventsFunction?: ?gdEventsFunction,
 |};
 
 export const getProjectScopedContainersFromScope = (

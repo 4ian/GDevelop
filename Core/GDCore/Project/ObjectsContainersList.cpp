@@ -13,6 +13,12 @@
 namespace gd {
 
 ObjectsContainersList
+ObjectsContainersList::MakeNewEmptyObjectsContainersList() {
+  ObjectsContainersList objectsContainersList;
+  return objectsContainersList;
+}
+
+ObjectsContainersList
 ObjectsContainersList::MakeNewObjectsContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   ObjectsContainersList objectsContainersList;

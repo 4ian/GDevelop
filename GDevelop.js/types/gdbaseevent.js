@@ -8,6 +8,9 @@ declare class gdBaseEvent extends gdBaseEvent {
   canHaveSubEvents(): boolean;
   hasSubEvents(): boolean;
   getSubEvents(): gdEventsList;
+  canHaveVariables(): boolean;
+  hasVariables(): boolean;
+  getVariables(): gdVariablesContainer;
   isDisabled(): boolean;
   setDisabled(disable: boolean): void;
   isFolded(): boolean;

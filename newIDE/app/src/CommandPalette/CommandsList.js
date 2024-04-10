@@ -53,6 +53,7 @@ export type CommandName =
   | 'EDIT_OBJECT_GROUP'
   | 'ADD_STANDARD_EVENT'
   | 'ADD_SUBEVENT'
+  | 'ADD_LOCAL_VARIABLE'
   | 'ADD_COMMENT_EVENT'
   | 'TOGGLE_EVENT_DISABLED'
   | 'TOGGLE_CONDITION_INVERTED'
@@ -286,6 +287,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   ADD_SUBEVENT: {
     area: 'EVENTS',
     displayText: t`Add a sub-event to the selected event`,
+  },
+  ADD_LOCAL_VARIABLE: {
+    area: 'EVENTS',
+    displayText: t`Add a local variable to the selected event`,
   },
   ADD_COMMENT_EVENT: { area: 'EVENTS', displayText: t`Add a comment` },
   TOGGLE_EVENT_DISABLED: {

@@ -112,6 +112,19 @@ class Rendered3DInstance {
   static toRad(angleInDegrees: number): number;
 
   /**
+   * Applies ratio to value without intermediary value to avoid precision issues.
+   */
+  static applyRatio({
+    oldReferenceValue,
+    newReferenceValue,
+    valueToApplyTo,
+  }: {
+    oldReferenceValue: number;
+    newReferenceValue: number;
+    valueToApplyTo: number;
+  }): number;
+
+  /**
    * Called when the scene editor is rendered.
    */
   update(): void;

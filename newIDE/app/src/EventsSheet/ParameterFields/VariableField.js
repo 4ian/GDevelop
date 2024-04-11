@@ -35,19 +35,17 @@ import VariableStructureIcon from '../../VariablesList/Icons/VariableStructureIc
 import UnknownTypeIcon from '../../UI/CustomSvgIcons/Cross';
 import { type EnumeratedVariable } from './EnumerateVariables';
 import { LineStackLayout } from '../../UI/Layout';
-import ListIcon from '../../UI/ListIcon';
+import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
+import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
+import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
 
 const gd: libGDevelop = global.gd;
-
-export type EnumeratedVariableWithIcon = {
-  ...EnumeratedVariable,
-  renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
-};
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainers: Array<gdVariablesContainer>,
-  enumerateVariables: () => Array<EnumeratedVariableWithIcon>,
+  enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
   getVariableTypeFromParameters?: (
@@ -129,6 +127,21 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
+const getVariableSourceIcon = (variableType: VariablesContainer_SourceType) => {
+  switch (variableType) {
+    case gd.VariablesContainer.Global:
+      return GlobalIcon;
+    case gd.VariablesContainer.Scene:
+      return SceneIcon;
+    case gd.VariablesContainer.Object:
+      return ObjectIcon;
+    case gd.VariablesContainer.Local:
+      return LocalIcon;
+    default:
+      return UnknownTypeIcon;
+  }
+};
+
 const getVariableTypeIcon = (variableType: Variable_Type) => {
   switch (variableType) {
     case gd.Variable.Number:
@@ -193,14 +206,15 @@ export default React.forwardRef<Props, VariableFieldInterface>(
               text: variable.name,
               value: variable.name,
               renderIcon: () => {
+                const VariableSourceIcon = getVariableSourceIcon(
+                  variable.source
+                );
                 const VariableTypeIcon = getVariableTypeIcon(variable.type);
-                return variable.renderIcon ? (
+                return (
                   <LineStackLayout>
-                    {variable.renderIcon()}
+                    <VariableSourceIcon />
                     <VariableTypeIcon />
                   </LineStackLayout>
-                ) : (
-                  <VariableTypeIcon />
                 );
               },
             }))

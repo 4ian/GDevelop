@@ -305,6 +305,7 @@ export default class ForEachChildVariableEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -339,6 +340,7 @@ export default class ForEachChildVariableEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -354,6 +356,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            projectScopedContainers={this.props.projectScopedContainers}
             value={valueIteratorName}
             onChange={text => {
               forEachChildVariableEvent.setValueIteratorVariableName(text);
@@ -376,6 +379,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            projectScopedContainers={this.props.projectScopedContainers}
             value={keyIteratorName}
             onChange={text => {
               forEachChildVariableEvent.setKeyIteratorVariableName(text);
@@ -398,6 +402,7 @@ export default class ForEachChildVariableEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            projectScopedContainers={this.props.projectScopedContainers}
             value={iterableName}
             onChange={text => {
               forEachChildVariableEvent.setIterableVariableName(text);

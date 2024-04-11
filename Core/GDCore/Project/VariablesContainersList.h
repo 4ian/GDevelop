@@ -66,6 +66,21 @@ class GD_CORE_API VariablesContainersList {
   }
 
   /**
+   * \brief Get the variable container at the specified index in the list.
+   *
+   * \warning Trying to access to a not existing variable container will result
+   * in undefined behavior.
+   */
+  const gd::VariablesContainer& GetVariablesContainer(std::size_t index) const {
+    return *variablesContainers.at(index);
+  }
+
+  /**
+   * \brief Return the number variable containers.
+   */
+  std::size_t GetVariablesContainersCount() const { return variablesContainers.size(); }
+
+  /**
    * \brief Call the callback for each variable having a name matching the specified search.
    */
   void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;

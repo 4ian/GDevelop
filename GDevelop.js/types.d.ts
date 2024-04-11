@@ -28,6 +28,14 @@ export enum Variable_Type {
   Array = 5,
 }
 
+export enum VariablesContainer_SourceType {
+  Unknown = 0,
+  Global = 1,
+  Scene = 2,
+  Object = 3,
+  Local = 4,
+}
+
 export enum ObjectsContainersList_VariableExistence {
   DoesNotExist = 0,
   Exists = 1,
@@ -289,6 +297,8 @@ export class Variable extends EmscriptenObject {
 
 export class VariablesContainer extends EmscriptenObject {
   constructor();
+  constructor(sourceType: VariablesContainer_SourceType);
+  getSourceType(): VariablesContainer_SourceType;
   has(name: string): boolean;
   get(name: string): Variable;
   getAt(index: number): Variable;
@@ -314,6 +324,8 @@ export class VariablesContainersList extends EmscriptenObject {
   static makeNewEmptyVariablesContainersList(): VariablesContainersList;
   has(name: string): boolean;
   get(name: string): Variable;
+  getVariablesContainer(index: number): VariablesContainer;
+  getVariablesContainersCount(): number;
 }
 
 export class ObjectGroup extends EmscriptenObject {

@@ -15,7 +15,8 @@ using namespace std;
 
 namespace gd {
 
-StandardEvent::StandardEvent() : BaseEvent() {}
+StandardEvent::StandardEvent()
+    : BaseEvent(), variables(gd::VariablesContainer::SourceType::Local) {}
 
 StandardEvent::~StandardEvent(){};
 

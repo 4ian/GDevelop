@@ -35,7 +35,13 @@ class VariableHasName {
 };
 }  // namespace
 
-VariablesContainer::VariablesContainer() {}
+VariablesContainer::VariablesContainer()
+    : sourceType(VariablesContainer::SourceType::Unknown) {}
+
+VariablesContainer::VariablesContainer(
+    VariablesContainer::SourceType sourceType_) {
+  sourceType = sourceType_;
+}
 
 bool VariablesContainer::Has(const gd::String& name) const {
   auto i =
@@ -229,6 +235,7 @@ VariablesContainer& VariablesContainer::operator=(
 }
 
 void VariablesContainer::Init(const gd::VariablesContainer& other) {
+  sourceType = other.sourceType;
   persistentUuid = other.persistentUuid;
   variables.clear();
   for (auto& it : other.variables) {

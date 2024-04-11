@@ -68,6 +68,7 @@ declare class libGDevelop {
   VariableInstructionSwitcher: Class<gdVariableInstructionSwitcher>;
   ExpressionVariableTypeFinder: Class<gdExpressionVariableTypeFinder>;
   Variable: Class<gdVariable>;
+  VariablesContainer_SourceType: Class<VariablesContainer_SourceType>;
   VariablesContainer: Class<gdVariablesContainer>;
   VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;

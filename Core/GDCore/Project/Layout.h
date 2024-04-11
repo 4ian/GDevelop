@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_LAYOUT_H
-#define GDCORE_LAYOUT_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -504,5 +504,3 @@ GetBehaviorsOfObject(const ObjectsContainer& game,
 }  // namespace gd
 
 typedef gd::Layout Scene;
-
-#endif  // GDCORE_LAYOUT_H

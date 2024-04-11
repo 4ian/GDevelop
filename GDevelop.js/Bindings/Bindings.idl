@@ -295,8 +295,19 @@ interface Variable {
     [Ref] Variable ClearPersistentUuid();
 };
 
+enum VariablesContainer_SourceType {
+  "VariablesContainer::Unknown",
+  "VariablesContainer::Global",
+  "VariablesContainer::Scene",
+  "VariablesContainer::Object",
+  "VariablesContainer::Local"
+};
+
 interface VariablesContainer {
     void VariablesContainer();
+    void VariablesContainer(VariablesContainer_SourceType sourceType);
+
+    VariablesContainer_SourceType GetSourceType();
 
     boolean Has([Const] DOMString name);
     [Ref] Variable Get([Const] DOMString name);
@@ -326,6 +337,9 @@ interface VariablesContainersList {
   [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
   boolean Has([Const] DOMString name);
   [Const, Ref] Variable Get([Const] DOMString name);
+
+  [Const, Ref] VariablesContainer GetVariablesContainer(unsigned long index);
+  unsigned long GetVariablesContainersCount();
 };
 
 interface ObjectGroup {

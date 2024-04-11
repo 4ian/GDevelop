@@ -75,7 +75,8 @@ Project::Project()
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
-      gdBuildVersion(gd::VersionWrapper::Build()) {}
+      gdBuildVersion(gd::VersionWrapper::Build()),
+      variables(gd::VariablesContainer::SourceType::Global) {}
 
 Project::~Project() {}
 

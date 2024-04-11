@@ -20,6 +20,7 @@ type CommonProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   isInline?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,

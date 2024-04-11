@@ -108,6 +108,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
 
   id: string,
 |};
@@ -216,6 +217,7 @@ const Instruction = (props: Props) => {
     onContextMenu,
     globalObjectsContainer,
     objectsContainer,
+    projectScopedContainers,
     id,
     resourcesManager,
     scope,
@@ -300,11 +302,7 @@ const Instruction = (props: Props) => {
                 .getRootNode();
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
-                getProjectScopedContainersFromScope(
-                  scope,
-                  globalObjectsContainer,
-                  objectsContainer
-                ),
+                projectScopedContainers,
                 parameterType
               );
               expressionNode.visit(expressionValidator);
@@ -321,11 +319,6 @@ const Instruction = (props: Props) => {
                   instruction.getType()
                 )
               ) {
-                const projectScopedContainers = getProjectScopedContainersFromScope(
-                  scope,
-                  globalObjectsContainer,
-                  objectsContainer
-                );
                 // Check at least the name of the root variable, it's the best we can do.
                 const objectsContainersList = projectScopedContainers.getObjectsContainersList();
                 const objectName = instruction.getParameter(0).getPlainString();
@@ -674,6 +667,7 @@ const Instruction = (props: Props) => {
                     resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}
+                    projectScopedContainers={props.projectScopedContainers}
                     idPrefix={props.id}
                   />
                 )}

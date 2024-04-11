@@ -123,6 +123,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainers,
       scope,
       instructionMetadata,
       instruction,
@@ -162,10 +163,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           ? variablesContainers
               .map(variablesContainer => enumerateVariables(variablesContainer))
               .reduce((a, b) => intersection(a, b))
-              .map(variable => ({
-                ...variable,
-                renderIcon: () => <ObjectIcon />,
-              }))
           : [],
       [variablesContainers]
     );
@@ -223,6 +220,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          projectScopedContainers={projectScopedContainers}
           scope={scope}
           id={
             props.parameterIndex !== undefined

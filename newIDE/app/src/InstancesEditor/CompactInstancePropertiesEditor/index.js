@@ -28,12 +28,15 @@ import {
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
 
-const styles = {
+export const styles = {
   paper: {
     display: 'flex',
     flex: 1,
     minWidth: 0,
     flexDirection: 'column',
+  },
+  icon: {
+    fontSize: 18,
   },
 };
 
@@ -171,7 +174,7 @@ const CompactInstancePropertiesEditor = ({
                   editInstanceVariables(instance);
                 }}
               >
-                <ShareExternal fontSize="small" />
+                <ShareExternal style={styles.icon} />
               </IconButton>
             </Line>
           </Column>

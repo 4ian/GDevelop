@@ -7,6 +7,7 @@ import { t } from '@lingui/macro';
 import { type Schema } from '../../CompactPropertiesEditor';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
+import { styles } from '.';
 
 import Angle from '../../UI/CustomSvgIcons/Angle';
 import Layers from '../../UI/CustomSvgIcons/Layers';
@@ -162,7 +163,7 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
       name: 'Instance',
       title: i18n._(t`Instance`),
       renderLeftIcon: className => (
-        <Instance className={className} fontSize="small" />
+        <Instance className={className} style={styles.icon} />
       ),
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
       nonFieldType: 'title',
@@ -179,11 +180,11 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
       valueType: 'enumIcon',
       renderIcon: value =>
         value === 'sealed' ? (
-          <RemoveCircle fontSize="small" />
+          <RemoveCircle style={styles.icon} />
         ) : value === 'locked' ? (
-          <Lock fontSize="small" />
+          <Lock style={styles.icon} />
         ) : (
-          <LockOpen fontSize="small" />
+          <LockOpen style={styles.icon} />
         ),
       isHighlighted: value => value === 'locked' || value === 'sealed',
       getValue: (instance: gdInitialInstance) =>
@@ -394,7 +395,7 @@ const getKeepRatioField = ({
   valueType: 'enumIcon',
   isHighlighted: value => value,
   renderIcon: value =>
-    value ? <Link fontSize="small" /> : <Unlink fontSize="small" />,
+    value ? <Link style={styles.icon} /> : <Unlink style={styles.icon} />,
   getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
   setValue: (instance: gdInitialInstance, newValue: boolean) =>
     instance.setShouldKeepRatio(newValue),

@@ -80,10 +80,10 @@
 
 .label {
   display: flex;
-  cursor: inherit;
 }
 
-.container:not(.disabled) .leftIconContainer.control {
+.container:not(.disabled) .leftIconContainer.control,
+.container:not(.disabled) .leftIconContainer.control .label * {
   cursor: ew-resize;
 }
 

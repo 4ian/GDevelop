@@ -438,6 +438,7 @@ export const makeSchema = ({
         name: 'Position',
         type: 'row',
         preventWrap: true,
+        removeSpacers: true,
         children: [...getXAndYFields({ i18n }), getZField({ i18n })],
       },
       {
@@ -491,6 +492,7 @@ export const makeSchema = ({
         type: 'row',
         title: i18n._(t`Rotation`),
         preventWrap: true,
+        removeSpacers: true,
         children: [
           ...getRotationXAndRotationYFields({ i18n }),
           getRotationZField({ i18n, label: t`Rotation (Z)`, Icon: LetterZ }),
@@ -506,6 +508,7 @@ export const makeSchema = ({
       name: 'Position',
       type: 'row',
       preventWrap: true,
+      removeSpacers: true,
       children: getXAndYFields({ i18n }),
     },
     getZOrderField({ i18n }),
@@ -513,6 +516,7 @@ export const makeSchema = ({
       name: 'Custom size',
       type: 'row',
       preventWrap: true,
+      removeSpacers: true,
       children: [
         getWidthField({
           i18n,

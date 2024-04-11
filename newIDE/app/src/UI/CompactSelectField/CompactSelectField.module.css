@@ -117,7 +117,8 @@
 
 .leftIconContainer {
   display: flex;
-  margin-right: 4px;
+  margin-left: 2px;
+  margin-right: 4px; /* For some reason, margin right seems to be a bit altered next to the select element: 2 px are not enough to match the CompactTextField left icon spacing. */
 }
 
 /* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/

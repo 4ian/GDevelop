@@ -75,7 +75,7 @@
 
 .leftIconContainer {
   display: flex;
-  margin-right: 4px;
+  margin: 0 2px;
 }
 
 .label {

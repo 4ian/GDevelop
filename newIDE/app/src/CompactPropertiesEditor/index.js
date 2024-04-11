@@ -17,7 +17,7 @@ import CompactSelectField from '../UI/CompactSelectField';
 import CompactSemiControlledTextField from '../UI/CompactSemiControlledTextField';
 import CompactSemiControlledNumberField from '../UI/CompactSemiControlledNumberField';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { Line, marginsSize } from '../UI/Grid';
+import { Column, Line, Spacer, marginsSize } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Edit from '../UI/CustomSvgIcons/Edit';
@@ -156,6 +156,7 @@ export type Field =
       name: string,
       type: 'row' | 'column',
       preventWrap?: boolean,
+      removeSpacers?: boolean,
       title?: ?string,
       children: Array<Field>,
     |};
@@ -169,6 +170,7 @@ type Props = {|
   schema: Schema,
   mode?: 'column' | 'row',
   preventWrap?: boolean,
+  removeSpacers?: boolean,
 
   // If set, render the "extra" description content from fields
   // (see getExtraDescription).
@@ -292,6 +294,7 @@ const CompactPropertiesEditor = ({
   project,
   resourceManagementProps,
   preventWrap,
+  removeSpacers,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -643,19 +646,30 @@ const CompactPropertiesEditor = ({
     mode === 'row'
       ? (fields: React.Node) =>
           preventWrap ? (
-            <LineStackLayout noMargin alignItems="center" expand>
-              {fields}
-            </LineStackLayout>
+            removeSpacers ? (
+              <Line noMargin alignItems="center" expand>
+                {fields}
+              </Line>
+            ) : (
+              <LineStackLayout noMargin alignItems="center" expand>
+                {fields}
+              </LineStackLayout>
+            )
           ) : (
             <ResponsiveLineStackLayout noMargin alignItems="center" expand>
               {fields}
             </ResponsiveLineStackLayout>
           )
-      : (fields: React.Node) => (
-          <ColumnStackLayout noMargin expand>
-            {fields}
-          </ColumnStackLayout>
-        );
+      : (fields: React.Node) =>
+          removeSpacers ? (
+            <Column noMargin expand>
+              {fields}
+            </Column>
+          ) : (
+            <ColumnStackLayout noMargin expand>
+              {fields}
+            </ColumnStackLayout>
+          );
 
   const renderTitle = React.useCallback(
     (field: Title) => {
@@ -751,6 +765,7 @@ const CompactPropertiesEditor = ({
                 unsavedChanges={unsavedChanges}
                 onInstancesModified={onInstancesModified}
                 preventWrap={field.preventWrap}
+                removeSpacers={field.removeSpacers}
               />
             </React.Fragment>
           );
@@ -778,6 +793,7 @@ const CompactPropertiesEditor = ({
                 unsavedChanges={unsavedChanges}
                 onInstancesModified={onInstancesModified}
                 preventWrap={field.preventWrap}
+                removeSpacers={field.removeSpacers}
               />
             </React.Fragment>
           </div>

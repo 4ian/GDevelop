@@ -1680,6 +1680,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       scope,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainers,
     } = this.props;
 
     // Choose the dialog to use
@@ -1697,6 +1698,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            projectScopedContainers={projectScopedContainers}
             instruction={instruction}
             isCondition={this.state.editedInstruction.isCondition}
             isNewInstruction={
@@ -1795,6 +1797,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainers,
       preferences,
       resourceManagementProps,
       onCreateEventsFunction,
@@ -1883,6 +1886,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainers={projectScopedContainers}
                   selection={this.state.selection}
                   onInstructionClick={this.selectInstruction}
                   onInstructionDoubleClick={this.openInstructionEditor}
@@ -1977,6 +1981,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainers={projectScopedContainers}
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
                   parameterIndex={this.state.editedParameter.parameterIndex}

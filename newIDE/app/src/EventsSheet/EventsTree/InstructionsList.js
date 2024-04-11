@@ -61,6 +61,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
 
   idPrefix: string,
 |};
@@ -98,6 +99,7 @@ export default function InstructionsList({
   resourcesManager,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainers,
   idPrefix,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
@@ -173,6 +175,7 @@ export default function InstructionsList({
         resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
+        projectScopedContainers={projectScopedContainers}
         id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}
       />
     );

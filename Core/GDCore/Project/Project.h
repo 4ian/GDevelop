@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_PROJECT_H
-#define GDCORE_PROJECT_H
+#pragma once
+
 #include <memory>
 #include <vector>
 
@@ -1134,5 +1134,3 @@ class GD_CORE_API Project : public ObjectsContainer {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_PROJECT_H

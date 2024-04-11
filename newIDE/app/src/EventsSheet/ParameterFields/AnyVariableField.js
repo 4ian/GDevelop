@@ -13,9 +13,7 @@ import {
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
-import { enumerateVariables } from './EnumerateVariables';
-import uniqBy from 'lodash/uniqBy';
-import sortBy from 'lodash/sortBy';
+import { enumerateVariablesOfContainersList } from './EnumerateVariables';
 import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 
@@ -69,8 +67,6 @@ export const switchBetweenUnifiedInstructionIfNeeded = (
   }
 };
 
-const variableSort = [variable => variable.name.toLowerCase()];
-
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
@@ -82,37 +78,23 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope, instruction, onInstructionTypeChanged } = props;
+    const {
+      project,
+      scope,
+      instruction,
+      onInstructionTypeChanged,
+      projectScopedContainers,
+    } = props;
     const { layout } = scope;
 
     const onComputeAllVariableNames = React.useCallback(() => [], []);
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
-      () => {
-        return project && layout
-          ? sortBy(
-              uniqBy(
-                [
-                  ...enumerateVariables(layout.getVariables()).map(
-                    variable => ({
-                      ...variable,
-                      renderIcon: () => <SceneIcon />,
-                    })
-                  ),
-                  ...enumerateVariables(project.getVariables()).map(
-                    variable => ({
-                      ...variable,
-                      renderIcon: () => <GlobalIcon />,
-                    })
-                  ),
-                ],
-                'name'
-              ),
-              variableSort
-            )
-          : [];
-      },
-      [project, layout]
+      () =>
+        enumerateVariablesOfContainersList(
+          projectScopedContainers.getVariablesContainersList()
+        ),
+      [projectScopedContainers]
     );
 
     const variablesContainers = React.useMemo(
@@ -179,6 +161,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onOpenDialog={() => setEditorOpen(true)}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          projectScopedContainers={projectScopedContainers}
           scope={scope}
           id={
             props.parameterIndex !== undefined

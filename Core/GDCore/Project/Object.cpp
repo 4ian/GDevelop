@@ -24,14 +24,18 @@ Object::~Object() {}
 Object::Object(const gd::String& name_,
                const gd::String& type_,
                std::unique_ptr<gd::ObjectConfiguration> configuration_)
-    : name(name_), configuration(std::move(configuration_)) {
+    : name(name_),
+      configuration(std::move(configuration_)),
+      objectVariables(gd::VariablesContainer::SourceType::Object) {
       SetType(type_);
     }
 
 Object::Object(const gd::String& name_,
                const gd::String& type_,
                gd::ObjectConfiguration* configuration_)
-    : name(name_), configuration(configuration_) {
+    : name(name_),
+      configuration(configuration_),
+      objectVariables(gd::VariablesContainer::SourceType::Object) {
       SetType(type_);
     }
 

@@ -4,6 +4,8 @@ declare class gdVariablesContainersList {
   static makeNewEmptyVariablesContainersList(): gdVariablesContainersList;
   has(name: string): boolean;
   get(name: string): gdVariable;
+  getVariablesContainer(index: number): gdVariablesContainer;
+  getVariablesContainersCount(): number;
   delete(): void;
   ptr: number;
 };

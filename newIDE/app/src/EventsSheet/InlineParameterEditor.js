@@ -21,6 +21,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
 
   open: boolean,
   onRequestClose: () => void,
@@ -41,6 +42,7 @@ const InlineParameterEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainers,
   open,
   onRequestClose,
   onApply,
@@ -169,6 +171,7 @@ const InlineParameterEditor = ({
       scope={scope}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
+      projectScopedContainers={projectScopedContainers}
       key={instruction.ptr}
       ref={field}
       parameterRenderingService={ParameterRenderingService}

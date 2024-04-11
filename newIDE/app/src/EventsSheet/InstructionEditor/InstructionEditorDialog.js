@@ -52,6 +52,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   instruction: gdInstruction,
   isCondition: boolean,
   resourceManagementProps: ResourceManagementProps,
@@ -91,6 +92,7 @@ const InstructionEditorDialog = ({
   project,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainers,
   onCancel,
   open,
   instruction,
@@ -262,6 +264,7 @@ const InstructionEditorDialog = ({
       scope={scope}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
+      projectScopedContainers={projectScopedContainers}
       objectName={chosenObjectName}
       isCondition={isCondition}
       instruction={instruction}

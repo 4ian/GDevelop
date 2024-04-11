@@ -25,7 +25,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope } = props;
+    const { project, scope, projectScopedContainers } = props;
 
     const variablesContainers = React.useMemo(
       () => {
@@ -36,12 +36,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const enumerateGlobaleVariables = React.useCallback(
       () => {
-        return project
-          ? enumerateVariables(project.getVariables()).map(variable => ({
-              ...variable,
-              renderIcon: () => <GlobalIcon />,
-            }))
-          : [];
+        return project ? enumerateVariables(project.getVariables()) : [];
       },
       [project]
     );
@@ -61,6 +56,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onOpenDialog={() => setEditorOpen(true)}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
+          projectScopedContainers={projectScopedContainers}
           scope={scope}
         />
         {editorOpen && project && (

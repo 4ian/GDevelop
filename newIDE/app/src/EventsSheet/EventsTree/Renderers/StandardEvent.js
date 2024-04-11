@@ -68,6 +68,7 @@ export default class StandardEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -102,6 +103,7 @@ export default class StandardEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}

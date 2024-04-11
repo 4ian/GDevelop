@@ -27,6 +27,7 @@ export const RelationalOperatorFieldString = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainers={testProject.testSceneProjectScopedContainers}
         parameterMetadata={
           testProject.stringRelationalOperatorParameterMetadata
         }
@@ -44,6 +45,7 @@ export const RelationalOperatorFieldNumber = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainers={testProject.testSceneProjectScopedContainers}
         parameterMetadata={
           testProject.numberRelationalOperatorParameterMetadata
         }
@@ -61,6 +63,7 @@ export const RelationalOperatorFieldColor = () => (
         onChange={onChange}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
+        projectScopedContainers={testProject.testSceneProjectScopedContainers}
         parameterMetadata={testProject.colorRelationalOperatorParameterMetadata}
       />
     )}
@@ -75,6 +78,7 @@ export const RelationalOperatorFieldUnknownType = () => (
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
+        projectScopedContainers={testProject.testSceneProjectScopedContainers}
         objectsContainer={testProject.testLayout}
         parameterMetadata={
           testProject.unknownRelationalOperatorParameterMetadata

@@ -96,6 +96,7 @@ type EventsContainerProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   selection: SelectionState,
   onAddNewInstruction: InstructionsListContext => void,
   onPasteInstructions: InstructionsListContext => void,
@@ -145,6 +146,7 @@ const EventContainer = (props: EventsContainerProps) => {
     disabled,
     eventsHeightsCache,
     onEventContextMenu,
+    projectScopedContainers,
   } = props;
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -198,6 +200,7 @@ const EventContainer = (props: EventsContainerProps) => {
               event={event}
               globalObjectsContainer={props.globalObjectsContainer}
               objectsContainer={props.objectsContainer}
+              projectScopedContainers={projectScopedContainers}
               selected={isEventSelected(props.selection, event)}
               selection={props.selection}
               leftIndentWidth={props.leftIndentWidth}
@@ -250,6 +253,7 @@ type EventsTreeProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   selection: SelectionState,
   onAddNewInstruction: (
     eventContext: EventContext,
@@ -770,6 +774,7 @@ export default class ThemableEventsTree extends Component<
                 scope={this.props.scope}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
+                projectScopedContainers={this.props.projectScopedContainers}
                 event={event}
                 key={event.ptr}
                 eventsHeightsCache={this.eventsHeightsCache}

@@ -74,6 +74,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   objectName?: ?string,
   instruction: gdInstruction,
   isCondition: boolean,
@@ -111,6 +112,7 @@ const InstructionParametersEditor = React.forwardRef<
       project,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainers,
       noHelpButton,
       objectName,
       isCondition,
@@ -215,11 +217,6 @@ const InstructionParametersEditor = React.forwardRef<
       [focus, focusOnMount]
     );
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
     switchBetweenUnifiedInstructionIfNeeded(
       project.getCurrentPlatform(),
       projectScopedContainers,
@@ -368,6 +365,7 @@ const InstructionParametersEditor = React.forwardRef<
                         scope={scope}
                         globalObjectsContainer={globalObjectsContainer}
                         objectsContainer={objectsContainer}
+                        projectScopedContainers={projectScopedContainers}
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
                         resourceManagementProps={resourceManagementProps}

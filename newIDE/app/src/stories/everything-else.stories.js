@@ -1392,6 +1392,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -1413,6 +1414,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -1432,6 +1434,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -1471,6 +1474,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
         />
@@ -1487,6 +1491,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1503,6 +1508,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
         />
@@ -1519,6 +1525,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1534,6 +1541,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1549,6 +1557,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1565,6 +1574,7 @@ storiesOf('ParameterFields', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           value={value}
           onChange={onChange}
         />
@@ -1581,6 +1591,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1595,6 +1606,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1609,6 +1621,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1623,6 +1636,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           isInline
         />
       )}
@@ -1638,6 +1652,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           isInline
         />
       )}
@@ -1653,6 +1668,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           isInline
         />
       )}
@@ -1668,6 +1684,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -1682,6 +1699,7 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
         />
       )}
     />
@@ -2280,6 +2298,7 @@ storiesOf('InstructionEditorDialog', module)
           }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           isCondition
           isNewInstruction={false}
           instruction={testProject.testInstruction}
@@ -2303,6 +2322,7 @@ storiesOf('InstructionEditorDialog', module)
           scope={{ project: testProject.project, layout: null }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+          projectScopedContainers={testProject.testSceneProjectScopedContainers}
           isCondition
           isNewInstruction={false}
           instruction={testProject.testInstruction}
@@ -2333,6 +2353,9 @@ storiesOf('InstructionEditorDialog', module)
             scope={{ project: testProject.project, layout: null }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
+            projectScopedContainers={
+              testProject.testSceneProjectScopedContainers
+            }
             isCondition
             isNewInstruction={true}
             instruction={testProject.testInstruction}
@@ -2374,6 +2397,9 @@ storiesOf('InstructionEditorMenu', module)
                 }}
                 globalObjectsContainer={testProject.project}
                 objectsContainer={testProject.testLayout}
+                projectScopedContainers={
+                  testProject.testSceneProjectScopedContainers
+                }
                 isCondition
                 isNewInstruction={false}
                 instruction={testProject.testInstruction}

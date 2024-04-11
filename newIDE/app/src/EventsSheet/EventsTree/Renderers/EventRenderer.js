@@ -14,6 +14,7 @@ export type EventRendererProps = {
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainers: gdProjectScopedContainers,
   event: gdBaseEvent,
   disabled: boolean,
 

@@ -162,6 +162,7 @@ export default class ForEachEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -196,6 +197,7 @@ export default class ForEachEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              projectScopedContainers={this.props.projectScopedContainers}
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -211,6 +213,7 @@ export default class ForEachEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            projectScopedContainers={this.props.projectScopedContainers}
             value={objectName}
             onChange={text => {
               forEachEvent.setObjectToPick(text);

@@ -53,7 +53,8 @@ Layout::Layout()
       stopSoundsOnStartup(true),
       standardSortMethod(true),
       disableInputWhenNotFocused(true),
-      profiler(NULL)
+      profiler(NULL),
+      variables(gd::VariablesContainer::SourceType::Scene)
 {
   gd::Layer layer;
   layer.SetCameraCount(1);

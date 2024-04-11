@@ -26,6 +26,7 @@ import FlatButton from '../UI/FlatButton';
 import VerticallyCenterWithBar from '../UI/VerticallyCenterWithBar';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import CompactPropertiesEditorRowField from './CompactPropertiesEditorRowField';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -471,34 +472,46 @@ const CompactPropertiesEditor = ({
           setValue,
           onClickEndAdornment,
         } = field;
-        return (
-          <CompactSemiControlledTextField
-            value={getFieldValue({
-              instances,
-              field,
-              defaultValue: '(Multiple values)',
-            })}
-            id={field.name}
-            // floatingLabelText={getFieldLabel({ instances, field })}
-            // helperMarkdownText={getFieldDescription(field)}
-            onChange={newValue => {
-              instances.forEach(i => setValue(i, newValue || ''));
-              _onInstancesModified(instances);
-            }}
-            disabled={getDisabled({ instances, field })}
-            renderLeftIcon={field.renderLeftIcon}
-            leftIconTooltip={getFieldLabel({ instances, field })}
-            renderEndAdornmentOnHover={field.getEndAdornmentIcon || undefined}
-            onClickEndAdornment={() => {
-              if (!onClickEndAdornment) return;
-              instances.forEach(i => onClickEndAdornment(i));
-              _onInstancesModified(instances);
-            }}
-          />
-        );
+        const commonProps = {
+          value: getFieldValue({
+            instances,
+            field,
+            defaultValue: '(Multiple values)',
+          }),
+          id: field.name,
+          onChange: newValue => {
+            instances.forEach(i => setValue(i, newValue || ''));
+            _onInstancesModified(instances);
+          },
+          disabled: getDisabled({ instances, field }),
+          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+
+          onClickEndAdornment: () => {
+            if (!onClickEndAdornment) return;
+            instances.forEach(i => onClickEndAdornment(i));
+            _onInstancesModified(instances);
+          },
+        };
+        if (field.renderLeftIcon) {
+          return (
+            <CompactSemiControlledTextField
+              {...commonProps}
+              renderLeftIcon={field.renderLeftIcon}
+              leftIconTooltip={getFieldLabel({ instances, field })}
+            />
+          );
+        } else {
+          return (
+            <CompactPropertiesEditorRowField
+              label={getFieldLabel({ instances, field })}
+              markdownDescription={getFieldDescription(field)}
+              field={<CompactSemiControlledTextField {...commonProps} />}
+            />
+          );
+        }
       }
     },
-    [instances, _onInstancesModified]
+    [instances, _onInstancesModified, getFieldDescription]
   );
 
   const renderSelectField = React.useCallback(

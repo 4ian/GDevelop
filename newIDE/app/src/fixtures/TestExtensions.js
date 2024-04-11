@@ -430,7 +430,8 @@ export const makeTestExtensions = (gd: libGDevelop) => {
         .getOrCreate('initialValue')
         .setValue(instance.getRawStringProperty('initialValue'))
         .setType('string')
-        .setLabel('Initial value');
+        .setLabel('Initial value')
+        .setDescription('Value that the input will take **initially**');
       instanceProperties
         .getOrCreate('placeholder')
         .setValue(instance.getRawStringProperty('placeholder'))

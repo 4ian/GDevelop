@@ -56,6 +56,9 @@ type Props = {|
 
     // Allow to change color to easily simulate disabled text
     opacity?: number,
+
+    // Allow to set maxHeight to limit number of lines displayed
+    maxHeight?: number,
   |},
   tooltip?: string,
 |};

@@ -17,7 +17,11 @@ const useClickDragAsControl = ({ onChange, onGetInitialValue }: Props) => {
   const start = React.useCallback(
     (e: MouseEvent) => {
       const target = e.currentTarget;
-      if (target instanceof Element) {
+      if (
+        target instanceof Element &&
+        // requestPointerLock does not exist no mobile devices.
+        target.requestPointerLock
+      ) {
         target.requestPointerLock();
         clickDragOrigin.current = {
           initialValue: onGetInitialValue(),

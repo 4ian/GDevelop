@@ -94,7 +94,7 @@ const CompactTextField = ({
         [classes.errored]: errored,
       })}
     >
-      {renderLeftIcon && (
+      {renderLeftIcon && leftIconTooltip && (
         <Tooltip
           title={leftIconTooltip}
           enterDelay={tooltipEnterDelay}

@@ -37,7 +37,7 @@ export type ValueFieldCommonProperties = {|
   getLabel?: Instance => string,
   getDescription?: Instance => string,
   getExtraDescription?: Instance => string,
-  disabled?: boolean | ((instances: Array<gdInitialInstance>) => boolean),
+  disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
 |};
@@ -112,6 +112,7 @@ type ResourceField = {|
 
 type Title = {|
   name: string,
+  title: string,
   renderLeftIcon: (className?: string) => React.Node,
   getValue?: Instance => string,
   nonFieldType: 'title',
@@ -120,6 +121,7 @@ type Title = {|
 
 type SectionTitle = {|
   name: string,
+  title: string,
   nonFieldType: 'sectionTitle',
   getValue: typeof undefined,
 |};
@@ -201,7 +203,7 @@ const styles = {
     marginRight: -marginsSize,
     marginLeft: -marginsSize,
     marginTop: marginsSize,
-    borderTop: '1px solid black',
+    borderTop: '1px solid black', // Border color is changed in the component.
   },
 };
 
@@ -223,13 +225,7 @@ const getDisabled = ({
 }: {|
   instances: Instances,
   field: ValueField,
-|}): boolean => {
-  return typeof field.disabled === 'boolean'
-    ? field.disabled
-    : typeof field.disabled === 'function'
-    ? field.disabled(instances)
-    : false;
-};
+|}): boolean => (field.disabled ? field.disabled(instances) : false);
 
 /**
  * Get the value for the given field across all instances.
@@ -247,8 +243,8 @@ const getFieldValue = ({
   defaultValue?: any,
 |}): any => {
   if (!instances[0]) {
-    console.log(
-      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+    console.warn(
+      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
     );
     return defaultValue;
   }
@@ -275,8 +271,8 @@ const getFieldLabel = ({
   field: ValueField,
 |}): any => {
   if (!instances[0]) {
-    console.log(
-      'CompactPropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+    console.warn(
+      'getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
     );
     return field.name;
   }
@@ -314,8 +310,8 @@ const CompactPropertiesEditor = ({
   const getFieldDescription = React.useCallback(
     (field: ValueField): ?string => {
       if (!instances[0]) {
-        console.log(
-          'CompactPropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+        console.warn(
+          'getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
         );
         return undefined;
       }
@@ -591,6 +587,7 @@ const CompactPropertiesEditor = ({
           disabled={disabled}
           label={field.label}
           onClick={() => {
+            if (!instances[0]) return;
             field.onClick(instances[0]);
           }}
         />
@@ -618,7 +615,7 @@ const CompactPropertiesEditor = ({
         resourceName={getFieldValue({
           instances,
           field,
-          defaultValue: '(Multiple values)', //TODO
+          defaultValue: '(Multiple values)',
         })}
         onChange={newValue => {
           instances.forEach(i => setValue(i, newValue));
@@ -681,9 +678,9 @@ const CompactPropertiesEditor = ({
           >
             {renderLeftIcon()}
             <Text displayInlineAsSpan noMargin>
-              {field.name}
+              {field.title}
             </Text>
-            <Text allowSelection displayInlineAsSpan size="body2" noMargin>
+            <Text displayInlineAsSpan size="body2" noMargin>
               -
             </Text>
             <Text
@@ -703,7 +700,7 @@ const CompactPropertiesEditor = ({
         <LineStackLayout key={`title-${field.name}`}>
           {renderLeftIcon()}
           <Text displayInlineAsSpan size="sub-title" noMargin>
-            {field.name}
+            {field.title}
           </Text>
         </LineStackLayout>
       );
@@ -714,7 +711,7 @@ const CompactPropertiesEditor = ({
     return [
       <Line key={`section-title-${field.name}`}>
         <Text displayInlineAsSpan size="sub-title" noMargin>
-          {field.name}
+          {field.title}
         </Text>
       </Line>,
     ];

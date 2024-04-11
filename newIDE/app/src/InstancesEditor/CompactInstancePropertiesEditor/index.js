@@ -1,9 +1,9 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import * as React from 'react';
-import Background from '../../UI/Background';
+import Paper from '../../UI/Paper';
 import EmptyMessage from '../../UI/EmptyMessage';
 import CompactPropertiesEditor, {
   Separator,
@@ -27,6 +27,15 @@ import {
   makeSchema,
   reorderInstanceSchemaForCustomProperties,
 } from './CompactPropertiesSchema';
+
+const styles = {
+  paper: {
+    display: 'flex',
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'column',
+  },
+};
 
 const gd: libGDevelop = global.gd;
 
@@ -200,7 +209,7 @@ const CompactInstancePropertiesEditorContainer = React.forwardRef<
   }));
 
   return (
-    <Background minWidth={0}>
+    <Paper background="dark" square style={styles.paper}>
       {!props.instances || !props.instances.length ? (
         <EmptyMessage>
           <Trans>
@@ -210,7 +219,7 @@ const CompactInstancePropertiesEditorContainer = React.forwardRef<
       ) : (
         <CompactInstancePropertiesEditor {...props} />
       )}
-    </Background>
+    </Paper>
   );
 });
 

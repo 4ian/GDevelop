@@ -63,7 +63,7 @@ const getEditObjectButton = ({
 
 const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
   {
-    name: 'RotationX',
+    name: 'Rotation X',
     getLabel: () => i18n._(t`Rotation (X)`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
@@ -72,7 +72,7 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     renderLeftIcon: className => <LetterX className={className} />,
   },
   {
-    name: 'RotationY',
+    name: 'Rotation Y',
     getLabel: () => i18n._(t`Rotation (Y)`),
     valueType: 'number',
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
@@ -159,7 +159,8 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
   preventWrap: true,
   children: [
     {
-      name: i18n._(t`Instance`),
+      name: 'Instance',
+      title: i18n._(t`Instance`),
       renderLeftIcon: className => (
         <Instance className={className} fontSize="small" />
       ),
@@ -375,7 +376,7 @@ const getDepthField = ({
     forceUpdate();
   },
 });
-const getCustomSizeField = ({
+const getKeepRatioField = ({
   i18n,
   getInstanceWidth,
   getInstanceHeight,
@@ -472,9 +473,9 @@ export const makeSchema = ({
             ],
           },
           {
-            name: 'verticalCenterCustomSize',
+            name: 'Keep ratio column',
             nonFieldType: 'verticalCenterWithBar',
-            child: getCustomSizeField({
+            child: getKeepRatioField({
               i18n,
               getInstanceWidth,
               getInstanceHeight,
@@ -492,7 +493,7 @@ export const makeSchema = ({
         preventWrap: true,
         children: [
           ...getRotationXAndRotationYFields({ i18n }),
-          getRotationZField({ i18n, label: t`Z`, Icon: LetterZ }),
+          getRotationZField({ i18n, label: t`Rotation (Z)`, Icon: LetterZ }),
         ],
       },
     ];
@@ -509,7 +510,7 @@ export const makeSchema = ({
     },
     getZOrderField({ i18n }),
     {
-      name: 'custom-size-row',
+      name: 'Custom size',
       type: 'row',
       preventWrap: true,
       children: [
@@ -521,7 +522,7 @@ export const makeSchema = ({
           forceUpdate,
         }),
         {
-          name: 'height-and-custom-size',
+          name: 'Height and keep ratio',
           type: 'row',
           preventWrap: true,
           children: [
@@ -532,7 +533,7 @@ export const makeSchema = ({
               getInstanceDepth,
               forceUpdate,
             }),
-            getCustomSizeField({
+            getKeepRatioField({
               i18n,
               getInstanceWidth,
               getInstanceHeight,

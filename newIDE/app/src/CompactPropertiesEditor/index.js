@@ -573,24 +573,27 @@ const CompactPropertiesEditor = ({
           }) === DIFFERENT_VALUES;
       }
       return (
-        <FlatButton
-          key={`button-${field.label}`}
-          fullWidth
-          primary
-          leftIcon={
-            field.getIcon ? (
-              field.getIcon({ fontSize: 'small' })
-            ) : (
-              <Edit fontSize="small" />
-            )
-          }
-          disabled={disabled}
-          label={field.label}
-          onClick={() => {
-            if (!instances[0]) return;
-            field.onClick(instances[0]);
-          }}
-        />
+        <>
+          <FlatButton
+            key={`button-${field.label}`}
+            fullWidth
+            primary
+            leftIcon={
+              field.getIcon ? (
+                field.getIcon({ fontSize: 'small' })
+              ) : (
+                <Edit fontSize="small" />
+              )
+            }
+            disabled={disabled}
+            label={field.label}
+            onClick={() => {
+              if (!instances[0]) return;
+              field.onClick(instances[0]);
+            }}
+          />
+          <Spacer key={`button-${field.label}-spacer`} />
+        </>
       );
     },
     [instances]
@@ -675,18 +678,18 @@ const CompactPropertiesEditor = ({
             alignItems="center"
             key={`section-title-${field.name}`}
             expand
+            noMargin
           >
             {renderLeftIcon()}
             <Text displayInlineAsSpan noMargin>
               {field.title}
             </Text>
-            <Text displayInlineAsSpan size="body2" noMargin>
+            <Text displayInlineAsSpan noMargin>
               -
             </Text>
             <Text
               allowSelection
               displayInlineAsSpan
-              size="body2"
               noMargin
               style={textEllipsisStyle}
             >
@@ -697,7 +700,12 @@ const CompactPropertiesEditor = ({
       }
 
       return (
-        <LineStackLayout key={`title-${field.name}`}>
+        <LineStackLayout
+          key={`title-${field.name}`}
+          expand
+          noMargin
+          alignItems="center"
+        >
           {renderLeftIcon()}
           <Text displayInlineAsSpan size="sub-title" noMargin>
             {field.title}

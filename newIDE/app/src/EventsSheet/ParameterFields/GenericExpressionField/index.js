@@ -48,7 +48,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
-import { getProjectScopedContainersFromScope } from '../../../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -279,13 +279,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
-    const {
-      globalObjectsContainer,
-      objectsContainer,
-      scope,
-      expressionType,
-      value,
-    } = this.props;
+    const { projectScopedContainers, expressionType, value } = this.props;
     const cursorPosition = this._inputElement.selectionStart;
     const parser = new gd.ExpressionParser2();
 
@@ -305,11 +299,6 @@ export default class ExpressionField extends React.Component<Props, State> {
     const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
       expressionNode,
       cursorPosition + 'fakeIdentifier'.length - 1
-    );
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
     );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
@@ -430,8 +419,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _doValidation = () => {
     const {
       project,
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainers,
       expressionType,
       scope,
       onGetAdditionalAutocompletions,
@@ -446,12 +434,6 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     const parser = new gd.ExpressionParser2();
     const expressionNode = parser.parseExpression(expression).get();
-
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
 
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),

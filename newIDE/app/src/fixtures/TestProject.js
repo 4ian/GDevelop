@@ -11,6 +11,7 @@ export type TestProject = {|
   spriteObjectConfiguration: gdSpriteObject,
   emptySpriteObjectConfiguration: gdSpriteObject,
   cube3dObject: gdObject,
+  textInputObject: gdObject,
   customObject: gdObject,
   spriteObject: gdObject,
   emptySpriteObject: gdObject,
@@ -23,6 +24,7 @@ export type TestProject = {|
   group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
   testLayoutInstance2: gdInitialInstance,
+  testLayoutInstance3: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
@@ -221,6 +223,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'CubeObject',
     0
   );
+  const textInputObject = testLayout.insertNewObject(
+    project,
+    'FakeTextInput::TextInput',
+    'TextInputObject',
+    0
+  );
   const panelSpriteObject = testLayout.insertNewObject(
     project,
     'PanelSpriteObject::PanelSprite',
@@ -401,6 +409,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayoutInstance2.setY(-15);
   testLayoutInstance2.setZ(32);
   testLayoutInstance2.setObjectName(cube3dObject.getName());
+
+  const testLayoutInstance3 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance3.setX(12);
+  testLayoutInstance3.setY(-15.5);
+  testLayoutInstance3.setZ(3.2);
+  testLayoutInstance3.setObjectName(textInputObject.getName());
 
   const testSpriteObjectInstance = testLayout
     .getInitialInstances()
@@ -897,6 +913,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     panelSpriteObject,
     customObject,
     cube3dObject,
+    textInputObject,
     spriteObject,
     spriteObjectConfiguration,
     emptySpriteObject,
@@ -910,6 +927,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     group4WithLongsNames,
     testLayoutInstance1,
     testLayoutInstance2,
+    testLayoutInstance3,
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,

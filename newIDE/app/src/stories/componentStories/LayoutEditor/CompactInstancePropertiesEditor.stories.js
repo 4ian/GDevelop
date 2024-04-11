@@ -18,11 +18,11 @@ export default {
   decorators: [paperDecorator],
 };
 
-export const Instance2d = () => (
+export const InstanceSprite2d = () => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
-        <SerializedObjectDisplay object={testProject.testLayout}>
+        <SerializedObjectDisplay object={testProject.testSpriteObjectInstance}>
           <CompactInstancePropertiesEditor
             i18n={i18n}
             project={testProject.project}
@@ -38,11 +38,11 @@ export const Instance2d = () => (
   </DragAndDropContextProvider>
 );
 
-export const Instance3d = () => (
+export const InstanceCube3d = () => (
   <DragAndDropContextProvider>
     <I18n>
       {({ i18n }) => (
-        <SerializedObjectDisplay object={testProject.testLayout}>
+        <SerializedObjectDisplay object={testProject.testLayoutInstance2}>
           <CompactInstancePropertiesEditor
             i18n={i18n}
             project={testProject.project}
@@ -50,6 +50,26 @@ export const Instance3d = () => (
             instances={[testProject.testLayoutInstance2]}
             editInstanceVariables={action('edit instance variables')}
             onGetInstanceSize={() => [100, 101, 102]}
+            onEditObjectByName={action('edit object')}
+          />
+        </SerializedObjectDisplay>
+      )}
+    </I18n>
+  </DragAndDropContextProvider>
+);
+
+export const InstanceTextInput = () => (
+  <DragAndDropContextProvider>
+    <I18n>
+      {({ i18n }) => (
+        <SerializedObjectDisplay object={testProject.testLayoutInstance3}>
+          <CompactInstancePropertiesEditor
+            i18n={i18n}
+            project={testProject.project}
+            layout={testProject.testLayout}
+            instances={[testProject.testLayoutInstance3]}
+            editInstanceVariables={action('edit instance variables')}
+            onGetInstanceSize={() => [120, 40, 0]}
             onEditObjectByName={action('edit object')}
           />
         </SerializedObjectDisplay>

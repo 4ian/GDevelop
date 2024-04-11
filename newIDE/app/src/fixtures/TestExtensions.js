@@ -395,4 +395,82 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
+  {
+    const extension = new gd.PlatformExtension();
+    extension
+      .setExtensionInformation(
+        'FakeTextInput',
+        'Fake Text Input',
+        'A fake text field the player can type text into.',
+        '',
+        'MIT'
+      )
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata('Text Input')
+      .setIcon('JsPlatform/Extensions/text_input.svg');
+
+    const textInputObject = new gd.ObjectJsImplementation();
+    // $FlowExpectedError
+    textInputObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+
+    // $FlowExpectedError
+    textInputObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+
+      instanceProperties
+        .getOrCreate('initialValue')
+        .setValue(instance.getRawStringProperty('initialValue'))
+        .setType('string')
+        .setLabel('Initial value');
+      instanceProperties
+        .getOrCreate('placeholder')
+        .setValue(instance.getRawStringProperty('placeholder'))
+        .setType('string')
+        .setLabel('Placeholder');
+
+      return instanceProperties;
+    };
+
+    // $FlowExpectedError
+    textInputObject.updateInitialInstanceProperty = function(
+      objectContent,
+      instance,
+      propertyName,
+      newValue,
+      project,
+      layout
+    ) {
+      if (propertyName === 'initialValue') {
+        instance.setRawStringProperty('initialValue', newValue);
+        return true;
+      } else if (propertyName === 'placeholder') {
+        instance.setRawStringProperty('placeholder', newValue);
+        return true;
+      }
+
+      return false;
+    };
+
+    extension
+      .addObject(
+        'TextInput',
+        'Text input',
+        'A text field the player can type text into.',
+        'JsPlatform/Extensions/text_input.svg',
+        textInputObject
+      )
+      .setCategoryFullName('User interface');
+
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
 };

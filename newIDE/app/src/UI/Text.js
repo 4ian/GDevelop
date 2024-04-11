@@ -58,6 +58,7 @@ type Props = {|
     opacity?: number,
 
     // Allow to set maxHeight to limit number of lines displayed
+    lineHeight?: string,
     maxHeight?: number,
   |},
   tooltip?: string,

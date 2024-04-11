@@ -13,7 +13,8 @@ const styles = {
   label: {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    maxHeight: 40, // 2 * lineHeight to limit to 2 lines.
+    lineHeight: '17px',
+    maxHeight: 34, // 2 * lineHeight to limit to 2 lines.
     opacity: 0.7,
   },
 };

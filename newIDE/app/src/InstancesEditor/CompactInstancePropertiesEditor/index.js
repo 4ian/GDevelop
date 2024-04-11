@@ -195,6 +195,7 @@ const CompactInstancePropertiesEditor = ({
                   : []
               }
               historyHandler={historyHandler}
+              toolbarIconStyle={styles.icon}
             />
           ) : null}
         </Column>

@@ -109,6 +109,7 @@ type Props = {|
   /** If set to small, will collapse variable row by default. */
   size?: 'small',
   onVariablesUpdated?: () => void,
+  toolbarIconStyle?: any,
 |};
 
 const variableRowStyles = {
@@ -1659,6 +1660,7 @@ const VariablesList = (props: Props) => {
       onAdd={onAdd}
       searchText={searchText}
       onChangeSearchText={setSearchText}
+      iconStyle={props.toolbarIconStyle}
     />
   );
 

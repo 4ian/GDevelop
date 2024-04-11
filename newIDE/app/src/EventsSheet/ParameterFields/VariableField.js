@@ -23,7 +23,6 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
-import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -163,9 +162,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       project,
-      globalObjectsContainer,
-      objectsContainer,
-      scope,
+      projectScopedContainers,
       variablesContainers,
       enumerateVariables,
       instruction,
@@ -280,11 +277,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : null;
 
-    const projectScopedContainers = getProjectScopedContainersFromScope(
-      scope,
-      globalObjectsContainer,
-      objectsContainer
-    );
     const variableType =
       project && instruction && getVariableTypeFromParameters
         ? getVariableTypeFromParameters(

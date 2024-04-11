@@ -34,7 +34,6 @@ import {
   type FieldFocusFunction,
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
-import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { switchBetweenUnifiedInstructionIfNeeded } from '../../EventsSheet/ParameterFields/AnyVariableField';
 import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../../EventsSheet/ParameterFields/ObjectVariableField';
 

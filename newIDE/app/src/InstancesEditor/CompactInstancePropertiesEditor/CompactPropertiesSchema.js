@@ -15,7 +15,7 @@ import LetterX from '../../UI/CustomSvgIcons/LetterX';
 import LetterY from '../../UI/CustomSvgIcons/LetterY';
 import LetterH from '../../UI/CustomSvgIcons/LetterH';
 import LetterW from '../../UI/CustomSvgIcons/LetterW';
-import Depth from '../../UI/CustomSvgIcons/Depth';
+import LetterD from '../../UI/CustomSvgIcons/LetterD';
 import LetterZ from '../../UI/CustomSvgIcons/LetterZ';
 import Instance from '../../UI/CustomSvgIcons/Instance';
 import Link from '../../UI/CustomSvgIcons/Link';
@@ -369,7 +369,7 @@ const getDepthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  renderLeftIcon: className => <Depth className={className} />,
+  renderLeftIcon: className => <LetterD className={className} />,
   getEndAdornmentIcon: className => <Restore className={className} />,
   onClickEndAdornment: (instance: gdInitialInstance) => {
     instance.setHasCustomSize(false);
@@ -494,11 +494,9 @@ export const makeSchema = ({
         title: i18n._(t`Rotation`),
         preventWrap: true,
         removeSpacers: true,
-        children: [
-          ...getRotationXAndRotationYFields({ i18n }),
-          getRotationZField({ i18n, label: t`Rotation (Z)`, Icon: LetterZ }),
-        ],
+        children: getRotationXAndRotationYFields({ i18n }),
       },
+      getRotationZField({ i18n, label: t`Rotation (Z)`, Icon: LetterZ }),
     ];
   }
 
@@ -514,31 +512,22 @@ export const makeSchema = ({
     },
     getZOrderField({ i18n }),
     {
-      name: 'Custom size',
+      name: 'Size',
       type: 'row',
       preventWrap: true,
-      removeSpacers: true,
       children: [
-        getWidthField({
-          i18n,
-          getInstanceWidth,
-          getInstanceHeight,
-          getInstanceDepth,
-          forceUpdate,
-        }),
         {
-          name: 'Height and keep ratio',
-          type: 'row',
-          preventWrap: true,
+          name: 'Custom size',
+          type: 'column',
           children: [
-            getHeightField({
+            getWidthField({
               i18n,
               getInstanceWidth,
               getInstanceHeight,
               getInstanceDepth,
               forceUpdate,
             }),
-            getKeepRatioField({
+            getHeightField({
               i18n,
               getInstanceWidth,
               getInstanceHeight,
@@ -547,10 +536,28 @@ export const makeSchema = ({
             }),
           ],
         },
+        {
+          name: 'Keep ratio column',
+          nonFieldType: 'verticalCenterWithBar',
+          child: getKeepRatioField({
+            i18n,
+            getInstanceWidth,
+            getInstanceHeight,
+            getInstanceDepth,
+            forceUpdate,
+          }),
+        },
       ],
     },
-    getRotationZField({ i18n, label: t`Angle`, Icon: Angle }),
     getLayerField({ i18n, layout }),
+    {
+      name: 'Rotation',
+      type: 'row',
+      title: i18n._(t`Rotation`),
+      preventWrap: true,
+      removeSpacers: true,
+      children: [getRotationZField({ i18n, label: t`Angle`, Icon: Angle })],
+    },
   ];
 };
 

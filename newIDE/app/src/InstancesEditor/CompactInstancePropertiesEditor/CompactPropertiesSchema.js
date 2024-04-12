@@ -4,7 +4,7 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
-import { type Schema } from '../../CompactPropertiesEditor';
+import { type Schema, type SectionTitle } from '../../CompactPropertiesEditor';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import { styles } from '.';
@@ -569,14 +569,31 @@ export const reorderInstanceSchemaForCustomProperties = (
   const animationFieldIndex = newSchema.findIndex(
     field => field.name && field.name === 'animation'
   );
-  if (animationFieldIndex === -1) return newSchema;
+  const contentSectionTitle: SectionTitle = {
+    nonFieldType: 'sectionTitle',
+    name: 'Content',
+    title: 'Content',
+    getValue: undefined,
+  };
+  if (animationFieldIndex === -1) {
+    if (newSchema.length > 0) {
+      newSchema.unshift(contentSectionTitle);
+    }
+    return newSchema;
+  }
 
   const [animationField] = newSchema.splice(animationFieldIndex, 1);
-  newSchema.unshift({
-    name: 'Animation',
-    type: 'row',
-    title: i18n._(t`Animation`),
-    children: [animationField],
-  });
+  const firstFields = [
+    {
+      name: 'Animation',
+      type: 'row',
+      title: i18n._(t`Animation`),
+      children: [animationField],
+    },
+  ];
+  if (newSchema.length > 0) {
+    firstFields.push(contentSectionTitle);
+  }
+  newSchema.unshift(...firstFields);
   return newSchema;
 };

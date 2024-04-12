@@ -120,7 +120,7 @@ type Title = {|
   defaultValue?: string,
 |};
 
-type SectionTitle = {|
+export type SectionTitle = {|
   name: string,
   title: string,
   nonFieldType: 'sectionTitle',
@@ -771,7 +771,8 @@ const CompactPropertiesEditor = ({
   );
   const renderSectionTitle = React.useCallback((field: SectionTitle) => {
     return [
-      <Line key={`section-title-${field.name}`}>
+      <Separator key={field.name + '-separator'} />,
+      <Line key={`section-title-${field.name}`} noMargin>
         <Text displayInlineAsSpan size="sub-title" noMargin>
           {field.title}
         </Text>

@@ -130,7 +130,6 @@ const CompactInstancePropertiesEditor = ({
         instanceSchemaForCustomProperties,
         i18n
       );
-
       return {
         object,
         instanceSchema: is3DInstance

@@ -8,12 +8,14 @@ namespace gdjs {
     let _hasGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
+    let _playerPositionInLobby: number | null = null;
     let _lobby: {
       id: string;
       name: string;
       status: string;
       players: { playerId: string; status: string }[];
     } | null = null;
+    let _playerPublicProfiles: { id: string; username?: string }[] = [];
 
     // Communication methods.
     let _lobbiesMessageCallback: ((event: MessageEvent) => void) | null = null;
@@ -50,6 +52,12 @@ namespace gdjs {
       }
       if (_connectionId) {
         url.searchParams.set('connectionId', _connectionId);
+      }
+      if (_playerPositionInLobby) {
+        url.searchParams.set(
+          'positionInLobby',
+          _playerPositionInLobby.toString()
+        );
       }
       const playerId = gdjs.playerAuthentication.getUserId();
       if (playerId) {
@@ -91,16 +99,46 @@ namespace gdjs {
     };
 
     /**
-     * Returns the player ID of the player at the given index in the lobby.
+     * Returns the position of the current player in the lobby.
+     * Return 0 if the player is not in the lobby.
+     * Returns 1, 2, 3, ... if the player is in the lobby.
      */
-    export const getPlayerId = (index: number) => {
+    export const getCurrentPlayerPositionInLobby = () => {
+      return _playerPositionInLobby || 0;
+    };
+
+    /**
+     * Returns the player ID of the player at the given position in the lobby.
+     * The position is shifted by one, so that the first player has position 1.
+     */
+    export const getPlayerId = (position: number) => {
       if (!_lobby) {
         return '';
       }
-      if (index >= _lobby.players.length) {
+      const index = position - 1;
+      if (index < 0 || index >= _lobby.players.length) {
         return '';
       }
       return _lobby.players[index].playerId;
+    };
+
+    /**
+     * Returns the player ID of the player at the given position in the lobby.
+     * The position is shifted by one, so that the first player has position 1.
+     */
+    export const getPlayerUsername = (position: number) => {
+      const playerId = getPlayerId(position);
+      if (!playerId) {
+        return '';
+      }
+
+      const playerPublicProfile = _playerPublicProfiles.find(
+        (profile) => profile.id === playerId
+      );
+
+      return playerPublicProfile
+        ? playerPublicProfile.username
+        : `Player ${position}`;
     };
 
     /**
@@ -139,6 +177,60 @@ namespace gdjs {
       );
     };
 
+    const getUserPublicProfile = async (
+      userId: string,
+      isDev: boolean
+    ): Promise<{ id: string; username?: string }> => {
+      const rootApi = isDev
+        ? 'https://api-dev.gdevelop.io'
+        : 'https://api.gdevelop.io';
+      const url = `${rootApi}/user/user-public-profile/${userId}`;
+      const response = await fetch(url);
+      return response.json();
+    };
+
+    const updatePlayerPublicProfiles = async (isDev: boolean) => {
+      if (!_lobby) {
+        return;
+      }
+
+      const playerIds = _lobby.players.map((player) => player.playerId);
+      const currentPlayerPublicProfileIds = _playerPublicProfiles.map(
+        (profile) => profile.id
+      );
+      const addedPlayerIds = playerIds.filter(
+        (id) => !currentPlayerPublicProfileIds.includes(id)
+      );
+      const removedPlayerIds = currentPlayerPublicProfileIds.filter(
+        (id) => !playerIds.includes(id)
+      );
+      if (addedPlayerIds.length === 0 && removedPlayerIds.length === 0) {
+        return;
+      }
+
+      if (addedPlayerIds.length > 0) {
+        const addedPlayerPublicProfiles = await Promise.all(
+          addedPlayerIds.map(async (id) => {
+            const userPublicProfile = await getUserPublicProfile(id, isDev);
+            return userPublicProfile;
+          })
+        );
+
+        _playerPublicProfiles = [
+          ..._playerPublicProfiles,
+          ...addedPlayerPublicProfiles,
+        ];
+      }
+
+      if (removedPlayerIds.length > 0) {
+        const updatedPlayerPublicProfiles = _playerPublicProfiles.filter(
+          (profile) => !removedPlayerIds.includes(profile.id)
+        );
+
+        _playerPublicProfiles = updatedPlayerPublicProfiles;
+      }
+    };
+
     const handleLobbyJoinEvent = function (
       runtimeScene: gdjs.RuntimeScene,
       lobbyId: string
@@ -152,6 +244,7 @@ namespace gdjs {
         logger.warn('Already connected to a lobby. Closing the previous one.');
         _websocket.close();
         _connectionId = null;
+        _playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
         _websocket = null;
@@ -207,32 +300,38 @@ namespace gdjs {
           const messageContent = JSON.parse(event.data);
           switch (messageContent.type) {
             case 'connectionId': {
-              // Once we receive the connectionId, we can consider a lobby is joined,
-              // and inform the lobbies window and store the lobby & connection id.
               const messageData = messageContent.data;
               const connectionId = messageData.connectionId;
-              if (!connectionId) {
-                logger.error('No connectionId received');
+              const positionInLobby = messageData.positionInLobby;
+
+              if (!connectionId || !positionInLobby) {
+                logger.error('No connectionId or position received');
                 return;
               }
 
-              handleConnectionIdReceived(
+              handleConnectionIdReceived({
                 runtimeScene,
                 connectionId,
+                positionInLobby,
                 lobbyId,
                 playerId,
-                playerToken
-              );
+                playerToken,
+              });
               break;
             }
             case 'lobbyUpdated': {
               const messageData = messageContent.data;
               const lobby = messageData.lobby;
+              const positionInLobby = messageData.positionInLobby;
               if (!lobby) {
                 logger.error('No lobby received');
                 return;
               }
-              handleLobbyUpdatedEvent(runtimeScene, lobby);
+              handleLobbyUpdatedEvent(runtimeScene, lobby, positionInLobby);
+              break;
+            }
+            case 'gameCountdownStarted': {
+              handleGameCountdownStartedEvent(runtimeScene);
               break;
             }
             case 'gameStarted': {
@@ -241,6 +340,21 @@ namespace gdjs {
             }
             case 'gameEnded': {
               handleGameEndedEvent(runtimeScene);
+              break;
+            }
+            case 'peerId': {
+              const messageData = messageContent.data;
+              if (!messageData) {
+                logger.error('No message received');
+                return;
+              }
+              const peerId = messageData.peerId;
+              if (!peerId) {
+                logger.error('Malformed message received');
+                return;
+              }
+
+              handlePeerIdEvent(peerId);
               break;
             }
           }
@@ -274,6 +388,7 @@ namespace gdjs {
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
         _connectionId = null;
+        _playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
         _websocket = null;
@@ -283,13 +398,30 @@ namespace gdjs {
       };
     };
 
-    const handleConnectionIdReceived = function (
-      runtimeScene: gdjs.RuntimeScene,
-      connectionId: string,
-      lobbyId: string,
-      playerId: string,
-      playerToken: string
-    ) {
+    const handleConnectionIdReceived = function ({
+      runtimeScene,
+      connectionId,
+      positionInLobby,
+      lobbyId,
+      playerId,
+      playerToken,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      connectionId: string;
+      positionInLobby: number;
+      lobbyId: string;
+      playerId: string;
+      playerToken: string;
+    }) {
+      // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
+      gdjs.evtTools.p2p.useDefaultBrokerServer();
+
+      _connectionId = connectionId;
+      _playerPositionInLobby = positionInLobby;
+      // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
+      _lobbyId = lobbyId;
+
+      // Then we inform the lobbies window that the player has joined.
       const lobbiesIframe =
         multiplayerComponents.getLobbiesIframe(runtimeScene);
 
@@ -300,23 +432,20 @@ namespace gdjs {
         return;
       }
 
-      // Tell the Lobbies iframe that the lobby has been joined.
       lobbiesIframe.contentWindow.postMessage(
         {
           id: 'lobbyJoined',
           lobbyId,
           playerId,
           playerToken,
-          connectionId,
+          connectionId: _connectionId,
+          positionInLobby,
         },
         // Specify the origin to avoid leaking the playerToken.
         // Replace with '*' to test locally.
         // 'https://gd.games'
         '*'
       );
-
-      _lobbyId = lobbyId;
-      _connectionId = connectionId;
     };
 
     const handleLobbyLeaveEvent = function () {
@@ -324,6 +453,7 @@ namespace gdjs {
         _websocket.close();
       }
       _connectionId = null;
+      _playerPositionInLobby = null;
       _lobbyId = null;
       _lobby = null;
       _websocket = null;
@@ -331,13 +461,28 @@ namespace gdjs {
 
     const handleLobbyUpdatedEvent = function (
       runtimeScene: gdjs.RuntimeScene,
-      lobby
+      lobby,
+      positionInLobby: number
     ) {
-      // Update the object representing the lobby in the extension, but also
-      // just pass along the message to the iframe so that it can make its own
-      // requests to the server.
+      // Update the object representing the lobby in the extension.
       _lobby = lobby;
 
+      // Update the profiles so we can use the usernames of the players.
+      const isDev = runtimeScene
+        .getGame()
+        .isUsingGDevelopDevelopmentEnvironment();
+      updatePlayerPublicProfiles(isDev);
+
+      // If the lobby is playing, do not update the player position as it's probably a player leaving,
+      // and we don't want to affect the game.
+      if (lobby.status === 'playing') {
+        return;
+      }
+
+      _playerPositionInLobby = positionInLobby;
+
+      // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
+      // as well as the player position.
       const lobbiesIframe =
         multiplayerComponents.getLobbiesIframe(runtimeScene);
 
@@ -349,9 +494,38 @@ namespace gdjs {
       lobbiesIframe.contentWindow.postMessage(
         {
           id: 'lobbyUpdated',
+          positionInLobby,
         },
         '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
       );
+    };
+
+    const handleGameCountdownStartedEvent = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      // When the countdown starts, if we are player number 1, then send the peerId to others so they can connect via P2P.
+      if (getCurrentPlayerPositionInLobby() === 1) {
+        sendPeerId();
+      }
+
+      // Just pass along the message to the iframe so that it can display the countdown.
+      const lobbiesIframe =
+        multiplayerComponents.getLobbiesIframe(runtimeScene);
+
+      if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
+        logger.info('The lobbies iframe is not opened, not sending message.');
+        return;
+      }
+
+      lobbiesIframe.contentWindow.postMessage(
+        {
+          id: 'gameCountdownStarted',
+        },
+        '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
+      );
+
+      // Prevent the player from leaving the lobby while the game is starting.
+      multiplayerComponents.hideLobbiesCloseArrow(runtimeScene);
     };
 
     /**
@@ -373,20 +547,117 @@ namespace gdjs {
     };
 
     /**
+     * When the game receives the information of the peerId, then
+     * the player can connect to the peer.
+     */
+    const handlePeerIdEvent = function (peerId: string) {
+      // When a peerId is received, trigger a P2P connection with the peer.
+      const currentPeerId = gdjs.evtTools.p2p.getCurrentId();
+      if (!currentPeerId) {
+        logger.error(
+          'No peerId found, the player does not seem connected to the broker server.'
+        );
+        return;
+      }
+
+      if (currentPeerId === peerId) {
+        logger.info('Received our own peerId, ignoring.');
+        return;
+      }
+
+      gdjs.evtTools.p2p.connect(peerId);
+    };
+
+    /**
+     * When the game receives a start countdown message from the lobby, just send it to all
+     * players in the lobby via the websocket.
+     * It will then trigger an event from the websocket to all players in the lobby.
+     */
+    const handleGameCountdownStartMessage = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      if (!_websocket) {
+        logger.error(
+          'No connection to send the start countdown message. Are you connected to a lobby?'
+        );
+        return;
+      }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'startGameCountdown',
+          connectionType: 'lobby',
+        })
+      );
+    };
+
+    /**
+     * When the game receives a start game message from the lobby, just send it to all
+     * players in the lobby via the websocket.
+     * It will then trigger an event from the websocket to all players in the lobby.
+     */
+    const handleGameStartMessage = function () {
+      if (!_websocket) {
+        logger.error(
+          'No connection to send the start countdown message. Are you connected to a lobby?'
+        );
+        return;
+      }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'startGame',
+          connectionType: 'lobby',
+        })
+      );
+    };
+
+    /**
      * Action to end the lobby game.
      * This will update the lobby status and inform everyone in the lobby that the game has ended.
      */
-    export const endLobbyGame = function (runtimeScene: gdjs.RuntimeScene) {
-      if (_websocket) {
-        _websocket.send(
-          JSON.stringify({
-            action: 'endGame',
-            connectionType: 'lobby',
-            gameId: gdjs.projectData.properties.projectUuid,
-            lobbyId: _lobbyId,
-          })
+    export const endLobbyGame = function () {
+      if (!_websocket) {
+        logger.error(
+          'No connection to send the end game message. Are you connected to a lobby?'
         );
+        return;
       }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'endGame',
+          connectionType: 'lobby',
+        })
+      );
+    };
+
+    /**
+     * Helper to send the ID from PeerJS to the lobby players.
+     */
+    const sendPeerId = function () {
+      if (!_websocket || !_lobby) {
+        logger.error(
+          'No connection to send the message. Are you connected to a lobby?'
+        );
+        return;
+      }
+
+      const peerId = gdjs.evtTools.p2p.getCurrentId();
+      if (!peerId) {
+        logger.error(
+          "No peerId found, the player doesn't seem connected to the broker server."
+        );
+        return;
+      }
+
+      _websocket.send(
+        JSON.stringify({
+          action: 'sendPeerId',
+          connectionType: 'lobby',
+          peerId,
+        })
+      );
     };
 
     /**
@@ -418,6 +689,14 @@ namespace gdjs {
           }
 
           handleLobbyJoinEvent(runtimeScene, event.data.lobbyId);
+          break;
+        }
+        case 'startGameCountdown': {
+          handleGameCountdownStartMessage(runtimeScene);
+          break;
+        }
+        case 'startGame': {
+          handleGameStartMessage();
           break;
         }
         case 'leaveLobby': {
@@ -461,8 +740,6 @@ namespace gdjs {
       };
       window.addEventListener('message', _lobbiesMessageCallback, true);
 
-      console.log('open lobbies iframe');
-
       multiplayerComponents.displayIframeInsideLobbiesContainer(
         runtimeScene,
         targetUrl
@@ -476,7 +753,6 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       if (isLobbiesWindowOpen(runtimeScene)) {
-        console.log('Lobbies window is already open');
         return;
       }
 
@@ -494,7 +770,6 @@ namespace gdjs {
       }
 
       const onLobbiesContainerDismissed = () => {
-        console.log('onLobbiesContainerDismissed');
         removeLobbiesContainer(runtimeScene);
       };
 
@@ -507,7 +782,16 @@ namespace gdjs {
         return;
       }
 
-      console.log('open lobbies window');
+      const playerId = gdjs.playerAuthentication.getUserId();
+      const playerToken = gdjs.playerAuthentication.getUserToken();
+      if (!playerId || !playerToken) {
+        gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene);
+        // Create a callback to open the lobbies window once the player is connected.
+        gdjs.playerAuthentication.setLoginCallback(() => {
+          openLobbiesWindow(runtimeScene);
+        });
+        return;
+      }
 
       multiplayerComponents.displayLobbies(
         runtimeScene,
@@ -566,7 +850,6 @@ namespace gdjs {
     export const removeLobbiesContainer = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
-      console.log('removeLobbiesContainer');
       removeLobbiesCallbacks();
       multiplayerComponents.removeLobbiesContainer(runtimeScene);
     };

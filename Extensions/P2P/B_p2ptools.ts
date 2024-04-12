@@ -280,7 +280,8 @@ namespace gdjs {
       ): boolean => {
         const event = getEvent(eventName);
         event.dataloss = defaultDataLoss;
-        return event.isTriggered();
+        const isTriggered = event.isTriggered();
+        return isTriggered;
       };
 
       /**
@@ -347,8 +348,10 @@ namespace gdjs {
        * @param eventName - The event to get data from.
        * @returns - The data as JSON.
        */
-      export const getEventData = (eventName: string) =>
-        getEvent(eventName).getData();
+      export const getEventData = (eventName: string) => {
+        const data = getEvent(eventName).getData();
+        return data;
+      };
 
       /**
        * Get the id of peer that caused the last trigger of an event.

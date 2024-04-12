@@ -62,7 +62,6 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg',
         'JsPlatform/Extensions/authentication.svg'
       )
-      .addCodeOnlyParameter('currentScene', '')
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
@@ -131,7 +130,7 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.isConnectedToLobby');
 
     extension
-      .addStrExpression(
+      .addExpression(
         'NumberOfPlayersInLobby',
         _('Number of players in lobby'),
         _('Get the number of players in the lobby.'),
@@ -144,6 +143,19 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.getNumberOfPlayersInLobby');
 
     extension
+      .addExpression(
+        'CurrentPlayerPositionInLobby',
+        _('Current player position in lobby'),
+        _('Get the current player position in the lobby. (1, 2, ...)'),
+        '',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getCurrentPlayerPositionInLobby');
+
+    extension
       .addStrExpression(
         'PlayerId',
         _('Player ID in lobby'),
@@ -153,7 +165,7 @@ module.exports = {
       )
       .addParameter(
         'number',
-        _('The position of the player in the lobby (0, 1, ...)'),
+        _('The position of the player in the lobby (1, 2, ...)'),
         '',
         false
       )
@@ -161,6 +173,25 @@ module.exports = {
       .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerId');
+
+    extension
+      .addStrExpression(
+        'PlayerUsername',
+        _('Player username in lobby'),
+        _('Get the username of the player in the lobby.'),
+        '',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addParameter(
+        'number',
+        _('The position of the player in the lobby (1, 2, ...)'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayer.getPlayerUsername');
 
     return extension;
   },

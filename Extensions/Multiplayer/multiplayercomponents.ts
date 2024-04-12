@@ -68,6 +68,21 @@ namespace gdjs {
       return lobbiesIframeContainer;
     };
 
+    export const getLobbiesCloseContainer = (
+      runtimeScene: gdjs.RuntimeScene
+    ): HTMLDivElement | null => {
+      const domElementContainer = getDomElementContainer(runtimeScene);
+      if (!domElementContainer) {
+        return null;
+      }
+
+      // Find the close container with its ID.
+      const lobbiesCloseContainer = domElementContainer.querySelector(
+        `#${lobbiesCloseContainerId}`
+      ) as HTMLDivElement | null;
+      return lobbiesCloseContainer;
+    };
+
     export const getLobbiesTextsContainer = (
       runtimeScene: gdjs.RuntimeScene
     ): HTMLDivElement | null => {
@@ -131,7 +146,7 @@ namespace gdjs {
       frameContainer.style.right = '16px';
       frameContainer.style.borderRadius = '8px';
       frameContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
-      frameContainer.style.padding = '16px';
+      frameContainer.style.overflow = 'hidden';
 
       const _closeContainer: HTMLDivElement = document.createElement('div');
       _closeContainer.id = lobbiesCloseContainerId;
@@ -140,6 +155,8 @@ namespace gdjs {
       _closeContainer.style.justifyContent = 'right';
       _closeContainer.style.alignItems = 'center';
       _closeContainer.style.zIndex = '3';
+      _closeContainer.style.paddingTop = '32px';
+      _closeContainer.style.paddingRight = '32px';
       addTouchAndClickEventListeners(_closeContainer, onCloseLobbiesContainer);
 
       const _close = document.createElement('img');
@@ -334,6 +351,18 @@ namespace gdjs {
       rootContainer.remove();
     };
 
+    export const hideLobbiesCloseArrow = function (
+      runtimeScene: gdjs.RuntimeScene
+    ) {
+      const closeContainer = getLobbiesCloseContainer(runtimeScene);
+      if (!closeContainer) {
+        return;
+      }
+
+      closeContainer.style.display = 'none';
+      removeTouchAndClickEventListeners(closeContainer);
+    };
+
     /**
      * Create, display, and hide an error notification.
      */
@@ -441,6 +470,11 @@ namespace gdjs {
       element.addEventListener('click', (event) => {
         action();
       });
+    };
+
+    const removeTouchAndClickEventListeners = function (element: HTMLElement) {
+      element.removeEventListener('touchstart', () => {});
+      element.removeEventListener('click', () => {});
     };
   }
 }

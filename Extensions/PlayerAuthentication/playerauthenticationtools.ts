@@ -13,6 +13,9 @@ namespace gdjs {
 
     let _checkedLocalStorage: boolean = false;
 
+    // Callbacks that can be used by other extensions.
+    let _loginCallbacks: Array<() => void> = [];
+
     // Authentication display
     let _authenticationWindow: Window | null = null; // For Web.
     let _authenticationInAppWindow: any | null = null; // For Cordova.
@@ -319,6 +322,7 @@ namespace gdjs {
         _authenticationInAppWindow.close();
         _authenticationInAppWindow = null;
       }
+      // If there were any callbacks
     };
 
     const saveAuthKeyToStorage = ({
@@ -390,6 +394,10 @@ namespace gdjs {
         domElementContainer,
         _username || 'Anonymous'
       );
+
+      _loginCallbacks.forEach((callback) => callback());
+      // Clear the callbacks, as they are only called once.
+      _loginCallbacks = [];
     };
 
     /**
@@ -942,6 +950,8 @@ namespace gdjs {
             displayAuthenticationBanner(runtimeScene);
 
             isDimissedAlready = true;
+            // Clear login callbacks, as they are either already called if logged in, or not called if the window is closed.
+            _loginCallbacks = [];
             resolve({ status: 'dismissed' });
           };
 
@@ -1136,6 +1146,10 @@ namespace gdjs {
     const focusOnGame = function (runtimeScene: gdjs.RuntimeScene) {
       const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
       if (gameCanvas) gameCanvas.focus();
+    };
+
+    export const setLoginCallback = (callback: () => void) => {
+      _loginCallbacks.push(callback);
     };
   }
 }

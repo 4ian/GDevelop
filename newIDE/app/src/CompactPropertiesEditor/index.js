@@ -370,41 +370,68 @@ const CompactPropertiesEditor = ({
         // TODO: Support end adornment
         // const endAdornment = getEndAdornment && getEndAdornment(instances[0]);
 
-        return (
-          <CompactSemiControlledNumberField
-            value={getFieldValue({ instances, field })}
-            key={field.name}
-            id={field.name}
-            // floatingLabelText={getFieldLabel({ instances, field })}
-            // helperMarkdownText={getFieldDescription(field)}
-            onChange={newValue => {
-              // If the value is not a number, the user is probably still typing, adding a dot or a comma.
-              // So don't update the value, it will be reverted if they leave the field.
-              if (isNaN(newValue)) return;
-              instances.forEach(i => setValue(i, newValue));
-              _onInstancesModified(instances);
-            }}
-            disabled={getDisabled({ instances, field })}
-            renderLeftIcon={field.renderLeftIcon}
-            leftIconTooltip={getFieldLabel({ instances, field })}
-            renderEndAdornmentOnHover={field.getEndAdornmentIcon}
-            onClickEndAdornment={() => {
-              if (!onClickEndAdornment) return;
-              instances.forEach(i => onClickEndAdornment(i));
-              _onInstancesModified(instances);
-            }}
-            useLeftIconAsNumberControl
-            // endAdornment={
-            //   endAdornment && (
-            //     <Tooltip title={endAdornment.tooltipContent}>
-            //       <InputAdornment position="end">
-            //         {endAdornment.label}
-            //       </InputAdornment>
-            //     </Tooltip>
-            //   )
-            // }
-          />
-        );
+        const commonProps = {
+          key: field.name,
+          id: field.name,
+          value: getFieldValue({
+            instances,
+            field,
+          }),
+          onChange: newValue => {
+            // If the value is not a number, the user is probably still typing, adding a dot or a comma.
+            // So don't update the value, it will be reverted if they leave the field.
+            if (isNaN(newValue)) return;
+            instances.forEach(i => setValue(i, newValue));
+            _onInstancesModified(instances);
+          },
+          disabled: getDisabled({ instances, field }),
+          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+          onClickEndAdornment: () => {
+            if (!onClickEndAdornment) return;
+            instances.forEach(i => onClickEndAdornment(i));
+            _onInstancesModified(instances);
+          },
+        };
+        if (field.renderLeftIcon) {
+          return (
+            <CompactSemiControlledNumberField
+              {...commonProps}
+              useLeftIconAsNumberControl
+              renderLeftIcon={field.renderLeftIcon}
+              leftIconTooltip={getFieldLabel({ instances, field })}
+              // endAdornment={
+              //   endAdornment && (
+              //     <Tooltip title={endAdornment.tooltipContent}>
+              //       <InputAdornment position="end">
+              //         {endAdornment.label}
+              //       </InputAdornment>
+              //     </Tooltip>
+              //   )
+              // }
+            />
+          );
+        } else {
+          return (
+            <CompactPropertiesEditorRowField
+              label={getFieldLabel({ instances, field })}
+              markdownDescription={getFieldDescription(field)}
+              field={
+                <CompactSemiControlledNumberField
+                  {...commonProps}
+                  // endAdornment={
+                  //   endAdornment && (
+                  //     <Tooltip title={endAdornment.tooltipContent}>
+                  //       <InputAdornment position="end">
+                  //         {endAdornment.label}
+                  //       </InputAdornment>
+                  //     </Tooltip>
+                  //   )
+                  // }
+                />
+              }
+            />
+          );
+        }
       } else if (field.valueType === 'color') {
         return 'TODO';
         // const { setValue } = field;
@@ -473,19 +500,19 @@ const CompactPropertiesEditor = ({
           onClickEndAdornment,
         } = field;
         const commonProps = {
+          key: field.name,
+          id: field.name,
           value: getFieldValue({
             instances,
             field,
             defaultValue: '(Multiple values)',
           }),
-          id: field.name,
           onChange: newValue => {
             instances.forEach(i => setValue(i, newValue || ''));
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
           renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
-
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));

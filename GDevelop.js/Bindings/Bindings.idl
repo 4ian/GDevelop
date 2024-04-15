@@ -337,6 +337,7 @@ interface VariablesContainersList {
   [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
   boolean Has([Const] DOMString name);
   [Const, Ref] Variable Get([Const] DOMString name);
+  [Const, Ref] VariablesContainer GetVariablesContainerFromVariableName([Const] DOMString variableName);
 
   [Const, Ref] VariablesContainer GetVariablesContainer(unsigned long index);
   unsigned long GetVariablesContainersCount();
@@ -657,6 +658,9 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
+  [Ref] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersWithLocalVariables(
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Const, Ref] BaseEvent event);
 
   [Ref] ProjectScopedContainers AddPropertiesContainer(
         [Const, Ref] PropertiesContainer propertiesContainer);

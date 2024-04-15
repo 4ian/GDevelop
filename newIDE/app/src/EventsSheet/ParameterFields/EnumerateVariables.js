@@ -42,6 +42,10 @@ export const enumerateVariablesOfContainersList = (
   if (!variablesContainersList) {
     return [];
   }
+  console.log(
+    'VariableContainer: ' +
+      variablesContainersList.getVariablesContainersCount()
+  );
 
   return sortBy(
     uniqBy(

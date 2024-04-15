@@ -84,4 +84,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, GlobalIcon, 'global variable');
+) => renderVariableWithIcon(props, 'global variable', GlobalIcon);

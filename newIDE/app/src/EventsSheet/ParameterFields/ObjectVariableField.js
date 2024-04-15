@@ -19,6 +19,7 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import intersection from 'lodash/intersection';
 import { enumerateVariables } from './EnumerateVariables';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -92,12 +93,12 @@ const getVariableTypeFromParameters = (
 
 export const switchBetweenUnifiedObjectInstructionIfNeeded = (
   platform: gdPlatform,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
   const variableType = getVariableTypeFromParameters(
     platform,
-    projectScopedContainers,
+    projectScopedContainers.get(),
     instruction
   );
   if (variableType != null) {
@@ -260,4 +261,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, ObjectIcon, 'object variable');
+) => renderVariableWithIcon(props, 'object variable', ObjectIcon);

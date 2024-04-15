@@ -91,4 +91,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineSceneVariable = (
   props: ParameterInlineRendererProps
-) => renderVariableWithIcon(props, SceneIcon, 'scene variable');
+) => renderVariableWithIcon(props, 'scene variable', SceneIcon);

@@ -8,13 +8,14 @@ import {
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import { type ScreenType } from '../../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
+import { ProjectScopedContainers } from '../../../InstructionOrExpression/EventsScope.flow';
 
 export type EventRendererProps = {
   project: gdProject,
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   event: gdBaseEvent,
   disabled: boolean,
 

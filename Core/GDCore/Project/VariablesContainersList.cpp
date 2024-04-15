@@ -9,6 +9,7 @@
 namespace gd {
 
 Variable VariablesContainersList::badVariable;
+VariablesContainer VariablesContainersList::badVariablesContainer;
 
 VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
@@ -17,6 +18,14 @@ VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
   variablesContainersList.Add(project.GetVariables());
   variablesContainersList.Add(layout.GetVariables());
   return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListPushing(
+    const VariablesContainersList& variablesContainersList, const gd::VariablesContainer& variablesContainer) {
+  VariablesContainersList newVariablesContainersList(variablesContainersList);
+  newVariablesContainersList.Add(variablesContainer);
+  return newVariablesContainersList;
 }
 
 VariablesContainersList
@@ -41,6 +50,17 @@ const Variable& VariablesContainersList::Get(const gd::String& name) const {
   }
 
   return badVariable;
+}
+
+const VariablesContainer &
+VariablesContainersList::GetVariablesContainerFromVariableName(
+    const gd::String &variableName) const {
+  for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
+       ++it) {
+    if ((*it)->Has(variableName))
+      return **it;
+  }
+  return badVariablesContainer;
 }
 
 bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const {

@@ -574,6 +574,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   MakeNewProjectScopedContainersForProjectAndLayout
 #define STATIC_MakeNewProjectScopedContainersFor \
   MakeNewProjectScopedContainersFor
+#define STATIC_MakeNewProjectScopedContainersWithLocalVariables \
+  MakeNewProjectScopedContainersWithLocalVariables
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata

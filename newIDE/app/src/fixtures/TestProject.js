@@ -1,5 +1,5 @@
 // @flow
-import { getProjectScopedContainersFromScope } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
 
 /*::
 export type TestProject = {|
@@ -20,7 +20,7 @@ export type TestProject = {|
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
-  testSceneProjectScopedContainers: gdProjectScopedContainers,
+  testSceneProjectScopedContainers: ProjectScopedContainers,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
@@ -31,7 +31,7 @@ export type TestProject = {|
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
   emptyLayout: gdLayout,
-  emptySceneProjectScopedContainers: gdProjectScopedContainers,
+  emptySceneProjectScopedContainers: ProjectScopedContainers,
   emptyEventsList: gdEventsList,
   testEventsFunction: gdEventsFunction,
   testEventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -907,7 +907,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'whatever-this-is-not-recognised'
   );
 
-  const testSceneProjectScopedContainers = getProjectScopedContainersFromScope(
+  const testSceneProjectScopedContainers = new ProjectScopedContainers(
     {
       project,
       layout: testLayout,
@@ -916,7 +916,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testLayout
   );
 
-  const emptySceneProjectScopedContainers = getProjectScopedContainersFromScope(
+  const emptySceneProjectScopedContainers = new ProjectScopedContainers(
     {
       project,
       layout: emptyLayout,

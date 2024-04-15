@@ -14,8 +14,8 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateVariablesOfContainersList } from './EnumerateVariables';
-import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
-import SceneIcon from '../../UI/CustomSvgIcons/Scene';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+import { mapFor } from '../../Utils/MapFor';
 
 const gd: libGDevelop = global.gd;
 
@@ -51,12 +51,12 @@ const getVariableTypeFromParameters = (
 
 export const switchBetweenUnifiedInstructionIfNeeded = (
   platform: gdPlatform,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   instruction: gdInstruction
 ): void => {
   const variableType = getVariableTypeFromParameters(
     platform,
-    projectScopedContainers,
+    projectScopedContainers.get(),
     instruction
   );
   if (variableType != null) {
@@ -92,18 +92,25 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
         enumerateVariablesOfContainersList(
-          projectScopedContainers.getVariablesContainersList()
+          projectScopedContainers.get().getVariablesContainersList()
         ),
       [projectScopedContainers]
     );
 
     const variablesContainers = React.useMemo(
       () => {
-        return layout && project
-          ? [layout.getVariables(), project.getVariables()]
-          : [];
+        const variablesContainersList = projectScopedContainers
+          .get()
+          .getVariablesContainersList();
+        return mapFor(
+          0,
+          variablesContainersList.getVariablesContainersCount(),
+          i => {
+            return variablesContainersList.getVariablesContainer(i);
+          }
+        );
       },
-      [layout, project]
+      [projectScopedContainers]
     );
 
     const isGlobal =
@@ -203,11 +210,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 );
 
 export const renderInlineAnyVariable = (props: ParameterInlineRendererProps) =>
-  renderVariableWithIcon(
-    props,
-    props.scope.layout &&
-      props.scope.layout.getVariables().has(getRootVariableName(props.value))
-      ? SceneIcon
-      : GlobalIcon,
-    'variable'
-  );
+  renderVariableWithIcon(props, 'variable');

@@ -6,7 +6,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import { getProjectScopedContainersFromScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
   editor: ?EventsSheetInterface;
@@ -83,7 +83,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       project,
       layout,
     };
-    const projectScopedContainers = getProjectScopedContainersFromScope(
+    const projectScopedContainers = new ProjectScopedContainers(
       scope,
       project,
       layout

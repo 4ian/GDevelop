@@ -48,6 +48,7 @@ import {
   shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import Paper from '../../../UI/Paper';
+import { ProjectScopedContainers } from '../../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -126,7 +127,7 @@ const MAX_ERRORS_COUNT = 10;
 const extractErrors = (
   platform: gdPlatform,
   project: gdProject,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
@@ -135,7 +136,7 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    projectScopedContainers,
+    projectScopedContainers.get(),
     expressionType
   );
   expressionNode.visit(expressionValidator);
@@ -302,7 +303,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      projectScopedContainers,
+      projectScopedContainers.get(),
       expressionType,
       currentNode
     );
@@ -468,7 +469,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      projectScopedContainers,
+      projectScopedContainers.get(),
       expressionType,
       expressionNode,
       cursorPosition - 1

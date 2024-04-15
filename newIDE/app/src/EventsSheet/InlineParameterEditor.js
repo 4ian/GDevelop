@@ -14,6 +14,8 @@ import {
   getAvoidSoftKeyboardStyle,
   useSoftKeyboardBottomOffset,
 } from '../UI/MobileSoftKeyboard';
+import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -21,7 +23,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
 
   open: boolean,
   onRequestClose: () => void,

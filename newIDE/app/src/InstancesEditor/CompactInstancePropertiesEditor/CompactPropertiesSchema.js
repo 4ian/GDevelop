@@ -583,12 +583,14 @@ export const reorderInstanceSchemaForCustomProperties = (
   }
 
   const [animationField] = newSchema.splice(animationFieldIndex, 1);
-  const firstFields = [
+
+  const firstFields: Schema = [
     {
       name: 'Animation',
       type: 'row',
       title: i18n._(t`Animation`),
-      children: [animationField],
+      // $FlowIgnore - We are confident the animation field is not a row or a column.
+      children: [{ ...animationField, hideLabel: true }],
     },
   ];
   if (newSchema.length > 0) {

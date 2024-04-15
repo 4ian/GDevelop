@@ -37,6 +37,7 @@ export type ValueFieldCommonProperties = {|
   name: string,
   getLabel?: Instance => string,
   getDescription?: Instance => string,
+  hideLabel?: boolean,
   getExtraDescription?: Instance => string,
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
@@ -392,7 +393,7 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
         };
-        if (field.renderLeftIcon) {
+        if (field.renderLeftIcon || field.hideLabel) {
           return (
             <CompactSemiControlledNumberField
               {...commonProps}
@@ -411,13 +412,15 @@ const CompactPropertiesEditor = ({
             />
           );
         } else {
+          const { key, ...otherCommonProps } = commonProps;
           return (
             <CompactPropertiesEditorRowField
+              key={key}
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
               field={
                 <CompactSemiControlledNumberField
-                  {...commonProps}
+                  {...otherCommonProps}
                   // endAdornment={
                   //   endAdornment && (
                   //     <Tooltip title={endAdornment.tooltipContent}>
@@ -519,7 +522,7 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
         };
-        if (field.renderLeftIcon) {
+        if (field.renderLeftIcon || field.hideLabel) {
           return (
             <CompactSemiControlledTextField
               {...commonProps}
@@ -528,11 +531,14 @@ const CompactPropertiesEditor = ({
             />
           );
         } else {
+          const { key, ...otherCommonProps } = commonProps;
+
           return (
             <CompactPropertiesEditorRowField
+              key={key}
               label={getFieldLabel({ instances, field })}
               markdownDescription={getFieldDescription(field)}
-              field={<CompactSemiControlledTextField {...commonProps} />}
+              field={<CompactSemiControlledTextField {...otherCommonProps} />}
             />
           );
         }
@@ -616,9 +622,8 @@ const CompactPropertiesEditor = ({
           }) === DIFFERENT_VALUES;
       }
       return (
-        <>
+        <React.Fragment key={`button-${field.label}`}>
           <FlatButton
-            key={`button-${field.label}`}
             fullWidth
             primary
             leftIcon={
@@ -635,8 +640,8 @@ const CompactPropertiesEditor = ({
               field.onClick(instances[0]);
             }}
           />
-          <Spacer key={`button-${field.label}-spacer`} />
-        </>
+          <Spacer />
+        </React.Fragment>
       );
     },
     [instances]

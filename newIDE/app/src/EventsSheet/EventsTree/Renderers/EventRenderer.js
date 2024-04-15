@@ -4,6 +4,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
+  type VariableDeclarationContext,
 } from '../../SelectionHandler';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import { type ScreenType } from '../../../UI/Responsive/ScreenTypeMeasurer';
@@ -37,6 +38,9 @@ export type EventRendererProps = {
   onParameterClick: ParameterContext => void,
   onEndEditingEvent: () => void,
   selection: any,
+
+  onVariableDeclarationClick: VariableDeclarationContext => void,
+  onVariableDeclarationDoubleClick: VariableDeclarationContext => void,
 
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,

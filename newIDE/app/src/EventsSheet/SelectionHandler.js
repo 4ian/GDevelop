@@ -24,6 +24,11 @@ export type ParameterContext = {|
   domEvent?: any,
 |};
 
+export type VariableDeclarationContext = {|
+  variablesContainer: gdVariablesContainer,
+  variableName: string,
+|};
+
 export type EventContext = {|
   eventsList: gdEventsList,
   event: gdBaseEvent,

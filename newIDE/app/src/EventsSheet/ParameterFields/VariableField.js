@@ -142,7 +142,7 @@ const getVariableSourceIcon = (variableType: VariablesContainer_SourceType) => {
   }
 };
 
-const getVariableTypeIcon = (variableType: Variable_Type) => {
+export const getVariableTypeIcon = (variableType: Variable_Type) => {
   switch (variableType) {
     case gd.Variable.Number:
       return VariableNumberIcon;
@@ -376,7 +376,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   }
 );
 
-const getVariableContainerSourceType = (
+const getVariablesContainerSourceType = (
   projectScopedContainers: ProjectScopedContainers,
   variableName: string
 ) => {
@@ -409,7 +409,7 @@ export const renderVariableWithIcon = (
   const VariableIcon =
     ForcedVariableIcon ||
     getVariableSourceIcon(
-      getVariableContainerSourceType(projectScopedContainers, value)
+      getVariablesContainerSourceType(projectScopedContainers, value)
     );
 
   const IconAndNameContainer = expressionIsValid

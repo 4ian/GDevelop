@@ -25,6 +25,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
+  type VariableDeclarationContext,
 } from '../SelectionHandler';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import getObjectByName from '../../Utils/GetObjectByName';
@@ -114,6 +115,9 @@ type EventsContainerProps = {|
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
+
+  onVariableDeclarationClick: VariableDeclarationContext => void,
+  onVariableDeclarationDoubleClick: VariableDeclarationContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEndEditingEvent: () => void,
@@ -215,6 +219,10 @@ const EventContainer = (props: EventsContainerProps) => {
               onInstructionDoubleClick={props.onInstructionDoubleClick}
               onInstructionContextMenu={props.onInstructionContextMenu}
               onAddInstructionContextMenu={props.onAddInstructionContextMenu}
+              onVariableDeclarationClick={props.onVariableDeclarationClick}
+              onVariableDeclarationDoubleClick={
+                props.onVariableDeclarationDoubleClick
+              }
               onEndEditingEvent={props.onEndEditingEvent}
               onParameterClick={props.onParameterClick}
               onOpenExternalEvents={props.onOpenExternalEvents}
@@ -295,6 +303,15 @@ type EventsTreeProps = {|
   onParameterClick: (
     eventContext: EventContext,
     parameterContext: ParameterContext
+  ) => void,
+
+  onVariableDeclarationClick: (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
+  ) => void,
+  onVariableDeclarationDoubleClick: (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
   ) => void,
 
   onEventClick: (eventContext: EventContext) => void,
@@ -838,6 +855,18 @@ export default class ThemableEventsTree extends Component<
                 }
                 onParameterClick={parameterContext =>
                   this.props.onParameterClick(eventContext, parameterContext)
+                }
+                onVariableDeclarationClick={variableDeclarationContext =>
+                  this.props.onVariableDeclarationClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
+                }
+                onVariableDeclarationDoubleClick={variableDeclarationContext =>
+                  this.props.onVariableDeclarationDoubleClick(
+                    eventContext,
+                    variableDeclarationContext
+                  )
                 }
                 onEventClick={() =>
                   this.props.onEventClick({

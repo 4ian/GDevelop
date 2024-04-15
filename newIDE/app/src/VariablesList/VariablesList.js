@@ -111,7 +111,6 @@ type Props = {|
   onVariablesUpdated?: () => void,
   toolbarIconStyle?: any,
   onSelectedVariableChange?: (Array<string>) => void,
-  hideToolbar?: boolean,
 |};
 
 const variableRowStyles = {
@@ -526,11 +525,7 @@ const VariablesList = (props: Props) => {
   );
 
   const [searchText, setSearchText] = React.useState<string>('');
-  const {
-    onComputeAllVariableNames,
-    onSelectedVariableChange,
-    hideToolbar,
-  } = props;
+  const { onComputeAllVariableNames, onSelectedVariableChange } = props;
   const allVariablesNames = React.useMemo<?Array<string>>(
     () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
     [onComputeAllVariableNames]
@@ -1708,7 +1703,7 @@ const VariablesList = (props: Props) => {
                   onKeyUp={keyboardShortcuts.onKeyUp}
                 >
                   <Column expand useFullHeight noMargin>
-                    {hideToolbar ? null : isNarrow ? null : toolbar}
+                    {isNarrow ? null : toolbar}
                     {props.variablesContainer.count() === 0 &&
                     (!props.inheritedVariablesContainer ||
                       props.inheritedVariablesContainer.count() === 0) ? (
@@ -1747,7 +1742,7 @@ const VariablesList = (props: Props) => {
                         )}
                       </ScrollView>
                     )}
-                    {hideToolbar ? null : isNarrow ? toolbar : null}
+                    {isNarrow ? toolbar : null}
                   </Column>
                 </div>
               )}

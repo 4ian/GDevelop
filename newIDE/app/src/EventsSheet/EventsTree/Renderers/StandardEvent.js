@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import InstructionsList from '../InstructionsList';
+import VariableDeclarationsList from '../VariableDeclarationsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -10,7 +11,6 @@ import {
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Column } from '../../../UI/Grid';
-import VariablesList from '../../../VariablesList/VariablesList';
 
 const gd: libGDevelop = global.gd;
 
@@ -29,9 +29,18 @@ export default class StandardEvent extends React.Component<
 
     return (
       <Column noMargin>
-        <VariablesList
+        <VariableDeclarationsList
           variablesContainer={standardEvent.getVariables()}
-          hideToolbar
+          selection={this.props.selection}
+          onVariableDeclarationClick={this.props.onVariableDeclarationClick}
+          onVariableDeclarationDoubleClick={
+            this.props.onVariableDeclarationDoubleClick
+          }
+          className={'actions-container'}
+          disabled={this.props.disabled}
+          screenType={this.props.screenType}
+          windowSize={this.props.windowSize}
+          idPrefix={this.props.idPrefix}
         />
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}

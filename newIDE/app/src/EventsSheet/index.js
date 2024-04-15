@@ -35,6 +35,7 @@ import {
   type InstructionContext,
   type ParameterContext,
   type InstructionContextWithEventContext,
+  type VariableDeclarationContext,
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -115,6 +116,7 @@ import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/Paramete
 import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
 
@@ -179,6 +181,11 @@ type State = {|
     parameterIndex: number,
     eventContext: ?EventContext,
   },
+  editedVariable: {
+    variablesContainer: gdVariablesContainer,
+    variableName: string,
+    eventContext: ?EventContext,
+  } | null,
 
   selection: SelectionState,
 
@@ -272,6 +279,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       parameterIndex: 0,
       eventContext: null,
     },
+    editedVariable: null,
 
     selection: getInitialSelection(),
 
@@ -681,6 +689,19 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instructionContext.indexInList !== undefined
             ? instructionContext.indexInList
             : undefined,
+        eventContext,
+      },
+    });
+  };
+
+  openVariablesEditor = (
+    eventContext: EventContext,
+    variableDeclarationContext: VariableDeclarationContext
+  ) => {
+    this.setState({
+      editedVariable: {
+        variablesContainer: variableDeclarationContext.variablesContainer,
+        variableName: variableDeclarationContext.variableName,
         eventContext,
       },
     });
@@ -1912,6 +1933,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     this.moveSelectionToInstructionsList
                   }
                   onParameterClick={this.openParameterEditor}
+                  onVariableDeclarationClick={() => {
+                    //TODO
+                  }}
+                  onVariableDeclarationDoubleClick={this.openVariablesEditor}
                   onEventClick={this.selectEvent}
                   onEventContextMenu={this.openEventContextMenu}
                   onAddNewEvent={(
@@ -2072,6 +2097,34 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         serializedEventsToExtract: null,
                       });
                     }}
+                  />
+                )}
+                {this.state.editedVariable && (
+                  <VariablesEditorDialog
+                    project={project}
+                    title={<Trans>Local variables</Trans>}
+                    open
+                    onCancel={() =>
+                      this.setState({
+                        editedVariable: null,
+                      })
+                    }
+                    onApply={() =>
+                      this.setState({
+                        editedVariable: null,
+                      })
+                    }
+                    tabs={[
+                      {
+                        id: 'local-variables',
+                        label: '',
+                        variablesContainer: this.state.editedVariable
+                          .variablesContainer,
+                      },
+                    ]}
+                    helpPagePath={'/all-features/variables/local-variables'}
+                    onComputeAllVariableNames={() => []}
+                    preventRefactoringToDeleteInstructions
                   />
                 )}
                 {this.state.textEditedEvent && (

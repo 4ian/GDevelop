@@ -121,15 +121,15 @@ export default class SelectedInstances {
     for (const resizeGrabbingLocation of resizeGrabbingLocationValues) {
       const resizeButton = new PIXI.Graphics();
       this.resizeButtons[resizeGrabbingLocation] = resizeButton;
-      this._makeButton(
-        resizeButton,
-        event => {
+      this._makeButton({
+        objectButton: resizeButton,
+        onMove: event => {
           this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
         },
-        () => {
+        onEnd: () => {
           this.onResizeEnd();
         },
-        event => {
+        onPanMove: event => {
           this.onPanMove(
             event.deltaX,
             event.deltaY,
@@ -137,21 +137,21 @@ export default class SelectedInstances {
             event.data.global.y
           );
         },
-        () => {
+        onPanEnd: () => {
           this.onPanEnd();
         },
-        resizeGrabbingIconNames[resizeGrabbingLocation]
-      );
+        cursor: resizeGrabbingIconNames[resizeGrabbingLocation],
+      });
     }
-    this._makeButton(
-      this.rotateButton,
-      event => {
+    this._makeButton({
+      objectButton: this.rotateButton,
+      onMove: event => {
         this.onRotate(event.deltaX, event.deltaY);
       },
-      () => {
+      onEnd: () => {
         this.onRotateEnd();
       },
-      event => {
+      onPanMove: event => {
         this.onPanMove(
           event.deltaX,
           event.deltaY,
@@ -159,25 +159,32 @@ export default class SelectedInstances {
           event.data.global.y
         );
       },
-      () => {
+      onPanEnd: () => {
         this.onPanEnd();
       },
-      'url("res/actions/rotate24_black.png"),auto'
-    );
+      cursor: 'url("res/actions/rotate24_black.png"),auto',
+    });
   }
 
   setScreenType(screenType: ScreenType) {
     this._screenType = screenType;
   }
 
-  _makeButton(
+  _makeButton({
+    objectButton,
+    onMove,
+    onEnd,
+    onPanMove,
+    onPanEnd,
+    cursor,
+  }: {
     objectButton: PIXI.Graphics,
     onMove: (event: PanMoveEvent) => void,
     onEnd: () => void,
     onPanMove: (event: PanMoveEvent) => void,
     onPanEnd: () => void,
-    cursor: string
-  ) {
+    cursor: string,
+  }) {
     objectButton.eventMode = 'static';
     objectButton.buttonMode = true;
     objectButton.cursor = cursor;

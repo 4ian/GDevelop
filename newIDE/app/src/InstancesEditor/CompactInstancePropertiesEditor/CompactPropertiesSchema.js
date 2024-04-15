@@ -5,11 +5,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import { type Schema, type SectionTitle } from '../../CompactPropertiesEditor';
-import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import { styles } from '.';
 
-import Angle from '../../UI/CustomSvgIcons/Angle';
 import Layers from '../../UI/CustomSvgIcons/Layers';
 import LetterX from '../../UI/CustomSvgIcons/LetterX';
 import LetterY from '../../UI/CustomSvgIcons/LetterY';
@@ -26,6 +24,9 @@ import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Restore from '../../UI/CustomSvgIcons/Restore';
 import Object3d from '../../UI/CustomSvgIcons/Object3d';
 import Object2d from '../../UI/CustomSvgIcons/Object2d';
+import RotateX from '../../UI/CustomSvgIcons/RotateX';
+import RotateY from '../../UI/CustomSvgIcons/RotateY';
+import RotateZ from '../../UI/CustomSvgIcons/RotateZ';
 
 /**
  * Applies ratio to value without intermediary value to avoid precision issues.
@@ -70,7 +71,7 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationX(newValue),
-    renderLeftIcon: className => <LetterX className={className} />,
+    renderLeftIcon: className => <RotateX className={className} />,
   },
   {
     name: 'Rotation Y',
@@ -79,25 +80,17 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationY(newValue),
-    renderLeftIcon: className => <LetterY className={className} />,
+    renderLeftIcon: className => <RotateY className={className} />,
   },
 ];
-const getRotationZField = ({
-  i18n,
-  label,
-  Icon,
-}: {|
-  i18n: I18nType,
-  label: MessageDescriptor,
-  Icon: React.ComponentType<any>,
-|}) => ({
+const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
   name: 'Angle',
-  getLabel: () => i18n._(label),
+  getLabel: () => i18n._(t`Rotation (Z)`),
   valueType: 'number',
   getValue: (instance: gdInitialInstance) => instance.getAngle(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setAngle(newValue),
-  renderLeftIcon: className => <Icon className={className} />,
+  renderLeftIcon: className => <RotateZ className={className} />,
 });
 const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
   {
@@ -496,7 +489,7 @@ export const makeSchema = ({
         removeSpacers: true,
         children: getRotationXAndRotationYFields({ i18n }),
       },
-      getRotationZField({ i18n, label: t`Rotation (Z)`, Icon: LetterZ }),
+      getRotationZField({ i18n }),
     ];
   }
 
@@ -556,7 +549,7 @@ export const makeSchema = ({
       title: i18n._(t`Rotation`),
       preventWrap: true,
       removeSpacers: true,
-      children: [getRotationZField({ i18n, label: t`Angle`, Icon: Angle })],
+      children: [getRotationZField({ i18n })],
     },
   ];
 };

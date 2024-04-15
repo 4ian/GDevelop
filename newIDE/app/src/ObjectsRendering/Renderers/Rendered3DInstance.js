@@ -44,8 +44,23 @@ export default class Rendered3DInstance {
   /**
    * Convert an angle from degrees to radians.
    */
-  static toRad(angleInDegrees: number) {
+  static toRad(angleInDegrees: number): number {
     return (angleInDegrees / 180) * Math.PI;
+  }
+
+  /**
+   * Applies ratio to value without intermediary value to avoid precision issues.
+   */
+  static applyRatio({
+    oldReferenceValue,
+    newReferenceValue,
+    valueToApplyTo,
+  }: {|
+    oldReferenceValue: number,
+    newReferenceValue: number,
+    valueToApplyTo: number,
+  |}): number {
+    return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
   }
 
   /**

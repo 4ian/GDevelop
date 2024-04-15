@@ -17,9 +17,9 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(containerObjectsList).toHaveLength(20);
+    expect(containerObjectsList).toHaveLength(22);
     expect(projectObjectsList).toHaveLength(2);
-    expect(allObjectsList).toHaveLength(22);
+    expect(allObjectsList).toHaveLength(24);
   });
 
   it('can enumerate objects with a filter on object type', () => {

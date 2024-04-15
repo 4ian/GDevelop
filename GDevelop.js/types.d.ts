@@ -1025,6 +1025,8 @@ export class InitialInstance extends EmscriptenObject {
   setLocked(lock: boolean): void;
   isSealed(): boolean;
   setSealed(seal: boolean): void;
+  shouldKeepRatio(): boolean;
+  setShouldKeepRatio(keepRatio: boolean): void;
   getZOrder(): number;
   setZOrder(zOrder: number): void;
   getLayer(): string;

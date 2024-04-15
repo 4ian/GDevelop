@@ -3134,14 +3134,51 @@ module.exports = {
             modelDepth < epsilon
               ? Number.POSITIVE_INFINITY
               : originalDepth / modelDepth;
-          let scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
-          if (!Number.isFinite(scaleRatio)) {
-            scaleRatio = 1;
-          }
+          const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          if (!Number.isFinite(minScaleRatio)) {
+            this._defaultWidth = modelWidth;
+            this._defaultHeight = modelHeight;
+            this._defaultDepth = modelDepth;
+          } else {
+            if (widthRatio === minScaleRatio) {
+              this._defaultWidth = originalWidth;
+              this._defaultHeight = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelDepth,
+              });
+            } else if (heightRatio === minScaleRatio) {
+              this._defaultWidth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelWidth,
+              });
 
-          this._defaultWidth = scaleRatio * modelWidth;
-          this._defaultHeight = scaleRatio * modelHeight;
-          this._defaultDepth = scaleRatio * modelDepth;
+              this._defaultHeight = originalHeight;
+              this._defaultDepth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelDepth,
+              });
+            } else {
+              this._defaultWidth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelWidth,
+              });
+              this._defaultHeight = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = originalDepth;
+            }
+          }
         }
       }
 

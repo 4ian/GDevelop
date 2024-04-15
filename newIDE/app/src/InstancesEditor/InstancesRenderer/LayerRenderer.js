@@ -37,9 +37,9 @@ export default class LayerRenderer {
   onMoveInstanceEnd: void => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
   onUpInstance: (gdInitialInstance, number, number) => void;
-  /**Used for instances culling on rendering */
+  /** Used for instances culling on rendering. */
   viewTopLeft: [number, number];
-  /** Used for instances culling on rendering */
+  /** Used for instances culling on rendering. */
   viewBottomRight: [number, number];
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
@@ -134,8 +134,8 @@ export default class LayerRenderer {
     this.onDownInstance = onDownInstance;
     this.onUpInstance = onUpInstance;
 
-    this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
-    this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
+    this.viewTopLeft = [0, 0];
+    this.viewBottomRight = [0, 0];
 
     this.pixiContainer = new PIXI.Container();
 
@@ -182,6 +182,9 @@ export default class LayerRenderer {
 
         if (renderedInstance instanceof Rendered3DInstance) {
           const threeObject = renderedInstance.getThreeObject();
+          if (threeObject) {
+            threeObject.visible = isVisible;
+          }
           if (this._threeGroup && threeObject) {
             this._threeGroup.add(threeObject);
           }
@@ -516,11 +519,17 @@ export default class LayerRenderer {
   }
 
   _computeViewBounds() {
-    // Add a margin of 100 pixels around the view. Culling will hide PIXI objects,
-    // and hidden objects won't respond to events. Hence, a margin allow the cursor to go
-    // slightly out of the canvas when moving an instance, and still have the instance
-    // to follow the cursor.
-    const margin = 100;
+    /**
+     * Add a margin around the view. Culling will hide PIXI and THREE objects,
+     * and hidden objects won't respond to events.
+     * Hence, this margin allows for two things:
+     * - it allows the cursor to go slightly out of the canvas when moving an
+     *   instance, and still have the instance to follow the cursor.
+     * - THREE objects, depending on their shape and orientation, should appear
+     *   on the screen even though their coordinates are off the view. This margin
+     *   should cover most of the cases.
+     */
+    const margin = 1000;
     this.viewTopLeft = this.viewPosition.toSceneCoordinates(-margin, -margin);
     this.viewBottomRight = this.viewPosition.toSceneCoordinates(
       this.viewPosition.getWidth() + margin,

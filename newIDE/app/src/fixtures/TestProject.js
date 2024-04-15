@@ -10,6 +10,8 @@ export type TestProject = {|
   panelSpriteObject: gdObject,
   spriteObjectConfiguration: gdSpriteObject,
   emptySpriteObjectConfiguration: gdSpriteObject,
+  cube3dObject: gdObject,
+  textInputObject: gdObject,
   customObject: gdObject,
   spriteObject: gdObject,
   emptySpriteObject: gdObject,
@@ -21,6 +23,8 @@ export type TestProject = {|
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
+  testLayoutInstance2: gdInitialInstance,
+  testLayoutInstance3: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
@@ -213,6 +217,18 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MyTiledSpriteObject',
     0
   );
+  const cube3dObject = testLayout.insertNewObject(
+    project,
+    'FakeScene3D::Cube3DObject',
+    'CubeObject',
+    0
+  );
+  const textInputObject = testLayout.insertNewObject(
+    project,
+    'FakeTextInput::TextInput',
+    'TextInputObject',
+    0
+  );
   const panelSpriteObject = testLayout.insertNewObject(
     project,
     'PanelSpriteObject::PanelSprite',
@@ -385,6 +401,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewInitialInstance();
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
+
+  const testLayoutInstance2 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance2.setX(120);
+  testLayoutInstance2.setY(-15);
+  testLayoutInstance2.setZ(32);
+  testLayoutInstance2.setObjectName(cube3dObject.getName());
+
+  const testLayoutInstance3 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance3.setX(12);
+  testLayoutInstance3.setY(-15.5);
+  testLayoutInstance3.setZ(3.2);
+  testLayoutInstance3.setObjectName(textInputObject.getName());
 
   const testSpriteObjectInstance = testLayout
     .getInitialInstances()
@@ -880,6 +912,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObject,
     customObject,
+    cube3dObject,
+    textInputObject,
     spriteObject,
     spriteObjectConfiguration,
     emptySpriteObject,
@@ -892,6 +926,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     group2,
     group4WithLongsNames,
     testLayoutInstance1,
+    testLayoutInstance2,
+    testLayoutInstance3,
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,

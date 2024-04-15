@@ -30,6 +30,7 @@ type Props = {|
   onAdd: () => void,
   searchText: string,
   onChangeSearchText: string => void,
+  iconStyle?: any,
 |};
 
 const VariablesListToolbar = React.memo<Props>((props: Props) => {
@@ -98,7 +99,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
                     size="small"
                     disabled={disabled}
                   >
-                    <Icon />
+                    <Icon style={props.iconStyle} />
                   </IconButton>
                 ) : (
                   <FlatButton
@@ -130,7 +131,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
             onClick={props.onAdd}
             size="small"
           >
-            <Add />
+            <Add style={props.iconStyle} />
           </IconButton>
         ) : (
           <FlatButton

@@ -36,6 +36,7 @@ import {
 import Edit from '../../UI/CustomSvgIcons/Edit';
 import { switchBetweenUnifiedInstructionIfNeeded } from '../../EventsSheet/ParameterFields/AnyVariableField';
 import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../../EventsSheet/ParameterFields/ObjectVariableField';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -73,7 +74,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   objectName?: ?string,
   instruction: gdInstruction,
   isCondition: boolean,

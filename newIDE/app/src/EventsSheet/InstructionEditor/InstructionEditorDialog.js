@@ -33,6 +33,7 @@ import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSe
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   fullHeightSelector: {
@@ -52,7 +53,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   instruction: gdInstruction,
   isCondition: boolean,
   resourceManagementProps: ResourceManagementProps,

@@ -38,7 +38,10 @@ import {
 import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import {
+  type EventsScope,
+  ProjectScopedContainers,
+} from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
 import { ExtensionStoreContext } from '../../AssetStore/ExtensionStore/ExtensionStoreContext';
@@ -105,7 +108,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
 
   id: string,
 |};
@@ -214,11 +217,11 @@ const Instruction = (props: Props) => {
     onContextMenu,
     globalObjectsContainer,
     objectsContainer,
-    projectScopedContainers,
     id,
     resourcesManager,
     scope,
   } = props;
+  const projectScopedContainers = props.projectScopedContainers.get();
 
   const instrFormatter = React.useMemo(
     () => gd.InstructionSentenceFormatter.get(),
@@ -449,6 +452,7 @@ const Instruction = (props: Props) => {
                 InvalidParameterValue,
                 MissingParameterValue,
                 useAssignmentOperators,
+                projectScopedContainers: props.projectScopedContainers,
               })}
             </span>
           );

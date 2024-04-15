@@ -324,6 +324,7 @@ export class VariablesContainersList extends EmscriptenObject {
   static makeNewEmptyVariablesContainersList(): VariablesContainersList;
   has(name: string): boolean;
   get(name: string): Variable;
+  getVariablesContainerFromVariableName(variableName: string): VariablesContainer;
   getVariablesContainer(index: number): VariablesContainer;
   getVariablesContainersCount(): number;
 }
@@ -597,6 +598,7 @@ export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewEmptyProjectScopedContainers(): ProjectScopedContainers;
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
   static makeNewProjectScopedContainersFor(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
   getObjectsContainersList(): ObjectsContainersList;

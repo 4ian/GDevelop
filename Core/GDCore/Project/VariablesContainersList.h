@@ -30,6 +30,10 @@ class GD_CORE_API VariablesContainersList {
   MakeNewVariablesContainersListForProjectAndLayout(const gd::Project& project,
                                                     const gd::Layout& layout);
 
+  static VariablesContainersList MakeNewVariablesContainersListPushing(
+      const VariablesContainersList &variablesContainersList,
+      const gd::VariablesContainer &variablesContainer);
+
   static VariablesContainersList MakeNewEmptyVariablesContainersList();
 
   /**
@@ -66,6 +70,12 @@ class GD_CORE_API VariablesContainersList {
   }
 
   /**
+   * Get the variables container for a given variable.
+   */
+  const VariablesContainer &
+  GetVariablesContainerFromVariableName(const gd::String &variableName) const;
+
+  /**
    * \brief Get the variable container at the specified index in the list.
    *
    * \warning Trying to access to a not existing variable container will result
@@ -95,6 +105,7 @@ class GD_CORE_API VariablesContainersList {
 
   std::vector<const gd::VariablesContainer*> variablesContainers;
   static Variable badVariable;
+  static VariablesContainer badVariablesContainer;
 };
 
 }  // namespace gd

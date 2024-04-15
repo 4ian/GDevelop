@@ -2,6 +2,7 @@
 #include <set>
 
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
+#include "GDCore/Events/Event.h"
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
@@ -71,7 +72,14 @@ class ProjectScopedContainers {
         PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
     return projectScopedContainers;
-  }
+  };
+
+  static std::vector<ProjectScopedContainers> test;
+
+  static ProjectScopedContainers&
+  MakeNewProjectScopedContainersWithLocalVariables(
+      const ProjectScopedContainers &projectScopedContainers,
+      const gd::BaseEvent &event);
 
   ProjectScopedContainers &AddPropertiesContainer(
       const gd::PropertiesContainer &container) {

@@ -114,6 +114,7 @@ import {
 import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/ParameterFields/AnyVariableField';
 import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
+import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -129,7 +130,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
@@ -1517,7 +1518,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const { projectScopedContainers } = this.props;
+    const projectScopedContainers = this.props.projectScopedContainers.get();
 
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get()
@@ -1698,7 +1699,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
-            projectScopedContainers={projectScopedContainers}
+            projectScopedContainers={
+              this.state.editedInstruction.eventContext
+                ? this.state.editedInstruction.eventContext
+                    .projectScopedContainers
+                : projectScopedContainers
+            }
             instruction={instruction}
             isCondition={this.state.editedInstruction.isCondition}
             isNewInstruction={
@@ -1832,6 +1838,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope.eventsBasedObject,
             scope.eventsFunction
           )));
+
+    const editedParameterProjectScopedContainers = this.state.editedParameter
+      .eventContext
+      ? this.state.editedParameter.eventContext.projectScopedContainers
+      : projectScopedContainers;
 
     return (
       <ResponsiveWindowMeasurer>
@@ -1981,7 +1992,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
-                  projectScopedContainers={projectScopedContainers}
+                  projectScopedContainers={
+                    editedParameterProjectScopedContainers
+                  }
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
                   parameterIndex={this.state.editedParameter.parameterIndex}
@@ -2000,12 +2013,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
                     switchBetweenUnifiedInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      this.props.projectScopedContainers,
+                      editedParameterProjectScopedContainers,
                       instruction
                     );
                     switchBetweenUnifiedObjectInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      this.props.projectScopedContainers,
+                      editedParameterProjectScopedContainers,
                       instruction
                     );
 

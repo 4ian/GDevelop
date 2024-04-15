@@ -38,6 +38,7 @@ import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -281,7 +282,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       project && instruction && getVariableTypeFromParameters
         ? getVariableTypeFromParameters(
             project.getCurrentPlatform(),
-            projectScopedContainers,
+            projectScopedContainers.get(),
             instruction
           )
         : null;
@@ -375,6 +376,21 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   }
 );
 
+const getVariableContainerSourceType = (
+  projectScopedContainers: ProjectScopedContainers,
+  variableName: string
+) => {
+  const rootVariableName = getRootVariableName(variableName);
+  const variablesContainersList = projectScopedContainers
+    .get()
+    .getVariablesContainersList();
+  return variablesContainersList.has(rootVariableName)
+    ? variablesContainersList
+        .getVariablesContainerFromVariableName(rootVariableName)
+        .getSourceType()
+    : gd.VariablesContainer.Unknown;
+};
+
 export const renderVariableWithIcon = (
   {
     value,
@@ -382,13 +398,19 @@ export const renderVariableWithIcon = (
     expressionIsValid,
     InvalidParameterValue,
     MissingParameterValue,
+    projectScopedContainers,
   }: ParameterInlineRendererProps,
-  VariableIcon: SvgIconProps => React.Element<typeof SvgIcon>,
-  tooltip: string
+  tooltip: string,
+  ForcedVariableIcon?: SvgIconProps => React.Element<typeof SvgIcon>
 ) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
+  const VariableIcon =
+    ForcedVariableIcon ||
+    getVariableSourceIcon(
+      getVariableContainerSourceType(projectScopedContainers, value)
+    );
 
   const IconAndNameContainer = expressionIsValid
     ? React.Fragment

@@ -17,7 +17,10 @@ import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import {
+  type EventsScope,
+  ProjectScopedContainers,
+} from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   addButton: {
@@ -61,7 +64,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
 
   idPrefix: string,
 |};

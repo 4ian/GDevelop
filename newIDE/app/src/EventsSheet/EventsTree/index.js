@@ -51,6 +51,8 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+
 const gd: libGDevelop = global.gd;
 
 const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
@@ -96,7 +98,7 @@ type EventsContainerProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   selection: SelectionState,
   onAddNewInstruction: InstructionsListContext => void,
   onPasteInstructions: InstructionsListContext => void,
@@ -253,7 +255,7 @@ type EventsTreeProps = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: gdProjectScopedContainers,
+  projectScopedContainers: ProjectScopedContainers,
   selection: SelectionState,
   onAddNewInstruction: (
     eventContext: EventContext,
@@ -338,6 +340,7 @@ export type SortableTreeNode = {|
   rowIndex: number,
   nodePath: Array<number>,
   relativeNodePath: Array<number>,
+  projectScopedContainers: ProjectScopedContainers,
   // Key is event pointer or an identification string.
   key: number | string,
 
@@ -381,7 +384,7 @@ export default class ThemableEventsTree extends Component<
     this.temporaryUnfoldedNodes = [];
     this.eventsHeightsCache = new EventHeightsCache(this);
     this.state = {
-      ...this._eventsToTreeData(props.events),
+      ...this._eventsToTreeData(props.projectScopedContainers, props.events),
       draggedNode: null,
       isScrolledTop: true,
       isScrolledBottom: false,
@@ -433,12 +436,18 @@ export default class ThemableEventsTree extends Component<
    * from outside this component.
    */
   forceEventsUpdate(cb: ?() => void) {
-    this.setState(this._eventsToTreeData(this.props.events), () => {
-      if (this._list && this._list.wrappedInstance.current) {
-        this._list.wrappedInstance.current.recomputeRowHeights();
+    this.setState(
+      this._eventsToTreeData(
+        this.props.projectScopedContainers,
+        this.props.events
+      ),
+      () => {
+        if (this._list && this._list.wrappedInstance.current) {
+          this._list.wrappedInstance.current.recomputeRowHeights();
+        }
+        if (cb) cb();
       }
-      if (cb) cb();
-    });
+    );
   }
 
   scrollToRow(row: number) {
@@ -490,14 +499,17 @@ export default class ThemableEventsTree extends Component<
       .map(rowIndex => {
         if (!flatDataTree[rowIndex]) return null;
         const {
-          node: { event, eventsList, indexInList },
+          node: { event, eventsList, indexInList, projectScopedContainers },
         } = flatDataTree[rowIndex];
-        return event ? { event, eventsList, indexInList } : null;
+        return event
+          ? { event, eventsList, indexInList, projectScopedContainers }
+          : null;
       })
       .filter(Boolean);
   }
 
   _eventsToTreeData = (
+    parentProjectScopedContainers: ProjectScopedContainers,
     eventsList: gdEventsList,
     flatData: Array<gdBaseEvent> = [],
     depth: number = 0,
@@ -518,6 +530,11 @@ export default class ThemableEventsTree extends Component<
           flatData.length - 1
         );
         const currentRelativePath = [...(parentRelativePath || []), i];
+        const projectScopedContainers = event.canHaveVariables()
+          ? parentProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(
+              event
+            )
+          : parentProjectScopedContainers;
 
         return {
           title: this._renderEvent,
@@ -530,6 +547,7 @@ export default class ThemableEventsTree extends Component<
           depth,
           key: event.ptr, //TODO: useless?
           children: this._eventsToTreeData(
+            projectScopedContainers,
             event.getSubEvents(),
             // flatData is a flat representation of events, one for each line.
             // Hence it should not contain the folded events.
@@ -541,6 +559,7 @@ export default class ThemableEventsTree extends Component<
           ).treeData,
           nodePath: currentAbsolutePath,
           relativeNodePath: currentRelativePath,
+          projectScopedContainers,
         };
       }
     );
@@ -759,6 +778,7 @@ export default class ThemableEventsTree extends Component<
             eventsList: node.eventsList,
             event: event,
             indexInList: node.indexInList,
+            projectScopedContainers: node.projectScopedContainers,
           };
 
           const dropTarget = (
@@ -774,7 +794,7 @@ export default class ThemableEventsTree extends Component<
                 scope={this.props.scope}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
-                projectScopedContainers={this.props.projectScopedContainers}
+                projectScopedContainers={node.projectScopedContainers}
                 event={event}
                 key={event.ptr}
                 eventsHeightsCache={this.eventsHeightsCache}
@@ -824,6 +844,7 @@ export default class ThemableEventsTree extends Component<
                     eventsList: node.eventsList,
                     event: event,
                     indexInList: node.indexInList,
+                    projectScopedContainers: node.projectScopedContainers,
                   })
                 }
                 onEndEditingEvent={() => this.props.onEndEditingEvent(event)}
@@ -832,6 +853,7 @@ export default class ThemableEventsTree extends Component<
                     eventsList: node.eventsList,
                     event: event,
                     indexInList: node.indexInList,
+                    projectScopedContainers: node.projectScopedContainers,
                   })
                 }
                 onInstructionContextMenu={(...args) =>

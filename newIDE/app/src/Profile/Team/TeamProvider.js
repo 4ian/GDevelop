@@ -22,9 +22,12 @@ import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project
 type Props = {| children: React.Node |};
 
 const TeamProvider = ({ children }: Props) => {
-  const { profile, getAuthorizationHeader, authenticated } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    limits,
+    profile,
+    getAuthorizationHeader,
+    authenticated,
+  } = React.useContext(AuthenticatedUserContext);
   const [groups, setGroups] = React.useState<?(TeamGroup[])>(null);
   const [team, setTeam] = React.useState<?Team>(null);
   const [members, setMembers] = React.useState<?(User[])>(null);
@@ -47,14 +50,20 @@ const TeamProvider = ({ children }: Props) => {
   React.useEffect(
     () => {
       const fetchTeam = async () => {
-        if (!profile || !profile.isTeacher) return;
+        if (
+          !profile ||
+          !limits ||
+          !limits.capabilities.classrooms ||
+          !limits.capabilities.classrooms.viewClassroomTab
+        )
+          return;
         const teams = await listUserTeams(getAuthorizationHeader, profile.id);
         // Being admin of multiple teams is not supported at the moment.
         setTeam(teams[0]);
       };
       fetchTeam();
     },
-    [getAuthorizationHeader, profile]
+    [getAuthorizationHeader, profile, limits]
   );
 
   React.useEffect(

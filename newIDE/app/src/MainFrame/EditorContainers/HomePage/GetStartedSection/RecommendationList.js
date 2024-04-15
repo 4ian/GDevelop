@@ -186,7 +186,7 @@ const RecommendationList = ({
   onStartSurvey,
   hasFilledSurveyAlready,
 }: Props) => {
-  const { recommendations, subscription, profile } = authenticatedUser;
+  const { recommendations, subscription, profile, limits } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
@@ -320,8 +320,11 @@ const RecommendationList = ({
         }
         if (planRecommendation) {
           const shouldDisplayPlanRecommendation =
-            profile &&
-            !profile.isStudent &&
+            limits &&
+            !(
+              limits.capabilities.classrooms &&
+              limits.capabilities.classrooms.hideUpgradeNotice
+            ) &&
             (!subscription ||
               isPlanRecommendationRelevant(subscription, planRecommendation));
           if (

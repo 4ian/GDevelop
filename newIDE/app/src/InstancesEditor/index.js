@@ -449,6 +449,9 @@ export default class InstancesEditor extends Component<Props> {
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
       screenType: this.props.screenType,
+      keyboardShortcuts: this.keyboardShortcuts,
+      onPanMove: this._onPanMove,
+      onPanEnd: this._onPanEnd,
     });
     this.highlightedInstance = new HighlightedInstance({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),

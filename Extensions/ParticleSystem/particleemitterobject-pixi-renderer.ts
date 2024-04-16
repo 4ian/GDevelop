@@ -14,6 +14,8 @@ namespace gdjs {
     first.next.value = endValue;
   };
 
+  const frequencyMinimumValue = 0.0001;
+
   export class ParticleEmitterObjectPixiRenderer {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
@@ -68,7 +70,8 @@ namespace gdjs {
           max: objectData.particleLifeTimeMax,
         },
         // A negative flow is "infinite flow" (all particles burst)
-        frequency: objectData.flow < 0 ? 0.0001 : 1.0 / objectData.flow,
+        frequency:
+          objectData.flow < 0 ? frequencyMinimumValue : 1.0 / objectData.flow,
         spawnChance: 1,
         particlesPerWave: objectData.flow < 0 ? objectData.maxParticleNb : 1,
         maxParticles: objectData.maxParticleNb,
@@ -274,9 +277,8 @@ namespace gdjs {
      */
     private _updateRotateFlagFromSpeed() {
       const rotation: any = this.emitter.getBehavior('rotation');
-      const moveAcceleration: any = this.emitter.getBehavior(
-        'moveAcceleration'
-      );
+      const moveAcceleration: any =
+        this.emitter.getBehavior('moveAcceleration');
       moveAcceleration.rotate =
         rotation.minSpeed === 0 &&
         rotation.maxSpeed === 0 &&
@@ -347,11 +349,9 @@ namespace gdjs {
     }
 
     setFlow(flow: number, tank: number): void {
-      this.emitter.frequency = flow < 0 ? 0 : 1.0 / flow;
-      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
-        flow,
-        tank
-      );
+      this.emitter.frequency = flow < 0 ? frequencyMinimumValue : 1.0 / flow;
+      this.emitter.emitterLifetime =
+        ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -447,6 +447,7 @@ namespace gdjs {
   }
 
   // @ts-ignore - Register the class to let the engine use it.
-  export const ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
+  export const ParticleEmitterObjectRenderer =
+    ParticleEmitterObjectPixiRenderer;
   export type ParticleEmitterObjectRenderer = ParticleEmitterObjectPixiRenderer;
 }

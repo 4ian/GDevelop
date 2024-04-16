@@ -2463,7 +2463,7 @@ export const limitsForStartupUser: Limits = {
       maximumCountPerGame: -1,
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
-      canUseCustomCss: false,
+      canUseCustomCss: true,
     },
   },
   quotas: {

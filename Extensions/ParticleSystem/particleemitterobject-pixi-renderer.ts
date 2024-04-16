@@ -14,8 +14,6 @@ namespace gdjs {
     first.next.value = endValue;
   };
 
-  const frequencyMinimumValue = 0.0001;
-
   export class ParticleEmitterObjectPixiRenderer {
     renderer: PIXI.Container;
     emitter: PIXI.particles.Emitter;
@@ -71,7 +69,9 @@ namespace gdjs {
         },
         // A negative flow is "infinite flow" (all particles burst)
         frequency:
-          objectData.flow < 0 ? frequencyMinimumValue : 1.0 / objectData.flow,
+          objectData.flow < 0
+            ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+            : 1.0 / objectData.flow,
         spawnChance: 1,
         particlesPerWave: objectData.flow < 0 ? objectData.maxParticleNb : 1,
         maxParticles: objectData.maxParticleNb,
@@ -350,7 +350,10 @@ namespace gdjs {
     }
 
     setFlow(flow: number, tank: number): void {
-      this.emitter.frequency = flow < 0 ? frequencyMinimumValue : 1.0 / flow;
+      this.emitter.frequency =
+        flow < 0
+          ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+          : 1.0 / flow;
       this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
         flow,
         tank
@@ -430,7 +433,8 @@ namespace gdjs {
     _mayHaveEndedEmission(): boolean {
       return (
         // No end can be reached if there is no flow.
-        this.emitter.frequency > 0 &&
+        this.emitter.frequency >
+          ParticleEmitterObjectPixiRenderer.frequencyMinimumValue &&
         // No end can be reached when there is no limit.
         this.emitter.emitterLifetime >= 0 &&
         // Pixi stops the emission at the end.
@@ -447,6 +451,8 @@ namespace gdjs {
       else if (flow < 0) return 0.001;
       else return (tank + 0.1) / flow;
     }
+
+    static frequencyMinimumValue = 0.0001;
   }
 
   // @ts-ignore - Register the class to let the engine use it.

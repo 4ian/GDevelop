@@ -403,8 +403,7 @@ function LeaderboardAppearanceDialog({
                   <Column noMargin>
                     <Text noMargin>
                       <Trans>
-                        Get a business subscription to unlock custom CSS or
-                        contact us.
+                        Get a pro subscription to unlock custom CSS.
                       </Trans>
                     </Text>
                     <Link

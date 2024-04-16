@@ -30,5 +30,3 @@ export const handle = 'move-handle';
 export const linkContainer = 'link-container';
 
 export const nameAndIconContainer = 'name-and-icon-container';
-
-export const treeView = 'tree-view';

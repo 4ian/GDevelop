@@ -24,15 +24,17 @@
   align-items: center;
   height: 100%;
   position: relative;
+
+  --horizontal-padding: 21px;
 }
 
 .rowContentSide.rowContentExtraPadding {
   /* Used for a better dragging preview. */
-  padding: 0 21px;
+  padding: 0 var(--horizontal-padding);
 }
 .rowContentSide.rowContentSideLeft {
   /* Necessary for itemName to be overflown. */
-  width: 80%;
+  width: calc(100% - 2 * var(--horizontal-padding));
 }
 .rowContentSide.rowContentSideRight {
   /* Used for a better dragging preview. */

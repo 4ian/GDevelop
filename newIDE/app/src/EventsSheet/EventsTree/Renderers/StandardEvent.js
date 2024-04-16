@@ -28,7 +28,13 @@ export default class StandardEvent extends React.Component<
     var standardEvent = gd.asStandardEvent(this.props.event);
 
     return (
-      <Column noMargin>
+      <div
+        style={styles.oneColumnContainer}
+        className={classNames({
+          [largeSelectableArea]: true,
+          [largeSelectedArea]: this.props.selected,
+        })}
+      >
         <VariableDeclarationsList
           variablesContainer={standardEvent.getVariables()}
           selection={this.props.selection}
@@ -46,8 +52,6 @@ export default class StandardEvent extends React.Component<
           leftIndentWidth={this.props.leftIndentWidth}
           windowSize={this.props.windowSize}
           className={classNames({
-            [largeSelectableArea]: true,
-            [largeSelectedArea]: this.props.selected,
             [executableEventContainer]: true,
           })}
           renderConditionsList={({ style, className }) => (
@@ -117,7 +121,7 @@ export default class StandardEvent extends React.Component<
             />
           )}
         />
-      </Column>
+      </div>
     );
   }
 }

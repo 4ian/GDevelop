@@ -43,9 +43,11 @@ class GD_CORE_API ArbitraryEventsWorker : private EventVisitor {
    */
   void Launch(gd::EventsList& events) { VisitEventList(events); };
 
+protected:
+  virtual bool VisitEvent(gd::BaseEvent& event) override;
+
  private:
   void VisitEventList(gd::EventsList& events);
-  bool VisitEvent(gd::BaseEvent& event) override;
   bool VisitLinkEvent(gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(gd::InstructionsList& instructions,
                             bool areConditions);
@@ -141,6 +143,8 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
   };
 
  private:
+  bool VisitEvent(gd::BaseEvent& event) override;
+
   const gd::ProjectScopedContainers* projectScopedContainers;
 };
 
@@ -164,10 +168,10 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorker : private ReadOnlyEventVisitor {
 
 protected:
   void StopAnyEventIteration() override;
+  virtual void VisitEvent(const gd::BaseEvent& event) override;
 
  private:
   void VisitEventList(const gd::EventsList& events);
-  void VisitEvent(const gd::BaseEvent& event) override;
   void VisitLinkEvent(const gd::LinkEvent& linkEvent) override;
   void VisitInstructionList(const gd::InstructionsList& instructions,
                             bool areConditions);
@@ -248,6 +252,8 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
   };
 
  private:
+  void VisitEvent(const gd::BaseEvent& event) override;
+
   const gd::ProjectScopedContainers* projectScopedContainers;
 };
 

@@ -17,6 +17,7 @@ VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
   VariablesContainersList variablesContainersList;
   variablesContainersList.Add(project.GetVariables());
   variablesContainersList.Add(layout.GetVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 2;
   return variablesContainersList;
 }
 

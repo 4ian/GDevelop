@@ -55,7 +55,6 @@ bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
       *expressionAndMetadata.first, expressionAndMetadata.second);
   }
 
-
   return shouldDelete;
 }
 
@@ -88,9 +87,6 @@ bool ArbitraryEventsWorker::VisitEventExpression(gd::Expression& expression,
                                                  const gd::ParameterMetadata& metadata) {
   return DoVisitEventExpression(expression, metadata);
 }
-
-ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
-
 
 ReadOnlyArbitraryEventsWorker::~ReadOnlyArbitraryEventsWorker() {}
 
@@ -165,6 +161,45 @@ void ReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {
   shouldStopIteration = true;
 }
 
+ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
+
+bool ArbitraryEventsWorkerWithContext::VisitEvent(gd::BaseEvent &event) {
+  // TODO Should CanHaveVariables be used instead?
+  // CanHaveVariables is less efficient but allows to add local variables to
+  // empty containers.
+  if (!event.HasVariables()) {
+    return ArbitraryEventsWorker::VisitEvent(event);
+  }
+  auto newProjectScopedContainers =
+      ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
+          *projectScopedContainers, event);
+
+  auto *parentProjectScopedContainers = projectScopedContainers;
+  projectScopedContainers = &newProjectScopedContainers;
+  bool shouldDelete = ArbitraryEventsWorker::VisitEvent(event);
+  projectScopedContainers = parentProjectScopedContainers;
+  return shouldDelete;
+}
+
 ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithContext() {}
+
+void ReadOnlyArbitraryEventsWorkerWithContext::VisitEvent(
+    const gd::BaseEvent &event) {
+  // TOD SHould CanHaveVariables be used instead?
+  // CanHaveVariables is less efficient but allows to add local variables to
+  // empty containers.
+  if (!event.HasVariables()) {
+    ReadOnlyArbitraryEventsWorker::VisitEvent(event);
+    return;
+  }
+  auto newProjectScopedContainers =
+      ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
+          *projectScopedContainers, event);
+
+  auto *parentProjectScopedContainers = projectScopedContainers;
+  projectScopedContainers = &newProjectScopedContainers;
+  ReadOnlyArbitraryEventsWorker::VisitEvent(event);
+  projectScopedContainers = parentProjectScopedContainers;
+}
 
 }  // namespace gd

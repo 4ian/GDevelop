@@ -50,7 +50,6 @@ export default function VariableDeclarationsList({
           variableName={variableName}
           variable={variable}
           key={variable.ptr}
-          selected={false}
           onClick={() => onVariableDeclarationClick(variableDeclarationContext)}
           onDoubleClick={() =>
             onVariableDeclarationDoubleClick(variableDeclarationContext)

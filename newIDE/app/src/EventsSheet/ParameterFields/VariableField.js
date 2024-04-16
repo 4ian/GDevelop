@@ -210,8 +210,8 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 const VariableTypeIcon = getVariableTypeIcon(variable.type);
                 return (
                   <LineStackLayout>
-                    <VariableSourceIcon />
-                    <VariableTypeIcon />
+                    <VariableSourceIcon fontSize="small" />
+                    <VariableTypeIcon fontSize="small" />
                   </LineStackLayout>
                 );
               },

@@ -421,8 +421,8 @@ namespace gdjs {
     }
 
     /**
-     * @returns `true` at the end of emission or at the start if its paused
-     * or never if there is no limit.
+     * @returns `true` at the end of emission or at the start if it's paused.
+     * Returns false if there is no limit.
      */
     _mayHaveEndedEmission(): boolean {
       return (

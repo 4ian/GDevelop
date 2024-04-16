@@ -93,8 +93,9 @@ class GD_CORE_API ExpressionVariableReplacer
 
     // Match the potential *new* name of the variable, because refactorings are
     // done after changes in the variables container.
+    const auto& potentialNewName = GetPotentialNewName(node.name);
     projectScopedContainers.MatchIdentifierWithName<void>(
-        GetPotentialNewName(node.name),
+        potentialNewName,
         [&]() {
           // This represents an object.
           // Remember the object name.
@@ -104,8 +105,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is a variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                  .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(potentialNewName) ==
+              &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
@@ -123,8 +125,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is something else - potentially a deleted variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                  .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(potentialNewName) ==
+              &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(node.name);
@@ -174,8 +177,9 @@ class GD_CORE_API ExpressionVariableReplacer
 
     // Match the potential *new* name of the variable, because refactorings are
     // done after changes in the variables container.
+    const auto& potentialNewName = GetPotentialNewName(node.identifierName);
     projectScopedContainers.MatchIdentifierWithName<void>(
-        GetPotentialNewName(node.identifierName),
+        potentialNewName,
         [&]() {
           // This represents an object.
           if (objectsContainersList.HasObjectOrGroupVariablesContainer(
@@ -188,8 +192,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is a variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                  .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(potentialNewName) ==
+              &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(
@@ -204,8 +209,9 @@ class GD_CORE_API ExpressionVariableReplacer
         },
         [&]() {
           // This is something else - potentially a deleted variable.
-          if (projectScopedContainers.GetVariablesContainersList()
-                  .HasVariablesContainer(targetVariablesContainer)) {
+          if (&projectScopedContainers.GetVariablesContainersList()
+                   .GetVariablesContainerFromVariableName(potentialNewName) ==
+              &targetVariablesContainer) {
             // The node represents a variable, that can come from the target
             // (because the target is in the scope), replace or remove it:
             RenameOrRemoveVariableOfTargetVariableContainer(

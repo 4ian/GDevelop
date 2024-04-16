@@ -66,7 +66,7 @@ class GD_CORE_API VariablesContainersList {
    */
   const VariablesContainer* GetBottomMostVariablesContainer() const {
     if (variablesContainers.empty()) return nullptr;
-    return variablesContainers.back();
+    return variablesContainers.at(firstLocalVariableContainerIndex - 1);
   }
 
   /**
@@ -96,7 +96,7 @@ class GD_CORE_API VariablesContainersList {
   void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
 
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
-  VariablesContainersList() {};
+  VariablesContainersList(): firstLocalVariableContainerIndex(0) {};
  private:
 
   void Add(const gd::VariablesContainer& variablesContainer) {
@@ -104,6 +104,7 @@ class GD_CORE_API VariablesContainersList {
   };
 
   std::vector<const gd::VariablesContainer*> variablesContainers;
+  std::size_t firstLocalVariableContainerIndex;
   static Variable badVariable;
   static VariablesContainer badVariablesContainer;
 };

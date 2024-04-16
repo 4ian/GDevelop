@@ -3,8 +3,7 @@
 import * as React from 'react';
 import { FixedSizeList } from 'react-window';
 import memoizeOne from 'memoize-one';
-import { treeView } from '../../EventsSheet/EventsTree/ClassNames';
-import './TreeView.css';
+import classes from './TreeView.module.css';
 import ContextMenu, { type ContextMenuInterface } from '../Menu/ContextMenu';
 import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import TreeViewRow from './TreeViewRow';
@@ -262,7 +261,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       const rightButton = getItemRightButton && getItemRightButton(item);
       const dataset = getItemDataset ? getItemDataset(item) : undefined;
       const extraClass =
-        animatedItemId && id === animatedItemId ? 'animate' : '';
+        animatedItemId && id === animatedItemId ? classes.animate : '';
 
       /*
        * Append node to result if either:
@@ -703,7 +702,7 @@ const TreeView = <Item: ItemBaseAttributes>(
     <>
       <div
         tabIndex={0}
-        className={treeView}
+        className={classes.treeView}
         onKeyDown={onKeyDown}
         ref={containerRef}
       >

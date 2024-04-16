@@ -452,7 +452,7 @@ namespace gdjs {
       else return (tank + 0.1) / flow;
     }
 
-    static frequencyMinimumValue = 0.0001;
+    private static readonly frequencyMinimumValue = 0.0001;
   }
 
   // @ts-ignore - Register the class to let the engine use it.

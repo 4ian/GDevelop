@@ -32,6 +32,9 @@ namespace gdjs {
     _objects: Hashtable<ObjectData>;
     _objectsCtor: Hashtable<typeof RuntimeObject>;
 
+    //@ts-ignore Only used by generated code.
+    private _localVariables: Array<gdjs.VariablesContainer> = [];
+
     _layers: Hashtable<RuntimeLayer>;
     _orderedLayers: RuntimeLayer[]; // TODO: should this be a single structure with _layers, to enforce its usage?
     _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};

@@ -170,6 +170,11 @@ class ProjectScopedContainers {
     return variablesContainersList;
   };
 
+  // TODO Only keep the const one.
+  gd::VariablesContainersList &GetVariablesContainersList() {
+    return variablesContainersList;
+  };
+
   const gd::PropertiesContainersList &GetPropertiesContainersList() const {
     return propertiesContainersList;
   };

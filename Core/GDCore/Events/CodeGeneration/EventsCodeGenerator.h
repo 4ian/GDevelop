@@ -336,6 +336,11 @@ class GD_CORE_API EventsCodeGenerator {
     return projectScopedContainers;
   }
 
+  // TODO Only keep the const one.
+  gd::ProjectScopedContainers& GetProjectScopedContainers() {
+    return projectScopedContainers;
+  }
+
   /**
    * \brief Return true if the code generation is done for a given project and
    * layout. If not, this means that the code is generated for a function.
@@ -534,6 +539,7 @@ class GD_CORE_API EventsCodeGenerator {
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
       const gd::String& objectName) {
+    // This is dead code. See the real implementation in GDJS.
     if (scope == LAYOUT_VARIABLE) {
       return "getLayoutVariable(" + variableName + ")";
 

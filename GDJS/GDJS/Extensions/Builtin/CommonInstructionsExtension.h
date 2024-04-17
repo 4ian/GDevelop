@@ -3,10 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef COMMONINSTRUCTIONSEXTENSION_H
-#define COMMONINSTRUCTIONSEXTENSION_H
+#pragma once
 #include "GDCore/Extensions/PlatformExtension.h"
 
+namespace gd {
+class Variable;
+class VariablesContainer;
+}  
 namespace gdjs {
 
 /**
@@ -18,7 +21,10 @@ class CommonInstructionsExtension : public gd::PlatformExtension {
  public:
   CommonInstructionsExtension();
   virtual ~CommonInstructionsExtension(){};
+private:
+
+static void GenerateLocalVariablesInitializationCode(gd::VariablesContainer &variablesContainer, gd::String& code);
+static void GenerateLocalVariableInitializationCode(gd::Variable &variable, gd::String& code, std::size_t depth = 0);
 };
 
 }  // namespace gdjs
-#endif  // COMMONINSTRUCTIONSEXTENSION_H

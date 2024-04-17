@@ -64,6 +64,16 @@ VariablesContainersList::GetVariablesContainerFromVariableName(
   return badVariablesContainer;
 }
 
+std::size_t
+VariablesContainersList::GetVariablesContainerPositionFromVariableName(
+    const gd::String &variableName) const {
+  for (std::size_t i = 0; i < variablesContainers.size(); ++i) {
+    if (variablesContainers[i]->Has(variableName))
+      return i;
+  }
+  return gd::String::npos;
+}
+
 bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {

@@ -68,7 +68,10 @@ namespace gdjs {
           max: objectData.particleLifeTimeMax,
         },
         // A negative flow is "infinite flow" (all particles burst)
-        frequency: objectData.flow < 0 ? 0.0001 : 1.0 / objectData.flow,
+        frequency:
+          objectData.flow < 0
+            ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+            : 1.0 / objectData.flow,
         spawnChance: 1,
         particlesPerWave: objectData.flow < 0 ? objectData.maxParticleNb : 1,
         maxParticles: objectData.maxParticleNb,
@@ -347,7 +350,10 @@ namespace gdjs {
     }
 
     setFlow(flow: number, tank: number): void {
-      this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
+      this.emitter.frequency =
+        flow < 0
+          ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+          : 1.0 / flow;
       this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
         flow,
         tank
@@ -420,11 +426,33 @@ namespace gdjs {
       return this.started;
     }
 
+    /**
+     * @returns `true` at the end of emission or at the start if it's paused.
+     * Returns false if there is no limit.
+     */
+    _mayHaveEndedEmission(): boolean {
+      return (
+        // No end can be reached if there is no flow.
+        this.emitter.frequency >
+          ParticleEmitterObjectPixiRenderer.frequencyMinimumValue &&
+        // No end can be reached when there is no limit.
+        this.emitter.emitterLifetime >= 0 &&
+        // Pixi stops the emission at the end.
+        !this.emitter.emit &&
+        // Pixi reset `_emitterLife` to `emitterLifetime` at the end of emission
+        // so there is no way to know if it is the end or the start.
+        // @ts-ignore Use a private attribute.
+        this.emitter._emitterLife === this.emitter.emitterLifetime
+      );
+    }
+
     static computeLifetime(flow: number, tank: number): float {
       if (tank < 0) return -1;
       else if (flow < 0) return 0.001;
       else return (tank + 0.1) / flow;
     }
+
+    private static readonly frequencyMinimumValue = 0.0001;
   }
 
   // @ts-ignore - Register the class to let the engine use it.

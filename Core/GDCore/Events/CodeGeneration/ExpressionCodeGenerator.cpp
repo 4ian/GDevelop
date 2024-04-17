@@ -145,13 +145,8 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
         return;
       }
 
-      // This could be adapted in the future if more scopes are supported.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      if (codeGenerator.GetProjectScopedContainers().GetVariablesContainersList().GetBottomMostVariablesContainer()->Has(node.name)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      }
-
-      output += codeGenerator.GenerateGetVariable(node.name, scope, context, "");
+      output += codeGenerator.GenerateGetVariable(
+          node.name, gd::EventsCodeGenerator::ANY_VARIABLE, context, "");
       if (node.child) node.child->Visit(*this);
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
@@ -246,13 +241,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         return;
       }
 
-      // This could be adapted in the future if more scopes are supported at runtime.
-      EventsCodeGenerator::VariableScope scope = gd::EventsCodeGenerator::PROJECT_VARIABLE;
-      if (variablesContainersList.GetBottomMostVariablesContainer()->Has(node.identifierName)) {
-        scope = gd::EventsCodeGenerator::LAYOUT_VARIABLE;
-      }
-
-      output += codeGenerator.GenerateGetVariable(node.identifierName, scope, context, "");
+      output += codeGenerator.GenerateGetVariable(
+          node.identifierName, gd::EventsCodeGenerator::ANY_VARIABLE, context,
+          "");
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }

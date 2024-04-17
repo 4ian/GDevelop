@@ -869,6 +869,11 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, EventsCodeGenerationContext& parentContext) {
   gd::String output;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
+    auto& event = events[eId];
+    if (event.HasVariables()) {
+      GetProjectScopedContainers().GetVariablesContainersList().Push(event.GetVariables());
+    }
+
     // Each event has its own context : Objects picked in an event are totally
     // different than the one picked in another.
     gd::EventsCodeGenerationContext newContext;
@@ -889,13 +894,17 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 
     auto& context = reuseParentContext ? reusedContext : newContext;
 
-    gd::String eventCoreCode = events[eId].GenerateEventCode(*this, context);
+    gd::String eventCoreCode = event.GenerateEventCode(*this, context);
     gd::String scopeBegin = GenerateScopeBegin(context);
     gd::String scopeEnd = GenerateScopeEnd(context);
     gd::String declarationsCode = GenerateObjectsDeclarationCode(context);
 
     output += "\n" + scopeBegin + "\n" + declarationsCode + "\n" +
               eventCoreCode + "\n" + scopeEnd + "\n";
+    
+    if (event.HasVariables()) {
+      GetProjectScopedContainers().GetVariablesContainersList().Pop();
+    }
   }
 
   return output;

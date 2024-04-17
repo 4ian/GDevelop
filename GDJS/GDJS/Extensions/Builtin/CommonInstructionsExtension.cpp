@@ -134,6 +134,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerationContext& context) {
         gd::StandardEvent& event = dynamic_cast<gd::StandardEvent&>(event_);
 
+        gd::String localVariablesInitializationCode = "";
+        if (event_.HasVariables()) {
+            GenerateLocalVariablesInitializationCode(event_.GetVariables(), localVariablesInitializationCode);
+        }
+
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
         gd::String ifPredicate =
@@ -158,12 +163,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateObjectsDeclarationCode(actionsContext);
 
         gd::String outputCode;
+        outputCode += localVariablesInitializationCode;
         outputCode += conditionsCode;
         if (!ifPredicate.empty()) outputCode += "if (" + ifPredicate + ") ";
         outputCode += "{\n";
         outputCode += actionsDeclarationsCode;
         outputCode += actionsCode;
         outputCode += "}\n";
+
+        if (event_.HasVariables()) {
+            outputCode += "runtimeScene._localVariables.pop();\n";
+        }
 
         return outputCode;
       });
@@ -874,6 +884,59 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         callingCode += functionName + "(" + callArguments + ");\n";
         return callingCode;
       });
+}
+
+void CommonInstructionsExtension::GenerateLocalVariablesInitializationCode(
+    gd::VariablesContainer &variablesContainer, gd::String &code) {
+  code += "{\n";
+  code += "const variables = new gdjs.VariablesContainer();\n";
+  for (std::size_t i = 0; i < variablesContainer.Count(); i++) {
+    auto &variable = variablesContainer.Get(i);
+    code += "{\n";
+    GenerateLocalVariableInitializationCode(variable, code);
+    code += "variables.add(" +
+            EventsCodeGenerator::ConvertToStringExplicit(
+                variablesContainer.GetNameAt(i)) +
+            ", variable);\n";
+    code += "}\n";
+  }
+  code += "runtimeScene._localVariables.push(variables);\n";
+  code += "}\n";
+}
+
+void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
+    gd::Variable &variable, gd::String &code, std::size_t depth) {
+  const gd::String variableCodeName =
+      "variable" + (depth == 0 ? "" : gd::String::From(depth));
+  code += "const " + variableCodeName + " = new gdjs.Variable();\n";
+  if (variable.GetType() == gd::Variable::Number) {
+    code += variableCodeName + ".setNumber(" +
+            gd::String::From(variable.GetValue()) + ");\n";
+  } else if (variable.GetType() == gd::Variable::Boolean) {
+    gd::String value = variable.GetBool() ? "true" : "false";
+    code += variableCodeName + ".setBoolean(" + value + ");\n";
+  } else if (variable.GetType() == gd::Variable::String) {
+    code += variableCodeName + ".setString(" +
+            EventsCodeGenerator::ConvertToStringExplicit(variable.GetString()) +
+            ");\n";
+  } else if (variable.GetType() == gd::Variable::Structure ||
+             variable.GetType() == gd::Variable::Array) {
+    const auto &childrenNames = variable.GetAllChildrenNames();
+    for (std::size_t i = 0; i < variable.GetChildrenCount(); i++) {
+      auto &child = variable.GetAtIndex(i);
+
+      code += "{\n";
+      GenerateLocalVariableInitializationCode(child, code, depth + 1);
+      auto childCodeName = "variable" + gd::String::From(depth + 1);
+      code += variableCodeName + ".addChild(" +
+              EventsCodeGenerator::ConvertToStringExplicit(childrenNames[i]) +
+              ", " + childCodeName + ");\n";
+      code += "}\n";
+    }
+    if (variable.GetType() == gd::Variable::Array) {
+      code += variableCodeName + ".castTo('array');\n";
+    }
+  }
 }
 
 }  // namespace gdjs

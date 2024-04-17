@@ -76,6 +76,12 @@ class GD_CORE_API VariablesContainersList {
   GetVariablesContainerFromVariableName(const gd::String &variableName) const;
 
   /**
+   * Get the variables container index for a given variable.
+   */
+  std::size_t GetVariablesContainerPositionFromVariableName(
+      const gd::String &variableName) const;
+
+  /**
    * \brief Get the variable container at the specified index in the list.
    *
    * \warning Trying to access to a not existing variable container will result
@@ -94,6 +100,21 @@ class GD_CORE_API VariablesContainersList {
    * \brief Call the callback for each variable having a name matching the specified search.
    */
   void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
+
+  // TODO Refactor the code generator to remove these 2 methods.
+  /**
+   * Avoid to use this.
+   */
+  void Push(const gd::VariablesContainer& variablesContainer) {
+    variablesContainers.push_back(&variablesContainer);
+  };
+  /**
+   * Avoid to use this.
+   */
+  void Pop() {
+    variablesContainers.pop_back();
+  };
+
 
   /** Do not use - should be private but accessible to let Emscripten create a temporary. */
   VariablesContainersList(): firstLocalVariableContainerIndex(0) {};

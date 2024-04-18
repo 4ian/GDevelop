@@ -259,7 +259,7 @@ export default class LayerRenderer {
   };
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
-    const renderedInstance = this.renderedInstances[instance.ptr];
+    const renderedInstance = this.getRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
     const width = hasCustomSize

@@ -1,8 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
 import * as React from 'react';
-import { I18n } from '@lingui/react';
 import { mapFor } from '../../Utils/MapFor';
 import { type VariableDeclarationContext } from '../SelectionHandler';
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';

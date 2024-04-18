@@ -4,16 +4,9 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import classNames from 'classnames';
-import {
-  selectedArea,
-  selectableArea,
-  instructionParameter,
-  disabledText,
-  icon,
-} from './ClassNames';
+import { selectedArea, selectableArea, disabledText, icon } from './ClassNames';
 import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
-import { useLongTouch } from '../../Utils/UseLongTouch';
 import {
   shouldActivate,
   shouldValidate,
@@ -98,57 +91,27 @@ export const VariableDeclaration = (props: Props) => {
           [disabledText]: disabled,
         })}
       >
-        <span>
-          <Trans>Declare</Trans>{' '}
-        </span>
-        <span
-          className={classNames({
-            [selectableArea]: true,
-            [instructionParameter]: true,
-            variable: true,
-          })}
-        >
-          <>
+        <Trans>
+          Declare{' '}
+          <span>
             <LocalIcon
               className={classNames({
                 [icon]: true,
               })}
             />
             {variableName}
-          </>
-        </span>
-        <span>
-          {' '}
-          <Trans>as</Trans>{' '}
-        </span>
-        <span
-          className={classNames({
-            [selectableArea]: true,
-            [instructionParameter]: true,
-          })}
-        >
-          <>
+          </span>{' '}
+          as{' '}
+          <span>
             <VariableTypeIcon
               className={classNames({
                 [icon]: true,
               })}
             />
             {getVariableTypeLabel(variable, i18n)}
-          </>
-        </span>
-        <span>
-          {' '}
-          <Trans>with value</Trans>{' '}
-        </span>
-        <span
-          className={classNames({
-            [selectableArea]: true,
-            [instructionParameter]: true,
-            number: true,
-          })}
-        >
-          {getVariableValueAsString(variable, i18n)}
-        </span>
+          </span>{' '}
+          with value <span>{getVariableValueAsString(variable, i18n)}</span>
+        </Trans>
       </span>
     );
   };

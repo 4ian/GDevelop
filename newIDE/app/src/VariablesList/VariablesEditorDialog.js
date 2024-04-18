@@ -47,6 +47,7 @@ type Props = {|
   title: React.Node,
   tabs: Array<TabProps>,
   initiallyOpenTabId?: string,
+  initiallySelectedVariableName?: string,
 
   project: gdProject,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -80,6 +81,7 @@ const VariablesEditorDialog = ({
   id,
   tabs,
   initiallyOpenTabId,
+  initiallySelectedVariableName,
 }: Props) => {
   const serializableObjects = React.useMemo(
     () =>
@@ -253,6 +255,7 @@ const VariablesEditorDialog = ({
                 )}
                 <VariablesList
                   variablesContainer={variablesContainer}
+                  initiallySelectedVariableName={initiallySelectedVariableName}
                   inheritedVariablesContainer={inheritedVariablesContainer}
                   emptyPlaceholderTitle={emptyPlaceholderTitle}
                   emptyPlaceholderDescription={emptyPlaceholderDescription}

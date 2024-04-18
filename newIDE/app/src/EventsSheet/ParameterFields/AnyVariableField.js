@@ -198,6 +198,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             initiallyOpenTabId={
               isGlobal ? 'global-variables' : 'scene-variables'
             }
+            initiallySelectedVariableName={props.value}
             tabs={globalAndSceneVariableDialogTabs}
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}

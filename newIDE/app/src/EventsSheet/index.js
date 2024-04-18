@@ -486,6 +486,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           positionAfterAction: positions,
         });
       });
+
+    this.openVariablesEditor(eventContext, {
+      variablesContainer,
+      variableName: newName,
+    });
   };
 
   _selectionCanHaveLocalVariables = () => {
@@ -878,7 +883,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         {
           label: i18n._(t`Add Local Variable`),
           click: () => this.addLocalVariable(),
-          enabled: this._selectionCanHaveLocalVariables(),
+          enabled:
+            this._selectionCanHaveLocalVariables() &&
+            !this.props.scope.eventsFunctionsExtension,
           accelerator: getShortcutDisplayName(
             this.props.shortcutMap['ADD_LOCAL_VARIABLE']
           ),
@@ -2125,6 +2132,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     helpPagePath={'/all-features/variables/local-variables'}
                     onComputeAllVariableNames={() => []}
                     preventRefactoringToDeleteInstructions
+                    initiallySelectedVariableName={
+                      this.state.editedVariable.variableName
+                    }
                   />
                 )}
                 {this.state.textEditedEvent && (

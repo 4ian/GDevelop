@@ -180,7 +180,6 @@ export const useSerializableObjectsCancelableEditor = ({
 
   React.useEffect(
     () => {
-      console.log('Backup');
       const serializedElements = serializedElementsRef.current;
       for (const [id, serializableObject] of serializableObjects) {
         // Serialize the content of the object, to be used in case the user
@@ -226,7 +225,6 @@ export const useSerializableObjectsCancelableEditor = ({
 
   const onCancelChanges = React.useCallback(
     async () => {
-      console.log('Cancel');
       // Use the value that was serialized to cancel the changes
       // made to the object
       const serializedElements = serializedElementsRef.current;
@@ -257,7 +255,6 @@ export const useSerializableObjectsCancelableEditor = ({
 
       for (const [id, serializableObject] of serializableObjects) {
         const serializedElement = serializedElements.get(id);
-        console.log('Cancel: ' + id);
 
         if (useProjectToUnserialize) {
           serializableObject.unserializeFrom(

@@ -252,6 +252,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               if (field.current) field.current.updateAutocompletions();
             }}
             preventRefactoringToDeleteInstructions
+            initiallySelectedVariableName={props.value}
           />
         )}
       </React.Fragment>

@@ -51,6 +51,17 @@ export const isAnAncestryOf = (
   return lineageVariables.includes(variable);
 };
 
+/**
+ * Brackets accessors are not handled, only the path elements before it are
+ * converted.
+ */
+export const getNodeIdFromVariableName = (variableName: string): string => {
+  const bracketIndex = variableName.indexOf('[');
+  const knownVariablePart =
+    bracketIndex < 0 ? variableName : variableName.substring(bracketIndex);
+  return knownVariablePart.replace(/\./g, '$$.$$');
+};
+
 export const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer

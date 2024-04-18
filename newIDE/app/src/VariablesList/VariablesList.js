@@ -53,6 +53,7 @@ import {
   getDirectParentVariable,
   getMovementTypeWithinVariablesContainer,
   getOldestAncestryVariable,
+  getNodeIdFromVariableName,
   getVariableContextFromNodeId,
   inheritedPrefix,
   isAnAncestryOf,
@@ -97,6 +98,7 @@ export type HistoryHandler = {|
 type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  initiallySelectedVariableName?: string,
   /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
   /** To specify if history should be handled by parent. */
@@ -530,7 +532,12 @@ const VariablesList = (props: Props) => {
     () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
     [onComputeAllVariableNames]
   );
-  const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>([]);
+  // TODO Scroll to the initially selected variable and focus on the name.
+  const [selectedNodes, doSetSelectedNodes] = React.useState<Array<string>>(
+    props.initiallySelectedVariableName
+      ? [getNodeIdFromVariableName(props.initiallySelectedVariableName)]
+      : []
+  );
   const setSelectedNodes = React.useCallback(
     (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
       nodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);

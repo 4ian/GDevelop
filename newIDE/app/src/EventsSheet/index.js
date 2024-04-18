@@ -470,7 +470,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (!eventContext) return;
 
     const variablesContainer = eventContext.event.getVariables();
-    const { name: newName, variable } = insertInVariablesContainer(
+    const { name: newName } = insertInVariablesContainer(
       variablesContainer,
       'Variable',
       null,

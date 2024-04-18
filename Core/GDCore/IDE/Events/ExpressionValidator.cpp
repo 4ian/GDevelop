@@ -166,8 +166,7 @@ bool ExpressionValidator::ValidateObjectVariableOrVariableOrProperty(
         return true; // We found a property, even if the child is not allowed.
       }
 
-      const gd::NamedPropertyDescriptor& property = projectScopedContainers
-          .GetPropertiesContainersList().Get(identifier.identifierName).second;
+      const gd::NamedPropertyDescriptor& property = propertiesContainersList.Get(identifier.identifierName).second;
 
       if (property.GetType() == "Number") {
        childType = Type::Number;

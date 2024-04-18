@@ -16,6 +16,7 @@ import Typography from '@material-ui/core/Typography';
 import { shortenString } from '../Utils/StringHelpers';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useIsMounted } from '../Utils/UseIsMounted';
+import Lock from '../UI/CustomSvgIcons/Lock';
 
 const MAX_TILE_SIZE = 300;
 const SPACING = 8;
@@ -70,6 +71,15 @@ const styles = {
     borderRadius: 8,
     aspectRatio: '16 / 9',
   },
+  lockerImage: { height: 80, width: 80 },
+  lockedOverlay: {
+    position: 'absolute',
+    background: 'rgba(0, 0, 0, 0.6)',
+    inset: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 };
 
 // Styles to give a visible hover for the mouse cursor.
@@ -119,10 +129,17 @@ const ImageOverlay = ({
   );
 };
 
+const LockedOverlay = () => (
+  <div style={styles.lockedOverlay}>
+    <Lock style={styles.lockerImage} />
+  </div>
+);
+
 export type ImageTileComponent = {|
   onClick: () => void,
   imageUrl: string,
   title?: string,
+  isLocked?: boolean,
   description?: string,
   overlayText?: string | React.Node,
   overlayTextPosition?: OverlayTextPosition,
@@ -233,6 +250,7 @@ const ImageTileGrid = ({
                           position={item.overlayTextPosition || 'bottomRight'}
                         />
                       )}
+                      {item.isLocked && <LockedOverlay />}
                     </div>
                     {item.title && (
                       <div

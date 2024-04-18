@@ -70,8 +70,10 @@ export type Capabilities = {|
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
     canUseCustomCss: boolean,
   },
-  classrooms: {
-    canAccessCurriculums: boolean,
+  privateTutorials?: {
+    allowedIdPrefixes: Array<string>,
+  },
+  classrooms?: {
     hidePlayTab: boolean,
     hideUpgradeNotice: boolean,
     showClassroomTab: boolean,

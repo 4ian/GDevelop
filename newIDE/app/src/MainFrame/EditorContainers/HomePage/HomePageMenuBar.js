@@ -77,8 +77,8 @@ const HomePageMenuBar = ({
   const { isMobile, isMediumScreen } = useResponsiveWindowSize();
   const isMobileOrSmallScreen = isMobile || isMediumScreen;
   const theme = React.useContext(GDevelopThemeContext);
-  const { profile } = React.useContext(AuthenticatedUserContext);
-  const tabsToDisplay = getTabsToDisplay({ profile });
+  const { limits } = React.useContext(AuthenticatedUserContext);
+  const tabsToDisplay = getTabsToDisplay({ limits });
   const largeScreenOnlyButtons: {
     label: React.Node,
     getIcon: GetIconFunction,

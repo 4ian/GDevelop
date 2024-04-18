@@ -54,7 +54,7 @@ const TeamProvider = ({ children }: Props) => {
           !profile ||
           !limits ||
           !limits.capabilities.classrooms ||
-          !limits.capabilities.classrooms.viewClassroomTab
+          !limits.capabilities.classrooms.showClassroomTab
         )
           return;
         const teams = await listUserTeams(getAuthorizationHeader, profile.id);

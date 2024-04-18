@@ -2443,6 +2443,105 @@ export const limitsForGoldUser: Limits = {
   message: undefined,
 };
 
+export const limitsForTeacherUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 0,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
+    },
+    privateTutorials: {
+      allowedIdPrefixes: ['education-curriculum-'],
+    },
+    classrooms: {
+      hidePlayTab: false,
+      hideUpgradeNotice: false,
+      showClassroomTab: true,
+    },
+  },
+  quotas: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
+  },
+  message: undefined,
+};
+
+export const limitsForStudentUser: Limits = {
+  capabilities: {
+    analytics: {
+      sessions: true,
+      players: true,
+      retention: true,
+      sessionsTimeStats: true,
+      platforms: true,
+    },
+    cloudProjects: {
+      maximumCount: 100,
+      canMaximumCountBeIncreased: false,
+      maximumGuestCollaboratorsPerProject: 0,
+    },
+    leaderboards: {
+      maximumCountPerGame: -1,
+      canMaximumCountPerGameBeIncreased: false,
+      themeCustomizationCapabilities: 'FULL',
+      canUseCustomCss: false,
+    },
+    classrooms: {
+      hidePlayTab: true,
+      hideUpgradeNotice: true,
+      showClassroomTab: false,
+    },
+  },
+  quotas: {
+    'cordova-build': {
+      current: 2,
+      max: 70,
+      limitReached: false,
+    },
+    'ai-project-generation': {
+      current: 3,
+      max: 1000,
+      limitReached: false,
+    },
+  },
+  credits: {
+    userBalance: {
+      amount: 0,
+    },
+    prices: {},
+    purchasableQuantities: {},
+  },
+  message: undefined,
+};
+
 export const limitsForStartupUser: Limits = {
   capabilities: {
     analytics: {
@@ -2753,12 +2852,17 @@ export const fakeStartupAuthenticatedUser: AuthenticatedUser = {
 export const fakeAuthenticatedUserWithEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForEducationPlan,
-  limits: limitsForGoldUser,
+  limits: limitsForTeacherUser,
 };
-export const fakeAuthenticatedGoldUserFromEducationPlan: AuthenticatedUser = {
+export const fakeAuthenticatedStudentFromEducationPlan: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: subscriptionForGoldUserFromEducationPlan,
-  limits: limitsForGoldUser,
+  limits: limitsForStudentUser,
+};
+export const fakeAuthenticatedTeacherFromEducationPlan: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: subscriptionForGoldUserFromEducationPlan,
+  limits: limitsForTeacherUser,
 };
 
 export const fakeGoldWithPurchaselyAuthenticatedUser: AuthenticatedUser = {

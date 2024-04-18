@@ -651,14 +651,13 @@ interface ObjectsContainersList {
 };
 
 interface ProjectScopedContainers {
-  [Value] ProjectScopedContainers STATIC_MakeNewEmptyProjectScopedContainers();
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
         [Const, Ref] Project project,
         [Const, Ref] Layout layout);
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
-  [Ref] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersWithLocalVariables(
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersWithLocalVariables(
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const, Ref] BaseEvent event);
 

@@ -201,7 +201,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (parentType == Type::Variable) {
       childType = parentType;
 
-      // TODO Handle object variable?
       const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
       if (!variablesContainersList.Has(node.name)) {
         RaiseTypeError(_("No variable with this name found."), node.location);
@@ -326,7 +325,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
     }
     else if (parentType == Type::Variable) {
-      // TODO Handle object variable?
       const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
       if (!variablesContainersList.Has(node.identifierName)) {
         RaiseTypeError(_("No variable with this name found."), node.location);

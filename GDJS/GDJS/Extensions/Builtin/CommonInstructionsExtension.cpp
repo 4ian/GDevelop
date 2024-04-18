@@ -135,8 +135,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::StandardEvent& event = dynamic_cast<gd::StandardEvent&>(event_);
 
         gd::String localVariablesInitializationCode = "";
-        if (event_.HasVariables()) {
-            GenerateLocalVariablesInitializationCode(event_.GetVariables(), localVariablesInitializationCode);
+        if (event_.HasVariables() && codeGenerator.HasProjectAndLayout()) {
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
         }
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
@@ -171,8 +173,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += actionsCode;
         outputCode += "}\n";
 
-        if (event_.HasVariables()) {
-            outputCode += "runtimeScene._localVariables.pop();\n";
+        if (event_.HasVariables() && codeGenerator.HasProjectAndLayout()) {
+            outputCode += codeGenerator.GetCodeNamespace() + ".localVariables.pop();\n";
         }
 
         return outputCode;
@@ -887,7 +889,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 }
 
 void CommonInstructionsExtension::GenerateLocalVariablesInitializationCode(
-    gd::VariablesContainer &variablesContainer, gd::String &code) {
+    gd::VariablesContainer &variablesContainer,
+    gd::EventsCodeGenerator &codeGenerator, gd::String &code) {
   code += "{\n";
   code += "const variables = new gdjs.VariablesContainer();\n";
   for (std::size_t i = 0; i < variablesContainer.Count(); i++) {
@@ -900,7 +903,8 @@ void CommonInstructionsExtension::GenerateLocalVariablesInitializationCode(
             ", variable);\n";
     code += "}\n";
   }
-  code += "runtimeScene._localVariables.push(variables);\n";
+  code +=
+      codeGenerator.GetCodeNamespace() + ".localVariables.push(variables);\n";
   code += "}\n";
 }
 

@@ -67,9 +67,16 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
   gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
   gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
+  gd::String localVariablesInitializationCode;
+  if (codeGenerator.HasProjectAndLayout()) {
+    localVariablesInitializationCode +=
+        codeGenerator.GetCodeNamespace() + ".localVariables = [];\n";
+  }
+
   gd::String output =
       // clang-format off
       codeGenerator.GetCodeNamespace() + " = {};\n" +
+      localVariablesInitializationCode +
       globalDeclarations +
       globalObjectLists + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
@@ -1317,13 +1324,15 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       } else if (sourceType == gd::VariablesContainer::SourceType::Global) {
         variables = &variablesContainer;
         output = "runtimeScene.getGame().getVariables()";
-      } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
+      } else if (sourceType == gd::VariablesContainer::SourceType::Local &&
+                 HasProjectAndLayout()) {
         variables = &variablesContainer;
         // It supposes that there is always 2 not local VariablesContainer:
         // - 1 for the project
         // - 1 for the scene
         std::size_t localVariablesIndex = variablesContainerIndex - 2;
-        output = "runtimeScene._localVariables[" + gd::String::From(localVariablesIndex) + "]";
+        output = GetCodeNamespace() + ".localVariables[" +
+                 gd::String::From(localVariablesIndex) + "]";
       }
     }
     else {

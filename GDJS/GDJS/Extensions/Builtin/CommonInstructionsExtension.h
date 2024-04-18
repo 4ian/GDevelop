@@ -22,9 +22,12 @@ class CommonInstructionsExtension : public gd::PlatformExtension {
   CommonInstructionsExtension();
   virtual ~CommonInstructionsExtension(){};
 private:
-
-static void GenerateLocalVariablesInitializationCode(gd::VariablesContainer &variablesContainer, gd::String& code);
-static void GenerateLocalVariableInitializationCode(gd::Variable &variable, gd::String& code, std::size_t depth = 0);
+  static void GenerateLocalVariablesInitializationCode(
+      gd::VariablesContainer &variablesContainer,
+      gd::EventsCodeGenerator &codeGenerator, gd::String &code);
+  static void GenerateLocalVariableInitializationCode(gd::Variable &variable,
+                                                      gd::String &code,
+                                                      std::size_t depth = 0);
 };
 
 }  // namespace gdjs

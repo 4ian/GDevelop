@@ -648,6 +648,8 @@ class LongLivedObjectsList {
   constructor() {
     /** @type {Map<string, Array<RuntimeObject>>} */
     this.objectsLists = new Map();
+    /** @type {Map<string, Array<VariablesContainer>>} */
+    this.localVariablesContainers = [];
     /** @type {Map<RuntimeObject, () => void>} */
     this.callbacks = new Map();
     /** @type {LongLivedObjectsList | null} */
@@ -677,7 +679,7 @@ class LongLivedObjectsList {
 
   /**
    * @param {string} objectName
-   * @param {gdjs.RuntimeObject} runtimeObject
+   * @param {RuntimeObject} runtimeObject
    */
   addObject(objectName, runtimeObject) {
     const list = this.getOrCreateList(objectName);
@@ -692,7 +694,7 @@ class LongLivedObjectsList {
 
   /**
    * @param {string} objectName
-   * @param {gdjs.RuntimeObject} runtimeObject
+   * @param {RuntimeObject} runtimeObject
    */
   removeObject(objectName, runtimeObject) {
     const list = this.getOrCreateList(objectName);
@@ -703,6 +705,20 @@ class LongLivedObjectsList {
     // Properly remove callbacks to not leak the object
     runtimeObject.unregisterDestroyCallback(this.callbacks.get(runtimeObject));
     this.callbacks.delete(runtimeObject);
+  }
+  
+  /**
+   * @param {Array<VariablesContainer>} variablesContainers
+   */
+  restoreLocalVariablesContainers(variablesContainers) {
+    copyArray(this.localVariablesContainers, variablesContainers);
+  }
+
+  /**
+   * @param {Array<VariablesContainer>} variablesContainers
+   */
+  backupLocalVariablesContainers(variablesContainers) {
+    copyArray(variablesContainers, this.localVariablesContainers);
   }
 }
 

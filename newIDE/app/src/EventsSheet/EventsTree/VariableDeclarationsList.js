@@ -42,24 +42,26 @@ export default function VariableDeclarationsList({
     };
 
     return (
-      <div className={className} style={style} id={`${idPrefix}-variables`}>
-        <VariableDeclaration
-          variableName={variableName}
-          variable={variable}
-          key={variable.ptr}
-          onClick={() => onVariableDeclarationClick(variableDeclarationContext)}
-          onDoubleClick={() =>
-            onVariableDeclarationDoubleClick(variableDeclarationContext)
-          }
-          selected={false}
-          disabled={disabled}
-          screenType={screenType}
-          windowSize={windowSize}
-          id={`${idPrefix}-variable-${i}`}
-        />
-      </div>
+      <VariableDeclaration
+        variableName={variableName}
+        variable={variable}
+        key={variable.ptr}
+        onClick={() => onVariableDeclarationClick(variableDeclarationContext)}
+        onDoubleClick={() =>
+          onVariableDeclarationDoubleClick(variableDeclarationContext)
+        }
+        selected={false}
+        disabled={disabled}
+        screenType={screenType}
+        windowSize={windowSize}
+        id={`${idPrefix}-variable-${i}`}
+      />
     );
   });
 
-  return <>{instructions}</>;
+  return (
+    <div className={className} style={style} id={`${idPrefix}-variables`}>
+      {instructions}
+    </div>
+  );
 }

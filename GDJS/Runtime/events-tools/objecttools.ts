@@ -597,6 +597,7 @@ namespace gdjs {
    */
   export class LongLivedObjectsList {
     private objectsLists = new Map<string, Array<RuntimeObject>>();
+    private localVariablesContainers: Array<gdjs.VariablesContainer> = [];
     private callbacks = new Map<RuntimeObject, () => void>();
     private parent: LongLivedObjectsList | null = null;
 
@@ -650,6 +651,14 @@ namespace gdjs {
         this.callbacks.get(runtimeObject)!
       );
       this.callbacks.delete(runtimeObject);
+    }
+
+    getLocalVariablesContainers(): Array<gdjs.VariablesContainer> {
+      return this.localVariablesContainers;
+    }
+
+    setLocalVariablesContainers(variablesContainers: Array<gdjs.VariablesContainer>): void {
+      gdjs.copyArray(variablesContainers, this.localVariablesContainers);
     }
   }
 }

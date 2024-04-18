@@ -49,6 +49,11 @@ AsyncExtension::AsyncExtension() {
                 ? "const asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(parentAsyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
+
+        asyncObjectsListBuilder +=
+            "asyncObjectsList.setLocalVariablesContainers(runtimeScene._"
+            "localVariables);\n";
+
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {
           if (parentContext.ShouldUseAsyncObjectsList(objectNameToBackup))

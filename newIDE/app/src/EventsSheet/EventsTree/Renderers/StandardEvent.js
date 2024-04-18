@@ -10,7 +10,6 @@ import {
 } from '../ClassNames';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
-import { Column } from '../../../UI/Grid';
 
 const gd: libGDevelop = global.gd;
 
@@ -29,7 +28,6 @@ export default class StandardEvent extends React.Component<
 
     return (
       <div
-        style={styles.oneColumnContainer}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,

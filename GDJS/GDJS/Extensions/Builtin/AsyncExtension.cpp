@@ -44,24 +44,24 @@ AsyncExtension::AsyncExtension() {
             parentContext.IsInsideAsync()
                 ? "const parentAsyncObjectsList = asyncObjectsList;\n"
                 : "";
-        gd::String asyncObjectsListBuilder =
+        gd::String asyncContextBuilder =
             parentContext.IsInsideAsync()
                 ? "const asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(parentAsyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
 
-        asyncObjectsListBuilder +=
-            "asyncObjectsList.setLocalVariablesContainers(runtimeScene._"
+        asyncContextBuilder +=
+            "asyncObjectsList.backupLocalVariablesContainers(runtimeScene._"
             "localVariables);\n";
 
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {
           if (parentContext.ShouldUseAsyncObjectsList(objectNameToBackup))
-            asyncObjectsListBuilder +=
+            asyncContextBuilder +=
                 "/* Don't save " + objectNameToBackup +
                 " as it will be provided by the parent asyncObjectsList. */\n";
           else
-            asyncObjectsListBuilder +=
+            asyncContextBuilder +=
                 "for (const obj of " +
                 codeGenerator.GetObjectListName(objectNameToBackup,
                                                 parentContext) +
@@ -71,7 +71,7 @@ AsyncExtension::AsyncExtension() {
         }
 
         return "{\n" + parentAsyncObjectsListGetter + "{\n" +
-               asyncObjectsListBuilder + asyncActionCode + "}\n" + "}\n";
+               asyncContextBuilder + asyncActionCode + "}\n" + "}\n";
       });
 
   GetAllActions()["BuiltinAsync::ResolveAsyncEventsFunction"].SetFunctionName(

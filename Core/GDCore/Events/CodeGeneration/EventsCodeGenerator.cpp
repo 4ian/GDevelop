@@ -617,8 +617,8 @@ EventsCodeGenerator::GenerateCallback(
   const gd::String callbackCode =
       callbackFunctionName + " = function (" +
       GenerateEventsParameters(callbackContext) + ") {\n" +
-      "gdjs.copyArray(asyncObjectsList.getLocalVariablesContainers(), "
-      "runtimeScene._localVariables);\n" +
+      "asyncObjectsList.restoreLocalVariablesContainers(runtimeScene._"
+      "localVariables);\n" +
       actionsDeclarationsCode + actionsCode + "}\n";
 
   AddCustomCodeOutsideMain(callbackCode);

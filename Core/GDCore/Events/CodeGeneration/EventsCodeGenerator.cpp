@@ -610,6 +610,13 @@ EventsCodeGenerator::GenerateCallback(
     actionsCode += "} //End of subevents\n";
   }
 
+  gd::String restoreLocalVariablesCode;
+  if (HasProjectAndLayout()) {
+    restoreLocalVariablesCode +=
+        "asyncObjectsList.restoreLocalVariablesContainers(" +
+        GetCodeNamespace() + ".localVariables);\n";
+  }
+
   // Compose the callback function and add outside main
   const gd::String actionsDeclarationsCode =
       GenerateObjectsDeclarationCode(callbackContext);
@@ -617,8 +624,7 @@ EventsCodeGenerator::GenerateCallback(
   const gd::String callbackCode =
       callbackFunctionName + " = function (" +
       GenerateEventsParameters(callbackContext) + ") {\n" +
-      "asyncObjectsList.restoreLocalVariablesContainers(runtimeScene._"
-      "localVariables);\n" +
+      restoreLocalVariablesCode +
       actionsDeclarationsCode + actionsCode + "}\n";
 
   AddCustomCodeOutsideMain(callbackCode);

@@ -11,7 +11,32 @@ import IconButton from '../../UI/IconButton';
 import { type EditorId } from '..';
 import Paper from '../../UI/Paper';
 
-const styles = { container: { padding: 4, paddingBottom: 8 } };
+const iconSize = 24;
+const iconButtonPaddingTop = 8;
+/**
+ * Padding bottom is bigger than padding top to leave space for the Android/iOS
+ * bottom navigation bar.
+ */
+const iconButtonPaddingBottom = 20;
+const iconButtonPaddingHorizontal = 8;
+const iconButtonLabelPadding = 2;
+const toolbarHeight =
+  iconSize +
+  2 * iconButtonLabelPadding +
+  iconButtonPaddingTop +
+  iconButtonPaddingBottom;
+
+const styles = {
+  iconButton: {
+    padding: `${iconButtonPaddingTop}px ${iconButtonPaddingHorizontal}px ${iconButtonPaddingBottom}px ${iconButtonPaddingHorizontal}px`,
+    fontSize: 'inherit',
+  },
+  buttonLabel: {
+    padding: iconButtonLabelPadding,
+    display: 'flex',
+  },
+  container: { fontSize: iconSize },
+};
 
 type Props = {|
   selectedEditorId: ?EditorId,
@@ -21,30 +46,30 @@ type Props = {|
 const editors = {
   'objects-list': {
     buttonId: 'toolbar-open-objects-panel-button',
-    icon: <ObjectIcon />,
+    icon: <ObjectIcon fontSize="inherit" />,
   },
   'object-groups-list': {
     buttonId: 'toolbar-open-object-groups-panel-button',
-    icon: <ObjectGroupIcon />,
+    icon: <ObjectGroupIcon fontSize="inherit" />,
   },
   properties: {
     buttonId: 'toolbar-open-properties-panel-button',
-    icon: <EditIcon />,
+    icon: <EditIcon fontSize="inherit" />,
   },
   'instances-list': {
     buttonId: 'toolbar-open-instances-list-panel-button',
-    icon: <InstancesListIcon />,
+    icon: <InstancesListIcon fontSize="inherit" />,
   },
   'layers-list': {
     buttonId: 'toolbar-open-layers-panel-button',
-    icon: <LayersIcon />,
+    icon: <LayersIcon fontSize="inherit" />,
   },
 };
 
 const BottomToolbar = React.memo<Props>((props: Props) => {
   return (
     <Paper background="medium" square style={styles.container}>
-      <Toolbar>
+      <Toolbar height={toolbarHeight}>
         <ToolbarGroup>
           {Object.keys(editors).map(editorId => {
             const { icon, buttonId } = editors[editorId];
@@ -55,13 +80,14 @@ const BottomToolbar = React.memo<Props>((props: Props) => {
                 key={editorId}
                 disableRipple
                 disableFocusRipple
+                style={styles.iconButton}
                 id={buttonId}
                 onClick={() => {
                   props.onSelectEditor(editorId);
                 }}
                 selected={isSelected}
               >
-                {icon}
+                <span style={styles.buttonLabel}>{icon}</span>
               </IconButton>
             );
           })}

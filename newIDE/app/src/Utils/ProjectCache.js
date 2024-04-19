@@ -17,12 +17,33 @@ class ProjectCache {
 
   static async burst() {
     if (!ProjectCache.isAvailable()) return;
+    const databases = await window.indexedDB.databases();
+    if (
+      !databases.find(
+        database => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+      )
+    ) {
+      // The database does not exist so there is nothing to clear.
+      return;
+    }
     return new Promise(resolve => {
       const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
       request.onsuccess = event => {
         const db = event.target.result;
-        const transaction = db.transaction(objectStoreScope, 'readwrite');
-        transaction.objectStore(objectStoreScope).clear();
+        if (!db.objectStoreNames.contains(objectStoreScope)) {
+          // The database does not contain the object store so there is nothing to clear.
+          // This situation will be fixed by the next database initialization.
+          resolve();
+        }
+        try {
+          const transaction = db.transaction(objectStoreScope, 'readwrite');
+          transaction.objectStore(objectStoreScope).clear();
+        } catch (error) {
+          console.warn(
+            'An error occurred while clearing the cloud project autosave indexedDB:',
+            error
+          );
+        }
         resolve();
       };
     });
@@ -32,38 +53,92 @@ class ProjectCache {
     return `${cacheKey.userId}/${cacheKey.cloudProjectId}`;
   }
 
+  static async _removeDatabaseIfCorrupt(): Promise<void> {
+    const databases = await window.indexedDB.databases();
+    if (
+      !databases.find(
+        database => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+      )
+    ) {
+      // The database does not exist so it cannot be corrupt.
+      return;
+    }
+    // Check that the database is not in a corrupt state where the object store does
+    // not exist. If it does not exist, the autosave feature won't work and the database
+    // needs to be removed and recreated.
+    await new Promise((resolve, reject) => {
+      const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
+      request.onsuccess = event => {
+        const db = event.target.result;
+        if (db.objectStoreNames.contains(objectStoreScope)) {
+          // The object store exists, there is nothing else to do.
+          resolve();
+        } else {
+          console.warn(
+            'The cloud project autosave indexed db exist but the object store is not available. Deleting the indexedDB...'
+          );
+          db.close();
+          const req = window.indexedDB.deleteDatabase(
+            CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+          );
+
+          req.onsuccess = function() {
+            console.warn('Deleted indexedDB successfully!');
+            resolve();
+          };
+          req.onerror = function(event) {
+            console.error("Couldn't delete indexedDB: ", event);
+            reject();
+          };
+          req.onblocked = function() {
+            console.error(
+              "Couldn't delete indexedDB due to the operation being blocked."
+            );
+            reject();
+          };
+        }
+      };
+    });
+  }
+
   _initializeDatabase() {
     if (!this.databasePromise) {
       this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
-        const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-        request.onsuccess = event => {
-          if (
-            !event.target.result.objectStoreNames.contains(objectStoreScope)
-          ) {
-            // The onUpgradeNeeded is called before the success event so the object
-            // store should exist.
+        ProjectCache._removeDatabaseIfCorrupt().then(
+          () => {
+            const request = window.indexedDB.open(
+              CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+            );
+            request.onsuccess = event => {
+              const db = event.target.result;
+              if (!db.objectStoreNames.contains(objectStoreScope)) {
+                // The onUpgradeNeeded is called before the success event so the object
+                // store should exist.
+                console.error(
+                  `Couldn't find the object store ${objectStoreScope}. An issue must have happened when creating the database.`
+                );
+              }
+              resolve(db);
+            };
+            request.onerror = event => {
+              console.error('IndexedDB could not be opened:', event);
+              reject(event);
+            };
+            request.onupgradeneeded = event => {
+              const db = event.target.result;
+
+              if (!db.objectStoreNames.contains(objectStoreScope)) {
+                db.createObjectStore(objectStoreScope, { keyPath: keyName });
+              }
+            };
+          },
+          error => {
             console.error(
-              `Couldn't find the object store ${objectStoreScope}. An issue must have happened when creating the database.`
+              'An error occurred while clearing a corrupt database.',
+              error
             );
           }
-          resolve(event.target.result);
-        };
-        request.onerror = event => {
-          console.error('IndexedDB could not be opened:', event);
-          reject(event);
-        };
-        request.onupgradeneeded = event => {
-          const db = event.target.result;
-
-          if (!db.objectStoreNames.contains(objectStoreScope)) {
-            // The object store can only be created in the onUpgradeNeeded event.
-            // This event is called after the database is created and before the success event.
-            // If, for some reason, the object store creation failed at the time the
-            // database was created, the database will be in a transition state and
-            // ProjectCache instances will always fail.
-            db.createObjectStore(objectStoreScope, { keyPath: keyName });
-          }
-        };
+        );
       });
     }
     return this.databasePromise;

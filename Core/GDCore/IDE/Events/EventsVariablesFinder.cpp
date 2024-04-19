@@ -229,7 +229,7 @@ std::set<gd::String> EventsVariablesFinder::FindAllObjectVariables(
     const gd::Platform& platform,
     const gd::Project& project,
     const gd::Layout& layout,
-    const gd::Object& object) {
+    const gd::String& objectName) {
   std::set<gd::String> results;
 
   FindArgumentsInEventsAndDependencies(
@@ -238,7 +238,7 @@ std::set<gd::String> EventsVariablesFinder::FindAllObjectVariables(
       project,
       layout,
       "objectvar",
-      object.GetName());
+      objectName);
 
   return results;
 }

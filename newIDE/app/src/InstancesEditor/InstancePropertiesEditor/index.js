@@ -396,7 +396,7 @@ const InstancePropertiesEditor = ({
                       project.getCurrentPlatform(),
                       project,
                       layout,
-                      object
+                      object.getName()
                     )
                   : []
               }

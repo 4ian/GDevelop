@@ -1787,7 +1787,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                             project.getCurrentPlatform(),
                             project,
                             layout,
-                            editedObjectWithContext.object
+                            editedObjectWithContext.object.getName()
                           );
                         }}
                         onCancel={() => {
@@ -1915,7 +1915,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                             project.getCurrentPlatform(),
                             project,
                             layout,
-                            variablesEditedObject
+                            variablesEditedObject.getName()
                           )
                         : [];
                     }}

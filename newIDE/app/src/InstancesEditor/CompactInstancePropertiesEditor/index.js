@@ -191,7 +191,7 @@ const CompactInstancePropertiesEditor = ({
                       project.getCurrentPlatform(),
                       project,
                       layout,
-                      object
+                      object.getName()
                     )
                   : []
               }

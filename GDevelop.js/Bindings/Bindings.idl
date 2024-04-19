@@ -135,7 +135,7 @@ interface EventsVariablesFinder {
 
     [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
     [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
-    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
+    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const] DOMString objectName);
 
     //Inherited from ExpressionParser2NodeWorker:
 };
@@ -2547,7 +2547,7 @@ enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Variable",
   "ExpressionCompletionDescription::TextWithPrefix",
   "ExpressionCompletionDescription::Property",
-  "ExpressionCompletionDescription::Parameter"
+  "ExpressionCompletionDescription::Parameter",
 };
 
 interface ExpressionCompletionDescription {

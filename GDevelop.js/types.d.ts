@@ -185,7 +185,7 @@ export class EventsVariablesFinder extends EmscriptenObject {
   constructor();
   static findAllGlobalVariables(platform: Platform, project: Project): SetString;
   static findAllLayoutVariables(platform: Platform, project: Project, layout: Layout): SetString;
-  static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, obj: gdObject): SetString;
+  static findAllObjectVariables(platform: Platform, project: Project, layout: Layout, objectName: string): SetString;
 }
 
 export class EventsIdentifiersFinder extends EmscriptenObject {

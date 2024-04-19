@@ -1,19 +1,17 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
-import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import ObjectVariablesDialog from '../../VariablesList/ObjectVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 import getObjectByName from '../../Utils/GetObjectByName';
 import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
@@ -24,7 +22,7 @@ import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsSco
 const gd: libGDevelop = global.gd;
 
 // TODO Move this function to the ObjectsContainersList class.
-const getObjectOrGroupVariablesContainers = (
+export const getObjectOrGroupVariablesContainers = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   objectName: string
@@ -143,9 +141,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     });
 
     const { layout } = scope;
-    const object = objectName
-      ? getObjectByName(globalObjectsContainer, objectsContainer, objectName)
-      : null;
     const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
       () =>
         objectName
@@ -165,33 +160,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               .map(variablesContainer => enumerateVariables(variablesContainer))
               .reduce((a, b) => intersection(a, b))
           : [],
-      [variablesContainers]
-    );
-
-    const onComputeAllVariableNames = () =>
-      project && layout && object
-        ? EventsRootVariablesFinder.findAllObjectVariables(
-            project.getCurrentPlatform(),
-            project,
-            layout,
-            object
-          )
-        : [];
-
-    const objectVariablesDialogTabs = React.useMemo(
-      () => [
-        {
-          id: 'object-variables',
-          label: <Trans>Object variables</Trans>,
-          variablesContainer: variablesContainers[0],
-          emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
-          emptyPlaceholderDescription: (
-            <Trans>
-              These variables hold additional information on an object.
-            </Trans>
-          ),
-        },
-      ],
       [variablesContainers]
     );
 
@@ -232,13 +200,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
         {editorOpen && project && (
-          <VariablesEditorDialog
+          <ObjectVariablesDialog
             project={project}
-            title={<Trans>Object Variables</Trans>}
+            layout={layout}
+            objectName={objectName}
+            variablesContainer={variablesContainers[0]}
             open={editorOpen}
-            tabs={objectVariablesDialogTabs}
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
             onCancel={() => setEditorOpen(false)}
             onApply={(selectedVariableName: string | null) => {
               if (

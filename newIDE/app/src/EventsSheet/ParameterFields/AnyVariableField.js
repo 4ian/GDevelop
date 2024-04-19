@@ -1,5 +1,4 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import VariableField, {
@@ -7,7 +6,7 @@ import VariableField, {
   renderVariableWithIcon,
   type VariableFieldInterface,
 } from './VariableField';
-import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
+import GlobalAndSceneVariablesDialog from '../../VariablesList/GlobalAndSceneVariablesDialog';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -87,8 +86,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     } = props;
     const { layout } = scope;
 
-    const onComputeAllVariableNames = React.useCallback(() => [], []);
-
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
         enumerateVariablesOfContainersList(
@@ -113,41 +110,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [projectScopedContainers]
     );
 
-    const isGlobal =
+    const isGlobal = !!(
       layout &&
       project &&
       !layout.getVariables().has(getRootVariableName(props.value)) &&
-      project.getVariables().has(getRootVariableName(props.value));
-
-    const globalAndSceneVariableDialogTabs = React.useMemo(
-      () =>
-        [
-          layout && {
-            id: 'scene-variables',
-            label: <Trans>Scene variables</Trans>,
-            variablesContainer: layout.getVariables(),
-            emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
-            emptyPlaceholderDescription: (
-              <Trans>
-                These variables hold additional information on a scene.
-              </Trans>
-            ),
-          },
-          project && {
-            id: 'global-variables',
-            label: <Trans>Global variables</Trans>,
-            variablesContainer: project.getVariables(),
-            emptyPlaceholderTitle: (
-              <Trans>Add your first global variable</Trans>
-            ),
-            emptyPlaceholderDescription: (
-              <Trans>
-                These variables hold additional information on a project.
-              </Trans>
-            ),
-          },
-        ].filter(Boolean),
-      [layout, project]
+      project.getVariables().has(getRootVariableName(props.value))
     );
 
     return (
@@ -179,9 +146,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
         {editorOpen && layout && project && (
-          <VariablesEditorDialog
+          <GlobalAndSceneVariablesDialog
             project={project}
-            title={<Trans>{layout.getName()} variables</Trans>}
+            layout={layout}
             open
             onCancel={() => setEditorOpen(false)}
             onApply={(selectedVariableName: string | null) => {
@@ -195,13 +162,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               if (onInstructionTypeChanged) onInstructionTypeChanged();
               if (field.current) field.current.updateAutocompletions();
             }}
-            initiallyOpenTabId={
-              isGlobal ? 'global-variables' : 'scene-variables'
-            }
+            isGlobalTabInitiallyOpen={isGlobal}
             initiallySelectedVariableName={props.value}
-            tabs={globalAndSceneVariableDialogTabs}
-            helpPagePath={'/all-features/variables/scene-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
             preventRefactoringToDeleteInstructions
           />
         )}

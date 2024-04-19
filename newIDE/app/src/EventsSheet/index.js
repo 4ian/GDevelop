@@ -357,6 +357,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvent}
         canAddSubEvent={canAddSubEvent}
+        onAddLocalVariable={this.addLocalVariable}
+        canAddLocalVariable={this._selectionCanHaveLocalVariables()}
         canToggleEventDisabled={
           hasEventSelected(this.state.selection) &&
           this._selectionCanToggleDisabled()

@@ -247,7 +247,7 @@ const VariablesEditorDialog = ({
         }) => {
           return (
             currentTab === id && (
-              <Column expand noMargin noOverflowParent id={id}>
+              <Column expand noMargin noOverflowParent id={id} key={id}>
                 {variablesContainer.count() > 0 && DismissableTutorialMessage && (
                   <Line>
                     <Column expand>{DismissableTutorialMessage}</Column>

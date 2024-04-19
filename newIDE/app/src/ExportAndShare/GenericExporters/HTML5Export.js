@@ -105,7 +105,7 @@ export const DoneFooter = ({
       </LineStackLayout>
       <Text>
         <Trans>
-          You can now upload the game to a web hosting to play to the game.
+          You can now upload the game to a web hosting service to play it.
         </Trans>
       </Text>
       <Spacer />

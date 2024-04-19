@@ -58,7 +58,7 @@ export const isAnAncestryOf = (
 export const getNodeIdFromVariableName = (variableName: string): string => {
   const bracketIndex = variableName.indexOf('[');
   const knownVariablePart =
-    bracketIndex < 0 ? variableName : variableName.substring(bracketIndex);
+    bracketIndex < 0 ? variableName : variableName.substring(0, bracketIndex);
   return knownVariablePart.replace(/\./g, '$$.$$');
 };
 

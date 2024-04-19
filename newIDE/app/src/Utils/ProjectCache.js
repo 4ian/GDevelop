@@ -104,8 +104,8 @@ class ProjectCache {
   _initializeDatabase() {
     if (!this.databasePromise) {
       this.databasePromise = new Promise<IDBDatabase>((resolve, reject) => {
-        ProjectCache._removeDatabaseIfCorrupt()
-          .then(() => {
+        ProjectCache._removeDatabaseIfCorrupt().then(
+          () => {
             const request = window.indexedDB.open(
               CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
             );
@@ -131,13 +131,14 @@ class ProjectCache {
                 db.createObjectStore(objectStoreScope, { keyPath: keyName });
               }
             };
-          })
-          .catch(error => {
+          },
+          error => {
             console.error(
               'An error occurred while clearing a corrupt database.',
               error
             );
-          });
+          }
+        );
       });
     }
     return this.databasePromise;

@@ -2,22 +2,23 @@
 import React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import OpenInNew from '@material-ui/icons/OpenInNew';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
+import FlatButtonWithSplitMenu from '../../UI/FlatButtonWithSplitMenu';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
@@ -36,7 +37,12 @@ const useFetchLeaderboards = () => {
   );
   const fetchLeaderboards = React.useCallback(
     async () => {
-      await listLeaderboards();
+      try {
+        await listLeaderboards();
+      } catch (e) {
+        // Do not throw or show alert as this can be triggered every time the field is seen.
+        console.error('Unable to fetch leaderboards', e);
+      }
     },
     [listLeaderboards]
   );
@@ -57,16 +63,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const inputFieldRef = React.useRef<?(
+    const field = React.useRef<?(
       | GenericExpressionField
       | SelectFieldInterface
     )>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (inputFieldRef.current) {
-          inputFieldRef.current.focus();
-        }
-      },
+      focus,
     }));
 
     const isCurrentValueInLeaderboardList =
@@ -98,21 +103,15 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               <SelectOption
                 key={leaderboard.id}
                 value={`"${leaderboard.id}"`}
-                primaryText={`${leaderboard.name} ${
+                label={`${leaderboard.name} ${
                   leaderboard.id
                     ? `(${shortenUuidForDisplay(leaderboard.id)})`
                     : ''
                 }`}
+                shouldNotTranslate
               />
             ))
-          : [
-              <SelectOption
-                disabled
-                key="empty"
-                value="empty"
-                primaryText={''}
-              />,
-            ],
+          : [<SelectOption disabled key="empty" value="empty" label={''} />],
       [leaderboards, gameHasLeaderboards]
     );
 
@@ -124,13 +123,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               renderTextField={() =>
                 !isExpressionField ? (
                   <SelectField
-                    ref={inputFieldRef}
+                    ref={field}
                     value={props.value}
                     onChange={onChangeSelectValue}
                     margin={props.isInline ? 'none' : 'dense'}
                     fullWidth
                     floatingLabelText={fieldLabel}
-                    hintText={
+                    translatableHintText={
                       gameHasLeaderboards
                         ? props.parameterMetadata &&
                           props.parameterMetadata.isOptional()
@@ -152,7 +151,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   </SelectField>
                 ) : (
                   <GenericExpressionField
-                    ref={inputFieldRef}
+                    ref={field}
                     expressionType="string"
                     {...props}
                     onChange={onChangeTextValue}
@@ -170,8 +169,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 )
               }
               renderButton={style => (
-                <RaisedButtonWithSplitMenu
-                  icon={<OpenInNew />}
+                <FlatButtonWithSplitMenu
+                  id="open-leaderboard-admin-button"
+                  icon={<ShareExternal />}
                   style={style}
                   primary
                   onClick={() => setIsAdminOpen(true)}

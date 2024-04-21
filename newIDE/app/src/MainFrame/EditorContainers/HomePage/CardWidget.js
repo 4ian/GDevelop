@@ -3,7 +3,7 @@ import * as React from 'react';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   buttonBase: {
@@ -16,27 +16,34 @@ const styles = {
   contentWrapper: {
     height: '100%',
     width: '100%',
+    display: 'flex',
   },
 };
 
 // Styles to give the impression of pressing an element.
-const useStylesForWidget = makeStyles(theme =>
-  createStyles({
-    root: {
-      border: `1px solid ${theme.palette.text.primary}`,
-      borderBottom: `6px solid ${theme.palette.text.primary}`,
-      '&:focus': {
-        backgroundColor: theme.palette.action.hover,
+const useStylesForWidget = (useDefaultDisabledStyle?: boolean) =>
+  makeStyles(theme =>
+    createStyles({
+      root: {
+        border: `1px solid ${theme.palette.text.primary}`,
+        borderBottom: `6px solid ${theme.palette.text.primary}`,
+        transition: 'background-color 100ms ease',
+        '&:focus': {
+          backgroundColor: theme.palette.action.hover,
+        },
+        '&:hover': {
+          backgroundColor: theme.palette.action.hover,
+        },
+        '&:disabled': useDefaultDisabledStyle
+          ? {
+              opacity: theme.palette.action.disabledOpacity,
+              border: `1px solid ${theme.palette.text.secondary}`,
+              borderBottom: `6px solid ${theme.palette.text.secondary}`,
+            }
+          : undefined,
       },
-      '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-      },
-      '&:disabled': {
-        backgroundColor: theme.palette.action.disabled,
-      },
-    },
-  })
-);
+    })
+  )();
 
 export const LARGE_WIDGET_SIZE = 320;
 export const SMALL_WIDGET_SIZE = 200;
@@ -44,16 +51,25 @@ export const SMALL_WIDGET_SIZE = 200;
 type Props = {|
   children: React.Node,
   onClick: () => void,
-  size: 'small' | 'large',
+  size: 'small' | 'large' | 'banner',
   disabled?: boolean,
+  useDefaultDisabledStyle?: boolean,
 |};
 
-export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
-  const classes = useStylesForWidget();
-  const windowWidth = useResponsiveWindowWidth();
+export const CardWidget = ({
+  children,
+  onClick,
+  size,
+  disabled,
+  useDefaultDisabledStyle,
+}: Props) => {
+  const classes = useStylesForWidget(useDefaultDisabledStyle);
+  const { isMobile } = useResponsiveWindowSize();
 
   const widgetMaxWidth =
-    windowWidth === 'small'
+    size === 'banner'
+      ? undefined
+      : isMobile
       ? undefined
       : size === 'small'
       ? SMALL_WIDGET_SIZE

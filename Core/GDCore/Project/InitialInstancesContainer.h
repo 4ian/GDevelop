@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_INITIALINSTANCESCONTAINER_H
-#define GDCORE_INITIALINSTANCESCONTAINER_H
+#pragma once
+
 #include <list>
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/String.h"
@@ -54,7 +54,6 @@ class GD_CORE_API InitialInstancesContainer {
     return new InitialInstancesContainer(*this);
   };
 
-#if defined(GD_IDE_ONLY)
   /**
    * Must construct the class from the source
    * A such method is needed as the IDE may want to store copies of some
@@ -71,7 +70,6 @@ class GD_CORE_API InitialInstancesContainer {
    * from an object which is not a MyContainer"; } \endcode
    */
   void Create(const InitialInstancesContainer &source);
-#endif
 
   /** \name Instances management
    * Members functions related to managing the instances
@@ -100,7 +98,6 @@ class GD_CORE_API InitialInstancesContainer {
   void IterateOverInstancesWithZOrdering(InitialInstanceFunctor &func,
                                          const gd::String &layer);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Insert the specified \a instance into the list and return a
    * a reference to the newly added instance.
@@ -141,21 +138,26 @@ class GD_CORE_API InitialInstancesContainer {
                                const gd::String &newName);
 
   /**
+   * \brief Return the number of instances on the layer named \a layerName.
+   */
+  std::size_t GetLayerInstancesCount(const gd::String &layerName) const;
+
+  /**
    * \brief Return true if there is at least one instance on the layer named \a
    * layerName.
    */
-  bool SomeInstancesAreOnLayer(const gd::String &layerName);
+  bool SomeInstancesAreOnLayer(const gd::String &layerName) const;
 
   /**
    * \brief Return true if there is at least one instance of the given object.
    */
-  bool HasInstancesOfObject(const gd::String &objectName);
+  bool HasInstancesOfObject(const gd::String &objectName) const;
 
   /**
    * \brief Remove all instances
    */
   void Clear();
-#endif
+
   ///@}
 
   /** \name Saving and loading
@@ -163,12 +165,10 @@ class GD_CORE_API InitialInstancesContainer {
    */
   ///@{
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize instances container.
    */
   virtual void SerializeTo(SerializerElement &element) const;
-#endif
 
   /**
    * \brief Unserialize the instances container.
@@ -178,7 +178,7 @@ class GD_CORE_API InitialInstancesContainer {
 
  private:
   void RemoveInstanceIf(
-      std::function<bool(const gd::InitialInstance &)> predicat);
+      std::function<bool(const gd::InitialInstance &)> predicate);
 
   std::list<gd::InitialInstance> initialInstances;
 
@@ -244,6 +244,15 @@ class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor {
    */
   size_t GetInstancesCount() const { return instancesCount; }
 
+  void Reset() {
+    highestZOrder = 0;
+    lowestZOrder = 0;
+    instancesCount = 0;
+    firstCall = true;
+    layerRestricted = false;
+    layerName.clear();
+  }
+
  private:
   int highestZOrder;
   int lowestZOrder;
@@ -256,5 +265,3 @@ class GD_CORE_API HighestZOrderFinder : public gd::InitialInstanceFunctor {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_INITIALINSTANCESCONTAINER_H

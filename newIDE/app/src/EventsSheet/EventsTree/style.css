@@ -64,6 +64,13 @@
     border-radius: 0;
     padding: 0;
     flex: 1;
+
+    /*
+     * Align the renderered event to the top, so that it does not move
+     * if the container is too large and resized down (for exemple, when deleting
+     * an action or a condition.
+     */
+    align-items: flex-start;
 }
 
 .gd-events-sheet .rst__rowWrapper {
@@ -78,6 +85,33 @@
 
 .gd-events-sheet .rst__rowTitle {
     font-weight: normal;
+}
+
+/**
+ * Unset font family of Material UI textfields (for comment and group events)
+ * so that they get the same font family as the rest of the event sheet.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInputBase-root {
+    font-family: unset;
+}
+
+/**
+ * Remove default style of multiline textfield (for comment events) to remove
+ * the height change occurring when starting to edit the comment.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInput-multiline,
+.gd-events-sheet .rst__rowTitle .MuiInputBase-input {
+    padding-bottom: 0;
+}
+
+/**
+ * Add transparent border around Material UI textfields (for comment and group events)
+ * to avoid a slight shift due to the border added by the class "selectable" applied
+ * to those events.
+ */
+.gd-events-sheet .rst__rowTitle .MuiInputBase-root{
+    box-sizing: border-box;
+    border: 1px solid transparent;
 }
 
 /**
@@ -103,7 +137,7 @@
     background-image: url('./unfold.png');
     background-position: 11px 3px !important;
 }
-.gd-events-sheet .DefaultLightTheme .rst__expandButton {
+.gd-events-sheet .light-theme .rst__expandButton {
     background-image: url('./unfoldDark.png');
 }
 
@@ -111,7 +145,7 @@
     background-image: url('./fold.png');
     background-position: center 7px !important;
 }
-.gd-events-sheet .DefaultLightTheme .rst__collapseButton {
+.gd-events-sheet .light-theme .rst__collapseButton {
     background-image: url('./foldDark.png');
 }
 
@@ -133,6 +167,11 @@
     font: inherit;
     cursor: pointer;
     opacity: 0.6;
+
+    /** Ensure the links are not growing outside of their parents on small screens. */
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 .gd-events-sheet .add-link:hover {
     opacity: 0.9;
@@ -143,7 +182,7 @@
  */
 .gd-events-sheet .selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**
@@ -151,7 +190,7 @@
  */
 .gd-events-sheet .large-selectable {
     box-sizing: border-box;
-    border: 1px transparent solid;
+    border: 1px solid transparent;
 }
 
 /**

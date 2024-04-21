@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class BloomFilter extends PIXI.Filter {
     constructor(
       blur?: number | PIXI.Point | number[],

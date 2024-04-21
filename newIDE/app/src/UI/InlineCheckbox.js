@@ -19,13 +19,21 @@ const useFormGroupStyles = makeStyles({
   },
 });
 
+const useSmallPaddingCheckboxStyles = makeStyles({
+  root: {
+    padding: 3,
+  },
+});
+
 type Props = {|
+  id?: string,
   label?: ?React.Node,
   checked: boolean,
-  onCheck?: (e: {||}, checked: boolean) => void,
+  onCheck?: (e: {||}, checked: boolean) => void | Promise<void>,
   checkedIcon?: React.Node,
   uncheckedIcon?: React.Node,
   disabled?: boolean,
+  paddingSize?: 'small',
   tooltipOrHelperText?: React.Node,
 |};
 
@@ -34,6 +42,7 @@ type Props = {|
  * without having it taking the full width of its container.
  */
 const InlineCheckbox = ({
+  id,
   onCheck,
   disabled,
   checked,
@@ -41,16 +50,20 @@ const InlineCheckbox = ({
   uncheckedIcon,
   checkedIcon,
   tooltipOrHelperText,
+  paddingSize,
 }: Props) => {
   const labelClasses = useLabelStyles();
   const formGroupClasses = useFormGroupStyles();
+  const smallPaddingClasses = useSmallPaddingCheckboxStyles();
   const checkbox = (
     <Checkbox
+      id={id}
       disabled={disabled}
       checked={checked}
       onChange={
         onCheck ? event => onCheck(event, event.target.checked) : undefined
       }
+      classes={paddingSize === 'small' ? smallPaddingClasses : null}
       icon={uncheckedIcon}
       checkedIcon={checkedIcon}
       color="secondary"

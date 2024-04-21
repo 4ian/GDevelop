@@ -1,69 +1,61 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { makeStyles } from '@material-ui/core';
-import Person from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
-import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { getGravatarUrl } from '../GravatarUrl';
-import DotBadge from '../DotBadge';
 import RaisedButton from '../RaisedButton';
 import { shortenString } from '../../Utils/StringHelpers';
 import TextButton from '../TextButton';
-
-const useStyles = makeStyles({
-  root: { flexDirection: 'column' },
-  anchorOriginTopRightCircle: {
-    top: 5,
-    right: 5,
-  },
-});
+import { LineStackLayout } from '../Layout';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import CircularProgress from '../CircularProgress';
+import User from '../CustomSvgIcons/User';
 
 const styles = {
   avatar: {
     width: 20,
     height: 20,
   },
+  buttonContainer: { flexShrink: 0 },
 };
 
 type Props = {|
-  profile: ?Profile,
-  onClick: () => void,
-  displayNotificationBadge: boolean,
+  onOpenProfile: () => void,
 |};
 
-const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
-  const classes = useStyles();
-  return (
-    <DotBadge
-      overlap="circle"
-      invisible={!displayNotificationBadge}
-      classes={classes}
-    >
-      {profile ? (
-        <TextButton
-          label={shortenString(profile.username || profile.email, 20)}
-          onClick={onClick}
-          icon={
-            <Avatar
-              src={getGravatarUrl(profile.email || '', { size: 50 })}
-              style={styles.avatar}
-            />
-          }
+const UserChip = ({ onOpenProfile }: Props) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { profile, onOpenCreateAccountDialog, loginState } = authenticatedUser;
+
+  return !profile && loginState === 'loggingIn' ? (
+    <CircularProgress size={25} />
+  ) : profile ? (
+    <TextButton
+      label={shortenString(profile.username || profile.email, 20)}
+      onClick={onOpenProfile}
+      allowBrowserAutoTranslate={false}
+      icon={
+        <Avatar
+          src={getGravatarUrl(profile.email || '', { size: 50 })}
+          style={styles.avatar}
         />
-      ) : (
+      }
+    />
+  ) : (
+    <div style={styles.buttonContainer}>
+      <LineStackLayout noMargin alignItems="center">
         <RaisedButton
           label={
             <span>
-              <Trans>Create account - Sign in</Trans>
+              <Trans>Create account</Trans>
             </span>
           }
-          onClick={onClick}
+          onClick={onOpenCreateAccountDialog}
           primary
-          icon={<Person fontSize="small" />}
+          icon={<User fontSize="small" />}
         />
-      )}
-    </DotBadge>
+      </LineStackLayout>
+    </div>
   );
 };
 

@@ -100,6 +100,7 @@ function LeaderboardSortOptionsDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
+          title={<Trans>Leaderboard options</Trans>}
           open={open}
           maxWidth="sm"
           secondaryActions={[
@@ -146,12 +147,12 @@ function LeaderboardSortOptionsDialog({
               <SelectOption
                 key={'ASC'}
                 value={'ASC'}
-                primaryText={t`Lower is better`}
+                label={t`Lower is better`}
               />
               <SelectOption
                 key={'DESC'}
                 value={'DESC'}
-                primaryText={t`Higher is better`}
+                label={t`Higher is better`}
               />
             </SelectField>
             <Checkbox
@@ -164,8 +165,8 @@ function LeaderboardSortOptionsDialog({
                     <MarkdownText
                       source={i18n._(
                         sortOrder === 'ASC'
-                          ? `Any submitted score that is lower than the set value will not be saved in the leaderboard.`
-                          : `Any submitted score that is higher than the set value will not be saved in the leaderboard.`
+                          ? t`Any submitted score that is lower than the set value will not be saved in the leaderboard.`
+                          : t`Any submitted score that is higher than the set value will not be saved in the leaderboard.`
                       )}
                     />
                   </FormHelperText>

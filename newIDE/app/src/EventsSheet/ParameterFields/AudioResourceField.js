@@ -1,51 +1,53 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
-
-import React, { Component } from 'react';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourceSelector, {
+  type ResourceSelectorInterface,
+} from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 
-export default class AudioResourceField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?ResourceSelector;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function AudioResourceField(props, ref) {
+    const field = React.useRef<?ResourceSelectorInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
-    if (
-      !this.props.resourceSources ||
-      !this.props.onChooseResource ||
-      !this.props.resourceExternalEditors ||
-      !this.props.project
-    ) {
+    if (!props.resourceManagementProps || !props.project) {
       console.error(
-        'Missing project, resourceSources, onChooseResource or resourceExternalEditors for AudioResourceField'
+        'Missing project or resourceManagementProps for AudioResourceField'
       );
       return null;
     }
 
     return (
       <ResourceSelector
-        margin={this.props.isInline ? 'none' : 'dense'}
-        project={this.props.project}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        resourceExternalEditors={this.props.resourceExternalEditors}
+        margin={props.isInline ? 'none' : 'dense'}
+        project={props.project}
+        resourceManagementProps={props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind="audio"
         fullWidth
-        initialResourceName={this.props.value}
-        onChange={this.props.onChange}
+        initialResourceName={props.value}
+        onChange={props.onChange}
         floatingLabelText={<Trans>Choose the audio file to use</Trans>}
-        onRequestClose={this.props.onRequestClose}
-        onApply={this.props.onApply}
-        ref={field => (this._field = field)}
+        onRequestClose={props.onRequestClose}
+        onApply={props.onApply}
+        ref={field}
+        id={
+          props.parameterIndex !== undefined
+            ? `parameter-${props.parameterIndex}-audio-field`
+            : undefined
+        }
       />
     );
   }
-}
+);

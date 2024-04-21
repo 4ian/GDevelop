@@ -5,30 +5,38 @@ import { type I18n } from '@lingui/core';
 import React from 'react';
 import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
+import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import SelectOption from '../../UI/SelectOption';
 import Toggle from '../../UI/Toggle';
 import Dialog from '../../UI/Dialog';
 import { Column, Line, Spacer } from '../../UI/Grid';
-import { themes } from '../../UI/Theme';
+import { themes } from '../../UI/Theme/ThemeRegistry';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import PreferencesContext from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import { Tabs, Tab } from '../../UI/Tabs';
+import { Tabs } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { adaptAcceleratorString } from '../../UI/AcceleratorString';
+import { getElectronAccelerator } from '../../KeyboardShortcuts';
+import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
+import AlertMessage from '../../UI/AlertMessage';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
-  onClose: (languageDidChange: boolean) => void,
+  onClose: (options: {| languageDidChange: boolean |}) => void,
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -40,11 +48,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutoDownloadUpdates,
     showAllAlertMessages,
     showAllTutorialHints,
+    showAllAnnouncements,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
-    setUseNewInstructionEditorDialog,
-    setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -54,35 +61,52 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
+    setResourcesImporationBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
+    setShowEventBasedObjectsEditor,
+    setShowDeprecatedInstructionWarning,
+    setUse3DEditor,
+    setNewProjectsDefaultFolder,
+    setUseShortcutToClosePreviewWindow,
+    setWatchProjectFolderFilesForLocalProjects,
   } = React.useContext(PreferencesContext);
+
+  const initialUse3DEditor = React.useRef<boolean>(values.use3DEditor);
 
   return (
     <Dialog
+      title={<Trans>Preferences</Trans>}
       actions={[
         <FlatButton
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={() => onClose(languageDidChange)}
+          onClick={() => onClose({ languageDidChange })}
         />,
       ]}
-      onRequestClose={() => onClose(languageDidChange)}
+      onRequestClose={() => onClose({ languageDidChange })}
       open
-      noTitleMargin
       maxWidth="sm"
-      noMargin
-      title={
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-          <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
-        </Tabs>
+      fixedContent={
+        <Tabs
+          value={currentTab}
+          onChange={setCurrentTab}
+          options={[
+            { value: 'preferences', label: <Trans>Preferences</Trans> },
+            { value: 'shortcuts', label: <Trans>Keyboard Shortcuts</Trans> },
+            ...(electron
+              ? [{ value: 'folders', label: <Trans>Folders</Trans> }]
+              : []),
+          ]}
+          // Enforce scroll on very small screens, because the tabs have long names.
+          variant={isMobile ? 'scrollable' : undefined}
+        />
       }
     >
       {currentTab === 'preferences' && (
-        <ColumnStackLayout>
+        <ColumnStackLayout noMargin>
           <Text size="block-title">
             <Trans>Language</Trans>
           </Text>
@@ -104,7 +128,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {Object.keys(themes).map(themeName => (
                 <SelectOption
                   value={themeName}
-                  primaryText={themeName}
+                  label={themeName}
                   key={themeName}
                 />
               ))}
@@ -118,7 +142,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               {getAllThemes().map(codeEditorTheme => (
                 <SelectOption
                   value={codeEditorTheme.themeName}
-                  primaryText={codeEditorTheme.name}
+                  label={codeEditorTheme.name}
                   key={codeEditorTheme.themeName}
                 />
               ))}
@@ -198,10 +222,34 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
-            <SelectOption value="nothing" primaryText={t`Do nothing`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
+            <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
+          {!!electron && (
+            <SelectField
+              floatingLabelText={
+                <Trans>
+                  Importing resources outside from the project folder
+                </Trans>
+              }
+              value={values.resourcesImporationBehavior}
+              onChange={(e, i, value: string) =>
+                setResourcesImporationBehavior(value)
+              }
+              fullWidth
+            >
+              <SelectOption
+                value="import"
+                label={t`Copy them into the project folder`}
+              />
+              <SelectOption
+                value="relative"
+                label={t`Keep their original location`}
+              />
+              <SelectOption value="ask" label={t`Ask every time`} />
+            </SelectField>
+          )}
           <Text size="block-title">
             <Trans>Updates</Trans>
           </Text>
@@ -238,25 +286,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             labelPosition="right"
             label={<Trans>Display assignment operators in Events Sheets</Trans>}
           />
-          <Toggle
-            onToggle={(e, check) => setUseNewInstructionEditorDialog(check)}
-            toggled={values.useNewInstructionEditorDialog}
-            labelPosition="right"
-            label={<Trans>Use the new action/condition editor</Trans>}
-          />
-          <Toggle
-            onToggle={(e, check) =>
-              setUseUndefinedVariablesInAutocompletion(check)
-            }
-            toggled={values.useUndefinedVariablesInAutocompletion}
-            labelPosition="right"
-            label={
-              <Trans>
-                Suggest names of variables used in events but not declared in
-                the list of variables
-              </Trans>
-            }
-          />
           <SelectField
             floatingLabelText={
               <Trans>
@@ -269,8 +298,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             }}
             fullWidth
           >
-            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-            <SelectOption value="apply" primaryText={t`Apply changes`} />
+            <SelectOption value="cancel" label={t`Cancel changes`} />
+            <SelectOption value="apply" label={t`Apply changes`} />
           </SelectField>
           <Text size="block-title">
             <Trans>Embedded help and tutorials</Trans>
@@ -288,6 +317,13 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 label={<Trans>Reset hidden embedded tutorials</Trans>}
                 onClick={() => showAllTutorialHints()}
                 disabled={!Object.keys(values.hiddenTutorialHints).length}
+              />
+            </Line>
+            <Line>
+              <RaisedButton
+                label={<Trans>Reset hidden announcements</Trans>}
+                onClick={() => showAllAnnouncements()}
+                disabled={!Object.keys(values.hiddenAnnouncements).length}
               />
             </Line>
           </Column>
@@ -321,6 +357,54 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
+          <Toggle
+            onToggle={(e, check) => setShowEventBasedObjectsEditor(check)}
+            toggled={values.showEventBasedObjectsEditor}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show custom objects in the extension editor (experimental)
+              </Trans>
+            }
+          />
+          {!!electron && (
+            <Toggle
+              onToggle={(e, check) =>
+                setWatchProjectFolderFilesForLocalProjects(check)
+              }
+              toggled={values.watchProjectFolderFilesForLocalProjects}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Watch the project folder for file changes in order to refresh
+                  the resources used in the editor (images, 3D models, fonts,
+                  etc.)
+                </Trans>
+              }
+            />
+          )}
+          <Toggle
+            onToggle={(e, check) => setShowDeprecatedInstructionWarning(check)}
+            toggled={values.showDeprecatedInstructionWarning}
+            labelPosition="right"
+            label={
+              <Trans>Show a warning on deprecated actions and conditions</Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setUse3DEditor(check)}
+            toggled={values.use3DEditor}
+            labelPosition="right"
+            label={<Trans>Show objects in 3D in the scene editor</Trans>}
+          />
+          {initialUse3DEditor.current !== values.use3DEditor && (
+            <AlertMessage kind="info">
+              <Trans>
+                For the 3D change to take effect, close and reopen all currently
+                opened scenes.
+              </Trans>
+            </AlertMessage>
+          )}
           {electron && (
             <>
               <ColumnStackLayout expand noMargin>
@@ -337,6 +421,25 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   label={
                     <Trans>
                       Always display the preview window on top of the editor
+                    </Trans>
+                  }
+                />
+                <Toggle
+                  onToggle={(e, check) =>
+                    setUseShortcutToClosePreviewWindow(check)
+                  }
+                  toggled={values.useShortcutToClosePreviewWindow}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Enable "Close project" shortcut (
+                      {adaptAcceleratorString(
+                        getElectronAccelerator(
+                          values.userShortcutMap['CLOSE_PROJECT'] ||
+                            defaultShortcuts['CLOSE_PROJECT']
+                        )
+                      )}
+                      ) to close preview window
                     </Trans>
                   }
                 />
@@ -360,7 +463,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       )}
       {currentTab === 'shortcuts' && (
         <Line expand>
-          <Column expand>
+          <Column expand noMargin>
             <ShortcutsList
               i18n={i18n}
               userShortcutMap={values.userShortcutMap}
@@ -370,8 +473,28 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </Column>
         </Line>
       )}
+      {electron && currentTab === 'folders' && (
+        <ColumnStackLayout noMargin>
+          <LocalFolderPicker
+            fullWidth
+            value={values.newProjectsDefaultFolder}
+            onChange={setNewProjectsDefaultFolder}
+            type="default-workspace"
+          />
+        </ColumnStackLayout>
+      )}
     </Dialog>
   );
 };
 
-export default PreferencesDialog;
+const PreferencesDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Preferences</Trans>}
+    scope="preferences"
+    onClose={() => props.onClose({ languageDidChange: false })}
+  >
+    <PreferencesDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default PreferencesDialogWithErrorBoundary;

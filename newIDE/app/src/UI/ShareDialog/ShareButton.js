@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import Share from '@material-ui/icons/Share';
 import FlatButton from '../FlatButton';
 import { Line } from '../Grid';
+import Share from '../CustomSvgIcons/Share';
 
 type Props = {|
   url: string,

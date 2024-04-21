@@ -102,6 +102,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
       const std::vector<std::unique_ptr<ExpressionNode>>& parameters);
 
   gd::String output;
+  gd::String objectNameToUseForVariableAccessor;
   EventsCodeGenerator& codeGenerator;
   EventsCodeGenerationContext& context;
   const gd::String rootType;

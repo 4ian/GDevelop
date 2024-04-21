@@ -8,52 +8,52 @@ This project is released under the MIT License.
 #ifndef PANELSPRITEOBJECT_H
 #define PANELSPRITEOBJECT_H
 #include <memory>
+
 #include "GDCore/Project/Object.h"
 namespace gd {
-class Object;
+class ObjectConfiguration;
 class InitialInstance;
 class Project;
-}
+}  // namespace gd
 
 /**
  * PanelSprite Object
  */
-class GD_EXTENSION_API PanelSpriteObject : public gd::Object {
+class GD_EXTENSION_API PanelSpriteObject : public gd::ObjectConfiguration {
  public:
-  PanelSpriteObject(gd::String name_);
+  PanelSpriteObject();
   virtual ~PanelSpriteObject();
-  virtual std::unique_ptr<gd::Object> Clone() const {
-    return std::unique_ptr<gd::Object>(new PanelSpriteObject(*this));
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
+    return std::unique_ptr<gd::ObjectConfiguration>(
+        new PanelSpriteObject(*this));
   }
 
-#if defined(GD_IDE_ONLY)
   virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
-#endif
 
-  float GetWidth() const { return width; };
-  float GetHeight() const { return height; };
+  double GetWidth() const { return width; };
+  double GetHeight() const { return height; };
 
-  void SetWidth(float newWidth) {
+  void SetWidth(double newWidth) {
     width = newWidth >= (leftMargin + rightMargin) ? newWidth
                                                    : (leftMargin + rightMargin);
   };
-  void SetHeight(float newHeight) {
+  void SetHeight(double newHeight) {
     height = newHeight >= (topMargin + bottomMargin)
                  ? newHeight
                  : (topMargin + bottomMargin);
   };
 
-  float GetLeftMargin() const { return leftMargin; };
-  void SetLeftMargin(float newMargin) { leftMargin = newMargin; };
+  double GetLeftMargin() const { return leftMargin; };
+  void SetLeftMargin(double newMargin) { leftMargin = newMargin; };
 
-  float GetTopMargin() const { return topMargin; };
-  void SetTopMargin(float newMargin) { topMargin = newMargin; };
+  double GetTopMargin() const { return topMargin; };
+  void SetTopMargin(double newMargin) { topMargin = newMargin; };
 
-  float GetRightMargin() const { return rightMargin; };
-  void SetRightMargin(float newMargin) { rightMargin = newMargin; };
+  double GetRightMargin() const { return rightMargin; };
+  void SetRightMargin(double newMargin) { rightMargin = newMargin; };
 
-  float GetBottomMargin() const { return bottomMargin; };
-  void SetBottomMargin(float newMargin) { bottomMargin = newMargin; };
+  double GetBottomMargin() const { return bottomMargin; };
+  void SetBottomMargin(double newMargin) { bottomMargin = newMargin; };
 
   bool IsTiled() const { return tiled; };
   void SetTiled(bool enable = true) { tiled = enable; };
@@ -72,13 +72,13 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::Object {
   virtual void DoSerializeTo(gd::SerializerElement &element) const;
 #endif
 
-  float width;
-  float height;
+  double width;
+  double height;
 
-  float leftMargin;
-  float topMargin;
-  float rightMargin;
-  float bottomMargin;
+  double leftMargin;
+  double topMargin;
+  double rightMargin;
+  double bottomMargin;
 
   bool tiled;
 };

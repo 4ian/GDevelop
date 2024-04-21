@@ -16,7 +16,7 @@ export const shouldCloseOrCancel = (event: SupportedEvent) => {
  * Check if the user asked to validate what is being edited.
  */
 export const shouldValidate = (event: SupportedEvent) => {
-  return event.key === 'Enter';
+  return event.key === 'Enter' && !event.shiftKey;
 };
 
 /**
@@ -45,7 +45,7 @@ export const shouldSubmit = (event: SupportedEvent) => {
 /**
  * Check if the user wants to zoom when scrolling.
  */
-export const shouldZoom = (event: SupportedEvent) => {
+export const shouldZoom = (event: SupportedEvent | WheelEvent) => {
   return event.metaKey || event.ctrlKey;
 };
 

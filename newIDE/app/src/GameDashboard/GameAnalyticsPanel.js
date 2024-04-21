@@ -28,14 +28,14 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   buildChartData,
   daysShownForYear,
   durationValues,
 } from './GameAnalyticsEvaluator';
-import Paper from '@material-ui/core/Paper';
+import Paper from '../UI/Paper';
 
 const chartMargins = {
   top: 5,
@@ -70,12 +70,12 @@ const CustomTooltip = ({
   customStyle: Object,
 |}) =>
   payload ? (
-    <Paper style={customStyle}>
+    <Paper style={customStyle} background="light">
       <ColumnStackLayout>
         <Text size="sub-title" noMargin>
           {label}
         </Text>
-        {payload.length &&
+        {payload.length > 0 &&
           payload.map(
             (
               {
@@ -157,7 +157,6 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
       width: 100,
     },
     tooltipContent: {
-      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
       color: gdevelopTheme.chart.textColor,
       padding: 10,
     },
@@ -194,16 +193,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   }}
                   disableUnderline
                 >
-                  <SelectOption
-                    key="month"
-                    value="month"
-                    primaryText={i18n._(t`Month`)}
-                  />
-                  <SelectOption
-                    key="year"
-                    value="year"
-                    primaryText={i18n._(t`Year`)}
-                  />
+                  <SelectOption key="month" value="month" label={t`Month`} />
+                  <SelectOption key="year" value="year" label={t`Year`} />
                 </SelectField>
               </Line>
               {!isGameMetricsLoading &&

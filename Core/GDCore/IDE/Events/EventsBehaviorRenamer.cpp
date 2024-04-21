@@ -31,14 +31,10 @@ namespace gd {
 class GD_CORE_API ExpressionBehaviorRenamer
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionBehaviorRenamer(const gd::ObjectsContainer& globalObjectsContainer_,
-                            const gd::ObjectsContainer& objectsContainer_,
-                            const gd::String& objectName_,
+  ExpressionBehaviorRenamer(const gd::String& objectName_,
                             const gd::String& oldBehaviorName_,
                             const gd::String& newBehaviorName_)
       : hasDoneRenaming(false),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
         objectName(objectName_),
         oldBehaviorName(oldBehaviorName_),
         newBehaviorName(newBehaviorName_){};
@@ -97,8 +93,6 @@ class GD_CORE_API ExpressionBehaviorRenamer
 
  private:
   bool hasDoneRenaming;
-  const gd::ObjectsContainer& globalObjectsContainer;
-  const gd::ObjectsContainer& objectsContainer;
   const gd::String& objectName;  // The object name for which the behavior
                                  // must be replaced.
   const gd::String& oldBehaviorName;
@@ -120,7 +114,7 @@ bool EventsBehaviorRenamer::DoVisitInstruction(gd::Instruction& instruction,
           const gd::Expression& parameterValue,
           size_t parameterIndex,
           const gd::String& lastObjectName) {
-        const gd::String& type = parameterMetadata.type;
+        const gd::String& type = parameterMetadata.GetType();
 
         if (gd::ParameterMetadata::IsBehavior(type)) {
           if (lastObjectName == objectName) {
@@ -132,9 +126,7 @@ bool EventsBehaviorRenamer::DoVisitInstruction(gd::Instruction& instruction,
         } else {
           auto node = parameterValue.GetRootNode();
           if (node) {
-            ExpressionBehaviorRenamer renamer(GetGlobalObjectsContainer(),
-                                              GetObjectsContainer(),
-                                              objectName,
+            ExpressionBehaviorRenamer renamer(objectName,
                                               oldBehaviorName,
                                               newBehaviorName);
             node->Visit(renamer);

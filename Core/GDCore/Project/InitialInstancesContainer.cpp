@@ -60,7 +60,6 @@ void InitialInstancesContainer::IterateOverInstancesWithZOrdering(
   for (auto& instance : sortedInstances) func(instance);
 }
 
-#if defined(GD_IDE_ONLY)
 gd::InitialInstance& InitialInstancesContainer::InsertNewInitialInstance() {
   gd::InitialInstance newInstance;
   initialInstances.push_back(newInstance);
@@ -69,14 +68,14 @@ gd::InitialInstance& InitialInstancesContainer::InsertNewInitialInstance() {
 }
 
 void InitialInstancesContainer::RemoveInstanceIf(
-    std::function<bool(const gd::InitialInstance&)> predicat) {
+    std::function<bool(const gd::InitialInstance&)> predicate) {
   // Note that we can't use erase–remove idiom here because remove_if would
   // move the instances, and the container must guarantee that
   // iterators/pointers to instances always remain valid.
   for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(),
                                                 end = initialInstances.end();
        it != end;) {
-    if (predicat(*it))
+    if (predicate(*it))
       it = initialInstances.erase(it);
     else
       ++it;
@@ -135,8 +134,19 @@ void InitialInstancesContainer::MoveInstancesToLayer(
   }
 }
 
+std::size_t InitialInstancesContainer::GetLayerInstancesCount(
+    const gd::String &layerName) const {
+  std::size_t count = 0;
+  for (const gd::InitialInstance &instance : initialInstances) {
+    if (instance.GetLayer() == layerName) {
+      count++;
+    }
+  }
+  return count;
+}
+
 bool InitialInstancesContainer::SomeInstancesAreOnLayer(
-    const gd::String& layerName) {
+    const gd::String& layerName) const {
   return std::any_of(initialInstances.begin(),
                      initialInstances.end(),
                      [&layerName](const InitialInstance& currentInstance) {
@@ -145,7 +155,7 @@ bool InitialInstancesContainer::SomeInstancesAreOnLayer(
 }
 
 bool InitialInstancesContainer::HasInstancesOfObject(
-    const gd::String& objectName) {
+    const gd::String& objectName) const {
   return std::any_of(initialInstances.begin(),
                      initialInstances.end(),
                      [&objectName](const InitialInstance& currentInstance) {
@@ -173,7 +183,6 @@ void InitialInstancesContainer::SerializeTo(SerializerElement& element) const {
 }
 
 void InitialInstancesContainer::Clear() { initialInstances.clear(); }
-#endif
 
 InitialInstanceFunctor::~InitialInstanceFunctor(){};
 

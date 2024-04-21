@@ -1,25 +1,27 @@
 // @flow
 import React from 'react';
-import HelpOutline from '@material-ui/icons/HelpOutline';
 import IconButton from '../IconButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
+import Help from '../CustomSvgIcons/Help';
 
 type PropsType = {|
   helpPagePath: ?string,
   disabled?: boolean,
   style?: {|
-    padding?: number,
+    padding?: number | string,
     width?: number,
     height?: number,
     transform?: string,
     transition?: string,
     opacity?: number,
+    cursor?: 'pointer',
     margin?: number,
     marginRight?: number,
     marginLeft?: number,
     marginTop?: number,
     marginBottom?: number,
+    visibility?: 'visible' | 'hidden',
   |},
   size?: 'small',
 |};
@@ -38,7 +40,7 @@ const HelpIcon = (props: PropsType) => {
       style={props.style}
       size={props.size}
     >
-      <HelpOutline />
+      <Help />
     </IconButton>
   );
 };

@@ -4,9 +4,9 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import { Column, LargeSpacer } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import Text from '../UI/Text';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 
 const styles = {
   container: {
@@ -17,21 +17,21 @@ const styles = {
 
 type Props = {
   message?: React.Node,
-  onLogin: () => void,
-  onCreateAccount: () => void,
+  onOpenLoginDialog: () => void,
+  onOpenCreateAccountDialog: () => void,
   justifyContent?: 'center',
 };
 
 const CreateProfile = ({
   message,
-  onLogin,
-  onCreateAccount,
+  onOpenLoginDialog,
+  onOpenCreateAccountDialog,
   justifyContent,
 }: Props) => (
   <Column alignItems="center">
     <div style={styles.container}>
-      <Column>
-        <Text>
+      <ColumnStackLayout>
+        <Text noMargin align="center">
           {message || (
             <Trans>
               You are not connected. Create an account to build your game for
@@ -40,16 +40,19 @@ const CreateProfile = ({
             </Trans>
           )}
         </Text>
-        <LargeSpacer />
         <ResponsiveLineStackLayout justifyContent="center" noMargin>
           <RaisedButton
+            id="create-account-button"
             label={<Trans>Create my account</Trans>}
-            onClick={onCreateAccount}
+            onClick={onOpenCreateAccountDialog}
             primary
           />
-          <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
+          <FlatButton
+            label={<Trans>Login</Trans>}
+            onClick={onOpenLoginDialog}
+          />
         </ResponsiveLineStackLayout>
-      </Column>
+      </ColumnStackLayout>
     </div>
   </Column>
 );

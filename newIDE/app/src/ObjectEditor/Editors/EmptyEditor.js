@@ -4,9 +4,14 @@ import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 
-export default function EmptyEditor() {
+export default function EmptyEditor({
+  renderObjectNameField,
+}: {
+  renderObjectNameField?: () => React.Node,
+}) {
   return (
-    <Column>
+    <Column noMargin>
+      {renderObjectNameField && renderObjectNameField()}
       <Line>
         <EmptyMessage>
           <Trans>

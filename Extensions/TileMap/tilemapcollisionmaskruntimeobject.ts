@@ -1,12 +1,12 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  const logger = new gdjs.Logger('Tilemap object');
-
   /**
    * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
    */
-  export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
+  export class TileMapCollisionMaskRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable {
     private _tilemapJsonFile: string;
     private _tilesetJsonFile: string;
     private _renderer: gdjs.TileMap.TileMapCollisionMaskRenderer;
@@ -31,14 +31,19 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
+    _width: float;
+    _height: float;
+    _scaleX: float;
+    _scaleY: float;
+
     /**
      * If the owner moves, the hitboxes vertices
      * will have to be transformed again.
      */
     private _transformationIsUpToDate: boolean = false;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
-      super(runtimeScene, objectData);
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+      super(instanceContainer, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;
@@ -53,8 +58,14 @@ namespace gdjs {
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = objectData.content.outlineSize;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
+        instanceContainer
       );
+
+      // The actual size is set when the tile map file is loaded.
+      this._width = 0;
+      this._height = 0;
+      this._scaleX = 1;
+      this._scaleY = 1;
       const editableTileMap = new TileMapHelper.EditableTileMap(
         1,
         1,
@@ -66,14 +77,23 @@ namespace gdjs {
         editableTileMap,
         this._collisionMaskTag
       );
+
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
       this._updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
+    }
+
+    updatePreRender(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      super.updatePreRender(instanceContainer);
+
+      if (this._debugMode && this.hitBoxesDirty) {
+        this.updateHitBoxes();
+      }
     }
 
     getRendererObject() {
@@ -136,6 +156,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
+        0, // levelIndex
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already log errors.
@@ -152,6 +173,9 @@ namespace gdjs {
             this._collisionTileMap.getAllHitboxes(this._collisionMaskTag)
           );
           this._renderer.redrawCollisionMask();
+
+          this._width = this._collisionTileMap.getWidth() * this._scaleX;
+          this._height = this._collisionTileMap.getHeight() * this._scaleY;
         }
       );
     }
@@ -159,7 +183,7 @@ namespace gdjs {
     updateHitBoxes(): void {
       this.updateTransformation();
       // Update the RuntimeObject hitboxes attribute.
-      for (const hitboxes of this._collisionTileMap.getAllHitboxes(
+      for (const _ of this._collisionTileMap.getAllHitboxes(
         this._collisionMaskTag
       )) {
         // RuntimeObject.hitBoxes contains the same polygons instances as the
@@ -186,8 +210,8 @@ namespace gdjs {
       }
       const transformation = this._collisionTileMap.getTransformation();
 
-      const absScaleX = Math.abs(this._renderer.getScaleX());
-      const absScaleY = Math.abs(this._renderer.getScaleY());
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
 
       transformation.setToIdentity();
 
@@ -198,8 +222,8 @@ namespace gdjs {
       const angleInRadians = (this.angle * Math.PI) / 180;
       transformation.rotateAround(
         angleInRadians,
-        this.getCenterX() * absScaleX,
-        this.getCenterY() * absScaleY
+        this.getCenterX(),
+        this.getCenterY()
       );
 
       // Scale
@@ -438,30 +462,102 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    // TODO allow size changes from events?
-
     setWidth(width: float): void {
-      if (this._renderer.getWidth() === width) return;
-
-      this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      if (this._width === width) {
+        return;
+      }
+      this._scaleX = width / this._collisionTileMap.getWidth();
+      this._width = width;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     setHeight(height: float): void {
-      if (this._renderer.getHeight() === height) return;
-
-      this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      if (this._height === height) {
+        return;
+      }
+      this._scaleY = height / this._collisionTileMap.getHeight();
+      this._height = height;
       this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param scale The new scale (must be greater than 0).
+     */
+    setScale(scale: float): void {
+      this.setScaleX(scale);
+      this.setScaleY(scale);
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param scaleX The new scale (must be greater than 0).
+     */
+    setScaleX(scaleX: float): void {
+      if (scaleX < 0) {
+        scaleX = 0;
+      }
+      if (this._scaleX === scaleX) {
+        return;
+      }
+      this._scaleX = scaleX;
+      this._width = scaleX * this._collisionTileMap.getWidth();
+      this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param scaleY The new scale (must be greater than 0).
+     */
+    setScaleY(scaleY: float): void {
+      if (scaleY < 0) {
+        scaleY = 0;
+      }
+      if (this._scaleY === scaleY) {
+        return;
+      }
+      this._scaleY = scaleY;
+      this._height = scaleY * this._collisionTileMap.getHeight();
+      this._transformationIsUpToDate = false;
+      this.invalidateHitboxes();
     }
 
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._width;
     }
 
     getHeight(): float {
-      return this._renderer.getHeight();
+      return this._height;
+    }
+
+    getScaleX(): float {
+      return this._scaleX;
+    }
+
+    getScaleY(): float {
+      return this._scaleY;
     }
   }
   gdjs.registerObject(

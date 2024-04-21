@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import CloudDownload from '@material-ui/icons/CloudDownload';
 import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
@@ -17,7 +16,10 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import Add from '@material-ui/icons/Add';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import Download from '../../UI/CustomSvgIcons/Download';
+import Add from '../../UI/CustomSvgIcons/Add';
+import ErrorBoundary from '../../UI/ErrorBoundary';
 
 type Props = {|
   project: gdProject,
@@ -30,13 +32,14 @@ type Props = {|
 /**
  * Allows to browse and install events based extensions.
  */
-export default function ExtensionsSearchDialog({
+const ExtensionsSearchDialog = ({
   project,
   onClose,
   onInstallExtension,
   onExtensionInstalled,
   onCreateNew,
-}: Props) {
+}: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false
@@ -93,10 +96,12 @@ export default function ExtensionsSearchDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
-          fullHeight
           title={<Trans>Search for New Extensions</Trans>}
+          id="extension-search-dialog"
+          fullHeight
           actions={[
             <FlatButton
+              id="close-button"
               key="close"
               label={<Trans>Close</Trans>}
               primary
@@ -108,9 +113,15 @@ export default function ExtensionsSearchDialog({
             <HelpButton key="help" helpPagePath="/extensions/search" />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton
-                leftIcon={<CloudDownload />}
+                leftIcon={<Download />}
                 key="import"
-                label={<Trans>Import extension</Trans>}
+                label={
+                  isMobile ? (
+                    <Trans>Import</Trans>
+                  ) : (
+                    <Trans>Import extension</Trans>
+                  )
+                }
                 onClick={() => {
                   installOrImportExtension(i18n);
                 }}
@@ -121,14 +132,19 @@ export default function ExtensionsSearchDialog({
               <FlatButton
                 key="create-new"
                 onClick={onCreateNew}
-                label={<Trans>Create a new extension</Trans>}
+                label={
+                  isMobile ? (
+                    <Trans>Create</Trans>
+                  ) : (
+                    <Trans>Create a new extension</Trans>
+                  )
+                }
                 leftIcon={<Add />}
               />
             ) : null,
           ]}
           flexBody
           open
-          noMargin
           cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >
@@ -155,4 +171,16 @@ export default function ExtensionsSearchDialog({
       )}
     </I18n>
   );
-}
+};
+
+const ExtensionsSearchDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Extensions search</Trans>}
+    scope="extensions-search-dialog"
+    onClose={props.onClose}
+  >
+    <ExtensionsSearchDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ExtensionsSearchDialogWithErrorBoundary;

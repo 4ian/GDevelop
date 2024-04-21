@@ -1,6 +1,9 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import Instruction, { reactDndInstructionType } from './Instruction';
+import { I18n } from '@lingui/react';
 import { mapFor } from '../../Utils/MapFor';
 import {
   isInstructionSelected,
@@ -9,20 +12,24 @@ import {
   type ParameterContext,
 } from '../SelectionHandler';
 import DropIndicator from './DropIndicator';
-import { Trans } from '@lingui/macro';
 import { hasClipboardConditions, hasClipboardActions } from '../ClipboardKind';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import { type ScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type ScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   addButton: {
     cursor: 'pointer',
   },
+  pasteButtonContainer: {
+    marginLeft: '4px',
+  },
 };
 
-type Props = {
+type Props = {|
+  platform: gdPlatform,
   instrsList: gdInstructionsList,
   areConditions: boolean,
   onAddNewInstruction: InstructionsListContext => void,
@@ -41,23 +48,33 @@ type Props = {
   onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
+  addButtonId?: string,
   className?: string,
   style?: Object,
   disabled: boolean,
   renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
 
+  scope: EventsScope,
+  resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-};
+
+  idPrefix: string,
+|};
 
 const DropTarget = makeDropTarget<{
   isCondition: boolean,
 }>(reactDndInstructionType);
 
+const addButtonTooltipLabelMouse = t`Right-click for quick menu`;
+const addButtonTooltipLabelTouch = t`Long press for quick menu`;
+
 export default function InstructionsList({
+  platform,
+  addButtonId,
   addButtonLabel,
   areConditions,
   className,
@@ -76,9 +93,12 @@ export default function InstructionsList({
   disabled,
   renderObjectThumbnail,
   screenType,
-  windowWidth,
+  windowSize,
+  scope,
+  resourcesManager,
   globalObjectsContainer,
   objectsContainer,
+  idPrefix,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
@@ -114,6 +134,7 @@ export default function InstructionsList({
 
     return (
       <Instruction
+        platform={platform}
         instruction={instruction}
         isCondition={areConditions}
         key={instruction.ptr}
@@ -147,9 +168,12 @@ export default function InstructionsList({
         disabled={disabled}
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
-        windowWidth={windowWidth}
+        windowSize={windowSize}
+        scope={scope}
+        resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
+        id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}
       />
     );
   });
@@ -167,6 +191,10 @@ export default function InstructionsList({
   ) : (
     <Trans>Add action</Trans>
   );
+  const addButtonTooltipLabel =
+    screenType === 'touch'
+      ? addButtonTooltipLabelTouch
+      : addButtonTooltipLabelMouse;
 
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
@@ -182,69 +210,83 @@ export default function InstructionsList({
   );
 
   return (
-    <DropTarget
-      canDrop={draggedItem => draggedItem.isCondition === areConditions}
-      drop={() => {
-        onMoveToInstructionsList({
-          isCondition: areConditions,
-          instrsList: instrsList,
-        });
-      }}
-    >
-      {({ connectDropTarget, isOver, canDrop }) =>
-        connectDropTarget(
-          <div className={className} style={style}>
-            {instructions}
-            {isOver && <DropIndicator canDrop={canDrop} />}
-            <span
-              onPointerEnter={() => {
-                setCanPaste(
-                  (areConditions && hasClipboardConditions()) ||
-                    (!areConditions && hasClipboardActions())
-                );
-              }}
-              onPointerLeave={() => {
-                setCanPaste(false);
-              }}
-            >
-              <button
-                style={styles.addButton}
-                className="add-link"
-                onClick={addNewInstruction}
-                onContextMenu={e => {
-                  e.stopPropagation();
-                  onAddInstructionContextMenu(
-                    e.currentTarget,
-                    instructionsListContext
-                  );
-                }}
-                {...longTouchForContextMenuProps}
-                ref={addButton}
-                id={
-                  areConditions ? 'add-condition-button' : 'add-action-button'
-                }
+    <I18n>
+      {({ i18n }) => (
+        <DropTarget
+          canDrop={draggedItem => draggedItem.isCondition === areConditions}
+          drop={() => {
+            onMoveToInstructionsList({
+              isCondition: areConditions,
+              instrsList: instrsList,
+            });
+          }}
+        >
+          {({ connectDropTarget, isOver, canDrop }) =>
+            connectDropTarget(
+              <div
+                className={className}
+                style={style}
+                id={`${idPrefix}-${areConditions ? 'conditions' : 'actions'}`}
               >
-                {addButtonLabel || addButtonDefaultLabel}
-              </button>
-              {canPaste && (
-                <span>
+                {instructions}
+                {isOver && <DropIndicator canDrop={canDrop} />}
+                <span
+                  onPointerEnter={() => {
+                    setCanPaste(
+                      (areConditions && hasClipboardConditions()) ||
+                        (!areConditions && hasClipboardActions())
+                    );
+                  }}
+                  onPointerLeave={() => {
+                    setCanPaste(false);
+                  }}
+                >
                   <button
                     style={styles.addButton}
                     className="add-link"
-                    onClick={pasteInstructions}
+                    onClick={addNewInstruction}
+                    onContextMenu={e => {
+                      e.stopPropagation();
+                      onAddInstructionContextMenu(
+                        e.currentTarget,
+                        instructionsListContext
+                      );
+                    }}
+                    {...longTouchForContextMenuProps}
+                    ref={addButton}
+                    id={
+                      addButtonId ||
+                      `${
+                        areConditions
+                          ? 'add-condition-button'
+                          : 'add-action-button'
+                      }${instructions.length === 0 ? '-empty' : ''}`
+                    }
+                    title={i18n._(addButtonTooltipLabel)}
                   >
-                    {areConditions ? (
-                      <Trans>(or paste conditions)</Trans>
-                    ) : (
-                      <Trans>(or paste actions)</Trans>
-                    )}
+                    {addButtonLabel || addButtonDefaultLabel}
                   </button>
+                  {canPaste && (
+                    <span style={styles.pasteButtonContainer}>
+                      <button
+                        style={styles.addButton}
+                        className="add-link"
+                        onClick={pasteInstructions}
+                      >
+                        {areConditions ? (
+                          <Trans>(or paste conditions)</Trans>
+                        ) : (
+                          <Trans>(or paste actions)</Trans>
+                        )}
+                      </button>
+                    </span>
+                  )}
                 </span>
-              )}
-            </span>
-          </div>
-        )
-      }
-    </DropTarget>
+              </div>
+            )
+          }
+        </DropTarget>
+      )}
+    </I18n>
   );
 }

@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
-
-type Props = {|
-  style?: Object,
-|};
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 /**
  * Adds a checkered background to the container element.
@@ -22,7 +18,7 @@ type Props = {|
  * (or it just doesn't work as expected), ensure that the parent element and
  * at least one of the sibling elements have `position: relative` set.
  */
-const CheckeredBackground = (props: Props) => {
+const CheckeredBackground = () => {
   const theme = React.useContext(GDevelopThemeContext);
   const backgroundStyle = {
     position: 'absolute',
@@ -34,8 +30,6 @@ const CheckeredBackground = (props: Props) => {
     // Apply a theme-defined CSS filter on static checkered background
     background: 'url("res/transparentback.png") repeat',
     filter: theme.imagePreview.backgroundFilter || 'none',
-
-    ...props.style,
   };
 
   return <div style={backgroundStyle} />;

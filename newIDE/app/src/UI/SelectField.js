@@ -5,6 +5,7 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import { MarkdownText } from './MarkdownText';
 import { makeStyles } from '@material-ui/core';
 
@@ -19,7 +20,9 @@ const useSelectStyles = textAlign =>
     },
   })();
 
-export type SelectFieldInterface = {| focus: () => void |};
+export type SelectFieldInterface = {|
+  focus: FieldFocusFunction,
+|};
 
 type ValueProps = {|
   value: number | string,
@@ -40,6 +43,7 @@ type Props = {|
   disabled?: boolean,
   stopPropagationOnClick?: boolean,
 
+  id?: ?string,
   style?: {
     flex?: 1,
     width?: 'auto',
@@ -54,7 +58,8 @@ type Props = {|
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
-  hintText?: MessageDescriptor,
+  translatableHintText?: MessageDescriptor,
+  errorText?: React.Node,
 |};
 
 /**
@@ -65,7 +70,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
     const inputRef = React.useRef<?HTMLInputElement>(null);
 
-    const focus = () => {
+    const focus: FieldFocusFunction = options => {
       if (inputRef.current) inputRef.current.focus();
     };
 
@@ -94,7 +99,9 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     }
     const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
 
-    const helperText = props.helperMarkdownText ? (
+    const helperText = props.errorText ? (
+      props.errorText
+    ) : props.helperMarkdownText ? (
       <MarkdownText source={props.helperMarkdownText} />
     ) : null;
 
@@ -102,6 +109,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
       <I18n>
         {({ i18n }) => (
           <TextField
+            id={props.id}
             select
             color="secondary"
             {...computeTextFieldStyleProps(props)}
@@ -109,6 +117,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             fullWidth={props.fullWidth}
             label={props.floatingLabelText}
             helperText={helperText}
+            error={!!props.errorText}
             value={displayedValue}
             onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={
@@ -134,8 +143,8 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
           >
             {!hasValidValue ? (
               <option value={INVALID_VALUE} disabled>
-                {props.hintText
-                  ? i18n._(props.hintText)
+                {props.translatableHintText
+                  ? i18n._(props.translatableHintText)
                   : i18n._(t`Choose an option`)}
               </option>
             ) : null}

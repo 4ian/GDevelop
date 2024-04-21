@@ -1,12 +1,15 @@
 // @flow
-
+import * as React from 'react';
 import optionalRequire from './OptionalRequire';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
+import debounce from 'lodash/debounce';
+import { hexToRGBColor, isLightRgbColor } from './ColorTransformer';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
 const dialog = remote ? remote.dialog : null;
+const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 export type AppArguments = { [string]: any };
 type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
@@ -18,6 +21,46 @@ type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
 export const POSITIONAL_ARGUMENTS_KEY = '_';
 
 let currentTitleBarColor: ?string = null;
+
+/**
+ * Listen to the changes to the window controls provided by the operating system:
+ *
+ * - An installed PWA can have window controls displayed as overlay. If supported,
+ * we set up a listener to detect any change and notify the caller.
+ * - On Electron, the window controls are always integrated in the app - so this does nothing.
+ */
+export const useWindowControlsOverlayWatcher = ({
+  onChanged,
+}: {|
+  onChanged: () => void,
+|}) => {
+  // $FlowFixMe - this API is not handled by Flow.
+  const { windowControlsOverlay } = navigator;
+
+  React.useEffect(
+    () => {
+      let listenerCallback = null;
+      if (windowControlsOverlay) {
+        listenerCallback = debounce(() => {
+          onChanged();
+        }, 50);
+        windowControlsOverlay.addEventListener(
+          'geometrychange',
+          listenerCallback
+        );
+      }
+      return () => {
+        if (listenerCallback) {
+          windowControlsOverlay.removeEventListener(
+            'geometrychange',
+            listenerCallback
+          );
+        }
+      };
+    },
+    [onChanged, windowControlsOverlay]
+  );
+};
 
 /**
  * Various utilities related to the app window management.
@@ -42,16 +85,23 @@ export default class Window {
   }
 
   static setTitleBarColor(newColor: string) {
-    if (electron) {
-      // Nothing to do, the title bar is using the system window management.
-      return;
-    }
-
     if (currentTitleBarColor === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
     }
 
+    if (ipcRenderer) {
+      // Update the window controls colors on Windows.
+      ipcRenderer.invoke('titlebar-set-overlay-options', {
+        color: newColor,
+        symbolColor: isLightRgbColor(hexToRGBColor(newColor))
+          ? '#000000'
+          : '#ffffff',
+      });
+      currentTitleBarColor = newColor;
+    }
+
+    // Update the PWA titlebar/controls color (if it's an installed PWA).
     const metaElement = document.querySelector('meta[name="theme-color"]');
     if (metaElement) {
       metaElement.setAttribute('content', newColor);
@@ -151,6 +201,31 @@ export default class Window {
       : [];
 
     return argumentsObject;
+  }
+
+  /**
+   * On web, removes a list of query params from the URL.
+   */
+  static removeArguments(argumentNames: string[]) {
+    // On Electron, we don't have a way to modify global args.
+    if (remote) return;
+
+    const url = new URL(window.location.href);
+    for (const argumentName of argumentNames) {
+      url.searchParams.delete(argumentName);
+    }
+    window.history.replaceState({}, document.title, url.toString());
+  }
+
+  static addArguments(argumentNamesAndValues: { [key: string]: string }) {
+    // On Electron, we don't have a way to modify global args.
+    if (remote) return;
+
+    const url = new URL(window.location.href);
+    for (const argumentName in argumentNamesAndValues) {
+      url.searchParams.set(argumentName, argumentNamesAndValues[argumentName]);
+    }
+    window.history.replaceState({}, document.title, url.toString());
   }
 
   static showMessageBox(
@@ -265,6 +340,15 @@ export default class Window {
     }
 
     window.open(url, '_blank');
+  }
+
+  static getOrientation(): 'portrait' | 'landscape' {
+    try {
+      return window.screen.orientation.type.split('-')[0];
+    } catch (error) {
+      console.warn('An error occurred when reading screen orientation', error);
+      return 'landscape';
+    }
   }
 
   static hasMainMenu() {

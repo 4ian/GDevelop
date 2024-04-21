@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -20,6 +18,8 @@ namespace gdjs {
      */
     _transformationIsUpToDate = false;
 
+    _antialiasingFilter: null | PIXI.Filter = null;
+
     private static readonly _positionForTransformation: PIXI.IPointData = {
       x: 0,
       y: 0,
@@ -27,14 +27,15 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.ShapePainterRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
       this._graphics = new PIXI.Graphics();
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
+      this.updateAntialiasing();
     }
 
     getRendererObject() {
@@ -130,6 +131,96 @@ namespace gdjs {
         this._object._fillOpacity / 255
       );
       this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawFilletRectangle(
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
+      fillet: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawFilletRect(x1, y1, x2 - x1, y2 - y1, fillet);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawChamferRectangle(
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
+      chamfer: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawChamferRect(x1, y1, x2 - x1, y2 - y1, chamfer);
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawTorus(
+      x1: float,
+      y1: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawTorus(
+        x1,
+        y1,
+        innerRadius,
+        outerRadius,
+        startArc ? gdjs.toRad(startArc) : 0,
+        endArc ? gdjs.toRad(endArc) : 0
+      );
+      this._graphics.closePath();
+      this._graphics.endFill();
+      this.invalidateBounds();
+    }
+
+    drawRegularPolygon(
+      x1: float,
+      y1: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this.updateOutline();
+      this._graphics.beginFill(
+        this._object._fillColor,
+        this._object._fillOpacity / 255
+      );
+      //@ts-ignore from @pixi/graphics-extras
+      this._graphics.drawRegularPolygon(
+        x1,
+        y1,
+        radius,
+        sides,
+        rotation ? gdjs.toRad(rotation) : 0
+      );
       this._graphics.closePath();
       this._graphics.endFill();
       this.invalidateBounds();
@@ -236,6 +327,7 @@ namespace gdjs {
     }
 
     beginFillPath() {
+      this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
@@ -484,6 +576,43 @@ namespace gdjs {
       point[0] = position.x;
       point[1] = position.y;
       return point;
+    }
+
+    updateAntialiasing(): void {
+      if (this._object.getAntialiasing() !== 'none') {
+        if (!this._antialiasingFilter) {
+          this._antialiasingFilter = new PIXI.FXAAFilter();
+        }
+
+        const antialiasingFilter = this._antialiasingFilter;
+        antialiasingFilter.enabled = true;
+        antialiasingFilter.multisample =
+          PIXI.MSAA_QUALITY[this._object.getAntialiasing().toUpperCase()] ||
+          PIXI.MSAA_QUALITY.LOW;
+
+        if (!this._graphics.filters) {
+          this._graphics.filters = [];
+        }
+        // Do not apply the filter if it is already present on the object.
+        if (this._graphics.filters.indexOf(antialiasingFilter) === -1) {
+          this._graphics.filters.push(antialiasingFilter);
+        }
+      } else if (this._antialiasingFilter !== null) {
+        if (!this._graphics.filters) {
+          return;
+        }
+        const antialiasingFilterIndex = this._graphics.filters.indexOf(
+          this._antialiasingFilter
+        );
+
+        if (antialiasingFilterIndex !== -1) {
+          this._graphics.filters.splice(antialiasingFilterIndex, 1);
+        }
+      }
+    }
+
+    destroy(): void {
+      this._graphics.destroy();
     }
   }
 

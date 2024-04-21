@@ -12,7 +12,7 @@ import { getCurrentElements } from './SpriteObjectHelper';
 import { ResponsiveLineStackLayout } from '../../../../UI/Layout';
 
 type Props = {|
-  spriteObject: gdSpriteObject,
+  animations: gdSpriteAnimationList,
 
   animationIndex: number,
   directionIndex: number,
@@ -25,11 +25,13 @@ type Props = {|
   sameForAllAnimations: boolean,
   sameForAllSprites: boolean,
 
-  setSameForAllAnimations: boolean => void,
-  setSameForAllSprites: boolean => void,
+  setSameForAllAnimations: boolean => Promise<void>,
+  setSameForAllSprites: boolean => Promise<void>,
 
-  setSameForAllAnimationsLabel: string | React.Node,
-  setSameForAllSpritesLabel: string | React.Node,
+  setSameForAllAnimationsLabel: React.Node,
+  setSameForAllSpritesLabel: React.Node,
+
+  hideControlsForSprite?: (sprite: gdSprite) => boolean,
 |};
 
 /**
@@ -38,112 +40,106 @@ type Props = {|
  * (typically, the points or the collision masks of the sprite) should be shared between
  * all sprites of an animation, or between all sprites of all animations of the object.
  */
-export default class SpriteSelector extends React.Component<Props, void> {
-  render() {
-    const {
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex,
-      sameForAllAnimations,
-      sameForAllSprites,
-      chooseAnimation,
-      chooseDirection,
-      chooseSprite,
-      setSameForAllAnimations,
-      setSameForAllSprites,
-      setSameForAllAnimationsLabel,
-      setSameForAllSpritesLabel,
-    } = this.props;
+const SpriteSelector = ({
+  animations,
+  animationIndex,
+  directionIndex,
+  spriteIndex,
+  sameForAllAnimations,
+  sameForAllSprites,
+  chooseAnimation,
+  chooseDirection,
+  chooseSprite,
+  setSameForAllAnimations,
+  setSameForAllSprites,
+  setSameForAllAnimationsLabel,
+  setSameForAllSpritesLabel,
+  hideControlsForSprite,
+}: Props) => {
+  const { animation, direction, sprite } = getCurrentElements(
+    animations,
+    animationIndex,
+    directionIndex,
+    spriteIndex
+  );
 
-    const {
-      hasValidAnimation,
-      animation,
-      hasValidDirection,
-      direction,
-    } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+  const shouldHideControls =
+    !direction ||
+    !direction.getSpritesCount() ||
+    !sprite ||
+    (hideControlsForSprite && hideControlsForSprite(sprite));
 
-    return (
-      <React.Fragment>
-        <ResponsiveLineStackLayout>
+  return (
+    <React.Fragment>
+      <ResponsiveLineStackLayout noColumnMargin>
+        <SelectField
+          fullWidth
+          floatingLabelText={<Trans>Animation</Trans>}
+          value={animationIndex}
+          onChange={(e, i, value: string) =>
+            chooseAnimation(parseInt(value, 10) || 0)
+          }
+        >
+          {mapFor(0, animations.getAnimationsCount(), i => {
+            const animation = animations.getAnimation(i);
+            return (
+              <SelectOption
+                key={i}
+                value={i}
+                label={t`Animation #${i} ${animation.getName()}`}
+              />
+            );
+          })}
+        </SelectField>
+        {animation && animation.getDirectionsCount() > 1 && (
           <SelectField
             fullWidth
-            floatingLabelText={<Trans>Animation</Trans>}
-            value={this.props.animationIndex}
+            floatingLabelText={<Trans>Direction</Trans>}
+            value={directionIndex}
             onChange={(e, i, value: string) =>
-              chooseAnimation(parseInt(value, 10) || 0)
+              chooseDirection(parseInt(value, 10) || 0)
             }
           >
-            {mapFor(0, spriteObject.getAnimationsCount(), i => {
-              const animation = spriteObject.getAnimation(i);
+            {mapFor(0, animation.getDirectionsCount(), i => {
               return (
-                <SelectOption
-                  key={i}
-                  value={i}
-                  primaryText={t`Animation #${i} ${animation.getName()}`}
-                />
+                <SelectOption value={i} key={i} label={t`Direction #${i}`} />
               );
             })}
           </SelectField>
-          {hasValidAnimation && animation.getDirectionsCount() > 1 && (
-            <SelectField
-              fullWidth
-              floatingLabelText={<Trans>Direction</Trans>}
-              value={this.props.directionIndex}
-              onChange={(e, i, value: string) =>
-                chooseDirection(parseInt(value, 10) || 0)
-              }
-            >
-              {mapFor(0, animation.getDirectionsCount(), i => {
-                return (
-                  <SelectOption
-                    value={i}
-                    key={i}
-                    primaryText={t`Direction #${i}`}
-                  />
-                );
-              })}
-            </SelectField>
-          )}
-          {hasValidDirection && (
-            <SelectField
-              fullWidth
-              floatingLabelText={<Trans>Frame</Trans>}
-              value={this.props.spriteIndex}
-              onChange={(e, i, value: string) =>
-                chooseSprite(parseInt(value, 10) || 0)
-              }
-            >
-              {mapFor(0, direction.getSpritesCount(), i => {
-                return (
-                  <SelectOption
-                    value={i}
-                    key={i}
-                    primaryText={t`Frame #${i}`}
-                  />
-                );
-              })}
-            </SelectField>
-          )}
-        </ResponsiveLineStackLayout>
-        <Toggle
-          label={setSameForAllAnimationsLabel}
-          labelPosition="right"
-          toggled={sameForAllAnimations}
-          onToggle={(e, checked) => setSameForAllAnimations(checked)}
-        />
-        <Toggle
-          label={setSameForAllSpritesLabel}
-          labelPosition="right"
-          toggled={sameForAllSprites}
-          onToggle={(e, checked) => setSameForAllSprites(checked)}
-        />
-      </React.Fragment>
-    );
-  }
-}
+        )}
+        {direction && (
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Frame</Trans>}
+            value={spriteIndex}
+            onChange={(e, i, value: string) =>
+              chooseSprite(parseInt(value, 10) || 0)
+            }
+          >
+            {mapFor(0, direction.getSpritesCount(), i => {
+              return <SelectOption value={i} key={i} label={t`Frame #${i}`} />;
+            })}
+          </SelectField>
+        )}
+      </ResponsiveLineStackLayout>
+      {!shouldHideControls && (
+        <>
+          <Toggle
+            label={setSameForAllAnimationsLabel}
+            labelPosition="right"
+            toggled={sameForAllAnimations}
+            onToggle={(e, checked) => setSameForAllAnimations(checked)}
+          />
+          <Toggle
+            label={setSameForAllSpritesLabel}
+            labelPosition="right"
+            toggled={sameForAllSprites}
+            onToggle={(e, checked) => setSameForAllSprites(checked)}
+          />
+        </>
+      )}
+    </React.Fragment>
+  );
+};
+
+export default SpriteSelector;

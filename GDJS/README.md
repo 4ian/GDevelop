@@ -43,5 +43,5 @@ or any pull request to add a feature, do not hesitate to get in touch.
 
 ## License
 
-GDJS is distributed under the MIT license: see license.txt for
+GDJS is distributed under the MIT license: see [LICENSE.md](LICENSE.md) for
 more information.

@@ -1,7 +1,5 @@
 namespace gdjs {
   export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
-
     /**
      * This render is only useful for debugging purposes.
      * @see {@link PixiTileMapHelper.updatePixiCollisionMask}, the render used by the GUI.
@@ -12,11 +10,11 @@ namespace gdjs {
 
       constructor(
         runtimeObject: gdjs.TileMapCollisionMaskRuntimeObject,
-        runtimeScene: gdjs.RuntimeScene
+        instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
         this._object = runtimeObject;
         this._graphics = new PIXI.Graphics();
-        runtimeScene
+        instanceContainer
           .getLayer('')
           .getRenderer()
           .addRendererObject(this._graphics, runtimeObject.getZOrder());
@@ -51,36 +49,6 @@ namespace gdjs {
 
       getRendererObject() {
         return this._graphics;
-      }
-
-      setWidth(width: float): void {
-        const tileMap = this._object._collisionTileMap;
-        this._graphics.scale.x = width / tileMap.getWidth();
-        this._graphics.pivot.x = width / 2;
-      }
-
-      setHeight(height: float): void {
-        const tileMap = this._object._collisionTileMap;
-        this._graphics.scale.y = height / tileMap.getHeight();
-        this._graphics.pivot.y = height / 2;
-      }
-
-      getWidth(): float {
-        const tileMap = this._object._collisionTileMap;
-        return tileMap.getWidth() * this._graphics.scale.x;
-      }
-
-      getHeight(): float {
-        const tileMap = this._object._collisionTileMap;
-        return tileMap.getHeight() * this._graphics.scale.y;
-      }
-
-      getScaleX(): float {
-        return this._graphics.scale.x;
-      }
-
-      getScaleY(): float {
-        return this._graphics.scale.y;
       }
     }
   }

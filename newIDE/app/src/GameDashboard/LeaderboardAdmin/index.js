@@ -11,28 +11,27 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import Add from '@material-ui/icons/Add';
-import Brush from '@material-ui/icons/Brush';
+import Add from '../../UI/CustomSvgIcons/Add';
 import TextFormat from '@material-ui/icons/TextFormat';
-import Save from '@material-ui/icons/Save';
-import Cancel from '@material-ui/icons/Cancel';
-import Edit from '@material-ui/icons/Edit';
-import Label from '@material-ui/icons/Label';
-import Fingerprint from '@material-ui/icons/Fingerprint';
-import Update from '@material-ui/icons/Update';
-import Today from '@material-ui/icons/Today';
-import Sort from '@material-ui/icons/Sort';
-import PeopleAlt from '@material-ui/icons/PeopleAlt';
-import Refresh from '@material-ui/icons/Refresh';
-import Delete from '@material-ui/icons/Delete';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Loop from '@material-ui/icons/Loop';
-
+import Save from '../../UI/CustomSvgIcons/Floppy';
+import Cross from '../../UI/CustomSvgIcons/Cross';
+import Edit from '../../UI/CustomSvgIcons/Edit';
+import EditFile from '../../UI/CustomSvgIcons/EditFile';
+import Tag from '../../UI/CustomSvgIcons/Tag';
+import AtSign from '../../UI/CustomSvgIcons/AtSign';
+import Calendar from '../../UI/CustomSvgIcons/Calendar';
+import Sort from '../../UI/CustomSvgIcons/Sort';
+import Users from '../../UI/CustomSvgIcons/Users';
+import Refresh from '../../UI/CustomSvgIcons/Refresh';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import Visibility from '../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../UI/CustomSvgIcons/VisibilityOff';
+import Lock from '../../UI/CustomSvgIcons/Lock';
+import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
 import Copy from '../../UI/CustomSvgIcons/Copy';
+
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
@@ -40,7 +39,7 @@ import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
-import TextField from '../../UI/TextField';
+import TextField, { type TextFieldInterface } from '../../UI/TextField';
 import SelectField from '../../UI/SelectField';
 import CircularProgress from '../../UI/CircularProgress';
 import SelectOption from '../../UI/SelectOption';
@@ -49,14 +48,14 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
+  type LeaderboardEntry,
   shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
-import Window from '../../Utils/Window';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
@@ -67,6 +66,13 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import Toggle from '../../UI/Toggle';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import { SubscriptionSuggestionContext } from '../../Profile/Subscription/SubscriptionSuggestionContext';
+import MaxLeaderboardCountAlertMessage from './MaxLeaderboardCountAlertMessage';
+import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import Paper from '../../UI/Paper';
+import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type Props = {|
   onLoading: boolean => void,
@@ -84,6 +90,8 @@ type ApiError = {|
     | 'leaderboardNameUpdate'
     | 'leaderboardSortUpdate'
     | 'leaderboardVisibilityUpdate'
+    | 'leaderboardAutoPlayerNamePrefixUpdate'
+    | 'leaderboardIgnoreCustomPlayerNamesUpdate'
     | 'leaderboardPrimaryUpdate'
     | 'leaderboardAppearanceUpdate'
     | 'leaderboardPlayerUnicityDisplayChoiceUpdate'
@@ -101,7 +109,12 @@ const CenteredError = ({ children }: {| children: React.Node |}) => (
 );
 
 const styles = {
-  leftColumn: { display: 'flex', flexDirection: 'column', flex: 1, padding: 5 },
+  leftColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    paddingRight: 5,
+  },
   rightColumn: {
     display: 'flex',
     flexDirection: 'column',
@@ -119,6 +132,10 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
     ? 'leaderboardSortUpdate'
     : payload.visibility
     ? 'leaderboardVisibilityUpdate'
+    : payload.ignoreCustomPlayerNames !== undefined
+    ? 'leaderboardIgnoreCustomPlayerNamesUpdate'
+    : payload.autoPlayerNamePrefix !== undefined
+    ? 'leaderboardAutoPlayerNamePrefixUpdate'
     : payload.primary
     ? 'leaderboardPrimaryUpdate'
     : payload.customizationSettings
@@ -138,6 +155,16 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
     <Trans>
       An error occurred when updating the visibility of the leaderboard, please
       close the dialog, come back and try again.
+    </Trans>
+  ) : payload.ignoreCustomPlayerNames !== undefined ? (
+    <Trans>
+      An error occurred when updating the handling of player names of the
+      leaderboard, please close the dialog, come back and try again.
+    </Trans>
+  ) : payload.autoPlayerNamePrefix !== undefined ? (
+    <Trans>
+      An error occurred when updating the handling of player names of the
+      leaderboard, please close the dialog, come back and try again.
     </Trans>
   ) : payload.primary ? (
     <Trans>
@@ -183,21 +210,40 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
+  const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
+  const [
+    displayMaxLeaderboardCountReachedWarning,
+    setDisplayMaxLeaderboardCountReachedWarning,
+  ] = React.useState<boolean>(false);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { limits } = authenticatedUser;
+
   const [
     isEditingSortOptions,
     setIsEditingSortOptions,
   ] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
+  const [
+    isEditingAutoPlayerNamePrefix,
+    setIsEditingAutoPlayerNamePrefix,
+  ] = React.useState<boolean>(false);
   const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
     false
   );
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
-  const newNameTextFieldRef = React.useRef<?TextField>(null);
+  const [
+    newAutoPlayerNamePrefix,
+    setNewAutoPlayerNamePrefix,
+  ] = React.useState<string>('');
+  const newNameTextFieldRef = React.useRef<?TextFieldInterface>(null);
+  const newAutoPlayerNamePrefixTextFieldRef = React.useRef<?TextFieldInterface>(
+    null
+  );
   const [apiError, setApiError] = React.useState<?ApiError>(null);
   const [
     displayGameRegistration,
@@ -219,6 +265,9 @@ export const LeaderboardAdmin = ({
     fetchLeaderboardEntries,
     browsing: { entries, goToNextPage, goToPreviousPage, goToFirstPage },
   } = React.useContext(LeaderboardContext);
+  const { openSubscriptionDialog } = React.useContext(
+    SubscriptionSuggestionContext
+  );
 
   const setIsLoading = React.useCallback(
     (yesOrNo: boolean) => {
@@ -246,6 +295,8 @@ export const LeaderboardAdmin = ({
     try {
       await updateLeaderboard(payload);
       if (payload.name) setIsEditingName(false);
+      if (payload.autoPlayerNamePrefix !== undefined)
+        setIsEditingAutoPlayerNamePrefix(false);
     } catch (err) {
       console.error('An error occurred when updating leaderboard', err);
       setApiError(getApiError(payload));
@@ -257,16 +308,19 @@ export const LeaderboardAdmin = ({
   const onListLeaderboards = React.useCallback(
     () => {
       const fetchAndHandleError = async () => {
-        setIsLoading(true);
+        setIsRequestPending(true); // We only set the local loading state here to avoid blocking the dialog buttons on first load.
         setApiError(null);
         try {
           await listLeaderboards();
-        } catch (err) {
-          if (err.response && err.response.status === 404) {
+        } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
             setDisplayGameRegistration(true);
             return;
           }
-          console.error('An error occurred when fetching leaderboards', err);
+          console.error('An error occurred when fetching leaderboards', error);
           setApiError({
             action: 'leaderboardsFetching',
             message: (
@@ -277,12 +331,12 @@ export const LeaderboardAdmin = ({
             ),
           });
         } finally {
-          setIsLoading(false);
+          setIsRequestPending(false);
         }
       };
       fetchAndHandleError();
     },
-    [setIsLoading, listLeaderboards]
+    [listLeaderboards]
   );
 
   const onFetchLeaderboardEntries = async () => {
@@ -310,6 +364,18 @@ export const LeaderboardAdmin = ({
     setIsLoading(true);
     setApiError(null);
     try {
+      if (limits && leaderboards) {
+        const leaderboardLimits = limits.capabilities.leaderboards;
+        if (
+          leaderboardLimits &&
+          leaderboardLimits.maximumCountPerGame > 0 &&
+          leaderboards.length >= leaderboardLimits.maximumCountPerGame
+        ) {
+          setDisplayMaxLeaderboardCountReachedWarning(true);
+          return;
+        }
+      }
+
       await createLeaderboard({
         name: 'New leaderboard',
         sort: 'ASC',
@@ -331,23 +397,27 @@ export const LeaderboardAdmin = ({
   };
 
   const onResetLeaderboard = async (i18n: I18nType) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`
-      )
-    );
+    if (!currentLeaderboard) return;
+    const answer = await showConfirmation({
+      title: t`Reset leaderboard ${currentLeaderboard.name}`,
+      message: t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`,
+      confirmButtonLabel: t`Reset leaderboard`,
+    });
     if (!answer) return;
 
     setIsLoading(true);
     setApiError(null);
     try {
       await resetLeaderboard();
-    } catch (err) {
-      console.error('An error occurred when resetting leaderboard', err);
+    } catch (error) {
+      console.error('An error occurred when resetting leaderboard', error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       setApiError({
         action: 'leaderboardReset',
         message:
-          err.status && err.status === 409 ? (
+          extractedStatusAndCode && extractedStatusAndCode.status === 409 ? (
             <Trans>
               This leaderboard is already resetting, please wait a bit, close
               the dialog, come back and try again.
@@ -365,12 +435,20 @@ export const LeaderboardAdmin = ({
   };
 
   const onDeleteLeaderboard = async (i18n: I18nType) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`
-      )
-    );
-    if (!answer) return;
+    if (!currentLeaderboard) return;
+    // Extract word translation to ensure it is not wrongly translated in the sentence.
+    const translatedConfirmText = i18n._(t`delete`);
+
+    const deleteAnswer = await showDeleteConfirmation({
+      title: t`Do you really want to permanently delete the leaderboard ${
+        currentLeaderboard.name
+      }?`,
+      message: t`You’re about to permanently delete this leaderboard and all of its entries. This can't be undone.`,
+      fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
+      confirmText: translatedConfirmText,
+      confirmButtonLabel: t`Delete Leaderboard`,
+    });
+    if (!deleteAnswer) return;
 
     setIsLoading(true);
     setApiError(null);
@@ -392,18 +470,19 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onDeleteEntry = async (i18n: I18nType, entryId: string) => {
-    const answer = Window.showConfirmDialog(
-      i18n._(
-        t`Are you sure you want to delete this entry? This can't be undone.`
-      )
-    );
+  const onDeleteEntry = async (i18n: I18nType, entry: LeaderboardEntry) => {
+    if (!currentLeaderboard) return;
+    const answer = await showConfirmation({
+      title: t`Delete score ${entry.score} from ${entry.playerName}`,
+      message: t`Are you sure you want to delete this entry? This can't be undone.`,
+      confirmButtonLabel: t`Delete Entry`,
+    });
     if (!answer) return;
 
     setIsLoading(true);
     setApiError(null);
     try {
-      await deleteLeaderboardEntry(entryId);
+      await deleteLeaderboardEntry(entry.id);
     } catch (err) {
       console.error('An error occurred when deleting entry', err);
       setApiError({
@@ -413,7 +492,7 @@ export const LeaderboardAdmin = ({
             An error occurred when deleting the entry, please try again.
           </Trans>
         ),
-        itemId: entryId,
+        itemId: entry.id,
       });
     } finally {
       setIsLoading(false);
@@ -477,7 +556,6 @@ export const LeaderboardAdmin = ({
       <CenteredError>
         <GameRegistration
           project={project}
-          hideIfRegistered
           onGameRegistered={() => {
             setDisplayGameRegistration(false);
             onListLeaderboards();
@@ -527,6 +605,7 @@ export const LeaderboardAdmin = ({
           onAction={() => {
             onCreateLeaderboard();
           }}
+          actionButtonId="add-new-leaderboard-button"
           isLoading={isRequestPending}
         />
       </Line>
@@ -538,10 +617,11 @@ export const LeaderboardAdmin = ({
   ) => [
     {
       key: 'name',
-      avatar: <Label />,
+      avatar: <Tag />,
       text: isEditingName ? (
         <Line alignItems="center" expand noMargin>
           <TextField
+            id="edit-name-field"
             ref={newNameTextFieldRef}
             margin="none"
             style={styles.leaderboardNameTextField}
@@ -566,7 +646,7 @@ export const LeaderboardAdmin = ({
                   setIsEditingName(false);
                 }}
               >
-                <Cancel />
+                <Cross />
               </IconButton>
             </>
           )}
@@ -597,6 +677,7 @@ export const LeaderboardAdmin = ({
           tooltip={isEditingName ? t`Save` : t`Rename`}
           disabled={isRequestPending}
           edge="end"
+          id={isEditingName ? 'save-name-button' : 'edit-name-button'}
         >
           {isEditingName ? (
             isRequestPending ? (
@@ -612,7 +693,7 @@ export const LeaderboardAdmin = ({
     },
     {
       key: 'id',
-      avatar: <Fingerprint />,
+      avatar: <AtSign />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
           <Text size="body2">
@@ -629,7 +710,7 @@ export const LeaderboardAdmin = ({
     },
     {
       key: 'startDatetime',
-      avatar: <Today />,
+      avatar: <Calendar />,
       text: currentLeaderboard.resetLaunchedAt ? (
         <Text size="body2">
           <Trans>
@@ -675,7 +756,7 @@ export const LeaderboardAdmin = ({
             !!currentLeaderboard.resetLaunchedAt
           }
         >
-          <Update />
+          <Refresh />
         </IconButton>
       ),
     },
@@ -696,7 +777,7 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Brush />
+          <Edit />
         </IconButton>
       ),
     },
@@ -749,7 +830,153 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Loop />
+          <SwitchHorizontal />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'ignoreCustomPlayerNames',
+      avatar: currentLeaderboard.ignoreCustomPlayerNames ? (
+        <Lock />
+      ) : (
+        <LockOpen />
+      ),
+      text: (
+        <Tooltip
+          title={i18n._(
+            currentLeaderboard.ignoreCustomPlayerNames
+              ? t`Even if the action is used to send a score with a custom player username, this name will be ignored by the leaderboard.`
+              : t`The player name sent in the action to send a score will be used.`
+          )}
+        >
+          <Text size="body2">
+            {currentLeaderboard.ignoreCustomPlayerNames ? (
+              <Trans>Ignore unauthenticated player usernames</Trans>
+            ) : (
+              <Trans>Allow unauthenticated player usernames</Trans>
+            )}
+          </Text>
+        </Tooltip>
+      ),
+      secondaryText:
+        apiError &&
+        apiError.action === 'leaderboardIgnoreCustomPlayerNamesUpdate' ? (
+          <Text color="error" size="body2">
+            {apiError.message}
+          </Text>
+        ) : null,
+      secondaryAction: (
+        <IconButton
+          onClick={async () => {
+            await onUpdateLeaderboard(i18n, {
+              ignoreCustomPlayerNames: !currentLeaderboard.ignoreCustomPlayerNames,
+            });
+          }}
+          tooltip={
+            currentLeaderboard.ignoreCustomPlayerNames
+              ? t`Change to allow custom player usernames`
+              : t`Change to ignore custom player usernames`
+          }
+          edge="end"
+          disabled={isRequestPending || isEditingName}
+        >
+          <SwitchHorizontal />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'autoPlayerNamePrefix',
+      avatar: <Tag />,
+      text: isEditingAutoPlayerNamePrefix ? (
+        <Line alignItems="center" expand noMargin>
+          <TextField
+            id="edit-autoPlayerNamePrefix-field"
+            ref={newAutoPlayerNamePrefixTextFieldRef}
+            margin="none"
+            style={styles.leaderboardNameTextField}
+            maxLength={40}
+            value={newAutoPlayerNamePrefix}
+            onChange={(e, text) => setNewAutoPlayerNamePrefix(text)}
+            onKeyPress={event => {
+              if (shouldValidate(event) && !isRequestPending) {
+                onUpdateLeaderboard(i18n, {
+                  autoPlayerNamePrefix: newAutoPlayerNamePrefix,
+                });
+              }
+            }}
+            disabled={isRequestPending}
+          />
+          {!isRequestPending && (
+            <>
+              <Spacer />
+              <IconButton
+                tooltip={t`Cancel`}
+                style={{ padding: 0 }}
+                onClick={() => {
+                  setIsEditingAutoPlayerNamePrefix(false);
+                }}
+              >
+                <Cross />
+              </IconButton>
+            </>
+          )}
+        </Line>
+      ) : (
+        <Tooltip
+          title={
+            currentLeaderboard.autoPlayerNamePrefix ||
+            i18n._('No custom prefix for auto-generated player names')
+          }
+        >
+          <Text size="body2" style={styles.leaderboardNameText}>
+            {currentLeaderboard.autoPlayerNamePrefix ||
+              i18n._('No custom prefix for auto-generated player names')}
+          </Text>
+        </Tooltip>
+      ),
+      secondaryText:
+        apiError &&
+        apiError.action === 'leaderboardAutoPlayerNamePrefixUpdate' ? (
+          <Text color="error" size="body2">
+            {apiError.message}
+          </Text>
+        ) : null,
+      secondaryAction: (
+        <IconButton
+          onClick={() => {
+            if (isEditingAutoPlayerNamePrefix) {
+              onUpdateLeaderboard(i18n, {
+                autoPlayerNamePrefix: newAutoPlayerNamePrefix,
+              });
+            } else {
+              setNewAutoPlayerNamePrefix(
+                currentLeaderboard.autoPlayerNamePrefix || ''
+              );
+              setIsEditingAutoPlayerNamePrefix(true);
+            }
+          }}
+          tooltip={
+            isEditingAutoPlayerNamePrefix
+              ? t`Save`
+              : t`Change the default prefix for player names`
+          }
+          disabled={isRequestPending}
+          edge="end"
+          id={
+            isEditingAutoPlayerNamePrefix
+              ? 'save-autoPlayerNamePrefix-button'
+              : 'edit-autoPlayerNamePrefix-button'
+          }
+        >
+          {isEditingAutoPlayerNamePrefix ? (
+            isRequestPending ? (
+              <CircularProgress size={20} />
+            ) : (
+              <Save />
+            )
+          ) : (
+            <Edit />
+          )}
         </IconButton>
       ),
     },
@@ -774,13 +1001,13 @@ export const LeaderboardAdmin = ({
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <Brush />
+          <EditFile />
         </IconButton>
       ),
     },
     {
       key: 'playerUnicityDisplayChoice',
-      avatar: <PeopleAlt />,
+      avatar: <Users />,
       text: (
         <SelectField
           fullWidth
@@ -808,17 +1035,17 @@ export const LeaderboardAdmin = ({
           <SelectOption
             key={'free'}
             value={'FREE'}
-            primaryText={i18n._(t`Let the user select`)}
+            label={t`Let the user select`}
           />
           <SelectOption
             key={'prefer-unique'}
             value={'PREFER_UNIQUE'}
-            primaryText={i18n._(t`Only best entry`)}
+            label={t`Only best entry`}
           />
           <SelectOption
             key={'prefer-non-unique'}
             value={'PREFER_NON_UNIQUE'}
-            primaryText={i18n._(t`All entries`)}
+            label={t`All entries`}
           />
         </SelectField>
       ),
@@ -837,177 +1064,210 @@ export const LeaderboardAdmin = ({
     <I18n>
       {({ i18n }) => (
         <>
-          <ResponsiveLineStackLayout noMargin expand noColumnMargin>
-            <div style={styles.leftColumn}>
-              <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
-                <Column>
-                  <Line>
-                    {currentLeaderboard && leaderboards ? (
-                      <SelectField
-                        fullWidth
-                        floatingLabelText={<Trans>Leaderboard name</Trans>}
-                        value={currentLeaderboard.id}
-                        onChange={(e, i, leaderboardId) => {
-                          selectLeaderboard(leaderboardId);
-                        }}
+          <Column noMargin expand>
+            {displayMaxLeaderboardCountReachedWarning && limits && (
+              <MaxLeaderboardCountAlertMessage
+                onUpgrade={() =>
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: 'Leaderboard count per game limit reached',
+                    },
+                  })
+                }
+                onClose={() =>
+                  setDisplayMaxLeaderboardCountReachedWarning(false)
+                }
+                limits={limits}
+              />
+            )}
+            <ResponsiveLineStackLayout
+              noMargin
+              expand
+              noColumnMargin
+              id="leaderboard-administration-panel"
+            >
+              <div style={styles.leftColumn}>
+                <Paper
+                  elevation={3}
+                  style={styles.leaderboardConfigurationPaper}
+                  background="light"
+                >
+                  <Column>
+                    <Line noMargin>
+                      {currentLeaderboard && leaderboards ? (
+                        <SelectField
+                          fullWidth
+                          floatingLabelText={<Trans>Leaderboard name</Trans>}
+                          value={currentLeaderboard.id}
+                          onChange={(e, i, leaderboardId) => {
+                            selectLeaderboard(leaderboardId);
+                          }}
+                        >
+                          {leaderboards.map(leaderboard => (
+                            <SelectOption
+                              key={leaderboard.id}
+                              value={leaderboard.id}
+                              label={
+                                leaderboard.primary
+                                  ? t`${leaderboard.name} (default)`
+                                  : leaderboard.name
+                              }
+                              shouldNotTranslate={!leaderboard.primary}
+                            />
+                          ))}
+                        </SelectField>
+                      ) : null}
+                      <IconButton
+                        onClick={onCreateLeaderboard}
+                        disabled={isEditingName || isRequestPending}
                       >
-                        {leaderboards.map(leaderboard => (
-                          <SelectOption
-                            key={leaderboard.id}
-                            value={leaderboard.id}
-                            primaryText={
-                              leaderboard.primary
-                                ? t`${leaderboard.name} (default)`
-                                : leaderboard.name
+                        <Add />
+                      </IconButton>
+                    </Line>
+                    {currentLeaderboard ? (
+                      <>
+                        <List>
+                          {getLeaderboardDescription(
+                            i18n,
+                            currentLeaderboard
+                          ).map((item, index) => (
+                            <React.Fragment key={`fragment-${item.key}`}>
+                              {index > 0 ? (
+                                <Divider
+                                  key={`divider-${item.key}`}
+                                  component="li"
+                                />
+                              ) : null}
+                              <ListItem key={item.key} disableGutters>
+                                <ListItemAvatar>
+                                  <Avatar>{item.avatar}</Avatar>
+                                </ListItemAvatar>
+                                <ListItemText
+                                  disableTypography
+                                  secondary={item.secondaryText}
+                                >
+                                  {item.text}
+                                </ListItemText>
+                                {item.secondaryAction ? (
+                                  <ListItemSecondaryAction>
+                                    {item.secondaryAction}
+                                  </ListItemSecondaryAction>
+                                ) : null}
+                              </ListItem>
+                            </React.Fragment>
+                          ))}
+                        </List>
+                        <Line justifyContent="space-between">
+                          <FlatButton
+                            leftIcon={<Trash />}
+                            label={<Trans>Delete</Trans>}
+                            disabled={isRequestPending || isEditingName}
+                            onClick={() => onDeleteLeaderboard(i18n)}
+                          />
+                          <RaisedButton
+                            label={
+                              currentLeaderboard.primary ? (
+                                <Trans>Default</Trans>
+                              ) : (
+                                <Trans>Set as default</Trans>
+                              )
+                            }
+                            disabled={
+                              isRequestPending ||
+                              isEditingName ||
+                              currentLeaderboard.primary
+                            }
+                            onClick={() =>
+                              onUpdateLeaderboard(i18n, { primary: true })
                             }
                           />
-                        ))}
-                      </SelectField>
+                        </Line>
+                        {apiError &&
+                        (apiError.action === 'leaderboardDeletion' ||
+                          apiError.action === 'leaderboardPrimaryUpdate') ? (
+                          <PlaceholderError>
+                            {apiError.message}
+                          </PlaceholderError>
+                        ) : null}
+                      </>
                     ) : null}
-                    <IconButton
-                      onClick={onCreateLeaderboard}
-                      disabled={isEditingName || isRequestPending}
-                    >
-                      <Add />
-                    </IconButton>
-                  </Line>
-                  {currentLeaderboard ? (
-                    <>
-                      <List>
-                        {getLeaderboardDescription(
-                          i18n,
-                          currentLeaderboard
-                        ).map((item, index) => (
-                          <React.Fragment key={`fragment-${item.key}`}>
-                            {index > 0 ? (
-                              <Divider
-                                key={`divider-${item.key}`}
-                                component="li"
-                              />
-                            ) : null}
-                            <ListItem key={item.key} disableGutters>
-                              <ListItemAvatar>
-                                <Avatar>{item.avatar}</Avatar>
-                              </ListItemAvatar>
-                              <ListItemText
-                                disableTypography
-                                secondary={item.secondaryText}
-                              >
-                                {item.text}
-                              </ListItemText>
-                              {item.secondaryAction ? (
-                                <ListItemSecondaryAction>
-                                  {item.secondaryAction}
-                                </ListItemSecondaryAction>
-                              ) : null}
-                            </ListItem>
-                          </React.Fragment>
-                        ))}
-                      </List>
-                      <Line justifyContent="space-between">
-                        <FlatButton
-                          leftIcon={<Delete />}
-                          label={<Trans>Delete</Trans>}
-                          disabled={isRequestPending || isEditingName}
-                          onClick={() => onDeleteLeaderboard(i18n)}
-                        />
-                        <RaisedButton
-                          label={
-                            currentLeaderboard.primary ? (
-                              <Trans>Default</Trans>
-                            ) : (
-                              <Trans>Set as default</Trans>
-                            )
+                  </Column>
+                </Paper>
+              </div>
+              <div
+                style={{
+                  ...styles.rightColumn,
+                  paddingLeft: isMobile ? 0 : 20,
+                }}
+              >
+                <Line alignItems="center" justifyContent="flex-end">
+                  <Toggle
+                    labelPosition="left"
+                    toggled={displayOnlyBestEntry}
+                    onToggle={(e, newValue) =>
+                      setDisplayOnlyBestEntry(newValue)
+                    }
+                    label={
+                      <Tooltip
+                        title={i18n._(
+                          t`When checked, will only display the best score of each player (only for the display below).`
+                        )}
+                      >
+                        <Text size="body2">
+                          <Trans>Player best entry</Trans>
+                        </Text>
+                      </Tooltip>
+                    }
+                  />
+                  <LargeSpacer />
+                  <Divider orientation="vertical" />
+                  <Spacer />
+                  <IconButton
+                    onClick={onFetchLeaderboardEntries}
+                    disabled={isRequestPending || isEditingName}
+                    tooltip={t`Refresh`}
+                    size="small"
+                  >
+                    <Refresh />
+                  </IconButton>
+                  <Spacer />
+                </Line>
+                {apiError && apiError.action === 'entriesFetching' ? (
+                  <CenteredError>
+                    <PlaceholderError onRetry={onFetchLeaderboardEntries}>
+                      {apiError.message}
+                    </PlaceholderError>
+                  </CenteredError>
+                ) : (
+                  <LeaderboardEntriesTable
+                    entries={entries}
+                    customizationSettings={
+                      currentLeaderboard
+                        ? currentLeaderboard.customizationSettings
+                        : null
+                    }
+                    onDeleteEntry={entry => onDeleteEntry(i18n, entry)}
+                    isLoading={isRequestPending || isEditingName}
+                    navigation={{
+                      goToNextPage,
+                      goToPreviousPage,
+                      goToFirstPage,
+                    }}
+                    erroredEntry={
+                      apiError &&
+                      apiError.action === 'entryDeletion' &&
+                      apiError.itemId
+                        ? {
+                            entryId: apiError.itemId,
+                            message: apiError.message,
                           }
-                          disabled={
-                            isRequestPending ||
-                            isEditingName ||
-                            currentLeaderboard.primary
-                          }
-                          onClick={() =>
-                            onUpdateLeaderboard(i18n, { primary: true })
-                          }
-                        />
-                      </Line>
-                      {apiError &&
-                      (apiError.action === 'leaderboardDeletion' ||
-                        apiError.action === 'leaderboardPrimaryUpdate') ? (
-                        <PlaceholderError>{apiError.message}</PlaceholderError>
-                      ) : null}
-                    </>
-                  ) : null}
-                </Column>
-              </Paper>
-            </div>
-            <div
-              style={{
-                ...styles.rightColumn,
-                paddingLeft: windowWidth === 'small' ? 0 : 20,
-              }}
-            >
-              <Line alignItems="center" justifyContent="flex-end">
-                <Toggle
-                  size="small"
-                  labelPosition="left"
-                  toggled={displayOnlyBestEntry}
-                  onToggle={(e, newValue) => setDisplayOnlyBestEntry(newValue)}
-                  label={
-                    <Tooltip
-                      title={i18n._(
-                        t`When checked, will only display the best score of each player (only for the display below).`
-                      )}
-                    >
-                      <Text size="body2">
-                        <Trans>Player best entry</Trans>
-                      </Text>
-                    </Tooltip>
-                  }
-                />
-                <LargeSpacer />
-                <Divider orientation="vertical" />
-                <Spacer />
-                <IconButton
-                  onClick={onFetchLeaderboardEntries}
-                  disabled={isRequestPending || isEditingName}
-                  tooltip={t`Refresh`}
-                  size="small"
-                >
-                  <Refresh />
-                </IconButton>
-                <Spacer />
-              </Line>
-              {apiError && apiError.action === 'entriesFetching' ? (
-                <CenteredError>
-                  <PlaceholderError onRetry={onFetchLeaderboardEntries}>
-                    {apiError.message}
-                  </PlaceholderError>
-                </CenteredError>
-              ) : (
-                <LeaderboardEntriesTable
-                  entries={entries}
-                  customizationSettings={
-                    currentLeaderboard
-                      ? currentLeaderboard.customizationSettings
-                      : null
-                  }
-                  onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
-                  isLoading={isRequestPending || isEditingName}
-                  navigation={{
-                    goToNextPage,
-                    goToPreviousPage,
-                    goToFirstPage,
-                  }}
-                  erroredEntry={
-                    apiError &&
-                    apiError.action === 'entryDeletion' &&
-                    apiError.itemId
-                      ? { entryId: apiError.itemId, message: apiError.message }
-                      : undefined
-                  }
-                />
-              )}
-            </div>
-          </ResponsiveLineStackLayout>
+                        : undefined
+                    }
+                  />
+                )}
+              </div>
+            </ResponsiveLineStackLayout>
+          </Column>
           {isEditingAppearance ? (
             <LeaderboardAppearanceDialog
               open

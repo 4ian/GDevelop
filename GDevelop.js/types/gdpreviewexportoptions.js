@@ -4,12 +4,16 @@ declare class gdPreviewExportOptions {
   useWebsocketDebuggerClientWithServerAddress(address: string, port: string): gdPreviewExportOptions;
   useWindowMessageDebuggerClient(): gdPreviewExportOptions;
   setLayoutName(layoutName: string): gdPreviewExportOptions;
+  setFallbackAuthor(id: string, username: string): gdPreviewExportOptions;
   setExternalLayoutName(externalLayoutName: string): gdPreviewExportOptions;
   setIncludeFileHash(includeFile: string, hash: number): gdPreviewExportOptions;
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
+  setIsDevelopmentEnvironment(enable: boolean): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
   setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
+  setGDevelopResourceToken(gdevelopResourceToken: string): gdPreviewExportOptions;
+  setAllowAuthenticationUsingIframeForPreview(enable: boolean): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

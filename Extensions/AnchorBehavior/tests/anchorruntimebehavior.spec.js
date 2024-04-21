@@ -1,10 +1,7 @@
 // @ts-check
 describe('gdjs.AnchorRuntimeBehavior', function () {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: { resources: [] },
-    // @ts-ignore
-    properties: { windowWidth: 1000, windowHeight: 1000 },
+  const runtimeGame = gdjs.getPixiRuntimeGame({
+    propertiesOverrides: { windowHeight: 1000, windowWidth: 1000 },
   });
   const anchorBehaviorName = 'Anchor';
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
@@ -33,6 +30,7 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     behaviorsSharedData: [],
     objects: [],
     instances: [],
+    usedResources: [],
   });
 
   function createObject(behaviorProperties) {
@@ -60,16 +58,6 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     object.setCustomWidthAndHeight(10, 10);
     runtimeScene.addObject(object);
     return object;
-  }
-
-  function getAnchorBehavior(object) {
-    const behavior = object.getBehavior(anchorBehaviorName);
-    if (!(behavior instanceof gdjs.AnchorRuntimeBehavior)) {
-      throw new Error(
-        'Expected behavior to be an instance of gdjs.AnchorBehavior'
-      );
-    }
-    return behavior;
   }
 
   describe('(anchor horizontal edge)', function () {

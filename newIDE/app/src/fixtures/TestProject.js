@@ -3,19 +3,28 @@
 /*::
 export type TestProject = {|
   project: gdProject,
-  shapePainterObject: any,
-  textObject: any,
-  tiledSpriteObject: any,
-  panelSpriteObject: any,
-  spriteObject: gdSpriteObject,
-  spriteObjectWithBehaviors: gdSpriteObject,
-  spriteObjectWithoutBehaviors: gdSpriteObject,
+  shapePainterObjectConfiguration: gdObjectConfiguration,
+  textObjectConfiguration: gdObjectConfiguration,
+  particleEmitterConfiguration: gdObjectConfiguration,
+  tiledSpriteObjectConfiguration: gdObjectConfiguration,
+  panelSpriteObject: gdObject,
+  spriteObjectConfiguration: gdSpriteObject,
+  emptySpriteObjectConfiguration: gdSpriteObject,
+  cube3dObject: gdObject,
+  textInputObject: gdObject,
+  customObject: gdObject,
+  spriteObject: gdObject,
+  emptySpriteObject: gdObject,
+  spriteObjectWithBehaviors: gdObject,
+  spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
+  testLayoutInstance2: gdInitialInstance,
+  testLayoutInstance3: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
@@ -29,15 +38,20 @@ export type TestProject = {|
   testEmptyEventsBasedBehavior: gdEventsBasedBehavior,
   testBehaviorEventsFunction: gdEventsFunction,
   testBehaviorLifecycleEventsFunction: gdEventsFunction,
+  testEventsBasedObject: gdEventsBasedObject,
+  testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
+  layerWith3DEffects: gdLayer,
+  layerWith2DEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
-  spriteObjectWithEffects: gdSpriteObject,
-  spriteObjectWithoutEffects: gdSpriteObject,
+  spriteObjectWithEffects: gdObject,
+  spriteObjectWithoutEffects: gdObject,
   stringRelationalOperatorParameterMetadata: gdParameterMetadata,
   numberRelationalOperatorParameterMetadata: gdParameterMetadata,
   colorRelationalOperatorParameterMetadata: gdParameterMetadata,
   unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
+  emptyObjectsContainer: gdObjectsContainer,
 |};
 */
 
@@ -105,17 +119,177 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   project.getResourcesManager().addResource(jsonResource2);
   project.getResourcesManager().addResource(jsonResource3);
 
+  const buttonExtension = project.insertNewEventsFunctionsExtension(
+    'Button',
+    0
+  );
+  buttonExtension.setVersion('1.0.0');
+
+  const buttonEventBasedObject = buttonExtension
+    .getEventsBasedObjects()
+    .insertNew('PanelSpriteButton', 0);
+  const buttonProperties = buttonEventBasedObject.getPropertyDescriptors();
+  buttonProperties
+    .insertNew('PressedLabelOffsetY', 0)
+    .setType('number')
+    .setLabel('Label offset on Y axis when pressed');
+  buttonProperties
+    .insertNew('LeftPadding', 1)
+    .setType('number')
+    .setLabel('Left padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('RightPadding', 2)
+    .setType('number')
+    .setLabel('Right padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('TopPadding', 3)
+    .setType('number')
+    .setLabel('Top padding')
+    .setGroup('Padding');
+  buttonProperties
+    .insertNew('DownPadding', 4)
+    .setType('number')
+    .setLabel('Down padding')
+    .setGroup('Padding');
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'TextObject::Text',
+    'Label',
+    0
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Idle',
+    1
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Hovered',
+    2
+  );
+  buttonEventBasedObject.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'Pressed',
+    3
+  );
+  // Add a function
+  const testObjectEventsFunction = buttonEventBasedObject
+    .getEventsFunctions()
+    .insertNewEventsFunction('MyTestFunction', 0);
+  testObjectEventsFunction
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
   // Create and expose some objects
-  const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
-  shapePainterObject.setType('PrimitiveDrawing::Drawer');
-  const textObject = new gd.TextObject('MyTextObject');
-  textObject.setType('TextObject::Text');
-  const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
-  tiledSpriteObject.setType('TiledSpriteObject::TiledSprite');
-  const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
-  panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
-  const spriteObject = new gd.SpriteObject('MySpriteObject');
-  spriteObject.setType('Sprite');
+  const testLayout = project.insertNewLayout('TestLayout', 0);
+  const customObject = testLayout.insertNewObject(
+    project,
+    'Button::PanelSpriteButton',
+    'MyButton',
+    0
+  );
+  const shapePainterObject = testLayout.insertNewObject(
+    project,
+    'PrimitiveDrawing::Drawer',
+    'MyShapePainterObject',
+    0
+  );
+  const textObject = testLayout.insertNewObject(
+    project,
+    'TextObject::Text',
+    'MyTextObject',
+    0
+  );
+  const particleEmitter = testLayout.insertNewObject(
+    project,
+    'ParticleSystem::ParticleEmitter',
+    'MyParticleEmitter',
+    0
+  );
+  const tiledSpriteObject = testLayout.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'MyTiledSpriteObject',
+    0
+  );
+  const cube3dObject = testLayout.insertNewObject(
+    project,
+    'FakeScene3D::Cube3DObject',
+    'CubeObject',
+    0
+  );
+  const textInputObject = testLayout.insertNewObject(
+    project,
+    'FakeTextInput::TextInput',
+    'TextInputObject',
+    0
+  );
+  const panelSpriteObject = testLayout.insertNewObject(
+    project,
+    'PanelSpriteObject::PanelSprite',
+    'MyPanelSpriteObject',
+    0
+  );
+  const spriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject',
+    0
+  );
+  const emptySpriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MyEmptySpriteObject',
+    0
+  );
+  const spriteObjectWithBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithBehaviors',
+    0
+  );
+  const spriteObjectWithoutBehaviors = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutBehaviors',
+    0
+  );
+  const spriteObjectWithoutEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithoutEffect',
+    0
+  );
+  const spriteObjectWithEffects = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObjectWithEffects',
+    0
+  );
+  testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name',
+    14
+  );
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
+  const spriteObjectConfiguration = gd.asSpriteConfiguration(
+    spriteObject.getConfiguration()
+  );
+  const animations = spriteObjectConfiguration.getAnimations();
+  const emptySpriteObjectConfiguration = gd.asSpriteConfiguration(
+    emptySpriteObject.getConfiguration()
+  );
   {
     const variablesContainer = spriteObject.getVariables();
     variablesContainer
@@ -136,21 +310,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     arrayVariable.setFolded(true);
     arrayVariable.pushNew().setValue(856.5);
   }
-  const spriteObjectWithBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithBehaviors'
-  );
-  spriteObjectWithBehaviors.setType('Sprite');
-  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
-    'MySpriteObjectWithoutBehaviors'
-  );
-  spriteObjectWithoutBehaviors.setType('Sprite');
-  const spriteObjectWithLongName = new gd.SpriteObject(
-    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
-  );
-  spriteObjectWithLongName.setType('Sprite');
-
   {
     const animation = new gd.Animation();
+    animation.setName('My animation');
     animation.setDirectionsCount(1);
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('icon128.png');
@@ -172,10 +334,11 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
-    spriteObject.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
+    animation.setName('My other animation');
     animation.setDirectionsCount(1);
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('icon128.png');
@@ -189,7 +352,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
     animation.getDirection(0).addSprite(sprite4);
-    spriteObject.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -197,7 +360,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('pixi');
     animation.getDirection(0).addSprite(sprite1);
-    spriteObject.addAnimation(animation);
+    animations.addAnimation(animation);
   }
 
   spriteObjectWithBehaviors.addNewBehavior(
@@ -209,27 +372,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     project,
     'DraggableBehavior::Draggable',
     'Draggable'
-  );
-
-  // Add some tags
-  tiledSpriteObject.setTags('Tag1');
-  spriteObject.setTags('Tag1, Tag2');
-
-  // Layout
-  const testLayout = project.insertNewLayout('TestLayout', 0);
-  testLayout.insertObject(shapePainterObject, 0);
-  testLayout.insertObject(textObject, 0);
-  testLayout.insertObject(tiledSpriteObject, 0);
-  testLayout.insertObject(panelSpriteObject, 0);
-  testLayout.insertObject(spriteObject, 0);
-  testLayout.insertObject(spriteObjectWithBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
-  testLayout.insertObject(spriteObjectWithLongName, 14);
-  testLayout.insertNewObject(
-    project,
-    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
-    'MyFakeObjectWithUnsupportedCapability',
-    15
   );
 
   const group1 = new gd.ObjectGroup();
@@ -259,6 +401,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewInitialInstance();
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
+
+  const testLayoutInstance2 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance2.setX(120);
+  testLayoutInstance2.setY(-15);
+  testLayoutInstance2.setZ(32);
+  testLayoutInstance2.setObjectName(cube3dObject.getName());
+
+  const testLayoutInstance3 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance3.setX(12);
+  testLayoutInstance3.setY(-15.5);
+  testLayoutInstance3.setZ(3.2);
+  testLayoutInstance3.setObjectName(textInputObject.getName());
 
   const testSpriteObjectInstance = testLayout
     .getInitialInstances()
@@ -456,12 +614,13 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const testInstruction = makeKeyPressedCondition('Space');
 
   // Global objects
-  const globalTextObject = new gd.TextObject('GlobalTextObject');
-  const globalTiledSpriteObject = new gd.TiledSpriteObject(
-    'GlobalTiledSpriteObject'
+  project.insertNewObject(project, 'TextObject::Text', 'GlobalTextObject', 0);
+  project.insertNewObject(
+    project,
+    'TiledSpriteObject::TiledSprite',
+    'GlobalTiledSpriteObject',
+    0
   );
-  project.insertObject(globalTextObject, 0);
-  project.insertObject(globalTiledSpriteObject, 0);
 
   // External events
   const testExternalEvents1 = project.insertNewExternalEvents(
@@ -495,6 +654,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   someAlreadyInstalledExtension.setFullName(
     'Some fake already installed extension'
   );
+  someAlreadyInstalledExtension.setVersion('1.2.3');
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -629,19 +789,61 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create a layer with some effects
   const layerWithEffects = new gd.Layer();
+  {
+    const effect1 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+    const effect4 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  const effect1 = layerWithEffects.getEffects().insertNewEffect('MyEffect1', 0);
-  const effect2 = layerWithEffects.getEffects().insertNewEffect('MyEffect2', 1);
-  const effect3 = layerWithEffects.getEffects().insertNewEffect('MyEffect3', 1);
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 3D effects
+  const layerWith3DEffects = new gd.Layer();
+  {
+    const effect4 = layerWith3DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  effect1.setEffectType('FakeSepia');
-  effect1.setDoubleParameter('opacity', 0.6);
-  effect2.setEffectType('FakeNight');
-  effect2.setDoubleParameter('intensity', 0.1);
-  effect2.setDoubleParameter('opacity', 0.2);
-  effect3.setEffectType('FakeEffectWithVariousParameters');
-  effect3.setDoubleParameter('intensity', 0.1);
-  effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 2D effects
+  const layerWith2DEffects = new gd.Layer();
+  {
+    const effect1 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+  }
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType
@@ -650,12 +852,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
-  const spriteObjectWithoutEffects = new gd.SpriteObject(
-    'MySpriteObjectWithoutEffects'
-  );
-  const spriteObjectWithEffects = new gd.SpriteObject(
-    'MySpriteObjectWithEffects'
-  );
   {
     const effect1 = spriteObjectWithEffects
       .getEffects()
@@ -710,11 +906,18 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   return {
     project,
-    shapePainterObject,
-    textObject,
-    tiledSpriteObject,
+    shapePainterObjectConfiguration: shapePainterObject.getConfiguration(),
+    textObjectConfiguration: textObject.getConfiguration(),
+    particleEmitterConfiguration: particleEmitter.getConfiguration(),
+    tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObject,
+    customObject,
+    cube3dObject,
+    textInputObject,
     spriteObject,
+    spriteObjectConfiguration,
+    emptySpriteObject,
+    emptySpriteObjectConfiguration,
     testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
@@ -723,6 +926,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     group2,
     group4WithLongsNames,
     testLayoutInstance1,
+    testLayoutInstance2,
+    testLayoutInstance3,
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,
@@ -736,7 +941,11 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testEmptyEventsBasedBehavior,
     testBehaviorEventsFunction,
     testBehaviorLifecycleEventsFunction,
+    testEventsBasedObject: buttonEventBasedObject,
+    testObjectEventsFunction,
     layerWithEffects,
+    layerWith3DEffects,
+    layerWith2DEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
     spriteObjectWithEffects,
@@ -745,5 +954,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     numberRelationalOperatorParameterMetadata,
     colorRelationalOperatorParameterMetadata,
     unknownRelationalOperatorParameterMetadata,
+    emptyObjectsContainer: new gd.ObjectsContainer(),
   };
 };

@@ -27,7 +27,13 @@ html {
   padding-left: env(safe-area-inset-left);
 
   /* Smoother startup */
-  animation: fadein 0.5s;
+  animation: fade-in 0.5s;
+}
+
+/* The part of the window which can be drag'n'dropped on desktop (Electron and installed PWA). */
+.title-bar-draggable-part {
+  -webkit-app-region: drag;
+  app-region: drag;
 }
 
 /* A container adding padding to fit on the screen, useful for dialogs on non square screens ("notch"). */
@@ -46,6 +52,13 @@ html {
 /* Add left padding to fit on screen, useful for drawers on non square screens ("notch"). */
 .safe-area-aware-left-container {
   padding-left: env(safe-area-inset-left);
+}
+
+/* Helper for avoiding the soft keyboard. See also `getAvoidSoftKeyboardStyle`. */
+.avoid-soft-keyboard {
+  transform: translateY(calc(-1 * var(--softKeyboardBottomOffset)));
+  transition: transform 0.2s linear;
+  will-change: transform;
 }
 
 /* Disable selections and web-ish cursors */

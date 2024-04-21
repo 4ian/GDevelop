@@ -1,7 +1,13 @@
 namespace gdjs {
+  export interface RuntimeGame {
+    inventories: { [name: string]: gdjs.Inventory };
+  }
   export class InventoryManager {
-    static get(runtimeScene, name): gdjs.Inventory {
-      const game = runtimeScene.getGame();
+    static get(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      name: string
+    ): gdjs.Inventory {
+      const game = instanceContainer.getGame();
       if (!game.inventories) {
         game.inventories = {};
       }
@@ -15,70 +21,116 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace inventory {
-      export const add = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).add(name);
+      export const add = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).add(name);
       };
 
-      export const remove = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).remove(name);
+      export const remove = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).remove(
+          name
+        );
       };
 
-      export const count = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).count(name);
+      export const count = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).count(
+          name
+        );
       };
 
-      export const has = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).has(name);
+      export const maximum = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).maximum(
+          name
+        );
+      };
+
+      export const has = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).has(name);
       };
 
       export const setMaximum = function (
-        runtimeScene,
-        inventoryName,
-        name,
-        maxCount
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string,
+        maxCount: number
       ) {
-        return InventoryManager.get(runtimeScene, inventoryName).setMaximum(
-          name,
-          maxCount
-        );
+        return InventoryManager.get(
+          instanceContainer,
+          inventoryName
+        ).setMaximum(name, maxCount);
       };
 
       export const setUnlimited = function (
-        runtimeScene,
-        inventoryName,
-        name,
-        enable
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string,
+        enable: boolean
       ) {
-        return InventoryManager.get(runtimeScene, inventoryName).setUnlimited(
-          name,
-          enable
+        return InventoryManager.get(
+          instanceContainer,
+          inventoryName
+        ).setUnlimited(name, enable);
+      };
+
+      export const isFull = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).isFull(
+          name
         );
       };
 
-      export const isFull = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).isFull(name);
-      };
-
-      export const equip = function (runtimeScene, inventoryName, name, equip) {
-        return InventoryManager.get(runtimeScene, inventoryName).equip(
+      export const equip = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string,
+        equip: boolean
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).equip(
           name,
           equip
         );
       };
 
-      export const isEquipped = function (runtimeScene, inventoryName, name) {
-        return InventoryManager.get(runtimeScene, inventoryName).isEquipped(
-          name
-        );
+      export const isEquipped = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(
+          instanceContainer,
+          inventoryName
+        ).isEquipped(name);
       };
 
       export const serializeToVariable = function (
-        runtimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         inventoryName: string,
         variable: gdjs.Variable
       ) {
         const allItems = gdjs.InventoryManager.get(
-          runtimeScene,
+          instanceContainer,
           inventoryName
         ).getAllItems();
         for (const name in allItems) {
@@ -92,12 +144,12 @@ namespace gdjs {
       };
 
       export const unserializeFromVariable = function (
-        runtimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         inventoryName: string,
         variable: gdjs.Variable
       ) {
         const inventory = gdjs.InventoryManager.get(
-          runtimeScene,
+          instanceContainer,
           inventoryName
         );
         inventory.clear();

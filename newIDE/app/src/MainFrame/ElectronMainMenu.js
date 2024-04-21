@@ -2,370 +2,253 @@
 import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
-import { getElectronAccelerator } from '../KeyboardShortcuts';
-import { useShortcutMap } from '../KeyboardShortcuts';
-import { t } from '@lingui/macro';
-import { isMacLike } from '../Utils/Platform';
-import { type MainMenuProps } from './MainMenu.flow';
+import {
+  buildMainMenuDeclarativeTemplate,
+  type BuildMainMenuProps,
+  type MainMenuCallbacks,
+  type MainMenuExtraCallbacks,
+  type MainMenuEvent,
+} from './MainMenu';
+import PreferencesContext from './Preferences/PreferencesContext';
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-type MainMenuEvent =
-  | 'main-menu-open'
-  | 'main-menu-open-recent'
-  | 'main-menu-save'
-  | 'main-menu-save-as'
-  | 'main-menu-close'
-  | 'main-menu-close-app'
-  | 'main-menu-export'
-  | 'main-menu-create'
-  | 'main-menu-open-project-manager'
-  | 'main-menu-open-home-page'
-  | 'main-menu-open-debugger'
-  | 'main-menu-open-about'
-  | 'main-menu-open-preferences'
-  | 'main-menu-open-language'
-  | 'main-menu-open-profile'
-  | 'main-menu-open-games-dashboard'
-  | 'update-status';
-
-type MenuItemTemplate =
-  | {|
-      onClickSendEvent?: MainMenuEvent,
-      onClickOpenLink?: string,
-      accelerator?: string,
-      enabled?: boolean,
-      label?: string,
-      role?: string,
-      eventArgs?: any,
-    |}
-  | {|
-      submenu: Array<MenuItemTemplate>,
-      label: string,
-    |}
-  | {|
-      submenu: Array<MenuItemTemplate>,
-      role: string,
-    |}
-  | {|
-      type: 'separator',
-    |}
-  | {|
-      role: string,
-    |};
-
-type RootMenuTemplate =
-  | {|
-      label?: string,
-      role?: string,
-      submenu: Array<MenuItemTemplate>,
-    |}
-  | {|
-      role: string,
-      submenu: Array<MenuItemTemplate>,
-    |}
-  | {|
-      submenu: Array<MenuItemTemplate>,
-    |};
-
 // Custom hook to register and deregister IPC listener
-const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
+const useIPCEventListener = ({
+  ipcEvent,
+  callback,
+  shouldApply,
+}: {
+  ipcEvent: MainMenuEvent,
+  callback: Function,
+  shouldApply: boolean,
+}) => {
   React.useEffect(
     () => {
-      if (!ipcRenderer) return;
-      const handler = (event, ...eventArgs) => func(...eventArgs);
+      if (!ipcRenderer || !shouldApply) return;
+
+      const handler = (event, ...eventArgs) => callback(...eventArgs);
       ipcRenderer.on(ipcEvent, handler);
       return () => ipcRenderer.removeListener(ipcEvent, handler);
     },
-    [ipcEvent, func]
+    [ipcEvent, callback, shouldApply]
   );
 };
 
-const buildAndSendMenuTemplate = (
-  project,
-  i18n,
-  recentProjectFiles,
-  shortcutMap
-) => {
-  const fileTemplate = {
-    label: i18n._(t`File`),
-    submenu: [
-      {
-        label: i18n._(t`Create a New Project...`),
-        accelerator: getElectronAccelerator(shortcutMap['CREATE_NEW_PROJECT']),
-        onClickSendEvent: 'main-menu-create',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Open...`),
-        accelerator: getElectronAccelerator(shortcutMap['OPEN_PROJECT']),
-        onClickSendEvent: 'main-menu-open',
-      },
-      {
-        label: i18n._(t`Open Recent`),
-        submenu: recentProjectFiles.map(item => ({
-          label: item.fileMetadata.fileIdentifier,
-          onClickSendEvent: 'main-menu-open-recent',
-          eventArgs: item,
-        })),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Save`),
-        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT']),
-        onClickSendEvent: 'main-menu-save',
-        enabled: !!project,
-      },
-      {
-        label: i18n._(t`Save as...`),
-        accelerator: getElectronAccelerator(shortcutMap['SAVE_PROJECT_AS']),
-        onClickSendEvent: 'main-menu-save-as',
-        enabled: !!project,
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Export (web, iOS, Android)...`),
-        accelerator: getElectronAccelerator(shortcutMap['EXPORT_GAME']),
-        onClickSendEvent: 'main-menu-export',
-        enabled: !!project,
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Close Project`),
-        accelerator: getElectronAccelerator(shortcutMap['CLOSE_PROJECT']),
-        onClickSendEvent: 'main-menu-close',
-        enabled: !!project,
-      },
-    ],
-  };
-  if (!isMacLike()) {
-    fileTemplate.submenu.push(
-      { type: 'separator' },
-      {
-        label: i18n._(t`My Profile`),
-        onClickSendEvent: 'main-menu-open-profile',
-      },
-      {
-        label: i18n._(t`Games Dashboard`),
-        onClickSendEvent: 'main-menu-open-games-dashboard',
-      },
-      {
-        label: i18n._(t`Preferences`),
-        onClickSendEvent: 'main-menu-open-preferences',
-      },
-      {
-        label: i18n._(t`Language`),
-        onClickSendEvent: 'main-menu-open-language',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Exit GDevelop`),
-        accelerator: getElectronAccelerator(shortcutMap['QUIT_APP']),
-        onClickSendEvent: 'main-menu-close-app',
-      }
-    );
-  }
+const useAppEventListener = ({
+  event,
+  callback,
+}: {
+  event: string,
+  callback: Function,
+}) => {
+  React.useEffect(
+    () => {
+      if (!app) return;
+      const handler = (event, ...eventArgs) => callback(...eventArgs);
+      app.on(event, handler);
+      return () => app.removeListener(event, handler);
+    },
+    [event, callback]
+  );
+};
 
-  const editTemplate = {
-    label: i18n._(t`Edit`),
-    submenu: [
-      { label: i18n._(t`Undo`), role: 'undo' },
-      { label: i18n._(t`Redo`), role: 'redo' },
-      { type: 'separator' },
-      { label: i18n._(t`Cut`), role: 'cut' },
-      { label: i18n._(t`Copy`), role: 'copy' },
-      { label: i18n._(t`Paste`), role: 'paste' },
-      { label: i18n._(t`Paste and Match Style`), role: 'pasteandmatchstyle' },
-      { label: i18n._(t`Delete`), role: 'delete' },
-      { label: i18n._(t`Select All`), role: 'selectall' },
-    ],
-  };
-
-  const viewTemplate = {
-    label: i18n._(t`View`),
-    submenu: [
-      {
-        label: i18n._(t`Show Project Manager`),
-        accelerator: getElectronAccelerator(
-          shortcutMap['OPEN_PROJECT_MANAGER']
-        ),
-        onClickSendEvent: 'main-menu-open-project-manager',
-        enabled: !!project,
-      },
-      {
-        label: i18n._(t`Show Home`),
-        onClickSendEvent: 'main-menu-open-home-page',
-      },
-      {
-        label: i18n._(t`Open Debugger`),
-        onClickSendEvent: 'main-menu-open-debugger',
-        enabled: !!project,
-      },
-      { type: 'separator' },
-      { label: i18n._(t`Toggle Developer Tools`), role: 'toggledevtools' },
-      { type: 'separator' },
-      { label: i18n._(t`Toggle Fullscreen`), role: 'togglefullscreen' },
-    ],
-  };
-
-  const windowTemplate = {
-    label: i18n._(t`Window`),
-    role: 'window',
-    submenu: [{ label: i18n._(t`Minimize`), role: 'minimize' }],
-  };
-
-  const helpTemplate = {
-    label: i18n._(t`Help`),
-    role: 'help',
-    submenu: [
-      {
-        label: i18n._(t`GDevelop website`),
-        onClickOpenLink: 'http://gdevelop.io',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Community Forums`),
-        onClickOpenLink: 'https://forum.gdevelop.io',
-      },
-      {
-        label: i18n._(t`Community Discord Chat`),
-        onClickOpenLink: 'https://discord.gg/gdevelop',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Contribute to GDevelop`),
-        onClickOpenLink: 'https://gdevelop.io/page/contribute',
-      },
-      {
-        label: i18n._(t`Create Extensions for GDevelop`),
-        onClickOpenLink:
-          'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Help to Translate GDevelop`),
-        onClickOpenLink: 'https://crowdin.com/project/gdevelop',
-      },
-      {
-        label: i18n._(t`Report a wrong translation`),
-        onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
-      },
-    ],
-  };
-  if (!isMacLike()) {
-    helpTemplate.submenu.push(
-      { type: 'separator' },
-      {
-        label: i18n._(t`About GDevelop`),
-        onClickSendEvent: 'main-menu-open-about',
-      }
-    );
-  }
-
-  const template: Array<RootMenuTemplate> = [
-    fileTemplate,
-    editTemplate,
-    viewTemplate,
-    windowTemplate,
-    helpTemplate,
-  ];
-
-  if (isMacLike()) {
-    template.unshift({
-      label: i18n._(t`GDevelop 5`),
-      submenu: [
-        {
-          label: i18n._(t`About GDevelop`),
-          onClickSendEvent: 'main-menu-open-about',
-        },
-        { type: 'separator' },
-        {
-          label: i18n._(t`My Profile`),
-          onClickSendEvent: 'main-menu-open-profile',
-        },
-        {
-          label: i18n._(t`Games Dashboard`),
-          onClickSendEvent: 'main-menu-open-games-dashboard',
-        },
-        {
-          label: i18n._(t`Preferences`),
-          onClickSendEvent: 'main-menu-open-preferences',
-        },
-        {
-          label: i18n._(t`Language`),
-          onClickSendEvent: 'main-menu-open-language',
-        },
-        { type: 'separator' },
-        { role: 'services', submenu: [] },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' },
-      ],
-    });
-
-    editTemplate.submenu.push(
-      { type: 'separator' },
-      {
-        label: i18n._(t`Speech`),
-        submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
-      }
-    );
-
-    windowTemplate.submenu = [
-      { role: 'minimize' },
-      { role: 'zoom' },
-      { type: 'separator' },
-      { role: 'front' },
-    ];
-  }
-
-  if (ipcRenderer) {
-    ipcRenderer.send('set-main-menu', template);
-  }
+const isMainWindow = (windowTitle: string): boolean => {
+  if (!windowTitle) return false;
+  const lowercaseTitle = windowTitle.toLowerCase();
+  return (
+    lowercaseTitle.startsWith('gdevelop') &&
+    lowercaseTitle !== 'gdevelop dialogue tree editor (yarn)' &&
+    lowercaseTitle !== 'gdevelop sound effects editor (jfxr)' &&
+    lowercaseTitle !== 'gdevelop image editor (piskel)'
+  );
 };
 
 /**
  * Create and update the editor main menu using Electron APIs.
  */
-const ElectronMainMenu = (props: MainMenuProps) => {
-  const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
-  const shortcutMap = useShortcutMap();
+const ElectronMainMenu = ({
+  props,
+  callbacks,
+  extraCallbacks,
+}: {|
+  props: BuildMainMenuProps,
+  callbacks: MainMenuCallbacks,
+  extraCallbacks: MainMenuExtraCallbacks,
+|}) => {
+  const {
+    i18n,
+    project,
+    canSaveProjectAs,
+    recentProjectFiles,
+    shortcutMap,
+    isApplicationTopLevelMenu,
+  } = props;
+  const { onClosePreview } = extraCallbacks;
   const language = i18n.language;
+  const [
+    isFocusedOnMainWindow,
+    setIsFocusedOnMainWindow,
+  ] = React.useState<boolean>(true);
+  const [focusedWindowId, setFocusedWindowId] = React.useState<number>(
+    remote.getCurrentWindow().id
+  );
+  const closePreviewWindow =
+    !isFocusedOnMainWindow && onClosePreview
+      ? () => onClosePreview(focusedWindowId)
+      : null;
+  const {
+    values: { useShortcutToClosePreviewWindow },
+  } = React.useContext(PreferencesContext);
 
-  useIPCEventListener('main-menu-open', props.onChooseProject);
-  useIPCEventListener('main-menu-open-recent', props.onOpenRecentFile);
-  useIPCEventListener('main-menu-save', props.onSaveProject);
-  useIPCEventListener('main-menu-save-as', props.onSaveProjectAs);
-  useIPCEventListener('main-menu-close', props.onCloseProject);
-  useIPCEventListener('main-menu-close-app', props.onCloseApp);
-  useIPCEventListener('main-menu-export', props.onExportProject);
-  useIPCEventListener('main-menu-create', props.onCreateProject);
-  useIPCEventListener(
-    'main-menu-open-project-manager',
-    props.onOpenProjectManager
-  );
-  useIPCEventListener('main-menu-open-home-page', props.onOpenHomePage);
-  useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
-  useIPCEventListener('main-menu-open-about', props.onOpenAbout);
-  useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);
-  useIPCEventListener('main-menu-open-language', props.onOpenLanguage);
-  useIPCEventListener('main-menu-open-profile', props.onOpenProfile);
-  useIPCEventListener(
-    'main-menu-open-games-dashboard',
-    props.onOpenGamesDashboard
-  );
-  useIPCEventListener('update-status', props.setUpdateStatus);
+  useAppEventListener({
+    event: 'browser-window-focus',
+    callback: window => {
+      setFocusedWindowId(window.id);
+      setIsFocusedOnMainWindow(isMainWindow(window.title));
+    },
+  });
+  useAppEventListener({
+    event: 'browser-window-blur',
+    callback: window => {
+      setIsFocusedOnMainWindow(!isMainWindow(window.title));
+    },
+  });
+
+  // We could use a for loop, but for safety let's write every hook one by
+  // one to avoid any change at runtime which would break the rules of hooks.
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open',
+    callback: callbacks.onChooseProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-recent',
+    callback: callbacks.onOpenRecentFile,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-save',
+    callback: callbacks.onSaveProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-save-as',
+    callback: callbacks.onSaveProjectAs,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-show-version-history',
+    callback: callbacks.onShowVersionHistory,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-close',
+    callback:
+      useShortcutToClosePreviewWindow && closePreviewWindow
+        ? closePreviewWindow
+        : callbacks.onCloseProject,
+    shouldApply:
+      useShortcutToClosePreviewWindow && closePreviewWindow
+        ? true
+        : isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-close-app',
+    callback: callbacks.onCloseApp,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-export',
+    callback: callbacks.onExportProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-invite-collaborators',
+    callback: callbacks.onInviteCollaborators,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-create-template',
+    callback: callbacks.onCreateProject,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-create-blank',
+    callback: callbacks.onCreateBlank,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-project-manager',
+    callback: callbacks.onOpenProjectManager,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-home-page',
+    callback: callbacks.onOpenHomePage,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-debugger',
+    callback: callbacks.onOpenDebugger,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-about',
+    callback: callbacks.onOpenAbout,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-preferences',
+    callback: callbacks.onOpenPreferences,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-language',
+    callback: callbacks.onOpenLanguage,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'main-menu-open-profile',
+    callback: callbacks.onOpenProfile,
+    shouldApply: isFocusedOnMainWindow,
+  });
+  useIPCEventListener({
+    ipcEvent: 'update-status',
+    callback: callbacks.setElectronUpdateStatus,
+    shouldApply: true, // Keep logic around app update even if on preview window
+  });
 
   React.useEffect(
     () => {
-      buildAndSendMenuTemplate(project, i18n, recentProjectFiles, shortcutMap);
+      if (ipcRenderer) {
+        ipcRenderer.send(
+          'set-main-menu',
+          buildMainMenuDeclarativeTemplate({
+            project,
+            canSaveProjectAs,
+            i18n,
+            recentProjectFiles,
+            shortcutMap,
+            isApplicationTopLevelMenu,
+          })
+        );
+      }
     },
-    [i18n, language, project, recentProjectFiles, shortcutMap]
+    [
+      i18n,
+      language,
+      project,
+      canSaveProjectAs,
+      recentProjectFiles,
+      shortcutMap,
+      isApplicationTopLevelMenu,
+    ]
   );
 
+  const { onOpenRecentFile } = callbacks;
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
     generateOptions: React.useCallback(
       () =>

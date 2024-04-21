@@ -1,93 +1,130 @@
 // @flow
 import * as React from 'react';
-import withMock from 'storybook-addon-mock';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
-import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
+import {
+  indieUserProfile,
+  subscriptionForStartupUser,
+  subscriptionForSilverUser,
+} from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
-import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
   username: null,
   description: null,
+  communityLinks: {},
 };
 
 export default {
   title: 'Profile/ProfileDetails',
   component: ProfileDetails,
-  decorators: [paperDecorator, muiDecorator],
-  argTypes: {
-    profile: {
-      control: { type: 'radio' },
-      options: ['Complete profile', 'Without username nor bio'],
-      defaultValue: 'Complete profile',
-      mapping: {
-        'Complete profile': indieUserProfile,
-        'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
-      },
-    },
-  },
+  decorators: [paperDecorator],
 };
 
-type ArgsTypes = {|
-  profile: Profile,
-|};
-
-const badges = [
+const getAssetPacksListingData = (
+  userId
+): Array<PrivateAssetPackListingData> => [
   {
-    achievementId: 'trivial_first-event',
-    seen: true,
-    unlockedAt: '2020-10-05T11:28:24.864Z',
-    userId: 'userId',
-  },
-  {
-    achievementId: 'trivial_first-behavior',
-    seen: false,
-    unlockedAt: '2021-11-15T11:28:24.864Z',
-    userId: 'userId',
+    id: 'assetPackId',
+    sellerId: userId,
+    isSellerGDevelop: false,
+    productType: 'ASSET_PACK',
+    listing: 'ASSET_PACK',
+    name: 'French food',
+    description: 'The best asset pack about french food',
+    categories: ['props'],
+    updatedAt: '2021-11-18T10:19:50.417Z',
+    createdAt: '2021-11-18T10:19:50.417Z',
+    thumbnailUrls: [
+      'https://resources.gdevelop-app.com/private-assets/Blue Girl Platformer Pack/thumbnail.png',
+    ],
+    prices: [
+      {
+        value: 599,
+        name: 'commercial_USD',
+        stripePriceId: 'stripePriceId',
+        usageType: 'commercial',
+        currency: 'USD',
+      },
+    ],
+    creditPrices: [
+      {
+        amount: 600,
+        usageType: 'commercial',
+      },
+    ],
+    appStoreProductId: null,
+    sellerStripeAccountId: 'sellerStripeProductId',
+    stripeProductId: 'stripeProductId',
   },
 ];
 
-const apiDataServerSideError = {
-  mockData: [
-    {
-      url: `${GDevelopUserApi.baseUrl}/achievement`,
-      method: 'GET',
-      status: 500,
-      response: { data: 'status' },
-    },
-  ],
-};
+export const MyCompleteProfileWithoutSubscription = () => (
+  <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
+);
 
-export const MyProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isAuthenticatedUserProfile badges={badges} />
-);
-export const MyProfileWithAchievementLoadingError = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isAuthenticatedUserProfile badges={badges} />
-);
-MyProfileWithAchievementLoadingError.decorators = [withMock];
-MyProfileWithAchievementLoadingError.parameters = apiDataServerSideError;
-
-export const OtherUserProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} badges={badges} />
-);
-export const OtherProfileWithAchievementLoadingError = (args: ArgsTypes) => (
-  <ProfileDetails {...args} badges={badges} />
-);
-OtherProfileWithAchievementLoadingError.decorators = [withMock];
-OtherProfileWithAchievementLoadingError.parameters = apiDataServerSideError;
-export const Loading = (args: ArgsTypes) => (
-  <ProfileDetails {...args} badges={[]} profile={null} />
-);
-export const Errored = (args: ArgsTypes) => (
+export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails
-    {...args}
-    badges={[]}
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForSilverUser}
+  />
+);
+
+export const MyCompleteProfileWithBusinessSubscription = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForStartupUser}
+  />
+);
+
+export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
+  <ProfileDetails
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+    isAuthenticatedUserProfile
+  />
+);
+
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
+  <ProfileDetails
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+    isAuthenticatedUserProfile
+    subscription={subscriptionForStartupUser}
+  />
+);
+
+export const OtherUserProfile = () => (
+  <ProfileDetails profile={indieUserProfile} assetPacksListingDatas={[]} />
+);
+
+export const OtherUserIncompleteProfile = () => (
+  <ProfileDetails
+    profile={{
+      ...indieUserWithoutUsernameNorDescriptionProfile,
+      discordUsername: '',
+    }}
+    assetPacksListingDatas={[]}
+  />
+);
+
+export const OtherUserProfileWithPremiumAssetPacks = () => (
+  <ProfileDetails
+    profile={indieUserProfile}
+    assetPacksListingDatas={getAssetPacksListingData(indieUserProfile.id)}
+    onAssetPackOpen={action('open asset pack')}
+  />
+);
+
+export const Loading = () => <ProfileDetails profile={null} />;
+
+export const Errored = () => (
+  <ProfileDetails
     profile={null}
     error={new Error('Connectivity Problems')}
     onRetry={() => {
@@ -95,9 +132,3 @@ export const Errored = (args: ArgsTypes) => (
     }}
   />
 );
-Loading.argTypes = {
-  profile: { control: { disable: true } },
-};
-Errored.argTypes = {
-  profile: { control: { disable: true } },
-};

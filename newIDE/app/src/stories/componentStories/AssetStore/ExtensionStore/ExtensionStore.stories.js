@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { ExtensionStore } from '../../../../AssetStore/ExtensionStore';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
@@ -19,7 +17,7 @@ import PreferencesContext, {
 export default {
   title: 'AssetStore/ExtensionStore',
   component: ExtensionStore,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {
@@ -56,7 +54,6 @@ export const Default = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakeExtensions;
 
 export const WithCommunityExtensions = () => {
@@ -84,7 +81,6 @@ export const WithCommunityExtensions = () => {
     </PreferencesContext.Provider>
   );
 };
-WithCommunityExtensions.decorators = [withMock];
 WithCommunityExtensions.parameters = apiDataFakeExtensions;
 
 export const WithServerSideErrors = () => (
@@ -99,7 +95,6 @@ export const WithServerSideErrors = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-WithServerSideErrors.decorators = [withMock];
 WithServerSideErrors.parameters = apiDataServerSideError;
 
 export const ShowingAnAlreadyInstalledExtension = () => (
@@ -114,7 +109,6 @@ export const ShowingAnAlreadyInstalledExtension = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-ShowingAnAlreadyInstalledExtension.decorators = [withMock];
 ShowingAnAlreadyInstalledExtension.parameters = apiDataFakeExtensions;
 
 export const ExtensionBeingInstalled = () => (
@@ -129,7 +123,6 @@ export const ExtensionBeingInstalled = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-ExtensionBeingInstalled.decorators = [withMock];
 ExtensionBeingInstalled.parameters = apiDataFakeExtensions;
 
 export const OnlyWithBehaviors = () => (
@@ -144,5 +137,4 @@ export const OnlyWithBehaviors = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-OnlyWithBehaviors.decorators = [withMock];
 OnlyWithBehaviors.parameters = apiDataFakeExtensions;

@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react';
-import ReactDOM from 'react-dom';
+import { I18n } from '@lingui/react';
 import Popper from '@material-ui/core/Popper';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import Functions from '@material-ui/icons/Functions';
 import RaisedButton from '../../../UI/RaisedButton';
-import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import SemiControlledTextField, {
+  type SemiControlledTextFieldInterface,
+} from '../../../UI/SemiControlledTextField';
 import { mapVector } from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
@@ -14,13 +16,15 @@ import ExpressionParametersEditorDialog, {
 import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { type ParameterFieldProps } from '../ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type FieldFocusFunction,
+} from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
 } from './BackgroundHighlighting';
 import debounce from 'lodash/debounce';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
 import { TextFieldWithButtonLayout } from '../../../UI/Layout';
 import {
   type ExpressionAutocompletion,
@@ -37,11 +41,14 @@ import {
   getNonRenderedCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
-import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   shouldCloseOrCancel,
   shouldSubmit,
+  shouldValidate,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import Paper from '../../../UI/Paper';
+import { getProjectScopedContainersFromScope } from '../../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -53,7 +60,7 @@ const styles = {
     flex: 1,
     minWidth: 200,
   },
-  textFieldAndHightlightContainer: {
+  textFieldAndHighlightContainer: {
     position: 'relative',
   },
   expressionSelectorPopoverContentSmall: {
@@ -109,6 +116,7 @@ type Props = {|
   ) => ?string,
   renderExtraButton?: ({|
     style: Object,
+    onChange: (newValue: string) => void,
   |}) => React.Node,
   ...ParameterFieldProps,
 |};
@@ -117,8 +125,8 @@ const MAX_ERRORS_COUNT = 10;
 
 const extractErrors = (
   platform: gdPlatform,
-  globalObjectsContainer: gdObjectsContainer,
-  objectsContainer: gdObjectsContainer,
+  project: gdProject,
+  projectScopedContainers: gdProjectScopedContainers,
   expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
@@ -127,12 +135,11 @@ const extractErrors = (
 |} => {
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
-    globalObjectsContainer,
-    objectsContainer,
+    projectScopedContainers,
     expressionType
   );
   expressionNode.visit(expressionValidator);
-  const errors = expressionValidator.getErrors();
+  const errors = expressionValidator.getAllErrors();
 
   const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
     begin: error.getStartPosition(),
@@ -164,8 +171,8 @@ const extractErrors = (
 };
 
 export default class ExpressionField extends React.Component<Props, State> {
-  _field: ?SemiControlledTextField = null;
-  _fieldElement: ?Element = null;
+  _field: ?SemiControlledTextFieldInterface = null;
+  _fieldElementWidth: ?number = null;
   _inputElement: ?HTMLInputElement = null;
 
   state = {
@@ -181,18 +188,19 @@ export default class ExpressionField extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this._field) {
-      const node = ReactDOM.findDOMNode(this._field);
-      if (node instanceof Element) {
-        this._fieldElement = node;
-      }
+      this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
 
-  focus = (selectAll: boolean = false) => {
+  componentWillUnmount() {
+    this._enqueueValidation.cancel();
+  }
+
+  focus: FieldFocusFunction = options => {
     if (this._field) {
-      this._field.focus();
-      if (selectAll) {
+      this._field.focus(options);
+      if (options && options.selectAll) {
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
             0,
@@ -230,8 +238,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _handleBlur = (event: { currentTarget: { value: string } }) => {
-    const value = event.currentTarget.value;
+  _handleBlur = (value: string) => {
     if (this.props.onChange) this.props.onChange(value);
     this.setState({ validatedValue: value }, () => {
       this._enqueueValidation.cancel();
@@ -240,6 +247,10 @@ export default class ExpressionField extends React.Component<Props, State> {
         autocompletions: getAutocompletionsInitialState(),
       });
     });
+  };
+
+  _handleBlurEvent = (event: { currentTarget: { value: string } }) => {
+    this._handleBlur(event.currentTarget.value);
   };
 
   _shouldOpenParametersDialog = (
@@ -271,6 +282,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     const {
       globalObjectsContainer,
       objectsContainer,
+      scope,
       expressionType,
       value,
     } = this.props;
@@ -294,10 +306,14 @@ export default class ExpressionField extends React.Component<Props, State> {
       expressionNode,
       cursorPosition + 'fakeIdentifier'.length - 1
     );
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
     const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainers,
       expressionType,
       currentNode
     );
@@ -308,6 +324,8 @@ export default class ExpressionField extends React.Component<Props, State> {
     const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
       shouldConvertToString,
     });
+
+    parser.delete();
 
     // Generate the expression with the function call
     const newValue =
@@ -359,27 +377,34 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const expression = this.state.validatedValue;
 
-    const {
-      expression: newExpression,
-      caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
-      { expression, caretLocation },
-      {
-        completion: expressionAutocompletion.completion,
-        replacementStartPosition:
-          expressionAutocompletion.replacementStartPosition,
-        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
-        addParenthesis: expressionAutocompletion.addParenthesis,
-        addDot: expressionAutocompletion.addDot,
-        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
-        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
-        shouldConvertToString:
-          expressionAutocompletion.kind === 'Expression'
-            ? expressionAutocompletion.shouldConvertToString
-            : null,
-      }
-    );
+    const { expression: newExpression, caretLocation: newCaretLocation } =
+      expressionAutocompletion.kind === 'FullExpression'
+        ? {
+            expression: expressionAutocompletion.completion,
+            caretLocation: expressionAutocompletion.completion.length,
+          }
+        : insertAutocompletionInExpression(
+            { expression, caretLocation },
+            {
+              completion: expressionAutocompletion.completion,
+              replacementStartPosition:
+                expressionAutocompletion.replacementStartPosition,
+              replacementEndPosition:
+                expressionAutocompletion.replacementEndPosition,
+              addParenthesis: expressionAutocompletion.addParenthesis,
+              addDot: expressionAutocompletion.addDot,
+              addParameterSeparator:
+                expressionAutocompletion.addParameterSeparator,
+              addNamespaceSeparator:
+                expressionAutocompletion.addNamespaceSeparator,
+              hasVisibleParameters:
+                expressionAutocompletion.hasVisibleParameters,
+              shouldConvertToString:
+                expressionAutocompletion.kind === 'Expression'
+                  ? expressionAutocompletion.shouldConvertToString
+                  : null,
+            }
+          );
 
     if (this._field) {
       this._field.forceSetValue(newExpression);
@@ -420,13 +445,18 @@ export default class ExpressionField extends React.Component<Props, State> {
     // a few milliseconds for complex ones).
 
     const parser = new gd.ExpressionParser2();
-
     const expressionNode = parser.parseExpression(expression).get();
+
+    const projectScopedContainers = getProjectScopedContainersFromScope(
+      scope,
+      globalObjectsContainer,
+      objectsContainer
+    );
 
     const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      project,
+      projectScopedContainers,
       expressionType,
       expressionNode
     );
@@ -456,22 +486,24 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
-      globalObjectsContainer,
-      objectsContainer,
+      projectScopedContainers,
       expressionType,
       expressionNode,
       cursorPosition - 1
     );
+
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
         project,
-        globalObjectsContainer,
-        objectsContainer,
+        projectScopedContainers,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      // $FlowFixMe The autocompletion doesn't display the groups so it doesn't need to be able to translate them.
+      null
     );
+
     const allNewAutocompletions = onGetAdditionalAutocompletions
       ? onGetAdditionalAutocompletions(expression).concat(newAutocompletions)
       : newAutocompletions;
@@ -509,7 +541,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       : undefined;
 
     const popoverStyle = {
-      width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
+      width: this._fieldElementWidth || 'auto',
       marginLeft: -5, // Remove the offset that the Popper has for some reason with disablePortal={true}
       // Ensure the popper is above everything (modal, dialog, snackbar, tooltips, etc).
       // There will be only one ExpressionSelector opened at a time, so it's fair to put the
@@ -531,175 +563,194 @@ export default class ExpressionField extends React.Component<Props, State> {
         styles.backgroundHighlightingWithFloatingLabel;
 
     return (
-      <React.Fragment>
-        <TextFieldWithButtonLayout
-          margin={this.props.isInline ? 'none' : 'dense'}
-          renderTextField={() => (
-            <div style={styles.textFieldContainer}>
-              <div style={styles.textFieldAndHightlightContainer}>
-                <BackgroundHighlighting
-                  value={this.state.validatedValue}
-                  style={{ ...styles.input, ...backgroundHighlightingStyle }}
-                  highlights={this.state.errorHighlights}
-                />
-                <SemiControlledTextField
-                  margin={this.props.isInline ? 'none' : 'dense'}
-                  value={value}
-                  floatingLabelText={description}
-                  helperMarkdownText={longDescription}
-                  hintText={expressionType === 'string' ? '""' : undefined}
-                  inputStyle={styles.input}
-                  onChange={this._handleChange}
-                  onBlur={this._handleBlur}
-                  ref={field => (this._field = field)}
-                  onFocus={this._handleFocus}
-                  errorText={this.state.errorText}
-                  onClick={() => this._enqueueValidation()}
-                  onKeyDown={event => {
-                    const autocompletions = handleAutocompletionsKeyDown(
-                      this.state.autocompletions,
-                      {
-                        event,
-                        onUpdateAutocompletions: this._enqueueValidation,
-                        onInsertAutocompletion: this._insertAutocompletion,
-                      }
-                    );
-                    this.setState({ autocompletions });
-
-                    // If the user pressed the key to close (or to submit),
-                    // there is a chance that this will trigger the closing
-                    // of the dialog/popover containing the expression field.
-                    // Apply the changes now as otherwise the onBlur handler
-                    // has a risk not to be called (as the component will be
-                    // unmounted).
-                    if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
-                      const value = event.currentTarget.value;
-                      if (this.props.onChange) this.props.onChange(value);
-                    }
-                  }}
-                  multiline
-                  fullWidth
-                />
-              </div>
-              {this._inputElement && this.state.popoverOpen && (
-                <ClickAwayListener onClickAway={this._handleRequestClose}>
-                  <Popper
-                    style={popoverStyle}
-                    open={this.state.popoverOpen}
-                    anchorEl={this._inputElement}
-                    placement="bottom"
-                    disablePortal={
-                      true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
-                    }
-                  >
-                    <ResponsiveWindowMeasurer>
-                      {screenSize => (
-                        <Paper
-                          style={
-                            screenSize === 'small'
-                              ? styles.expressionSelectorPopoverContentSmall
-                              : styles.expressionSelectorPopoverContent
+      <I18n>
+        {({ i18n }) => (
+          <React.Fragment>
+            <TextFieldWithButtonLayout
+              margin={this.props.isInline ? 'none' : 'dense'}
+              renderTextField={() => (
+                <div style={styles.textFieldContainer}>
+                  <div style={styles.textFieldAndHighlightContainer}>
+                    <BackgroundHighlighting
+                      value={this.state.validatedValue}
+                      style={{
+                        ...styles.input,
+                        ...backgroundHighlightingStyle,
+                      }}
+                      highlights={this.state.errorHighlights}
+                    />
+                    <SemiControlledTextField
+                      id={this.props.id}
+                      margin={this.props.isInline ? 'none' : 'dense'}
+                      value={value}
+                      floatingLabelText={description}
+                      helperMarkdownText={longDescription}
+                      hintText={expressionType === 'string' ? '""' : undefined}
+                      inputStyle={styles.input}
+                      onChange={this._handleChange}
+                      onBlur={this._handleBlurEvent}
+                      ref={field => (this._field = field)}
+                      onFocus={this._handleFocus}
+                      errorText={this.state.errorText}
+                      onClick={() => this._enqueueValidation()}
+                      onKeyDown={event => {
+                        const autocompletions = handleAutocompletionsKeyDown(
+                          this.state.autocompletions,
+                          {
+                            event,
+                            onUpdateAutocompletions: this._enqueueValidation,
+                            onInsertAutocompletion: this._insertAutocompletion,
                           }
-                        >
-                          <ExpressionSelector
-                            selectedType=""
-                            onChoose={(type, expression) => {
-                              this._handleExpressionChosen(expression);
-                            }}
-                            expressionType={expressionType}
-                            focusOnMount
-                            scope={scope}
-                          />
-                        </Paper>
-                      )}
-                    </ResponsiveWindowMeasurer>
-                  </Popper>
-                </ClickAwayListener>
-              )}
-              {this._inputElement &&
-                !this.state.popoverOpen &&
-                parameterRenderingService && (
-                  <ExpressionAutocompletionsDisplayer
-                    project={project}
-                    anchorEl={this._inputElement}
-                    expressionAutocompletions={getRenderedAutocompletions(
-                      this.state.autocompletions
-                    )}
-                    remainingCount={getNonRenderedCount(
-                      this.state.autocompletions
-                    )}
-                    selectedCompletionIndex={
-                      this.state.autocompletions.selectedCompletionIndex
-                    }
-                    onScroll={this._onExpressionAutocompletionsScroll}
-                    onChoose={expressionAutocompletion => {
-                      this._insertAutocompletion(expressionAutocompletion);
+                        );
+                        this.setState({ autocompletions });
 
-                      setTimeout(
-                        this.focus,
-                        50 /* Give back the focus to the field after a completion is inserted */
-                      );
-                    }}
-                    parameterRenderingService={parameterRenderingService}
-                  />
-                )}
-            </div>
-          )}
-          renderButton={style => (
-            <React.Fragment>
-              {!this.props.isInline &&
-                this.props.renderExtraButton &&
-                this.props.renderExtraButton({
-                  style,
-                })}
-              {!this.props.isInline && (
-                <RaisedButton
-                  icon={<Functions />}
-                  label={
-                    expressionType === 'string'
-                      ? '"ABC"'
-                      : expressionType === 'number'
-                      ? '123'
-                      : ''
+                        // If the user pressed the key to close (or to submit),
+                        // there is a chance that this will trigger the closing
+                        // of the dialog/popover containing the expression field.
+                        // Apply the changes now as otherwise the onBlur handler
+                        // has a risk not to be called (as the component will be
+                        // unmounted).
+                        if (
+                          shouldCloseOrCancel(event) ||
+                          shouldSubmit(event) ||
+                          shouldValidate(event)
+                        ) {
+                          const value = event.currentTarget.value;
+                          if (this.props.onChange) this.props.onChange(value);
+                        }
+                      }}
+                      multiline
+                      fullWidth
+                    />
+                  </div>
+                  {this._inputElement && this.state.popoverOpen && (
+                    <ClickAwayListener onClickAway={this._handleRequestClose}>
+                      <Popper
+                        style={popoverStyle}
+                        open={this.state.popoverOpen}
+                        anchorEl={this._inputElement}
+                        placement="bottom"
+                        disablePortal={
+                          true /* Can't use portals as this would put the Popper outside of the Modal, which is keeping the focus in the modal (so the search bar and keyboard browsing won't not work) */
+                        }
+                      >
+                        <ResponsiveWindowMeasurer>
+                          {({ isMobile }) => (
+                            <Paper
+                              style={
+                                isMobile
+                                  ? styles.expressionSelectorPopoverContentSmall
+                                  : styles.expressionSelectorPopoverContent
+                              }
+                              background="light"
+                            >
+                              <ExpressionSelector
+                                i18n={i18n}
+                                selectedType=""
+                                onChoose={(type, expression) => {
+                                  this._handleExpressionChosen(expression);
+                                }}
+                                expressionType={expressionType}
+                                focusOnMount
+                                scope={scope}
+                              />
+                            </Paper>
+                          )}
+                        </ResponsiveWindowMeasurer>
+                      </Popper>
+                    </ClickAwayListener>
+                  )}
+                  {this._inputElement &&
+                    !this.state.popoverOpen &&
+                    parameterRenderingService && (
+                      <ExpressionAutocompletionsDisplayer
+                        project={project}
+                        anchorEl={this._inputElement}
+                        expressionAutocompletions={getRenderedAutocompletions(
+                          this.state.autocompletions
+                        )}
+                        remainingCount={getNonRenderedCount(
+                          this.state.autocompletions
+                        )}
+                        selectedCompletionIndex={
+                          this.state.autocompletions.selectedCompletionIndex
+                        }
+                        onScroll={this._onExpressionAutocompletionsScroll}
+                        onChoose={expressionAutocompletion => {
+                          this._insertAutocompletion(expressionAutocompletion);
+
+                          setTimeout(
+                            () => this.focus(),
+                            50 /* Give back the focus to the field after a completion is inserted */
+                          );
+                        }}
+                        parameterRenderingService={parameterRenderingService}
+                      />
+                    )}
+                </div>
+              )}
+              renderButton={style => (
+                <React.Fragment>
+                  {!this.props.isInline &&
+                    this.props.renderExtraButton &&
+                    this.props.renderExtraButton({
+                      style,
+                      onChange: this._handleBlur,
+                    })}
+                  {!this.props.isInline && (
+                    <RaisedButton
+                      id={`open-${expressionType}-expression-popover-button`}
+                      icon={<Functions />}
+                      label={
+                        expressionType === 'string'
+                          ? '"ABC"'
+                          : expressionType === 'number'
+                          ? '123'
+                          : ''
+                      }
+                      primary
+                      style={style}
+                      onClick={this._openExpressionPopover}
+                    />
+                  )}
+                </React.Fragment>
+              )}
+            />
+
+            {this.state.parametersDialogOpen &&
+              this.state.selectedExpressionInfo && (
+                <ExpressionParametersEditorDialog
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  expressionMetadata={
+                    this.state.selectedExpressionInfo.metadata
                   }
-                  primary
-                  style={style}
-                  onClick={this._openExpressionPopover}
+                  onDone={parameterValues => {
+                    if (!this.state.selectedExpressionInfo) return;
+
+                    this.insertExpression(
+                      this.state.selectedExpressionInfo,
+                      parameterValues
+                    );
+                    this.setState({
+                      parametersDialogOpen: false,
+                      selectedExpressionInfo: null,
+                    });
+                  }}
+                  onRequestClose={() => {
+                    this.setState({
+                      parametersDialogOpen: false,
+                      selectedExpressionInfo: null,
+                    });
+                  }}
+                  parameterRenderingService={parameterRenderingService}
                 />
               )}
-            </React.Fragment>
-          )}
-        />
-
-        {this.state.parametersDialogOpen && this.state.selectedExpressionInfo && (
-          <ExpressionParametersEditorDialog
-            project={project}
-            scope={scope}
-            globalObjectsContainer={globalObjectsContainer}
-            objectsContainer={objectsContainer}
-            expressionMetadata={this.state.selectedExpressionInfo.metadata}
-            onDone={parameterValues => {
-              if (!this.state.selectedExpressionInfo) return;
-
-              this.insertExpression(
-                this.state.selectedExpressionInfo,
-                parameterValues
-              );
-              this.setState({
-                parametersDialogOpen: false,
-                selectedExpressionInfo: null,
-              });
-            }}
-            onRequestClose={() => {
-              this.setState({
-                parametersDialogOpen: false,
-                selectedExpressionInfo: null,
-              });
-            }}
-            parameterRenderingService={parameterRenderingService}
-          />
+          </React.Fragment>
         )}
-      </React.Fragment>
+      </I18n>
     );
   }
 }

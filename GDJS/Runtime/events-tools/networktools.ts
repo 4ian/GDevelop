@@ -6,8 +6,6 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace network {
-      const logger = new gdjs.Logger('Network requests');
-
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)
        * body, method and contentType (defaults to `application/x-www-form-urlencoded`).
@@ -147,10 +145,10 @@ namespace gdjs {
       };
 
       export const enableMetrics = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         enable: boolean
       ) {
-        runtimeScene.getGame().enableMetrics(enable);
+        instanceContainer.getGame().enableMetrics(enable);
       };
 
       /**
@@ -170,7 +168,7 @@ namespace gdjs {
        * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
        */
       export const objectVariableStructureToJSON = function (
-        object: gdjs.RuntimeObject,
+        object: gdjs.RuntimeObject | null,
         variable: gdjs.Variable
       ): string {
         return JSON.stringify(variable.toJSObject());
@@ -207,7 +205,7 @@ namespace gdjs {
        */
       export const jsonToObjectVariableStructure = function (
         jsonStr: string,
-        object: gdjs.RuntimeObject,
+        object: gdjs.RuntimeObject | null,
         variable: gdjs.Variable
       ) {
         variable.fromJSON(jsonStr);

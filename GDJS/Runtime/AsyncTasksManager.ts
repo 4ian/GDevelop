@@ -117,4 +117,16 @@ ${error ? 'The following error was thrown: ' + error : ''}`
       return this.isResolved;
     }
   }
+
+  export class ManuallyResolvableTask extends AsyncTask {
+    private isResolved = false;
+
+    resolve() {
+      this.isResolved = true;
+    }
+
+    update(): boolean {
+      return this.isResolved;
+    }
+  }
 }

@@ -2,10 +2,9 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 
 describe('libGD.js object serialization', function() {
   let gd = null;
-  beforeAll((done) => (initializeGDevelopJs().then(module => {
-    gd = module;
-    done();
-  })));
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('gd.SerializerElement', function() {
     it('should support operations on its value', function() {
@@ -56,11 +55,7 @@ describe('libGD.js object serialization', function() {
   describe('gd.Serializer', function() {
     it('should serialize a Text Object', function() {
       var obj = new gd.TextObject('testObject');
-      obj.setType('TextObject::Text');
-      obj.setName('testObject');
-      obj.setString('Text of the object, with 官话 characters');
-      obj.setTags('inventory, player');
-      obj.setAssetStoreId('1234');
+      obj.setText('Text of the object, with 官话 characters');
 
       var serializedObject = new gd.SerializerElement();
       obj.serializeTo(serializedObject);
@@ -69,7 +64,7 @@ describe('libGD.js object serialization', function() {
       obj.delete();
 
       expect(jsonObject).toBe(
-        '{"assetStoreId":"1234","bold":false,"italic":false,"name":"testObject","smoothed":true,"tags":"inventory, player","type":"TextObject::Text","underlined":false,"variables":[],"effects":[],"behaviors":[],"string":"Text of the object, with 官话 characters","font":"","characterSize":20.0,"color":{"b":0,"g":0,"r":0}}'
+        '{"bold":false,"italic":false,"smoothed":true,"underlined":false,"string":"Text of the object, with 官话 characters","font":"","textAlignment":"left","characterSize":20.0,"color":{"b":0,"g":0,"r":0},"content":{"bold":false,"isOutlineEnabled":false,"isShadowEnabled":false,"italic":false,"outlineColor":"255;255;255","outlineThickness":2.0,"shadowAngle":90.0,"shadowBlurRadius":2.0,"shadowColor":"0;0;0","shadowDistance":4.0,"shadowOpacity":127.0,"smoothed":true,"underlined":false,"text":"Text of the object, with 官话 characters","font":"","textAlignment":"left","characterSize":20.0,"color":"0;0;0"}}'
       );
     });
   });

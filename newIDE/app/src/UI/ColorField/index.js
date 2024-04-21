@@ -1,7 +1,7 @@
 // @flow
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
-import TextField from '../TextField';
+import TextField, { type TextFieldInterface } from '../TextField';
 import ColorPicker, { type ColorResult } from './ColorPicker';
 import {
   rgbStringAndAlphaToRGBColor,
@@ -29,97 +29,99 @@ type Props = {|
   onChange: (string, ?number) => void,
   color: string,
   alpha?: number,
+  disabled?: boolean,
 |};
 
-type State = {|
-  color: string,
-  alpha: number,
-|};
+const ColorField = ({
+  fullWidth,
+  disableAlpha,
+  id,
+  floatingLabelText,
+  helperMarkdownText,
+  onChange,
+  color,
+  alpha,
+  disabled,
+}: Props) => {
+  const [colorValue, setColorValue] = React.useState<string>(color);
+  // alpha can be equal to 0, so we have to check if it is not undefined
+  const [alphaValue, setAlphaValue] = React.useState<number>(
+    !disableAlpha && alpha !== undefined ? alpha : 1
+  );
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
 
-export default class ColorField extends React.Component<Props, State> {
-  state = {
-    color: this.props.color,
-    // alpha can be equal to 0, so we have to check if it is not undefined
-    alpha:
-      !this.props.disableAlpha && this.props.alpha !== undefined
-        ? this.props.alpha
-        : 1,
+  const handleChange = (newColor: string, newAlpha: number) => {
+    setColorValue(newColor);
+    setAlphaValue(newAlpha);
   };
 
-  _textField: ?TextField = null;
-
-  _handleChange = (color: string, alpha: number) => {
-    this.setState({ color, alpha });
-  };
-
-  _handleBlur = () => {
+  const handleBlur = () => {
     // change alpha value to be within allowed limits (0-1)
-    let alpha = parseFloat(this.state.alpha);
-    if (alpha < 0) alpha = 0;
-    if (alpha > 1) alpha = 1;
-    this.setState({ alpha });
-    this.props.onChange(this.state.color, alpha);
+    let newAlpha = parseFloat(alphaValue);
+    if (newAlpha < 0) newAlpha = 0;
+    if (newAlpha > 1) newAlpha = 1;
+    setAlphaValue(newAlpha);
+    onChange(colorValue, newAlpha);
   };
 
-  _handlePickerChange = (color: ColorResult) => {
+  const handlePickerChange = (color: ColorResult) => {
     const rgbString = rgbColorToRGBString(color.rgb);
-    const alpha = this.props.disableAlpha ? 1 : color.rgb.a;
-    this.setState({ color: rgbString, alpha });
-    this.props.onChange(rgbString, alpha);
+    const newAlpha = disableAlpha ? 1 : color.rgb.a;
+    setColorValue(rgbString);
+    if (newAlpha) setAlphaValue(newAlpha);
+    onChange(rgbString, newAlpha);
   };
 
-  render() {
-    return (
-      <div
-        style={{
-          ...styles.container,
-          width: this.props.fullWidth ? '100%' : undefined,
-        }}
-      >
+  return (
+    <div
+      style={{
+        ...styles.container,
+        width: fullWidth ? '100%' : undefined,
+      }}
+    >
+      <TextField
+        id={id}
+        fullWidth={disableAlpha}
+        style={!disableAlpha ? { width: '70%' } : undefined}
+        floatingLabelText={floatingLabelText}
+        floatingLabelFixed={!disabled}
+        helperMarkdownText={helperMarkdownText}
+        type="text"
+        translatableHintText={disabled ? null : t`R;G;B, like 100;200;180`}
+        value={colorValue}
+        onChange={event => handleChange(event.target.value, alphaValue)}
+        onBlur={handleBlur}
+        ref={textFieldRef}
+        disabled={disabled}
+      />
+      {!disableAlpha && (
         <TextField
-          id={this.props.id}
-          fullWidth={this.props.disableAlpha}
-          style={!this.props.disableAlpha ? { width: '60%' } : undefined}
-          floatingLabelText={this.props.floatingLabelText}
+          id={`${id || ''}-alpha`}
+          floatingLabelText={<Trans>Alpha</Trans>}
           floatingLabelFixed
-          helperMarkdownText={this.props.helperMarkdownText}
-          type="text"
-          hintText={t`Text in the format R;G;B, like 100;200;180`}
-          value={this.state.color}
-          onChange={event =>
-            this._handleChange(event.target.value, this.state.alpha)
+          style={{ width: '30%' }}
+          translatableHintText={t`Number between 0 and 1`}
+          value={alphaValue.toString()}
+          onChange={(event, newAlphaValue) =>
+            handleChange(colorValue, parseFloat(newAlphaValue))
           }
-          onBlur={this._handleBlur}
-          ref={textField => (this._textField = textField)}
+          onBlur={handleBlur}
+          ref={textFieldRef}
+          type="number"
+          step={0.1}
+          disabled={disabled}
         />
-        {!this.props.disableAlpha && (
-          <TextField
-            id={`${this.props.id || ''}-alpha`}
-            floatingLabelText="Alpha"
-            floatingLabelFixed
-            style={{ width: '30%' }}
-            hintText={t`Number between 0 and 1`}
-            value={this.state.alpha.toString()}
-            onChange={(event, value) =>
-              this._handleChange(this.state.color, parseFloat(value))
-            }
-            onBlur={this._handleBlur}
-            ref={textField => (this._textField = textField)}
-            type="number"
-            step={0.1}
-          />
-        )}
-        <div style={styles.picker}>
-          <ColorPicker
-            disableAlpha={this.props.disableAlpha}
-            onChangeComplete={this._handlePickerChange}
-            color={rgbStringAndAlphaToRGBColor(
-              this.state.color,
-              this.state.alpha
-            )}
-          />
-        </div>
+      )}
+      <div style={styles.picker}>
+        <ColorPicker
+          disableAlpha={disableAlpha}
+          onChangeComplete={handlePickerChange}
+          color={rgbStringAndAlphaToRGBColor(colorValue, alphaValue)}
+          disabled={disabled}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default ColorField;

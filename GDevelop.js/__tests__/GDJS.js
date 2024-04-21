@@ -7,17 +7,24 @@ const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS related tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      makeTestExtensions(gd);
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
+  });
 
   describe('Exporter', () => {
     // Fake files to simulate a file system (see tests below).
-    const fakeIndexHtmlContent = '';
+    const fakeIndexHtmlContent = `<html>
+  <head>
+  <style>
+    /* GDJS_CUSTOM_STYLE */
+  </style>
+  <!-- GDJS_CODE_FILES -->
+  <body>
+    <!-- GDJS_CUSTOM_HTML -->
+  </body>
+  </head>
+</html>`;
     const fakeConfigXmlContent = `
 <widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION">
   <name>GDJS_PROJECTNAME</name>
@@ -38,10 +45,55 @@ describe('libGD.js - GDJS related tests', function () {
   "author": "GDJS_GAME_AUTHOR"
 }`;
 
-    it('properly exports Cordova files', () => {
+    it('properly exports HTML5 files', () => {
       // Create a simple project
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.setName('My great project with spaces and "quotes"!');
+      project.setDescription(
+        'A nice project\nwith line breaks in the description.'
+      );
+      project.setVersion('1.2.3');
+
+      // Prepare a fake file system
+      var fs = makeFakeAbstractFileSystem(gd, {
+        '/fake-gdjs-root/Runtime/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': "",
+      });
+
+      // Export and check the content of written files.
+      const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
+      const exportOptions = new gd.ExportOptions(project, '/fake-export-dir');
+      expect(exporter.exportWholePixiProject(exportOptions)).toBe(true);
+      exportOptions.delete();
+      exporter.delete();
+
+      // Check the index.html contains the include files.
+      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/index.html');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('gd.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('affinetransformation.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('data.js');
+
+      // Check the webmanifest was properly generated.
+      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/manifest.webmanifest');
+      expect(() => JSON.parse(fs.writeToFile.mock.calls[2][1])).not.toThrow();
+      expect(JSON.parse(fs.writeToFile.mock.calls[2][1])).toEqual({
+        "name": "My great project with spaces and \"quotes\"!",
+        "short_name": "My great project with spaces and \"quotes\"!",
+        "id": "com.example.gamename",
+        "description": "A nice project\nwith line breaks in the description.",
+        "orientation": "landscape",
+        "start_url": "./index.html",
+        "display": "standalone",
+        "background_color": "black",
+        "categories": ["games", "entertainment"],
+        "icons": []
+      });
+    });
+    it('properly exports Cordova files', () => {
+      // Create a simple project
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setName('My great project with spaces and "quotes" and (parentheses)!');
       project.setVersion('1.2.3');
 
       // Prepare a fake file system
@@ -49,19 +101,14 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
       const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
-      const exportOptions = new gd.MapStringBoolean();
-      exportOptions.set('exportForCordova', true);
-      expect(
-        exporter.exportWholePixiProject(
-          project,
-          '/fake-export-dir',
-          exportOptions
-        )
-      ).toBe(true);
+      const exportOptions = new gd.ExportOptions(project, '/fake-export-dir');
+      exportOptions.setTarget('cordova');
+      expect(exporter.exportWholePixiProject(exportOptions)).toBe(true);
       exportOptions.delete();
       exporter.delete();
 
@@ -69,7 +116,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-export-dir/config.xml',
         `
 <widget id="com.example.gamename" version="1.2.3">
-  <name>My great project with spaces and &quot;quotes&quot;!</name>
+  <name>My great project with spaces and &quot;quotes&quot; and parentheses!</name>
   <platform name="android">
 
   </platform>
@@ -79,14 +126,15 @@ describe('libGD.js - GDJS related tests', function () {
 
 </widget>`
       );
+      console.dir(fs.writeToFile.mock.calls);
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `
 {
-  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
-  \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_32and_32_40parentheses_41_33\",
+  \"displayName\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"version\": \"1.2.3\",
-  \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"description\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"author\": \"\"
 }`
       );
@@ -112,19 +160,14 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
       const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
-      const exportOptions = new gd.MapStringBoolean();
-      exportOptions.set('exportForCordova', true);
-      expect(
-        exporter.exportWholePixiProject(
-          project,
-          '/fake-export-dir',
-          exportOptions
-        )
-      ).toBe(true);
+      const exportOptions = new gd.ExportOptions(project, '/fake-export-dir');
+      exportOptions.setTarget('cordova');
+      expect(exporter.exportWholePixiProject(exportOptions)).toBe(true);
       exportOptions.delete();
       exporter.delete();
 
@@ -240,12 +283,15 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Action for an object not having the required capability.
       const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
+      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
+      unsupportedCapabilityAction.setParametersCount(4);
       unsupportedCapabilityAction.setParameter(0, 'MyFakeObjectWithUnsupportedCapability');
+      unsupportedCapabilityAction.setParameter(1, 'Effect');
       unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
       unsupportedCapabilityAction.setParameter(2, 'yes');
-      gd.asStandardEvent(evt).getActions().insert(unsupportedCapabilityAction, 4);
+      gd.asStandardEvent(evt)
+        .getActions()
+        .insert(unsupportedCapabilityAction, 4);
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
@@ -259,17 +305,19 @@ describe('libGD.js - GDJS related tests', function () {
         'gdjs.SceneCode.GDMyObjectObjects1[i].setAnimation(2);'
       );
 
-      // Check that the action with a wrong obejct was not generated.
+      // Check that the action with a wrong object was not generated.
       expect(code).toMatch('/* Mismatched object type - skipped. */');
 
-      // Check that the action with a wrong obejct was not generated.
+      // Check that the action with a wrong object was not generated.
       expect(code).toMatch('/* Unknown object - skipped. */');
 
       // Check that the unknown action was not generated.
       expect(code).toMatch('/* Unknown instruction - skipped. */');
 
       // Check that the action for an object not having the required capability was not generated.
-      expect(code).toMatch('/* Object with unsupported capability - skipped. */');
+      expect(code).toEqual(expect.not.stringContaining(
+        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
+      );
 
       action.delete();
     });
@@ -301,12 +349,15 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Action for an object not having the required capability.
       const unsupportedCapabilityAction = new gd.Instruction();
-      unsupportedCapabilityAction.setType('EnableEffect');
-      unsupportedCapabilityAction.setParametersCount(3);
+      unsupportedCapabilityAction.setType('EffectCapability::EffectBehavior::EnableEffect');
+      unsupportedCapabilityAction.setParametersCount(4);
       unsupportedCapabilityAction.setParameter(0, 'MyGroup');
-      unsupportedCapabilityAction.setParameter(1, '"MyEffect"');
-      unsupportedCapabilityAction.setParameter(2, 'yes');
-      gd.asStandardEvent(evt).getActions().insert(unsupportedCapabilityAction, 1);
+      unsupportedCapabilityAction.setParameter(1, 'Effect');
+      unsupportedCapabilityAction.setParameter(2, '"MyEffect"');
+      unsupportedCapabilityAction.setParameter(3, 'yes');
+      gd.asStandardEvent(evt)
+        .getActions()
+        .insert(unsupportedCapabilityAction, 1);
 
       const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
       const code = layoutCodeGenerator.generateLayoutCompleteCode(
@@ -327,9 +378,11 @@ describe('libGD.js - GDJS related tests', function () {
       // was not generated for this object,
       // but generated for the Sprite supporting this capability.
       expect(code).toMatch(
-        'gdjs.SceneCode.GDMySpriteObjects1[i].enableEffect("MyEffect", true);'
+        'gdjs.SceneCode.GDMySpriteObjects1[i].getBehavior(\"Effect\").enableEffect(\"MyEffect\", true);'
       );
-      expect(code).toMatch('/* Object with unsupported capability - skipped. */');
+      expect(code).toEqual(expect.not.stringContaining(
+        'gdjs.SceneCode.GDMyFakeObjectWithUnsupportedCapabilityObjects1[i].getBehavior(\"Effect\")')
+      );
 
       action.delete();
     });
@@ -404,10 +457,12 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action2, 1);
 
       const namespace = 'gdjs.eventsFunction.myTest';
+      const extension = new gd.EventsFunctionsExtension();
       const eventsFunctionsExtensionCodeGenerator =
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          extension,
           eventsFunction,
           namespace,
           includeFiles,
@@ -460,6 +515,7 @@ describe('libGD.js - GDJS related tests', function () {
 
       condition.delete();
       action.delete();
+      extension.delete();
     });
 
     it('can generate code for an events function, with groups', function () {
@@ -512,6 +568,7 @@ describe('libGD.js - GDJS related tests', function () {
         new gd.EventsFunctionsExtensionCodeGenerator(project);
       const code =
         eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          new gd.EventsFunctionsExtension(),
           eventsFunction,
           namespace,
           includeFiles,
@@ -547,36 +604,25 @@ describe('libGD.js - GDJS related tests', function () {
     });
   });
 
-  const testObjectFeatures = (object) => {
-    expect(object instanceof gd.Object).toBe(true);
-    object.setTags('tag1, tag2, tag3');
-    expect(object.getTags()).toBe('tag1, tag2, tag3');
-    expect(object.getVariables()).toBeTruthy();
-  };
-
   describe('TextObject', function () {
     it('should expose TextObject specific methods', function () {
       var object = new gd.TextObject('MyTextObject');
-      testObjectFeatures(object);
-      object.setString('Hello');
+      object.setText('Hello');
       object.setFontName('Hello.ttf');
       object.setCharacterSize(10);
       object.setBold(true);
-      object.setColor(1, 2, 3);
+      object.setColor('1;2;3');
 
-      expect(object.getString()).toBe('Hello');
+      expect(object.getText()).toBe('Hello');
       expect(object.getFontName()).toBe('Hello.ttf');
       expect(object.getCharacterSize()).toBe(10);
       expect(object.isBold()).toBe(true);
-      expect(object.getColorR()).toBe(1);
-      expect(object.getColorG()).toBe(2);
-      expect(object.getColorB()).toBe(3);
+      expect(object.getColor()).toBe('1;2;3');
     });
   });
   describe('TiledSpriteObject', function () {
     it('should expose TiledSpriteObject specific methods', function () {
       var object = new gd.TiledSpriteObject('MyTiledSpriteObject');
-      testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
@@ -584,7 +630,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('PanelSpriteObject', function () {
     it('should expose PanelSpriteObject specific methods', function () {
       var object = new gd.PanelSpriteObject('MyPanelSpriteObject');
-      testObjectFeatures(object);
       object.setTexture('MyImageName');
       expect(object.getTexture()).toBe('MyImageName');
     });
@@ -592,7 +637,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('ShapePainterObject', function () {
     it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
-      testObjectFeatures(object);
       object.setCoordinatesAbsolute();
       expect(object.areCoordinatesAbsolute()).toBe(true);
       object.setCoordinatesRelative();
@@ -602,7 +646,6 @@ describe('libGD.js - GDJS related tests', function () {
   describe('ShapePainterObject', function () {
     it('should expose ShapePainterObject specific methods', function () {
       var object = new gd.ShapePainterObject('MyShapePainterObject');
-      testObjectFeatures(object);
       object.setClearBetweenFrames(true);
       expect(object.isClearedBetweenFrames()).toBe(true);
       object.setClearBetweenFrames(false);
@@ -612,13 +655,11 @@ describe('libGD.js - GDJS related tests', function () {
   describe('TextEntryObject', function () {
     it('should expose TextEntryObject', function () {
       var object = new gd.TextEntryObject('MyTextEntryObject');
-      testObjectFeatures(object);
     });
   });
   describe('ParticleEmitterObject', function () {
     it('should expose ParticleEmitterObject', function () {
       var object = new gd.ParticleEmitterObject('MyParticleEmitterObject');
-      testObjectFeatures(object);
     });
   });
   describe('JsCodeEvent', function () {

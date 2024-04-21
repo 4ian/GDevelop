@@ -24,8 +24,6 @@ namespace gdjs {
     private _angle: float = 0;
 
     //Attributes used when moving
-    private _x: float = 0;
-    private _y: float = 0;
     private _xVelocity: float = 0;
     private _yVelocity: float = 0;
     private _angularSpeed: float = 0;
@@ -47,12 +45,16 @@ namespace gdjs {
     private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
+    private _topDownMovementHooks: Array<
+      gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    > = [];
+
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._allowDiagonals = behaviorData.allowDiagonals;
       this._acceleration = behaviorData.acceleration;
       this._deceleration = behaviorData.deceleration;
@@ -219,6 +221,14 @@ namespace gdjs {
       return this._angle;
     }
 
+    isMovementAngleAround(degreeAngle: float, tolerance: float) {
+      return (
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._angle, degreeAngle)
+        ) <= tolerance
+      );
+    }
+
     setMovementAngleOffset(movementAngleOffset: float): void {
       this._movementAngleOffset = movementAngleOffset;
     }
@@ -227,7 +237,7 @@ namespace gdjs {
       return this._movementAngleOffset;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -237,21 +247,21 @@ namespace gdjs {
       // @ts-ignore
       this._leftKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(LEFTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(LEFTKEY);
       // @ts-ignore
       this._rightKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(RIGHTKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(RIGHTKEY);
       // @ts-ignore
       this._downKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(DOWNKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(DOWNKEY);
       // @ts-ignore
       this._upKey |=
         !this._ignoreDefaultControls &&
-        runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+        instanceContainer.getGame().getInputManager().isKeyPressed(UPKEY);
 
-      const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+      const elapsedTime = this.owner.getElapsedTime();
 
       if (!this._leftKey) {
         this._leftKeyPressedDuration = 0;
@@ -329,8 +339,19 @@ namespace gdjs {
         }
       }
 
+      const hookContext =
+        gdjs.TopDownMovementRuntimeBehavior._topDownMovementHookContext;
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        hookContext._setDirection(direction);
+        direction = topDownMovementHook.overrideDirection(hookContext);
+      }
+      hookContext._setDirection(direction);
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforeSpeedUpdate(hookContext);
+      }
+
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
       this._wasStickUsed = false;
@@ -413,6 +434,10 @@ namespace gdjs {
       // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 
+      for (const topDownMovementHook of this._topDownMovementHooks) {
+        topDownMovementHook.beforePositionUpdate(hookContext);
+      }
+
       // Position object.
       // This is a Verlet integration considering the acceleration as constant.
       // If you expand deltaX or deltaY, it gives, thanks to the usage of both
@@ -443,8 +468,7 @@ namespace gdjs {
         if (this._rotateObject) {
           object.rotateTowardAngle(
             directionInDeg + this._angleOffset,
-            this._angularSpeed,
-            runtimeScene
+            this._angularSpeed
           );
         }
       }
@@ -518,8 +542,68 @@ namespace gdjs {
     getLastStickInputAngle() {
       return this._stickAngle;
     }
+
+    /**
+     * A hook must typically be registered by a behavior that requires this one
+     * in its onCreate function.
+     * The hook must stay forever to avoid side effects like a hooks order
+     * change. To handle deactivated behavior, the hook can check that its
+     * behavior is activated before doing anything.
+     */
+    registerHook(
+      hook: gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    ) {
+      this._topDownMovementHooks.push(hook);
+    }
   }
+
   export namespace TopDownMovementRuntimeBehavior {
+    export class TopDownMovementHookContext {
+      private direction: integer = -1;
+
+      /**
+       * @returns The movement direction from 0 for left to 7 for up-left and
+       * -1 for no direction.
+       */
+      getDirection(): integer {
+        return this.direction;
+      }
+
+      /**
+       * This method won't change the direction used by the top-down movement
+       * behavior.
+       */
+      _setDirection(direction: integer): void {
+        this.direction = direction;
+      }
+    }
+
+    // This should be a static attribute but it's not possible because of
+    // declaration order.
+    export const _topDownMovementHookContext = new gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHookContext();
+
+    /**
+     * Allow extensions relying on the top-down movement to customize its
+     * behavior a bit.
+     */
+    export interface TopDownMovementHook {
+      /**
+       * Return the direction to use instead of the direction given in
+       * parameter.
+       */
+      overrideDirection(hookContext: TopDownMovementHookContext): integer;
+      /**
+       * Called before the acceleration and new direction is applied to the
+       * velocity.
+       */
+      beforeSpeedUpdate(hookContext: TopDownMovementHookContext): void;
+      /**
+       * Called before the velocity is applied to the object position and
+       * angle.
+       */
+      beforePositionUpdate(hookContext: TopDownMovementHookContext): void;
+    }
+
     export interface BasisTransformation {
       toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }

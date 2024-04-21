@@ -5,24 +5,19 @@ import {
   type StorageProviderOperations,
   type FileMetadata,
 } from '.';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type AppArguments } from '../Utils/Window';
+import { type ResourcesActionsMenuBuilder } from '.';
 
 /**
  * An empty StorageProvider doing nothing.
+ * Use only for tests or for case where no storage provider was set
+ * (this is a "null object").
  */
-const emptyStorageProvider: StorageProvider = {
+export const emptyStorageProvider: StorageProvider = {
   internalName: 'Empty',
   name: 'No storage',
-  createOperations: () => ({
-    onOpenWithPicker: () => Promise.reject('No storage provider set up'),
-    onOpen: () => Promise.reject('No storage provider set up'),
-    hasAutoSave: () => Promise.resolve(false),
-    onSaveProject: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onSaveProjectAs: (project: gdProject) =>
-      Promise.reject('No storage provider set up'),
-    onAutoSaveProject: (project: gdProject) => Promise.resolve(),
-  }),
+  createOperations: () => ({}),
 };
 
 type Props = {|
@@ -31,9 +26,10 @@ type Props = {|
   defaultStorageProvider?: StorageProvider,
   children: ({
     storageProviders: Array<StorageProvider>,
+    getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
     getStorageProviderOperations: (
-      newStorageProvider: ?StorageProvider
-    ) => Promise<StorageProviderOperations>,
+      newStorageProvider?: ?StorageProvider
+    ) => StorageProviderOperations,
     initialFileMetadataToOpen: ?FileMetadata,
     getStorageProvider: () => StorageProvider,
   }) => React.Node,
@@ -44,13 +40,7 @@ type InitialStorageProviderAndFileMetadata = {|
   initialFileMetadataToOpen: ?FileMetadata,
 |};
 
-type State = {|
-  ...InitialStorageProviderAndFileMetadata,
-  storageProviderOperations: ?StorageProviderOperations,
-  renderDialog: ?() => React.Node,
-|};
-
-const computeInitialFileMetadataToOpen = (
+const computeDefaultConfiguration = (
   defaultStorageProvider: ?StorageProvider,
   storageProviders: Array<StorageProvider>,
   appArguments: AppArguments
@@ -81,86 +71,129 @@ const computeInitialFileMetadataToOpen = (
   return candidates[0];
 };
 
-export default class ProjectStorageProviders extends React.Component<
-  Props,
-  State
-> {
-  state = {
-    ...computeInitialFileMetadataToOpen(
-      this.props.defaultStorageProvider,
-      this.props.storageProviders,
-      this.props.appArguments
-    ),
-    storageProviderOperations: null,
-    renderDialog: null,
-  };
+const ProjectStorageProviders = (props: Props) => {
+  const storageProviderOperations = React.useRef<?StorageProviderOperations>(
+    null
+  );
+  const storageProviderResourceOperations = React.useRef<?ResourcesActionsMenuBuilder>(
+    null
+  );
+  const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
+    null
+  );
+  const defaultConfiguration = computeDefaultConfiguration(
+    props.defaultStorageProvider,
+    props.storageProviders,
+    props.appArguments
+  );
+  const currentStorageProvider = React.useRef<?StorageProvider>(
+    defaultConfiguration.currentStorageProvider
+  );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  _setDialog = (renderDialog: () => React.Node) => {
-    this.setState({
-      renderDialog,
-    });
-  };
+  /** Wrapper around setRenderDialog to allow passing a function without confusing React. */
+  const setDialog = React.useCallback(
+    (_renderDialog: () => React.Node) => {
+      setRenderDialog((): (() => React.Node) => _renderDialog);
+    },
+    [setRenderDialog]
+  );
 
-  _closeDialog = () => {
-    this.setState({
-      renderDialog: null,
-    });
-  };
+  /** Wrapper around setRenderDialog to close the dialog. */
+  const closeDialog = React.useCallback(() => {
+    setRenderDialog(null);
+  }, []);
 
-  _getStorageProviderOperations = (
-    storageProvider: ?StorageProvider
-  ): Promise<StorageProviderOperations> => {
-    // Avoid creating a new storageProviderOperations
-    // if we're not changing the storage provider.
-    if (
-      !storageProvider ||
-      storageProvider === this.state.currentStorageProvider
-    ) {
-      if (this.state.storageProviderOperations) {
-        return Promise.resolve(this.state.storageProviderOperations);
+  const getStorageProviderOperations = React.useCallback(
+    (newStorageProvider?: ?StorageProvider): StorageProviderOperations => {
+      if (!newStorageProvider) {
+        if (!storageProviderOperations.current) {
+          currentStorageProvider.current = emptyStorageProvider;
+          storageProviderResourceOperations.current = null;
+          storageProviderOperations.current = emptyStorageProvider.createOperations(
+            {
+              setDialog,
+              closeDialog,
+              authenticatedUser,
+            }
+          );
+        }
+        return storageProviderOperations.current;
       }
-    }
 
-    const newStorageProvider: StorageProvider =
-      storageProvider ||
-      this.state.currentStorageProvider ||
-      emptyStorageProvider;
-    const storageProviderOperations = newStorageProvider.createOperations({
-      setDialog: this._setDialog,
-      closeDialog: this._closeDialog,
-    });
+      // Avoid creating a new storageProviderOperations
+      // if we're not changing the storage provider.
+      if (
+        newStorageProvider === currentStorageProvider.current &&
+        storageProviderOperations.current
+      ) {
+        return storageProviderOperations.current;
+      }
 
-    return new Promise(resolve => {
-      this.setState(
+      const storageProviderOperationsToUse = newStorageProvider.createOperations(
         {
-          currentStorageProvider: newStorageProvider,
-          storageProviderOperations,
-        },
-        () => {
-          resolve(storageProviderOperations);
+          setDialog,
+          closeDialog,
+          authenticatedUser,
         }
       );
-    });
-  };
 
-  _getStorageProvider = () => {
-    return this.state.currentStorageProvider || emptyStorageProvider;
-  };
+      // If the storage provider is unable to open a project, we won't keep it, we just
+      // return it for a one time usage (example: DownloadFileStorageProvider).
+      const keepForNextOperations = !!storageProviderOperationsToUse.onOpen;
+      if (keepForNextOperations) {
+        currentStorageProvider.current = newStorageProvider;
+        storageProviderOperations.current = storageProviderOperationsToUse;
+        storageProviderResourceOperations.current = newStorageProvider.createResourceOperations
+          ? newStorageProvider.createResourceOperations({ authenticatedUser })
+          : null;
+      }
 
-  render() {
-    const { children, storageProviders } = this.props;
-    const { renderDialog, initialFileMetadataToOpen } = this.state;
+      return storageProviderOperationsToUse;
+    },
+    [authenticatedUser, setDialog, closeDialog]
+  );
 
-    return (
-      <React.Fragment>
-        {children({
-          storageProviders,
-          getStorageProviderOperations: this._getStorageProviderOperations,
-          initialFileMetadataToOpen,
-          getStorageProvider: this._getStorageProvider,
-        })}
-        {renderDialog && renderDialog()}
-      </React.Fragment>
-    );
-  }
-}
+  const getStorageProvider = React.useCallback(() => {
+    return currentStorageProvider.current || emptyStorageProvider;
+  }, []);
+
+  const getStorageProviderResourceOperations = React.useCallback(() => {
+    return storageProviderResourceOperations.current;
+  }, []);
+
+  // Some storage providers might need the current authenticated user
+  // to create their operations. This effect makes sure operations are always
+  // up to date with the current authenticated user.
+  React.useEffect(
+    () => {
+      const { current: storageProvider } = currentStorageProvider;
+      if (!storageProvider) return;
+      storageProviderOperations.current = storageProvider.createOperations({
+        setDialog,
+        closeDialog,
+        authenticatedUser,
+      });
+      storageProviderResourceOperations.current = storageProvider.createResourceOperations
+        ? storageProvider.createResourceOperations({ authenticatedUser })
+        : null;
+    },
+    [authenticatedUser, setDialog, closeDialog]
+  );
+
+  return (
+    <React.Fragment>
+      {props.children({
+        storageProviders: props.storageProviders,
+        getStorageProviderOperations,
+        initialFileMetadataToOpen:
+          defaultConfiguration.initialFileMetadataToOpen,
+        getStorageProvider,
+        getStorageProviderResourceOperations,
+      })}
+      {renderDialog && renderDialog()}
+    </React.Fragment>
+  );
+};
+
+export default ProjectStorageProviders;

@@ -46,20 +46,20 @@ type CommandHandlers = {|
   onHotReloadPreview: () => void,
   allowNetworkPreview: boolean,
   onOpenHomePage: () => void,
-  onCreateProject: () => void,
+  onCreateBlank: () => void,
   onOpenProject: () => void,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
   onExportGame: () => void,
+  onInviteCollaborators: () => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
-  onOpenGamesDashboard: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
@@ -69,10 +69,6 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('OPEN_PROFILE', !!handlers.project, {
     handler: handlers.onOpenProfile,
-  });
-
-  useCommand('OPEN_GAMES_DASHBOARD', !!handlers.project, {
-    handler: handlers.onOpenGamesDashboard,
   });
 
   useCommand('OPEN_PROJECT_MANAGER', !!handlers.project, {
@@ -108,7 +104,7 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
   });
 
   useCommand('CREATE_NEW_PROJECT', true, {
-    handler: handlers.onCreateProject,
+    handler: handlers.onCreateBlank,
   });
 
   useCommand('OPEN_PROJECT', true, {
@@ -129,6 +125,10 @@ const useMainFrameCommands = (handlers: CommandHandlers) => {
 
   useCommand('EXPORT_GAME', !!handlers.project, {
     handler: handlers.onExportGame,
+  });
+
+  useCommand('INVITE_COLLABORATORS', !!handlers.project, {
+    handler: handlers.onInviteCollaborators,
   });
 
   useCommand('OPEN_COMMAND_PALETTE', true, {

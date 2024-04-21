@@ -15,7 +15,7 @@ import {
 
 import AchievementList from './AchievementList';
 import Trophy from '../../UI/CustomSvgIcons/Trophy';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 
 type Props = {|
@@ -31,6 +31,9 @@ const styles = {
   leftContainer: {
     flex: 1,
     margin: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rightContainer: {
     flex: 2,
@@ -44,7 +47,7 @@ const UserAchievements = ({
 }: Props) => {
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
 
   const fetchAchievements = useCallback(async () => {
     try {
@@ -81,7 +84,7 @@ const UserAchievements = ({
             <div
               style={{
                 ...styles.summary,
-                padding: windowWidth === 'small' ? '0 20' : '20',
+                padding: isMobile ? '0 20' : '20',
               }}
             >
               <Trophy color="secondary" fontSize="large" />

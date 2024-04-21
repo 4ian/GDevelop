@@ -18,6 +18,7 @@ namespace gdjs {
    * @memberOf gdjs
    */
   export namespace evtTools {
+    // @ts-ignore - This variable is unused on purpose.
     const thisIsUnusedButEnsureTheNamespaceIsDeclared = true;
   }
 
@@ -26,7 +27,7 @@ namespace gdjs {
 
   type RuntimeSceneCallback = (runtimeScene: gdjs.RuntimeScene) => void;
   type RuntimeSceneRuntimeObjectCallback = (
-    runtimeScene: gdjs.RuntimeScene,
+    instanceContainer: gdjs.RuntimeInstanceContainer,
     runtimeObject: gdjs.RuntimeObject
   ) => void;
 
@@ -67,12 +68,10 @@ namespace gdjs {
   export const hexToRGBColor = function (
     hexString: string
   ): [number, number, number] {
-    var hexNumber = parseInt(hexString.replace('#', ''), 16);
-    return [
-      (hexNumber >> 16) & 0xff,
-      (hexNumber >> 8) & 0xff,
-      hexNumber & 0xff,
-    ];
+    const hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return Number.isFinite(hexNumber)
+      ? [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff]
+      : [0, 0, 0];
   };
 
   /**
@@ -119,7 +118,7 @@ namespace gdjs {
   };
 
   /**
-   * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
+   * Convert a Hex number to a RGB color object ({r,g,b,a} with each component going from 0 to 255 and alpha set to 255).
    * @param hex Hex color
    */
   export const hexNumberToRGB = (
@@ -131,6 +130,20 @@ namespace gdjs {
       b: hexNumber & 0xff,
       a: 255,
     };
+  };
+
+  /**
+   * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
+   * @param hex Hex color
+   */
+  export const hexNumberToRGBArray = (
+    hexNumber: number
+  ): [integer, integer, integer] => {
+    return [
+      (hexNumber >> 16) & 0xff,
+      (hexNumber >> 8) & 0xff,
+      hexNumber & 0xff,
+    ];
   };
 
   /**
@@ -558,8 +571,33 @@ namespace gdjs {
       return diff / Math.min(absA + absB, Number.MAX_VALUE) < epsilon;
     }
   };
+
+  const asynchronouslyLoadingLibraryPromises: Array<Promise<any>> = [];
+
+  /**
+   * Register a promise which will be resolved when a third party library has
+   * finished loading (and is required to load before launching the game).
+   *
+   * This method must be called by any library that loads asynchronously.
+   */
+  export const registerAsynchronouslyLoadingLibraryPromise = (
+    promise: Promise<any>
+  ): void => {
+    asynchronouslyLoadingLibraryPromises.push(promise);
+  };
+
+  /**
+   * @returns a promise resolved when all all third party libraries, which need
+   * to be loaded before the game startup, are loaded. If a library fails
+   * loading, this will be rejected.
+   */
+  export const getAllAsynchronouslyLoadingLibraryPromise = (): Promise<
+    any[]
+  > => {
+    return Promise.all(asynchronouslyLoadingLibraryPromises);
+  };
 }
 
-//Make sure console.warn and console.error are available.
+// Make sure console.warn and console.error are available.
 console.warn = console.warn || console.log;
 console.error = console.error || console.log;

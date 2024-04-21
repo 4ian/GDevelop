@@ -1,0 +1,159 @@
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.compactTextField {
+  border-radius: 4px;
+  color: var(--theme-text-default-color);
+  background-color: var(--theme-text-field-default-background-color);
+  transition: box-shadow 0.1s;
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0px;
+}
+
+.container.disabled .compactTextField {
+  color: var(--theme-text-field-disabled-color);
+}
+
+.container.errored:not(.disabled) .compactTextField {
+  border: none;
+  outline: 1px solid var(--theme-text-field-default-error);
+}
+.container.errored:not(.disabled):hover .compactTextField {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+.container.errored:not(.disabled):focus-within .compactTextField {
+  outline: 1px solid var(--theme-text-field-active-error);
+}
+
+.compactTextField::before {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  content: '';
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.container:not(.disabled):not(.errored):hover .compactTextField::before {
+  border-bottom: 1px solid var(--theme-text-field-hover-border-color);
+}
+.container:not(.disabled):not(.errored):focus-within .compactTextField::before {
+  border-bottom: 1px solid var(--theme-text-field-active-border-color);
+}
+
+.compactTextField input {
+  outline: none;
+  border: none;
+  padding: 2px 8px;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--gdevelop-modern-font-family);
+  color: inherit;
+  flex: 1;
+  caret-color: var(--theme-text-field-active-caret-color);
+  min-width: 0px;
+  border-radius: inherit; /* Needed for InAppTutorialElementHighlighter to adapt its border-radius to the input container */
+}
+.compactTextField.withEndAdornment input {
+  padding-right: 20px;
+}
+
+.compactTextField input::placeholder {
+  color: var(--theme-text-field-placeholder-color);
+}
+
+.leftIconContainer {
+  display: flex;
+  margin: 0 2px;
+}
+
+.label {
+  display: flex;
+}
+
+.container:not(.disabled) .leftIconContainer.control,
+.container:not(.disabled) .leftIconContainer.control .label * {
+  cursor: ew-resize;
+}
+
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.leftIcon {
+  font-size: 20px;
+  color: var(--theme-text-field-placeholder-color);
+  transition: color 0.1s linear;
+}
+
+.container.disabled .leftIcon {
+  color: var(--theme-text-field-disabled-color);
+}
+
+.container:not(.disabled):hover .leftIcon {
+  color: var(--theme-text-default-color);
+}
+.container:not(.disabled):focus-within .leftIcon {
+  color: var(--theme-text-default-color);
+}
+
+.endAdornmentButton {
+  outline: 0;
+  border: 0;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 17px;
+  height: 17px;
+  display: none;
+  padding: 1px;
+  border-radius: 4px;
+  background-color: unset;
+}
+/* svg tag is needed to be first priority compared to Material UI Custom SVG icon classes*/
+svg.endAdornmentIcon {
+  font-size: 15px;
+  color: var(--theme-text-field-placeholder-color);
+  transition: color 0.1s linear;
+}
+.container:not(.disabled):hover .endAdornmentButton,
+.container:not(.disabled):focus-within .endAdornmentButton {
+  display: flex;
+}
+.container:not(.disabled):hover .endAdornmentButton:hover,
+.container:not(.disabled):focus-within .endAdornmentButton:hover,
+.container:not(.disabled):hover .endAdornmentButton:focus,
+.container:not(.disabled):focus-within .endAdornmentButton:focus {
+  background-color: var(--theme-text-field-end-adornment-icon-background-color);
+}
+.container:not(.disabled):hover .endAdornmentButton:hover .endAdornmentIcon,
+.container:not(.disabled):focus-within
+  .endAdornmentButton:hover
+  .endAdornmentIcon,
+.container:not(.disabled):hover .endAdornmentButton:focus .endAdornmentIcon,
+.container:not(.disabled):focus-within
+  .endAdornmentButton:focus
+  .endAdornmentIcon {
+  color: var(--theme-text-default-color);
+}
+
+/* Chrome, Safari, Edge, Opera */
+.compactTextField input::-webkit-outer-spin-button,
+.compactTextField input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.compactTextField input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

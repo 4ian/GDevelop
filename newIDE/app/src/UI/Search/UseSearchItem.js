@@ -3,12 +3,29 @@ import * as React from 'react';
 import { type ChosenCategory } from './FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import SearchApi from 'js-worker-search';
+import {
+  type AssetShortHeader,
+  type PublicAssetPack,
+  type Resource,
+} from '../../Utils/GDevelopServices/Asset';
+import {
+  type PrivateAssetPackListingData,
+  type PrivateGameTemplateListingData,
+} from '../../Utils/GDevelopServices/Shop';
+
+type SearchableItem =
+  | AssetShortHeader
+  | PublicAssetPack
+  | Resource
+  | PrivateAssetPackListingData
+  | PrivateGameTemplateListingData;
 
 export interface SearchFilter<SearchItem> {
   getPertinence(searchItem: SearchItem): number;
+  hasFilters(): boolean;
 }
 
-export class TagSearchFilter<SearchItem: { tags: Array<string> }>
+export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
   implements SearchFilter<SearchItem> {
   tags: Set<string>;
 
@@ -21,6 +38,10 @@ export class TagSearchFilter<SearchItem: { tags: Array<string> }>
       searchItem.tags.some(tag => this.tags.has(tag))
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return this.tags.size > 0;
   }
 }
 
@@ -97,7 +118,7 @@ export const partialQuickSort = <Element: any>(
  * Filter a list of items according to the chosen category
  * and the chosen filters.
  */
-export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
+export const filterSearchItems = <SearchItem: SearchableItem>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
@@ -108,15 +129,22 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
   const startTime = performance.now();
   // TODO do only one call to filter for efficiency.
   const filteredSearchItems = searchItems
-    .filter(({ tags }) => {
+    .filter(searchItem => {
       if (!chosenCategory) return true;
+      if (chosenCategory && !searchItem.tags) {
+        // TODO: If the item has no tags, it's a Public or Private pack.
+        // We don't have information about the tags present in the pack yet, so
+        // we cannot return results when a tag/category is selected.
+        return false;
+      }
 
       const hasChosenCategoryTag =
         // If the chosen category is a container of tags, not a real tag, then
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
-        tags.some(tag => tag === chosenCategory.node.name);
-      if (!hasChosenCategoryTag) return false; // Asset is not in the selected category
+        (searchItem.tags &&
+          searchItem.tags.some(tag => tag === chosenCategory.node.name));
+      if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {
           // The parent is a container of tags, not a real tag. No need
@@ -124,8 +152,10 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
           return true;
         }
 
-        const hasParentCategoryTag = tags.some(tag => tag === parentNode.name);
-        if (!hasParentCategoryTag) return false; // Asset is not in the parent(s) of the selected category
+        const hasParentCategoryTag =
+          searchItem.tags &&
+          searchItem.tags.some(tag => tag === parentNode.name);
+        if (!hasParentCategoryTag) return false; // Item is not in the parent(s) of the selected category
       }
 
       return true;
@@ -134,7 +164,10 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
       return (
         !chosenFilters ||
         chosenFilters.size === 0 ||
-        searchItem.tags.some(tag => chosenFilters.has(tag))
+        (searchItem.tags &&
+          searchItem.tags.some(tag => chosenFilters.has(tag))) ||
+        (searchItem.categories &&
+          searchItem.categories.some(category => chosenFilters.has(category)))
       );
     });
 
@@ -177,14 +210,14 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
 /**
  * Allow to efficiently search and filters items.
  *
- * This instanciates a search API (in a web-worker, if available), index
+ * This instantiates a search API (in a web-worker, if available), index
  * the specified items, then returns the results of the search (according to the
  * search text and the chosen category/filters).
  *
  * Search is done asynchronously within a web-worker when available, so they
  * won't block the main thread.
  */
-export const useSearchItem = <SearchItem: { tags: Array<string> }>(
+export const useSearchItem = <SearchItem: SearchableItem>(
   searchItemsById: ?{ [string]: SearchItem },
   getItemDescription: SearchItem => string,
   searchText: string,
@@ -237,8 +270,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
         const allIds = Object.keys(searchItemsById);
 
         allIds.forEach(id => {
-          const assetShortHeader = searchItemsById[id];
-          newSearchApi.indexDocument(id, getItemDescription(assetShortHeader));
+          const searchItem = searchItemsById[id];
+          newSearchApi.indexDocument(id, getItemDescription(searchItem));
         });
 
         const totalTime = performance.now() - startTime;

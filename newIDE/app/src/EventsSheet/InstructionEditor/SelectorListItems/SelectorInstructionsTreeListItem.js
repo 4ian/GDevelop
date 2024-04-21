@@ -16,6 +16,7 @@ type Props<T> = {|
   selectedValue: ?string,
   initiallyOpenedPath?: ?Array<string>,
   getGroupIconSrc: string => string,
+  parentGroupIconSrc?: ?string,
 
   // Optional ref that will be filled with the selected ListItem
   selectedItemRef?: { current: null | ListItemRefType },
@@ -32,6 +33,7 @@ export const renderInstructionOrExpressionTree = <
   selectedItemRef,
   initiallyOpenedPath,
   getGroupIconSrc,
+  parentGroupIconSrc,
 }: Props<T>): Array<React$Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
@@ -48,23 +50,28 @@ export const renderInstructionOrExpressionTree = <
 
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
-        const instructionInformation: T = instructionOrGroup;
+        const instructionMetadata: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
         return (
           <ListItem
             key={value}
-            primaryText={key}
+            primaryText={instructionMetadata.displayedName}
             selected={selected}
-            id={'instruction-item-' + instructionInformation.type}
+            id={
+              // TODO: This id is used by in app tutorials. When in app tutorials
+              // are linked to GDevelop versions, change this id to be more accurate
+              // using getInstructionOrExpressionIdentifier
+              'instruction-item-' + instructionMetadata.type.replace(/:/g, '-')
+            }
             leftIcon={
               <ListIcon
                 iconSize={iconSize}
-                src={instructionInformation.iconFilename}
+                src={instructionMetadata.iconFilename}
               />
             }
             onClick={() => {
-              onChoose(instructionInformation.type, instructionInformation);
+              onChoose(instructionMetadata.type, instructionMetadata);
             }}
             ref={selected ? selectedItemRef : undefined}
           />
@@ -73,6 +80,7 @@ export const renderInstructionOrExpressionTree = <
         // $FlowFixMe - see above
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
+          const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return [
             <Subheader key={getSubheaderListItemKey(key)}>{key}</Subheader>,
           ].concat(
@@ -85,11 +93,12 @@ export const renderInstructionOrExpressionTree = <
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
               getGroupIconSrc,
+              parentGroupIconSrc: iconSrc,
             })
           );
         } else {
           const initiallyOpen = initiallyOpenedKey === key;
-          const iconSrc = getGroupIconSrc(key);
+          const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return (
             <ListItem
               key={key}
@@ -110,6 +119,7 @@ export const renderInstructionOrExpressionTree = <
                     ? restOfInitiallyOpenedPath
                     : undefined,
                   getGroupIconSrc,
+                  parentGroupIconSrc: iconSrc,
                 })
               }
             />

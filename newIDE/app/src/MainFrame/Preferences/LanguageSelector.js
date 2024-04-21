@@ -38,7 +38,7 @@ const renderLanguageSelectOption = localeMetadata => {
   return (
     <SelectOption
       value={localeMetadata.languageCode}
-      primaryText={`${localeMetadata.languageNativeName} (${
+      label={`${localeMetadata.languageNativeName} (${
         localeMetadata.languageName
       })${isStarted ? ` - ~${percent}%` : ''}`}
       disabled={!isStarted}
@@ -62,7 +62,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
           }}
           fullWidth
         >
-          <SelectOption value="en" primaryText="English (default)" />
+          <SelectOption value="en" label="English (default)" />
           {goodProgressLocales.map(localeMetadata =>
             renderLanguageSelectOption(localeMetadata)
           )}

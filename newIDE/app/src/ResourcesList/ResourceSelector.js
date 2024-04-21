@@ -1,37 +1,52 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+import { I18n } from '@lingui/react';
+import { Trans, t } from '@lingui/macro';
+
 import SemiControlledAutoComplete, {
   type DataSource,
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
-import BackspaceIcon from '@material-ui/icons/Backspace';
-import Add from '@material-ui/icons/Add';
-import Brush from '@material-ui/icons/Brush';
 import {
   type ResourceSource,
-  type ChooseResourceFunction,
+  type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
-import { TextFieldWithButtonLayout } from '../UI/Layout';
+import FlatButtonWithSplitMenu from '../UI/FlatButtonWithSplitMenu';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import IconButton from '../UI/IconButton';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import { Column } from '../UI/Grid';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import { ExternalEditorOpenedDialog } from '../UI/ExternalEditorOpenedDialog';
+import Add from '../UI/CustomSvgIcons/Add';
+import Edit from '../UI/CustomSvgIcons/Edit';
+import Cross from '../UI/CustomSvgIcons/Cross';
+import useResourcesChangedWatcher from './UseResourcesChangedWatcher';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+
+const styles = {
+  textFieldStyle: { display: 'flex', flex: 1 },
+};
 
 type Props = {|
   project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
   resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
+  fallbackResourceKind?: ?ResourceKind,
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
+  defaultNewResourceName?: string,
   onChange: string => void,
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
@@ -40,289 +55,406 @@ type Props = {|
   onApply?: () => void,
   margin?: 'none' | 'dense',
   style?: {| alignSelf?: 'center' |},
+  id?: string,
 |};
 
-type State = {|
-  notExistingError: boolean,
-  resourceName: string,
-|};
+export type ResourceSelectorInterface = {| focus: FieldFocusFunction |};
 
-export default class ResourceSelector extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
+  (props, ref) => {
+    const {
+      project,
+      initialResourceName,
+      defaultNewResourceName,
+      resourceManagementProps,
+      resourcesLoader,
+      resourceKind,
+      fallbackResourceKind,
+      onChange,
+    } = props;
+    const forceUpdate = useForceUpdate();
+    const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
+      null
+    );
+    const { showConfirmation } = useAlertDialog();
+    const abortControllerRef = React.useRef<?AbortController>(null);
+    const allResourcesNamesRef = React.useRef<Array<string>>([]);
+    const [notFoundError, setNotFoundError] = React.useState<boolean>(false);
+    const [resourceName, setResourceName] = React.useState<string>(
+      props.initialResourceName
+    );
+    const [
+      externalEditorOpened,
+      setExternalEditorOpened,
+    ] = React.useState<boolean>(false);
 
-    this.state = {
-      notExistingError: false,
-      resourceName: props.initialResourceName || '',
-    };
+    const focus: FieldFocusFunction = React.useCallback(options => {
+      if (autoCompleteRef.current) autoCompleteRef.current.focus(options);
+    }, []);
 
-    const { project } = props;
-    if (project) {
-      this._loadFrom(project.getResourcesManager());
-    }
-  }
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  allResourcesNames: Array<string>;
-  autoCompleteData: DataSource;
-  _autoComplete: ?SemiControlledAutoCompleteInterface;
-
-  focus(selectAll: boolean = false) {
-    if (this._autoComplete) this._autoComplete.focus(selectAll);
-  }
-
-  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.initialResourceName !== this.props.initialResourceName) {
-      this.setState({
-        resourceName: nextProps.initialResourceName || '',
-      });
-    }
-  }
-
-  _getResourceSourceItems(): DataSource {
-    const sources = this.props.resourceSources || [];
-    return [
-      ...sources
-        .filter(source => source.kind === this.props.resourceKind)
-        .map(source => ({
-          text: '',
-          value: '',
-          translatableValue: source.displayName,
-          renderIcon: () => <Add />,
-          onClick: () => this._addFrom(source),
-        })),
-      {
-        type: 'separator',
+    React.useEffect(
+      () => {
+        setResourceName(initialResourceName);
       },
-    ];
-  }
+      // Update resource name with the one given by the parent if it changes.
+      [initialResourceName]
+    );
 
-  _loadFrom(resourcesManager: gdResourcesManager) {
-    this.allResourcesNames = resourcesManager.getAllResourceNames().toJSArray();
-    if (this.props.resourceKind) {
-      this.allResourcesNames = this.allResourcesNames.filter(resourceName => {
-        return (
-          resourcesManager.getResource(resourceName).getKind() ===
-          this.props.resourceKind
-        );
-      });
-    }
-    const resourceSourceItems = this._getResourceSourceItems();
-    const resourceItems = this.allResourcesNames.map(resourceName => ({
+    const onResetResourceName = React.useCallback(
+      () => {
+        setResourceName('');
+        setNotFoundError(false);
+        if (onChange) onChange('');
+      },
+      [onChange]
+    );
+
+    const onChangeResourceName = React.useCallback(
+      (newResourceName: string) => {
+        if (newResourceName === '') {
+          onResetResourceName();
+          return;
+        }
+        const isMissing =
+          allResourcesNamesRef.current.indexOf(newResourceName) === -1;
+
+        if (!isMissing) {
+          if (onChange) onChange(newResourceName);
+        }
+        setResourceName(newResourceName);
+        setNotFoundError(isMissing);
+      },
+      [onChange, onResetResourceName]
+    );
+
+    const loadFrom = React.useCallback(
+      (resourcesManager: gdResourcesManager) => {
+        const allResourcesNames = resourcesManager
+          .getAllResourceNames()
+          .toJSArray();
+        if (resourceKind) {
+          const mainResourcesNames = allResourcesNames.filter(resourceName => {
+            return (
+              resourcesManager.getResource(resourceName).getKind() ===
+              resourceKind
+            );
+          });
+
+          if (fallbackResourceKind) {
+            mainResourcesNames.push(
+              ...allResourcesNames.filter(resourceName => {
+                return (
+                  resourcesManager.getResource(resourceName).getKind() ===
+                  fallbackResourceKind
+                );
+              })
+            );
+          }
+
+          allResourcesNamesRef.current = mainResourcesNames;
+        }
+      },
+      [resourceKind, fallbackResourceKind]
+    );
+
+    const refreshResources = React.useCallback(
+      () => {
+        if (project) {
+          loadFrom(project.getResourcesManager());
+          forceUpdate();
+        }
+      },
+      [project, forceUpdate, loadFrom]
+    );
+
+    React.useEffect(
+      refreshResources,
+      // Reload resources when loadFrom - and refreshResources - is updated, that's to say
+      // when resourceKind or fallbackResourceKind is updated, or when the project changes.
+      [refreshResources]
+    );
+
+    // Transfer responsibility of refreshing project resources to this hook.
+    const { triggerResourcesHaveChanged } = useResourcesChangedWatcher({
+      project,
+      callback: refreshResources,
+    });
+
+    const addFrom = React.useCallback(
+      async (source: ResourceSource) => {
+        try {
+          if (!source) return;
+
+          const resources = await resourceManagementProps.onChooseResource({
+            initialSourceName: source.name,
+            multiSelection: false,
+            resourceKind: resourceKind,
+          });
+
+          if (!resources.length) return;
+          const resource = resources[0];
+          applyResourceDefaults(project, resource);
+
+          // addResource will check if a resource with the same name exists, and if it is
+          // the case, no new resource will be added.
+          project.getResourcesManager().addResource(resource);
+
+          const resourceName: string = resource.getName();
+
+          // Imperatively set the value of the autoComplete, as it can be (on Windows for example),
+          // still focused. This means that when it's then getting blurred, the value we
+          // set for the resource name would get erased by the one that was getting entered.
+          if (autoCompleteRef.current)
+            autoCompleteRef.current.forceInputValueTo(resourceName);
+
+          // Important, we are responsible for deleting the resources that were given to us.
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          resources.forEach(resource => resource.delete());
+
+          await resourceManagementProps.onFetchNewlyAddedResources();
+          triggerResourcesHaveChanged();
+          onChangeResourceName(resourceName);
+        } catch (err) {
+          // Should never happen, errors should be shown in the interface.
+          console.error('Unable to choose a resource', err);
+        }
+      },
+      [
+        project,
+        resourceManagementProps,
+        resourceKind,
+        onChangeResourceName,
+        triggerResourcesHaveChanged,
+      ]
+    );
+
+    const getResourceSourceItems = React.useCallback(
+      (): DataSource => {
+        const sources = resourceManagementProps.resourceSources || [];
+        const storageProvider = resourceManagementProps.getStorageProvider();
+
+        return [
+          ...sources
+            .filter(source => source.kind === resourceKind)
+            .filter(
+              ({ onlyForStorageProvider }) =>
+                !onlyForStorageProvider ||
+                onlyForStorageProvider === storageProvider.internalName
+            )
+            .map(source => ({
+              text: '',
+              value: '',
+              translatableValue: source.displayName,
+              renderIcon: () => <Add />,
+              onClick: () => addFrom(source),
+            })),
+          {
+            type: 'separator',
+          },
+        ];
+      },
+      [addFrom, resourceManagementProps, resourceKind]
+    );
+
+    const editWith = React.useCallback(
+      async (
+        i18n: I18nType,
+        resourceExternalEditor: ResourceExternalEditor
+      ) => {
+        abortControllerRef.current = new AbortController();
+        const { signal } = abortControllerRef.current;
+        const resourcesManager = project.getResourcesManager();
+        const initialResource = resourcesManager.getResource(resourceName);
+
+        try {
+          setExternalEditorOpened(true);
+          const editResult = await resourceExternalEditor.edit({
+            project,
+            i18n,
+            getStorageProvider: resourceManagementProps.getStorageProvider,
+            resourceManagementProps,
+            resourceNames: [resourceName],
+            extraOptions: {
+              existingMetadata: initialResource.getMetadata(),
+
+              // Only useful for images:
+              singleFrame: true,
+              fps: 0,
+              name: resourceName || defaultNewResourceName,
+              isLooping: false,
+            },
+            signal,
+          });
+
+          setExternalEditorOpened(false);
+          if (!editResult) return;
+
+          const { resources } = editResult;
+          if (!resources.length) return;
+
+          // Burst the ResourcesLoader cache to force the file to be reloaded (and not cached by the browser).
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            resources[0].name,
+          ]);
+
+          onChange(resources[0].name);
+          triggerResourcesHaveChanged();
+          forceUpdate();
+        } catch (error) {
+          if (error.name !== 'UserCancellationError') {
+            console.error(
+              'An exception was thrown when launching or reading resources from the external editor:',
+              error
+            );
+            showErrorBox({
+              message:
+                'There was an error while using the external editor. Try with another resource and if this persists, please report this as a bug.',
+              rawError: error,
+              errorId: 'external-editor-error',
+            });
+          }
+          setExternalEditorOpened(false);
+        } finally {
+          abortControllerRef.current = null;
+        }
+      },
+      [
+        defaultNewResourceName,
+        forceUpdate,
+        onChange,
+        project,
+        resourceManagementProps,
+        resourceName,
+        resourcesLoader,
+        triggerResourcesHaveChanged,
+      ]
+    );
+
+    const cancelEditingWithExternalEditor = React.useCallback(
+      async () => {
+        const shouldContinue = await showConfirmation({
+          title: t`Cancel editing`,
+          message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
+          confirmButtonLabel: t`Cancel edition`,
+          dismissButtonLabel: t`Continue editing`,
+        });
+        if (!shouldContinue) return;
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        } else {
+          console.error(
+            'Cannot cancel editing with external editor, abort controller is missing.'
+          );
+        }
+      },
+      [showConfirmation]
+    );
+
+    const errorText = notFoundError ? (
+      <Trans>This resource does not exist in the game</Trans>
+    ) : null;
+
+    const externalEditors = resourceManagementProps.resourceExternalEditors.filter(
+      externalEditor => externalEditor.kind === resourceKind
+    );
+
+    const resourceSourceItems = getResourceSourceItems();
+    const resourceItems = allResourcesNamesRef.current.map(resourceName => ({
       text: resourceName,
       value: resourceName,
     }));
-    this.autoCompleteData = [...resourceSourceItems, ...resourceItems];
-  }
+    const autoCompleteData = [...resourceSourceItems, ...resourceItems];
 
-  _addFrom = (source: ResourceSource) => {
-    if (!source) return;
-
-    const { project, onChooseResource } = this.props;
-    onChooseResource({
-      initialSourceName: source.name,
-      multiSelection: false,
-      resourceKind: this.props.resourceKind,
-    })
-      .then(resources => {
-        if (!resources.length) return;
-        const resource = resources[0];
-        applyResourceDefaults(project, resource);
-
-        // addResource will check if a resource with the same name exists, and if it is
-        // the case, no new resource will be added.
-        project.getResourcesManager().addResource(resource);
-
-        this._loadFrom(project.getResourcesManager());
-        const resourceName: string = resource.getName();
-        this._onChangeResourceName(resourceName);
-
-        // Imperatively set the value of the autocomplete, as it can be (on Windows for example),
-        // still focused. This means that when it's then getting blurred, the value we
-        // set for the resource name would get erased by the one that was getting entered.
-        if (this._autoComplete)
-          this._autoComplete.forceInputValueTo(resourceName);
-
-        // Important, we are responsible for deleting the resources that were given to us.
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resources.forEach(resource => resource.delete());
-      })
-      .catch(err => {
-        // Should never happen, errors should be shown in the interface.
-        console.error('Unable to choose a resource', err);
-      });
-  };
-
-  _onResetResourceName = () => {
-    this.setState(
-      {
-        resourceName: '',
-        notExistingError: false,
-      },
-      () => {
-        if (this.props.onChange) this.props.onChange(this.state.resourceName);
-      }
-    );
-  };
-
-  _onChangeResourceName = (resourceName: string) => {
-    if (resourceName === '') {
-      this._onResetResourceName();
-      return;
-    }
-
-    const notExistingError =
-      this.allResourcesNames.indexOf(resourceName) === -1;
-
-    if (!notExistingError) {
-      if (this.props.onChange) this.props.onChange(resourceName);
-    }
-    this.setState({
-      resourceName,
-      notExistingError,
-    });
-  };
-
-  _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
-    const { project, resourcesLoader, resourceKind } = this.props;
-    const { resourceName } = this.state;
-    const resourcesManager = project.getResourcesManager();
-    const initialResource = resourcesManager.getResource(resourceName);
-    let initialResourceMetadata = {};
-    const initialResourceMetadataRaw = initialResource.getMetadata();
-    if (initialResourceMetadataRaw) {
-      try {
-        initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
-      } catch (e) {
-        console.error('Malformed metadata', e);
-      }
-    }
-
-    if (resourceKind === 'image') {
-      const resourceNames = [];
-      if (resourcesManager.hasResource(resourceName)) {
-        resourceNames.push(resourceName);
-      }
-      const externalEditorOptions = {
-        project,
-        resourcesLoader,
-        singleFrame: true,
-        resourceNames,
-        extraOptions: {
-          fps: 0,
-          name: resourceName,
-          isLooping: false,
-          externalEditorData: initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          if (!newResourceData.length) return;
-
-          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (resourceKind === 'audio') {
-      const externalEditorOptions = {
-        project,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          externalEditorData: initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceData[0].name,
-          ]);
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    } else if (resourceKind === 'json') {
-      const externalEditorOptions = {
-        project,
-        resourcesLoader,
-        resourceNames: [resourceName],
-        extraOptions: {
-          initialResourceMetadata,
-        },
-        onChangesSaved: newResourceData => {
-          this.props.onChange(newResourceData[0].name);
-        },
-      };
-      resourceExternalEditor.edit(externalEditorOptions);
-    }
-  };
-
-  render() {
-    const errorText = this.state.notExistingError
-      ? 'This resource does not exist in the game'
-      : null;
-
-    const externalEditors = this.props.resourceExternalEditors.filter(
-      externalEditor => externalEditor.kind === this.props.resourceKind
-    );
     return (
-      <TextFieldWithButtonLayout
-        noFloatingLabelText={!this.props.floatingLabelText}
-        margin={this.props.margin}
-        renderTextField={() => (
-          <SemiControlledAutoComplete
-            style={this.props.style}
-            floatingLabelText={this.props.floatingLabelText}
-            helperMarkdownText={this.props.helperMarkdownText}
-            hintText={this.props.hintText}
-            openOnFocus
-            dataSource={this.autoCompleteData || []}
-            value={this.state.resourceName}
-            onChange={this._onChangeResourceName}
-            errorText={errorText}
-            fullWidth={this.props.fullWidth}
-            margin={this.props.margin}
-            onRequestClose={this.props.onRequestClose}
-            onApply={this.props.onApply}
-            ref={autoComplete => (this._autoComplete = autoComplete)}
-          />
-        )}
-        renderButton={style => (
-          <React.Fragment>
-            {this.props.canBeReset && (
-              <IconButton
-                size="small"
-                onClick={() => {
-                  this._onResetResourceName();
-                }}
-              >
-                <BackspaceIcon />
-              </IconButton>
+      <I18n>
+        {({ i18n }) => (
+          <ResponsiveLineStackLayout noMargin expand alignItems="center">
+            <Column expand noMargin>
+              <LineStackLayout expand noMargin alignItems="center">
+                <SemiControlledAutoComplete
+                  style={props.style}
+                  textFieldStyle={styles.textFieldStyle}
+                  floatingLabelText={props.floatingLabelText}
+                  helperMarkdownText={props.helperMarkdownText}
+                  hintText={props.hintText}
+                  openOnFocus
+                  dataSource={autoCompleteData}
+                  value={resourceName}
+                  onChange={onChangeResourceName}
+                  errorText={errorText}
+                  fullWidth={props.fullWidth}
+                  margin={props.margin}
+                  onRequestClose={props.onRequestClose}
+                  onApply={props.onApply}
+                  ref={autoCompleteRef}
+                  id={props.id}
+                />
+                {props.canBeReset && (
+                  <IconButton size="small" onClick={onResetResourceName}>
+                    <Cross />
+                  </IconButton>
+                )}
+              </LineStackLayout>
+            </Column>
+            <RaisedButton
+              label={
+                resourceName ? (
+                  <Trans>Replace</Trans>
+                ) : (
+                  <Trans>Choose a file</Trans>
+                )
+              }
+              onClick={() => {
+                autoCompleteRef.current && autoCompleteRef.current.focus();
+              }}
+              primary
+            />
+            {externalEditors.length === 1 && (
+              <FlatButton
+                leftIcon={<Edit fontSize="small" />}
+                label={i18n._(
+                  resourceName
+                    ? externalEditors[0].editDisplayName
+                    : externalEditors[0].createDisplayName
+                )}
+                onClick={() => editWith(i18n, externalEditors[0])}
+              />
             )}
-            {!!externalEditors.length ? (
-              <RaisedButtonWithMenu
-                style={style}
-                icon={<Brush />}
-                label={
-                  this.state.resourceName ? (
-                    <Trans>Edit</Trans>
-                  ) : (
-                    <Trans>Create</Trans>
-                  )
-                }
-                primary
-                buildMenuTemplate={() =>
+            {externalEditors.length > 1 ? (
+              <FlatButtonWithSplitMenu
+                icon={<Edit fontSize="small" />}
+                label={i18n._(
+                  resourceName
+                    ? externalEditors[0].editDisplayName
+                    : externalEditors[0].createDisplayName
+                )}
+                onClick={() => editWith(i18n, externalEditors[0])}
+                buildMenuTemplate={(i18n: I18nType) =>
                   externalEditors.map(externalEditor => ({
-                    label: externalEditor.displayName,
-                    click: () => this._editWith(externalEditor),
+                    label: i18n._(
+                      resourceName
+                        ? externalEditor.editDisplayName
+                        : externalEditor.createDisplayName
+                    ),
+                    click: () => editWith(i18n, externalEditor),
                   }))
                 }
               />
             ) : null}
-          </React.Fragment>
+            {externalEditorOpened && (
+              <ExternalEditorOpenedDialog
+                onClose={cancelEditingWithExternalEditor}
+              />
+            )}
+          </ResponsiveLineStackLayout>
         )}
-      />
+      </I18n>
     );
   }
-}
+);
+
+export default ResourceSelector;

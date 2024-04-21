@@ -3,32 +3,36 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 
-import muiDecorator from '../../../ThemeDecorator';
-import paperDecorator from '../../../PaperDecorator';
-
 import GameFeedback from '../../../../GameDashboard/Feedbacks/GameFeedback';
 
 import {
-  commentSolved,
-  commentUnsolved,
-  fakeIndieAuthenticatedUser,
+  commentProcessed,
+  commentUnprocessed,
+  completeWebBuild,
+  fakeSilverAuthenticatedUser,
   game1,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import MockAdapter from 'axios-mock-adapter';
 import Axios from 'axios';
-import { GDevelopPlayApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
+import {
+  GDevelopBuildApi,
+  GDevelopPlayApi,
+} from '../../../../Utils/GDevelopServices/ApiConfigs';
+import { getPaperDecorator } from '../../../PaperDecorator';
 
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 export const DefaultGameFeedback = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
-    .reply(200, [commentSolved, commentUnsolved])
+    .reply(200, [commentProcessed, commentUnprocessed])
+    .onGet(`${GDevelopBuildApi.baseUrl}/build`)
+    .reply(200, [completeWebBuild])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -39,7 +43,7 @@ export const DefaultGameFeedback = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -51,7 +55,9 @@ export const GameFeedbackOneSolvedComment = () => {
   const mock = new MockAdapter(Axios);
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
-    .reply(200, [commentSolved])
+    .reply(200, [commentProcessed])
+    .onGet(`${GDevelopBuildApi.baseUrl}/build`)
+    .reply(200, [completeWebBuild])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -62,7 +68,7 @@ export const GameFeedbackOneSolvedComment = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -75,6 +81,8 @@ export const GameFeedbackWithError = () => {
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
     .reply(500, 'Internal server error')
+    .onGet(`${GDevelopBuildApi.baseUrl}/build`)
+    .reply(200, [completeWebBuild])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -85,7 +93,7 @@ export const GameFeedbackWithError = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -98,6 +106,8 @@ export const GameFeedbackEmpty = () => {
   mock
     .onGet(`${GDevelopPlayApi.baseUrl}/game/${game1.id}/comment`)
     .reply(200, [])
+    .onGet(`${GDevelopBuildApi.baseUrl}/build`)
+    .reply(200, [completeWebBuild])
     .onAny()
     .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -108,7 +118,7 @@ export const GameFeedbackEmpty = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}

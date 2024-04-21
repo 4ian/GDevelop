@@ -1,7 +1,7 @@
 /* This is the styling applied to markdown (like the one used for Changelog). */
 
 .gd-markdown {
-  font-family: var(--gdevelop-classic-font-family);
+  font-family: var(--gdevelop-modern-font-family);
 }
 
 .gd-markdown.standalone-text-container {
@@ -41,4 +41,21 @@
 
 .gd-markdown img {
   max-width: 100%;
+}
+
+.gd-markdown p {
+  margin-block-start: 10px;
+  margin-block-end: 10px;
+}
+
+.gd-markdown table {
+  border-collapse: collapse;
+}
+.gd-markdown th,
+.gd-markdown td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid currentColor;
 }

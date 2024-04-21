@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
@@ -11,6 +11,8 @@ import {
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
@@ -18,29 +20,32 @@ export default class PanelSpriteEditor extends React.Component<
   void
 > {
   render() {
-    const { object } = this.props;
-    const shapePainterObject = gd.asShapePainterObject(object);
+    const { objectConfiguration, renderObjectNameField } = this.props;
+    const shapePainterConfiguration = gd.asShapePainterConfiguration(
+      objectConfiguration
+    );
 
     return (
-      <ColumnStackLayout>
+      <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <Checkbox
           label={
             <Trans>
               Draw the shapes relative to the object position on the scene
             </Trans>
           }
-          checked={!shapePainterObject.areCoordinatesAbsolute()}
+          checked={!shapePainterConfiguration.areCoordinatesAbsolute()}
           onCheck={(e, checked) => {
-            if (!checked) shapePainterObject.setCoordinatesAbsolute();
-            else shapePainterObject.setCoordinatesRelative();
+            if (!checked) shapePainterConfiguration.setCoordinatesAbsolute();
+            else shapePainterConfiguration.setCoordinatesRelative();
             this.forceUpdate();
           }}
         />
         <Checkbox
           label={<Trans>Clear the rendered image between each frame</Trans>}
-          checked={shapePainterObject.isClearedBetweenFrames()}
+          checked={shapePainterConfiguration.isClearedBetweenFrames()}
           onCheck={(e, checked) => {
-            shapePainterObject.setClearBetweenFrames(checked);
+            shapePainterConfiguration.setClearBetweenFrames(checked);
             this.forceUpdate();
           }}
         />
@@ -50,14 +55,14 @@ export default class PanelSpriteEditor extends React.Component<
             disableAlpha
             fullWidth
             color={rgbColorToRGBString({
-              r: shapePainterObject.getOutlineColorR(),
-              g: shapePainterObject.getOutlineColorG(),
-              b: shapePainterObject.getOutlineColorB(),
+              r: shapePainterConfiguration.getOutlineColorR(),
+              g: shapePainterConfiguration.getOutlineColorG(),
+              b: shapePainterConfiguration.getOutlineColorB(),
             })}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
-                shapePainterObject.setOutlineColor(
+                shapePainterConfiguration.setOutlineColor(
                   rgbColor.r,
                   rgbColor.g,
                   rgbColor.b
@@ -72,9 +77,11 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Outline opacity (0-255)</Trans>}
             fullWidth
             type="number"
-            value={shapePainterObject.getOutlineOpacity()}
+            value={shapePainterConfiguration.getOutlineOpacity()}
             onChange={value => {
-              shapePainterObject.setOutlineOpacity(parseInt(value, 10) || 0);
+              shapePainterConfiguration.setOutlineOpacity(
+                parseInt(value, 10) || 0
+              );
               this.forceUpdate();
             }}
           />
@@ -83,9 +90,11 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Outline size (in pixels)</Trans>}
             fullWidth
             type="number"
-            value={shapePainterObject.getOutlineSize()}
+            value={shapePainterConfiguration.getOutlineSize()}
             onChange={value => {
-              shapePainterObject.setOutlineSize(parseInt(value, 10) || 0);
+              shapePainterConfiguration.setOutlineSize(
+                parseInt(value, 10) || 0
+              );
               this.forceUpdate();
             }}
           />
@@ -96,14 +105,14 @@ export default class PanelSpriteEditor extends React.Component<
             disableAlpha
             fullWidth
             color={rgbColorToRGBString({
-              r: shapePainterObject.getFillColorR(),
-              g: shapePainterObject.getFillColorG(),
-              b: shapePainterObject.getFillColorB(),
+              r: shapePainterConfiguration.getFillColorR(),
+              g: shapePainterConfiguration.getFillColorG(),
+              b: shapePainterConfiguration.getFillColorB(),
             })}
             onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
-                shapePainterObject.setFillColor(
+                shapePainterConfiguration.setFillColor(
                   rgbColor.r,
                   rgbColor.g,
                   rgbColor.b
@@ -118,12 +127,33 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Fill opacity (0-255)</Trans>}
             fullWidth
             type="number"
-            value={shapePainterObject.getFillOpacity()}
+            value={shapePainterConfiguration.getFillOpacity()}
             onChange={value => {
-              shapePainterObject.setFillOpacity(parseInt(value, 10) || 0);
+              shapePainterConfiguration.setFillOpacity(
+                parseInt(value, 10) || 0
+              );
               this.forceUpdate();
             }}
           />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout alignItems="center" noMargin>
+          <SelectField
+            floatingLabelText={<Trans>Anti-aliasing</Trans>}
+            value={shapePainterConfiguration.getAntialiasing()}
+            onChange={(e, i, valueString: string) => {
+              shapePainterConfiguration.setAntialiasing(valueString);
+              this.forceUpdate();
+            }}
+          >
+            <SelectOption key="none" value="none" label={t`None`} />
+            <SelectOption key="low" value="low" label={t`Low quality`} />
+            <SelectOption
+              key="medium"
+              value="medium"
+              label={t`Medium quality`}
+            />
+            <SelectOption key="high" value="high" label={t`High quality`} />
+          </SelectField>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
     );

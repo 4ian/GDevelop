@@ -16,6 +16,7 @@ namespace gd {
 class InstructionsMetadataHolder;
 class Project;
 class Object;
+class ObjectConfiguration;
 class Behavior;
 class BehaviorMetadata;
 class ObjectMetadata;
@@ -26,7 +27,7 @@ class LayoutEditorCanvas;
 class ProjectExporter;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 #undef CreateEvent
@@ -146,8 +147,8 @@ class GD_CORE_API Platform {
   /**
    * \brief Create an object of given type with the specified name.
    */
-  std::unique_ptr<gd::Object> CreateObject(gd::String type,
-                                           const gd::String& name) const;
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      gd::String type) const;
 
   /**
    * \brief Create an event of given type

@@ -1,4 +1,6 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
+
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,31 +14,27 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'Video',
-        'Video',
-        'Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.',
+        _('Video'),
+        _(
+          'Provides an object to display a video on the scene. The recommended file format is MPEG4, with H264 video codec and AAC audio codec, to maximize the support of the video on different platform and browsers.'
+        ),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
+      .setCategory('User interface')
       .setExtensionHelpPath('/objects/video');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Video'))
+      .setIcon('JsPlatform/Extensions/videoicon16.png');
 
     var videoObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -61,7 +59,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getProperties = function (objectContent) {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -101,7 +98,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -112,7 +108,6 @@ module.exports = {
     ) {
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     videoObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -129,11 +124,14 @@ module.exports = {
         _('Video'),
         _('Displays a video.'),
         'JsPlatform/Extensions/videoicon32.png',
+        // @ts-ignore - TODO: Fix videoObject being an ObjectJsImplementation instead of an ObjectConfiguration
         videoObject
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .setCategoryFullName(_('Multimedia'));
+      .setCategoryFullName(_('User interface'))
+      .addDefaultBehavior('EffectCapability::EffectBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     object
       .addAction(
@@ -198,15 +196,20 @@ module.exports = {
     object
       .addAction(
         'SetTime',
-        _('Set time'),
-        _('Set the time of the video object in seconds'),
+        _('Current time'),
+        _('Set the time of the video'),
         _('the time'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Position (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setCurrentTime')
       .setGetter('getCurrentTime');
@@ -214,17 +217,18 @@ module.exports = {
     object
       .addAction(
         'SetVolume',
-        _('Set volume'),
-        _(
-          'Set the volume of the video object, between 0 (muted) and 100 (maximum).'
-        ),
+        _('Volume'),
+        _('Set the volume of the video object.'),
         _('the volume'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Volume (0-100)'))
+      )
       .getCodeExtraInformation()
       .setFunctionName('setVolume')
       .setGetter('getVolume');
@@ -296,7 +300,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Volume to compare to (0-100)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getVolume');
 
@@ -349,7 +358,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Duration to compare to (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getDuration');
 
@@ -364,7 +378,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Time to compare to (in seconds)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getCurrentTime');
 
@@ -386,20 +405,25 @@ module.exports = {
       .addAction(
         'SetOpacity',
         _('Set opacity'),
-        _(
-          'Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque).'
-        ),
+        _('Set opacity of the specified video object.'),
         _('the opacity'),
         '',
         'JsPlatform/Extensions/videoicon24.png',
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addCondition(
         'GetOpacity',
@@ -411,10 +435,17 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity to compare to (0-255)')
+        )
+      )
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
+    // Deprecated
     object
       .addExpression(
         'Opacity',
@@ -425,7 +456,8 @@ module.exports = {
       )
       .addParameter('object', _('Object'), 'VideoObject', false)
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName('getOpacity')
+      .setHidden();
 
     object
       .addAction(
@@ -440,7 +472,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardOperatorParameters('number')
+      .useStandardOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Playback speed (1 by default)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('setPlaybackSpeed')
       .setGetter('getPlaybackSpeed');
@@ -456,7 +493,12 @@ module.exports = {
         'JsPlatform/Extensions/videoicon16.png'
       )
       .addParameter('object', _('Video object'), 'VideoObject', false)
-      .useStandardRelationalOperatorParameters('number')
+      .useStandardRelationalOperatorParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Playback speed (1 by default)')
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('getPlaybackSpeed');
 
@@ -476,7 +518,7 @@ module.exports = {
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -484,10 +526,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -496,9 +535,7 @@ module.exports = {
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
 
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'Video::VideoObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -511,135 +548,128 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
     /**
      * Renderer for instances of VideoObject inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedVideoObjectInstance
-     * @constructor
      */
-    function RenderedVideoObjectInstance(
-      project,
-      layout,
-      instance,
-      associatedObject,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedVideoObjectInstance extends RenderedInstance {
+      constructor(
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-      this._videoResource = undefined;
+        this._videoResource = undefined;
 
-      //Setup the PIXI object:
-      this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
-    }
-    RenderedVideoObjectInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
+        //Setup the PIXI object:
+        this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
+        this._pixiObject.anchor.x = 0.5;
+        this._pixiObject.anchor.y = 0.5;
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
+      }
 
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedVideoObjectInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      object
-    ) {
-      return 'JsPlatform/Extensions/videoicon24.png';
-    };
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all sprites.
+        this._pixiObject.destroy(false);
+      }
 
-    RenderedVideoObjectInstance.prototype._getVideoTexture = function () {
-      // Get the video resource to use
-      const videoResource = this._associatedObject
-        .getProperties()
-        .get('videoResource')
-        .getValue();
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/videoicon24.png';
+      }
 
-      // This returns a VideoTexture with autoPlay set to false
-      return this._pixiResourcesLoader.getPIXIVideoTexture(
-        this._project,
-        videoResource
-      );
-    };
+      _getVideoTexture() {
+        // Get the video resource to use
+        const videoResource = this._associatedObjectConfiguration
+          .getProperties()
+          .get('videoResource')
+          .getValue();
 
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedVideoObjectInstance.prototype.update = function () {
-      // Check if the video resource has changed
-      const videoResource = this._associatedObject
-        .getProperties()
-        .get('videoResource')
-        .getValue();
-      if (videoResource !== this._videoResource) {
-        this._videoResource = videoResource;
-        this._pixiObject.texture = this._getVideoTexture();
+        // This returns a VideoTexture with autoPlay set to false
+        return this._pixiResourcesLoader.getPIXIVideoTexture(
+          this._project,
+          videoResource
+        );
+      }
 
-        if (!this._pixiObject.texture.baseTexture.valid) {
-          var that = this;
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        // Check if the video resource has changed
+        const videoResource = this._associatedObjectConfiguration
+          .getProperties()
+          .get('videoResource')
+          .getValue();
+        if (videoResource !== this._videoResource) {
+          this._videoResource = videoResource;
+          this._pixiObject.texture = this._getVideoTexture();
 
-          that._pixiObject.texture.on('error', function () {
-            that._pixiObject.texture.off('error', this);
+          if (!this._pixiObject.texture.baseTexture.valid) {
+            var that = this;
 
-            that._pixiObject.texture =
-              that._pixiResourcesLoader.getInvalidPIXITexture();
-          });
+            that._pixiObject.texture.on('error', function () {
+              that._pixiObject.texture.off('error', this);
+
+              that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
+            });
+          }
+        }
+
+        // Update opacity
+        const opacity = +this._associatedObjectConfiguration
+          .getProperties()
+          .get('Opacity')
+          .getValue();
+        this._pixiObject.alpha = opacity / 255;
+
+        // Read position and angle from the instance
+        this._pixiObject.position.x =
+          this._instance.getX() + this._pixiObject.width / 2;
+        this._pixiObject.position.y =
+          this._instance.getY() + this._pixiObject.height / 2;
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+
+        if (this._instance.hasCustomSize()) {
+          this._pixiObject.width = this.getCustomWidth();
+          this._pixiObject.height = this.getCustomHeight();
         }
       }
 
-      // Update opacity
-      const opacity = this._associatedObject
-        .getProperties()
-        .get('Opacity')
-        .getValue();
-      this._pixiObject.alpha = opacity / 255;
-
-      // Read position and angle from the instance
-      this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-
-      if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this._pixiObject.width;
       }
-    };
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedVideoObjectInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedVideoObjectInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this._pixiObject.height;
+      }
+    }
 
     // We don't do anything special when instance is removed from the scene,
     // because the video is never really played.

@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #define SHAPEPAINTEROBJECT_H
 #include <vector>
 
-#include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class Object;
 class InitialInstance;
@@ -26,11 +26,11 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   ShapePainterObjectBase();
   virtual ~ShapePainterObjectBase(){};
 
-  inline void SetOutlineSize(float size) { outlineSize = size; };
-  inline float GetOutlineSize() const { return outlineSize; };
+  inline void SetOutlineSize(double size) { outlineSize = size; };
+  inline double GetOutlineSize() const { return outlineSize; };
 
-  void SetOutlineOpacity(float val);
-  inline float GetOutlineOpacity() const { return outlineOpacity; };
+  void SetOutlineOpacity(double val);
+  inline double GetOutlineOpacity() const { return outlineOpacity; };
 
   void SetOutlineColor(unsigned int r, unsigned int v, unsigned int b);
   inline unsigned int GetOutlineColorR() const { return outlineColorR; };
@@ -41,8 +41,8 @@ class GD_EXTENSION_API ShapePainterObjectBase {
    */
   void SetOutlineColor(const gd::String& color);
 
-  void SetFillOpacity(float val);
-  inline float GetFillOpacity() const { return fillOpacity; };
+  void SetFillOpacity(double val);
+  inline double GetFillOpacity() const { return fillOpacity; };
 
   void SetFillColor(unsigned int r, unsigned int v, unsigned int b);
   inline unsigned int GetFillColorR() const { return fillColorR; };
@@ -60,12 +60,13 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
+  inline gd::String GetAntialiasing() { return antialiasing; }
+  inline void SetAntialiasing(const gd::String& value) { antialiasing = value; }
+
  protected:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
-#endif
 
  private:
   // Fill color
@@ -83,27 +84,27 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 
   bool absoluteCoordinates;
   bool clearBetweenFrames;
+
+  // Antialiasing
+  gd::String antialiasing;
 };
 
 /**
  * \brief The Shape Painter object used for storage and by the IDE.
  */
-class GD_EXTENSION_API ShapePainterObject : public gd::Object,
+class GD_EXTENSION_API ShapePainterObject : public gd::ObjectConfiguration,
                                             public ShapePainterObjectBase {
  public:
-  ShapePainterObject(gd::String name_);
+  ShapePainterObject();
   virtual ~ShapePainterObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<ShapePainterObject>(*this);
   }
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
-
-#endif
 };
 
 #endif  // SHAPEPAINTEROBJECT_H

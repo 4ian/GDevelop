@@ -6,12 +6,7 @@ describe('gdjs.LinksManager', function () {
     object3Names,
     eventsFunctionContext
   ) => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore - missing properties.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [
@@ -38,6 +33,7 @@ describe('gdjs.LinksManager', function () {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      usedResources: [],
     });
 
     const manager = gdjs.LinksManager.getManager(runtimeScene);
@@ -239,14 +235,14 @@ describe('gdjs.LinksManager', function () {
       manager.removeAllLinksOf(object1A);
       manager.removeAllLinksOf(object1A);
       {
-        const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
+        const { pickedSomething } = pickObjectsLinkedTo(
           object1A,
           Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(false);
       }
       {
-        const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
+        const { pickedSomething } = pickObjectsLinkedTo(
           object2A,
           Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );

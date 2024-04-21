@@ -17,11 +17,12 @@ type Props = {|
 const SceneVariablesDialog = (props: Props) => {
   return (
     <VariablesEditorDialog
+      project={props.project}
       open={props.open}
       variablesContainer={props.layout.getVariables()}
       onCancel={props.onClose}
       onApply={props.onApply}
-      title={<Trans>Scene Variables</Trans>}
+      title={<Trans>{props.layout.getName()} variables</Trans>}
       emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
       emptyPlaceholderDescription={
         <Trans>These variables hold additional information on a scene.</Trans>
@@ -35,6 +36,7 @@ const SceneVariablesDialog = (props: Props) => {
           props.layout
         )
       }
+      id="scene-variables-dialog"
     />
   );
 };

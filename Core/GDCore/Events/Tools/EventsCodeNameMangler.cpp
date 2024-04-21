@@ -17,7 +17,7 @@ const gd::String& EventsCodeNameMangler::GetMangledObjectsListName(
     return it->second;
   }
 
-  gd::String partiallyMangledName = originalObjectName;
+  gd::String partiallyMangledName = GetMangledNameWithForbiddenUnderscore(originalObjectName);
   static const gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -43,7 +43,15 @@ const gd::String& EventsCodeNameMangler::GetExternalEventsFunctionMangledName(
     return it->second;
   }
 
-  gd::String partiallyMangledName = externalEventsName;
+  gd::String partiallyMangledName = GetMangledNameWithForbiddenUnderscore(externalEventsName);
+
+  mangledExternalEventsNames[externalEventsName] = "GDExternalEvents" + partiallyMangledName;
+  return mangledExternalEventsNames[externalEventsName];
+}
+
+gd::String EventsCodeNameMangler::GetMangledNameWithForbiddenUnderscore(
+    const gd::String &name) {
+  gd::String partiallyMangledName = name;
   static const gd::String allowedCharacters =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -57,10 +65,29 @@ const gd::String& EventsCodeNameMangler::GetExternalEventsFunctionMangledName(
       partiallyMangledName.replace(i, 1, "_" + gd::String::From(unallowedChar));
     }
   }
-
-  mangledExternalEventsNames[externalEventsName] = "GDExternalEvents" + partiallyMangledName;
-  return mangledExternalEventsNames[externalEventsName];
+  return partiallyMangledName;
 }
+
+gd::String EventsCodeNameMangler::GetMangledName(
+    const gd::String &name) {
+  gd::String partiallyMangledName = name;
+  static const gd::String allowedCharacters =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+  for (size_t i = 0; i < partiallyMangledName.size();
+       ++i)  // Replace all unallowed letter by an underscore and the ascii
+             // number of the letter
+  {
+    if (allowedCharacters.find_first_of(
+            std::u32string(1, partiallyMangledName[i])) == gd::String::npos) {
+      char32_t unallowedChar = partiallyMangledName[i];
+      partiallyMangledName.replace(i, 1, "_" + gd::String::From(unallowedChar));
+    }
+  }
+  return partiallyMangledName;
+}
+
+
 
 const gd::String& ManObjListName(const gd::String &objectName) {
   return EventsCodeNameMangler::Get()->GetMangledObjectsListName(objectName);

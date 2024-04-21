@@ -37,9 +37,10 @@ class ArbitraryResourceWorker;
 class BehaviorsSharedData;
 class Behavior;
 class Object;
+class ObjectConfiguration;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+typedef std::function<std::unique_ptr<gd::ObjectConfiguration>()>
     CreateFunPtr;
 
 namespace gd {
@@ -242,15 +243,32 @@ class GD_CORE_API PlatformExtension {
                                 const gd::String& fullname_,
                                 const gd::String& description_,
                                 const gd::String& icon_,
-                                std::shared_ptr<gd::Object> instance);
+                                std::shared_ptr<gd::ObjectConfiguration> instance);
+
+  /**
+   * \brief Declare a new events based object as being part of the extension.
+   *
+   * \param name The name of the object
+   * \param fullname The user friendly name of the object
+   * \param description The user friendly description of the object
+   * \param icon The icon of the object.
+   */
+  gd::ObjectMetadata& AddEventsBasedObject(
+      const gd::String& name_,
+      const gd::String& fullname_,
+      const gd::String& description_,
+      const gd::String& icon_);
 
   /**
    * \brief Declare a new behavior as being part of the extension.
    *
    * \param name The name of the behavior
    * \param fullname The user friendly name of the behavior
+   * \param defaultName The default name of behavior instances
    * \param description The user friendly description of the behavior
+   * \param group The behavior category label
    * \param icon The icon of the behavior.
+   * \param className The name of the class implementing the behavior
    * \param instance An instance of the behavior that
    * will be used to create the behavior
    * \param sharedDatasInstance Optional
@@ -390,6 +408,32 @@ class GD_CORE_API PlatformExtension {
    * extension.
    */
   const gd::String& GetIconUrl() const { return iconUrl; }
+
+  /**
+   * \brief Return keywords that help search engines find this extension.
+   */
+  const std::vector<gd::String>& GetTags() const { return tags; }
+
+  /**
+   * \brief Set keywords that help search engines find this extension.
+   */
+  PlatformExtension& SetTags(const gd::String& csvTags) {
+    tags.clear();
+    tags = csvTags.Split(',');
+    for (size_t i = 0; i < tags.size(); i++)
+    {
+      tags[i] = tags[i].Trim().LowerCase();
+    }
+    return *this;
+  }
+
+  /**
+   * \brief Add a keyword that help search engines find this extension.
+   */
+  PlatformExtension& AddTag(const gd::String& tag) {
+    tags.push_back(tag);
+    return *this;
+  }
 
   /**
    * \brief Check if the extension is flagged as being deprecated.
@@ -590,7 +634,26 @@ class GD_CORE_API PlatformExtension {
    */
   static gd::String GetNamespaceSeparator() { return "::"; }
 
- private:
+  static gd::String GetEventsFunctionFullType(const gd::String &extensionName,
+                                              const gd::String &functionName);
+
+  static gd::String
+  GetBehaviorEventsFunctionFullType(const gd::String &extensionName,
+                                    const gd::String &behaviorName,
+                                    const gd::String &functionName);
+
+  static gd::String GetBehaviorFullType(const gd::String &extensionName,
+                                        const gd::String &behaviorName);
+
+  static gd::String
+  GetObjectEventsFunctionFullType(const gd::String &extensionName,
+                                  const gd::String &objectName,
+                                  const gd::String &functionName);
+
+  static gd::String GetObjectFullType(const gd::String &extensionName,
+                                      const gd::String &objectName);
+
+private:
   /**
    * Set the namespace (the string all actions/conditions/expressions start
    * with).
@@ -612,6 +675,7 @@ class GD_CORE_API PlatformExtension {
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation.
   gd::String iconUrl;   ///< The URL to the icon to be shown for this extension.
+  std::vector<gd::String> tags;
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;

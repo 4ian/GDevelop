@@ -21,20 +21,20 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
   extension.AddInstructionOrExpressionGroupMetadata(_("Text manipulation"))
-      .SetIcon("res/actions/text24.png");
+      .SetIcon("res/actions/text24_black.png");
 
   extension.AddStrExpression("NewLine",
                              _("Insert a new line"),
                              _("Insert a new line"),
                              "",
-                             "res/conditions/toujours24.png");
+                             "res/conditions/toujours24_black.png");
 
   extension
       .AddStrExpression("FromCodePoint",
                         _("Get character from code point"),
                         _("Get character from code point"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("expression", _("Code point"));
 
@@ -43,7 +43,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Uppercase a text"),
                         _("Uppercase a text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -52,7 +52,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Lowercase a text"),
                         _("Lowercase a text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -61,7 +61,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Get a portion of a text"),
                         _("Get a portion of a text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("expression",
@@ -74,7 +74,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Get a character from a text"),
                         _("Get a character from a text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter(
@@ -86,7 +86,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                         _("Repeat a text"),
                         _("Repeat a text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text to repeat"))
       .AddParameter("expression", _("Repetition count"));
@@ -96,7 +96,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      _("Length of a text"),
                      _("Length of a text"),
                      "",
-                     "res/conditions/toujours24.png")
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"));
 
@@ -106,7 +106,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      _("Search in a text (return the position of the result or "
                        "-1 if not found)"),
                      "",
-                     "res/conditions/toujours24.png")
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
@@ -117,7 +117,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      "Search in a text from the end (return the position of "
                      "the result or -1 if not found)",
                      "",
-                     "res/conditions/toujours24.png")
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -126,12 +126,12 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
   extension
       .AddExpression(
           "StrFindLast",
-          _("Search the last occurence in a text"),
-          _("Search the last occurence in a string (return the position of "
+          _("Search the last occurrence in a text"),
+          _("Search the last occurrence in a string (return the position of "
             "the result, from the beginning of the string, or -1 if not "
             "found)"),
           "",
-          "res/conditions/toujours24.png")
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"));
@@ -142,7 +142,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                      _("Search in a text, starting from a position (return the "
                        "position of the result or -1 if not found)"),
                      "",
-                     "res/conditions/toujours24.png")
+                     "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -157,7 +157,7 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Search in a text from the end, starting from a position (return "
           "the position of the result or -1 if not found)",
           "",
-          "res/conditions/toujours24.png")
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
@@ -169,19 +169,39 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
   extension
       .AddExpression(
           "StrFindLastFrom",
-          _("Search the last occurence in a text, starting from a position"),
-          _("Search in a text the last occurence, starting from a position "
+          _("Search the last occurrence in a text, starting from a position"),
+          _("Search in a text the last occurrence, starting from a position "
             "(return "
-            " the position of the result, from the beginning of the string, or "
+            "the position of the result, from the beginning of the string, or "
             "-1 if not found)"),
           "",
-          "res/conditions/toujours24.png")
+          "res/conditions/toujours24_black.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
       .AddParameter("expression",
                     _("Position of the last character in the string to be "
                       "considered in the search"));
+
+  extension
+      .AddStrExpression("StrReplaceOne",
+                        _("Replace the first occurrence of a text by another."),
+                        _("Replace the first occurrence of a text by another."),
+                        "",
+                        "res/conditions/toujours24_black.png")
+      .AddParameter("string", _("Text in which the replacement must be done"))
+      .AddParameter("string", _("Text to find inside the first text"))
+      .AddParameter("string", _("Replacement to put instead of the text to find"));
+
+  extension
+      .AddStrExpression("StrReplaceAll",
+                        _("Replace all occurrences of a text by another."),
+                        _("Replace all occurrences of a text by another."),
+                        "",
+                        "res/conditions/toujours24_black.png")
+      .AddParameter("string", _("Text in which the replacement(s) must be done"))
+      .AddParameter("string", _("Text to find inside the first text"))
+      .AddParameter("string", _("Replacement to put instead of the text to find"));
 
 }
 

@@ -1,8 +1,22 @@
 // @flow
 import * as React from 'react';
 import { type ChosenCategory } from './FiltersChooser';
+import {
+  type ExtensionShortHeader,
+  type BehaviorShortHeader,
+} from '../../Utils/GDevelopServices/Extension';
+import { type SearchableBehaviorMetadata } from '../../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
+
+type SearchableItem =
+  | ExtensionShortHeader
+  | ExampleShortHeader
+  | BehaviorShortHeader
+  | SearchableBehaviorMetadata
+  | PrivateGameTemplateListingData;
 
 export type SearchMatch = {|
   key: string,
@@ -16,6 +30,7 @@ export type SearchResult<T> = {|
 
 type SearchOptions = {|
   searchText: string,
+  chosenItemCategory?: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>,
@@ -28,6 +43,44 @@ export const sharedFuseConfiguration = {
   threshold: 0.35,
   includeMatches: true,
   ignoreLocation: true,
+  useExtendedSearch: true,
+  findAllMatches: true,
+};
+
+/**
+ * This helper allows creating the search query for a search within a simple array of strings.
+ */
+export const getFuseSearchQueryForSimpleArray = (searchText: string) => {
+  const tokenisedSearchQuery = searchText.trim().split(' ');
+  return `'${tokenisedSearchQuery.join(" '")}`;
+};
+
+/**
+ * This helper allows creating the search query for searching within an array of
+ * objects with multiple keys.
+ * If we don't use this, the search will only be done on one of the keys.
+ * See https://github.com/krisk/Fuse/issues/235#issuecomment-850269634
+ */
+export const getFuseSearchQueryForMultipleKeys = (
+  searchText: string,
+  keys: Array<string>
+) => {
+  const tokenisedSearchQuery = searchText.trim().split(' ');
+  const searchQuery: {
+    $or: Fuse.Expression[],
+  }[] = tokenisedSearchQuery.map((searchToken: string) => {
+    const orFields: Fuse.Expression[] = keys.map(key => ({
+      [key]: searchToken,
+    }));
+
+    return {
+      $or: orFields,
+    };
+  });
+
+  return {
+    $or: searchQuery,
+  };
 };
 
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
@@ -69,15 +122,9 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
  * Filter a list of items according to the chosen category
  * and the chosen filters.
  */
-export const filterSearchResults = <
-  SearchItem: {
-    // All search items have tags:
-    tags: Array<string>,
-    // Some search items can have tiers:
-    +tier?: string,
-  }
->(
+export const filterSearchResults = <SearchItem: SearchableItem>(
   searchResults: ?Array<SearchResult<SearchItem>>,
+  chosenItemCategory: ?string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>
@@ -86,15 +133,20 @@ export const filterSearchResults = <
 
   const startTime = performance.now();
   const filteredSearchResults = searchResults
-    .filter(({ item: { tags } }) => {
+    .filter(({ item }) => {
+      if (!chosenItemCategory) return true; // No category chosen, return all items.
+      if (!item.category) return false; // Item has no category, it cannot be in the chosen category.
+      return item.category === chosenItemCategory;
+    })
+    .filter(({ item }) => {
       if (!chosenCategory) return true;
 
       const hasChosenCategoryTag =
         // If the chosen category is a container of tags, not a real tag, then
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
-        tags.some(tag => tag === chosenCategory.node.name);
-      if (!hasChosenCategoryTag) return false; // Asset is not in the selected category
+        (item.tags && item.tags.some(tag => tag === chosenCategory.node.name));
+      if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {
           // The parent is a container of tags, not a real tag. No need
@@ -102,16 +154,31 @@ export const filterSearchResults = <
           return true;
         }
 
-        const hasParentCategoryTag = tags.some(tag => tag === parentNode.name);
-        if (!hasParentCategoryTag) return false; // Asset is not in the parent(s) of the selected category
+        const hasParentCategoryTag =
+          item.tags && item.tags.some(tag => tag === parentNode.name);
+        if (!hasParentCategoryTag) return false; // Item is not in the parent(s) of the selected category
       }
 
       return true;
     })
-    .filter(({ item: { tags, tier } }) => {
-      const passTier = !tier || !excludedTiers.has(tier);
+    .filter(({ item }) => {
+      const passTier = !item.tier || !excludedTiers.has(item.tier);
+      // When checking the chosen filters, we ignore the case.
+      // Particularly useful when multiple items are being searched but are not
+      // in the same repository, so the tags/categories are not always the same case.
+      const lowerCaseChosenFilters = new Set(
+        [...chosenFilters].map(filter => filter.toLowerCase())
+      );
       const passChosenFilters =
-        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag));
+        lowerCaseChosenFilters.size === 0 ||
+        (item.tags &&
+          item.tags.some(tag =>
+            lowerCaseChosenFilters.has(tag.toLowerCase())
+          )) ||
+        (item.categories &&
+          item.categories.some(category =>
+            lowerCaseChosenFilters.has(category.toLowerCase())
+          ));
 
       return passTier && passChosenFilters;
     });
@@ -126,21 +193,15 @@ export const filterSearchResults = <
 /**
  * Allow to efficiently search and filters items.
  *
- * This instanciates a search API, indexes the specified items,
+ * This instantiates a search API, indexes the specified items,
  * then returns the results of the search (according to the
  * search text and the chosen category/filters).
  */
-export const useSearchStructuredItem = <
-  SearchItem: {
-    // All search items have tags:
-    tags: Array<string>,
-    // Some search items can have tiers:
-    +tier?: string,
-  }
->(
+export const useSearchStructuredItem = <SearchItem: SearchableItem>(
   searchItemsById: ?{ [string]: SearchItem },
   {
     searchText,
+    chosenItemCategory,
     chosenCategory,
     chosenFilters,
     excludedTiers,
@@ -197,11 +258,14 @@ export const useSearchStructuredItem = <
             { name: 'name', weight: 2 },
             { name: 'fullName', weight: 5 },
             { name: 'shortDescription', weight: 1 },
+            { name: 'tags', weight: 4 },
           ],
           minMatchCharLength: 2,
           threshold: 0.35,
           includeMatches: true,
           ignoreLocation: true,
+          useExtendedSearch: true,
+          findAllMatches: true,
         });
 
         const totalTime = performance.now() - startTime;
@@ -228,6 +292,7 @@ export const useSearchStructuredItem = <
         setSearchResults(
           filterSearchResults(
             orderedSearchResults,
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -242,7 +307,14 @@ export const useSearchStructuredItem = <
         }
 
         const startTime = performance.now();
-        const results = searchApi.search(`'${searchText}`);
+        const results = searchApi.search(
+          getFuseSearchQueryForMultipleKeys(searchText, [
+            'name',
+            'fullName',
+            'shortDescription',
+            'tags',
+          ])
+        );
         const totalTime = performance.now() - startTime;
         console.info(
           `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`
@@ -259,6 +331,7 @@ export const useSearchStructuredItem = <
               item: result.item,
               matches: tuneMatches(result, searchText),
             })),
+            chosenItemCategory,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -276,6 +349,7 @@ export const useSearchStructuredItem = <
       orderedSearchResults,
       searchItemsById,
       searchText,
+      chosenItemCategory,
       chosenCategory,
       chosenFilters,
       searchApi,

@@ -9,6 +9,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
 
@@ -17,9 +18,10 @@ namespace gd {
 std::vector<gd::String> ProjectResourcesAdder::GetAllUseless(
     gd::Project& project, const gd::String& resourceType) {
   std::vector<gd::String> unusedResources;
+
   // Search for resources used in the project
-  gd::ResourcesInUseHelper resourcesInUse;
-  project.ExposeResources(resourcesInUse);
+  gd::ResourcesInUseHelper resourcesInUse(project.GetResourcesManager());
+  gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesInUse);
   std::set<gd::String>& usedResources = resourcesInUse.GetAll(resourceType);
 
   // Search all resources not used

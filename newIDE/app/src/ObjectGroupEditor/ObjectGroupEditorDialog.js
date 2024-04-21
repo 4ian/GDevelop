@@ -25,13 +25,17 @@ const ObjectGroupEditorDialog = ({
   objectsContainer,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const onCancelChanges = useSerializableObjectCancelableEditor({
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
     serializableObject: group,
     onCancel,
   });
 
   return (
     <Dialog
+      title={<Trans>Edit {group.getName()}</Trans>}
       key={group.ptr}
       actions={[
         <FlatButton
@@ -47,11 +51,9 @@ const ObjectGroupEditorDialog = ({
           onClick={onApply}
         />,
       ]}
-      noMargin
       onRequestClose={onCancelChanges}
       onApply={onApply}
       open
-      title={`Edit ${group.getName()} group`}
     >
       <ObjectGroupEditor
         project={project}
@@ -59,8 +61,9 @@ const ObjectGroupEditorDialog = ({
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
         onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positionned*/
+          forceUpdate /*Force update to ensure dialog is properly positioned*/
         }
+        onObjectGroupUpdated={notifyOfChange}
       />
     </Dialog>
   );

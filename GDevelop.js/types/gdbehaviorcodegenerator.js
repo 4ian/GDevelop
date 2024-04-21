@@ -4,6 +4,10 @@ declare class gdBehaviorCodeGenerator {
   generateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: gdEventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: gdMapStringString, includes: gdSetString, compilationForRuntime: boolean): string;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
+  static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
+  static getBehaviorSharedPropertyGetterName(propertyName: string): string;
+  static getBehaviorSharedPropertySetterName(propertyName: string): string;
+  static getBehaviorSharedPropertyToggleFunctionName(propertyName: string): string;
   delete(): void;
   ptr: number;
 };

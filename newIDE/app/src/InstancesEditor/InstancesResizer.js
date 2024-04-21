@@ -2,6 +2,7 @@
 import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -49,7 +50,7 @@ const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
 };
 
 export default class InstancesResizer {
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
 
   // The initial state of instances before a resize:
@@ -71,7 +72,7 @@ export default class InstancesResizer {
     instanceMeasurer,
     instancesEditorSettings,
   }: {
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
@@ -137,7 +138,8 @@ export default class InstancesResizer {
     deltaX: number,
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation,
-    proportional: boolean
+    proportional: boolean,
+    noGridSnap: boolean
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -165,7 +167,8 @@ export default class InstancesResizer {
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
     if (
       this.instancesEditorSettings.snap &&
-      this.instancesEditorSettings.grid
+      this.instancesEditorSettings.grid &&
+      !noGridSnap
     ) {
       roundPositionForResizing(
         grabbingPosition,
@@ -217,6 +220,7 @@ export default class InstancesResizer {
         ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
           initialSelectionAABB.height()
         : flippedTotalDeltaY;
+    let scaleZ = 1;
 
     const hasRotatedInstance = areAnyInstancesNotStraight(nonLockedInstances);
 
@@ -234,8 +238,10 @@ export default class InstancesResizer {
             flippedTotalDeltaY * initialSelectionAABB.width())
       ) {
         scaleY = scaleX;
+        scaleZ = scaleX;
       } else {
         scaleX = scaleY;
+        scaleZ = scaleY;
       }
     }
 
@@ -253,6 +259,12 @@ export default class InstancesResizer {
         ? 1 / initialSelectionAABB.height()
         : 0.00001,
       scaleY
+    );
+    scaleZ = Math.max(
+      initialSelectionAABB.depth() !== 0
+        ? 1 / initialSelectionAABB.depth()
+        : 0.00001,
+      scaleZ
     );
 
     const fixedPointX =
@@ -284,6 +296,10 @@ export default class InstancesResizer {
         initialUnrotatedInstanceAABB.height() !== 0
           ? initialUnrotatedInstanceAABB.height()
           : 1;
+      const initialDepth =
+        initialUnrotatedInstanceAABB.depth() !== 0
+          ? initialUnrotatedInstanceAABB.depth()
+          : 1;
 
       // The position and size of an instance describe the shape
       // before the rotation is applied.
@@ -292,14 +308,19 @@ export default class InstancesResizer {
       // is stable by instance rotation. This allows to use the same formula
       // for both 90° or 270°.
       const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
+      let newX = initialInstanceOriginPosition.x;
+      let newY = initialInstanceOriginPosition.y;
+      let newWidth = initialWidth;
+      let newHeight = initialHeight;
+      let newDepth = initialDepth;
       if (
         !proportional &&
         !hasRotatedInstance &&
         (angle === 90 || angle === 270)
       ) {
-        selectedInstance.setCustomWidth(scaleY * initialWidth);
-        selectedInstance.setCustomHeight(scaleX * initialHeight);
-        selectedInstance.setHasCustomSize(true);
+        newWidth = scaleY * initialWidth;
+        newHeight = scaleX * initialHeight;
+        newDepth = scaleZ * initialDepth;
 
         // These 4 variables are the positions and vector after the scaling.
         // It's easier to scale the instance center
@@ -321,20 +342,32 @@ export default class InstancesResizer {
           scaleX *
           (initialInstanceOriginPosition.y -
             initialUnrotatedInstanceAABB.centerY());
-        selectedInstance.setX(centerX + centerToOriginX);
-        selectedInstance.setY(centerY + centerToOriginY);
+        newX = centerX + centerToOriginX;
+        newY = centerY + centerToOriginY;
       } else {
-        selectedInstance.setCustomWidth(scaleX * initialWidth);
-        selectedInstance.setCustomHeight(scaleY * initialHeight);
-        selectedInstance.setHasCustomSize(true);
-
-        selectedInstance.setX(
-          (initialInstanceOriginPosition.x - fixedPointX) * scaleX + fixedPointX
-        );
-        selectedInstance.setY(
-          (initialInstanceOriginPosition.y - fixedPointY) * scaleY + fixedPointY
-        );
+        newWidth = scaleX * initialWidth;
+        newHeight = scaleY * initialHeight;
+        newDepth = scaleZ * initialDepth;
+        newX =
+          (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
+          fixedPointX;
+        newY =
+          (initialInstanceOriginPosition.y - fixedPointY) * scaleY +
+          fixedPointY;
       }
+
+      // After resizing, we round the new positions and dimensions to the nearest pixel.
+      // This is to avoid having a lot of decimals appearing, and it does not
+      // prevent the user from modifying them manually in the inline fields.
+      selectedInstance.setX(Math.round(newX));
+      selectedInstance.setY(Math.round(newY));
+
+      // Also round the size.
+      selectedInstance.setHasCustomDepth(true);
+      selectedInstance.setHasCustomSize(true);
+      selectedInstance.setCustomWidth(Math.round(newWidth));
+      selectedInstance.setCustomHeight(Math.round(newHeight));
+      selectedInstance.setCustomDepth(Math.round(newDepth));
     }
   }
 

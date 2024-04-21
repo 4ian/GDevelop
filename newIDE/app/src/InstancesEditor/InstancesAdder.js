@@ -1,5 +1,6 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
+import { unserializeFromJSObject } from '../Utils/Serializer';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
 const gd: libGDevelop = global.gd;
 
@@ -51,14 +52,77 @@ export default class InstancesAdder {
     this._instancesEditorSettings = instancesEditorSettings;
   }
 
+  addSerializedInstances = ({
+    position,
+    copyReferential,
+    serializedInstances,
+    preventSnapToGrid = false,
+    addInstancesInTheForeground = false,
+  }: {|
+    position: [number, number],
+    copyReferential: [number, number],
+    serializedInstances: Array<Object>,
+    preventSnapToGrid?: boolean,
+    addInstancesInTheForeground?: boolean,
+  |}): Array<gdInitialInstance> => {
+    this._zOrderFinder.reset();
+    this._instances.iterateOverInstances(this._zOrderFinder);
+    const sceneForegroundZOrder = this._zOrderFinder.getHighestZOrder() + 1;
+
+    let addedInstancesLowestZOrder = null;
+
+    const newInstances = serializedInstances.map(serializedInstance => {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      const desiredPosition = [
+        instance.getX() - copyReferential[0] + position[0],
+        instance.getY() - copyReferential[1] + position[1],
+      ];
+      const newPos = preventSnapToGrid
+        ? desiredPosition
+        : roundPositionsToGrid(desiredPosition, this._instancesEditorSettings);
+      instance.setX(newPos[0]);
+      instance.setY(newPos[1]);
+      if (addInstancesInTheForeground) {
+        if (
+          addedInstancesLowestZOrder === null ||
+          addedInstancesLowestZOrder > instance.getZOrder()
+        ) {
+          addedInstancesLowestZOrder = instance.getZOrder();
+        }
+      }
+      const newInstance = this._instances
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+      return newInstance;
+    });
+
+    if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
+      newInstances.forEach(instance => {
+        instance.setZOrder(
+          instance.getZOrder() -
+            // Flow is not happy with addedInstancesLowestZOrder possible null value
+            // so 0 is used as a fallback.
+            (addedInstancesLowestZOrder || 0) +
+            sceneForegroundZOrder
+        );
+      });
+    }
+
+    return newInstances;
+  };
+
   /**
    * Immediately create new instance at the specified position
    * (specified in scene coordinates).
    */
   addInstances = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ): Array<gdInitialInstance> => {
+    this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
@@ -68,6 +132,7 @@ export default class InstancesAdder {
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      instance.setLayer(layer);
       instance.setZOrder(zOrder);
 
       return instance;
@@ -82,12 +147,13 @@ export default class InstancesAdder {
    */
   createOrUpdateTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ) => {
     if (!objectNames.length) return;
 
     if (!this._temporaryInstances.length) {
-      this._createTemporaryInstancesFromObjectNames(pos, objectNames);
+      this._createTemporaryInstancesFromObjectNames(pos, objectNames, layer);
     } else {
       this.updateTemporaryInstancePositions(pos);
     }
@@ -95,10 +161,12 @@ export default class InstancesAdder {
 
   _createTemporaryInstancesFromObjectNames = (
     pos: [number, number],
-    objectNames: Array<string>
+    objectNames: Array<string>,
+    layer: string
   ) => {
     this.deleteTemporaryInstances();
 
+    this._zOrderFinder.reset();
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
@@ -108,6 +176,7 @@ export default class InstancesAdder {
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
+      instance.setLayer(layer);
       instance.setZOrder(zOrder);
 
       return instance;

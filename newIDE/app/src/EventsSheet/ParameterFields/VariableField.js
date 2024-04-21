@@ -1,10 +1,15 @@
 // @flow
+import * as React from 'react';
+import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import React, { Component } from 'react';
+import { t } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import classNames from 'classnames';
 import {
   icon,
@@ -17,37 +22,47 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import uniq from 'lodash/uniq';
+import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
+import intersection from 'lodash/intersection';
+import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
 
 type Props = {
   ...ParameterFieldProps,
-  variablesContainer: ?gdVariablesContainer,
-  onComputeAllVariableNames: () => Array<string>,
+  variablesContainers: Array<gdVariablesContainer>,
   onOpenDialog: ?() => void,
 };
 
-type State = {|
-  autocompletionVariableNames: DataSource,
-|};
+type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
 
-type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3;
+export type VariableFieldInterface = {|
+  ...ParameterFieldInterface,
+  updateAutocompletions: () => void,
+|};
 
 export const VariableNameQuickAnalyzeResults = {
   OK: 0,
   WRONG_QUOTE: 1,
   WRONG_SPACE: 2,
   WRONG_EXPRESSION: 3,
+  UNDECLARED_VARIABLE: 4,
 };
 
+// TODO: the entire VariableField could be reworked to be a "real" GenericExpressionField
+// (of type: "variable" or the legacy: "scenevar", "globalvar" or "objectvar"). This will
+// ensure we 100% validate and can autocomplete what is entered (and we can have also a simpler
+// selector that offers the variables in the scope).
 export const quicklyAnalyzeVariableName = (
-  name: string
+  name: string,
+  variablesContainers?: Array<gdVariablesContainer>
 ): VariableNameQuickAnalyzeResult => {
+  if (!name) return VariableNameQuickAnalyzeResults.OK;
+
   for (let i = 0; i < name.length; ++i) {
     const character = name[i];
+
     if (character === '[') {
       // This probably starts an expression, so stop the analysis.
-      return VariableNameQuickAnalyzeResults.OK;
+      break;
     } else if (character === ' ') {
       return VariableNameQuickAnalyzeResults.WRONG_SPACE;
     } else if (character === '"') {
@@ -63,68 +78,35 @@ export const quicklyAnalyzeVariableName = (
     }
   }
 
+  // Check at least the name of the root variable, it's the best we can do.
+  const dotPosition = name.indexOf('.');
+  const squareBracketPosition = name.indexOf('[');
+  const nameToCheck =
+    dotPosition !== -1 || squareBracketPosition !== -1
+      ? name.substring(
+          0,
+          Math.min(
+            dotPosition === -1 ? name.length : dotPosition,
+            squareBracketPosition === -1 ? name.length : squareBracketPosition
+          )
+        )
+      : name;
+
+  if (
+    variablesContainers &&
+    !variablesContainers.some(variablesContainer =>
+      variablesContainer.has(nameToCheck)
+    )
+  ) {
+    return VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE;
+  }
   return VariableNameQuickAnalyzeResults.OK;
 };
 
-export default class VariableField extends Component<Props, State> {
-  _field: ?SemiControlledAutoCompleteInterface;
-
-  static contextType = PreferencesContext;
-
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      autocompletionVariableNames: [],
-    };
-  }
-
-  componentDidMount() {
-    this.updateAutocompletions();
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.variablesContainer !== this.props.variablesContainer) {
-      this.updateAutocompletions();
-    }
-  }
-
-  /**
-   * Can be called to set up or force updating the variables list.
-   */
-  updateAutocompletions() {
-    const definedVariableNames = enumerateVariables(
-      this.props.variablesContainer
-    )
-      .map(({ name, isValidName }) =>
-        isValidName
-          ? name
-          : // Hide invalid variable names - they would not
-            // be parsed correctly anyway.
-            null
-      )
-      .filter(Boolean);
-    const preferences = this.context;
-    const autocompletionVariableNames = preferences.values
-      .useUndefinedVariablesInAutocompletion
-      ? uniq([
-          ...definedVariableNames,
-          ...this.props.onComputeAllVariableNames(),
-        ])
-      : definedVariableNames;
-    this.setState({
-      autocompletionVariableNames: autocompletionVariableNames.map(name => ({
-        text: name,
-        value: name,
-      })),
-    });
-  }
-
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
+export default React.forwardRef<Props, VariableFieldInterface>(
+  function VariableField(props: Props, ref) {
     const {
+      variablesContainers,
       value,
       onChange,
       isInline,
@@ -132,13 +114,68 @@ export default class VariableField extends Component<Props, State> {
       parameterMetadata,
       onRequestClose,
       onApply,
-    } = this.props;
+      id,
+    } = props;
+
+    const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
+    const [
+      autocompletionVariableNames,
+      setAutocompletionVariableNames,
+    ] = React.useState<DataSource>([]);
+    /**
+     * Can be called to set up or force updating the variables list.
+     */
+    const updateAutocompletions = React.useCallback(
+      () => {
+        const definedVariableNames =
+          variablesContainers.length === 0
+            ? []
+            : variablesContainers
+                .map(variablesContainer =>
+                  enumerateVariables(variablesContainer)
+                    .map(({ name, isValidName }) =>
+                      isValidName
+                        ? name
+                        : // Hide invalid variable names - they would not
+                          // be parsed correctly anyway.
+                          null
+                    )
+                    .filter(Boolean)
+                )
+                .reduce((a, b) => intersection(a, b));
+        setAutocompletionVariableNames(
+          definedVariableNames.map(name => ({
+            text: name,
+            value: name,
+          }))
+        );
+      },
+      [variablesContainers]
+    );
+
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+      updateAutocompletions,
+    }));
+
+    React.useEffect(
+      () => {
+        updateAutocompletions();
+      },
+      [updateAutocompletions]
+    );
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const quicklyAnalysisResult = quicklyAnalyzeVariableName(value);
+    const quicklyAnalysisResult = quicklyAnalyzeVariableName(
+      value,
+      variablesContainers
+    );
 
     const errorText =
       quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
@@ -160,44 +197,66 @@ export default class VariableField extends Component<Props, State> {
           Score[3].
         </Trans>
       ) : null;
+    const warningTranslatableText =
+      quicklyAnalysisResult ===
+      VariableNameQuickAnalyzeResults.UNDECLARED_VARIABLE
+        ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
+        : null;
 
     return (
-      <TextFieldWithButtonLayout
-        renderTextField={() => (
-          <SemiControlledAutoComplete
-            margin={this.props.isInline ? 'none' : 'dense'}
-            floatingLabelText={description}
-            helperMarkdownText={
-              parameterMetadata
-                ? parameterMetadata.getLongDescription()
-                : undefined
+      <I18n>
+        {({ i18n }) => (
+          <TextFieldWithButtonLayout
+            renderTextField={() => (
+              <SemiControlledAutoComplete
+                margin={isInline ? 'none' : 'dense'}
+                floatingLabelText={description}
+                helperMarkdownText={
+                  warningTranslatableText
+                    ? i18n._(warningTranslatableText)
+                    : parameterMetadata
+                    ? parameterMetadata.getLongDescription()
+                    : undefined
+                }
+                errorText={errorText}
+                fullWidth
+                value={value}
+                onChange={onChange}
+                onRequestClose={onRequestClose}
+                onApply={onApply}
+                dataSource={[
+                  ...autocompletionVariableNames,
+                  onOpenDialog && variablesContainers.length === 1
+                    ? {
+                        translatableValue: t`Add or edit variables...`,
+                        text: '',
+                        value: '',
+                        onClick: onOpenDialog,
+                      }
+                    : null,
+                ].filter(Boolean)}
+                openOnFocus={!isInline}
+                ref={field}
+                id={id}
+              />
+            )}
+            renderButton={style =>
+              onOpenDialog && !isInline ? (
+                <RaisedButton
+                  icon={<ShareExternal />}
+                  disabled={variablesContainers.length !== 1}
+                  primary
+                  style={style}
+                  onClick={onOpenDialog}
+                />
+              ) : null
             }
-            errorText={errorText}
-            fullWidth
-            value={value}
-            onChange={onChange}
-            onRequestClose={onRequestClose}
-            onApply={onApply}
-            dataSource={this.state.autocompletionVariableNames}
-            openOnFocus={!isInline}
-            ref={field => (this._field = field)}
           />
         )}
-        renderButton={style =>
-          onOpenDialog && !isInline ? (
-            <RaisedButton
-              icon={<OpenInNew />}
-              disabled={!this.props.variablesContainer}
-              primary
-              style={style}
-              onClick={onOpenDialog}
-            />
-          ) : null
-        }
-      />
+      </I18n>
     );
   }
-}
+);
 
 export const renderVariableWithIcon = (
   {
@@ -207,12 +266,16 @@ export const renderVariableWithIcon = (
     InvalidParameterValue,
     MissingParameterValue,
   }: ParameterInlineRendererProps,
-  iconPath: string,
+  VariableIcon: SvgIconProps => React.Element<typeof SvgIcon>,
   tooltip: string
 ) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
+
+  const IconAndNameContainer = expressionIsValid
+    ? React.Fragment
+    : InvalidParameterValue;
 
   return (
     <span
@@ -224,18 +287,14 @@ export const renderVariableWithIcon = (
           VariableNameQuickAnalyzeResults.OK,
       })}
     >
-      <img
-        className={classNames({
-          [icon]: true,
-        })}
-        src={iconPath}
-        alt=""
-      />
-      {expressionIsValid ? (
-        value
-      ) : (
-        <InvalidParameterValue>{value}</InvalidParameterValue>
-      )}
+      <IconAndNameContainer>
+        <VariableIcon
+          className={classNames({
+            [icon]: true,
+          })}
+        />
+        {value}
+      </IconAndNameContainer>
     </span>
   );
 };

@@ -31,7 +31,7 @@ export default ({ renderButtons, renderEditorMosaic }: Props) => {
     direction: 'column' | 'row'
   ) => {
     if (editorRef.current)
-      editorRef.current.openEditor(
+      editorRef.current.toggleEditor(
         editorName,
         position,
         slipPercentage,

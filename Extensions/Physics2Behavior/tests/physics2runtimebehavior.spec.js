@@ -1,4 +1,16 @@
 describe('Physics2RuntimeBehavior', () => {
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+  beforeEach(async function () {
+    // TODO find a clean way to wait for the Box2D library to load.
+    for (let index = 0; index < 200 && !window.Box2D; index++) {
+      await delay(5);
+    }
+    if (!window.Box2D) {
+      throw new Error('Timeout loading Box2D.');
+    }
+  });
+
   class FakeAutoRemoveBehavior extends gdjs.RuntimeBehavior {
     shouldDeleteInPreEvent = false;
 
@@ -47,12 +59,8 @@ describe('Physics2RuntimeBehavior', () => {
   }
 
   function createGameWithSceneWithPhysics2SharedData() {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      resources: { resources: [] },
-      properties: { windowWidth: 1000, windowHeight: 1000 },
-    });
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    const runtimeGame = gdjs.getPixiRuntimeGame();
+    const runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [
         {
@@ -224,12 +232,48 @@ describe('Physics2RuntimeBehavior', () => {
       expect(behavior.getRestitution()).to.be(0.5);
     });
 
+    it('should not resolve collision before the 1st frame events', () => {
+      const fps = 60;
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return (1 / fps) * 1000;
+      };
+
+      // Create objects in contact
+      const {
+        object: object1,
+        behavior: object1Behavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Dynamic',
+      });
+      object1.setPosition(10, 0);
+      const {
+        object: object2,
+        behavior: object2Behavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
+      object2.setPosition(20, 0);
+
+      // First frame
+      runtimeScene.renderAndStep(1000 / fps);
+
+      // The object has not moved.
+      expect(object1.getX()).to.be(10);
+      expect(object1.getY()).to.be(0);
+      expect(object2.getX()).to.be(20);
+      expect(object2.getY()).to.be(0);
+    });
+
     it('should clear contacts when deactivating the physics2 behavior', () => {
       const fps = 60;
       runtimeGame.setGameResolutionSize(1000, 1000);
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
+
+      // The behavior doesn't call Box2D step at the 1st frame.
+      runtimeScene.renderAndStep(1000 / fps);
 
       // Create objects not in contact
       const {
@@ -259,11 +303,10 @@ describe('Physics2RuntimeBehavior', () => {
       ).to.be(true);
 
       // Put objects in contact and assert collision started during the frame
-      runtimeScene.setEventsFunction(() => {
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         object1.setPosition(10, 0);
         object2.setPosition(20, 0);
       });
-      runtimeScene.renderAndStep(1000 / fps);
 
       // After post event, collision should be present
       assertCollision(object1, object2, {
@@ -271,9 +314,6 @@ describe('Physics2RuntimeBehavior', () => {
         collision: true,
         stopped: false,
       });
-
-      // Reset scene events
-      runtimeScene.setEventsFunction(() => {});
 
       // Deactivate physics behavior and test that collisions are cleared.
       object1.activateBehavior('Physics2', false);
@@ -412,33 +452,28 @@ describe('Physics2RuntimeBehavior', () => {
       movingObjectBehavior.setLinearVelocityY(40000);
 
       let hasBounced = false;
-      let stepIndex = 0;
-
-      runtimeScene.setEventsFunction(() => {
-        if (movingObjectBehavior.getLinearVelocityY() > 0) {
-          // If the moving object has a positive velocity, it hasn't bounced
-          // on the static object
-          assertCollision(movingObject, staticObject, {
-            started: false,
-            collision: false,
-            stopped: false,
-          });
-        } else {
-          hasBounced = true;
-          expect(movingObject.getY() < staticObject.getY()).to.be(true);
-          assertCollision(movingObject, staticObject, {
-            started: true,
-            collision: true,
-            stopped: true,
-          });
-        }
-      });
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
-        stepIndex++;
+      for (let stepIndex = 0; stepIndex < 10 && !hasBounced; stepIndex++) {
+        runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
+          if (movingObjectBehavior.getLinearVelocityY() > 0) {
+            // If the moving object has a positive velocity, it hasn't bounced
+            // on the static object
+            assertCollision(movingObject, staticObject, {
+              started: false,
+              collision: false,
+              stopped: false,
+            });
+          } else {
+            hasBounced = true;
+            expect(movingObject.getY() < staticObject.getY()).to.be(true);
+            assertCollision(movingObject, staticObject, {
+              started: true,
+              collision: true,
+              stopped: true,
+            });
+          }
+        });
       }
 
-      runtimeScene.setEventsFunction(() => {});
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: false,
@@ -474,32 +509,31 @@ describe('Physics2RuntimeBehavior', () => {
       movingObjectBehavior.setLinearVelocityY(40000);
 
       let hasBegunBouncing = false;
-      let stepIndex = 0;
-
-      runtimeScene.setEventsFunction(() => {
-        if (movingObjectBehavior.getLinearVelocityY() > 0) {
-          // If the moving object has a positive velocity, it hasn't bounced
-          // on the static object
-          assertCollision(movingObject, staticObject, {
-            started: false,
-            collision: false,
-            stopped: false,
-          });
-        } else {
-          hasBegunBouncing = true;
-          // At first frame, collision should have only started
-          expect(movingObject.getY() < staticObject.getY()).to.be(true);
-          assertCollision(movingObject, staticObject, {
-            started: true,
-            collision: true,
-            stopped: false,
-          });
-        }
-      });
-
-      while (stepIndex < 10 && !hasBegunBouncing) {
-        runtimeScene.renderAndStep(1000 / fps);
-        stepIndex++;
+      for (
+        let stepIndex = 0;
+        stepIndex < 10 && !hasBegunBouncing;
+        stepIndex++
+      ) {
+        runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
+          if (movingObjectBehavior.getLinearVelocityY() > 0) {
+            // If the moving object has a positive velocity, it hasn't bounced
+            // on the static object
+            assertCollision(movingObject, staticObject, {
+              started: false,
+              collision: false,
+              stopped: false,
+            });
+          } else {
+            hasBegunBouncing = true;
+            // At first frame, collision should have only started
+            expect(movingObject.getY() < staticObject.getY()).to.be(true);
+            assertCollision(movingObject, staticObject, {
+              started: true,
+              collision: true,
+              stopped: false,
+            });
+          }
+        });
       }
 
       if (!hasBegunBouncing) {
@@ -510,8 +544,7 @@ describe('Physics2RuntimeBehavior', () => {
 
       // At next frame, end of collision should be detected
       let hasFinishedBouncing = false;
-
-      runtimeScene.setEventsFunction(() => {
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         hasFinishedBouncing = true;
         assertCollision(movingObject, staticObject, {
           started: false,
@@ -519,8 +552,6 @@ describe('Physics2RuntimeBehavior', () => {
           stopped: true,
         });
       });
-
-      runtimeScene.renderAndStep(1000 / fps);
 
       if (!hasFinishedBouncing) {
         throw new Error('End of contact was not detected, nothing was tested.');
@@ -533,6 +564,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
+
+      // The behavior doesn't call Box2D step at the 1st frame.
+      runtimeScene.renderAndStep(1000 / fps);
 
       const {
         behavior: movingObjectBehavior,
@@ -555,7 +589,7 @@ describe('Physics2RuntimeBehavior', () => {
         stopped: false,
       });
 
-      runtimeScene.setEventsFunction(() => {
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         // Manually call onContactEnd and onContactBegin methods to simulate
         // a loss of contact followed by a contact beginning during the preEvent.
         movingObject
@@ -572,7 +606,6 @@ describe('Physics2RuntimeBehavior', () => {
           stopped: false,
         });
       });
-      runtimeScene.renderAndStep(1000 / fps);
     });
 
     it('should not detect a new contact if the contact ended and jittered.', () => {
@@ -581,6 +614,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
+
+      // The behavior doesn't call Box2D step at the 1st frame.
+      runtimeScene.renderAndStep(1000 / fps);
 
       const {
         behavior: movingObjectBehavior,
@@ -603,7 +639,7 @@ describe('Physics2RuntimeBehavior', () => {
         stopped: false,
       });
 
-      runtimeScene.setEventsFunction(() => {
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         // Manually call onContactEnd and onContactBegin methods to simulate
         // a loss of contact followed by a contact beginning and another loss
         // of contact during the event.
@@ -625,7 +661,6 @@ describe('Physics2RuntimeBehavior', () => {
           stopped: true,
         });
       });
-      runtimeScene.renderAndStep(1000 / fps);
     });
 
     it('it should end collision on resize (body updated in pre-event).', () => {
@@ -634,6 +669,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
+
+      // The behavior doesn't call Box2D step at the 1st frame.
+      runtimeScene.renderAndStep(1000 / fps);
 
       const {
         behavior: movingObjectBehavior,
@@ -656,18 +694,15 @@ describe('Physics2RuntimeBehavior', () => {
       });
 
       // Resize.
-      runtimeScene.setEventsFunction(() => {
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         movingObject.setCustomWidthAndHeight(5, 5);
       });
-
-      runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: false,
         collision: true,
         stopped: false,
       });
 
-      runtimeScene.setEventsFunction(() => {});
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: false,
@@ -682,6 +717,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
+
+      // The behavior doesn't call Box2D step at the 1st frame.
+      runtimeScene.renderAndStep(1000 / fps);
 
       const {
         behavior: movingObjectBehavior,
@@ -704,12 +742,10 @@ describe('Physics2RuntimeBehavior', () => {
         stopped: false,
       });
 
-      // Destroy (postEvent operation).
-      runtimeScene.setEventsFunction(() => {
+      // Destroy (handled by postEvent).
+      runtimeScene.renderAndStepWithEventsFunction(1000 / fps, () => {
         movingObject.deleteFromScene(runtimeScene);
       });
-
-      runtimeScene.renderAndStep(1000 / fps);
 
       // Collision should be reset on destroyed object and
       // added to contactsEndedThisFrame array of the other object.

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import {
   Table,
   TableRow,
@@ -9,11 +10,12 @@ import {
   TableHeaderColumn,
 } from '../../../UI/Table';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import Warning from '@material-ui/icons/Warning';
 import IconButton from '../../../UI/IconButton';
-import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
-import AddCircle from '@material-ui/icons/AddCircle';
-import Delete from '@material-ui/icons/Delete';
+import GDevelopThemeContext from '../../../UI/Theme/GDevelopThemeContext';
+import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../UI/CustomSvgIcons/Warning';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export type Vertex = {|
   x: number,
@@ -28,8 +30,15 @@ type Props = {|
   onRemove: (index: number) => void,
 |};
 
-export default class PolygonEditor extends React.Component<Props> {
-  _isPolygonConvex(vertices: Array<Vertex>) {
+const PolygonEditor = ({
+  vertices,
+  onChangeVertexX,
+  onChangeVertexY,
+  onAdd,
+  onRemove,
+}: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const isPolygonConvex = (vertices: Array<Vertex>) => {
     // Get edges
     let edges = [];
     let v1 = null;
@@ -78,85 +87,77 @@ export default class PolygonEditor extends React.Component<Props> {
     if (alignedX || alignedY) return false;
 
     return true;
-  }
+  };
 
-  render() {
-    const {
-      vertices,
-      onChangeVertexX,
-      onChangeVertexY,
-      onAdd,
-      onRemove,
-    } = this.props;
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHeaderColumn />
+          <TableHeaderColumn>X</TableHeaderColumn>
+          <TableHeaderColumn>Y</TableHeaderColumn>
+          <TableRowColumn />
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {vertices.map((value, index) => {
+          return (
+            <TableRow
+              key={`vertexRow${index}`}
+              style={{
+                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+              }}
+            >
+              <TableRowColumn>
+                {!isPolygonConvex(vertices) && (
+                  <Tooltip title={<Trans>The polygon is not convex</Trans>}>
+                    <Warning />
+                  </Tooltip>
+                )}
+              </TableRowColumn>
+              <TableRowColumn>
+                <SemiControlledTextField
+                  margin="none"
+                  fullWidth
+                  value={value.x.toString(10)}
+                  onChange={newValue =>
+                    onChangeVertexX(parseFloat(newValue) || 0, index)
+                  }
+                  type="number"
+                />
+              </TableRowColumn>
+              <TableRowColumn>
+                <SemiControlledTextField
+                  margin="none"
+                  fullWidth
+                  value={value.y.toString(10)}
+                  onChange={newValue =>
+                    onChangeVertexY(parseFloat(newValue) || 0, index)
+                  }
+                  type="number"
+                />
+              </TableRowColumn>
+              <TableRowColumn>
+                <IconButton size="small" onClick={() => onRemove(index)}>
+                  <Trash />
+                </IconButton>
+              </TableRowColumn>
+            </TableRow>
+          );
+        })}
+        <TableRow>
+          <TableRowColumn />
+          <TableRowColumn />
+          <TableRowColumn />
+          <TableRowColumn>
+            <IconButton onClick={onAdd} size="small">
+              <AddCircle />
+            </IconButton>
+          </TableRowColumn>
+        </TableRow>
+      </TableBody>
+    </Table>
+  );
+};
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHeaderColumn />
-                <TableHeaderColumn>X</TableHeaderColumn>
-                <TableHeaderColumn>Y</TableHeaderColumn>
-                <TableRowColumn />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vertices.map((value, index) => {
-                return (
-                  <TableRow
-                    key={`vertexRow${index}`}
-                    style={{
-                      backgroundColor: muiTheme.list.itemsBackgroundColor,
-                    }}
-                  >
-                    <TableRowColumn>
-                      {!this._isPolygonConvex(vertices) && <Warning />}
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <SemiControlledTextField
-                        margin="none"
-                        fullWidth
-                        value={value.x.toString(10)}
-                        onChange={newValue =>
-                          onChangeVertexX(parseFloat(newValue) || 0, index)
-                        }
-                        type="number"
-                      />
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <SemiControlledTextField
-                        margin="none"
-                        fullWidth
-                        value={value.y.toString(10)}
-                        onChange={newValue =>
-                          onChangeVertexY(parseFloat(newValue) || 0, index)
-                        }
-                        type="number"
-                      />
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <IconButton size="small" onClick={() => onRemove(index)}>
-                        <Delete />
-                      </IconButton>
-                    </TableRowColumn>
-                  </TableRow>
-                );
-              })}
-              <TableRow>
-                <TableRowColumn />
-                <TableRowColumn />
-                <TableRowColumn />
-                <TableRowColumn>
-                  <IconButton onClick={onAdd}>
-                    <AddCircle />
-                  </IconButton>
-                </TableRowColumn>
-              </TableRow>
-            </TableBody>
-          </Table>
-        )}
-      </ThemeConsumer>
-    );
-  }
-}
+export default PolygonEditor;

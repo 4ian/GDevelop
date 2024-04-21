@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class GlitchFilter extends PIXI.Filter {
     constructor(options?: GlitchFilterOptions);
     slices: number;
@@ -7,6 +6,9 @@ declare namespace PIXI.filters {
     direction: number;
     fillMode: number;
     seed: number;
+    average: boolean;
+    minSize: number;
+    sampleSize: number;
     red: PIXI.Point;
     green: PIXI.Point;
     blue: PIXI.Point;
@@ -22,13 +24,13 @@ declare namespace PIXI.filters {
     offset: number;
     direction: number;
     fillMode: number;
-    average: boolean;
     seed: number;
+    average: boolean;
+    minSize: number;
+    sampleSize: number;
     red: PIXI.Point;
     green: PIXI.Point;
     blue: PIXI.Point;
-    minSize: number;
-    sampleSize: number;
   }
 }
 

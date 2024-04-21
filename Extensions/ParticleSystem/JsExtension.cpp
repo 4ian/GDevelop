@@ -178,6 +178,8 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setTexture")
         .SetGetter("getTexture");
     conditions["ParticleSystem::Texture"].SetFunctionName("getTexture");
+    actions["ParticleSystem::JumpEmitterForwardInTime"].SetFunctionName(
+        "jumpEmitterForwardInTime");
 
     strExpressions["Texture"].SetFunctionName("getTexture");
     expressions["CurrentParticleCount"].SetFunctionName("getParticleCount");
@@ -191,6 +193,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
     expressions["EmitterAngle"].SetFunctionName("getAngle");
     expressions["EmitterAngleA"].SetFunctionName("getEmitterAngleA");
     expressions["EmitterAngleB"].SetFunctionName("getEmitterAngleB");
+    expressions["ConeSprayAngle"].SetFunctionName("getConeSprayAngle");
     expressions["ZoneRadius"].SetFunctionName("getZoneRadius");
     expressions["ParticleGravityX"].SetFunctionName("getParticleGravityX");
     expressions["ParticleGravityY"].SetFunctionName("getParticleGravityY");

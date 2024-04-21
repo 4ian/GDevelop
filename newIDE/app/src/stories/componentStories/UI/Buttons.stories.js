@@ -2,14 +2,8 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import Brush from '@material-ui/icons/Brush';
-import FilterList from '@material-ui/icons/FilterList';
-import CloudDownload from '@material-ui/icons/CloudDownload';
-import Delete from '@material-ui/icons/Delete';
-import AddCircle from '@material-ui/icons/AddCircle';
 import Home from '../../../UI/CustomSvgIcons/Home';
 import Crown from '../../../UI/CustomSvgIcons/Crown';
 import Cut from '../../../UI/CustomSvgIcons/Cut';
@@ -20,12 +14,17 @@ import RaisedButton from '../../../UI/RaisedButton';
 import FlatButton from '../../../UI/FlatButton';
 import TextButton from '../../../UI/TextButton';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import FlatButtonWithSplitMenu from '../../../UI/FlatButtonWithSplitMenu';
 import RaisedButtonWithMenu from '../../../UI/RaisedButtonWithMenu';
 import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
-import ToolbarIcon from '../../../UI/ToolbarIcon';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import IconButton from '../../../UI/IconButton';
 import { Column, Line } from '../../../UI/Grid';
+import Trash from '../../../UI/CustomSvgIcons/Trash';
+import AddCircle from '../../../UI/CustomSvgIcons/AddCircle';
+import Download from '../../../UI/CustomSvgIcons/Download';
+import Edit from '../../../UI/CustomSvgIcons/Edit';
+import Filter from '../../../UI/CustomSvgIcons/Filter';
 
 const buildFakeMenuTemplate = () => [
   {
@@ -41,7 +40,7 @@ const buildFakeMenuTemplate = () => [
 
 export default {
   title: 'UI Building Blocks/Buttons',
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (
@@ -52,7 +51,7 @@ export const Default = () => (
     <LineStackLayout noMargin>
       <RaisedButton label="Raised button" onClick={action('onClick')()} />
       <RaisedButton
-        icon={<CloudDownload />}
+        icon={<Download />}
         label="Raised button"
         onClick={action('onClick')()}
       />
@@ -62,16 +61,18 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <RaisedButton
-        icon={<CloudDownload />}
+        icon={<Download />}
         label="Primary Raised button"
         primary
         onClick={action('onClick')()}
       />
+      <RaisedButton icon={<Download />} primary onClick={action('onClick')()} />
+      <RaisedButton icon={<Download />} onClick={action('onClick')()} />
     </LineStackLayout>
     <LineStackLayout noMargin>
       <FlatButton label="Flat button" onClick={action('onClick')()} />
       <FlatButton
-        leftIcon={<CloudDownload />}
+        leftIcon={<Download />}
         label="Flat button"
         onClick={action('onClick')()}
       />
@@ -81,7 +82,7 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <FlatButton
-        leftIcon={<CloudDownload />}
+        leftIcon={<Download />}
         label="Primary Flat button"
         primary
         onClick={action('onClick')()}
@@ -90,7 +91,7 @@ export const Default = () => (
     <LineStackLayout noMargin>
       <TextButton label="Text button" onClick={action('onClick')()} />
       <TextButton
-        icon={<CloudDownload />}
+        icon={<Download />}
         label="Text button"
         onClick={action('onClick')()}
       />
@@ -100,9 +101,20 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <TextButton
-        icon={<CloudDownload />}
+        icon={<Download />}
         primary
         label="Primary Text button"
+        onClick={action('onClick')()}
+      />
+      <TextButton
+        secondary
+        label="Secondary Text button"
+        onClick={action('onClick')()}
+      />
+      <TextButton
+        icon={<Download />}
+        secondary
+        label="Secondary Text button"
         onClick={action('onClick')()}
       />
     </LineStackLayout>
@@ -115,25 +127,46 @@ export const Default = () => (
         onClick={action('onClick')()}
       />
       <RaisedButtonWithSplitMenu
-        label="Button with split menu"
-        onClick={action('onClick')()}
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
-      <RaisedButtonWithSplitMenu
-        label="Primary button with split menu"
+        label="Raised button with split menu"
         primary
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
-        label="... and with icon"
-        icon={<Brush />}
+      <FlatButtonWithSplitMenu
+        label="Flat primary button"
+        primary
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
-      <RaisedButtonWithSplitMenu
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        label="Flat non primary button"
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
+        label="... and with icon"
+        icon={<Edit />}
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
         label="... and disabled"
-        icon={<Brush />}
+        icon={<Edit />}
+        disabled
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <FlatButtonWithSplitMenu
+        icon={<Edit />}
+        onClick={action('onClick')()}
+        buildMenuTemplate={buildFakeMenuTemplate}
+      />
+      <FlatButtonWithSplitMenu
+        icon={<Edit />}
         disabled
         onClick={action('onClick')()}
         buildMenuTemplate={buildFakeMenuTemplate}
@@ -153,12 +186,12 @@ export const Default = () => (
       />
       <RaisedButtonWithMenu
         label="... and with icon"
-        icon={<Brush />}
+        icon={<Edit />}
         buildMenuTemplate={buildFakeMenuTemplate}
       />
       <RaisedButtonWithMenu
         label="... and disabled"
-        icon={<Brush />}
+        icon={<Edit />}
         disabled
         buildMenuTemplate={buildFakeMenuTemplate}
       />
@@ -169,17 +202,8 @@ export const Default = () => (
     <LineStackLayout noMargin>
       <ElementWithMenu
         element={
-          <ToolbarIcon
-            src="res/ribbon_default/bug32.png"
-            tooltip={'ToolbarIcon with menu'}
-          />
-        }
-        buildMenuTemplate={buildFakeMenuTemplate}
-      />
-      <ElementWithMenu
-        element={
           <IconButton>
-            <FilterList />
+            <Filter />
           </IconButton>
         }
         buildMenuTemplate={buildFakeMenuTemplate}
@@ -190,25 +214,33 @@ export const Default = () => (
     </LineStackLayout>
     <LineStackLayout noMargin>
       <Column expand>
-        <Text>A few Material UI icon buttons</Text>
+        <Text>A few icon buttons</Text>
         <Line noMargin>
           <IconButton>
-            <Brush />
+            <Edit />
+          </IconButton>
+          <IconButton selected>
+            <Edit />
           </IconButton>
           <IconButton>
-            <Brush fontSize="small" />
-          </IconButton>
-          <IconButton>
-            <Delete />
-          </IconButton>
-          <IconButton>
-            <Delete fontSize="small" />
+            <Trash />
           </IconButton>
           <IconButton>
             <AddCircle />
           </IconButton>
-          <IconButton>
-            <AddCircle fontSize="small" />
+        </Line>
+        <Line>
+          <IconButton size="small">
+            <Edit />
+          </IconButton>
+          <IconButton size="small" selected>
+            <Edit />
+          </IconButton>
+          <IconButton size="small">
+            <Trash />
+          </IconButton>
+          <IconButton size="small">
+            <AddCircle />
           </IconButton>
         </Line>
       </Column>
@@ -219,19 +251,27 @@ export const Default = () => (
             <Home />
           </IconButton>
           <IconButton>
-            <Home fontSize="small" />
-          </IconButton>
-          <IconButton>
             <Cut />
-          </IconButton>
-          <IconButton>
-            <Cut fontSize="small" />
           </IconButton>
           <IconButton>
             <Crown />
           </IconButton>
-          <IconButton>
-            <Crown fontSize="small" />
+          <IconButton selected>
+            <Crown />
+          </IconButton>
+        </Line>
+        <Line>
+          <IconButton size="small">
+            <Home />
+          </IconButton>
+          <IconButton size="small">
+            <Cut />
+          </IconButton>
+          <IconButton size="small">
+            <Crown />
+          </IconButton>
+          <IconButton size="small" selected>
+            <Crown />
           </IconButton>
         </Line>
       </Column>
@@ -243,12 +283,12 @@ export const Default = () => (
       <MiniToolbar>
         <MiniToolbarText firstChild>Some text:</MiniToolbarText>
         <IconButton>
-          <Brush />
+          <Edit />
         </IconButton>
         <ElementWithMenu
           element={
             <IconButton>
-              <FilterList />
+              <Filter />
             </IconButton>
           }
           buildMenuTemplate={() => [

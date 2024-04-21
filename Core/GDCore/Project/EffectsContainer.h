@@ -64,7 +64,7 @@ class GD_CORE_API EffectsContainer {
   std::size_t GetEffectPosition(const gd::String& name) const;
 
   /**
-   * Return the number of effecst.
+   * Return the number of effects.
    */
   std::size_t GetEffectsCount() const;
 
@@ -109,6 +109,11 @@ class GD_CORE_API EffectsContainer {
    * \brief Unserialize the effects container.
    */
   void UnserializeFrom(const SerializerElement& element);
+
+  /**
+   * \brief Clear all effects of the container.
+   */
+  inline void Clear() { effects.clear(); }
 
  private:
   std::vector<std::shared_ptr<gd::Effect>> effects;

@@ -3,12 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EXPORTER_HELPER_H
-#define EXPORTER_HELPER_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -37,7 +38,11 @@ struct PreviewExportOptions {
         useWindowMessageDebuggerClient(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
-        nonRuntimeScriptsCacheBurst(0){};
+        isDevelopmentEnvironment(false),
+        nonRuntimeScriptsCacheBurst(0),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""),
+        allowAuthenticationUsingIframeForPreview(false){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -47,6 +52,17 @@ struct PreviewExportOptions {
       const gd::String &address, const gd::String &port) {
     websocketDebuggerServerAddress = address;
     websocketDebuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
+   */
+  PreviewExportOptions &SetFallbackAuthor(const gd::String &id,
+                                          const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
     return *this;
   }
 
@@ -68,7 +84,7 @@ struct PreviewExportOptions {
   }
 
   /**
-   * \brief Set the (optional) external layout to be instanciated in the scene
+   * \brief Set the (optional) external layout to be instantiated in the scene
    * at the beginning of the previewed game.
    */
   PreviewExportOptions &SetExternalLayoutName(
@@ -106,6 +122,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the export should consider to be in a development environment
+   * of GDevelop (the game should use GDevelop development APIs).
+   */
+  PreviewExportOptions &SetIsDevelopmentEnvironment(bool enable) {
+    isDevelopmentEnvironment = enable;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -127,6 +152,30 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * Set the token to use by the game engine when requiring any resource stored
+   * on GDevelop Cloud buckets. Note that this is only useful during previews.
+   */
+  PreviewExportOptions &SetGDevelopResourceToken(
+      const gd::String &gdevelopResourceToken_) {
+    gdevelopResourceToken = gdevelopResourceToken_;
+    return *this;
+  }
+
+  /**
+   * Set if, in some exceptional cases, we allow authentication
+   * to be done through a iframe.
+   * This is usually discouraged as the user can't verify that the
+   * authentication window is a genuine one. It's only to be used in trusted
+   * contexts.
+   */
+  PreviewExportOptions &SetAllowAuthenticationUsingIframeForPreview(
+      bool allowAuthenticationUsingIframeForPreview_) {
+    allowAuthenticationUsingIframeForPreview =
+        allowAuthenticationUsingIframeForPreview_;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;
@@ -134,11 +183,60 @@ struct PreviewExportOptions {
   bool useWindowMessageDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
+  bool isDevelopmentEnvironment;
   unsigned int nonRuntimeScriptsCacheBurst;
   gd::String electronRemoteRequirePath;
+  gd::String gdevelopResourceToken;
+  bool allowAuthenticationUsingIframeForPreview;
+};
+
+/**
+ * \brief The options used to export a project.
+ */
+struct ExportOptions {
+  /**
+   * \param project_ The project to export
+   * \param exportPath_ The path in the filesystem where to export the files
+   */
+  ExportOptions(gd::Project &project_, const gd::String &exportPath_)
+      : project(project_),
+        exportPath(exportPath_),
+        target(""),
+        fallbackAuthorId(""),
+        fallbackAuthorUsername(""){};
+
+  /**
+   * \brief Set the fallback author info (if info not present in project
+   * properties).
+   */
+  ExportOptions &SetFallbackAuthor(const gd::String &id,
+                                   const gd::String &username) {
+    fallbackAuthorId = id;
+    fallbackAuthorUsername = username;
+    return *this;
+  }
+
+  /**
+   * \brief Set the (optional) target platform.
+   *
+   * \param target_ The target platform (`cordova`, `facebookInstantGames` or
+   * `electron`)
+   */
+  ExportOptions &SetTarget(const gd::String &target_) {
+    target = target_;
+    return *this;
+  }
+
+  gd::Project &project;
+  gd::String exportPath;
+  gd::String target;
+  gd::String fallbackAuthorUsername;
+  gd::String fallbackAuthorId;
 };
 
 /**
@@ -164,14 +262,15 @@ class ExporterHelper {
    * \param project The project to be exported.
    * \param filename The filename where export the project
    * \param runtimeGameOptions The content of the extra configuration to store
-   * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
+   * in gdjs.runtimeGameOptions \return Empty string if everything is ok,
    * description of the error otherwise.
    */
-  static gd::String ExportProjectData(
-      gd::AbstractFileSystem &fs,
-      const gd::Project &project,
-      gd::String filename,
-      const gd::SerializerElement &runtimeGameOptions);
+  static gd::String
+  ExportProjectData(gd::AbstractFileSystem &fs, gd::Project &project,
+                    gd::String filename,
+                    const gd::SerializerElement &runtimeGameOptions,
+                    std::set<gd::String> &projectUsedResources,
+                    std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -191,6 +290,7 @@ class ExporterHelper {
    * \brief Add libraries files to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
+                      bool pixiInThreeRenderers,
                       bool includeWebsocketDebuggerClient,
                       bool includeWindowMessageDebuggerClient,
                       gd::String gdevelopLogoStyle,
@@ -233,15 +333,8 @@ class ExporterHelper {
   /**
    * \brief Add the project effects include files.
    */
-  bool ExportEffectIncludes(const gd::Project &project,
+  bool ExportEffectIncludes(gd::Project &project,
                             std::vector<gd::String> &includesFiles);
-
-  /**
-   * \brief Add the include files for all the objects of the project
-   * and their behaviors.
-   */
-  void ExportObjectAndBehaviorsIncludes(const gd::Project &project,
-                                        std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Copy the external source files used by the game into the export
@@ -346,6 +439,14 @@ class ExporterHelper {
                                        gd::String exportDir);
 
   /**
+   * \brief Generate any HTML5 specific file.
+   *
+   * \param project The project to be used to generate the files.
+   * \param exportDir The directory where the files must be created.
+   */
+  bool ExportHtml5Files(const gd::Project &project, gd::String exportDir);
+
+  /**
    * \brief Create a preview for the specified options.
    * \note The preview is not launched, it is the caller responsibility to open
    * a browser pointing to the preview.
@@ -383,7 +484,12 @@ class ExporterHelper {
       gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
   gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
                              ///< be then copied to the final output directory.
+
+private:
+  static void SerializeUsedResources(
+      gd::SerializerElement &rootElement,
+      std::set<gd::String> &projectUsedResources,
+      std::unordered_map<gd::String, std::set<gd::String>> &layersUsedResources);
 };
 
 }  // namespace gdjs
-#endif  // EXPORTER_HELPER_H

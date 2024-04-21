@@ -48,7 +48,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .AddParameter("string", "Content type", "", true)
       .SetParameterLongDescription(
           "If empty, \"application/x-www-form-urlencoded\" will be used.")
-      .AddParameter("scenevar", "Reponse scene variable", "", true)
+      .AddParameter("scenevar", "Response scene variable", "", true)
       .SetParameterLongDescription(
           "The response of the server will be stored, as a string, in this "
           "variable. If the server returns *JSON*, you may want to use the "

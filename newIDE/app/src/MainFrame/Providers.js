@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
-import { ThemeProvider } from '@material-ui/styles';
-import { StylesProvider, jssPreset } from '@material-ui/core/styles';
-import { getTheme } from '../UI/Theme';
 import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
 import PublicProfileProvider from '../Profile/PublicProfileProvider';
 import Authentication from '../Utils/GDevelopServices/Authentication';
@@ -21,26 +18,29 @@ import {
   type EventsFunctionsExtensionWriter,
   type EventsFunctionsExtensionOpener,
 } from '../EventsFunctionsExtensionsLoader/Storage';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { UnsavedChangesContextProvider } from './UnsavedChangesContext';
 import { CommandsContextProvider } from '../CommandPalette/CommandsContext';
-import { create } from 'jss';
-import rtl from 'jss-rtl';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import { PrivateGameTemplateStoreStateProvider } from '../AssetStore/PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import {
-  type ResourceFetcher,
-  ResourceFetcherContext,
-} from '../ProjectsStorage/ResourceFetcher';
-import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
+import { BehaviorStoreStateProvider } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
-
-// Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
-const jss = create({
-  plugins: [...jssPreset().plugins, rtl()],
-});
+import AlertProvider from '../UI/Alert/AlertProvider';
+import { AnnouncementsFeedStateProvider } from '../AnnouncementsFeed/AnnouncementsFeedContext';
+import PrivateAssetsAuthorizationProvider from '../AssetStore/PrivateAssets/PrivateAssetsAuthorizationProvider';
+import InAppTutorialProvider from '../InAppTutorial/InAppTutorialProvider';
+import { SubscriptionSuggestionProvider } from '../Profile/Subscription/SubscriptionSuggestionContext';
+import { RouterContextProvider } from './RouterContext';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
+import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
+import { Trans } from '@lingui/macro';
+import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
+import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
+import { CommunityLeaderboardsStateProvider } from '../CommunityLeaderboards/CommunityLeaderboardsContext';
 
 type Props = {|
   authentication: Authentication,
@@ -48,7 +48,6 @@ type Props = {|
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  resourceFetcher: ResourceFetcher,
   children: ({|
     i18n: I18nType,
   |}) => React.Node,
@@ -58,32 +57,30 @@ type Props = {|
  * Wrap the children with Drag and Drop, Material UI theme and i18n React providers,
  * so that these modules can be used in the children.
  */
-export default class Providers extends React.Component<Props, {||}> {
-  render() {
-    const {
-      disableCheckForUpdates,
-      authentication,
-      children,
-      makeEventsFunctionCodeWriter,
-      eventsFunctionsExtensionWriter,
-      eventsFunctionsExtensionOpener,
-      resourceFetcher,
-    } = this.props;
-    return (
-      <DragAndDropContextProvider>
-        <UnsavedChangesContextProvider>
+const Providers = ({
+  disableCheckForUpdates,
+  authentication,
+  children,
+  makeEventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener,
+}: Props) => {
+  const shopNavigationState = useShopNavigation();
+  return (
+    <DragAndDropContextProvider>
+      <UnsavedChangesContextProvider>
+        <RouterContextProvider>
           <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
             <PreferencesContext.Consumer>
-              {({ values }) => {
-                const theme = getTheme({
-                  themeName: values.themeName,
-                  language: values.language,
-                });
-                return (
-                  <GDI18nProvider language={values.language.replace('_', '-')}>
-                    <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
-                      <StylesProvider jss={jss}>
-                        <ThemeProvider theme={theme.muiTheme}>
+              {({ values }) => (
+                <GDI18nProvider language={values.language.replace('_', '-')}>
+                  <FullThemeProvider>
+                    <ErrorBoundary
+                      componentTitle={<Trans>GDevelop app</Trans>}
+                      scope="app"
+                    >
+                      <InAppTutorialProvider>
+                        <AlertProvider>
                           <AuthenticatedUserProvider
                             authentication={authentication}
                           >
@@ -102,40 +99,64 @@ export default class Providers extends React.Component<Props, {||}> {
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <CommandsContextProvider>
-                                      <AssetStoreStateProvider>
-                                        <ResourceStoreStateProvider>
-                                          <ExampleStoreStateProvider>
-                                            <ExtensionStoreStateProvider>
-                                              <GamesShowcaseStateProvider>
-                                                <TutorialStateProvider>
-                                                  <ResourceFetcherContext.Provider
-                                                    value={resourceFetcher}
-                                                  >
-                                                    {children({ i18n })}
-                                                  </ResourceFetcherContext.Provider>
-                                                </TutorialStateProvider>
-                                              </GamesShowcaseStateProvider>
-                                            </ExtensionStoreStateProvider>
-                                          </ExampleStoreStateProvider>
-                                        </ResourceStoreStateProvider>
-                                      </AssetStoreStateProvider>
-                                    </CommandsContextProvider>
+                                    <SubscriptionSuggestionProvider>
+                                      <CommandsContextProvider>
+                                        <AssetStoreStateProvider
+                                          shopNavigationState={
+                                            shopNavigationState
+                                          }
+                                        >
+                                          <ResourceStoreStateProvider>
+                                            <ExampleStoreStateProvider>
+                                              <PrivateGameTemplateStoreStateProvider
+                                                shopNavigationState={
+                                                  shopNavigationState
+                                                }
+                                              >
+                                                <CreditsPackageStoreStateProvider>
+                                                  <ProductLicenseStoreStateProvider>
+                                                    <MarketingPlansStoreStateProvider>
+                                                      <ExtensionStoreStateProvider>
+                                                        <BehaviorStoreStateProvider>
+                                                          <TutorialStateProvider>
+                                                            <AnnouncementsFeedStateProvider>
+                                                              <CommunityLeaderboardsStateProvider>
+                                                                <PrivateAssetsAuthorizationProvider>
+                                                                  {children({
+                                                                    i18n,
+                                                                  })}
+                                                                </PrivateAssetsAuthorizationProvider>
+                                                              </CommunityLeaderboardsStateProvider>
+                                                            </AnnouncementsFeedStateProvider>
+                                                          </TutorialStateProvider>
+                                                        </BehaviorStoreStateProvider>
+                                                      </ExtensionStoreStateProvider>
+                                                    </MarketingPlansStoreStateProvider>
+                                                  </ProductLicenseStoreStateProvider>
+                                                </CreditsPackageStoreStateProvider>
+                                              </PrivateGameTemplateStoreStateProvider>
+                                            </ExampleStoreStateProvider>
+                                          </ResourceStoreStateProvider>
+                                        </AssetStoreStateProvider>
+                                      </CommandsContextProvider>
+                                    </SubscriptionSuggestionProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>
                             </PublicProfileProvider>
                           </AuthenticatedUserProvider>
-                        </ThemeProvider>
-                      </StylesProvider>
-                    </GDevelopThemeContext.Provider>
-                  </GDI18nProvider>
-                );
-              }}
+                        </AlertProvider>
+                      </InAppTutorialProvider>
+                    </ErrorBoundary>
+                  </FullThemeProvider>
+                </GDI18nProvider>
+              )}
             </PreferencesContext.Consumer>
           </PreferencesProvider>
-        </UnsavedChangesContextProvider>
-      </DragAndDropContextProvider>
-    );
-  }
-}
+        </RouterContextProvider>
+      </UnsavedChangesContextProvider>
+    </DragAndDropContextProvider>
+  );
+};
+
+export default Providers;

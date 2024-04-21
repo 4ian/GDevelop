@@ -1,0 +1,55 @@
+/**
+ * CSS classes for a text field, inspired from Material UI, but lightweight
+ * and faster to render.
+ */
+.simpleTextField {
+  position: relative;
+  width: 100%;
+}
+
+.simpleTextField input {
+  font-family: var(--gdevelop-modern-font-family);
+  font-size: 14px;
+  outline: none;
+  border: none;
+  padding: 0;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: inherit;
+  width: 100%;
+}
+
+.disabled input {
+  color: var(--theme-text-disabled-color);
+}
+
+.simpleTextField:before {
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  content: '\00a0';
+  border-bottom: 1px solid var(--theme-text-default-color);
+  display: block;
+  position: absolute;
+  pointer-events: none;
+}
+.simpleTextField:hover::before {
+  border-width: 2px;
+}
+.simpleTextField:focus-within::before {
+  border-width: 2px;
+}
+
+.disabled:before {
+  border-bottom-style: dotted;
+  border-color: var(--theme-text-disabled-color);
+}
+.disabled:hover::before {
+  border-width: 1px;
+}
+.disabled:focus-within::before {
+  border-width: 1px;
+}

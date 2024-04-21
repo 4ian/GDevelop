@@ -3,10 +3,9 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import BuildsList from '../../../Export/Builds/BuildsList';
+import BuildsList from '../../../ExportAndShare/Builds/BuildsList';
 
 import {
   erroredCordovaBuild,
@@ -16,13 +15,13 @@ import {
   completeElectronBuild,
   completeWebBuild,
   game1,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Builds/BuildsList',
   component: BuildsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const buildArray = [
@@ -38,7 +37,7 @@ const buildArray = [
 export const DefaultBuildsList = () => (
   <BuildsList
     builds={buildArray}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     error={null}
     loadBuilds={action('loadBuilds')}
     game={game1}
@@ -50,7 +49,7 @@ export const DefaultBuildsList = () => (
 export const ErroredBuildsList = () => (
   <BuildsList
     builds={null}
-    authenticatedUser={fakeIndieAuthenticatedUser}
+    authenticatedUser={fakeSilverAuthenticatedUser}
     error={
       new Error(
         'There was an issue getting the game builds, verify your internet connection or try again later.'

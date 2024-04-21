@@ -4,7 +4,7 @@ import { type CommandName } from '../CommandPalette/CommandsList';
 export type ShortcutMap = { [CommandName]: string };
 
 const defaultShortcuts: ShortcutMap = {
-  QUIT_APP: 'CmdOrCtrl+Shift+KeyQ',
+  QUIT_APP: 'CmdOrCtrl+KeyQ', // It's important to keep this shortcut, as this default cannot be overriden on Mac.
   OPEN_PROJECT_MANAGER: 'CmdOrCtrl+Alt+KeyE',
   LAUNCH_NEW_PREVIEW: 'F4',
   LAUNCH_DEBUG_PREVIEW: 'F6',
@@ -15,8 +15,9 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PROJECT: 'CmdOrCtrl+KeyO',
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',
   SAVE_PROJECT_AS: 'CmdOrCtrl+Shift+KeyS',
-  CLOSE_PROJECT: 'CmdOrCtrl+KeyQ',
+  CLOSE_PROJECT: 'CmdOrCtrl+KeyW',
   EXPORT_GAME: 'CmdOrCtrl+Shift+KeyE',
+  INVITE_COLLABORATORS: 'CmdOrCtrl+Shift+KeyI',
   OPEN_RECENT_PROJECT: '',
   OPEN_COMMAND_PALETTE: 'CmdOrCtrl+KeyP',
 
@@ -39,6 +40,7 @@ const defaultShortcuts: ShortcutMap = {
   OPEN_PROPERTIES_PANEL: 'KeyP',
   TOGGLE_INSTANCES_PANEL: 'KeyI',
   TOGGLE_LAYERS_PANEL: 'KeyL',
+  RENAME_SCENE_OBJECT: 'F2',
   TOGGLE_WINDOW_MASK: 'KeyM',
   TOGGLE_GRID: 'Alt+KeyG',
   OPEN_SETUP_GRID: 'CmdOrCtrl+Shift+KeyG',
@@ -52,7 +54,9 @@ const defaultShortcuts: ShortcutMap = {
   ADD_SUBEVENT: 'Shift+KeyD',
   ADD_COMMENT_EVENT: '',
   TOGGLE_EVENT_DISABLED: 'KeyD',
+  TOGGLE_CONDITION_INVERTED: 'KeyJ',
   CHOOSE_AND_ADD_EVENT: 'Shift+KeyW',
+  MOVE_EVENTS_IN_NEW_GROUP: 'CmdOrCtrl+KeyG',
   OPEN_EXTENSION_SETTINGS: '',
 };
 

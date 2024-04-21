@@ -1,4 +1,5 @@
 // @flow
+import 'pixi-spine';
 import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
@@ -7,23 +8,27 @@ import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
+import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
+import RenderedSprite3DInstance from './Renderers/RenderedSprite3DInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
-import * as PIXI from 'pixi.js-legacy';
+import Rendered3DInstance from './Renderers/Rendered3DInstance';
+import * as PIXI_LEGACY from 'pixi.js-legacy';
+import * as PIXI_SPINE from 'pixi-spine';
+import * as THREE from 'three';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
 import optionalRequire from '../Utils/OptionalRequire';
 import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
+const PIXI = { ...PIXI_LEGACY, ...PIXI_SPINE };
 
 // Some PixiJS plugins like pixi-tilemap are not distributed as UMD modules,
 // or still require a global PIXI object to be accessible, so we expose PIXI here.
 // This can be removed if no more extension PixiJS plugin requires this.
 global.PIXI = PIXI;
-// We also export it as GlobalPIXIModule, which is normally used in GDJS runtime and extensions
-// to allow TypeScript typings of PIXI to work.
-global.GlobalPIXIModule = { PIXI };
 
 const requirableModules = {};
 
@@ -42,39 +47,90 @@ const ObjectsRenderingService = {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
-  getThumbnail: function(project: gdProject, object: gdObject) {
-    var objectType = object.getType();
+  renderers3D: {},
+  getThumbnail: function(
+    project: gdProject,
+    objectConfiguration: gdObjectConfiguration
+  ) {
+    const objectType = objectConfiguration.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
         project,
         ResourcesLoader,
-        object
+        objectConfiguration
       );
-    else
+    else if (project.hasEventsBasedObject(objectType)) {
+      return RenderedCustomObjectInstance.getThumbnail(
+        project,
+        ResourcesLoader,
+        objectConfiguration
+      );
+    } else {
       return this.renderers['unknownObjectType'].getThumbnail(
         project,
         ResourcesLoader,
-        object
+        objectConfiguration
       );
+    }
   },
   createNewInstanceRenderer: function(
     project: gdProject,
     layout: gdLayout,
     instance: gdInitialInstance,
-    associatedObject: gdObject,
-    pixiContainer: any
-  ) {
-    var objectType = associatedObject.getType();
-    if (this.renderers.hasOwnProperty(objectType))
+    associatedObjectConfiguration: gdObjectConfiguration,
+    pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group | null
+  ): RenderedInstance | Rendered3DInstance {
+    const objectType = associatedObjectConfiguration.getType();
+    if (threeGroup && this.renderers3D.hasOwnProperty(objectType)) {
+      return new this.renderers3D[objectType](
+        project,
+        layout,
+        instance,
+        associatedObjectConfiguration,
+        pixiContainer,
+        threeGroup,
+        PixiResourcesLoader
+      );
+    } else if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader
       );
     else {
+      if (project.hasEventsBasedObject(objectType)) {
+        const eventsBasedObject = project.getEventsBasedObject(objectType);
+        if (
+          eventsBasedObject.isRenderedIn3D() &&
+          eventsBasedObject.isAnimatable() &&
+          eventsBasedObject.getObjectsCount() === 0
+        ) {
+          return new RenderedSprite3DInstance(
+            project,
+            layout,
+            instance,
+            associatedObjectConfiguration,
+            pixiContainer,
+            threeGroup,
+            PixiResourcesLoader
+          );
+        } else {
+          return new RenderedCustomObjectInstance(
+            project,
+            layout,
+            instance,
+            associatedObjectConfiguration,
+            pixiContainer,
+            threeGroup,
+            PixiResourcesLoader
+          );
+        }
+      }
+
       console.warn(
         `Object with type ${objectType} has no instance renderer registered. Please use registerInstanceRenderer to register your renderer.`
       );
@@ -82,7 +138,7 @@ const ObjectsRenderingService = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         PixiResourcesLoader
       );
@@ -108,6 +164,23 @@ const ObjectsRenderingService = {
     }
 
     this.renderers[objectType] = renderer;
+  },
+  registerInstance3DRenderer: function(objectType: string, renderer: any) {
+    if (this.renderers3D.hasOwnProperty(objectType)) {
+      console.warn(
+        `Tried to register 3D renderer for object "${objectType}", but a renderer already exists.`
+      );
+
+      // If you want to update a 3D renderer, this is currently unsupported.
+      // See comment in registerInstanceRenderer.
+      return;
+    }
+
+    this.renderers3D[objectType] = renderer;
+  },
+  renderersCacheClearingMethods: [],
+  registerClearCache: function(clearCache: (project: gdProject) => void) {
+    this.renderersCacheClearingMethods.push(clearCache);
   },
   /**
    * Register a module that can be then required using `requireModule`.
@@ -202,7 +275,12 @@ const ObjectsRenderingService = {
   rgbOrHexToHexNumber, // Expose a ColorTransformer function, useful to manage different color types for the extensions
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
+  THREE, // Expose THREE so that it can be used by renderers
+  THREE_ADDONS: {
+    SkeletonUtils,
+  }, // Expose THREE so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
+  Rendered3DInstance, // Expose the base class for 3D renderers so that it can be used by renderers
 };
 
 export default ObjectsRenderingService;

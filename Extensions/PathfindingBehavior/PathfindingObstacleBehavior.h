@@ -8,6 +8,7 @@ This project is released under the MIT License.
 #ifndef PATHFINDINGOBSTACLEBEHAVIOR_H
 #define PATHFINDINGOBSTACLEBEHAVIOR_H
 #include <map>
+
 #include "GDCore/Project/Behavior.h"
 namespace gd {
 class SerializerElement;
@@ -28,13 +29,11 @@ class GD_EXTENSION_API PathfindingObstacleBehavior : public gd::Behavior {
     return new PathfindingObstacleBehavior(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       const gd::SerializerElement& behaviorContent) const override;
   virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
                               const gd::String& name,
                               const gd::String& value) override;
-#endif
 
   virtual void InitializeContent(
       gd::SerializerElement& behaviorContent) override;

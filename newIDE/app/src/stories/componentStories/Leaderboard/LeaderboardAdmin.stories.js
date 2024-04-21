@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { LeaderboardAdmin } from '../../../GameDashboard/LeaderboardAdmin';
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
@@ -10,9 +9,9 @@ import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 
 export default {
-  title: 'LeaderboardAdmin',
+  title: 'Leaderboard/LeaderboardAdmin',
   component: LeaderboardAdmin,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const primaryLeaderboardIndex = 2;
@@ -32,6 +31,7 @@ const mockedLeaderboards = Array(5)
 const mockedEntries = Array(8)
   .fill(0)
   .map((_, index) => ({
+    leaderboardId: '489165zad49-a8ad6-4a984-dcz8da-hjqn983qh0',
     id: `fze8f4ze9f489ze4f9zef4${index}`,
     playerName: `player${index % 2}`,
     score: Math.round(Math.random() * 20 + 150),

@@ -1,41 +1,43 @@
 // @flow
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import ThemeContext from './Theme/ThemeContext';
 import classNames from 'classnames';
+import Window from '../Utils/Window';
 
 // Sensible defaults for react-markdown
-const makeMarkdownCustomRenderers = (
+const makeMarkdownCustomComponents = (
   isStandaloneText: boolean,
   allowParagraphs: boolean
 ) => ({
   // Ensure link are opened in a new page
-  root: props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
-  link: props =>
+  a: props =>
     props.href ? (
-      <a href={props.href} target="_blank" rel="noopener noreferrer">
+      <a
+        href={props.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={event => {
+          event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
+          Window.openExternalURL(props.href);
+        }}
+      >
         {props.children}
       </a>
     ) : (
       props.children
     ),
-  linkReference: props =>
-    props.href ? (
-      <a href={props.href} target="_blank" rel="noopener noreferrer">
-        {props.children}
-      </a>
-    ) : (
-      props.children
-    ),
-  // Add paragraphs only if we explictly opt in.
-  paragraph: props =>
+  // Add paragraphs only if we explicitly opt in.
+  p: props =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (
       props.children
     ),
+  // eslint-disable-next-line jsx-a11y/alt-text
+  img: ({ node, ...props }) => <img style={{ display: 'flex' }} {...props} />,
 });
 
 type Props = {|
@@ -49,34 +51,38 @@ type Props = {|
  * Display a markdown text
  */
 export const MarkdownText = (props: Props) => {
-  const gdevelopTheme = React.useContext(ThemeContext);
-  const markdownCustomRenderers = React.useMemo(
+  const markdownCustomComponents = React.useMemo(
     () =>
-      makeMarkdownCustomRenderers(
+      makeMarkdownCustomComponents(
         props.isStandaloneText || false,
         props.allowParagraphs || false
       ),
     [props.isStandaloneText, props.allowParagraphs]
   );
 
-  return (
+  const markdownElement = (
     <I18n>
       {({ i18n }) => (
         <ReactMarkdown
-          escapeHtml
-          source={
-            props.translatableSource
-              ? i18n._(props.translatableSource)
-              : props.source
-          }
-          className={classNames({
-            'gd-markdown': true,
-            [gdevelopTheme.markdownRootClassName]: true,
-            'standalone-text-container': props.isStandaloneText,
-          })}
-          renderers={markdownCustomRenderers}
-        />
+          components={markdownCustomComponents}
+          remarkPlugins={[remarkGfm]}
+        >
+          {props.translatableSource
+            ? i18n._(props.translatableSource)
+            : props.source}
+        </ReactMarkdown>
       )}
     </I18n>
+  );
+
+  const className = classNames({
+    'gd-markdown': true,
+    'standalone-text-container': props.isStandaloneText,
+  });
+
+  return props.isStandaloneText ? (
+    <div className={className}>{markdownElement}</div>
+  ) : (
+    <span className={className}>{markdownElement}</span>
   );
 };

@@ -1,84 +1,145 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from '../../../UI/Grid';
-import Paper from '@material-ui/core/Paper';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Column, Line, Spacer } from '../../../UI/Grid';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
+import Paper from '../../../UI/Paper';
+import { LineStackLayout } from '../../../UI/Layout';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 export const SECTION_PADDING = 30;
 
 const styles = {
-  mobileScrollContainer: {
-    padding: 5,
+  title: { overflowWrap: 'anywhere', textWrap: 'wrap' },
+  mobileContainer: {
+    paddingTop: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
   },
-  desktopScrollContainer: {
+  desktopContainer: {
     paddingTop: SECTION_PADDING,
     paddingLeft: SECTION_PADDING,
     paddingRight: SECTION_PADDING,
+  },
+  mobileFooter: {
+    padding: 5,
+  },
+  desktopFooter: {
+    paddingLeft: SECTION_PADDING,
   },
   rowContainer: {
     display: 'flex',
     flexDirection: 'column',
     paddingBottom: SECTION_PADDING,
   },
-  scrollContainer: {
+  container: {
     flex: 1,
-    display: 'flex',
-    overflowY: 'auto',
+  },
+  scrollContainer: {
+    overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
+  },
+  noScrollContainer: {
+    overflowY: 'hidden',
   },
 };
 
 type Props = {|
   children: React.Node,
   title: React.Node,
-  subtitle?: React.Node,
+  titleAdornment?: React.Node,
+  subtitleText?: React.Node,
+  renderSubtitle?: () => React.Node,
   backAction?: () => void,
+  flexBody?: boolean,
+  renderFooter?: () => React.Node,
+  noScroll?: boolean,
+  showUrgentAnnouncements?: boolean,
 |};
 
-const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
+const SectionContainer = ({
+  children,
+  title,
+  titleAdornment,
+  subtitleText,
+  renderSubtitle,
+  backAction,
+  flexBody,
+  renderFooter,
+  noScroll,
+  showUrgentAnnouncements,
+}: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
+  const { announcements } = React.useContext(AnnouncementsFeedContext);
+  const containerStyle: {|
+    paddingTop: number,
+    paddingLeft: number,
+    paddingRight: number,
+  |} = isMobile ? styles.mobileContainer : styles.desktopContainer;
+  const scrollStyle: {| overflowY: string |} = noScroll
+    ? styles.noScrollContainer
+    : styles.scrollContainer;
+  const paperStyle = {
+    ...styles.container,
+    display: flexBody ? 'flex' : 'block',
+    ...containerStyle,
+    ...scrollStyle,
+  };
+
   return (
     <Column useFullHeight noMargin expand>
-      <Paper
-        style={{
-          ...styles.scrollContainer,
-          borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
-          ...(windowWidth === 'small'
-            ? styles.mobileScrollContainer
-            : styles.desktopScrollContainer),
-        }}
-        square
-      >
-        <Column expand>
-          <SectionRow>
-            {backAction && (
-              <Line>
-                <TextButton
-                  onClick={backAction}
-                  icon={<ArrowLeft fontSize="small" />}
-                  label={<Trans>Back</Trans>}
-                />
-              </Line>
-            )}
-            <Line noMargin>
-              <Text size="bold-title" noMargin>
-                {title}
-              </Text>
+      <Paper style={paperStyle} square background="dark">
+        <Column noOverflowParent expand>
+          {showUrgentAnnouncements && (
+            <>
+              <AnnouncementsFeed canClose level="urgent" hideLoader />
+              {announcements && announcements.length > 0 && <Spacer />}
+            </>
+          )}
+          {backAction && (
+            <Line>
+              <TextButton
+                onClick={backAction}
+                icon={<ArrowLeft fontSize="small" />}
+                label={<Trans>Back</Trans>}
+              />
             </Line>
-            {subtitle && (
-              <Line noMargin>
-                <Text noMargin>{subtitle}</Text>
-              </Line>
-            )}
-          </SectionRow>
+          )}
+          {title && (
+            <SectionRow>
+              <LineStackLayout
+                noMargin
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Text size="bold-title" noMargin style={styles.title}>
+                  {title}
+                </Text>
+                {titleAdornment && <Column noMargin>{titleAdornment}</Column>}
+              </LineStackLayout>
+              {subtitleText && (
+                <Line noMargin>
+                  <Text noMargin>{subtitleText}</Text>
+                </Line>
+              )}
+              {renderSubtitle && renderSubtitle()}
+            </SectionRow>
+          )}
           {children}
         </Column>
       </Paper>
+      {renderFooter && (
+        <Paper
+          style={isMobile ? styles.mobileFooter : styles.desktopFooter}
+          square
+          background="dark"
+        >
+          {renderFooter()}
+        </Paper>
+      )}
     </Column>
   );
 };

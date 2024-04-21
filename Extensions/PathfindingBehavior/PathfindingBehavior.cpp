@@ -24,39 +24,95 @@ void PathfindingBehavior::InitializeContent(
   behaviorContent.SetAttribute("gridOffsetX", 0);
   behaviorContent.SetAttribute("gridOffsetY", 0);
   behaviorContent.SetAttribute("extraBorder", 0);
+  behaviorContent.SetAttribute("smoothingMaxCellGap", 1);
 }
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
-    const gd::SerializerElement& behaviorContent) const {
+    const gd::SerializerElement &behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")]
+  properties["AllowDiagonals"]
+      .SetLabel(_("Allows diagonals"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
+      .SetGroup(_("Path smoothing"))
+      .SetAdvanced()
       .SetType("Boolean");
-  properties[_("Acceleration")].SetValue(
+  properties["Acceleration"]
+      .SetLabel(_("Acceleration"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration()).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Max. speed")].SetValue(
+  properties["MaxSpeed"]
+      .SetLabel(_("Max. speed"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed()).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties[_("Rotate object")].SetGroup(_("Rotation"))
+  properties["AngularMaxSpeed"]
+      .SetLabel(_("Rotation speed"))
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
+  properties["RotateObject"]
+      .SetLabel(_("Rotate object"))
+      .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
-  properties[_("Virtual cell width")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
-  properties[_("Virtual cell height")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("cellHeight", 0)));
-  properties[_("Virtual grid X offset")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
-  properties[_("Virtual grid Y offset")].SetGroup(_("Virtual Grid")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
-  properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
+  properties["AngleOffset"]
+      .SetLabel(_("Angle offset"))
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
+  properties["CellWidth"]
+      .SetLabel(_("Virtual cell width"))
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
+  properties["CellHeight"]
+      .SetLabel(_("Virtual cell height"))
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("cellHeight", 0)));
+  properties["GridOffsetX"]
+      .SetLabel(_("Virtual grid X offset"))
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
+  properties["GridOffsetY"]
+      .SetLabel(_("Virtual grid Y offset"))
+      .SetGroup(_("Virtual Grid"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
+  properties["ExtraBorder"]
+      .SetDescription(_("Extra border size"))
+      .SetGroup(_("Collision"))
+      .SetAdvanced()
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
+  properties["SmoothingMaxCellGap"]
+      .SetLabel(_("Smoothing max cell gap"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
+      .SetGroup(_("Path smoothing"))
+      .SetAdvanced()
+      .SetDescription(_("It's recommended to leave a max gap of 1 cell. "
+                        "Setting it to 0 disable the smoothing."));
 
   return properties;
 }
@@ -64,37 +120,39 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
 bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
                                          const gd::String& name,
                                          const gd::String& value) {
-  if (name == _("Allows diagonals")) {
+  if (name == "AllowDiagonals") {
     behaviorContent.SetAttribute("allowDiagonals", (value != "0"));
     return true;
   }
-  if (name == _("Rotate object")) {
+  if (name == "RotateObject") {
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
   }
-  if (name == _("Extra border size")) {
+  if (name == "ExtraBorder") {
     behaviorContent.SetAttribute("extraBorder", value.To<float>());
     return true;
   }
 
   if (value.To<float>() < 0) return false;
 
-  if (name == _("Acceleration"))
+  if (name == "Acceleration")
     behaviorContent.SetAttribute("acceleration", value.To<float>());
-  else if (name == _("Max. speed"))
+  else if (name == "MaxSpeed")
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == _("Rotate speed"))
+  else if (name == "AngularMaxSpeed")
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
-  else if (name == _("Angle offset"))
+  else if (name == "AngleOffset")
     behaviorContent.SetAttribute("angleOffset", value.To<float>());
-  else if (name == _("Virtual cell width"))
+  else if (name == "CellWidth")
     behaviorContent.SetAttribute("cellWidth", value.To<float>());
-  else if (name == _("Virtual cell height"))
+  else if (name == "CellHeight")
     behaviorContent.SetAttribute("cellHeight", value.To<float>());
-  else if (name == _("Virtual grid X offset"))
+  else if (name == "GridOffsetX")
     behaviorContent.SetAttribute("gridOffsetX", value.To<float>());
-  else if (name == _("Virtual grid Y offset"))
+  else if (name == "GridOffsetY")
     behaviorContent.SetAttribute("gridOffsetY", value.To<float>());
+  else if (name == "SmoothingMaxCellGap")
+    behaviorContent.SetAttribute("smoothingMaxCellGap", value.To<float>());
   else
     return false;
 

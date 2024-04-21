@@ -44,7 +44,7 @@ export default class LocalEventsFunctionsExtensionWriter {
             extensions: ['json'],
           },
         ],
-        defaultPath: extensionName ? extensionName : 'Extension.json',
+        defaultPath: extensionName || 'Extension.json',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;

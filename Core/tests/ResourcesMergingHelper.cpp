@@ -16,6 +16,7 @@
 #include "GDCore/Tools/SystemStats.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
 
 class MockFileSystem : public gd::AbstractFileSystem {
  public:
@@ -64,18 +65,18 @@ class MockFileSystem : public gd::AbstractFileSystem {
 
 TEST_CASE("ResourcesMergingHelper", "[common]") {
   SECTION("Basics") {
+    gd::Project project;
     MockFileSystem fs;
-    gd::ResourcesMergingHelper resourcesMerger(fs);
+    gd::ResourcesMergingHelper resourcesMerger(project.GetResourcesManager(), fs);
     resourcesMerger.SetBaseDirectory("/game/base/folder/");
 
-    gd::Project project;
     project.GetResourcesManager().AddResource("Image1", "/image1.png", "image");
     project.GetResourcesManager().AddResource("Image2", "image2.png", "image");
     project.GetResourcesManager().AddResource("Audio1", "audio1.png", "audio");
     project.GetResourcesManager().AddResource(
         "Image3", "subfolder/image3.png", "image");
 
-    project.ExposeResources(resourcesMerger);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMerger);
 
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();
@@ -89,19 +90,19 @@ TEST_CASE("ResourcesMergingHelper", "[common]") {
             "FileNameFrom(MakeAbsolute(subfolder/image3.png))");
   }
   SECTION("Can preserve directories structure") {
+    gd::Project project;
     MockFileSystem fs;
-    gd::ResourcesMergingHelper resourcesMerger(fs);
+    gd::ResourcesMergingHelper resourcesMerger(project.GetResourcesManager(), fs);
     resourcesMerger.SetBaseDirectory("/game/base/folder/");
     resourcesMerger.PreserveDirectoriesStructure(true);
 
-    gd::Project project;
     project.GetResourcesManager().AddResource("Image1", "/image1.png", "image");
     project.GetResourcesManager().AddResource("Image2", "image2.png", "image");
     project.GetResourcesManager().AddResource("Audio1", "audio1.png", "audio");
     project.GetResourcesManager().AddResource(
         "Image3", "subfolder/image3.png", "image");
 
-    project.ExposeResources(resourcesMerger);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesMerger);
 
     auto resourcesFilenames =
         resourcesMerger.GetAllResourcesOldAndNewFilename();

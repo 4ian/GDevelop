@@ -158,6 +158,12 @@ export class CodeEditor extends React.Component<Props, State> {
               options={{
                 ...monacoEditorOptions,
                 fontSize: preferences.eventsSheetZoomLevel,
+
+                // Wrap the code at either the viewport width
+                // (so no need to scroll horizontally
+                // on small code editors) or at 80 columns max
+                // (as a good practice).
+                wordWrap: 'on',
               }}
             />
           )}

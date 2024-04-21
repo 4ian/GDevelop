@@ -25,6 +25,7 @@ Which means that the character could climb it during 1 frame and then stop.
 [![RequestedDeltaX](./diagrams/SlopeFollowingClimbFactorMean.png)](./diagrams/SlopeFollowingClimbFactorMean.svgz)
 
 For further details on the implementation, please take a look at the comments in:
+
 - the function `gdjs.PlatformerObjectRuntimeBehavior._moveX`
 - the function `gdjs.PlatformerObjectRuntimeBehavior.OnFloor.beforeMovingY`
 
@@ -53,6 +54,7 @@ To detect such cases, 2 flags are used:
 [![RequestedDeltaX](./diagrams/SlopeFollowingContext.png)](./diagrams/SlopeFollowingContext.svgz)
 
 For further details on the implementation, please take a look at the comments in:
+
 - the function `gdjs.PlatformerObjectRuntimeBehavior._findHighestFloorAndMoveOnTop`
 - the class `gdjs.PlatformerObjectRuntimeBehavior.FollowConstraintContext`
 
@@ -63,6 +65,7 @@ For further details on the implementation, please take a look at the comments in
 The engine uses the previous speeds and positions to evaluate the new ones (with Verlet integrations). This is fast for sequential access and it's a good fit for what the engine does.
 
 The model doesn't follow the laws of physics and this is fine because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
+
 - the current jumping speed `currentJumpSpeed`
 - the current falling speed `currentFallSpeed`
 
@@ -92,11 +95,13 @@ This example of trajectory shows the 4 functions. It has an affine part in the m
 ![Trajectory with an affine part](./diagrams/WithAffine.png)
 
 The piece-wise function has 3 borders:
+
 - at the end of the jump sustaining (jumpSustainTime)
 - when the maximum falling speed is reached (maxFallingTime)
 - when the jump speed reach 0 (jumpEndTime)
 
 Depending on the when the maximum falling speed is reached, there can be 3 piece-wise functions:
+
 - after the jump end
   - sustain case
   - common case
@@ -306,10 +311,3 @@ This is the code used to plot the first graphic of the [Polynomial piece-wise fu
   ]), 0, 0.8, ymin=0, color='cyan')
 )
 ```
-
-
-
-
-
-
-

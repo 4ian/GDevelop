@@ -10,19 +10,16 @@ This project is released under the MIT License.
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <set>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/Tools/Localization.h"
-#include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Serialization/SerializerElement.h"
-#if defined(GD_IDE_ONLY)
-#include <map>
-
+#include "GDCore/Project/MeasurementUnit.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#endif
+#include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 
 void TopDownMovementBehavior::InitializeContent(
     gd::SerializerElement& behaviorContent) {
@@ -39,39 +36,67 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("movementAngleOffset", 0);
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor>
 TopDownMovementBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")].SetGroup(_("Movement"))
+  properties["AllowDiagonals"]
+      .SetLabel(_("Allow diagonals"))
+      .SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetType("Boolean");
-  properties[_("Acceleration")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Deceleration")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-  properties[_("Max. speed")].SetGroup(_("Movement")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties[_("Rotate object")]
+  properties["Acceleration"]
+      .SetLabel(_("Acceleration"))
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
+  properties["Deceleration"]
+      .SetLabel(_("Deceleration"))
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelAcceleration())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
+  properties["MaxSpeed"]
+      .SetLabel(_("Max. speed"))
+      .SetGroup(_("Movement"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetPixelSpeed())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
+  properties["AngularMaxSpeed"]
+      .SetLabel(_("Rotation speed"))
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetAngularSpeed())
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
+  properties["RotateObject"]
+      .SetLabel(_("Rotate object"))
       .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
-  properties[_("Default controls")]
+  properties["AngleOffset"]
+      .SetLabel(_("Angle offset"))
+      .SetGroup(_("Rotation"))
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
+  properties["IgnoreDefaultControls"]
+      .SetLabel(_("Default controls"))
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
                     ? "false"
                     : "true")
       .SetType("Boolean");
 
   gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
-  gd::String viewpointStr = _("Viewpoint");
+  gd::String viewpointStr = _("Top-Down");
   if (viewpoint == "TopDown")
     viewpointStr = _("Top-Down");
   else if (viewpoint == "PixelIsometry")
@@ -80,22 +105,32 @@ TopDownMovementBehavior::GetProperties(
     viewpointStr = _("True Isometry (30°)");
   else if (viewpoint == "CustomIsometry")
     viewpointStr = _("Custom Isometry");
-  properties[_("Viewpoint")]
+  properties["Viewpoint"]
+      .SetLabel(_("Viewpoint"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
       .SetValue(viewpointStr)
       .SetType("Choice")
       .AddExtraInfo(_("Top-Down"))
       .AddExtraInfo(_("Isometry 2:1 (26.565°)"))
       .AddExtraInfo(_("True Isometry (30°)"))
       .AddExtraInfo(_("Custom Isometry"));
-  properties[_("Custom isometry angle")]
+  properties["CustomIsometryAngle"]
+      .SetLabel(_("Custom isometry angle (between 1deg and 44deg)"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("customIsometryAngle")))
       .SetDescription(_("If you choose \"Custom Isometry\", this allows to "
                         "specify the angle of your isometry projection."));
-  properties[_("Movement angle offset")]
+  properties["MovementAngleOffset"]
+      .SetLabel(_("Movement angle offset"))
       .SetGroup(_("Viewpoint"))
+      .SetAdvanced()
+      .SetType("Number")
+      .SetMeasurementUnit(gd::MeasurementUnit::GetDegreeAngle())
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("movementAngleOffset")))
       .SetDescription(_(
@@ -109,19 +144,19 @@ bool TopDownMovementBehavior::UpdateProperty(
     gd::SerializerElement& behaviorContent,
     const gd::String& name,
     const gd::String& value) {
-  if (name == _("Default controls")) {
+  if (name == "IgnoreDefaultControls") {
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
     return true;
   }
-  if (name == _("Allows diagonals")) {
+  if (name == "AllowDiagonals") {
     behaviorContent.SetAttribute("allowDiagonals", (value != "0"));
     return true;
   }
-  if (name == _("Rotate object")) {
+  if (name == "RotateObject") {
     behaviorContent.SetAttribute("rotateObject", (value != "0"));
     return true;
   }
-  if (name == _("Viewpoint")) {
+  if (name == "Viewpoint") {
     // Fix the offset angle when switching between top-down and isometry
     const gd::String& oldValue =
         behaviorContent.GetStringAttribute("viewpoint", "TopDown", "");
@@ -147,23 +182,23 @@ bool TopDownMovementBehavior::UpdateProperty(
       behaviorContent.SetAttribute("viewpoint", "TopDown");
     return true;
   }
-  if (name == _("Movement angle offset")) {
+  if (name == "MovementAngleOffset") {
     behaviorContent.SetAttribute("movementAngleOffset", value.To<float>());
   }
 
   if (value.To<float>() < 0) return false;
 
-  if (name == _("Acceleration"))
+  if (name == "Acceleration")
     behaviorContent.SetAttribute("acceleration", value.To<float>());
-  else if (name == _("Deceleration"))
+  else if (name == "Deceleration")
     behaviorContent.SetAttribute("deceleration", value.To<float>());
-  else if (name == _("Max. speed"))
+  else if (name == "MaxSpeed")
     behaviorContent.SetAttribute("maxSpeed", value.To<float>());
-  else if (name == _("Rotate speed"))
+  else if (name == "AngularMaxSpeed")
     behaviorContent.SetAttribute("angularMaxSpeed", value.To<float>());
-  else if (name == _("Angle offset"))
+  else if (name == "AngleOffset")
     behaviorContent.SetAttribute("angleOffset", value.To<float>());
-  else if (name == _("Custom isometry angle")) {
+  else if (name == "CustomIsometryAngle") {
     if (value.To<float>() < 1 || value.To<float>() > 44) return false;
     behaviorContent.SetAttribute("customIsometryAngle", value.To<float>());
   } else
@@ -171,5 +206,3 @@ bool TopDownMovementBehavior::UpdateProperty(
 
   return true;
 }
-
-#endif

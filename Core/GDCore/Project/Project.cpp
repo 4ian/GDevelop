@@ -15,18 +15,19 @@
 #include <vector>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Parsers/GrammarTerminals.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/Project/CustomObjectConfiguration.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectConfiguration.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/SourceFile.h"
@@ -63,6 +64,8 @@ Project::Project()
       pixelsRounding(false),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
+      antialiasingMode("MSAA"),
+      isAntialisingEnabledOnMobile(false),
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useExternalSourceFiles(false),
@@ -79,22 +82,124 @@ Project::~Project() {}
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
 std::unique_ptr<gd::Object> Project::CreateObject(
-    const gd::String& type,
-    const gd::String& name,
-    const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
+    const gd::String& objectType, const gd::String& name) const {
+  std::unique_ptr<gd::Object> object = gd::make_unique<Object>(
+      name, objectType, CreateObjectConfiguration(objectType));
 
-    std::unique_ptr<gd::Object> object = platforms[i]->CreateObject(
-        type, name);  // Create a base object if the type can't be found in the
-                      // platform
-    if (object && object->GetType() == type)
-      return object;  // If the object is valid and has the good type (not a
-                      // base object), return it
+  auto& platform = GetCurrentPlatform();
+  auto& project = *this;
+  auto addDefaultBehavior = [&platform, &project, &object, &objectType](
+                                const gd::String& behaviorType) {
+    auto& behaviorMetadata =
+        gd::MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      gd::LogWarning("Object: " + objectType +
+                     " has an unknown default behavior: " + behaviorType);
+      return;
+    }
+    auto* behavior = object->AddNewBehavior(
+        project, behaviorType, behaviorMetadata.GetDefaultName());
+    behavior->SetDefaultBehavior(true);
+  };
+
+  auto &objectMetadata =
+      gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  if (!MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
+      addDefaultBehavior(behaviorType);
+    }
+  }
+  // During project deserialization, event-based object metadata are not yet
+  // generated. Default behaviors will be added by
+  // MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors
+  else if (!project.HasEventsBasedObject(objectType)) {
+    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
 
-  return nullptr;
+  return std::move(object);
+}
+
+std::unique_ptr<gd::ObjectConfiguration> Project::CreateObjectConfiguration(
+    const gd::String& type) const {
+  if (Project::HasEventsBasedObject(type)) {
+    return gd::make_unique<CustomObjectConfiguration>(*this, type);
+  } else {
+    // Create a base object if the type can't be found in the platform.
+    return currentPlatform->CreateObjectConfiguration(type);
+  }
+}
+
+bool Project::HasEventsBasedObject(const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return false;
+  }
+  gd::String extensionName = type.substr(0, separatorIndex);
+  if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+    return false;
+  }
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+  return extension.GetEventsBasedObjects().Has(objectTypeName);
+}
+
+gd::EventsBasedObject& Project::GetEventsBasedObject(const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
+}
+
+const gd::EventsBasedObject& Project::GetEventsBasedObject(
+    const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String objectTypeName = type.substr(separatorIndex + 2);
+
+  const auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedObjects().Get(objectTypeName);
+}
+
+bool Project::HasEventsBasedBehavior(const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  if (separatorIndex == std::string::npos) {
+    return false;
+  }
+  gd::String extensionName = type.substr(0, separatorIndex);
+  if (!Project::HasEventsFunctionsExtensionNamed(extensionName)) {
+    return false;
+  }
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+  return extension.GetEventsBasedBehaviors().Has(behaviorTypeName);
+}
+
+gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(
+    const gd::String& type) {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
+}
+
+const gd::EventsBasedBehavior& Project::GetEventsBasedBehavior(
+    const gd::String& type) const {
+  const auto separatorIndex =
+      type.find(PlatformExtension::GetNamespaceSeparator());
+  gd::String extensionName = type.substr(0, separatorIndex);
+  gd::String behaviorTypeName = type.substr(separatorIndex + 2);
+
+  auto& extension = Project::GetEventsFunctionsExtension(extensionName);
+  return extension.GetEventsBasedBehaviors().Get(behaviorTypeName);
 }
 
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
@@ -282,6 +387,49 @@ void Project::RemoveExternalEvents(const gd::String& name) {
 
   externalEvents.erase(events);
 }
+
+void Project::MoveLayout(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= scenes.size() || newIndex >= scenes.size()) return;
+
+  std::unique_ptr<gd::Layout> scene = std::move(scenes[oldIndex]);
+  scenes.erase(scenes.begin() + oldIndex);
+  scenes.insert(scenes.begin() + newIndex, std::move(scene));
+};
+
+void Project::MoveExternalEvents(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= externalEvents.size() || newIndex >= externalEvents.size())
+    return;
+
+  std::unique_ptr<gd::ExternalEvents> externalEventsItem =
+      std::move(externalEvents[oldIndex]);
+  externalEvents.erase(externalEvents.begin() + oldIndex);
+  externalEvents.insert(externalEvents.begin() + newIndex,
+                        std::move(externalEventsItem));
+};
+
+void Project::MoveExternalLayout(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= externalLayouts.size() || newIndex >= externalLayouts.size())
+    return;
+
+  std::unique_ptr<gd::ExternalLayout> externalLayout =
+      std::move(externalLayouts[oldIndex]);
+  externalLayouts.erase(externalLayouts.begin() + oldIndex);
+  externalLayouts.insert(externalLayouts.begin() + newIndex,
+                         std::move(externalLayout));
+};
+
+void Project::MoveEventsFunctionsExtension(std::size_t oldIndex,
+                                           std::size_t newIndex) {
+  if (oldIndex >= eventsFunctionsExtensions.size() ||
+      newIndex >= eventsFunctionsExtensions.size())
+    return;
+
+  std::unique_ptr<gd::EventsFunctionsExtension> eventsFunctionsExtension =
+      std::move(eventsFunctionsExtensions[oldIndex]);
+  eventsFunctionsExtensions.erase(eventsFunctionsExtensions.begin() + oldIndex);
+  eventsFunctionsExtensions.insert(eventsFunctionsExtensions.begin() + newIndex,
+                                   std::move(eventsFunctionsExtension));
+};
 
 void Project::SwapExternalEvents(std::size_t first, std::size_t second) {
   if (first >= externalEvents.size() || second >= externalEvents.size()) return;
@@ -514,6 +662,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
+  SetAntialiasingMode(
+      propElement.GetStringAttribute("antialiasingMode", "MSAA"));
+  SetAntialisingEnabledOnMobile(
+      propElement.GetBoolAttribute("antialisingEnabledOnMobile", false));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
@@ -529,6 +681,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   platformSpecificAssets.UnserializeFrom(
       propElement.GetChild("platformSpecificAssets"));
   loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
+  watermark.UnserializeFrom(propElement.GetChild("watermark"));
 
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
@@ -538,6 +691,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   authorIdsElement.ConsiderAsArray();
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
+  }
+  authorUsernames.clear();
+  auto& authorUsernamesElement = propElement.GetChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < authorUsernamesElement.GetChildrenCount(); ++i) {
+    authorUsernames.push_back(
+        authorUsernamesElement.GetChild(i).GetStringValue());
   }
 
   categories.clear();
@@ -642,11 +802,48 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 
+  eventsFunctionsExtensions.clear();
+  const SerializerElement& eventsFunctionsExtensionsElement =
+      element.GetChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  // First, only unserialize behaviors and objects names.
+  // As event based objects can contains CustomObject and Custom Object,
+  // this allows them to reference EventBasedBehavior and EventBasedObject
+  // respectively.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
+        InsertNewEventsFunctionsExtension("",
+                                          GetEventsFunctionsExtensionsCount());
+    newEventsFunctionsExtension.UnserializeExtensionDeclarationFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+  // Then unserialize functions, behaviors and objects content.
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    eventsFunctionsExtensions.at(i)->UnserializeExtensionImplementationFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
+
   GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
+  if (element.HasChild("objectsFolderStructure")) {
+    UnserializeFoldersFrom(*this, element.GetChild("objectsFolderStructure", 0));
+  }
+  AddMissingObjectsInRootFolder();
+
   GetVariables().UnserializeFrom(element.GetChild("variables", 0, "Variables"));
 
   scenes.clear();
@@ -674,24 +871,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         externalEventElement.GetStringAttribute("name", "", "Name"),
         GetExternalEventsCount());
     externalEvents.UnserializeFrom(*this, externalEventElement);
-  }
-
-  eventsFunctionsExtensions.clear();
-  const SerializerElement& eventsFunctionsExtensionsElement =
-      element.GetChild("eventsFunctionsExtensions");
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
-      "eventsFunctionsExtension");
-  for (std::size_t i = 0;
-       i < eventsFunctionsExtensionsElement.GetChildrenCount();
-       ++i) {
-    const SerializerElement& eventsFunctionsExtensionElement =
-        eventsFunctionsExtensionsElement.GetChild(i);
-
-    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
-        InsertNewEventsFunctionsExtension("",
-                                          GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeFrom(
-        *this, eventsFunctionsExtensionElement);
   }
 
   externalLayouts.clear();
@@ -746,6 +925,9 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
+  propElement.SetAttribute("antialiasingMode", antialiasingMode);
+  propElement.SetAttribute("antialisingEnabledOnMobile",
+                           isAntialisingEnabledOnMobile);
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
@@ -754,12 +936,18 @@ void Project::SerializeTo(SerializerElement& element) const {
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
+  watermark.SerializeTo(propElement.AddChild("watermark"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
   auto& authorIdsElement = propElement.AddChild("authorIds");
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+  auto& authorUsernamesElement = propElement.AddChild("authorUsernames");
+  authorUsernamesElement.ConsiderAsArray();
+  for (const auto& authorUsername : authorUsernames) {
+    authorUsernamesElement.AddChild("").SetStringValue(authorUsername);
   }
 
   auto& categoriesElement = propElement.AddChild("categories");
@@ -807,6 +995,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   resourcesManager.SerializeTo(element.AddChild("resources"));
   SerializeObjectsTo(element.AddChild("objects"));
+  SerializeFoldersTo(element.AddChild("objectsFolderStructure"));
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
   GetVariables().SerializeTo(element.AddChild("variables"));
 
@@ -845,55 +1034,42 @@ void Project::SerializeTo(SerializerElement& element) const {
         externalSourceFilesElement.AddChild("sourceFile"));
 }
 
-bool Project::ValidateName(const gd::String& name) {
+bool Project::IsNameSafe(const gd::String& name) {
   if (name.empty()) return false;
 
   if (isdigit(name[0])) return false;
 
-  gd::String allowedCharacters =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-  return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
-}
-
-void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that
-  // traverse the whole project (this time for events) and ExposeProjectEffects
-  // (this time for effects). Ideally, this method could be moved outside of
-  // gd::Project.
-
-  // Add project resources
-  worker.ExposeResources(&GetResourcesManager());
-  platformSpecificAssets.ExposeResources(worker);
-
-  // Add layouts resources
-  for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
-    for (std::size_t j = 0; j < GetLayout(s).GetObjectsCount();
-         ++j)  // Add objects resources
-      GetLayout(s).GetObject(j).ExposeResources(worker);
-
-    LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
-  }
-  // Add external events resources
-  for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
-    LaunchResourceWorkerOnEvents(
-        *this, GetExternalEvents(s).GetEvents(), worker);
-  }
-  // Add events functions extensions resources
-  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
-    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
+  for (auto character : name) {
+    if (!GrammarTerminals::IsAllowedInIdentifier(character)) {
+      return false;
     }
   }
 
-  // Add global objects resources
-  for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
-    GetObject(j).ExposeResources(worker);
+  return true;
+}
+
+gd::String Project::GetSafeName(const gd::String& name) {
+  if (name.empty()) return "Unnamed";
+
+  gd::String newName = name;
+
+  if (isdigit(name[0])) newName = "_" + newName;
+
+  for (size_t i = 0; i < newName.size(); ++i) {
+    // Note that iterating on the characters is not super efficient (O(n^2),
+    // which could be avoided with an iterator), but this function is not
+    // critical for performance (only used to generate a name when a user
+    // creates a new entity or rename one).
+    auto character = newName[i];
+    bool isAllowed = GrammarTerminals::IsAllowedInIdentifier(character);
+
+    // Replace all unallowed letters by an underscore.
+    if (!isAllowed) {
+      newName.replace(i, 1, '_');
+    }
   }
 
-  // Add loading screen background image if present
-  if (loadingScreen.GetBackgroundImageResourceName() != "")
-    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
+  return newName;
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {
@@ -968,11 +1144,14 @@ void Project::Init(const gd::Project& game) {
   pixelsRounding = game.pixelsRounding;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
+  antialiasingMode = game.antialiasingMode;
+  isAntialisingEnabledOnMobile = game.isAntialisingEnabledOnMobile;
   projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
   author = game.author;
   authorIds = game.authorIds;
+  authorUsernames = game.authorUsernames;
   isPlayableWithKeyboard = game.isPlayableWithKeyboard;
   isPlayableWithGamepad = game.isPlayableWithGamepad;
   isPlayableWithMobile = game.isPlayableWithMobile;
@@ -983,6 +1162,7 @@ void Project::Init(const gd::Project& game) {
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;
   loadingScreen = game.loadingScreen;
+  watermark = game.watermark;
   objectGroups = game.objectGroups;
 
   extensionProperties = game.extensionProperties;

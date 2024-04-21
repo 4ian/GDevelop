@@ -65,7 +65,7 @@ namespace gdjs {
          * from a query.
          * @param queryID - The query to add the filter to.
          * @param field - The field to run the condition on.
-         * @param op - The condtion operator.
+         * @param op - The condition operator.
          * @param value - The value to check against.
          */
         export const queryWhere = (
@@ -244,7 +244,7 @@ namespace gdjs {
         /**
          * Writes a variable in a collection as document.
          * @param collectionName - The collection where to store the variable.
-         * @param variableName - The name under wich the variable will be saved (document name).
+         * @param variableName - The name under which the variable will be saved (document name).
          * @param variable - The variable to write.
          * @param [callbackStateVariable] - The variable where to store the result.
          */
@@ -304,7 +304,7 @@ namespace gdjs {
         /**
          * Updates a variable/document.
          * @param collectionName - The collection where the document is stored.
-         * @param variableName - The name under wich the variable will be saved (document name).
+         * @param variableName - The name under which the variable will be saved (document name).
          * @param variable - The variable to update.
          * @param [callbackStateVariable] - The variable where to store the result.
          */

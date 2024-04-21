@@ -1,22 +1,26 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
-
 import TextField from '../../UI/TextField';
 import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import { ColumnStackLayout } from '../../UI/Layout';
 import paperDecorator from '../PaperDecorator';
+import CircularProgress from '../../UI/CircularProgress';
 
 export default {
   title: 'UI Building Blocks/TextField',
   component: TextField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
-export const Default = () => {
-  const [value, setValue] = React.useState('Hello World');
+const TextFieldStoryTemplate = (args: {|
+  floatingLabelText?: ?string,
+  endAdornment?: React.Node,
+  helperMarkdownText?: string,
+  required?: boolean,
+|}) => {
+  const [value, setValue] = React.useState('Hello world');
 
   return (
     <ColumnStackLayout>
@@ -24,120 +28,55 @@ export const Default = () => {
         value={value}
         onChange={(_, text) => setValue(text)}
         floatingLabelText="Text field label"
+        {...args}
       />
       <TextField
         margin="none"
         value={value}
         onChange={(_, text) => setValue(text)}
-        floatingLabelText="Text field label"
+        floatingLabelText="Text field label (no margin)"
+        {...args}
       />
       <p>State value is {value}</p>
     </ColumnStackLayout>
   );
 };
 
-export const EndAdornment = () => {
-  const [value, setValue] = React.useState('Hello World');
+export const Default = () => <TextFieldStoryTemplate />;
 
-  return (
-    <ColumnStackLayout>
-      <TextField
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        floatingLabelText="Text field label"
-        endAdornment={
-          <IconButton edge="end">
-            <Copy />
-          </IconButton>
-        }
-      />
-      <TextField
-        margin="none"
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        floatingLabelText="Text field label (with no margin)"
-        endAdornment={
-          <IconButton edge="end">
-            <Copy />
-          </IconButton>
-        }
-      />
-      <p>State value is {value}</p>
-    </ColumnStackLayout>
-  );
-};
+export const EndAdornment = () => (
+  <TextFieldStoryTemplate
+    endAdornment={
+      <IconButton>
+        <Copy />
+      </IconButton>
+    }
+  />
+);
 
-export const WithoutFloatingTextAndEndAdornment = () => {
-  const [value, setValue] = React.useState('Hello World');
+export const WithLoader = () => (
+  <TextFieldStoryTemplate
+    endAdornment={
+      <IconButton>
+        <CircularProgress style={{ height: 20, width: 20 }} />
+      </IconButton>
+    }
+  />
+);
 
-  return (
-    <ColumnStackLayout>
-      <TextField
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        endAdornment={
-          <IconButton edge="end" size="small">
-            <Copy />
-          </IconButton>
-        }
-      />
-      <TextField
-        margin="none"
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        endAdornment={
-          <IconButton edge="end" size="small">
-            <Copy />
-          </IconButton>
-        }
-      />
-      <p>State value is {value}</p>
-    </ColumnStackLayout>
-  );
-};
+export const WithoutFloatingTextAndEndAdornment = () => (
+  <TextFieldStoryTemplate
+    endAdornment={
+      <IconButton edge="end" size="small">
+        <Copy />
+      </IconButton>
+    }
+    floatingLabelText={null}
+  />
+);
 
-export const Required = () => {
-  const [value, setValue] = React.useState('Hello World');
+export const Required = () => <TextFieldStoryTemplate required />;
 
-  return (
-    <ColumnStackLayout>
-      <TextField
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        required
-        floatingLabelText="Text field label"
-      />
-      <TextField
-        margin="none"
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        required
-        floatingLabelText="Text field label"
-      />
-      <p>State value is {value}</p>
-    </ColumnStackLayout>
-  );
-};
-
-export const WithMarkdownText = () => {
-  const [value, setValue] = React.useState('Hello World');
-
-  return (
-    <ColumnStackLayout>
-      <TextField
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-        floatingLabelText="Text field label"
-      />
-      <TextField
-        margin="none"
-        value={value}
-        onChange={(_, text) => setValue(text)}
-        helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-        floatingLabelText="Text field label"
-      />
-      <p>State value is {value}</p>
-    </ColumnStackLayout>
-  );
-};
+export const WithMarkdownText = () => (
+  <TextFieldStoryTemplate helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)." />
+);

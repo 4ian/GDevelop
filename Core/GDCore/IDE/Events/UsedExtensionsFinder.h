@@ -16,29 +16,85 @@
 namespace gd {
 class Project;
 class Object;
-class BehaviorContent;
+class Behavior;
 }  // namespace gd
 
 namespace gd {
+
+class GD_CORE_API UsedExtensionsResult {
+public:
+  /**
+   * The extensions used by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedExtensions() const {
+    return usedExtensions;
+  }
+
+  /**
+   * The include files used at runtime by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedIncludeFiles() const {
+    return usedIncludeFiles;
+  }
+
+  /**
+   * The additional files required at runtime by the project (or part of it).
+   */
+  const std::set<gd::String> &GetUsedRequiredFiles() const {
+    return usedRequiredFiles;
+  }
+
+  /**
+   * \brief Return true when at least 1 object uses the 3D renderer.
+   */
+  bool Has3DObjects() const {
+    return has3DObjects;
+  }
+
+  /**
+   * The extensions used by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedExtensions() { return usedExtensions; }
+
+  /**
+   * The include files used at runtime by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedIncludeFiles() { return usedIncludeFiles; }
+
+  /**
+   * The additional files required at runtime by the project (or part of it).
+   */
+  std::set<gd::String> &GetUsedRequiredFiles() { return usedRequiredFiles; }
+
+  void MarkAsHaving3DObjects() {
+    has3DObjects = true;
+  }
+
+private:
+  std::set<gd::String> usedExtensions;
+  std::set<gd::String> usedIncludeFiles;
+  std::set<gd::String> usedRequiredFiles;
+  bool has3DObjects = false;
+};
 
 class GD_CORE_API UsedExtensionsFinder
     : public ArbitraryObjectsWorker,
       public ArbitraryEventsWorkerWithContext,
       public ExpressionParser2NodeWorker {
  public:
-  static std::set<gd::String> ScanProject(gd::Project& project);
+  static const UsedExtensionsResult ScanProject(gd::Project& project);
 
  private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
   gd::String rootType;
-  std::set<gd::String> usedExtensions;
+  UsedExtensionsResult result;
 
   // Object Visitor
   void DoVisitObject(gd::Object& object) override;
 
   // Behavior Visitor
-  void DoVisitBehavior(gd::BehaviorContent& behavior) override;
+  void DoVisitBehavior(gd::Behavior& behavior) override;
 
   // Instructions Visitor
   bool DoVisitInstruction(gd::Instruction& instruction,

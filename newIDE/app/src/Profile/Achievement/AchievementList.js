@@ -2,8 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { parseISO } from 'date-fns';
-import Lock from '@material-ui/icons/Lock';
-
+import Lock from '../../UI/CustomSvgIcons/Lock';
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import DotBadge from '../../UI/DotBadge';
@@ -96,6 +95,7 @@ const AchievementList = ({
                   >
                     <Text
                       noMargin
+                      size="sub-title"
                       style={
                         achievementWithBadgeData.unlockedAt
                           ? styles.unlockedAchievement

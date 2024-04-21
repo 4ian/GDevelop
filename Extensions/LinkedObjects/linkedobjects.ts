@@ -3,6 +3,7 @@ GDevelop - LinkedObjects Extension
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('LinkedObjects');
   /**
    * Manages the links between objects.
    */
@@ -12,15 +13,17 @@ namespace gdjs {
     /**
      * Get the links manager of a scene.
      */
-    static getManager(runtimeScene: gdjs.RuntimeScene): gdjs.LinksManager {
+    static getManager(
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): gdjs.LinksManager {
       // @ts-ignore
-      if (!runtimeScene.linkedObjectsManager) {
+      if (!instanceContainer.linkedObjectsManager) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        runtimeScene.linkedObjectsManager = new gdjs.LinksManager();
+        instanceContainer.linkedObjectsManager = new gdjs.LinksManager();
       }
       // @ts-ignore
-      return runtimeScene.linkedObjectsManager;
+      return instanceContainer.linkedObjectsManager;
     }
 
     /**
@@ -112,7 +115,14 @@ namespace gdjs {
           if (this._links.has(linkedObject.id)) {
             const otherObjList = this._links
               .get(linkedObject.id)!
-              .linkedObjectMap.get(removedObject.getName())!;
+              .linkedObjectMap.get(removedObject.getName());
+
+            if (!otherObjList) {
+              logger.error(
+                `Can't find link from ${linkedObject.id} (${linkedObject.name}) to ${removedObject.id} (${removedObject.name})`
+              );
+              return;
+            }
 
             const index = otherObjList.indexOf(removedObject);
             if (index !== -1) {
@@ -184,53 +194,59 @@ namespace gdjs {
 
   export namespace evtTools {
     export namespace linkedObjects {
-      gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
-        LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
+      gdjs.registerObjectDeletedFromSceneCallback(function (
+        instanceContainer,
+        obj
+      ) {
+        LinksManager.getManager(instanceContainer).removeAllLinksOf(obj);
       });
 
       export const linkObjects = function (
-        runtimeScene: gdjs.RuntimeScene,
-        objA: gdjs.RuntimeObject,
-        objB: gdjs.RuntimeObject
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        objA: gdjs.RuntimeObject | null,
+        objB: gdjs.RuntimeObject | null
       ) {
         if (objA === null || objB === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
+        LinksManager.getManager(instanceContainer).linkObjects(objA, objB);
       };
 
       export const removeLinkBetween = function (
-        runtimeScene: gdjs.RuntimeScene,
-        objA: gdjs.RuntimeObject,
-        objB: gdjs.RuntimeObject
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        objA: gdjs.RuntimeObject | null,
+        objB: gdjs.RuntimeObject | null
       ) {
         if (objA === null || objB === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
+        LinksManager.getManager(instanceContainer).removeLinkBetween(
+          objA,
+          objB
+        );
       };
 
       export const removeAllLinksOf = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objA: gdjs.RuntimeObject
       ) {
         if (objA === null) {
           return;
         }
-        LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
+        LinksManager.getManager(instanceContainer).removeAllLinksOf(objA);
       };
 
       export const pickObjectsLinkedTo = function (
-        runtimeScene: gdjs.RuntimeScene,
+        instanceContainer: gdjs.RuntimeInstanceContainer,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
-        obj: gdjs.RuntimeObject,
+        obj: gdjs.RuntimeObject | null,
         eventsFunctionContext: EventsFunctionContext | undefined
       ) {
         if (obj === null) {
           return false;
         }
         const linkedObjectMap = LinksManager.getManager(
-          runtimeScene
+          instanceContainer
         )._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
@@ -273,7 +289,7 @@ namespace gdjs {
             // avoid running an intersection with the picked objects later.
             let objectCount = 0;
             for (const objectName of parentEventPickedObjectNames) {
-              objectCount += runtimeScene.getObjects(objectName).length;
+              objectCount += instanceContainer.getObjects(objectName)!.length;
             }
 
             if (parentEventPickedObjects.length === objectCount) {

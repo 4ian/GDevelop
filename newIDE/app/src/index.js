@@ -7,7 +7,6 @@ import {
   sendProgramOpening,
   installAnalyticsEvents,
 } from './Utils/Analytics/EventSender';
-import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire';
@@ -15,13 +14,20 @@ import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
 import { loadPreferencesFromLocalStorage } from './MainFrame/Preferences/PreferencesProvider';
-import { getTheme } from './UI/Theme';
+import { getFullTheme } from './UI/Theme';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 // No i18n in this file
 
 const electron = optionalRequire('electron');
+
+// Make sure that the process object is available, even if we are not in Node.
+// This is needed by some libraries like path-browserify for example.
+// and it avoids hard crashes when using them.
+global.process = global.process || {
+  cwd: () => '/',
+};
 
 // Use the user preferred theme to define the loading screen color.
 
@@ -30,9 +36,10 @@ let color = 'f0f0f0';
 try {
   const values = loadPreferencesFromLocalStorage();
   if (values && values.themeName) {
-    const theme = getTheme({
+    const theme = getFullTheme({
       themeName: values.themeName,
-      language: 'en', // language is not important here as we only look for a color
+      language: 'en', // language is not important here as we only look for a color.
+      isMobile: true, // window size is not important as we only look for a color.
     });
     color = theme.muiTheme.palette.background.default;
   }
@@ -68,8 +75,7 @@ class Bootstrapper extends Component<{}, State> {
   authentication = new Authentication();
 
   componentDidMount() {
-    installAnalyticsEvents(this.authentication);
-    installRaven();
+    installAnalyticsEvents();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
     // Load GDevelop.js, ensuring a new version is fetched when the version changes.
@@ -89,9 +95,12 @@ class Bootstrapper extends Component<{}, State> {
         // Override the resolved URL for the .wasm file,
         // to ensure a new version is fetched when the version changes.
         locateFile: (path: string, prefix: string) => {
-          return (
-            prefix + path + `?cache-buster=${VersionMetadata.versionWithHash}`
-          );
+          // This function is called by Emscripten to locate the .wasm file only.
+          // As the wasm is at the root of the public folder, we can just return
+          // the path to the file.
+          // Plus, on Electron, the prefix seems to be pointing to the root of the
+          // app.asar archive, which is completely wrong.
+          return path + `?cache-buster=${VersionMetadata.versionWithHash}`;
         },
       }).then(gd => {
         global.gd = gd;

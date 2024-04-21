@@ -2,7 +2,7 @@
 import React from 'react';
 import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
+import { UsersAutocomplete } from '../Profile/UsersAutocomplete';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
@@ -10,8 +10,9 @@ import SelectOption from '../UI/SelectOption';
 import { t } from '@lingui/macro';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
-  allGameCategories,
   getCategoryName,
+  getGameCategories,
+  type GameCategory,
 } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
@@ -21,6 +22,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
 const GAME_SLUG_MAX_LENGTH = 30;
+const GAME_SLUG_MIN_LENGTH = 6;
 
 const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
@@ -37,12 +39,18 @@ export const cleanUpGameSlug = (gameSlug: string) => {
       })
       .join('');
   }
-  return latinGameSlug
+  let slug = latinGameSlug
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '-')
     .toLowerCase()
     .slice(0, GAME_SLUG_MAX_LENGTH);
+  if (slug.length < GAME_SLUG_MIN_LENGTH) {
+    slug = slug.concat(
+      new Array(GAME_SLUG_MIN_LENGTH - slug.length).fill('-').join('')
+    );
+  }
+  return slug;
 };
 
 type Props = {|
@@ -54,6 +62,7 @@ type Props = {|
   setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
+  setAuthorUsernames: (string[]) => void,
   authorIds: string[],
   setOrientation: string => void,
   orientation: string,
@@ -88,6 +97,7 @@ export function PublicGameProperties({
   setDescription,
   description,
   setAuthorIds,
+  setAuthorUsernames,
   authorIds,
   setOwnerIds,
   ownerIds,
@@ -112,10 +122,30 @@ export function PublicGameProperties({
   const { profile } = React.useContext(AuthenticatedUserContext);
 
   const hasGameSlug =
-    userSlug && userSlug.length && profile && profile.username;
+    userSlug && !!userSlug.length && profile && profile.username;
 
   const hasValidGameSlug =
     hasGameSlug && (profile && userSlug !== profile.username);
+
+  const [allGameCategories, setAllGameCategories] = React.useState<
+    GameCategory[]
+  >([]);
+
+  const fetchGameCategories = React.useCallback(async () => {
+    try {
+      const categories = await getGameCategories();
+      setAllGameCategories(categories);
+    } catch (error) {
+      console.error('An error occurred while fetching game categories.', error);
+    }
+  }, []);
+
+  React.useEffect(
+    () => {
+      fetchGameCategories();
+    },
+    [fetchGameCategories]
+  );
 
   return (
     <I18n>
@@ -140,7 +170,7 @@ export function PublicGameProperties({
                 type="text"
                 value={name}
                 onChange={setName}
-                autoFocus
+                autoFocus="desktop"
                 disabled={disabled}
               />
               {setCategories && (
@@ -149,8 +179,8 @@ export function PublicGameProperties({
                   floatingLabelText={<Trans>Genres</Trans>}
                   helperText={
                     <Trans>
-                      Select up to 4 genres for the game to be visible on
-                      Liluo.io's categories pages!
+                      Select up to 3 genres for the game to be visible on
+                      gd.games's categories pages!
                     </Trans>
                   }
                   value={
@@ -177,17 +207,19 @@ export function PublicGameProperties({
                     }
                   }}
                   dataSource={allGameCategories.map(category => ({
-                    value: category,
-                    text: getCategoryName(category, i18n),
+                    value: category.name,
+                    text: getCategoryName(category.name, i18n),
+                    disabled: category.type === 'admin-only',
                   }))}
                   fullWidth
-                  optionsLimit={4}
-                  loading={disabled}
+                  optionsLimit={3}
+                  disabled={disabled}
+                  loading={allGameCategories.length === 0}
                 />
               )}
               {setDiscoverable && (
                 <Checkbox
-                  label={<Trans>Make your game discoverable on Liluo.io</Trans>}
+                  label={<Trans>Make your game discoverable on gd.games</Trans>}
                   checked={!!discoverable}
                   onCheck={(e, checked) => setDiscoverable(checked)}
                   disabled={disabled}
@@ -211,7 +243,6 @@ export function PublicGameProperties({
             type="text"
             value={description || ''}
             onChange={setDescription}
-            autoFocus
             multiline
             rows={5}
             disabled={disabled}
@@ -230,11 +261,16 @@ export function PublicGameProperties({
                   {profile && profile.username && (
                     <SelectOption
                       value={profile.username}
-                      primaryText={profile.username}
+                      label={profile.username}
+                      shouldNotTranslate
                     />
                   )}
                   {userSlug && (!profile || userSlug !== profile.username) && (
-                    <SelectOption value={userSlug} primaryText={userSlug} />
+                    <SelectOption
+                      value={userSlug}
+                      label={userSlug}
+                      shouldNotTranslate
+                    />
                   )}
                 </SelectField>
                 <Spacer />
@@ -246,7 +282,6 @@ export function PublicGameProperties({
                   type="text"
                   value={hasGameSlug ? gameSlug || '' : ''}
                   onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
-                  autoFocus
                 />
               </Line>
               {!hasGameSlug && (
@@ -260,7 +295,18 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={setAuthorIds}
+            onChange={userIdAndUsernames => {
+              setAuthorIds(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.userId
+                )
+              );
+              setAuthorUsernames(
+                userIdAndUsernames.map(
+                  userIdAndUsername => userIdAndUsername.username
+                )
+              );
+            }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>
@@ -274,7 +320,9 @@ export function PublicGameProperties({
           {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
-              onChange={setOwnerIds}
+              onChange={userData =>
+                setOwnerIds(userData.map(data => data.userId))
+              }
               floatingLabelText={<Trans>Owners</Trans>}
               helperText={
                 <Trans>
@@ -293,9 +341,9 @@ export function PublicGameProperties({
             onChange={(e, i, value: string) => setOrientation(value)}
             disabled={disabled}
           >
-            <SelectOption value="default" primaryText={t`Platform default`} />
-            <SelectOption value="landscape" primaryText={t`Landscape`} />
-            <SelectOption value="portrait" primaryText={t`Portrait`} />
+            <SelectOption value="default" label={t`Platform default`} />
+            <SelectOption value="landscape" label={t`Landscape`} />
+            <SelectOption value="portrait" label={t`Portrait`} />
           </SelectField>
           {setPlayableWithKeyboard &&
             setPlayableWithGamepad &&

@@ -1,0 +1,78 @@
+name: 🐛Bug report
+description: Create a bug report about GDevelop or the game engine
+body:
+  - type: checkboxes
+    id: searched_issues
+    attributes:
+      label: Is there an existing issue for this?
+      options:
+        - label: I have searched the [existing issues](https://github.com/4ian/GDevelop/issues)
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to reproduce
+      description: |
+        * Please include a link to a game if possible!
+        * If applicable, add screenshots to help explain your problem.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: GDevelop platform
+      description: Which platform of GDevelop are you using?
+      multiple: true
+      options:
+        - Desktop
+        - Web
+        - Mobile
+    validations:
+      required: true
+  - type: input
+    id: gdevelop_version
+    attributes:
+      label: GDevelop version
+      description: |
+        Which version of GDevelop are you using?
+        Take a look here: [Editor Home - About GDevelop - "This version of GDevelop is: ~~~"]
+      placeholder: 5.1.159? 5.1.160?
+    validations:
+      required: true
+  - type: textarea
+    id: platform_info
+    attributes:
+      label: Platform info
+      value: |
+        <details>
+
+        *OS (e.g. Windows, Linux, macOS, Android, iOS)*
+        >
+
+        *OS Version (e.g. Windows 10, macOS 10.15)*
+        >
+
+        *Browser(For Web) (e.g. Chrome, Firefox, Safari)*
+        >
+
+        *Device(For Mobile) (e.g. iPhone 12, Samsung Galaxy S21)*
+        >
+
+        </details>
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.

@@ -1,111 +1,59 @@
 import { integer, float } from "../model/CommonTypes";
-import { TiledMap } from "../tiled/TiledFormat";
 import {
   EditableObjectLayer,
   EditableTileMap,
   EditableTileMapLayer,
 } from "../model/TileMapModel";
+import { TiledPixiHelper } from "./tiled/TiledPixiHelper";
+import { LDtkPixiHelper } from "./ldtk/LDtkPixiHelper";
+import { TileMapFileContent } from "../load/TileMapFileContent";
 import { TileTextureCache } from "./TileTextureCache";
+import { FlippingHelper, getPixiRotate } from "../model/GID";
 
-import PIXI = GlobalPIXIModule.PIXI;
-import { getTileIdFromTiledGUI } from "../tiled/TiledLoaderHelper";
-
-export class PixiTileMapHelper {
+export namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.
    *
    * @param tiledMap A tile map exported from Tiled.
+   * @param levelIndex The level of the tile map to load from.
    * @param atlasTexture The texture containing the whole tile set.
    * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
    * @returns A textures cache.
    */
-  static parseAtlas(
-    tiledMap: TiledMap,
+  export function parseAtlas(
+    tileMap: TileMapFileContent,
+    levelIndex: number,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
-    if (!tiledMap.tiledversion) {
-      console.warn(
-        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
+    if (tileMap.kind === "ldtk") {
+      return LDtkPixiHelper.parseAtlas(
+        tileMap.data,
+        levelIndex,
+        atlasTexture,
+        getTexture
       );
-
-      return null;
     }
-
-    // We only handle tileset embedded in the tilemap. Warn if it's not the case.
-    if (!tiledMap.tilesets.length || "source" in tiledMap.tilesets[0]) {
-      console.warn(
-        "The loaded Tiled map seems not to contain any tileset data (nothing in 'tilesets' key)."
+    if (tileMap.kind === "tiled") {
+      return TiledPixiHelper.parseAtlas(
+        tileMap.data,
+        levelIndex,
+        atlasTexture,
+        getTexture
       );
-      return null;
     }
 
-    const tiledSet = tiledMap.tilesets[0];
-    const {
-      tilewidth,
-      tileheight,
-      tilecount,
-      image,
-      columns,
-      spacing,
-      margin,
-    } = tiledSet;
-    const firstGid = tiledSet.firstgid === undefined ? 1 : tiledSet.firstgid;
-    if (!atlasTexture) atlasTexture = getTexture(image);
+    console.warn(
+      "The loaded Tiled map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
+    );
 
-    // We try to detect what size Tiled is expecting.
-    const rows = tilecount / columns;
-    const expectedAtlasWidth =
-      tilewidth * columns + spacing * (columns - 1) + margin * 2;
-    const expectedAtlasHeight =
-      tileheight * rows + spacing * (rows - 1) + margin * 2;
-    if (
-      (atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
-      (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)
-    ) {
-      const expectedSize = expectedAtlasWidth + "x" + expectedAtlasHeight;
-      const actualSize = atlasTexture.width + "x" + atlasTexture.height;
-      console.warn(
-        "It seems the atlas file was resized, which is not supported. It should be " +
-          expectedSize +
-          "px, but it's " +
-          actualSize +
-          " px."
-      );
-      return null;
-    }
-
-    // Prepare the textures pointing to the base "Atlas" Texture for each tile.
-    // Note that this cache can be augmented later with rotated/flipped
-    // versions of the tile textures.
-    const textureCache = new TileTextureCache();
-    for (let tileSetIndex = 0; tileSetIndex < tilecount; tileSetIndex++) {
-      const columnMultiplier = Math.floor(tileSetIndex % columns);
-      const rowMultiplier = Math.floor(tileSetIndex / columns);
-      const x = margin + columnMultiplier * (tilewidth + spacing);
-      const y = margin + rowMultiplier * (tileheight + spacing);
-      const tileId = getTileIdFromTiledGUI(firstGid + tileSetIndex);
-
-      try {
-        const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-        const texture = new PIXI.Texture(atlasTexture!, rect);
-
-        textureCache.setTexture(tileId, false, false, false, texture);
-      } catch (error) {
-        console.error(
-          "An error occurred while creating a PIXI.Texture to be used in a TileMap:",
-          error
-        );
-      }
-    }
-
-    return textureCache;
+    return null;
   }
 
   /**
    * Re-renders the tile map whenever its rendering settings have been changed
    *
-   * @param pixiTileMap the tile map renderer
+   * @param untypedPixiTileMap the tile map renderer
    * @param tileMap the tile map model
    * @param textureCache the tile set textures
    * @param displayMode What to display:
@@ -115,7 +63,7 @@ export class PixiTileMapHelper {
    * @param layerIndex If `displayMode` is set to `index`, the layer index to be
    * displayed.
    */
-  static updatePixiTileMap(
+  export function updatePixiTileMap(
     untypedPixiTileMap: any,
     tileMap: EditableTileMap,
     textureCache: TileTextureCache,
@@ -123,73 +71,105 @@ export class PixiTileMapHelper {
     layerIndex: number
   ): void {
     // The extension doesn't handle the Pixi sub-namespace very well.
-    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeRectTileLayer;
+    const pixiTileMap = untypedPixiTileMap as PIXI.tilemap.CompositeTilemap;
     if (!pixiTileMap) return;
     pixiTileMap.clear();
+
+    const bgResourceName = tileMap.getBackgroundResourceName();
+    if (bgResourceName) {
+      const texture = textureCache.getLevelBackgroundTexture(bgResourceName);
+      pixiTileMap.tile(texture, 0, 0);
+    }
 
     for (const layer of tileMap.getLayers()) {
       if (
         (displayMode === "index" && layerIndex !== layer.id) ||
         (displayMode === "visible" && !layer.isVisible())
       ) {
-        return;
+        continue;
       }
 
       if (layer instanceof EditableObjectLayer) {
         const objectLayer = layer as EditableObjectLayer;
+
         for (const object of objectLayer.objects) {
-          const texture = textureCache.findTileTexture(
-            object.getTileId(),
-            object.isFlippedHorizontally(),
-            object.isFlippedVertically(),
-            object.isFlippedDiagonally()
-          );
+          const tileGID = object.getTileId();
+          const texture = textureCache.getTexture(tileGID);
+
           if (texture) {
-            pixiTileMap.addFrame(
+            const rotate = getPixiRotate(tileGID);
+
+            pixiTileMap.tile(
               texture,
               object.x,
-              object.y - objectLayer.tileMap.getTileHeight()
+              object.y - objectLayer.tileMap.getTileHeight(),
+              { rotate }
             );
           }
         }
       } else if (layer instanceof EditableTileMapLayer) {
         const tileLayer = layer as EditableTileMapLayer;
 
-        for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-          for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-            const tileWidth = tileLayer.tileMap.getTileWidth();
-            const xPos = tileWidth * x;
-            const yPos = tileLayer.tileMap.getTileHeight() * y;
+        const tileWidth = tileLayer.tileMap.getTileWidth();
+        const tileHeight = tileLayer.tileMap.getTileHeight();
+        const dimensionX = tileLayer.tileMap.getDimensionX();
+        const dimensionY = tileLayer.tileMap.getDimensionY();
+        const alpha = tileLayer.getAlpha();
 
-            const tileId = tileLayer.get(x, y);
-            if (tileId === undefined) {
+        for (let y = 0; y < dimensionY; y++) {
+          for (let x = 0; x < dimensionX; x++) {
+            const xPos = tileWidth * x;
+            const yPos = tileHeight * y;
+
+            const tileGID = tileLayer.getTileGID(x, y);
+            if (tileGID === undefined) {
               continue;
             }
-            const tileTexture = textureCache.findTileTexture(
-              tileId,
-              tileLayer.isFlippedHorizontally(x, y),
-              tileLayer.isFlippedVertically(x, y),
-              tileLayer.isFlippedDiagonally(x, y)
-            );
-            if (!tileTexture) {
-              continue;
-            }
-            const pixiTilemapFrame = pixiTileMap.addFrame(
-              tileTexture,
-              xPos,
-              yPos
-            );
+            const tileId = FlippingHelper.getTileId(tileGID);
 
             const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
 
-            // Animated tiles have a limitation:
-            // they are only able to use frames arranged horizontally one next
-            // to each other on the atlas.
-            if (tileDefinition && tileDefinition.getAnimationLength() > 0) {
-              pixiTilemapFrame.tileAnimX(
-                tileWidth,
-                tileDefinition.getAnimationLength()
+            if (tileDefinition.hasStackedTiles()) {
+              for (const tileGID of tileDefinition.getStackedTiles()) {
+                const tileId = FlippingHelper.getTileId(tileGID);
+                const tileTexture = textureCache.getTexture(tileId);
+                if (!tileTexture) {
+                  continue;
+                }
+
+                const rotate = getPixiRotate(tileGID);
+
+                void pixiTileMap.tile(tileTexture, xPos, yPos, {
+                  alpha,
+                  rotate,
+                });
+              }
+            } else {
+              const tileTexture = textureCache.getTexture(tileId);
+              if (!tileTexture) {
+                console.warn(`Unknown tile id: ${tileId} at (${x}, ${y})`);
+                continue;
+              }
+              const rotate = getPixiRotate(tileGID);
+              const pixiTilemapFrame = pixiTileMap.tile(
+                tileTexture,
+                xPos,
+                yPos,
+                {
+                  alpha,
+                  rotate,
+                }
               );
+
+              // Animated tiles have a limitation:
+              // they are only able to use frames arranged horizontally one next
+              // to each other on the atlas.
+              if (tileDefinition.getAnimationLength() > 0) {
+                pixiTilemapFrame.tileAnimX(
+                  tileWidth,
+                  tileDefinition.getAnimationLength()
+                );
+              }
             }
           }
         }
@@ -200,7 +180,7 @@ export class PixiTileMapHelper {
   /**
    * Re-renders the collision mask
    */
-  static updatePixiCollisionMask(
+  export function updatePixiCollisionMask(
     pixiGraphics: PIXI.Graphics,
     tileMap: EditableTileMap,
     typeFilter: string,
@@ -212,6 +192,9 @@ export class PixiTileMapHelper {
   ): void {
     if (!pixiGraphics) return;
     pixiGraphics.clear();
+
+    pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
+    pixiGraphics.drawRect(0, 0, tileMap.getWidth(), tileMap.getHeight());
 
     for (const layer of tileMap.getLayers()) {
       const tileWidth = tileMap.getTileWidth();
@@ -225,7 +208,7 @@ export class PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileHeight * y;
 
-            const tileId = tileLayer.get(x, y)!;
+            const tileId = tileLayer.getTileId(x, y)!;
             const isFlippedHorizontally = tileLayer.isFlippedHorizontally(x, y);
             const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
             const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
@@ -237,7 +220,6 @@ export class PixiTileMapHelper {
             if (!hitboxes) {
               continue;
             }
-            pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
             for (const vertices of hitboxes) {
               if (vertices.length === 0) continue;
 
@@ -245,16 +227,18 @@ export class PixiTileMapHelper {
               for (let index = 0; index < vertices.length; index++) {
                 let vertexX = vertices[index][0];
                 let vertexY = vertices[index][1];
+                // It's important to do the diagonal flipping first,
+                // because the other flipping "move" the origin.
+                if (isFlippedDiagonally) {
+                  const swap = vertexX;
+                  vertexX = vertexY;
+                  vertexY = swap;
+                }
                 if (isFlippedHorizontally) {
                   vertexX = tileWidth - vertexX;
                 }
                 if (isFlippedVertically) {
                   vertexY = tileHeight - vertexY;
-                }
-                if (isFlippedDiagonally) {
-                  const swap = vertexX;
-                  vertexX = vertexY;
-                  vertexY = swap;
                 }
                 if (index === 0) {
                   pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);

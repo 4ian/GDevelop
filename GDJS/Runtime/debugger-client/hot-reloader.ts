@@ -311,77 +311,82 @@ namespace gdjs {
       return Promise.all(reloadPromises);
     }
 
-    _hotReloadRuntimeGame(
+    async _hotReloadRuntimeGame(
       oldProjectData: ProjectData,
       newProjectData: ProjectData,
       changedRuntimeBehaviors: ChangedRuntimeBehavior[],
       runtimeGame: gdjs.RuntimeGame
     ): Promise<void> {
-      return new Promise((resolve) => {
-        // Update project data and re-load assets (sound/image/font/json managers
-        // will take care of reloading only what is needed).
-        runtimeGame.setProjectData(newProjectData);
-        runtimeGame.loadAllAssets(() => {
-          this._hotReloadVariablesContainer(
-            oldProjectData.variables,
-            newProjectData.variables,
-            runtimeGame.getVariables()
-          );
-
-          // Reload runtime scenes
-          const sceneStack = runtimeGame.getSceneStack();
-          sceneStack._stack.forEach((runtimeScene) => {
-            const oldLayoutData = oldProjectData.layouts.filter(
-              (layoutData) => layoutData.name === runtimeScene.getName()
-            )[0];
-            const newLayoutData = newProjectData.layouts.filter(
-              (layoutData) => layoutData.name === runtimeScene.getName()
-            )[0];
-            if (oldLayoutData && newLayoutData) {
-              this._hotReloadRuntimeScene(
-                oldLayoutData,
-                newLayoutData,
-                changedRuntimeBehaviors,
-                runtimeScene
-              );
-            } else {
-              // A scene was removed. Not hot-reloading this.
-              this._logs.push({
-                kind: 'error',
-                message:
-                  'Scene ' +
-                  oldLayoutData.name +
-                  ' was removed. A fresh preview should be launched.',
-              });
-            }
-          });
-
-          // Reload changes in external layouts
-          newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
-            const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
-              (externalLayoutData) =>
-                externalLayoutData.name === newExternalLayoutData.name
-            )[0];
-            if (
-              oldExternalLayoutData &&
-              // Check if there are actual changes, to avoid useless work trying to
-              // hot-reload all the scenes.
-              !HotReloader.deepEqual(
-                oldExternalLayoutData,
-                newExternalLayoutData
-              )
-            ) {
-              sceneStack._stack.forEach((runtimeScene) => {
-                this._hotReloadRuntimeSceneInstances(
-                  oldExternalLayoutData.instances,
-                  newExternalLayoutData.instances,
-                  runtimeScene
-                );
-              });
-            }
-          });
-          resolve();
+      const sceneStack = runtimeGame.getSceneStack();
+      const currentScene = sceneStack.getCurrentScene();
+      if (!currentScene) {
+        // It can't actually happen.
+        this._logs.push({
+          kind: 'error',
+          message: "Can't hot-reload as no scene are opened.",
         });
+        return;
+      }
+      // Update project data and re-load assets (sound/image/font/json managers
+      // will take care of reloading only what is needed).
+      runtimeGame.setProjectData(newProjectData);
+      await runtimeGame.loadFirstAssetsAndStartBackgroundLoading(
+        currentScene.getName(),
+        () => {}
+      );
+      this._hotReloadVariablesContainer(
+        oldProjectData.variables,
+        newProjectData.variables,
+        runtimeGame.getVariables()
+      );
+
+      // Reload runtime scenes
+      sceneStack._stack.forEach((runtimeScene) => {
+        const oldLayoutData = oldProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
+        const newLayoutData = newProjectData.layouts.filter(
+          (layoutData) => layoutData.name === runtimeScene.getName()
+        )[0];
+        if (oldLayoutData && newLayoutData) {
+          this._hotReloadRuntimeScene(
+            oldLayoutData,
+            newLayoutData,
+            changedRuntimeBehaviors,
+            runtimeScene
+          );
+        } else {
+          // A scene was removed. Not hot-reloading this.
+          this._logs.push({
+            kind: 'error',
+            message:
+              'Scene ' +
+              oldLayoutData.name +
+              ' was removed. A fresh preview should be launched.',
+          });
+        }
+      });
+
+      // Reload changes in external layouts
+      newProjectData.externalLayouts.forEach((newExternalLayoutData) => {
+        const oldExternalLayoutData = oldProjectData.externalLayouts.filter(
+          (externalLayoutData) =>
+            externalLayoutData.name === newExternalLayoutData.name
+        )[0];
+        if (
+          oldExternalLayoutData &&
+          // Check if there are actual changes, to avoid useless work trying to
+          // hot-reload all the scenes.
+          !HotReloader.deepEqual(oldExternalLayoutData, newExternalLayoutData)
+        ) {
+          sceneStack._stack.forEach((runtimeScene) => {
+            this._hotReloadRuntimeSceneInstances(
+              oldExternalLayoutData.instances,
+              newExternalLayoutData.instances,
+              runtimeScene
+            );
+          });
+        }
       });
     }
 
@@ -429,7 +434,7 @@ namespace gdjs {
             );
           else {
             // Arrays cannot be hot reloaded.
-            // As indices can change at runtime, and in the IDE, they can be desychronized.
+            // As indices can change at runtime, and in the IDE, they can be desynchronized.
             // It will in that case mess up the whole array,
             // and there is no way to know if that was the case.
             //
@@ -494,7 +499,7 @@ namespace gdjs {
               );
             else {
               // Arrays cannot be hot reloaded.
-              // As indices can change at runtime, and in the IDE, they can be desychronized.
+              // As indices can change at runtime, and in the IDE, they can be desynchronized.
               // It will in that case mess up the whole array,
               // and there is no way to know if that was the case.
               //
@@ -639,7 +644,7 @@ namespace gdjs {
       newObjects.forEach((newObjectData) => {
         const objectName = newObjectData.name;
         const newBehaviors = newObjectData.behaviors;
-        const runtimeObjects = runtimeScene.getObjects(objectName);
+        const runtimeObjects = runtimeScene.getObjects(objectName)!;
         changedRuntimeBehaviors.forEach((changedRuntimeBehavior) => {
           const behaviorTypeName = changedRuntimeBehavior.behaviorTypeName;
 
@@ -784,7 +789,7 @@ namespace gdjs {
         runtimeScene.updateObject(newObjectData);
 
         // Update existing instances
-        const runtimeObjects = runtimeScene.getObjects(newObjectData.name);
+        const runtimeObjects = runtimeScene.getObjects(newObjectData.name)!;
 
         // Update instances state
         runtimeObjects.forEach((runtimeObject) => {
@@ -1037,7 +1042,7 @@ namespace gdjs {
     _hotReloadRuntimeLayer(
       oldLayer: LayerData,
       newLayer: LayerData,
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       // Properties
       if (oldLayer.visibility !== newLayer.visibility) {
@@ -1060,7 +1065,19 @@ namespace gdjs {
         }
       }
 
-      // TODO: cameras
+      // Rendering type can't be easily changed at runtime.
+      if (oldLayer.renderingType !== newLayer.renderingType) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not change the rendering type (2D, 3D...) layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
+      if (newLayer.isLightingLayer !== oldLayer.isLightingLayer) {
+        this._logs.push({
+          kind: 'error',
+          message: `Could not add/remove a lighting layer at runtime (for layer "${newLayer.name}").`,
+        });
+      }
 
       // Effects
       this._hotReloadRuntimeLayerEffects(
@@ -1073,7 +1090,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffects(
       oldEffectsData: EffectData[],
       newEffectsData: EffectData[],
-      runtimeLayer: gdjs.Layer
+      runtimeLayer: gdjs.RuntimeLayer
     ): void {
       oldEffectsData.forEach((oldEffectData) => {
         const name = oldEffectData.name;
@@ -1115,7 +1132,7 @@ namespace gdjs {
     _hotReloadRuntimeLayerEffect(
       oldEffectData: EffectData,
       newEffectData: EffectData,
-      runtimeLayer: gdjs.Layer,
+      runtimeLayer: gdjs.RuntimeLayer,
       effectName: string
     ): void {
       // We consider oldEffectData.effectType and newEffectData.effectType
@@ -1205,6 +1222,7 @@ namespace gdjs {
             [newInstance],
             0,
             0,
+            0,
             /*trackByPersistentUuid=*/
             true
           );
@@ -1240,6 +1258,26 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
+      if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
+        if (oldInstance.z !== newInstance.z && newInstance.z !== undefined) {
+          runtimeObject.setZ(newInstance.z);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationX !== newInstance.rotationX &&
+          newInstance.rotationX !== undefined
+        ) {
+          runtimeObject.setRotationX(newInstance.rotationX);
+          somethingChanged = true;
+        }
+        if (
+          oldInstance.rotationY !== newInstance.rotationY &&
+          newInstance.rotationY !== undefined
+        ) {
+          runtimeObject.setRotationY(newInstance.rotationY);
+          somethingChanged = true;
+        }
+      }
 
       // Check if size changed
       let sizeChanged = false;
@@ -1266,6 +1304,25 @@ namespace gdjs {
       } else {
         if (!newInstance.customSize && oldInstance.customSize) {
           // The custom size was removed. Just flag the size as changed
+          // and hope the object will handle this in
+          // `extraInitializationFromInitialInstance`.
+          sizeChanged = true;
+        }
+      }
+      if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
+        // A custom depth was set or changed
+        if (
+          oldInstance.depth !== newInstance.depth &&
+          newInstance.depth !== undefined
+        ) {
+          runtimeObject.setDepth(newInstance.depth);
+          somethingChanged = true;
+          sizeChanged = true;
+        } else if (
+          newInstance.depth === undefined &&
+          oldInstance.depth !== undefined
+        ) {
+          // The custom depth was removed. Just flag the depth as changed
           // and hope the object will handle this in
           // `extraInitializationFromInitialInstance`.
           sizeChanged = true;

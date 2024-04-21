@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TextRuntimeObjectPixiRenderer {
     _object: gdjs.TextRuntimeObject;
     _fontManager: any;
@@ -9,14 +7,14 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.TextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._fontManager = runtimeScene.getGame().getFontManager();
+      this._fontManager = instanceContainer.getGame().getFontManager();
       this._text = new PIXI.Text(' ', { align: 'left' });
       this._text.anchor.x = 0.5;
       this._text.anchor.y = 0.5;
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._text, runtimeObject.getZOrder());
@@ -71,17 +69,23 @@ namespace gdjs {
         this._object._outlineColor[1],
         this._object._outlineColor[2]
       );
-      style.strokeThickness = this._object._outlineThickness;
+      style.strokeThickness = this._object._isOutlineEnabled
+        ? this._object._outlineThickness
+        : 0;
       style.dropShadow = this._object._shadow;
       style.dropShadowColor = gdjs.rgbToHexNumber(
         this._object._shadowColor[0],
         this._object._shadowColor[1],
         this._object._shadowColor[2]
       );
+      style.dropShadowAlpha = this._object._shadowOpacity / 255;
       style.dropShadowBlur = this._object._shadowBlur;
-      style.dropShadowAngle = this._object._shadowAngle;
+      style.dropShadowAngle = gdjs.toRad(this._object._shadowAngle);
       style.dropShadowDistance = this._object._shadowDistance;
-      style.padding = this._object._padding;
+      const extraPaddingForShadow = style.dropShadow
+        ? style.dropShadowDistance + style.dropShadowBlur
+        : 0;
+      style.padding = Math.ceil(this._object._padding + extraPaddingForShadow);
 
       // Prevent spikey outlines by adding a miter limit
       style.miterLimit = 3;
@@ -94,7 +98,25 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._text.position.x = this._object.x + this._text.width / 2;
+      if (this._object.isWrapping()) {
+        const alignmentX =
+          this._object._textAlign === 'right'
+            ? 1
+            : this._object._textAlign === 'center'
+            ? 0.5
+            : 0;
+
+        const width = this._object.getWrappingWidth();
+
+        // A vector from the custom size center to the renderer center.
+        const centerToCenterX = (width - this._text.width) * (alignmentX - 0.5);
+
+        this._text.position.x = this._object.x + width / 2;
+        this._text.anchor.x = 0.5 - centerToCenterX / this._text.width;
+      } else {
+        this._text.position.x = this._object.x + this._text.width / 2;
+        this._text.anchor.x = 0.5;
+      }
       this._text.position.y = this._object.y + this._text.height / 2;
     }
 
@@ -186,6 +208,10 @@ namespace gdjs {
      */
     setScaleY(newScale: float): void {
       this._text.scale.y = newScale;
+    }
+
+    destroy() {
+      this._text.destroy(true);
     }
   }
 

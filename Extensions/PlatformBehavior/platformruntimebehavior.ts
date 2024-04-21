@@ -8,34 +8,31 @@ namespace gdjs {
 
   /**
    * Manages the common objects shared by objects having a
-   * platform behavior: in particular, the platforms behaviors are required to declare
-   * themselves (see PlatformObjectsManager.addPlatform) to the manager of their associated scene
-   * (see PlatformRuntimeBehavior.getManager).
+   * platform behavior: in particular, the platforms behaviors are required to
+   * declare themselves (see PlatformObjectsManager.addPlatform) to the manager
+   * of their associated container (see PlatformRuntimeBehavior.getManager).
    */
   export class PlatformObjectsManager {
     private _platformRBush: any;
 
-    /**
-     * @param object The object
-     */
-    constructor(runtimeScene: gdjs.RuntimeScene) {
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer) {
       this._platformRBush = new rbush();
     }
 
     /**
-     * Get the platforms manager of a scene.
+     * Get the platforms manager of an instance container.
      */
-    static getManager(runtimeScene: gdjs.RuntimeScene) {
+    static getManager(instanceContainer: gdjs.RuntimeInstanceContainer) {
       // @ts-ignore
-      if (!runtimeScene.platformsObjectsManager) {
+      if (!instanceContainer.platformsObjectsManager) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        runtimeScene.platformsObjectsManager = new gdjs.PlatformObjectsManager(
-          runtimeScene
+        instanceContainer.platformsObjectsManager = new gdjs.PlatformObjectsManager(
+          instanceContainer
         );
       }
       // @ts-ignore
-      return runtimeScene.platformsObjectsManager;
+      return instanceContainer.platformsObjectsManager;
     }
 
     /**
@@ -132,22 +129,22 @@ namespace gdjs {
     _registeredInManager: boolean = false;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._platformType = behaviorData.platformType;
       if (behaviorData.platformType === 'Ladder') {
         this._platformType = PlatformRuntimeBehavior.LADDER;
       } else if (behaviorData.platformType === 'Jumpthru') {
         this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
       } else {
-        this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
+        this._platformType = PlatformRuntimeBehavior.NORMALPLATFORM;
       }
       this._canBeGrabbed = behaviorData.canBeGrabbed || false;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
-      this._manager = PlatformObjectsManager.getManager(runtimeScene);
+      this._manager = PlatformObjectsManager.getManager(instanceContainer);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -169,7 +166,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       //Scene change is not supported
       /*if ( parentScene != &scene ) //Parent scene has changed
             {
@@ -211,7 +208,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     onActivate() {
       if (this._registeredInManager) {
@@ -235,7 +232,7 @@ namespace gdjs {
       } else if (platformType === 'Jumpthru') {
         this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
       } else {
-        this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
+        this._platformType = PlatformRuntimeBehavior.NORMALPLATFORM;
       }
     }
 
@@ -251,7 +248,9 @@ namespace gdjs {
       return this._yGrabOffset;
     }
 
-    static NORMALPLAFTORM = 0;
+    static NORMALPLATFORM = 0;
+    /** @deprecated Use NORMALPLATFORM instead. */
+    static NORMALPLAFTORM = PlatformRuntimeBehavior.NORMALPLATFORM;
     static JUMPTHRU = 1;
     static LADDER = 2;
 
@@ -263,6 +262,9 @@ namespace gdjs {
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as PlatformerObjectRuntimeBehavior;
+      if (!behavior1) {
+        return false;
+      }
       return behavior1.isOnFloorObject(object2);
     }
   }

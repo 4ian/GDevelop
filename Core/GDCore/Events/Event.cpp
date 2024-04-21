@@ -9,6 +9,7 @@
 #include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Events/EventVisitor.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
@@ -138,6 +139,14 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator& codeGenerator,
     std::cout << "ERROR: Exception caught during preprocessing of event \""
               << type << "\"." << std::endl;
   }
+}
+
+bool BaseEvent::AcceptVisitor(gd::EventVisitor& eventVisitor) {
+  return eventVisitor.VisitEvent(*this);
+}
+
+void BaseEvent::AcceptVisitor(gd::ReadOnlyEventVisitor& eventVisitor) const {
+  eventVisitor.VisitEvent(*this);
 }
 
 BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(BaseEventSPtr event) {

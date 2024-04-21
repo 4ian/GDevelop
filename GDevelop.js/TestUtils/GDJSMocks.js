@@ -1,5 +1,16 @@
 /** A minimal RuntimeBehavior base class */
-class RuntimeBehavior {}
+class RuntimeBehavior {
+  /**
+   * @param {RuntimeScene} instanceContainer The container owning the object of the behavior
+   * @param {any} behaviorData The properties used to setup the behavior
+   * @param {RuntimeObject} owner The object owning the behavior
+   */
+  constructor(runtimeScene, behaviorData, owner) {
+    this.name = behaviorData.name || '';
+    this.type = behaviorData.type || '';
+    this.owner = owner;
+  }
+}
 
 /** A minimal implementation of OnceTriggers */
 function OnceTriggers() {
@@ -73,6 +84,12 @@ class FakeAsyncTask {
   }
 }
 
+class ManuallyResolvableTask extends FakeAsyncTask {
+  resolve() {
+    this._finished = true;
+  }
+}
+
 class TaskGroup {
   constructor() {
     /** @type {FakeAsyncTask[]} */
@@ -95,27 +112,183 @@ class TaskGroup {
   }
 }
 
-class VariablesContainer {
+class Variable {
   constructor() {
-    this._variables = {};
+    /** @type {string|number} */
+    this._value = 0;
+    this._children = {};
   }
 
-  get(variableName) {
-    return {
-      add: (value) => {
-        this._variables[variableName] =
-          (this._variables[variableName] || 0) + value;
-      },
-      setNumber: (value) => {
-        this._variables[variableName] = value;
-      },
-      getAsNumber: () => {
-        return this._variables[variableName] || 0;
-      },
-    };
+  add(value) {
+    this._value = this.getAsNumber() + value;
   }
+
+  setNumber(value) {
+    this._value = value;
+  }
+
+  getAsNumber() {
+    return Number(this._value) || 0;
+  }
+
+  getValue() {
+    return this.getAsNumber();
+  }
+
+  setValue(value) {
+    this.setNumber(value);
+  }
+
+  /**
+   * @param {string} childName
+   * @returns {Variable}
+   */
+  getChild(childName) {
+    if (
+      this._children[childName] === undefined ||
+      this._children[childName] === null
+    )
+      this._children[childName] = new Variable();
+    return this._children[childName];
+  }
+
+  getAllChildren() {
+    return this._children;
+  }
+
+  getAllChildrenArray() {
+    return Object.values(this._children);
+  }
+
+  castTo() {}
+
+  isPrimitive() {
+    return this.getAllChildrenArray().length === 0;
+  }
+
+  getType() {
+    return this.isPrimitive() ? 'number' : 'structure';
+  }
+
+  clearChildren() {
+    this._children = {};
+    this._childrenArray = [];
+  }
+
+  clone() {
+    return Variable.copy(this, new Variable());
+  }
+
+  setString(value) {
+    this._value = value;
+  }
+
+  getAsString() {
+    return ('' + this._value) || '';
+  }
+
+  concatenateString(str) {
+    this.setString(this.getAsString() + str);
+  }
+
+  getAsNumberOrString() {
+    return this._value;
+  }
+
+  addChild(childName, childVariable) {
+    // Make sure this is a structure
+    this.castTo('structure');
+    this._children[childName] = childVariable;
+    return this;
+  }
+
+  /**
+   *
+   * @param {Variable} source
+   * @param {Variable} target
+   * @param {?boolean} merge
+   * @returns {Variable}
+   */
+  static copy(source, target, merge) {
+    if (!merge) target.clearChildren();
+    target.castTo(source.getType());
+    if (source.isPrimitive()) {
+      target.setValue(source.getValue());
+    } else if (source.getType() === 'structure') {
+      const children = source.getAllChildren();
+      for (const p in children) {
+        if (children.hasOwnProperty(p)) target.addChild(p, children[p].clone());
+      }
+    } else if (source.getType() === 'array') {
+      for (const p of source.getAllChildrenArray()) target.pushVariableCopy(p);
+    }
+    return target;
+  }
+}
+
+class VariablesContainer {
+  constructor(initialVariablesData) {
+    this._variables = new Hashtable();
+    this._indexedVariables = [];
+
+    if (initialVariablesData !== undefined) {
+      const setupVariableFromVariableData = (variable, variableData) => {
+        if (variableData.type === 'number') {
+          variable.setNumber(variableData.value);
+        } else if (variableData.type === 'string') {
+          variable.setString(variableData.value);
+        } else if (variableData.type === 'structure') {
+          variableData.children.forEach((childVariableData) => {
+            const childVariable = variable.getChild(childVariableData.name);
+            setupVariableFromVariableData(childVariable, childVariableData);
+          });
+          variable.setString(variableData.value);
+        } else {
+          throw new Error(
+            'Unsupported variable type in GDJS Mock:',
+            variableData.type
+          );
+        }
+      };
+
+      initialVariablesData.forEach((variableData) => {
+        const newVariable = new Variable();
+        setupVariableFromVariableData(newVariable, variableData);
+
+        this._variables.put(variableData.name, newVariable);
+        this._indexedVariables.push(newVariable);
+      });
+    }
+  }
+
+  /**
+   * @param {string} name
+   * @returns {Variable}
+   */
+  get(name) {
+    let variable = this._variables.get(name);
+    if (!variable) {
+      variable = new Variable();
+      this._variables.put(name, variable);
+    }
+    return variable;
+  }
+
+  /**
+   * @param {number} index
+   * @returns {Variable}
+   */
+  getFromIndex(index) {
+    if (!this._indexedVariables[index]) {
+      throw new Error(
+        'Trying to access to an indexed variable that does not exist.'
+      );
+    }
+    return this._indexedVariables[index];
+  }
+
   has(variableName) {
-    return this._variables.hasOwnProperty(variableName);
+    return this._variables.containsKey(variableName);
   }
 }
 
@@ -124,9 +297,26 @@ class RuntimeObject {
     this.name = objectData.name || '';
     this._variables = new VariablesContainer();
     this._livingOnScene = true;
+    this._behaviors = new Map();
+    this._x = 0;
+    this._y = 0;
 
     /** @type {Set<() => void>} */
     this.destroyCallbacks = new Set();
+  }
+
+  setX(x) {
+    this._x = x;
+  }
+  getX() {
+    return this._x;
+  }
+
+  setY(y) {
+    this._y = y;
+  }
+  getY() {
+    return this._x;
   }
 
   getName() {
@@ -139,6 +329,10 @@ class RuntimeObject {
 
   returnVariable(variable) {
     return variable;
+  }
+
+  static getVariableNumber(variable) {
+    return variable.getAsNumber();
   }
 
   getVariableNumber(variable) {
@@ -173,11 +367,31 @@ class RuntimeObject {
     return this._task;
   }
 
+  /** @param {RuntimeBehavior} behavior */
+  addBehavior(behavior) {
+    this._behaviors.set(behavior.name, behavior);
+  }
+
+  /** @param {string} behaviorName */
+  getBehavior(behaviorName) {
+    const behavior = this._behaviors.get(behaviorName);
+    if (!behavior) throw new Error(`No behavior called ${behaviorName} found.`);
+    return behavior;
+  }
+
   noop() {}
 
   markFakeAsyncActionAsFinished() {
     if (this._task) this._task.markAsFinished();
   }
+}
+
+class CustomRuntimeObject2D extends RuntimeObject {
+  constructor(parentInstanceContainer, objectData) {
+    super(parentInstanceContainer, objectData);
+    this._instanceContainer = parentInstanceContainer;
+  }
+  onCreated() {}
 }
 
 /**
@@ -336,7 +550,7 @@ const getSceneInstancesCount = (objectsContext, objectsLists) => {
     count += objectsContext.getInstancesCountOnScene(objectName);
   }
   return count;
-}
+};
 
 /**
  * @param {Hashtable<RuntimeObject[]>} objectsLists
@@ -349,12 +563,14 @@ const getPickedInstancesCount = (objectsLists) => {
     count += lists[i].length;
   }
   return count;
-}
+};
 
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
-  constructor() {
-    this._variablesContainer = new VariablesContainer();
+  constructor(sceneData) {
+    this._variablesContainer = new VariablesContainer(
+      sceneData && sceneData.variables
+    );
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
 
@@ -413,6 +629,14 @@ class RuntimeScene {
     }
 
     return 0;
+  }
+
+  getInitialSharedDataForBehavior(name) {
+    return {};
+  }
+
+  getScene() {
+    return this;
   }
 }
 
@@ -488,23 +712,37 @@ class LongLivedObjectsList {
  * (just enough to validate events logic), registering a behavior and some
  * lifecycle callbacks.
  */
-function makeMinimalGDJSMock() {
+function makeMinimalGDJSMock(options) {
   const behaviorCtors = {};
+  const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
-  const runtimeScene = new RuntimeScene();
+  const runtimeScene = new RuntimeScene(options && options.sceneData);
 
   return {
     gdjs: {
       evtTools: {
-        variable: { getVariableNumber: (variable) => variable.getAsNumber() },
-        object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
+        variable: {
+          getVariableNumber: (variable) => variable.getAsNumber(),
+          getVariableString: (variable) => variable.getAsString()
+        },
+        object: {
+          createObjectOnScene,
+          getSceneInstancesCount,
+          getPickedInstancesCount,
+        },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
           noop: () => {},
         },
+        common: {
+          resolveAsyncEventsFunction: ({ task }) => task.resolve(),
+        },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
+      },
+      registerObject: (objectTypeName, Ctor) => {
+        customObjectsCtors[objectTypeName] = Ctor;
       },
       registerRuntimeScenePreEventsCallback: (cb) => {
         runtimeScenePreEventsCallbacks.push(cb);
@@ -517,10 +755,14 @@ function makeMinimalGDJSMock() {
       copyArray,
       objectsListsToArray,
       RuntimeBehavior,
+      RuntimeObject,
       OnceTriggers,
       Hashtable,
       LongLivedObjectsList,
       TaskGroup,
+      CustomRuntimeObject2D,
+      ManuallyResolvableTask,
+      Variable,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

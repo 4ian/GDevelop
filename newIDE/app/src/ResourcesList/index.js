@@ -10,28 +10,17 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
-import { mapVector } from '../Utils/MapFor';
-import optionalRequire from '../Utils/OptionalRequire';
-import {
-  applyResourceDefaults,
-  getLocalResourceFullPath,
-  getResourceFilePathStatus,
-} from './ResourceUtils';
+import { getResourceFilePathStatus } from './ResourceUtils';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
   allResourceKindsAndMetadata,
 } from './ResourceSource';
-import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+import { type FileMetadata } from '../ProjectsStorage';
 import ResourcesLoader from '../ResourcesLoader';
-import newNameGenerator from '../Utils/NewNameGenerator';
-
-const lazyRequireGlob = optionalLazyRequire('glob');
-const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const hasElectron = electron ? true : false;
-
-const gd: libGDevelop = global.gd;
+import { Column, Line } from '../UI/Grid';
+import { type ResourcesActionsMenuBuilder } from '../ProjectsStorage';
+import InfoBar from '../UI/Messages/InfoBar';
 
 const styles = {
   listContainer: {
@@ -45,6 +34,11 @@ type State = {|
   renamedResource: ?gdResource,
   searchText: string,
   resourcesWithErrors: { [string]: '' | 'error' | 'warning' },
+  infoBarContent: ?{|
+    message: React.Node,
+    actionLabel?: React.Node,
+    onActionClick?: () => void,
+  |},
 |};
 
 type Props = {|
@@ -57,8 +51,10 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  fileMetadata: ?FileMetadata,
   onRemoveUnusedResources: ResourceKind => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
+  getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
@@ -67,6 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     renamedResource: null,
     searchText: '',
     resourcesWithErrors: {},
+    infoBarContent: null,
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -79,7 +76,8 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     if (
       this.state.renamedResource !== nextState.renamedResource ||
-      this.state.searchText !== nextState.searchText
+      this.state.searchText !== nextState.searchText ||
+      this.state.infoBarContent !== nextState.infoBarContent
     )
       return true;
 
@@ -94,84 +92,6 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _deleteResource = (resource: gdResource) => {
     this.props.onDeleteResource(resource);
-  };
-
-  _locateResourceFile = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.shell.showItemInFolder(path.resolve(resourceFilePath));
-  };
-
-  _openResourceFile = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.shell.openPath(path.resolve(resourceFilePath));
-  };
-
-  _copyResourceFilePath = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(
-      this.props.project,
-      resource.getName()
-    );
-    electron.clipboard.writeText(path.resolve(resourceFilePath));
-  };
-
-  _scanForNewResources = (
-    extensions: Array<string>,
-    createResource: () => gdResource
-  ) => {
-    const glob = lazyRequireGlob();
-    if (!glob) return;
-
-    const project = this.props.project;
-    const resourcesManager = project.getResourcesManager();
-    const projectPath = path.dirname(project.getProjectFile());
-
-    const allExtensions = [
-      ...extensions,
-      ...extensions.map(extension => extension.toUpperCase()),
-    ];
-    const getAllFiles = (src, callback) => {
-      glob(src + '/**/*.{' + allExtensions.join(',') + '}', callback);
-    };
-    getAllFiles(projectPath, (error, allFiles) => {
-      if (error) {
-        console.error(`Error finding files inside ${projectPath}:`, error);
-        return;
-      }
-
-      const filesToCheck = new gd.VectorString();
-      allFiles.forEach(filePath =>
-        filesToCheck.push_back(path.relative(projectPath, filePath))
-      );
-      const filePathsNotInResources = project
-        .getResourcesManager()
-        .findFilesNotInResources(filesToCheck);
-      filesToCheck.delete();
-
-      mapVector(filePathsNotInResources, (relativeFilePath: string) => {
-        const resourceName = newNameGenerator(relativeFilePath, name =>
-          resourcesManager.hasResource(name)
-        );
-
-        const resource = createResource();
-        resource.setFile(relativeFilePath);
-        resource.setName(resourceName);
-        applyResourceDefaults(project, resource);
-        resourcesManager.addResource(resource);
-        resource.delete();
-
-        console.info(
-          `"${relativeFilePath}" added to project as resource named "${resourceName}".`
-        );
-      });
-
-      this.forceUpdate();
-    });
   };
 
   _editName = (resource: ?gdResource) => {
@@ -196,6 +116,9 @@ export default class ResourcesList extends React.Component<Props, State> {
       case 'audio':
         return 'res/actions/music24.png';
       case 'json':
+      case 'tilemap':
+      case 'tileset':
+      case 'spine':
         return 'res/actions/fichier24.png';
       case 'video':
         return 'JsPlatform/Extensions/videoicon24.png';
@@ -203,6 +126,8 @@ export default class ResourcesList extends React.Component<Props, State> {
         return 'res/actions/font24.png';
       case 'bitmapFont':
         return 'JsPlatform/Extensions/bitmapfont32.png';
+      case 'model3D':
+        return 'JsPlatform/Extensions/3d_model.svg';
       default:
         return 'res/unknown32.png';
     }
@@ -251,7 +176,11 @@ export default class ResourcesList extends React.Component<Props, State> {
     resource: gdResource,
     _index: number
   ): Array<MenuItemTemplate> => {
-    return [
+    const {
+      getResourceActionsSpecificToStorageProvider,
+      fileMetadata,
+    } = this.props;
+    let menu = [
       {
         label: i18n._(t`Rename`),
         click: () => this._editName(resource),
@@ -259,35 +188,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: i18n._(t`Delete`),
         click: () => this._deleteResource(resource),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Open File`),
-        click: () => this._openResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Locate File`),
-        click: () => this._locateResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Copy File Path`),
-        click: () => this._copyResourceFilePath(resource),
-        enabled: hasElectron,
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Scan in the project folder for...`),
-        submenu: allResourceKindsAndMetadata.map(
-          ({ displayName, fileExtensions, createNewResource }) => ({
-            label: i18n._(displayName),
-            click: () => {
-              this._scanForNewResources(fileExtensions, createNewResource);
-            },
-            enabled: hasElectron,
-          })
-        ),
       },
       { type: 'separator' },
       {
@@ -312,14 +212,23 @@ export default class ResourcesList extends React.Component<Props, State> {
             },
           ]),
       },
-      {
-        label: i18n._(t`Remove Resources with Invalid Path`),
-        click: () => {
-          this.props.onRemoveAllResourcesWithInvalidPath();
-        },
-        enabled: hasElectron,
-      },
     ];
+    if (getResourceActionsSpecificToStorageProvider && fileMetadata) {
+      menu.push({ type: 'separator' });
+      menu = menu.concat(
+        getResourceActionsSpecificToStorageProvider({
+          project: this.props.project,
+          fileMetadata,
+          resource,
+          i18n,
+          informUser: this.openInfoBar,
+          updateInterface: () => this.forceUpdateList(),
+          cleanUserSelectionOfResources: () =>
+            this.props.onSelectResource(null),
+        })
+      );
+    }
+    return menu;
   };
 
   checkMissingPaths = () => {
@@ -337,13 +246,23 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
+  openInfoBar = (
+    infoBarContent: ?{|
+      message: React.Node,
+      actionLabel?: React.Node,
+      onActionClick?: () => void,
+    |}
+  ) => {
+    this.setState({ infoBarContent });
+  };
+
   componentDidMount() {
     this.checkMissingPaths();
   }
 
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
-    const { searchText } = this.state;
+    const { searchText, infoBarContent } = this.state;
 
     const resourcesManager = project.getResourcesManager();
     const allResourcesList = resourcesManager
@@ -359,6 +278,20 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line>
+          <Column expand>
+            <SearchBar
+              value={searchText}
+              onRequestSearch={() => {}}
+              onChange={text =>
+                this.setState({
+                  searchText: text,
+                })
+              }
+              placeholder={t`Search resources`}
+            />
+          </Column>
+        </Line>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -386,17 +319,14 @@ export default class ResourcesList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        <SearchBar
-          value={searchText}
-          onRequestSearch={() => {}}
-          onChange={text =>
-            this.setState({
-              searchText: text,
-            })
-          }
-          placeholder={t`Search resources`}
-          aspect="integrated-search-bar"
-        />
+        {!!infoBarContent && (
+          <InfoBar
+            duration={7000}
+            visible
+            hide={() => this.setState({ infoBarContent: null })}
+            {...infoBarContent}
+          />
+        )}
       </Background>
     );
   }

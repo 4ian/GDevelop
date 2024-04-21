@@ -8,11 +8,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip';
-import DeleteOutline from '@material-ui/icons/DeleteOutline';
-import Error from '@material-ui/icons/Error';
-import FirstPage from '@material-ui/icons/FirstPage';
-import NavigateBefore from '@material-ui/icons/NavigateBefore';
-import NavigateNext from '@material-ui/icons/NavigateNext';
 
 import IconButton from '../../UI/IconButton';
 import { Column, Line } from '../../UI/Grid';
@@ -20,15 +15,20 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import {
-  type LeaderboardDisplayData,
+  type LeaderboardEntry,
   type LeaderboardCustomizationSettings,
 } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
+import Trash from '../../UI/CustomSvgIcons/Trash';
+import ChevronArrowLeft from '../../UI/CustomSvgIcons/ChevronArrowLeft';
+import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
+import SkipBack from '../../UI/CustomSvgIcons/SkipBack';
+import Error from '../../UI/CustomSvgIcons/Error';
 
 type Props = {|
-  entries: ?Array<LeaderboardDisplayData>,
+  entries: ?Array<LeaderboardEntry>,
   customizationSettings: ?LeaderboardCustomizationSettings,
-  onDeleteEntry: (entryId: string) => Promise<void>,
+  onDeleteEntry: (entry: LeaderboardEntry) => Promise<void>,
   isLoading: boolean,
   erroredEntry?: {| entryId: string, message: React.Node |},
   navigation: {|
@@ -108,11 +108,11 @@ const LeaderboardEntriesTable = ({
                     <Line>
                       <IconButton
                         size="small"
-                        onClick={() => onDeleteEntry(entry.id)}
+                        onClick={() => onDeleteEntry(entry)}
                         disabled={isLoading}
                         tooltip={t`Remove entry`}
                       >
-                        <DeleteOutline size={20} />
+                        <Trash size={20} />
                       </IconButton>
                       {erroredEntry && erroredEntry.entryId === entry.id ? (
                         <IconButton
@@ -144,7 +144,7 @@ const LeaderboardEntriesTable = ({
                   if (navigation.goToFirstPage) navigation.goToFirstPage();
                 }}
               >
-                <FirstPage />
+                <SkipBack />
               </IconButton>
               <IconButton
                 tooltip={t`Previous page`}
@@ -154,7 +154,7 @@ const LeaderboardEntriesTable = ({
                     navigation.goToPreviousPage();
                 }}
               >
-                <NavigateBefore />
+                <ChevronArrowLeft />
               </IconButton>
               <IconButton
                 tooltip={t`Next page`}
@@ -163,7 +163,7 @@ const LeaderboardEntriesTable = ({
                   if (navigation.goToNextPage) navigation.goToNextPage();
                 }}
               >
-                <NavigateNext />
+                <ChevronArrowRight />
               </IconButton>
             </Line>
           )}

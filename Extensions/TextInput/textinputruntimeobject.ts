@@ -1,6 +1,4 @@
 namespace gdjs {
-  const logger = new gdjs.Logger('Text input object');
-
   const supportedInputTypes = [
     'text',
     'email',
@@ -50,7 +48,9 @@ namespace gdjs {
   /**
    * Shows a text input on the screen the player can type text into.
    */
-  export class TextInputRuntimeObject extends gdjs.RuntimeObject {
+  export class TextInputRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.TextContainer, gdjs.Resizable, gdjs.OpacityHandler {
     private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
@@ -71,10 +71,10 @@ namespace gdjs {
     _renderer: TextInputRuntimeObjectRenderer;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       objectData: TextInputObjectData
     ) {
-      super(runtimeScene, objectData);
+      super(instanceContainer, objectData);
 
       this._string = objectData.content.initialValue;
       this._placeholder = objectData.content.placeholder;
@@ -92,7 +92,10 @@ namespace gdjs {
       this._disabled = objectData.content.disabled;
       this._readOnly = objectData.content.readOnly;
 
-      this._renderer = new gdjs.TextInputRuntimeObjectRenderer(this);
+      this._renderer = new gdjs.TextInputRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -167,7 +170,7 @@ namespace gdjs {
       return true;
     }
 
-    updatePreRender(runtimeScene: RuntimeScene): void {
+    updatePreRender(instanceContainer: RuntimeInstanceContainer): void {
       this._renderer.updatePreRender();
     }
 
@@ -196,38 +199,29 @@ namespace gdjs {
       this._renderer.onSceneResumed();
     }
 
-    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.onDestroy();
     }
 
-    /**
-     * Set object opacity.
-     */
-    setOpacity(opacity): void {
+    setOpacity(opacity: float): void {
       this.opacity = Math.max(0, Math.min(255, opacity));
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get object opacity.
-     */
-    getOpacity() {
+    getOpacity(): float {
       return this.opacity;
     }
 
-    /**
-     * Set the width of the object, if applicable.
-     * @param width The new width in pixels.
-     */
+    setSize(width: number, height: number): void {
+      this.setWidth(width);
+      this.setHeight(height);
+    }
+
     setWidth(width: float): void {
       this._width = width;
     }
 
-    /**
-     * Set the height of the object, if applicable.
-     * @param height The new height in pixels.
-     */
     setHeight(height: float): void {
       this._height = height;
     }
@@ -250,15 +244,25 @@ namespace gdjs {
 
     /**
      * Get the text entered in the text input.
+     * @deprecated use `getText` instead
      */
     getString() {
-      return this._string;
+      return this.getText();
     }
 
     /**
      * Replace the text inside the text input.
+     * @deprecated use `setText` instead
      */
-    setString(newString: string) {
+    setString(text: string) {
+      this.setText(text);
+    }
+
+    getText() {
+      return this._string;
+    }
+
+    setText(newString: string) {
       if (newString === this._string) return;
 
       this._string = newString;
@@ -427,6 +431,10 @@ namespace gdjs {
 
     isFocused(): boolean {
       return this._renderer.isFocused();
+    }
+
+    focus(): void {
+      this._renderer.focus();
     }
   }
   gdjs.registerObject(

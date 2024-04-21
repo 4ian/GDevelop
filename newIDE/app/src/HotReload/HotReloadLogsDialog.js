@@ -6,8 +6,8 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { type HotReloaderLog } from '../Export/PreviewLauncher.flow';
-import { NewPreviewIcon } from './HotReloadPreviewButton';
+import { type HotReloaderLog } from '../ExportAndShare/PreviewLauncher.flow';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 
 type Props = {|
   logs: Array<HotReloaderLog>,
@@ -38,7 +38,7 @@ export default function HotReloadLogsDialog({
           onClick={onClose}
         />,
         <DialogPrimaryButton
-          icon={<NewPreviewIcon />}
+          icon={<PreviewIcon />}
           label={<Trans>Close and launch a new preview</Trans>}
           key="new-preview"
           primary

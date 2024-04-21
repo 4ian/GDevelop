@@ -12,6 +12,7 @@
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/String.h"
+#include "GDCore/Extensions/Metadata/ValueTypeMetadata.h"
 // TODO: In theory (for separation of concerns between Project and
 // extensions/events), this include should be removed and gd::ParameterMetadata
 // replaced by a new gd::EventsFunctionParameter class.
@@ -19,6 +20,7 @@
 namespace gd {
 class SerializerElement;
 class Project;
+class EventsFunctionsContainer;
 }  // namespace gd
 
 namespace gd {
@@ -115,7 +117,45 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
-  enum FunctionType { Action, Condition, Expression, StringExpression };
+  /**
+   * \brief Get the name of the ExpressionAndCondition to use as an operand
+   * that is defined in the editor.
+   */
+  const gd::String& GetGetterName() const { return getterName; };
+
+  /**
+   * \brief Set the name of the ExpressionAndCondition to use as an operand
+   * that is defined in the editor.
+   */
+  EventsFunction& SetGetterName(const gd::String& getterName_) {
+    getterName = getterName_;
+    return *this;
+  }
+
+  /**
+   * \brief Set the type of the expression
+   */
+  EventsFunction& SetExpressionType(const gd::ValueTypeMetadata& type) {
+    expressionType = type;
+    return *this;
+  }
+
+  /**
+   * \brief Get the type of the expression
+   */
+  const gd::ValueTypeMetadata& GetExpressionType() const { return expressionType; }
+
+  /**
+   * \brief Get the type of the expression
+   */
+  gd::ValueTypeMetadata& GetExpressionType() { return expressionType; }
+
+  enum FunctionType {
+      Action,
+      Condition,
+      Expression,
+      ExpressionAndCondition,
+      ActionWithOperator };
 
   /**
    * \brief Set the type of the function
@@ -123,23 +163,64 @@ class GD_CORE_API EventsFunction {
   EventsFunction& SetFunctionType(FunctionType type) {
     functionType = type;
     return *this;
-  };
+  }
 
   /**
    * \brief Get the type of the function
    */
-  FunctionType GetFunctionType() const { return functionType; };
+  FunctionType GetFunctionType() const { return functionType; }
+
+  /**
+   * \brief Return true if the function is an action.
+   */
+  bool IsAction() const {
+    return functionType == gd::EventsFunction::Action || 
+           functionType == gd::EventsFunction::ActionWithOperator;
+ }
+
+  /**
+   * \brief Return true if the function is an expression.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsExpression() const {
+    return functionType == gd::EventsFunction::Expression ||
+           functionType == gd::EventsFunction::ExpressionAndCondition;
+ }
+
+  /**
+   * \brief Return true if the function is a condition.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsCondition() const {
+    return functionType == gd::EventsFunction::Condition ||
+           functionType == gd::EventsFunction::ExpressionAndCondition;
+ }
 
   /**
    * \brief Returns true if the function is private.
    */
-  bool IsPrivate() { return isPrivate; }
+  bool IsPrivate() const { return isPrivate; }
 
   /**
    * \brief Sets the privateness of the function.
    */
   EventsFunction& SetPrivate(bool _isPrivate) {
     isPrivate = _isPrivate;
+    return *this;
+  }
+
+  /**
+   * \brief Returns true if the function is async.
+   */
+  bool IsAsync() const { return isAsync; }
+
+  /**
+   * \brief Sets the asynchronicity of the function.
+   */
+  EventsFunction& SetAsync(bool _isAsync) {
+    isAsync = _isAsync;
     return *this;
   }
 
@@ -154,7 +235,20 @@ class GD_CORE_API EventsFunction {
   gd::EventsList& GetEvents() { return events; };
 
   /**
-   * \brief Return the parameters of the function.
+   * \brief Return the parameters of the function that are used in the events.
+   *
+   * \note During code/extension generation, new parameters are added
+   * to the generated function, like "runtimeScene" and "eventsFunctionContext".
+   * This should be transparent to the user.
+   */
+  const std::vector<gd::ParameterMetadata>& GetParametersForEvents(
+      const gd::EventsFunctionsContainer& functionsContainer) const;
+
+  /**
+   * \brief Return the parameters of the function that are filled in the editor.
+   * 
+   * \note They won't be used for ActionWithOperator, but they need to be kept
+   * to avoid to loose them when the function type is changed.
    *
    * \note During code/extension generation, new parameters are added
    * to the generated function, like "runtimeScene" and "eventsFunctionContext".
@@ -202,11 +296,15 @@ class GD_CORE_API EventsFunction {
   gd::String description;
   gd::String sentence;
   gd::String group;
+  gd::String getterName;
+  gd::ValueTypeMetadata expressionType;
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;
+  mutable std::vector<gd::ParameterMetadata> actionWithOperationParameters;
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
+  bool isAsync = false;
 };
 
 }  // namespace gd

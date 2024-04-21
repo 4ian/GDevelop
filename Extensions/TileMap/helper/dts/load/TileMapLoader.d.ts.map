@@ -1,0 +1,1 @@
+{"version":3,"file":"TileMapLoader.d.ts","sourceRoot":"","sources":["../../src/load/TileMapLoader.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,uBAAuB,CAAC;AAC7D,OAAO,EAAE,kBAAkB,EAAE,MAAM,sBAAsB,CAAC;AAI1D,yBAAiB,aAAa,CAAC;IAC7B;;;;;;;OAOG;IACH,SAAgB,IAAI,CAClB,kBAAkB,EAAE,kBAAkB,EACtC,UAAU,EAAE,MAAM,EAClB,IAAI,EAAE,GAAG,GACR,eAAe,GAAG,IAAI,CAaxB;CACF"}

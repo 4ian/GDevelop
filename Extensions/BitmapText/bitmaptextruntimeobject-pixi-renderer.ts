@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
@@ -10,16 +8,16 @@ namespace gdjs {
 
     /**
      * @param runtimeObject The object to render
-     * @param runtimeScene The gdjs.RuntimeScene in which the object is
+     * @param instanceContainer The container in which the object is
      */
     constructor(
       runtimeObject: gdjs.BitmapTextRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
 
       // Obtain the bitmap font to use in the object.
-      const bitmapFont = runtimeScene
+      const bitmapFont = instanceContainer
         .getGame()
         .getBitmapFontManager()
         .obtainBitmapFont(
@@ -32,7 +30,7 @@ namespace gdjs {
       });
 
       // Set the object on the scene
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
@@ -59,7 +57,8 @@ namespace gdjs {
 
     onDestroy() {
       // Mark the font from the object as not used anymore.
-      this._object._runtimeScene
+      this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .releaseBitmapFont(this._pixiObject.fontName);
@@ -73,7 +72,8 @@ namespace gdjs {
 
     updateFont(): void {
       // Get the new bitmap font to use
-      const bitmapFont = this._object._runtimeScene
+      const bitmapFont = this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .obtainBitmapFont(
@@ -82,7 +82,8 @@ namespace gdjs {
         );
 
       // Mark the old font as not used anymore
-      this._object._runtimeScene
+      this._object
+        .getInstanceContainer()
         .getGame()
         .getBitmapFontManager()
         .releaseBitmapFont(this._pixiObject.fontName);
@@ -117,7 +118,10 @@ namespace gdjs {
     }
 
     updateScale(): void {
-      this._pixiObject.scale.set(Math.max(this._object._scale, 0));
+      this._pixiObject.scale.set(
+        Math.max(this._object._scaleX, 0),
+        Math.max(this._object._scaleY, 0)
+      );
       this.updatePosition();
     }
 
@@ -128,7 +132,7 @@ namespace gdjs {
     updateWrappingWidth(): void {
       if (this._object._wordWrap) {
         this._pixiObject.maxWidth =
-          this._object._wrappingWidth / this._object._scale;
+          this._object._wrappingWidth / this._object._scaleX;
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;

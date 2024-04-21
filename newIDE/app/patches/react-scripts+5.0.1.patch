@@ -1,0 +1,25 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index e465d8e..a66e4e4 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -415,6 +415,8 @@ module.exports = function (webpackEnv) {
+             // The preset includes JSX, Flow, TypeScript, and some ESnext features.
+             {
+               test: /\.(js|mjs|jsx|ts|tsx)$/,
++              // Exclude locale files that are huge don't need babel processing:
++              exclude: path.join(paths.appSrc, 'locale'),
+               include: paths.appSrc,
+               loader: require.resolve('babel-loader'),
+               options: {
+@@ -467,7 +469,10 @@ module.exports = function (webpackEnv) {
+             // Unlike the application JS, we only compile the standard ES features.
+             {
+               test: /\.(js|mjs)$/,
+-              exclude: /@babel(?:\/|\\{1,2})runtime/,
++              exclude: [/@babel(?:\/|\\{1,2})runtime/, 
++                // Exclude locale files that are huge don't need babel processing:
++                path.join(paths.appSrc, 'locale')
++              ],
+               loader: require.resolve('babel-loader'),
+               options: {
+                 babelrc: false,

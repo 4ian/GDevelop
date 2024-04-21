@@ -90,6 +90,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'PlayerAuthentication',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/PlayerAuthentication/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'DialogueTree',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DialogueTree/JsExtension.js'),
@@ -159,6 +165,18 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TextInput/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'Scene3D',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/3D/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'SpineObject',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Spine/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|
@@ -187,8 +205,6 @@ export default function makeExtensionsLoader({
         jsExtensions
           .filter(({ name }) => !filterExamples || !name.includes('Example'))
           .map(({ name, extensionModule, objectsRenderingServiceModules }) => {
-            // Load any editor for objects, if we have somewhere where
-            // to register them.
             if (
               objectsEditorService &&
               extensionModule.registerEditorConfigurations
@@ -198,25 +214,23 @@ export default function makeExtensionsLoader({
               );
             }
 
-            // Register modules for ObjectsRenderingService
-            if (objectsRenderingService && objectsRenderingServiceModules) {
-              for (let requirePath in objectsRenderingServiceModules) {
-                objectsRenderingService.registerModule(
-                  requirePath,
-                  objectsRenderingServiceModules[requirePath]
+            if (objectsRenderingService) {
+              if (objectsRenderingServiceModules) {
+                for (const requirePath in objectsRenderingServiceModules) {
+                  objectsRenderingService.registerModule(
+                    requirePath,
+                    objectsRenderingServiceModules[requirePath]
+                  );
+                }
+              }
+              if (extensionModule.registerInstanceRenderers) {
+                extensionModule.registerInstanceRenderers(
+                  objectsRenderingService
                 );
               }
-            }
-
-            // Load any renderer for objects, if we have somewhere where
-            // to register them.
-            if (
-              objectsRenderingService &&
-              extensionModule.registerInstanceRenderers
-            ) {
-              extensionModule.registerInstanceRenderers(
-                objectsRenderingService
-              );
+              if (extensionModule.registerClearCache) {
+                extensionModule.registerClearCache(objectsRenderingService);
+              }
             }
 
             return {

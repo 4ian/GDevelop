@@ -8,9 +8,9 @@ import {
   isJustBelow,
   isSibling,
 } from './helpers';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import './style.css';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 const sharedStyles = {
   dropArea: { zIndex: 1, position: 'absolute' },
@@ -138,7 +138,7 @@ type DropContainerProps = {|
   activateTargets: boolean,
 
   // Computes drop areas and drop indicator indent.
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
   // Used only for the node just above dragged node if it is an only child,
   // so that drop area covers the whole dragged node's row in height.
   draggedNodeHeight: number,
@@ -224,7 +224,7 @@ export function DropContainer({
   DnDComponent,
   onDrop,
   activateTargets,
-  windowWidth,
+  windowSize,
   draggedNodeHeight,
   getNodeAtPath,
 }: DropContainerProps) {
@@ -234,7 +234,7 @@ export function DropContainer({
   // child of the event is the dragged one.
   const canHaveSubEvents = !!node.event && node.event.canHaveSubEvents();
 
-  const indentWidth = getIndentWidth(windowWidth);
+  const indentWidth = getIndentWidth(windowSize);
   const dropAreaStyles = getTargetPositionStyles(
     indentWidth,
     draggedNodeHeight,

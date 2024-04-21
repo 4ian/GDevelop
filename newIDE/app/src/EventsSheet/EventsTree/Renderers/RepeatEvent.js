@@ -10,10 +10,12 @@ import {
   disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import DefaultField from '../../ParameterFields/DefaultField';
+import ExpressionField from '../../ParameterFields/ExpressionField';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import ParameterRenderingService from '../../ParameterRenderingService';
 import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
@@ -34,7 +36,7 @@ export default class RepeatEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  _field: ?DefaultField = null;
+  _field: ?ParameterFieldInterface = null;
   state = {
     editing: false,
     editingPreviousValue: null,
@@ -132,9 +134,10 @@ export default class RepeatEvent extends React.Component<
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
-          windowWidth={this.props.windowWidth}
+          windowSize={this.props.windowSize}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={repeatEvent.getConditions()}
               style={style}
               className={className}
@@ -154,13 +157,17 @@ export default class RepeatEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={repeatEvent.getActions()}
               style={
                 {
@@ -184,9 +191,12 @@ export default class RepeatEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
         />
@@ -196,7 +206,7 @@ export default class RepeatEvent extends React.Component<
           onRequestClose={this.cancelEditing}
           onApply={this.endEditing}
         >
-          <DefaultField
+          <ExpressionField
             project={this.props.project}
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
@@ -206,6 +216,7 @@ export default class RepeatEvent extends React.Component<
               repeatEvent.setRepeatExpression(text);
               this.props.onUpdate();
             }}
+            parameterRenderingService={ParameterRenderingService}
             isInline
             ref={field => (this._field = field)}
           />

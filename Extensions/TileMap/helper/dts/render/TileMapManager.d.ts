@@ -1,7 +1,6 @@
-import { TiledMap } from '../tiled/TiledFormat';
 import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
-import PIXI = GlobalPIXIModule.PIXI;
+import { TileMapFileContent } from '../load/TileMapFileContent';
 /**
  * A holder to share tile maps across the 2 extension objects.
  *
@@ -20,42 +19,52 @@ export declare class TileMapManager {
    */
   static getManager(instanceHolder: Object): TileMapManager;
   /**
-   * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+   * @param data JSON data.
+   * @returns The data enclosed with its detected kind.
+   */
+  static identify(data: any): TileMapFileContent | null;
+  /**
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param pako The zlib library.
    * @param callback A function called when the tile map is parsed.
    */
   getOrLoadTileMap(
-    loadTiledMap: (
+    loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tiledMap: TiledMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
   /**
-   * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
    * @param atlasImageResourceName The resource name of the atlas image.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param callback A function called when the tiles textures are split.
    */
   getOrLoadTextureCache(
-    loadTiledMap: (
+    loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tiledMap: TiledMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
     atlasImageResourceName: string,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
+  clearCaches(): void;
 }
 //# sourceMappingURL=TileMapManager.d.ts.map

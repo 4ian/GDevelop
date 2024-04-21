@@ -24,6 +24,8 @@ class EventsCodeGenerationContext;
 class Platform;
 class SerializerElement;
 class Instruction;
+class EventVisitor;
+class ReadOnlyEventVisitor;
 }  // namespace gd
 
 namespace gd {
@@ -238,6 +240,9 @@ class GD_CORE_API BaseEvent {
    */
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element){};
+
+  virtual bool AcceptVisitor(gd::EventVisitor& eventVisitor);
+  virtual void AcceptVisitor(gd::ReadOnlyEventVisitor& eventVisitor) const;
   ///@}
 
   /** \name Common properties
@@ -276,7 +281,6 @@ class GD_CORE_API BaseEvent {
    * \brief True if the event should be folded in the events editor.
    */
   bool IsFolded() const { return folded; }
-
   ///@}
 
   std::weak_ptr<gd::BaseEvent>

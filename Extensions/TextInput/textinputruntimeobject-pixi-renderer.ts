@@ -29,13 +29,16 @@ namespace gdjs {
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
-    private _runtimeScene: gdjs.RuntimeScene;
+    private _instanceContainer: gdjs.RuntimeInstanceContainer;
     private _runtimeGame: gdjs.RuntimeGame;
 
-    constructor(runtimeObject: gdjs.TextInputRuntimeObject) {
+    constructor(
+      runtimeObject: gdjs.TextInputRuntimeObject,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeObject.getRuntimeScene();
-      this._runtimeGame = this._runtimeScene.getGame();
+      this._instanceContainer = instanceContainer;
+      this._runtimeGame = this._instanceContainer.getGame();
 
       this._createElement();
     }
@@ -55,6 +58,7 @@ namespace gdjs {
       this._input.style.outline = 'none';
       this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
       this._input.style.display = 'none'; // Hide while object is being set up.
+      this._input.style.boxSizing = 'border-box'; // Important for iOS, because border is added to width/height.
 
       this._input.addEventListener('input', () => {
         if (!this._input) return;
@@ -123,51 +127,71 @@ namespace gdjs {
       // Hide the input entirely if the layer is not visible.
       // Because this object is rendered as a DOM element (and not part of the PixiJS
       // scene graph), we have to do this manually.
-      const layer = this._runtimeScene.getLayer(this._object.getLayer());
+      const layer = this._instanceContainer.getLayer(this._object.getLayer());
       if (!layer.isVisible()) {
         this._input.style.display = 'none';
         return;
       }
 
-      const runtimeGame = this._runtimeScene.getGame();
+      const workingPoint: FloatPoint = gdjs.staticArray(
+        TextInputRuntimeObjectPixiRenderer.prototype.updatePreRender
+      ) as FloatPoint;
+
+      const runtimeGame = this._instanceContainer.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
         this._object.x,
         this._object.y,
-        0
+        0,
+        workingPoint
       );
+      const canvasLeft = topLeftCanvasCoordinates[0];
+      const canvasTop = topLeftCanvasCoordinates[1];
+
       const bottomRightCanvasCoordinates = layer.convertInverseCoords(
         this._object.x + this._object.getWidth(),
         this._object.y + this._object.getHeight(),
-        0
+        0,
+        workingPoint
       );
+      const canvasRight = bottomRightCanvasCoordinates[0];
+      const canvasBottom = bottomRightCanvasCoordinates[1];
 
       // Hide the input entirely if not visible at all.
       const isOutsideCanvas =
-        bottomRightCanvasCoordinates[0] < 0 ||
-        bottomRightCanvasCoordinates[1] < 0 ||
-        topLeftCanvasCoordinates[0] > runtimeGame.getGameResolutionWidth() ||
-        topLeftCanvasCoordinates[1] > runtimeGame.getGameResolutionHeight();
+        canvasRight < 0 ||
+        canvasBottom < 0 ||
+        canvasLeft > runtimeGame.getGameResolutionWidth() ||
+        canvasTop > runtimeGame.getGameResolutionHeight();
       if (isOutsideCanvas) {
         this._input.style.display = 'none';
         return;
       }
 
       // Position the input on the container on top of the canvas.
-      const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        topLeftCanvasCoordinates
+      workingPoint[0] = canvasLeft;
+      workingPoint[1] = canvasTop;
+      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        workingPoint,
+        workingPoint
       );
-      const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        bottomRightCanvasCoordinates
+      const pageLeft = workingPoint[0];
+      const pageTop = workingPoint[1];
+
+      workingPoint[0] = canvasRight;
+      workingPoint[1] = canvasBottom;
+      runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        workingPoint,
+        workingPoint
       );
+      const pageRight = workingPoint[0];
+      const pageBottom = workingPoint[1];
 
-      const widthInContainer =
-        bottomRightPageCoordinates[0] - topLeftPageCoordinates[0];
-      const heightInContainer =
-        bottomRightPageCoordinates[1] - topLeftPageCoordinates[1];
+      const widthInContainer = pageRight - pageLeft;
+      const heightInContainer = pageBottom - pageTop;
 
-      this._input.style.left = topLeftPageCoordinates[0] + 'px';
-      this._input.style.top = topLeftPageCoordinates[1] + 'px';
+      this._input.style.left = pageLeft + 'px';
+      this._input.style.top = pageTop + 'px';
       this._input.style.width = widthInContainer + 'px';
       this._input.style.height = heightInContainer + 'px';
       this._input.style.transform =
@@ -195,7 +219,7 @@ namespace gdjs {
 
     updateFont() {
       if (!this._input) return;
-      this._input.style.fontFamily = this._runtimeScene
+      this._input.style.fontFamily = this._instanceContainer
         .getGame()
         .getFontManager()
         .getFontFamily(this._object.getFontResourceName());
@@ -265,6 +289,12 @@ namespace gdjs {
 
     isFocused() {
       return this._input === document.activeElement;
+    }
+
+    focus() {
+      if (!this._input) return;
+
+      this._input.focus();
     }
   }
 

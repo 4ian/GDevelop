@@ -3,9 +3,10 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef PROJECTRESOURCESCOPIER_H
-#define PROJECTRESOURCESCOPIER_H
+#pragma once
+
 #include "GDCore/String.h"
+
 namespace gd {
 class Project;
 class AbstractFileSystem;
@@ -47,8 +48,14 @@ class GD_CORE_API ProjectResourcesCopier {
                                  bool updateOriginalProject,
                                  bool preserveAbsoluteFilenames = true,
                                  bool preserveDirectoryStructure = true);
+
+private:
+  static bool CopyAllResourcesTo(gd::Project& originalProject,
+                                 gd::Project& clonedProject,
+                                 gd::AbstractFileSystem& fs,
+                                 gd::String destinationDirectory,
+                                 bool preserveAbsoluteFilenames = true,
+                                 bool preserveDirectoryStructure = true);
 };
 
 }  // namespace gd
-
-#endif  // PROJECTRESOURCESCOPIER_H

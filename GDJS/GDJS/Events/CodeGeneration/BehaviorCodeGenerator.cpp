@@ -22,95 +22,130 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
   auto& eventsFunctionsVector =
       eventsBasedBehavior.GetEventsFunctions().GetInternalVector();
 
+  auto generateInitializePropertiesCode = [&]() {
+    gd::String runtimeBehaviorDataInitializationCode;
+    for (auto& property :
+          eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+      runtimeBehaviorDataInitializationCode +=
+          property->IsHidden()
+              ? GenerateInitializePropertyFromDefaultValueCode(*property)
+              : GenerateInitializePropertyFromDataCode(*property);
+    }
+
+    return runtimeBehaviorDataInitializationCode;
+  };
+
+  auto generatePropertiesCode = [&]() {
+    gd::String runtimeBehaviorPropertyMethodsCode;
+    for (auto& property :
+          eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+      runtimeBehaviorPropertyMethodsCode +=
+          GenerateRuntimeBehaviorPropertyTemplateCode(
+              eventsBasedBehavior, *property);
+    }
+
+    return runtimeBehaviorPropertyMethodsCode;
+  };
+
+  auto generateInitializeSharedPropertiesCode = [&]() {
+    gd::String runtimeBehaviorSharedDataInitializationCode;
+    for (auto& property :
+          eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
+      runtimeBehaviorSharedDataInitializationCode +=
+          property->IsHidden()
+              ? GenerateInitializeSharedPropertyFromDefaultValueCode(*property)
+              : GenerateInitializeSharedPropertyFromDataCode(*property);
+    }
+
+    return runtimeBehaviorSharedDataInitializationCode;
+  };
+
+  auto generateSharedPropertiesCode = [&]() {
+    gd::String runtimeBehaviorSharedPropertyMethodsCode;
+    for (auto& property :
+          eventsBasedBehavior.GetSharedPropertyDescriptors().GetInternalVector()) {
+      runtimeBehaviorSharedPropertyMethodsCode +=
+          GenerateRuntimeBehaviorSharedPropertyTemplateCode(
+              eventsBasedBehavior, *property);
+    }
+
+    return runtimeBehaviorSharedPropertyMethodsCode;
+  };
+
+  // TODO: Update code generation to be able to generate methods (which would allow
+  // for a cleaner output, not having to add methods to the prototype).
+  auto generateMethodsCode = [&]() {
+    gd::String runtimeBehaviorMethodsCode;
+    for (auto& eventsFunction : eventsFunctionsVector) {
+      const gd::String& functionName =
+          behaviorMethodMangledNames.find(eventsFunction->GetName()) !=
+                  behaviorMethodMangledNames.end()
+              ? behaviorMethodMangledNames.find(eventsFunction->GetName())
+                    ->second
+              : "UNKNOWN_FUNCTION_fix_behaviorMethodMangledNames_please";
+      gd::String methodCodeNamespace =
+          codeNamespace + "." + eventsBasedBehavior.GetName() +
+          ".prototype." + functionName + "Context";
+      gd::String methodFullyQualifiedName = codeNamespace + "." +
+                                            eventsBasedBehavior.GetName() +
+                                            ".prototype." + functionName;
+      runtimeBehaviorMethodsCode +=
+          EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
+              project,
+              eventsBasedBehavior,
+              *eventsFunction,
+              methodCodeNamespace,
+              methodFullyQualifiedName,
+              "that._onceTriggers",
+              functionName == doStepPreEventsFunctionName
+                  ? GenerateDoStepPreEventsPreludeCode()
+                  : "",
+              includeFiles,
+              compilationForRuntime);
+
+      // Compatibility with GD <= 5.0 beta 75
+      if (functionName == "onOwnerRemovedFromScene") {
+        runtimeBehaviorMethodsCode +=
+            GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
+                eventsBasedBehavior, codeNamespace);
+      }
+      // end of compatibility code
+    }
+
+    bool hasDoStepPreEventsFunction =
+        eventsBasedBehavior.GetEventsFunctions().HasEventsFunctionNamed(
+            doStepPreEventsFunctionName);
+    if (!hasDoStepPreEventsFunction) {
+      runtimeBehaviorMethodsCode +=
+          GenerateDefaultDoStepPreEventsFunctionCode(eventsBasedBehavior,
+                                                      codeNamespace);
+    }
+
+    return runtimeBehaviorMethodsCode;
+  };
+
+  auto generateUpdateFromBehaviorDataCode = [&]() {
+    gd::String updateFromBehaviorCode;
+    for (auto& property :
+          eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
+      updateFromBehaviorCode +=
+          GenerateUpdatePropertyFromBehaviorDataCode(
+              eventsBasedBehavior, *property);
+    }
+
+    return updateFromBehaviorCode;
+  };
+
   return GenerateRuntimeBehaviorTemplateCode(
       extensionName,
       eventsBasedBehavior,
       codeNamespace,
-      [&]() {
-        gd::String runtimeBehaviorDataInitializationCode;
-        for (auto& property :
-             eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
-          runtimeBehaviorDataInitializationCode +=
-              property->IsHidden()
-                  ? GenerateInitializePropertyFromDefaultValueCode(*property)
-                  : GenerateInitializePropertyFromDataCode(*property);
-        }
-
-        return runtimeBehaviorDataInitializationCode;
-      },
-      [&]() {
-        gd::String runtimeBehaviorPropertyMethodsCode;
-        for (auto& property :
-             eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
-          runtimeBehaviorPropertyMethodsCode +=
-              GenerateRuntimeBehaviorPropertyTemplateCode(
-                  eventsBasedBehavior, *property);
-        }
-
-        return runtimeBehaviorPropertyMethodsCode;
-      },
-      // TODO: Update code generation to be able to generate methods (which would allow
-      // for a cleaner output, not having to add methods to the prototype).
-      [&]() {
-        gd::String runtimeBehaviorMethodsCode;
-        for (auto& eventsFunction : eventsFunctionsVector) {
-          const gd::String& functionName =
-              behaviorMethodMangledNames.find(eventsFunction->GetName()) !=
-                      behaviorMethodMangledNames.end()
-                  ? behaviorMethodMangledNames.find(eventsFunction->GetName())
-                        ->second
-                  : "UNKNOWN_FUNCTION_fix_behaviorMethodMangledNames_please";
-          gd::String methodCodeNamespace =
-              codeNamespace + "." + eventsBasedBehavior.GetName() +
-              ".prototype." + functionName + "Context";
-          gd::String methodFullyQualifiedName = codeNamespace + "." +
-                                                eventsBasedBehavior.GetName() +
-                                                ".prototype." + functionName;
-          runtimeBehaviorMethodsCode +=
-              EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
-                  project,
-                  eventsBasedBehavior,
-                  *eventsFunction,
-                  methodCodeNamespace,
-                  methodFullyQualifiedName,
-                  "that._onceTriggers",
-                  functionName == doStepPreEventsFunctionName
-                      ? GenerateDoStepPreEventsPreludeCode()
-                      : "",
-                  includeFiles,
-                  compilationForRuntime);
-
-          // Compatibility with GD <= 5.0 beta 75
-          if (functionName == "onOwnerRemovedFromScene") {
-            runtimeBehaviorMethodsCode +=
-                GenerateBehaviorOnDestroyToDeprecatedOnOwnerRemovedFromScene(
-                    eventsBasedBehavior, codeNamespace);
-          }
-          // end of compatibility code
-        }
-
-        bool hasDoStepPreEventsFunction =
-            eventsBasedBehavior.GetEventsFunctions().HasEventsFunctionNamed(
-                doStepPreEventsFunctionName);
-        if (!hasDoStepPreEventsFunction) {
-          runtimeBehaviorMethodsCode +=
-              GenerateDefaultDoStepPreEventsFunctionCode(eventsBasedBehavior,
-                                                         codeNamespace);
-        }
-
-        return runtimeBehaviorMethodsCode;
-      },
-      [&]() {
-        gd::String updateFromBehaviorCode;
-        for (auto& property :
-             eventsBasedBehavior.GetPropertyDescriptors().GetInternalVector()) {
-          updateFromBehaviorCode +=
-              GenerateUpdatePropertyFromBehaviorDataCode(
-                  eventsBasedBehavior, *property);
-        }
-
-        return updateFromBehaviorCode;
-      });
+      generateInitializePropertiesCode,
+      generatePropertiesCode,
+      generateInitializeSharedPropertiesCode,
+      generateSharedPropertiesCode,
+      generateMethodsCode,
+      generateUpdateFromBehaviorDataCode);
 }
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
@@ -119,6 +154,8 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorTemplateCode(
     const gd::String& codeNamespace,
     std::function<gd::String()> generateInitializePropertiesCode,
     std::function<gd::String()> generatePropertiesCode,
+    std::function<gd::String()> generateInitializeSharedPropertiesCode,
+    std::function<gd::String()> generateSharedPropertiesCode,
     std::function<gd::String()> generateMethodsCode,
     std::function<gd::String()> generateUpdateFromBehaviorDataCode) {
   return gd::String(R"jscode_template(
@@ -128,12 +165,16 @@ CODE_NAMESPACE = CODE_NAMESPACE || {};
  * Behavior generated from BEHAVIOR_FULL_NAME
  */
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME extends gdjs.RuntimeBehavior {
-  constructor(runtimeScene, behaviorData, owner) {
-    super(runtimeScene, behaviorData, owner);
-    this._runtimeScene = runtimeScene;
+  constructor(instanceContainer, behaviorData, owner) {
+    super(instanceContainer, behaviorData, owner);
+    this._runtimeScene = instanceContainer;
 
     this._onceTriggers = new gdjs.OnceTriggers();
     this._behaviorData = {};
+    this._sharedData = CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData(
+      instanceContainer,
+      behaviorData.name
+    );
     INITIALIZE_PROPERTIES_CODE
   }
 
@@ -148,6 +189,30 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = class RUNTIME_BEHAVIOR_CLASSNAME ext
   PROPERTIES_CODE
 }
 
+/**
+ * Shared data generated from BEHAVIOR_FULL_NAME
+ */
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData = class RUNTIME_BEHAVIOR_CLASSNAMESharedData {
+  constructor(sharedData) {
+    INITIALIZE_SHARED_PROPERTIES_CODE
+  }
+  
+  // Shared properties:
+  SHARED_PROPERTIES_CODE
+}
+
+CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.getSharedData = function(instanceContainer, behaviorName) {
+  if (!instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData) {
+    const initialData = instanceContainer.getInitialSharedDataForBehavior(
+      behaviorName
+    );
+    instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData = new CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.SharedData(
+      initialData
+    );
+  }
+  return instanceContainer._EXTENSION_NAME_RUNTIME_BEHAVIOR_CLASSNAMESharedData;
+}
+
 // Methods:
 METHODS_CODE
 
@@ -159,9 +224,13 @@ gdjs.registerBehavior("EXTENSION_NAME::BEHAVIOR_NAME", CODE_NAMESPACE.RUNTIME_BE
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
                       eventsBasedBehavior.GetName())
       .FindAndReplace("CODE_NAMESPACE", codeNamespace)
+      .FindAndReplace("INITIALIZE_SHARED_PROPERTIES_CODE",
+                      generateInitializeSharedPropertiesCode())
       .FindAndReplace("INITIALIZE_PROPERTIES_CODE",
                       generateInitializePropertiesCode())
       .FindAndReplace("UPDATE_FROM_BEHAVIOR_DATA_CODE", generateUpdateFromBehaviorDataCode())
+      // It must be done before PROPERTIES_CODE.
+      .FindAndReplace("SHARED_PROPERTIES_CODE", generateSharedPropertiesCode())
       .FindAndReplace("PROPERTIES_CODE", generatePropertiesCode())
       .FindAndReplace("METHODS_CODE", generateMethodsCode());
   ;
@@ -174,11 +243,29 @@ gd::String BehaviorCodeGenerator::GenerateInitializePropertyFromDataCode(
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
 }
+
+gd::String BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDataCode(
+    const gd::NamedPropertyDescriptor& property) {
+  return gd::String(R"jscode_template(
+    this.PROPERTY_NAME = sharedData.PROPERTY_NAME !== undefined ? sharedData.PROPERTY_NAME : DEFAULT_VALUE;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+}
+
 gd::String
 BehaviorCodeGenerator::GenerateInitializePropertyFromDefaultValueCode(
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
     this._behaviorData.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
+}
+
+gd::String
+BehaviorCodeGenerator::GenerateInitializeSharedPropertyFromDefaultValueCode(
+    const gd::NamedPropertyDescriptor& property) {
+  return gd::String(R"jscode_template(
+    this.PROPERTY_NAME = DEFAULT_VALUE;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property));
 }
@@ -192,7 +279,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
   }
   SETTER_NAME(newValue) {
     this._behaviorData.PROPERTY_NAME = newValue;
-  })jscode_template")
+  }TOGGLE_PROPERTY_CODE)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName())
       .FindAndReplace("GETTER_NAME",
                       GetBehaviorPropertyGetterName(property.GetName()))
@@ -200,7 +287,55 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorPropertyTemplateCode(
                       GetBehaviorPropertySetterName(property.GetName()))
       .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
       .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
-                      eventsBasedBehavior.GetName());
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace(
+          "TOGGLE_PROPERTY_CODE",
+          (property.GetType() == "Boolean"
+               ? GenerateToggleBooleanPropertyTemplateCode(
+                     GetBehaviorPropertyToggleFunctionName(property.GetName()),
+                     GetBehaviorPropertyGetterName(property.GetName()),
+                     GetBehaviorPropertySetterName(property.GetName()))
+               : ""));
+}
+
+gd::String BehaviorCodeGenerator::GenerateToggleBooleanPropertyTemplateCode(
+    const gd::String &toggleFunctionName, const gd::String &getterName,
+    const gd::String &setterName) {
+  return gd::String(R"jscode_template(
+  TOGGLE_NAME() {
+    this.SETTER_NAME(!this.GETTER_NAME());
+  })jscode_template")
+      .FindAndReplace("TOGGLE_NAME", toggleFunctionName)
+      .FindAndReplace("GETTER_NAME", getterName)
+      .FindAndReplace("SETTER_NAME", setterName);
+}
+
+gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorSharedPropertyTemplateCode(
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::NamedPropertyDescriptor& property) {
+  return gd::String(R"jscode_template(
+  GETTER_NAME() {
+    return this.PROPERTY_NAME !== undefined ? this.PROPERTY_NAME : DEFAULT_VALUE;
+  }
+  SETTER_NAME(newValue) {
+    this.PROPERTY_NAME = newValue;
+  }TOGGLE_PROPERTY_CODE)jscode_template")
+      .FindAndReplace("PROPERTY_NAME", property.GetName())
+      .FindAndReplace("GETTER_NAME",
+                      GetBehaviorSharedPropertyGetterInternalName(property.GetName()))
+      .FindAndReplace("SETTER_NAME",
+                      GetBehaviorSharedPropertySetterInternalName(property.GetName()))
+      .FindAndReplace("DEFAULT_VALUE", GeneratePropertyValueCode(property))
+      .FindAndReplace("RUNTIME_BEHAVIOR_CLASSNAME",
+                      eventsBasedBehavior.GetName())
+      .FindAndReplace(
+          "TOGGLE_PROPERTY_CODE",
+          (property.GetType() == "Boolean"
+               ? GenerateToggleBooleanPropertyTemplateCode(
+                     GetBehaviorSharedPropertyToggleFunctionInternalName(property.GetName()),
+                     GetBehaviorSharedPropertyGetterInternalName(property.GetName()),
+                     GetBehaviorSharedPropertySetterInternalName(property.GetName()))
+               : ""));
 }
 
 gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
@@ -263,4 +398,33 @@ gd::String BehaviorCodeGenerator::GenerateDoStepPreEventsPreludeCode() {
   return "this._onceTriggers.startNewFrame();";
 }
 
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertyGetterInternalName(propertyName);
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertySetterInternalName(propertyName);
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyToggleFunctionName(
+    const gd::String& propertyName) {
+  return "_sharedData." + GetBehaviorSharedPropertyToggleFunctionInternalName(propertyName);
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyGetterInternalName(
+    const gd::String& propertyName) {
+  return "_get" + propertyName;
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertySetterInternalName(
+    const gd::String& propertyName) {
+  return "_set" + propertyName;
+}
+
+gd::String BehaviorCodeGenerator::GetBehaviorSharedPropertyToggleFunctionInternalName(
+    const gd::String& propertyName) {
+  return "_toggle" + propertyName;
+}
 }  // namespace gdjs

@@ -123,6 +123,11 @@ class GD_CORE_API Instruction {
    */
   void SetParameter(std::size_t nb, const gd::Expression& val);
 
+  /** Add a parameter at the end
+   * \param val The new value of the parameter
+   */
+  void AddParameter(const gd::Expression& val);
+
   /** \brief Get a reference to the std::vector containing the parameters.
    * \return A std::vector containing the parameters
    */

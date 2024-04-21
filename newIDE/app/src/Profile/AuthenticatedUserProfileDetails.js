@@ -3,47 +3,33 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
-import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
-import { markBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
-import { useTimeout } from '../Utils/UseTimeout';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
-  onEditProfile: () => void,
-  onChangeEmail: () => void,
+  onOpenEditProfileDialog: () => void,
+  onOpenChangeEmailDialog: () => void,
   authenticatedUser: AuthenticatedUser,
 |};
 
 const AuthenticatedUserProfileDetails = ({
-  onEditProfile,
-  onChangeEmail,
+  onOpenEditProfileDialog,
+  onOpenChangeEmailDialog,
   authenticatedUser,
 }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
-  const isMounted = useIsMounted();
-  const [emailSent, setEmailSent] = React.useState<boolean>(false);
-  const sendEmail = React.useCallback(
+  const openEmailVerificationDialog = React.useCallback(
     () => {
-      authenticatedUser.onSendEmailVerification();
-      setEmailSent(true);
-      setTimeout(() => {
-        if (!isMounted.current) return;
-        setEmailSent(false);
-      }, 3000);
+      authenticatedUser.onOpenEmailVerificationDialog({
+        sendEmailAutomatically: true,
+        showSendEmailButton: false,
+      });
     },
-    [authenticatedUser, isMounted]
-  );
-
-  useTimeout(
-    React.useCallback(() => markBadgesAsSeen(authenticatedUser), [
-      authenticatedUser,
-    ]),
-    5000
+    [authenticatedUser]
   );
 
   return firebaseUser && profile ? (
@@ -52,23 +38,16 @@ const AuthenticatedUserProfileDetails = ({
         <AlertMessage
           kind="info"
           renderRightButton={() => (
-            <FlatButton
-              label={
-                emailSent ? (
-                  <Trans>Email sent!</Trans>
-                ) : (
-                  <Trans>Send it again</Trans>
-                )
-              }
-              onClick={sendEmail}
-              disabled={emailSent}
+            <RaisedButton
+              label={<Trans>Send it again</Trans>}
+              onClick={openEmailVerificationDialog}
               primary
             />
           )}
         >
           <Trans>
-            It looks like your email is not verified. Click on the link received
-            by email to verify your account. Didn't receive it?
+            You are missing out on asset store discounts and other benefits!
+            Verify your email address. Didn't receive it?
           </Trans>
         </AlertMessage>
       )}
@@ -79,10 +58,10 @@ const AuthenticatedUserProfileDetails = ({
             ? { ...authenticatedUser.profile, email: firebaseUser.email }
             : null
         }
+        subscription={authenticatedUser.subscription}
         isAuthenticatedUserProfile
-        onChangeEmail={onChangeEmail}
-        onEditProfile={onEditProfile}
-        badges={authenticatedUser.badges}
+        onOpenChangeEmailDialog={onOpenChangeEmailDialog}
+        onOpenEditProfileDialog={onOpenEditProfileDialog}
       />
     </ColumnStackLayout>
   ) : (

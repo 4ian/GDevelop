@@ -19,16 +19,17 @@ import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import Checkbox from '../UI/Checkbox';
 
-import InfoIcon from '@material-ui/icons/Info';
-import WarningIcon from '@material-ui/icons/Warning';
-import ErrorIcon from '@material-ui/icons/Error';
-import MinimizeIcon from '@material-ui/icons/PhotoSizeSelectSmall';
-import ExpandIcon from '@material-ui/icons/AspectRatio';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import FilterIcon from '@material-ui/icons/FilterList';
 import TimerIcon from '@material-ui/icons/Timer';
-import FolderIcon from '@material-ui/icons/Folder';
+
+import InfoIcon from '../UI/CustomSvgIcons/SquaredInfo';
+import WarningIcon from '../UI/CustomSvgIcons/Warning';
+import ErrorIcon from '../UI/CustomSvgIcons/Error';
+import FilterIcon from '../UI/CustomSvgIcons/Filter';
+import FolderIcon from '../UI/CustomSvgIcons/Folder';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import MaximizeIcon from '../UI/CustomSvgIcons/Maximize';
+import MinimizeIcon from '../UI/CustomSvgIcons/Minimize';
 
 export type Log = {
   message: string,
@@ -289,7 +290,7 @@ export const DebuggerConsole = ({
               )
             }
             checkedIcon={<MinimizeIcon />}
-            uncheckedIcon={<ExpandIcon />}
+            uncheckedIcon={<MaximizeIcon />}
             checked={showDetails}
             onCheck={(_, enabled) => setShowDetails(enabled)}
           />
@@ -313,8 +314,9 @@ export const DebuggerConsole = ({
 
       {editingHiddenGroups && (
         <Dialog
-          open
           title={<Trans>Select log groups to display</Trans>}
+          maxWidth="sm"
+          open
           actions={[
             <FlatButton
               key="close"

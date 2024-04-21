@@ -29,13 +29,13 @@ class GD_CORE_API LoadingScreen {
    * \brief Return true if the GDevelop logo should be shown while loading
    * assets.
    */
-  bool IsGDevelopSplashShown() const { return showGDevelopSplash; };
+  bool IsGDevelopLogoShownDuringLoadingScreen() const { return showGDevelopLogoDuringLoadingScreen; };
 
   /**
    * \brief Set if the GDevelop logo should be shown while loading assets.
    */
-  LoadingScreen& ShowGDevelopSplash(bool show) {
-    showGDevelopSplash = show;
+  LoadingScreen& ShowGDevelopLogoDuringLoadingScreen(bool show) {
+    showGDevelopLogoDuringLoadingScreen = show;
     return *this;
   };
 
@@ -157,7 +157,7 @@ class GD_CORE_API LoadingScreen {
   ///@}
 
  private:
-  bool showGDevelopSplash;
+  bool showGDevelopLogoDuringLoadingScreen;
   gd::String gdevelopLogoStyle;
   gd::String backgroundImageResourceName;
   int backgroundColor;

@@ -140,9 +140,14 @@ const EventTextDialog = (props: Props) => {
 
   return (
     <Dialog
-      title={<Trans>Edit the event text</Trans>}
+      title={
+        eventType === 'BuiltinCommonInstructions::Comment' ? (
+          <Trans>Edit comment</Trans>
+        ) : (
+          <Trans>Edit group</Trans>
+        )
+      }
       open
-      noMargin
       actions={[
         <FlatButton
           key="close"
@@ -161,7 +166,7 @@ const EventTextDialog = (props: Props) => {
       onApply={onApply}
     >
       <Column noMargin>
-        <MiniToolbar>
+        <MiniToolbar noPadding>
           <MiniToolbarText firstChild>
             <Trans>Background color:</Trans>
           </MiniToolbarText>
@@ -191,11 +196,11 @@ const EventTextDialog = (props: Props) => {
           )}
         </MiniToolbar>
         <Line noMargin>
-          <Column expand>
+          <Column expand noMargin>
             <Line>
               <SemiControlledTextField
                 commitOnBlur
-                hintText={t`Enter the text to be displayed`}
+                translatableHintText={t`Enter the text to be displayed`}
                 fullWidth
                 multiline
                 rows={8}

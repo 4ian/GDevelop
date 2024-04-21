@@ -2,19 +2,18 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import {
   LeaderboardReplacerProgressDialog,
   ReplacePromptDialog,
 } from '../../../Leaderboard/useLeaderboardReplacer';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { fakeIndieAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
+import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Leaderboard/LeaderboardReplacerDialog',
   component: LeaderboardReplacerProgressDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const IsReplacingLeaderboards = () => (
@@ -40,9 +39,9 @@ export const WithErrors = () => (
 );
 
 export const ReplacerPromptAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <ReplacePromptDialog
-      leaderboardsToReplace={['leadeboard-to-replace']}
+      leaderboardsToReplace={['leaderboard-to-replace']}
       onClose={action('onClose')}
       onTriggerReplace={action('onTriggerReplace')}
     />
@@ -51,10 +50,10 @@ export const ReplacerPromptAuthenticatedUser = () => (
 
 export const ReplacerPromptNotAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider
-    value={{ ...fakeIndieAuthenticatedUser, authenticated: false }}
+    value={{ ...fakeSilverAuthenticatedUser, authenticated: false }}
   >
     <ReplacePromptDialog
-      leaderboardsToReplace={['leadeboard-to-replace']}
+      leaderboardsToReplace={['leaderboard-to-replace']}
       onClose={action('onClose')}
       onTriggerReplace={action('onTriggerReplace')}
     />

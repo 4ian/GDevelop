@@ -1,12 +1,11 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
-  const logger = new gdjs.Logger('Tilemap object');
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    */
-  export class TileMapRuntimeObject extends gdjs.RuntimeObject {
+  export class TileMapRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.OpacityHandler {
     _frameElapsedTime: float = 0;
     _opacity: float;
     _tilemapJsonFile: string;
@@ -14,27 +13,29 @@ namespace gdjs {
     _tilemapAtlasImage: string;
     _displayMode: string;
     _layerIndex: integer;
+    _levelIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
-      super(runtimeScene, objectData);
+    constructor(instanceContainer: gdjs.RuntimeInstanceContainer, objectData) {
+      super(instanceContainer, objectData);
       this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
       this._displayMode = objectData.content.displayMode;
       this._layerIndex = objectData.content.layerIndex;
+      this._levelIndex = objectData.content.levelIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
-        runtimeScene
+        instanceContainer
       );
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
-        runtimeScene
+        instanceContainer
       );
       this._updateTileMap();
 
@@ -46,14 +47,14 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
-      const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
+      const elapsedTime = this.getElapsedTime() / 1000;
       this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
       while (this._frameElapsedTime > 1 / this._animationFps) {
-        this._renderer.incrementAnimationFrameX(runtimeScene);
+        this._renderer.incrementAnimationFrameX(instanceContainer);
         this._frameElapsedTime -= 1 / this._animationFps;
       }
     }
@@ -83,6 +84,11 @@ namespace gdjs {
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
+      }
+      if (
+        oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
+      ) {
+        this.setLevelIndex(newObjectData.content.levelIndex);
       }
       if (
         oldObjectData.content.animationSpeedScale !==
@@ -117,22 +123,29 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
+        this._levelIndex,
         (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already warn.
             return;
           }
           this._tileMapManager.getOrLoadTextureCache(
-            (textureName) =>
-              (this._runtimeScene
-                .getGame()
+            (textureName) => {
+              const game = this.getInstanceContainer().getGame();
+              const mappedName = game.resolveEmbeddedResource(
+                this._tilemapJsonFile,
+                textureName
+              );
+              return (game
                 .getImageManager()
-                .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
+                .getPIXITexture(mappedName) as unknown) as PIXI.BaseTexture<
                 PIXI.Resource
-              >,
+              >;
+            },
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,
+            this._levelIndex,
             (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
@@ -145,8 +158,13 @@ namespace gdjs {
       );
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
-     * Set the Tilemap json file to display.
+     * Set the Tilemap file to display.
      */
     setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
@@ -204,6 +222,15 @@ namespace gdjs {
       return this._layerIndex;
     }
 
+    setLevelIndex(levelIndex): void {
+      this._levelIndex = levelIndex;
+      this._updateTileMap();
+    }
+
+    getLevelIndex() {
+      return this._levelIndex;
+    }
+
     setAnimationSpeedScale(animationSpeedScale): void {
       this._animationSpeedScale = animationSpeedScale;
     }
@@ -213,17 +240,73 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      if (this._renderer.getWidth() === width) return;
+      if (this.getWidth() === width) return;
 
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     setHeight(height: float): void {
-      if (this._renderer.getHeight() === height) return;
+      if (this.getHeight() === height) return;
 
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = this.getScaleX();
+      const scaleY = this.getScaleY();
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
+    }
+
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param scale The new scale (must be greater than 0).
+     */
+    setScale(scale: float): void {
+      this.setScaleX(scale);
+      this.setScaleY(scale);
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param scaleX The new scale (must be greater than 0).
+     */
+    setScaleX(scaleX: float): void {
+      if (scaleX < 0) {
+        scaleX = 0;
+      }
+      if (this.getScaleX() === scaleX) return;
+
+      this._renderer.setScaleX(scaleX);
+      this.invalidateHitboxes();
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param scaleY The new scale (must be greater than 0).
+     */
+    setScaleY(scaleY: float): void {
+      if (scaleY < 0) {
+        scaleY = 0;
+      }
+      if (this.getScaleY() === scaleY) return;
+
+      this._renderer.setScaleY(scaleY);
+      this.invalidateHitboxes();
     }
 
     setX(x: float): void {
@@ -241,18 +324,11 @@ namespace gdjs {
       this._renderer.updateAngle();
     }
 
-    /**
-     * Set object opacity.
-     * @param opacity The new opacity of the object (0-255).
-     */
     setOpacity(opacity: float): void {
       this._opacity = opacity;
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get object opacity.
-     */
     getOpacity(): float {
       return this._opacity;
     }
@@ -263,6 +339,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    getScaleX(): float {
+      return this._renderer.getScaleX();
+    }
+
+    getScaleY(): float {
+      return this._renderer.getScaleY();
     }
   }
   gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);

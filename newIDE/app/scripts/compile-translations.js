@@ -146,21 +146,17 @@ const lintMessagePo = (locale, path) => {
 
     if (operatorWithBracketsCount !== 4 && operatorWithBracketsCount !== 8) {
       errors.push({
-        str:
-          'Unexpected number of <operator>: verify the <operator> translations',
+        str: `Unexpected number of <operator> (${operatorWithBracketsCount}): verify the <operator> translations`,
       });
     }
-    if (valueWithBracketsCount !== 4 && valueWithBracketsCount !== 8) {
+    if (valueWithBracketsCount !== 6 && valueWithBracketsCount !== 12) {
       errors.push({
-        str: 'Unexpected number of <value>: verify the <value> translations',
+        str: `Unexpected number of <value> (${valueWithBracketsCount}): verify the <value> translations`,
       });
     }
-    if (subjectWithBracketsCount !== 7 && subjectWithBracketsCount !== 11 && subjectWithBracketsCount !== 14) {
-      // 7 is for no translations at all for <subject>, 14 is for all translated and
-      // 11 is for only the ones before GDevelop 5.0 beta 106 translated.
+    if (subjectWithBracketsCount !== 12 && subjectWithBracketsCount !== 24) {
       errors.push({
-        str:
-          'Unexpected number of <subject>: verify the <subject> translations',
+        str: `Unexpected number of <subject> (${subjectWithBracketsCount}): verify the <subject> translations`,
       });
     }
     if (
@@ -251,12 +247,12 @@ getLocales()
 
     const successesLocales = successes.map(({ locale }) => locale).join(',');
     if (successesLocales) {
-      shell.echo(`ℹ️ Concatened translations for ${successesLocales}.`);
+      shell.echo(`ℹ️ Concatenated translations for ${successesLocales}.`);
     }
     if (failures.length) {
       failures.forEach(({ locale, shellOutput }) => {
         shell.echo(
-          `❌ Error(s) occurred while concatening translations for ${locale}: ` +
+          `❌ Error(s) occurred while concatenating translations for ${locale}: ` +
             shellOutput.stderr
         );
       });
@@ -308,18 +304,25 @@ getLocales()
   })
   .then(locales => {
     // Compute some stats about the languages...
-    return Promise.all(
-      locales.map(locale => {
-        const compiledCatalog = require(getLocaleCompiledCatalogPath(locale));
+    return locales
+      .map(locale => {
+        try {
+          const compiledCatalog = require(getLocaleCompiledCatalogPath(locale));
 
-        return {
-          languageCode: locale,
-          languageName: getLocaleName(locale),
-          languageNativeName: getLocaleNativeName(locale),
-          translationRatio: computeTranslationRatio(compiledCatalog),
-        };
+          return {
+            languageCode: locale,
+            languageName: getLocaleName(locale),
+            languageNativeName: getLocaleNativeName(locale),
+            translationRatio: computeTranslationRatio(compiledCatalog),
+          };
+        } catch (error) {
+          shell.echo(
+            `⚠️ Can't find catalog for ${locale} (${error}) - ignoring this language.`
+          );
+          return null;
+        }
       })
-    );
+      .filter(Boolean);
   })
   .then(
     // ... and store the stats in LocaleMetadata.js, to be displayed/used

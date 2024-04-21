@@ -2,28 +2,19 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import { makeStyles } from '@material-ui/styles';
-import IconButton from './IconButton';
-import TextField from './TextField';
-import Paper from '@material-ui/core/Paper';
-import {
-  Collapse,
-  Typography,
-  TextField as MuiTextField,
-} from '@material-ui/core';
-import Close from '@material-ui/icons/Close';
-import Search from '@material-ui/icons/Search';
-import FilterList from '@material-ui/icons/FilterList';
+import TextField, { type TextFieldInterface } from './TextField';
+import Collapse from '@material-ui/core/Collapse';
+import MuiTextField from '@material-ui/core/TextField';
+import Text from './Text';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import ElementWithMenu from './Menu/ElementWithMenu';
-import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import { useDebounce } from '../Utils/UseDebounce';
+import SearchBarContainer from './SearchBarContainer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 type TagsHandler = {|
   remove: string => void,
@@ -53,80 +44,15 @@ type Props = {|
   buildMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown. */
   helpPagePath?: ?string,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 |};
-
-const getStyles = (value: ?string, disabled?: boolean) => {
-  const nonEmpty = !!value && value.length > 0;
-
-  return {
-    root: {
-      height: 30,
-      display: 'flex',
-      flex: 1,
-      justifyContent: 'space-between',
-    },
-    iconButtonClose: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-        transform: nonEmpty ? 'scale(1, 1)' : 'scale(0, 0)',
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-      iconStyle: {
-        opacity: nonEmpty ? 1 : 0,
-        transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-    },
-    iconButtonSearch: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-        transform: nonEmpty ? 'scale(0, 0)' : 'scale(1, 1)',
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-        marginRight: -30,
-      },
-      iconStyle: {
-        opacity: nonEmpty ? 0 : 1,
-        transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-    },
-    iconButtonFilter: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-      },
-    },
-    iconButtonHelp: {
-      style: {
-        opacity: !disabled ? 0.54 : 0.38,
-      },
-    },
-    input: {
-      width: '100%',
-    },
-    searchContainer: {
-      position: 'relative',
-      margin: 'auto 8px',
-      width: '100%',
-    },
-  };
-};
-
-const useAutocompleteStyles = makeStyles(
-  ({
-    palette: {
-      text: { primary },
-    },
-  }) => ({
-    // We can't change the label opacity directly as it also changes the
-    // opacity of the background. Colors are stored in the themes as hex
-    // (#A3B or #AE345B) so we need to add the alpha channel to control
-    // opacity.
-    groupLabel: { color: `${primary}${primary.length > 4 ? '88' : '8'}` },
-  })
-);
 
 export type SearchBarInterface = {|
   focus: () => void,
   blur: () => void,
 |};
+
+const noop = () => {};
 
 /**
  * Material design search bar,
@@ -148,6 +74,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       tags,
       buildMenuTemplate,
       helpPagePath,
+      autoFocus,
     },
     ref
   ) => {
@@ -165,8 +92,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         textField.current.blur();
       }
     };
+    const { isMobile } = useResponsiveWindowSize();
 
-    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+    const [isInputFocused, setIsInputFocused] = React.useState(false);
 
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
@@ -177,15 +105,23 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       parentValue
     );
 
-    const textField = React.useRef<?TextField>(null);
+    const textField = React.useRef<?TextFieldInterface>(null);
 
-    const styles = getStyles(value, disabled);
-    const autocompleteStyles = useAutocompleteStyles();
+    const nonEmpty = !!value && value.length > 0;
+    const debouncedOnChange = useDebounce(onChange ? onChange : noop, 250);
 
-    const changeValue = React.useCallback(
-      newValue => {
-        setValue(newValue || '');
-        onChange && onChange(newValue || '');
+    const changeValueDebounced = React.useCallback(
+      (newValue: string) => {
+        setValue(newValue);
+        debouncedOnChange(newValue);
+      },
+      [debouncedOnChange, setValue]
+    );
+
+    const changeValueImmediately = React.useCallback(
+      (newValue: string) => {
+        setValue(newValue);
+        onChange && onChange(newValue);
       },
       [onChange, setValue]
     );
@@ -199,42 +135,49 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       [parentValue]
     );
 
-    const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-    const previousChosenTagsCount = React.useRef<number>(0);
+    const shouldAutofocusSearchbar = useShouldAutofocusInput();
+    const shouldAutoFocusTextField = !autoFocus
+      ? false
+      : autoFocus === 'desktopAndMobileDevices'
+      ? true
+      : shouldAutofocusSearchbar;
+    const previousChosenTagsCount = React.useRef<number>(
+      tagsHandler ? tagsHandler.chosenTags.size : 0
+    );
     React.useEffect(
       () => {
         // Used to focus search bar when all tags have been removed.
         // It is convenient when using keyboard to remove all tags and
         // quickly get back to the text field.
         if (
-          shouldAutofocusSearchbar &&
+          shouldAutoFocusTextField &&
           tagsHandler &&
           tagsHandler.chosenTags.size === 0 &&
           previousChosenTagsCount.current > 0
         )
           focus();
       },
-      [tagsHandler, shouldAutofocusSearchbar]
+      [tagsHandler, shouldAutoFocusTextField]
     );
 
-    React.useEffect(() => {
-      previousChosenTagsCount.current = tagsHandler
-        ? tagsHandler.chosenTags.size
-        : 0;
-    });
-
     const handleBlur = () => {
+      setIsInputFocused(false);
       if (!value || value.trim() === '') {
-        changeValue('');
+        changeValueImmediately('');
       }
     };
 
+    const handleFocus = () => {
+      setIsInputFocused(true);
+    };
+
     const handleInput = (e: {| target: {| value: string |} |}) => {
-      changeValue(e.target.value);
+      changeValueDebounced(e.target.value);
     };
 
     const handleCancel = () => {
-      changeValue('');
+      changeValueImmediately('');
+      if (!isMobile) focus();
     };
 
     const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
@@ -247,7 +190,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     const handleAutocompleteInput = (
       event: any,
-      newValue: string,
+      newValue: ?string,
       reason:
         | 'create-option'
         | 'select-option'
@@ -257,139 +200,130 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     ) => {
       // Called when the value of the autocomplete changes.
       if (reason === 'select-option') {
-        tagsHandler && tagsHandler.add(newValue);
-        changeValue('');
+        tagsHandler && tagsHandler.add(newValue || '');
+
+        // Clear the value that was entered as an option was selected.
+        changeValueImmediately('');
+
+        // Clear this value to make sure the autocomplete doesn't keep the
+        // last typed value in memory.
+        setAutocompleteValue('');
       } else {
-        changeValue(newValue);
+        changeValueImmediately(newValue || '');
       }
     };
 
     const handleAutocompleteInputChange = (
       event: any,
-      newValue: string,
+      newValue: ?string,
       reason: 'reset' | 'input' | 'clear'
     ) => {
       // Called when the value of the input within the autocomplete changes.
       if (reason === 'reset') {
-        // Happens when user selects an option
-        setValue('');
+        // Happens when user selects an option. Do as for 'select-option':
+        // Clear the value that was entered as an option was selected.
+        changeValueImmediately('');
+
         // Clear this value to make sure the autocomplete doesn't keep the
         // last typed value in memory.
         setAutocompleteValue('');
       } else {
-        setValue(newValue);
+        changeValueDebounced(newValue || '');
       }
     };
 
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
-            <Line noMargin>
-              <Paper
-                style={{
-                  backgroundColor: gdevelopTheme.searchBar.backgroundColor,
-                  ...styles.root,
-                }}
-                square={aspect === 'integrated-search-bar'}
-                elevation={0}
-              >
-                <div style={styles.searchContainer}>
-                  {tags ? (
-                    <Autocomplete
-                      id={id}
-                      options={tags.slice(0, 30)}
-                      groupBy={options => i18n._(t`Apply a filter`)}
-                      classes={autocompleteStyles}
-                      freeSolo
-                      fullWidth
-                      defaultValue=""
-                      inputValue={value}
-                      value={autocompleteValue}
-                      onChange={handleAutocompleteInput}
-                      onInputChange={handleAutocompleteInputChange}
-                      onKeyPress={handleKeyPressed}
-                      onBlur={handleBlur}
-                      renderOption={option => <Typography>{option}</Typography>}
-                      renderInput={params => (
-                        <MuiTextField
-                          margin="none"
-                          {...params}
-                          inputRef={textField}
-                          InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                            endAdornment: null,
-                            placeholder: i18n._(placeholder || t`Search`),
-                          }}
-                        />
-                      )}
-                    />
-                  ) : (
-                    <TextField
-                      id={id}
+          <SearchBarContainer
+            onCancel={handleCancel}
+            isFocused={isInputFocused}
+            disabled={disabled}
+            isSearchBarEmpty={!nonEmpty}
+            helpPagePath={helpPagePath}
+            aspect={aspect}
+            buildMenuTemplate={buildMenuTemplate}
+            renderSubLine={
+              tagsHandler
+                ? () => (
+                    <Collapse in={tagsHandler.chosenTags.size > 0}>
+                      <TagChips
+                        tags={Array.from(tagsHandler.chosenTags)}
+                        onRemove={tag => {
+                          if (tagsHandler.chosenTags.size === 1) {
+                            // If the last tag is removed, focus the search bar.
+                            focus();
+                          }
+                          tagsHandler.remove(tag);
+                        }}
+                      />
+                    </Collapse>
+                  )
+                : null
+            }
+            renderContent={({ inputStyle, popperContainerStyle }) =>
+              tags ? (
+                <Autocomplete
+                  id={id}
+                  options={tags}
+                  freeSolo
+                  fullWidth
+                  defaultValue=""
+                  inputValue={value}
+                  value={autocompleteValue}
+                  onChange={handleAutocompleteInput}
+                  onInputChange={handleAutocompleteInputChange}
+                  onKeyPress={handleKeyPressed}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
+                  getOptionDisabled={option =>
+                    option.disabled ||
+                    (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
+                  }
+                  getOptionSelected={(option, _) =>
+                    !!tagsHandler && tagsHandler.chosenTags.has(option)
+                  }
+                  PopperComponent={props => (
+                    <div style={popperContainerStyle}>{props.children}</div>
+                  )}
+                  renderOption={option => <Text noMargin>{option}</Text>}
+                  renderInput={params => (
+                    <MuiTextField
                       margin="none"
-                      hintText={placeholder || t`Search`}
-                      onBlur={handleBlur}
-                      value={value}
-                      onChange={handleInput}
-                      onKeyUp={handleKeyPressed}
-                      fullWidth
-                      style={styles.input}
-                      underlineShow={false}
-                      disabled={disabled}
-                      ref={textField}
+                      {...params}
+                      autoFocus={shouldAutoFocusTextField}
+                      inputRef={textField}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        endAdornment: null,
+                        placeholder: i18n._(placeholder || t`Search`),
+                        style: inputStyle,
+                      }}
                     />
                   )}
-                </div>
-                {buildMenuTemplate && (
-                  <ElementWithMenu
-                    element={
-                      <IconButton
-                        style={styles.iconButtonFilter.style}
-                        disabled={disabled}
-                        size="small"
-                      >
-                        <FilterList />
-                      </IconButton>
-                    }
-                    buildMenuTemplate={buildMenuTemplate}
-                  />
-                )}
-                {helpPagePath && (
-                  <HelpIcon
-                    disabled={disabled}
-                    helpPagePath={helpPagePath}
-                    style={styles.iconButtonHelp.style}
-                    size="small"
-                  />
-                )}
-                <IconButton
-                  style={styles.iconButtonSearch.style}
-                  disabled={disabled}
-                  size="small"
-                >
-                  <Search style={styles.iconButtonSearch.iconStyle} />
-                </IconButton>
-                <IconButton
-                  onClick={handleCancel}
-                  style={styles.iconButtonClose.style}
-                  disabled={disabled}
-                  size="small"
-                >
-                  <Close style={styles.iconButtonClose.iconStyle} />
-                </IconButton>
-              </Paper>
-            </Line>
-            {tagsHandler && (
-              <Collapse in={tagsHandler.chosenTags.size > 0}>
-                <TagChips
-                  tags={Array.from(tagsHandler.chosenTags)}
-                  onRemove={tag => tagsHandler.remove(tag)}
                 />
-              </Collapse>
-            )}
-          </Column>
+              ) : (
+                <TextField
+                  id={id}
+                  margin="none"
+                  dataset={{ searchBar: 'true' }}
+                  translatableHintText={placeholder || t`Search`}
+                  onBlur={handleBlur}
+                  value={value}
+                  onChange={handleInput}
+                  onKeyUp={handleKeyPressed}
+                  fullWidth
+                  underlineShow={false}
+                  disabled={disabled}
+                  ref={textField}
+                  inputStyle={inputStyle}
+                  onFocus={handleFocus}
+                  autoFocus={autoFocus}
+                />
+              )
+            }
+          />
         )}
       </I18n>
     );
@@ -397,11 +331,3 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 );
 
 export default SearchBar;
-
-export const useShouldAutofocusSearchbar = () => {
-  // Note: this is not a React hook but is named as one to encourage
-  // components to use it as such, so that it could be reworked
-  // at some point to use a context (verify in this case all usages).
-  const isTouchscreen = useScreenType() === 'touch';
-  return !isTouchscreen;
-};

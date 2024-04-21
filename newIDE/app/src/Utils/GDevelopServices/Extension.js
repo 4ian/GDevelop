@@ -2,14 +2,16 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
-import { type UserPublicProfileSearch } from './User';
+import { type UserPublicProfile } from './User';
+
+const gd: libGDevelop = global.gd;
 
 type ExtensionTier = 'community' | 'reviewed';
 
-export type ExtensionShortHeader = {|
+export type ExtensionRegistryItemHeader = {|
   tier: ExtensionTier,
-  shortDescription: string,
-  authors?: Array<UserPublicProfileSearch>,
+  authorIds: Array<string>,
+  authors?: Array<UserPublicProfile>,
   extensionNamespace: string,
   fullName: string,
   name: string,
@@ -18,15 +20,43 @@ export type ExtensionShortHeader = {|
   url: string,
   headerUrl: string,
   tags: Array<string>,
+  category: string,
   previewIconUrl: string,
+|};
+
+export type ExtensionShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  shortDescription: string,
   eventsBasedBehaviorsCount: number,
   eventsFunctionsCount: number,
 |};
+
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
   helpPath: string,
   description: string,
   iconUrl: string,
+|};
+
+export type BehaviorShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  description: string,
+  extensionName: string,
+  objectType: string,
+  /**
+   * All required behaviors including transitive ones.
+   */
+  allRequiredBehaviorTypes: Array<string>,
+  /** This attribute is calculated.
+   * @see adaptBehaviorHeader
+   */
+  type: string,
+|};
+
+export type ObjectShortHeader = {|
+  ...ExtensionRegistryItemHeader,
+  description: string,
+  extensionName: string,
 |};
 
 /**
@@ -46,11 +76,19 @@ export type SerializedExtension = {
 
 export type ExtensionsRegistry = {
   version: string,
-  allTags: Array<string>,
-  extensionShortHeaders: Array<ExtensionShortHeader>,
-  views?: {
+  headers: Array<ExtensionShortHeader>,
+  views: {
     default: {
-      firstExtensionIds: Array<string>,
+      firstIds: Array<string>,
+    },
+  },
+};
+
+export type BehaviorsRegistry = {
+  headers: Array<BehaviorShortHeader>,
+  views: {
+    default: {
+      firstIds: Array<{ extensionName: string, behaviorName: string }>,
     },
   },
 };
@@ -77,7 +115,9 @@ type SerializedExtensionWithTagsAsString = {
  * Transform the tags from their old representation sent by the API (a string)
  * to their new representation (array of strings).
  */
-const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
+const transformTagsAsStringToTagsAsArray = <
+  T: { tags: string } | { tags: string[] }
+>(
   dataWithTags: T
 ): $Exact<{ ...T, tags: Array<string> }> => {
   // Handle potential future update of the API that would
@@ -94,10 +134,10 @@ const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
   };
 };
 
-/** Check if the IDE version, passed as argument, satisfiy the version required by the extension. */
+/** Check if the IDE version, passed as argument, satisfy the version required by the extension. */
 export const isCompatibleWithExtension = (
   ideVersion: string,
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ) =>
   extensionShortHeader.gdevelopVersion
     ? semverSatisfies(ideVersion, extensionShortHeader.gdevelopVersion, {
@@ -105,23 +145,57 @@ export const isCompatibleWithExtension = (
       })
     : true;
 
-export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
-    .then(response => response.data)
-    .then(extensionsRegistry => {
-      return {
-        ...extensionsRegistry,
-        // TODO: move this to backend endpoint
-        extensionShortHeaders: extensionsRegistry.extensionShortHeaders.map(
-          transformTagsAsStringToTagsAsArray
-        ),
-      };
-    });
+export const getExtensionsRegistry = async (): Promise<ExtensionsRegistry> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/extensions-registry`
+  );
+  const extensionsRegistry: ExtensionsRegistry = response.data;
+
+  if (!extensionsRegistry) {
+    throw new Error('Unexpected response from the extensions endpoint.');
+  }
+  if (!extensionsRegistry.headers) {
+    extensionsRegistry.headers = extensionsRegistry.extensionShortHeaders;
+  }
+  if (!extensionsRegistry.views.default.firstIds) {
+    extensionsRegistry.views.default.firstIds =
+      extensionsRegistry.views.default.firstExtensionIds;
+  }
+  return {
+    ...extensionsRegistry,
+    // TODO: move this to backend endpoint
+    headers: extensionsRegistry.headers.map(transformTagsAsStringToTagsAsArray),
+  };
+};
+
+export const getBehaviorsRegistry = async (): Promise<BehaviorsRegistry> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/behaviors-registry`
+  );
+  const behaviorsRegistry: BehaviorsRegistry = response.data;
+
+  if (!behaviorsRegistry) {
+    throw new Error('Unexpected response from the behaviors endpoint.');
+  }
+  return {
+    ...behaviorsRegistry,
+    headers: behaviorsRegistry.headers.map(adaptBehaviorHeader),
+  };
+};
+
+const adaptBehaviorHeader = (
+  header: BehaviorShortHeader
+): BehaviorShortHeader => {
+  header.type = gd.PlatformExtension.getBehaviorFullType(
+    header.extensionNamespace || header.extensionName,
+    header.name
+  );
+  header = transformTagsAsStringToTagsAsArray(header);
+  return header;
 };
 
 export const getExtensionHeader = (
-  extensionShortHeader: ExtensionShortHeader
+  extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<ExtensionHeader> => {
   return axios.get(extensionShortHeader.headerUrl).then(response => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
@@ -133,7 +207,7 @@ export const getExtensionHeader = (
 };
 
 export const getExtension = (
-  extensionHeader: ExtensionShortHeader | ExtensionHeader
+  extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
   return axios.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;

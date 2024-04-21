@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { testProject } from '../GDevelopJsInitializerDecorator';
@@ -15,7 +14,7 @@ const gd: libGDevelop = global.gd;
 export default {
   title: 'ParameterFields/RelationalOperatorField',
   component: RelationalOperatorField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const RelationalOperatorFieldString = () => (
@@ -23,7 +22,7 @@ export const RelationalOperatorFieldString = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -40,7 +39,7 @@ export const RelationalOperatorFieldNumber = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -57,7 +56,7 @@ export const RelationalOperatorFieldColor = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}
@@ -72,7 +71,7 @@ export const RelationalOperatorFieldUnknownType = () => (
     initialValue=""
     render={(value, onChange) => (
       <RelationalOperatorField
-        scope={{}}
+        scope={{ project: testProject.project }}
         value={value}
         onChange={onChange}
         globalObjectsContainer={testProject.project}

@@ -2,12 +2,13 @@ import { PolygonVertices, integer, float } from './CommonTypes';
 /**
  * A tile map model.
  *
- * Tile map files are parsed into this model by {@link TiledTileMapLoader}.
+ * Tile map files are parsed into this model by {@link TiledTileMapLoader} or {@link LDtkTileMapLoader}.
  * This model is used for rending ({@link TileMapRuntimeObjectPixiRenderer})
  * and hitboxes handling ({@link TransformedCollisionTileMap}).
  * This allows to support new file format with only a new parser.
  */
 export declare class EditableTileMap {
+  private _backgroundResourceName?;
   private _tileSet;
   private _layers;
   /**
@@ -84,6 +85,10 @@ export declare class EditableTileMap {
    */
   addObjectLayer(id: integer): EditableObjectLayer;
   /**
+   * @returns The resource name of the background
+   */
+  getBackgroundResourceName(): string;
+  /**
    * @returns All the layers of the tile map.
    */
   getLayers(): Iterable<AbstractEditableLayer>;
@@ -99,6 +104,10 @@ export declare class EditableTileMap {
    * @returns true when the point is inside a tile with a given tag.
    */
   pointIsInsideTile(x: float, y: float, tag: string): boolean;
+  /**
+   * @param resourceName The name of the resource
+   */
+  setBackgroundResourceName(resourceName: string): void;
 }
 /**
  * A tile map layer.
@@ -183,15 +192,24 @@ export declare class TileObject {
  */
 export declare class EditableTileMapLayer extends AbstractEditableLayer {
   private readonly _tiles;
+  private _alpha;
   /**
    * @param tileMap The layer tile map.
    * @param id The layer identifier.
    */
   constructor(tileMap: EditableTileMap, id: integer);
   /**
+   * The opacity (between 0-1) of the layer
+   */
+  getAlpha(): float;
+  /**
+   * @param alpha The opacity between 0-1
+   */
+  setAlpha(alpha: float): void;
+  /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param tileId The tile identifier in the tile set.
+   * @param tileId The tile.
    */
   setTile(x: integer, y: integer, tileId: integer): void;
   /**
@@ -250,9 +268,15 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @returns The tile identifier from the tile set.
+   * @returns The tile's GID (id + flipping bits).
    */
-  get(x: integer, y: integer): integer | undefined;
+  getTileGID(x: integer, y: integer): integer | undefined;
+  /**
+   * @param x The layer column.
+   * @param y The layer row.
+   * @returns The tile's id.
+   */
+  getTileId(x: integer, y: integer): integer | undefined;
   /**
    * The number of tile columns in the layer.
    */
@@ -281,22 +305,27 @@ export declare class TileDefinition {
   private readonly taggedHitBoxes;
   private readonly animationLength;
   /**
+   * A tile can be a composition of several tiles.
+   */
+  private stackedTiles;
+  private stackTileId?;
+  /**
    * @param animationLength The number of frame in the tile animation.
    */
-  constructor(animationLength: integer);
+  constructor(animationLength?: integer);
   /**
    * Add a polygon for the collision layer
    * @param tag The tag to allow collision layer filtering.
    * @param polygon The polygon to use for collisions.
    */
-  add(tag: string, polygon: PolygonVertices): void;
+  addHitBox(tag: string, polygon: PolygonVertices): void;
   /**
    * This property is used by {@link TransformedCollisionTileMap}
    * to make collision classes.
    * @param tag  The tag to allow collision layer filtering.
    * @returns true if this tile contains any polygon with the given tag.
    */
-  hasTag(tag: string): boolean;
+  hasTaggedHitBox(tag: string): boolean;
   /**
    * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
    * @param tag  The tag to allow collision layer filtering.
@@ -310,6 +339,23 @@ export declare class TileDefinition {
    * @returns The number of frame in the tile animation.
    */
   getAnimationLength(): integer;
+  /**
+   * @returns The tile representing the stack of tiles.
+   */
+  getStackTileId(): integer;
+  /**
+   * @returns All the tiles composed in the stack.
+   */
+  getStackedTiles(): integer[];
+  /**
+   * @returns `true` if the defintion is a stack of tiles.
+   */
+  hasStackedTiles(): boolean;
+  /**
+   * @param stackTileId The `tileId` representing the stack.
+   * @param tiles All the tiles of stack.
+   */
+  setStackedTiles(stackTileId: integer, ...tiles: integer[]): void;
 }
 export {};
 //# sourceMappingURL=TileMapModel.d.ts.map

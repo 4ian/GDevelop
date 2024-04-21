@@ -3,6 +3,7 @@
 ## The need for a concept of "properties"
 
 A lot of elements in GDevelop can have fields which can be edited by the user. For example:
+
 * a behavior has properties that are, for most behaviors, strings, numbers and booleans.
 * an object also has properties that are shown in the editor. They are often strings (the text to display in a text object), numbers (the number of particles), booleans (a checkbox to set if a text is displayed in bold or not) and also sometimes can be a resource (for example, the image to be displayed by a tiled sprite object or the font to be used by a text object).
 * an instance on a scene also has a bunch of properties: its X and Y coordinates, its angle, etc...
@@ -72,6 +73,7 @@ That's why object and behaviors can have "properties". A property is defined by 
     return properties;
     }
     ```
+
 * **Behaviors** can also have properties (check example of existing behaviors in `JsExtension.js` or in C++ behaviors)
 * **Instances** of objects can also have custom properties.
 

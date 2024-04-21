@@ -11,8 +11,8 @@ const package = require('./package.json');
  * @param {Object[]} mainMenuTemplate The template (see ElectronMainMenu.js), where "click" is replaced
  * by declarative properties like onClickSendEvent or onClickOpenLink.
  */
-const buildMainMenuFor = (window, mainMenuTemplate) => {
-  const adaptMenuTemplate = menuTemplate =>
+const buildElectronMenuFromDeclarativeTemplate = (window, mainMenuTemplate) => {
+  const adaptMenuDeclarativeItemTemplate = menuTemplate =>
     menuTemplate.map(menuItemTemplate => {
       const hasOnClick =
         menuItemTemplate.onClickSendEvent || menuItemTemplate.onClickOpenLink;
@@ -23,7 +23,11 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
         click: hasOnClick
           ? function() {
               if (menuItemTemplate.onClickSendEvent) {
-                if(args) window.webContents.send(menuItemTemplate.onClickSendEvent, args);
+                if (args)
+                  window.webContents.send(
+                    menuItemTemplate.onClickSendEvent,
+                    args
+                  );
                 else window.webContents.send(menuItemTemplate.onClickSendEvent);
               }
 
@@ -33,7 +37,7 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
             }
           : undefined,
         submenu: menuItemTemplate.submenu
-          ? adaptMenuTemplate(menuItemTemplate.submenu)
+          ? adaptMenuDeclarativeItemTemplate(menuItemTemplate.submenu)
           : undefined,
       };
     });
@@ -41,7 +45,7 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
   return Menu.buildFromTemplate(
     mainMenuTemplate.map(rootMenuTemplate => ({
       ...rootMenuTemplate,
-      submenu: adaptMenuTemplate(rootMenuTemplate.submenu),
+      submenu: adaptMenuDeclarativeItemTemplate(rootMenuTemplate.submenu),
     }))
   );
 };
@@ -106,4 +110,7 @@ const buildPlaceholderMainMenu = () => {
   return Menu.buildFromTemplate(template);
 };
 
-module.exports = { buildMainMenuFor, buildPlaceholderMainMenu };
+module.exports = {
+  buildElectronMenuFromDeclarativeTemplate,
+  buildPlaceholderMainMenu,
+};

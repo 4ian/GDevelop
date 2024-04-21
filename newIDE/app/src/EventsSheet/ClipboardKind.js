@@ -3,13 +3,13 @@ import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   type SelectionState,
   getSelectedEvents,
-  hasEventSelected,
-  getSelectedEventContexts,
   hasInstructionSelected,
   hasInstructionsListSelected,
   getSelectedInstructionsContexts,
-  getSelectedInstructionsListsContexts,
   type InstructionsListContext,
+  getLastSelectedEventContext,
+  getLastSelectedInstructionContext,
+  getLastSelectedInstructionsListsContext,
 } from './SelectionHandler';
 import {
   serializeToJSObject,
@@ -92,7 +92,8 @@ export const pasteEventsFromClipboardInSelection = (
   project: gdProject,
   selection: SelectionState
 ): boolean => {
-  if (!hasEventSelected(selection) || !hasClipboardEvents()) return false;
+  const lastSelectEventContext = getLastSelectedEventContext(selection);
+  if (!lastSelectEventContext || !hasClipboardEvents()) return false;
 
   const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
   const eventsListContent = SafeExtractor.extractArrayProperty(
@@ -108,14 +109,13 @@ export const pasteEventsFromClipboardInSelection = (
     'unserializeFrom',
     project
   );
-  getSelectedEventContexts(selection).forEach(eventContext => {
-    eventContext.eventsList.insertEvents(
-      eventsList,
-      0,
-      eventsList.getEventsCount(),
-      eventContext.indexInList
-    );
-  });
+
+  lastSelectEventContext.eventsList.insertEvents(
+    eventsList,
+    0,
+    eventsList.getEventsCount(),
+    lastSelectEventContext.indexInList
+  );
   eventsList.delete();
 
   return true;
@@ -157,42 +157,47 @@ export const pasteInstructionsFromClipboardInSelection = (
     'unserializeFrom',
     project
   );
-  getSelectedInstructionsContexts(selection).forEach(instructionContext => {
-    if (instructionContext.isCondition) {
-      instructionContext.instrsList.insertInstructions(
+
+  const lastSelectedInstructionContext = getLastSelectedInstructionContext(
+    selection
+  );
+  if (lastSelectedInstructionContext) {
+    if (lastSelectedInstructionContext.isCondition) {
+      lastSelectedInstructionContext.instrsList.insertInstructions(
         conditionsList,
         0,
         conditionsList.size(),
-        instructionContext.indexInList
+        lastSelectedInstructionContext.indexInList
       );
     } else {
-      instructionContext.instrsList.insertInstructions(
+      lastSelectedInstructionContext.instrsList.insertInstructions(
         actionsList,
         0,
         actionsList.size(),
-        instructionContext.indexInList
+        lastSelectedInstructionContext.indexInList
       );
     }
-  });
-  getSelectedInstructionsListsContexts(selection).forEach(
-    instructionsListContext => {
-      if (instructionsListContext.isCondition) {
-        instructionsListContext.instrsList.insertInstructions(
-          conditionsList,
-          0,
-          conditionsList.size(),
-          instructionsListContext.instrsList.size()
-        );
-      } else {
-        instructionsListContext.instrsList.insertInstructions(
-          actionsList,
-          0,
-          actionsList.size(),
-          instructionsListContext.instrsList.size()
-        );
-      }
-    }
+  }
+  const lastSelectedInstructionsListsContext = getLastSelectedInstructionsListsContext(
+    selection
   );
+  if (lastSelectedInstructionsListsContext) {
+    if (lastSelectedInstructionsListsContext.isCondition) {
+      lastSelectedInstructionsListsContext.instrsList.insertInstructions(
+        conditionsList,
+        0,
+        conditionsList.size(),
+        lastSelectedInstructionsListsContext.instrsList.size()
+      );
+    } else {
+      lastSelectedInstructionsListsContext.instrsList.insertInstructions(
+        actionsList,
+        0,
+        actionsList.size(),
+        lastSelectedInstructionsListsContext.instrsList.size()
+      );
+    }
+  }
   conditionsList.delete();
   actionsList.delete();
 

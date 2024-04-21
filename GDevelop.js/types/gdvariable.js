@@ -34,6 +34,8 @@ declare class gdVariable {
   insertChild(name: string, variable: gdVariable): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
+  resetPersistentUuid(): gdVariable;
+  clearPersistentUuid(): gdVariable;
   delete(): void;
   ptr: number;
 };

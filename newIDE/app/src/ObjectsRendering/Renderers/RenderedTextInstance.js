@@ -1,140 +1,223 @@
+// @flow
 import RenderedInstance from './RenderedInstance';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
+import { rgbStringToHexNumber } from '../../Utils/ColorTransformer';
 import * as PIXI from 'pixi.js-legacy';
-const gd /* TODO: add flow in this file */ = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Renderer for a Text object.
- *
- * @extends RenderedInstance
- * @class RenderedTextInstance
- * @constructor
  */
-function RenderedTextInstance(
-  project,
-  layout,
-  instance,
-  associatedObject,
-  pixiContainer,
-  pixiResourcesLoader
-) {
-  RenderedInstance.call(
-    this,
-    project,
-    layout,
-    instance,
-    associatedObject,
-    pixiContainer,
-    pixiResourcesLoader
-  );
+export default class RenderedTextInstance extends RenderedInstance {
+  _isItalic: boolean = false;
+  _isBold: boolean = false;
+  _characterSize: number = 0;
+  _wrapping: boolean = false;
+  _wrappingWidth: number = 0;
+  _styleFontDirty: boolean = true;
+  _fontName: string = '';
+  _fontFamily: string = '';
+  _color: string = '0;0;0';
+  _textAlignment: string = 'left';
 
-  const style = new PIXI.TextStyle({
-    fontFamily: 'Arial',
-    fontSize: 20,
-    align: 'left',
-    padding: 5,
-  });
+  _isOutlineEnabled = false;
+  _outlineColor = '255;255;255';
+  _outlineThickness = 2;
 
-  //Setup the PIXI object:
-  this._pixiObject = new PIXI.Text('', style);
-  this._pixiObject.anchor.x = 0.5;
-  this._pixiObject.anchor.y = 0.5;
-  this._pixiContainer.addChild(this._pixiObject);
-  this._styleFontDirty = true;
-  this.update();
-}
-RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
+  _isShadowEnabled = false;
+  _shadowDistance = 3;
+  _shadowAngle = 90;
+  _shadowColor = '0;0;0';
+  _shadowOpacity = 127;
+  _shadowBlurRadius = 2;
 
-/**
- * Return a URL for thumbnail of the specified object.
- */
-RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
-  return 'CppPlatform/Extensions/texticon24.png';
-};
-
-RenderedTextInstance.prototype.update = function() {
-  const textObject = gd.asTextObject(this._associatedObject);
-  this._pixiObject.text = textObject.getString();
-
-  //Update style, only if needed to avoid destroying text rendering performances
-  if (
-    textObject.isItalic() !== this._isItalic ||
-    textObject.isBold() !== this._isBold ||
-    textObject.getCharacterSize() !== this._characterSize ||
-    this._instance.hasCustomSize() !== this._wrapping ||
-    (this._instance.getCustomWidth() !== this._wrappingWidth && this._wrapping)
+  constructor(
+    project: gdProject,
+    layout: gdLayout,
+    instance: gdInitialInstance,
+    associatedObjectConfiguration: gdObjectConfiguration,
+    pixiContainer: PIXI.Container,
+    pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
-    this._isItalic = textObject.isItalic();
-    this._isBold = textObject.isBold();
-    this._characterSize = textObject.getCharacterSize();
-    this._wrapping = this._instance.hasCustomSize();
-    this._wrappingWidth = this._instance.getCustomWidth();
+    super(
+      project,
+      layout,
+      instance,
+      associatedObjectConfiguration,
+      pixiContainer,
+      pixiResourcesLoader
+    );
+
+    const style = new PIXI.TextStyle({
+      fontFamily: 'Arial',
+      fontSize: 20,
+      align: 'left',
+      padding: 5,
+    });
+
+    //Setup the PIXI object:
+    this._pixiObject = new PIXI.Text('', style);
+    this._pixiObject.anchor.x = 0.5;
+    this._pixiObject.anchor.y = 0.5;
+    this._pixiContainer.addChild(this._pixiObject);
     this._styleFontDirty = true;
+    this.update();
   }
 
-  if (this._fontName !== textObject.getFontName()) {
-    //Avoid calling loadFontFamily if the font didn't changed.
-    this._fontName = textObject.getFontName();
-    this._pixiResourcesLoader
-      .loadFontFamily(this._project, textObject.getFontName())
-      .then(fontFamily => {
-        // Once the font is loaded, we can use the given fontFamily.
-        this._fontFamily = fontFamily;
-        this._styleFontDirty = true;
-      })
-      .catch(err => {
-        // Ignore errors
-        console.warn(
-          'Unable to load font family for RenderedTextInstance',
-          err
-        );
-      });
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    this._pixiObject.destroy(true);
   }
 
-  if (this._styleFontDirty) {
-    this._pixiObject.style.fontFamily = this._fontFamily || 'Arial';
-    this._pixiObject.style.fontSize = Math.max(1, this._characterSize);
-    this._pixiObject.style.fontStyle = this._isItalic ? 'italic' : 'normal';
-    this._pixiObject.style.fontWeight = this._isBold ? 'bold' : 'normal';
-    this._pixiObject.style.wordWrap = this._wrapping;
-    this._pixiObject.style.wordWrapWidth =
-      this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
-    this._pixiObject.style.breakWords = true;
-
-    // Manually ask the PIXI object to re-render as we changed a style property
-    // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
-    this._pixiObject.dirty = true;
-    this._styleFontDirty = false;
-  }
-
-  if (
-    textObject.getColorR() !== this._colorR ||
-    textObject.getColorG() !== this._colorG ||
-    textObject.getColorB() !== this._colorB
+  /**
+   * Return a URL for thumbnail of the specified object.
+   */
+  static getThumbnail(
+    project: gdProject,
+    resourcesLoader: Class<ResourcesLoader>,
+    objectConfiguration: gdObjectConfiguration
   ) {
-    this._colorR = textObject.getColorR();
-    this._colorG = textObject.getColorG();
-    this._colorB = textObject.getColorB();
-    this._pixiObject.style.fill =
-      'rgb(' + this._colorR + ',' + this._colorG + ',' + this._colorB + ')';
-
-    // Manually ask the PIXI object to re-render as we changed a style property
-    // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
-    this._pixiObject.dirty = true;
+    return 'CppPlatform/Extensions/texticon24.png';
   }
 
-  this._pixiObject.position.x =
-    this._instance.getX() + this._pixiObject.width / 2;
-  this._pixiObject.position.y =
-    this._instance.getY() + this._pixiObject.height / 2;
-  this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
-};
+  update() {
+    const textObjectConfiguration = gd.asTextObjectConfiguration(
+      this._associatedObjectConfiguration
+    );
+    this._pixiObject.text = textObjectConfiguration.getText();
 
-RenderedTextInstance.prototype.getDefaultWidth = function() {
-  return this._pixiObject.width;
-};
+    //Update style, only if needed to avoid destroying text rendering performances
+    if (
+      textObjectConfiguration.isItalic() !== this._isItalic ||
+      textObjectConfiguration.isBold() !== this._isBold ||
+      textObjectConfiguration.getCharacterSize() !== this._characterSize ||
+      textObjectConfiguration.getTextAlignment() !== this._textAlignment ||
+      textObjectConfiguration.getColor() !== this._color ||
+      textObjectConfiguration.isOutlineEnabled() !== this._isOutlineEnabled ||
+      textObjectConfiguration.getOutlineColor() !== this._outlineColor ||
+      textObjectConfiguration.getOutlineThickness() !==
+        this._outlineThickness ||
+      textObjectConfiguration.isShadowEnabled() !== this._isShadowEnabled ||
+      textObjectConfiguration.getShadowDistance() !== this._shadowDistance ||
+      textObjectConfiguration.getShadowAngle() !== this._shadowAngle ||
+      textObjectConfiguration.getShadowColor() !== this._shadowColor ||
+      textObjectConfiguration.getShadowOpacity() !== this._shadowOpacity ||
+      textObjectConfiguration.getShadowBlurRadius() !==
+        this._shadowBlurRadius ||
+      this._instance.hasCustomSize() !== this._wrapping ||
+      (this.getCustomWidth() !== this._wrappingWidth && this._wrapping)
+    ) {
+      this._isItalic = textObjectConfiguration.isItalic();
+      this._isBold = textObjectConfiguration.isBold();
+      this._characterSize = textObjectConfiguration.getCharacterSize();
+      this._textAlignment = textObjectConfiguration.getTextAlignment();
+      this._color = textObjectConfiguration.getColor();
 
-RenderedTextInstance.prototype.getDefaultHeight = function() {
-  return this._pixiObject.height;
-};
+      this._isOutlineEnabled = textObjectConfiguration.isOutlineEnabled();
+      this._outlineColor = textObjectConfiguration.getOutlineColor();
+      this._outlineThickness = textObjectConfiguration.getOutlineThickness();
 
-export default RenderedTextInstance;
+      this._isShadowEnabled = textObjectConfiguration.isShadowEnabled();
+      this._shadowDistance = textObjectConfiguration.getShadowDistance();
+      this._shadowAngle = textObjectConfiguration.getShadowAngle();
+      this._shadowColor = textObjectConfiguration.getShadowColor();
+      this._shadowOpacity = textObjectConfiguration.getShadowOpacity();
+      this._shadowBlurRadius = textObjectConfiguration.getShadowBlurRadius();
+
+      this._wrapping = this._instance.hasCustomSize();
+      this._wrappingWidth = this.getCustomWidth();
+      this._styleFontDirty = true;
+    }
+
+    if (this._fontName !== textObjectConfiguration.getFontName()) {
+      //Avoid calling loadFontFamily if the font didn't changed.
+      this._fontName = textObjectConfiguration.getFontName();
+      PixiResourcesLoader.loadFontFamily(
+        this._project,
+        textObjectConfiguration.getFontName()
+      )
+        .then(fontFamily => {
+          // Once the font is loaded, we can use the given fontFamily.
+          this._fontFamily = fontFamily;
+          this._styleFontDirty = true;
+        })
+        .catch(err => {
+          // Ignore errors
+          console.warn(
+            'Unable to load font family for RenderedTextInstance',
+            err
+          );
+        });
+    }
+
+    if (this._styleFontDirty) {
+      const style = this._pixiObject.style;
+      style.fontFamily = this._fontFamily || 'Arial';
+      style.fontSize = Math.max(1, this._characterSize);
+      style.fontStyle = this._isItalic ? 'italic' : 'normal';
+      style.fontWeight = this._isBold ? 'bold' : 'normal';
+      style.fill = rgbStringToHexNumber(this._color);
+      style.wordWrap = this._wrapping;
+      style.wordWrapWidth = this._wrappingWidth <= 1 ? 1 : this._wrappingWidth;
+      style.breakWords = true;
+      style.align = this._textAlignment;
+
+      style.stroke = rgbStringToHexNumber(this._outlineColor);
+      style.strokeThickness = this._isOutlineEnabled
+        ? this._outlineThickness
+        : 0;
+      style.dropShadow = this._isShadowEnabled;
+      style.dropShadowColor = rgbStringToHexNumber(this._shadowColor);
+      style.dropShadowAlpha = this._shadowOpacity / 255;
+      style.dropShadowBlur = this._shadowBlurRadius;
+      style.dropShadowAngle = RenderedInstance.toRad(this._shadowAngle);
+      style.dropShadowDistance = this._shadowDistance;
+      const extraPaddingForShadow = style.dropShadow
+        ? style.dropShadowDistance + style.dropShadowBlur
+        : 0;
+      style.padding = Math.ceil(extraPaddingForShadow);
+
+      // Manually ask the PIXI object to re-render as we changed a style property
+      // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
+      this._pixiObject.dirty = true;
+      this._styleFontDirty = false;
+    }
+
+    if (this._instance.hasCustomSize()) {
+      const alignmentX =
+        this._textAlignment === 'right'
+          ? 1
+          : this._textAlignment === 'center'
+          ? 0.5
+          : 0;
+
+      const width = this.getCustomWidth();
+
+      // A vector from the custom size center to the renderer center.
+      const centerToCenterX =
+        (width - this._pixiObject.width) * (alignmentX - 0.5);
+
+      this._pixiObject.position.x = this._instance.getX() + width / 2;
+      this._pixiObject.anchor.x =
+        0.5 - centerToCenterX / this._pixiObject.width;
+    } else {
+      this._pixiObject.position.x =
+        this._instance.getX() + this._pixiObject.width / 2;
+      this._pixiObject.anchor.x = 0.5;
+    }
+    this._pixiObject.position.y =
+      this._instance.getY() + this._pixiObject.height / 2;
+    this._pixiObject.rotation = RenderedInstance.toRad(
+      this._instance.getAngle()
+    );
+  }
+
+  getDefaultWidth() {
+    return this._pixiObject.width;
+  }
+
+  getDefaultHeight() {
+    return this._pixiObject.height;
+  }
+}

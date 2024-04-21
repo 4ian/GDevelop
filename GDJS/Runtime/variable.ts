@@ -194,7 +194,13 @@ namespace gdjs {
           return obj;
         case 'array':
           const arr: any[] = [];
-          for (const item of this._childrenArray) arr.push(item.toJSObject());
+          for (const item of this._childrenArray) {
+            // item can be undefined if there are empty elements in the array.
+            // A variable can have empty items in its children array if one inserts
+            // a variable at an index greater than highest index. All the array elements
+            // in the gap will be empty elements.
+            arr.push(item === undefined ? undefined : item.toJSObject());
+          }
           return arr;
       }
     }
@@ -250,25 +256,42 @@ namespace gdjs {
     }
 
     /**
+     * Get the child with the specified name or at the specified index.
+     *
+     * If the variable is an array, prefer `getChildAt`.
+     * If the variable is a structure, prefer `getChildNamed`.
+     *
+     * If the variable has not the specified child, an empty variable with the specified name
+     * (or index) is added as child.
+     *
+     * @returns The child variable
+     */
+    getChild(childName: string | number): gdjs.Variable {
+      if (this._type === 'array')
+        return this.getChildAt(
+          // @ts-ignore
+          Number.isInteger(childName) ? childName : parseInt(childName, 10) || 0
+        );
+      else {
+        if (this._type !== 'structure') this.castTo('structure');
+        return this.getChildNamed('' + childName);
+      }
+    }
+
+    /**
      * Get the child with the specified name.
      *
      * If the variable has not the specified child, an empty variable with the specified name
      * is added as child.
+     *
      * @returns The child variable
      */
-    getChild(childName: string): gdjs.Variable {
-      // Make sure the variable is a collection
-      if (this.isPrimitive()) this.castTo('structure');
+    getChildNamed(childName: string): gdjs.Variable {
+      const child = this._children[childName];
+      if (child === undefined || child === null)
+        return (this._children[childName] = new gdjs.Variable());
 
-      if (this._type === 'array')
-        return this.getChildAt(parseInt(childName, 10) || 0);
-
-      if (
-        this._children[childName] === undefined ||
-        this._children[childName] === null
-      )
-        this._children[childName] = new gdjs.Variable();
-      return this._children[childName];
+      return child;
     }
 
     /**
@@ -280,8 +303,8 @@ namespace gdjs {
      * @returns The variable (for chaining calls)
      */
     addChild(childName: string, childVariable: gdjs.Variable): this {
-      // Make sure this is a structure
-      this.castTo('structure');
+      if (this._type !== 'structure') this.castTo('structure');
+
       this._children[childName] = childVariable;
       return this;
     }
@@ -385,6 +408,21 @@ namespace gdjs {
     setString(newValue: string): void {
       this._type = 'string';
       this._str = '' + newValue;
+    }
+
+    /**
+     * Get the value of the variable, as a number if it's one,
+     * or as a string (if it's a string or something else)
+     *
+     * In most cases, prefer calling `getAsNumber` or `getAsString` directly.
+     * This is a fallback in case a variable type can't be known statically for sure,
+     * like `getValue`.
+     *
+     * @private
+     */
+    getAsNumberOrString(): number | string {
+      if (this._type === 'number') return this._value;
+      return this.getAsString();
     }
 
     /**
@@ -544,7 +582,8 @@ namespace gdjs {
      * Get a variable at a given index of the array.
      */
     getChildAt(index: integer) {
-      this.castTo('array');
+      if (this._type !== 'array') this.castTo('array');
+
       if (
         this._childrenArray[index] === undefined ||
         this._childrenArray[index] === null
@@ -564,7 +603,8 @@ namespace gdjs {
      * Pushes a copy of a variable into the array.
      */
     pushVariableCopy(variable: gdjs.Variable) {
-      this.castTo('array');
+      if (this._type !== 'array') this.castTo('array');
+
       this._childrenArray.push(variable.clone());
     }
 
@@ -572,7 +612,8 @@ namespace gdjs {
      * Pushes a value into the array.
      */
     pushValue(value: string | float | boolean) {
-      this.castTo('array');
+      if (this._type !== 'array') this.castTo('array');
+
       this._childrenArray.push(
         new gdjs.Variable({
           type: typeof value as 'string' | 'number' | 'boolean',

@@ -36,7 +36,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Time in seconds"))
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .SetHidden();
 
   extension
@@ -50,7 +50,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timer24.png",
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .AddParameter("relationalOperator", _("Sign of the test"), "time")
       .AddParameter("expression", _("Time in seconds"))
       .SetManipulatedType("number");
@@ -65,7 +65,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/time24.png",
                     "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Time scale (1 by default)")))
       .MarkAsAdvanced();
 
   extension
@@ -78,7 +81,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     "res/conditions/timerPaused24.png",
                     "res/conditions/timerPaused.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -93,7 +96,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "res/actions/timer24.png",
           "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
 
   extension
       .AddAction("PauseTimer",
@@ -105,7 +108,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/pauseTimer24.png",
                  "res/actions/pauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -118,7 +121,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/unPauseTimer24.png",
                  "res/actions/unPauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
@@ -131,12 +134,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/actions/timer24.png",
                  "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"))
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer")
       .MarkAsAdvanced();
 
   extension
       .AddAction("ChangeTimeScale",
-                 _("Change time scale"),
+                 _("Time scale"),
                  _("Change the time scale of the scene."),
                  _("Set the time scale of the scene to _PARAM1_"),
                  "",
@@ -148,14 +151,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("Wait",
-                 _("Wait X seconds (experimental)"),
+                 _("Wait X seconds"),
                  _("Waits a number of seconds before running "
                    "the next actions (and sub-events)."),
                  _("Wait _PARAM0_ seconds"),
                  "",
-                 "res/timer.svg",
-                 "res/timer.svg")
-      .AddParameter("expression", "Time to wait in seconds")
+                 "res/timer_black.svg",
+                 "res/timer_black.svg")
+      .AddParameter("expression", _("Time to wait in seconds"))
       .SetHelpPath("/all-features/timers-and-time/wait-action");
 
   extension
@@ -191,7 +194,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                      "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Timer's name"));
+      .AddParameter("identifier", _("Timer's name"), "sceneTimer");
 
   extension
       .AddExpression("TimeFromStart",

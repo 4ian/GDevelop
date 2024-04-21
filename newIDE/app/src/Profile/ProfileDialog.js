@@ -3,38 +3,82 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import { Tabs, Tab } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
-import CreateProfile from './CreateProfile';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import HelpButton from '../UI/HelpButton';
-import SubscriptionDetails from './SubscriptionDetails';
+import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
+import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
-import { GamesList } from '../GameDashboard/GamesList';
-import { ColumnStackLayout } from '../UI/Layout';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import CreateProfile from './CreateProfile';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
+import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 
 type Props = {|
-  currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
-  onChangeSubscription: () => void,
-  initialTab: 'profile' | 'games-dashboard',
 |};
 
-const ProfileDialog = ({
-  currentProject,
-  open,
-  onClose,
-  onChangeSubscription,
-  initialTab,
-}: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
+const ProfileDialog = ({ open, onClose }: Props) => {
+  const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
+  const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
+
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const isUserLoading = authenticatedUser.loginState !== 'done';
+  const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
+  const markBadgesAsSeen = React.useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
+        // If not connected (or loading), do nothing.
+        return;
+      }
+      if (badgesSeenNotificationSentRef.current) {
+        // If already marked as seen, do nothing.
+        return;
+      }
+      if (
+        !entries[0].isIntersecting &&
+        badgesSeenNotificationTimeoutRef.current
+      ) {
+        // If not visible, clear timeout.
+        clearTimeout(badgesSeenNotificationTimeoutRef.current);
+        badgesSeenNotificationTimeoutRef.current = null;
+        return;
+      }
+      if (entries[0].isIntersecting) {
+        // If visible
+        if (badgesSeenNotificationTimeoutRef.current) {
+          // If timeout already set, do nothing.
+          return;
+        } else {
+          // Set timeout to mark badges as seen in the future.
+          badgesSeenNotificationTimeoutRef.current = setTimeout(() => {
+            doMarkBadgesAsSeen(authenticatedUser);
+            badgesSeenNotificationSentRef.current = true;
+          }, 5000);
+        }
+      }
+    },
+    [authenticatedUser]
+  );
+
+  useIsElementVisibleInScroll(
+    userAchievementsContainerRef.current,
+    markBadgesAsSeen
+  );
 
   const [
     isManageSubscriptionLoading,
@@ -75,8 +119,20 @@ const ProfileDialog = ({
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  const onLogout = React.useCallback(
+    async () => {
+      await authenticatedUser.onLogout();
+      onClose();
+    },
+    [authenticatedUser, onClose]
+  );
+
+  const isConnected =
+    authenticatedUser.authenticated && authenticatedUser.profile;
+
   return (
     <Dialog
+      title={isConnected ? <Trans>My profile</Trans> : null}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -86,85 +142,115 @@ const ProfileDialog = ({
         />,
       ]}
       secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath={
-            currentTab === 'games-dashboard'
-              ? '/interface/games-dashboard'
-              : '/interface/profile'
-          }
-        />,
-        authenticatedUser.authenticated && authenticatedUser.profile && (
+        <HelpButton key="help" helpPagePath="/interface/profile" />,
+        isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}
             key="logout"
-            onClick={authenticatedUser.onLogout}
+            onClick={onLogout}
+            disabled={isUserLoading}
           />
         ),
       ]}
       onRequestClose={onClose}
       open={open}
-      noMargin
-      fullHeight
-      noTitleMargin
-      title={
-        <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>My Profile</Trans>} value="profile" />
-          <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
-        </Tabs>
-      }
+      fullHeight={!!isConnected}
+      maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody
     >
-      {currentTab === 'profile' &&
-        (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Line>
-            <Column expand>
-              <AuthenticatedUserProfileDetails
-                authenticatedUser={authenticatedUser}
-                onEditProfile={authenticatedUser.onEdit}
-                onChangeEmail={authenticatedUser.onChangeEmail}
-              />
+      {!isConnected && authenticatedUser.loginState === 'loggingIn' ? (
+        <PlaceholderLoader />
+      ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
+        <Line>
+          <Column expand noMargin>
+            <AuthenticatedUserProfileDetails
+              authenticatedUser={authenticatedUser}
+              onOpenEditProfileDialog={
+                authenticatedUser.onOpenEditProfileDialog
+              }
+              onOpenChangeEmailDialog={
+                authenticatedUser.onOpenChangeEmailDialog
+              }
+            />
+            {subscriptionPlansWithPricingSystems ? (
               <SubscriptionDetails
                 subscription={authenticatedUser.subscription}
-                onChangeSubscription={onChangeSubscription}
+                subscriptionPlansWithPricingSystems={
+                  subscriptionPlansWithPricingSystems
+                }
                 onManageSubscription={onManageSubscription}
                 isManageSubscriptionLoading={isManageSubscriptionLoading}
               />
-              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            ) : (
+              <PlaceholderLoader />
+            )}
+            <Column noMargin>
+              <Line alignItems="center">
+                <Column noMargin>
+                  <Text size="block-title">
+                    <Trans>GDevelop credits</Trans>
+                  </Text>
+                  <Text size="body" noMargin>
+                    <Trans>
+                      Get perks and cloud benefits when getting closer to your
+                      game launch.{' '}
+                      <Link
+                        href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                          )
+                        }
+                      >
+                        Learn more
+                      </Link>
+                    </Trans>
+                  </Text>
+                </Column>
+              </Line>
+              <CreditsStatusBanner displayPurchaseAction />
             </Column>
-          </Line>
-        ) : (
-          <Column noMargin expand justifyContent="center">
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-            />
+            <ContributionsDetails userId={authenticatedUser.profile.id} />
+            {isConnected && (
+              <div ref={userAchievementsContainerRef}>
+                <UserAchievements
+                  badges={authenticatedUser.badges}
+                  displayUnclaimedAchievements
+                  displayNotifications
+                />
+              </div>
+            )}
           </Column>
-        ))}
-      {currentTab === 'games-dashboard' &&
-        (authenticatedUser.authenticated ? (
-          <Line>
-            <ColumnStackLayout expand noOverflowParent>
-              <GamesList project={currentProject} />
-            </ColumnStackLayout>
-          </Line>
-        ) : (
-          <Column noMargin expand justifyContent="center">
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-              message={
-                <Trans>
-                  Create an account to register your games and to get access to
-                  metrics collected anonymously, like the number of daily
-                  players and retention of the players after a few days.
-                </Trans>
-              }
-            />
-          </Column>
-        ))}
+        </Line>
+      ) : (
+        <Column noMargin expand justifyContent="center">
+          <CreateProfile
+            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+            onOpenCreateAccountDialog={
+              authenticatedUser.onOpenCreateAccountDialog
+            }
+            message={
+              <Trans>
+                Create an account to register your games and to get access to
+                metrics collected anonymously, like the number of daily players
+                and retention of the players after a few days.
+              </Trans>
+            }
+          />
+        </Column>
+      )}
     </Dialog>
   );
 };
 
-export default ProfileDialog;
+const ProfileDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Profile</Trans>}
+    scope="profile"
+    onClose={props.onClose}
+  >
+    <ProfileDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfileDialogWithErrorBoundary;

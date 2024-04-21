@@ -33,8 +33,10 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .SetExtensionHelpPath("/all-features/advanced-conditions");
   extension
       .AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
-      .SetIcon("res/conditions/toujours24.png");
+      .SetIcon("res/conditions/toujours24_black.png");
 
+  // This condition is deprecated as this does not bring anything new
+  // and can be confusing or misleading for beginners.
   extension
       .AddCondition("Always",
                     _("Always"),
@@ -42,11 +44,12 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                       "the condition is inverted)."),
                     _("Always"),
                     "",
-                    "res/conditions/toujours24.png",
-                    "res/conditions/toujours.png")
+                    "res/conditions/toujours24_black.png",
+                    "res/conditions/toujours_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetHidden();
 
   // Compatibility with GD <= 5.0.127
   extension
@@ -61,8 +64,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
                     "",
-                    "res/conditions/or24.png",
-                    "res/conditions/or.png")
+                    "res/conditions/or24_black.png",
+                    "res/conditions/or_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -72,8 +75,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
                     "",
-                    "res/conditions/and24.png",
-                    "res/conditions/and.png")
+                    "res/conditions/and24_black.png",
+                    "res/conditions/and_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -84,8 +87,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Return the contrary of the result of the sub conditions"),
           _("Invert the logical result of these conditions:"),
           "",
-          "res/conditions/not24.png",
-          "res/conditions/not.png")
+          "res/conditions/not24_black.png",
+          "res/conditions/not_black.png")
       .SetCanHaveSubInstructions()
       .MarkAsAdvanced();
 
@@ -104,8 +107,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Compare the two numbers."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
-                    "res/conditions/egal24.png",
-                    "res/conditions/egal.png")
+                    "res/conditions/egal24_black.png",
+                    "res/conditions/egal_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("expression", _("First expression"))
       .AddParameter("relationalOperator", _("Sign of the test"), "number")
@@ -114,8 +117,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   // Compatibility with GD <= 5.0.127
   extension
-      .AddDuplicatedCondition(
-          "Egal", "BuiltinCommonInstructions::CompareNumbers", {.unscoped = true})
+      .AddDuplicatedCondition("Egal",
+                              "BuiltinCommonInstructions::CompareNumbers",
+                              {.unscoped = true})
       .SetHidden();
   // end of compatibility code
 
@@ -125,8 +129,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("Compare the two strings."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
                     "",
-                    "res/conditions/egal24.png",
-                    "res/conditions/egal.png")
+                    "res/conditions/egal24_black.png",
+                    "res/conditions/egal_black.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("string", _("First string expression"))
       .AddParameter("relationalOperator", _("Sign of the test"), "string")
@@ -135,8 +139,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   // Compatibility with GD <= 5.0.127
   extension
-      .AddDuplicatedCondition(
-          "StrEqual", "BuiltinCommonInstructions::CompareStrings", {.unscoped = true})
+      .AddDuplicatedCondition("StrEqual",
+                              "BuiltinCommonInstructions::CompareStrings",
+                              {.unscoped = true})
       .SetHidden();
   // end of compatibility code
 

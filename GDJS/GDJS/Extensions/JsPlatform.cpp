@@ -31,6 +31,13 @@
 #include "GDJS/Extensions/Builtin/TimeExtension.h"
 #include "GDJS/Extensions/Builtin/VariablesExtension.h"
 #include "GDJS/Extensions/Builtin/WindowExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/AnimatableExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/EffectExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/FlippableExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/ResizableExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/ScalableExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/OpacityExtension.h"
+#include "GDJS/Extensions/Builtin/Capacities/TextContainerExtension.h"
 
 namespace gdjs {
 
@@ -106,6 +113,27 @@ void JsPlatform::ReloadBuiltinExtensions() {
   std::cout.flush();
   AddExtension(
       std::shared_ptr<gd::PlatformExtension>(new ExternalLayoutsExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new AnimatableExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new EffectExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new FlippableExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new ResizableExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new ScalableExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new OpacityExtension));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(new TextContainerExtension));
   std::cout.flush();
   std::cout << "done." << std::endl;
 

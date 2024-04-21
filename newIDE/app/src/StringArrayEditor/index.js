@@ -6,27 +6,36 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { Line, Column } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { IconButton } from '@material-ui/core';
-import Delete from '@material-ui/icons/Delete';
 import RaisedButton from '../UI/RaisedButton';
-import Add from '@material-ui/icons/Add';
+import Add from '../UI/CustomSvgIcons/Add';
+import Trash from '../UI/CustomSvgIcons/Trash';
 
 type StringArrayEditorProps = {|
   extraInfo: Array<string>,
   setExtraInfo: (Array<string>) => void,
+  disabled?: boolean,
 |};
 
 const StringArrayEditor = ({
   extraInfo,
   setExtraInfo,
+  disabled,
 }: StringArrayEditorProps) => {
   const updateExtraInfo = () => setExtraInfo(extraInfo);
 
   return (
     <ResponsiveLineStackLayout>
-      <Column justifyContent="flex-end" expand>
+      <Column justifyContent="flex-end" expand noMargin>
         {extraInfo.map((item, index) => (
-          <Line key={index} justifyContent="flex-end" expand>
+          <Line
+            key={index}
+            justifyContent="flex-end"
+            expand
+            alignItems="center"
+            noMargin
+          >
             <SemiControlledTextField
+              disabled={disabled}
               commitOnBlur
               value={item}
               onChange={text => {
@@ -36,19 +45,21 @@ const StringArrayEditor = ({
               fullWidth
             />
             <IconButton
+              disabled={disabled}
               tooltip={t`Delete option`}
               onClick={() => {
                 extraInfo.splice(index, 1);
                 updateExtraInfo();
               }}
             >
-              <Delete />
+              <Trash />
             </IconButton>
           </Line>
         ))}
 
         <Line justifyContent="flex-end" expand>
           <RaisedButton
+            disabled={disabled}
             primary
             onClick={() => {
               extraInfo.push('New Option');

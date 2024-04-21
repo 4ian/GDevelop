@@ -9,6 +9,8 @@ import {
   getObjectListItemKey,
 } from './Keys';
 import HighlightedText from '../../../UI/Search/HighlightedText';
+import { styles } from '../InstructionOrObjectSelector';
+import { type HTMLDataset } from '../../../Utils/HTMLDataset';
 
 type Props = {|
   project: gdProject,
@@ -18,6 +20,9 @@ type Props = {|
   selectedValue: ?string,
   matchesCoordinates: number[][],
   id?: ?string,
+  data?: HTMLDataset,
+  withIndent?: boolean,
+  keyPrefix?: string,
 |};
 
 export const renderObjectListItem = ({
@@ -28,15 +33,20 @@ export const renderObjectListItem = ({
   selectedValue,
   matchesCoordinates,
   id,
+  data,
+  withIndent,
+  keyPrefix,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
       id={id}
-      key={getObjectListItemKey(objectWithContext)}
+      data={data}
+      key={(keyPrefix || '') + getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
+      style={withIndent ? styles.indentedListItem : undefined}
       primaryText={
         <HighlightedText
           text={objectName}
@@ -48,7 +58,7 @@ export const renderObjectListItem = ({
           iconSize={iconSize}
           src={ObjectsRenderingService.getThumbnail(
             project,
-            objectWithContext.object
+            objectWithContext.object.getConfiguration()
           )}
         />
       }

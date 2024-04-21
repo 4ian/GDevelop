@@ -8,7 +8,7 @@ import {
   allResourceKindsAndMetadata,
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
-import path from 'path';
+import path from 'path-browserify';
 import { Line } from '../UI/Grid';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
@@ -16,6 +16,11 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
+import {
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
+  isPublicAssetResourceUrl,
+} from '../Utils/GDevelopServices/Asset';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
@@ -34,7 +39,12 @@ const ResourceStoreChooser = ({
         const chosenResourceUrl = resource.url;
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
-        newResource.setName(path.basename(chosenResourceUrl));
+        const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
+          ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
+              chosenResourceUrl
+            )
+          : path.basename(chosenResourceUrl);
+        newResource.setName(resourceCleanedName);
         newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
 
         onChooseResources([newResource]);
@@ -171,6 +181,23 @@ export const UrlChooser = ({
 
 const browserResourceSources: Array<ResourceSource> = [
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `upload-${kind}`,
+    displayName: t`File(s) from your device`,
+    displayTab: 'import',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <FileToCloudProjectResourceUploader
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        fileMetadata={props.fileMetadata}
+        getStorageProvider={props.getStorageProvider}
+        key={`url-chooser-${kind}`}
+        automaticallyOpenInput={!!props.automaticallyOpenIfPossible}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `resource-store-${kind}`,
     displayName: t`Choose from asset store`,
     displayTab: 'standalone',
@@ -186,8 +213,8 @@ const browserResourceSources: Array<ResourceSource> = [
   })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `url-chooser-${kind}`,
-    displayName: t`Use an URL`,
-    displayTab: 'import',
+    displayName: t`Use a public URL`,
+    displayTab: 'import-advanced',
     kind,
     renderComponent: (props: ResourceSourceComponentProps) => (
       <UrlChooser

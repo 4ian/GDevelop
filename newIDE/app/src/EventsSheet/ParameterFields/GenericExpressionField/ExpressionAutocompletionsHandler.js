@@ -18,7 +18,7 @@ export const getAutocompletionsInitialState = (): AutocompletionsState => {
     selectedCompletionIndex: 0,
     // By default, only render some completions.
     // This is to avoid rendering a lot (100+) completions,
-    // riskying a lag/frame drops, just for them to be discarded afterwards,
+    // risking a lag/frame drops, just for them to be discarded afterwards,
     // at each keystroke of the user.
     renderEverything: false,
   };
@@ -136,6 +136,10 @@ export const handleAutocompletionsKeyDown = (
       // the user should be able to freely move to the next line.
       if (autocompletion.isExact) return state;
       onInsertAutocompletion(autocompletion);
+
+      // Stop propagation to avoid closing the modal the
+      // field is contained in.
+      event.stopPropagation();
     }
 
     // Avoid entering a new line or tabbing to the next field.

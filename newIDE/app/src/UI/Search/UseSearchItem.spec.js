@@ -1,5 +1,7 @@
 // @flow
 import { filterSearchItems, partialQuickSort } from './UseSearchItem';
+import { type AssetShortHeader } from '../../Utils/GDevelopServices/Asset';
+import { fakeAssetShortHeader1 } from '../../fixtures/GDevelopServicesTestData';
 
 describe('UseSearchItem', () => {
   test('sanitizeObjectName', () => {
@@ -8,11 +10,19 @@ describe('UseSearchItem', () => {
 
     expect(filterSearchItems(null, null, new Set())).toEqual(null);
 
-    const items = [{ id: 1, tags: ['hello'] }, { id: 2, tags: ['world'] }];
+    const item1: AssetShortHeader = {
+      ...fakeAssetShortHeader1,
+      id: '1',
+      tags: ['hello'],
+    };
+    const item2: AssetShortHeader = {
+      ...fakeAssetShortHeader1,
+      id: '2',
+      tags: ['world'],
+    };
+    const items = [item1, item2];
     expect(filterSearchItems(items, null, new Set())).toEqual(items);
-    expect(filterSearchItems(items, null, new Set(['world']))).toEqual([
-      { id: 2, tags: ['world'] },
-    ]);
+    expect(filterSearchItems(items, null, new Set(['world']))).toEqual([item2]);
   });
 });
 

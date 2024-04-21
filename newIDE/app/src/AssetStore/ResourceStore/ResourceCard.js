@@ -3,14 +3,15 @@ import * as React from 'react';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
-import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
-import VideoLibrary from '@material-ui/icons/VideoLibrary';
 import FontDownload from '@material-ui/icons/FontDownload';
 import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import CheckeredBackground from '../../ResourcesList/CheckeredBackground';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import Video from '../../UI/CustomSvgIcons/Video';
+import File from '../../UI/CustomSvgIcons/File';
 
 const paddingSize = 10;
 const styles = {
@@ -26,7 +27,12 @@ const styles = {
     verticalAlign: 'middle',
     pointerEvents: 'none',
   },
-  previewIcon: {
+  previewIconDarkTheme: {
+    width: 40,
+    height: 40,
+    filter: 'grayscale(1) invert(1)',
+  },
+  previewIconLightTheme: {
     width: 40,
     height: 40,
   },
@@ -62,6 +68,7 @@ type ImageCardProps = {|
   imageStyle?: {|
     width: number,
     height: number,
+    filter?: string,
   |},
 |};
 
@@ -137,6 +144,7 @@ type Props = {|
 
 export const ResourceCard = ({ resource, onChoose, size }: Props) => {
   const resourceKind = resource.type;
+  const theme = React.useContext(GDevelopThemeContext);
 
   switch (resourceKind) {
     case 'image':
@@ -147,7 +155,11 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
           resource={resource}
           onChoose={onChoose}
           size={size}
-          imageStyle={styles.previewIcon}
+          imageStyle={
+            theme.palette.type === 'light'
+              ? styles.previewIconLightTheme
+              : styles.previewIconDarkTheme
+          }
         />
       );
     case 'audio':
@@ -164,10 +176,13 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
         </GenericCard>
       );
     case 'json':
+    case 'tilemap':
+    case 'tileset':
+    case 'spine':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">
-            <InsertDriveFile style={styles.icon} />
+            <File style={styles.icon} />
           </Line>
           <Line justifyContent="center">
             <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
@@ -178,7 +193,7 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">
-            <VideoLibrary style={styles.icon} />
+            <Video style={styles.icon} />
           </Line>
           <Line justifyContent="center">
             <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
@@ -186,6 +201,28 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
         </GenericCard>
       );
     case 'font':
+      return (
+        <GenericCard onChoose={onChoose} resource={resource} size={size}>
+          <Line justifyContent="center">
+            <FontDownload style={styles.icon} />
+          </Line>
+          <Line justifyContent="center">
+            <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
+          </Line>
+        </GenericCard>
+      );
+    case 'model3D':
+      return (
+        <GenericCard onChoose={onChoose} resource={resource} size={size}>
+          <Line justifyContent="center">
+            <FontDownload style={styles.icon} />
+          </Line>
+          <Line justifyContent="center">
+            <RaisedButton onClick={onChoose} label={<Trans>Choose</Trans>} />
+          </Line>
+        </GenericCard>
+      );
+    case 'atlas':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>
           <Line justifyContent="center">

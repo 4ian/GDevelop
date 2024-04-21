@@ -11,6 +11,10 @@ if (!args['outputPath']) {
   shell.exit(1);
 }
 const outputPath = args['outputPath'];
+const commitHash = args['commitHash'];
+const pathToArtifacts = `https://gdevelop-releases.s3.amazonaws.com/master/${
+  commitHash ? 'commit/' + commitHash : 'latest'
+}`;
 
 // The version is read from `newIDE/electron-app/app/package.json`. It must
 // always be the source of truth and the only place to update when the version
@@ -30,47 +34,56 @@ shell.echo(
 );
 
 const artifactsToDownload = {
+  // Windows:
   'Windows exe': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup ${version}.exe`,
+    url: `${pathToArtifacts}/GDevelop 5 Setup ${version}.exe`,
     outputFilename: `GDevelop-5-Setup-${version}.exe`,
   },
   'Windows exe blockmap': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup ${version}.exe.blockmap`,
+    url: `${pathToArtifacts}/GDevelop 5 Setup ${version}.exe.blockmap`,
     outputFilename: `GDevelop-5-Setup-${version}.exe.blockmap`,
   },
   'Windows AppX': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 ${version}.appx`,
+    url: `${pathToArtifacts}/GDevelop 5 ${version}.appx`,
     outputFilename: `GDevelop 5 ${version}.appx`,
   },
   'Windows auto-update file': {
-    url: 'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest.yml',
+    url: `${pathToArtifacts}/latest.yml`,
     outputFilename: 'latest.yml',
   },
+  // macOS (Universal):
   'macOS zip': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}-mac.zip`,
-    outputFilename: `GDevelop-5-${version}-mac.zip`,
+    url: `${pathToArtifacts}/GDevelop 5-${version}-universal-mac.zip`,
+    outputFilename: `GDevelop-5-${version}-universal-mac.zip`,
   },
   'macOS dmg': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.dmg`,
-    outputFilename: `GDevelop-5-${version}.dmg`,
+    url: `${pathToArtifacts}/GDevelop 5-${version}-universal.dmg`,
+    outputFilename: `GDevelop-5-${version}-universal.dmg`,
   },
   'macOS dmg blockmap': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.dmg.blockmap`,
-    outputFilename: `GDevelop-5-${version}.dmg.blockmap`,
+    url: `${pathToArtifacts}/GDevelop 5-${version}-universal.dmg.blockmap`,
+    outputFilename: `GDevelop-5-${version}-universal.dmg.blockmap`,
   },
   'macOS auto-update file': {
-    url:
-      'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-mac.yml',
+    url: `${pathToArtifacts}/latest-mac.yml`,
     outputFilename: 'latest-mac.yml',
   },
-  'Linux AppImage': {
-    url: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-${version}.AppImage`,
+  // Linux (amd64 and arm64):
+  'Linux AppImage (amd64)': {
+    url: `${pathToArtifacts}/GDevelop 5-${version}.AppImage`,
     outputFilename: `GDevelop-5-${version}.AppImage`,
   },
-  'Linux auto-update file': {
-    url:
-      'https://gdevelop-releases.s3.amazonaws.com/master/latest/latest-linux.yml',
+  'Linux AppImage (arm64)': {
+    url: `${pathToArtifacts}/GDevelop 5-${version}-arm64.AppImage`,
+    outputFilename: `GDevelop-5-${version}-arm64.AppImage`,
+  },
+  'Linux auto-update file (amd64)': {
+    url: `${pathToArtifacts}/latest-linux.yml`,
     outputFilename: 'latest-linux.yml',
+  },
+  'Linux auto-update file (arm64)': {
+    url: `${pathToArtifacts}/latest-linux-arm64.yml`,
+    outputFilename: 'latest-linux-arm64.yml',
   },
 };
 

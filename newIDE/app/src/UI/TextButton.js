@@ -2,14 +2,14 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { Spacer } from './Grid';
-import { Tooltip } from '@material-ui/core';
-import { tooltipEnterDelay } from './Tooltip';
 import { type ButtonInterface } from './Button';
 
 type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
+  secondary?: boolean,
+  allowBrowserAutoTranslate?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
@@ -24,9 +24,6 @@ type Props = {|
   |},
   target?: '_blank',
   id?: ?string,
-  // Tooltips aren't really suited for TextButtons UX-wise, but we can use them for
-  // accessibility purpose for the Toolbar.
-  exceptionalTooltipForToolbar?: React.Node,
 |};
 
 /**
@@ -37,11 +34,12 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
     {
       label,
       primary,
+      secondary,
       icon,
       keyboardFocused,
-      exceptionalTooltipForToolbar,
       disabled,
       id,
+      allowBrowserAutoTranslate = true,
       ...otherProps
     },
     ref
@@ -52,11 +50,12 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
-    const button = (
+    return (
       <Button
         variant="text"
         size="small"
-        color={primary ? 'secondary' : 'default'}
+        translate={allowBrowserAutoTranslate ? undefined : 'no'}
+        color={primary ? 'primary' : secondary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
@@ -66,20 +65,9 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       >
         {icon}
         {icon && <Spacer />}
-        {label}
+        {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+        {label ? <span>{label}</span> : null}
       </Button>
-    );
-
-    return exceptionalTooltipForToolbar && !disabled ? (
-      <Tooltip
-        title={exceptionalTooltipForToolbar}
-        placement="bottom"
-        enterDelay={tooltipEnterDelay}
-      >
-        {button}
-      </Tooltip>
-    ) : (
-      button
     );
   }
 );

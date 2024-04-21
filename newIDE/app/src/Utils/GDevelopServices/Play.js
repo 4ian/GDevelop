@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { rgbOrHexToRGBString } from '../ColorTransformer';
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
 export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
@@ -34,10 +35,20 @@ export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingCustom
   | LeaderboardScoreFormattingTime;
 
+export interface LeaderboardTheme {
+  backgroundColor: string;
+  textColor: string;
+  highlightBackgroundColor: string;
+  highlightTextColor: string;
+}
+
 export type LeaderboardCustomizationSettings = {|
   defaultDisplayedEntriesNumber?: number,
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
+  theme?: LeaderboardTheme,
+  useCustomCss?: boolean,
+  customCss?: string,
 |};
 
 export type Leaderboard = {|
@@ -53,6 +64,8 @@ export type Leaderboard = {|
   primary?: boolean,
   resetLaunchedAt?: string,
   extremeAllowedScore?: number,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -63,6 +76,8 @@ export type LeaderboardUpdatePayload = {|
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
   extremeAllowedScore?: number | null,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardEntry = {|
@@ -72,49 +87,7 @@ export type LeaderboardEntry = {|
   playerName: string,
   createdAt: string,
   score: number,
-  deletedAt?: string,
-  outdatedAt?: string,
 |};
-
-export type LeaderboardDisplayData = {|
-  +id: string,
-  +playerName: string,
-  +createdAt: string,
-  +score: number,
-|};
-
-export type LeaderboardExtremePlayerScore = {|
-  leaderboardId: string,
-  playerId?: string,
-  playerName: string,
-  relatedEntryCreatedAt: string,
-  score: number,
-  relatedEntryId: string,
-|};
-
-export const extractEntryDisplayData = ({
-  playerName,
-  id,
-  score,
-  createdAt,
-}: LeaderboardEntry): LeaderboardDisplayData => ({
-  id,
-  createdAt,
-  playerName,
-  score,
-});
-
-export const extractExtremeScoreDisplayData = ({
-  playerName,
-  relatedEntryId,
-  score,
-  relatedEntryCreatedAt,
-}: LeaderboardExtremePlayerScore): LeaderboardDisplayData => ({
-  id: relatedEntryId,
-  createdAt: relatedEntryCreatedAt,
-  playerName,
-  score,
-});
 
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
@@ -161,7 +134,7 @@ export const listLeaderboardEntries = async (
   leaderboardId: string,
   options: {| pageSize: number, onlyBestEntry: boolean, forceUri: ?string |}
 ): Promise<{|
-  entries: LeaderboardEntry[] | LeaderboardExtremePlayerScore[],
+  entries: LeaderboardEntry[],
   nextPageUri: ?string,
 |}> => {
   const uri =
@@ -346,6 +319,9 @@ export type Comment = {
   createdAt: number,
   processedAt?: number,
   updatedAt: number,
+  qualityRatingPerRole?: {
+    owner?: string,
+  },
 };
 
 export const listComments = async (
@@ -381,17 +357,19 @@ export const updateComment = async (
     gameId,
     commentId,
     processed,
+    qualityRating,
   }: {|
     gameId: string,
     commentId: string,
-    processed: boolean,
+    processed?: boolean,
+    qualityRating?: string,
   |}
 ) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.patch(
         `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
-        { processed },
+        { processed, qualityRating },
         {
           params: { userId },
           headers: {
@@ -401,4 +379,63 @@ export const updateComment = async (
       )
     )
     .then(response => response.data);
+};
+
+export const canUserCustomizeLeaderboardTheme = (
+  authenticatedUser: AuthenticatedUser
+): {|
+  canUseTheme: boolean,
+  canUseCustomCss: boolean,
+|} => {
+  const { limits } = authenticatedUser;
+  return {
+    canUseTheme:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+        'BASIC' ||
+        limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+          'FULL'),
+    canUseCustomCss:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      !!limits.capabilities.leaderboards.canUseCustomCss,
+  };
+};
+
+export const getRGBLeaderboardTheme = (
+  leaderboardCustomizationSettings: ?LeaderboardCustomizationSettings
+): LeaderboardTheme => {
+  const defaultBackgroundColor = '#d0d1ff';
+  const defaultTextColor = '#000000';
+  const defaultHighlightBackgroundColor = '#5763dd';
+  const defaultHighlightTextColor = '#ffffff';
+
+  const hexLeaderboardTheme =
+    leaderboardCustomizationSettings && leaderboardCustomizationSettings.theme
+      ? {
+          backgroundColor:
+            leaderboardCustomizationSettings.theme.backgroundColor,
+          textColor: leaderboardCustomizationSettings.theme.textColor,
+          highlightBackgroundColor:
+            leaderboardCustomizationSettings.theme.highlightBackgroundColor,
+          highlightTextColor:
+            leaderboardCustomizationSettings.theme.highlightTextColor,
+        }
+      : {
+          backgroundColor: defaultBackgroundColor,
+          textColor: defaultTextColor,
+          highlightBackgroundColor: defaultHighlightBackgroundColor,
+          highlightTextColor: defaultHighlightTextColor,
+        };
+  return {
+    backgroundColor: rgbOrHexToRGBString(hexLeaderboardTheme.backgroundColor),
+    textColor: rgbOrHexToRGBString(hexLeaderboardTheme.textColor),
+    highlightBackgroundColor: rgbOrHexToRGBString(
+      hexLeaderboardTheme.highlightBackgroundColor
+    ),
+    highlightTextColor: rgbOrHexToRGBString(
+      hexLeaderboardTheme.highlightTextColor
+    ),
+  };
 };

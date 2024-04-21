@@ -17,6 +17,9 @@ PropertyDescriptor::~PropertyDescriptor() {}
 void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   element.AddChild("value").SetStringValue(currentValue);
   element.AddChild("type").SetStringValue(type);
+  if (type == "Number" && !measurementUnit.IsUndefined()) {
+    element.AddChild("unit").SetStringValue(measurementUnit.GetName());
+  }
   element.AddChild("label").SetStringValue(label);
   element.AddChild("description").SetStringValue(description);
   element.AddChild("group").SetStringValue(group);
@@ -26,12 +29,28 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   for (const gd::String& information : extraInformation) {
     extraInformationElement.AddChild("").SetStringValue(information);
   }
-  element.AddChild("hidden").SetBoolValue(hidden);
+  if (hidden) {
+    element.AddChild("hidden").SetBoolValue(hidden);
+  }
+  if (deprecated) {
+    element.AddChild("deprecated").SetBoolValue(deprecated);
+  }
+  if (advanced) {
+    element.AddChild("advanced").SetBoolValue(advanced);
+  }
 }
 
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   currentValue = element.GetChild("value").GetStringValue();
   type = element.GetChild("type").GetStringValue();
+  if (type == "Number") {
+    gd::String unitName = element.GetChild("unit").GetStringValue();
+    measurementUnit =
+        gd::MeasurementUnit::HasDefaultMeasurementUnitNamed(unitName)
+            ? measurementUnit =
+                  gd::MeasurementUnit::GetDefaultMeasurementUnitByName(unitName)
+            : gd::MeasurementUnit::GetUndefined();
+  }
   label = element.GetChild("label").GetStringValue();
   description = element.GetChild("description").GetStringValue();
   group = element.GetChild("group").GetStringValue();
@@ -46,6 +65,12 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
 
   hidden = element.HasChild("hidden")
                ? element.GetChild("hidden").GetBoolValue()
+               : false;
+  deprecated = element.HasChild("deprecated")
+               ? element.GetChild("deprecated").GetBoolValue()
+               : false;
+  advanced = element.HasChild("advanced")
+               ? element.GetChild("advanced").GetBoolValue()
                : false;
 }
 

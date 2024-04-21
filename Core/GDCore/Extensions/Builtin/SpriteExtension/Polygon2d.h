@@ -5,8 +5,9 @@
  */
 #ifndef GDCORE_POLYGON_H
 #define GDCORE_POLYGON_H
-#include "GDCore/Vector2.h"
 #include <vector>
+
+#include "GDCore/Vector2.h"
 
 /**
  * \brief Represents a polygon. Usually used for collisions masks.
@@ -42,7 +43,7 @@ class GD_CORE_API Polygon2d {
    * \note Edges are updated, there is no need to call ComputeEdges after
    * calling Move.
    */
-  void Move(float x, float y);
+  void Move(double x, double y);
 
   /**
    * \brief Rotate the polygon.
@@ -52,7 +53,7 @@ class GD_CORE_API Polygon2d {
    * \warning edges vector is not updated, you have to call ComputeEdges if
    * needed.
    */
-  void Rotate(float angle);
+  void Rotate(double angle);
 
   /**
    * \brief Automatically fill edges vector using vertices.
@@ -77,7 +78,7 @@ class GD_CORE_API Polygon2d {
   /**
    * \brief Create a rectangle
    */
-  static Polygon2d CreateRectangle(float width, float height);
+  static Polygon2d CreateRectangle(double width, double height);
   ///@}
 };
 

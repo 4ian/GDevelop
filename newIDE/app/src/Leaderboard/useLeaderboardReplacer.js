@@ -35,12 +35,13 @@ export const ReplacePromptDialog = ({
   onClose,
   onTriggerReplace,
 }: ReplacePromptDialogProps) => {
-  const { authenticated, onCreateAccount } = React.useContext(
+  const { authenticated, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
 
   return (
     <Dialog
+      title={<Trans>Set up new leaderboards for this game</Trans>}
       actions={
         authenticated
           ? [
@@ -55,6 +56,7 @@ export const ReplacePromptDialog = ({
                 key="register-game-now"
                 label={<Trans>Create new leaderboards now</Trans>}
                 onClick={onTriggerReplace}
+                id="create-and-replace-new-leaderboard"
               />,
             ]
           : [
@@ -67,19 +69,18 @@ export const ReplacePromptDialog = ({
               <DialogPrimaryButton
                 label={<Trans>Login now</Trans>}
                 primary
-                onClick={() => onCreateAccount()}
+                onClick={() => onOpenLoginDialog()}
                 key="login-now"
+                id="login-now"
               />,
             ]
       }
-      title={<Trans>Set up new leaderboards for this game</Trans>}
-      noMargin
       open
       maxWidth="sm"
       onRequestClose={onClose}
     >
-      <Line>
-        <ColumnStackLayout>
+      <Line noMargin>
+        <ColumnStackLayout noMargin>
           <Text>
             <Trans>
               This game is using leaderboards. GDevelop will create new
@@ -116,6 +117,7 @@ export const LeaderboardReplacerProgressDialog = ({
 
   return (
     <Dialog
+      title={null} // Specific loading dialog where we don't want a title.
       actions={[
         onRetry ? (
           <DialogPrimaryButton
@@ -135,11 +137,10 @@ export const LeaderboardReplacerProgressDialog = ({
         />,
       ]}
       cannotBeDismissed={!hasErrors}
-      noMargin
       open
       maxWidth="sm"
     >
-      <Line>
+      <Line noMargin>
         <ColumnStackLayout expand>
           <Text>
             {hasErrors && progress === 100 ? (
@@ -307,12 +308,16 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
 
       // Replace leaderboards in events.
       if (Object.keys(replacedLeaderboardsMap).length) {
+        const renamedLeaderboardsMap = toNewGdMapStringString(
+          replacedLeaderboardsMap
+        );
         const eventsLeaderboardReplacer = new gd.EventsLeaderboardsRenamer(
           project,
-          toNewGdMapStringString(replacedLeaderboardsMap)
+          renamedLeaderboardsMap
         );
+        renamedLeaderboardsMap.delete();
 
-        gd.WholeProjectRefactorer.exposeProjectEvents(
+        gd.ProjectBrowserHelper.exposeProjectEvents(
           project,
           eventsLeaderboardReplacer
         );
@@ -368,10 +373,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       setGameId(sourceGameId);
 
       const leaderboardsLister = new gd.EventsLeaderboardsLister(project);
-      gd.WholeProjectRefactorer.exposeProjectEvents(
-        project,
-        leaderboardsLister
-      );
+      gd.ProjectBrowserHelper.exposeProjectEvents(project, leaderboardsLister);
       const leaderboardIds = leaderboardsLister.getLeaderboardIds();
       setLeaderboardsToReplace(leaderboardIds.toNewVectorString().toJSArray());
       leaderboardsLister.delete();

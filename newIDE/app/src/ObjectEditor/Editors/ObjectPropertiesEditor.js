@@ -20,21 +20,23 @@ type Props = EditorProps;
 
 const ObjectPropertiesEditor = (props: Props) => {
   const {
-    object,
+    objectConfiguration,
     project,
-    resourceSources,
-    onChooseResource,
-    resourceExternalEditors,
+    resourceManagementProps,
     unsavedChanges,
+    renderObjectNameField,
   } = props;
 
   // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
   // and associated methods are redefined in JS, they have different arguments (
   // see ObjectJsImplementation C++ implementation). If called directly here from JS,
-  // the arguments will be mismatched. To workaround this, always case the object to
+  // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
-  const objectAsGdObject = gd.castObject(object, gd.gdObject);
-  const properties = objectAsGdObject.getProperties();
+  const objectConfigurationAsGd = gd.castObject(
+    objectConfiguration,
+    gd.ObjectConfiguration
+  );
+  const properties = objectConfigurationAsGd.getProperties();
 
   const propertiesSchema = propertiesMapToSchema(
     properties,
@@ -43,15 +45,16 @@ const ObjectPropertiesEditor = (props: Props) => {
   );
 
   const extraInformation = getExtraObjectsInformation()[
-    objectAsGdObject.getType()
+    objectConfigurationAsGd.getType()
   ];
 
-  const tutorialIds = getObjectTutorialIds(objectAsGdObject.getType());
+  const tutorialIds = getObjectTutorialIds(objectConfigurationAsGd.getType());
 
   return (
     <I18n>
       {({ i18n }) => (
-        <ColumnStackLayout>
+        <ColumnStackLayout noMargin>
+          {renderObjectNameField && renderObjectNameField()}
           {tutorialIds.map(tutorialId => (
             <DismissableTutorialMessage
               key={tutorialId}
@@ -74,11 +77,9 @@ const ObjectPropertiesEditor = (props: Props) => {
               <PropertiesEditor
                 unsavedChanges={unsavedChanges}
                 schema={propertiesSchema}
-                instances={[objectAsGdObject]}
+                instances={[objectConfigurationAsGd]}
                 project={project}
-                resourceSources={resourceSources}
-                onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
+                resourceManagementProps={resourceManagementProps}
               />
             </React.Fragment>
           ) : (

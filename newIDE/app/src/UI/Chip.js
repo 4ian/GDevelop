@@ -24,22 +24,42 @@ type Props = {|
   onBlur?: (() => void) | null,
   onFocus?: (() => void) | null,
   onDelete?: ((event: any) => void) | null,
+  disableAutoTranslate?: boolean,
 |};
 
-const Chip = (props: Props) => (
-  <MuiChip
-    label={props.label}
-    icon={props.icon}
-    size={props.size}
-    variant={props.variant}
-    avatar={props.avatar}
-    style={props.style}
-    onClick={props.onClick}
-    onBlur={props.onBlur}
-    onFocus={props.onFocus}
-    onDelete={props.onDelete}
-    classes={useStyles()}
-  />
-);
+type ChipInterface = {|
+  focus: () => void,
+|};
+
+const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
+  const chipRef = React.useRef<?HTMLDivElement>(null);
+  const focus = () => {
+    if (chipRef.current) {
+      chipRef.current.focus();
+    }
+  };
+  React.useImperativeHandle(ref, () => ({
+    focus,
+  }));
+
+  return (
+    <MuiChip
+      label={props.label}
+      icon={props.icon}
+      size={props.size}
+      variant={props.variant}
+      avatar={props.avatar}
+      style={props.style}
+      onClick={props.onClick}
+      onBlur={props.onBlur}
+      onFocus={props.onFocus}
+      onDelete={props.onDelete}
+      classes={useStyles()}
+      className={props.disableAutoTranslate ? 'notranslate' : ''}
+      ref={chipRef}
+      color={props.color}
+    />
+  );
+});
 
 export default Chip;

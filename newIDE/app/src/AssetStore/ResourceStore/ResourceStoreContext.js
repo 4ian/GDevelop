@@ -11,6 +11,7 @@ import {
 } from '../../Utils/GDevelopServices/Asset';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import { AssetStoreContext } from '../AssetStoreContext';
 
 const defaultSearchText = '';
 
@@ -67,6 +68,8 @@ export const ResourceStoreStateProvider = ({
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
+  const { environment } = React.useContext(AssetStoreContext);
+
   const fetchResourcesAndFilters = React.useCallback(
     () => {
       // Don't attempt to load again resources and filters if they
@@ -78,9 +81,11 @@ export const ResourceStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const { resources, filters } = await listAllResources();
-          const authors = await listAllAuthors();
-          const licenses = await listAllLicenses();
+          const { resources, filters } = await listAllResources({
+            environment,
+          });
+          const authors = await listAllAuthors({ environment });
+          const licenses = await listAllLicenses({ environment });
 
           const resourcesByUrl = {};
           resources.forEach(resource => {
@@ -88,7 +93,9 @@ export const ResourceStoreStateProvider = ({
           });
 
           console.info(
-            `Loaded ${resources.length} resources from the asset store.`
+            `Loaded ${
+              resources ? resources.length : 0
+            } resources from the asset store.`
           );
           setResourcesByUrl(resourcesByUrl);
           setFilters(filters);
@@ -105,7 +112,7 @@ export const ResourceStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [resourcesByUrl, isLoading]
+    [resourcesByUrl, isLoading, environment]
   );
 
   const { chosenCategory, chosenFilters } = filtersState;

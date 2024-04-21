@@ -1,26 +1,51 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-  gdjs.PixiFiltersTools.registerFilterCreator('Blur', {
-    makePIXIFilter: function (target, effectData) {
-      const blur = new PIXI.filters.BlurFilter();
-      return blur;
-    },
-    updatePreRender: function (filter, target) {},
-    updateDoubleParameter: function (filter, parameterName, value) {
-      if (
-        parameterName !== 'blur' &&
-        parameterName !== 'quality' &&
-        parameterName !== 'kernelSize' &&
-        parameterName !== 'resolution'
+  gdjs.PixiFiltersTools.registerFilterCreator(
+    'Blur',
+    new (class extends gdjs.PixiFiltersTools.PixiFilterCreator {
+      makePIXIFilter(target: EffectsTarget, effectData) {
+        const blur = new PIXI.BlurFilter();
+        return blur;
+      }
+      updatePreRender(filter: PIXI.Filter, target: EffectsTarget) {}
+      updateDoubleParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
       ) {
-        return;
+        if (
+          parameterName !== 'blur' &&
+          parameterName !== 'quality' &&
+          parameterName !== 'kernelSize' &&
+          parameterName !== 'resolution'
+        ) {
+          return;
+        }
+        if (parameterName === 'kernelSize') {
+          value = gdjs.PixiFiltersTools.clampKernelSize(value, 5, 15);
+        }
+        filter[parameterName] = value;
       }
-      if (parameterName === 'kernelSize') {
-        value = gdjs.PixiFiltersTools.clampKernelSize(value, 5, 15);
+      getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
+        return filter[parameterName] || 0;
       }
-      filter[parameterName] = value;
-    },
-    updateStringParameter: function (filter, parameterName, value) {},
-    updateBooleanParameter: function (filter, parameterName, value) {},
-  });
+      updateStringParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: string
+      ) {}
+      updateColorParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: number
+      ): void {}
+      getColorParameter(filter: PIXI.Filter, parameterName: string): number {
+        return 0;
+      }
+      updateBooleanParameter(
+        filter: PIXI.Filter,
+        parameterName: string,
+        value: boolean
+      ) {}
+    })()
+  );
 }

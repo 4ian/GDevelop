@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,29 +13,24 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'TextInput',
-      _('Text Input'),
-      _('A text field the player can type text into.'),
-      'Florian Rival',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'TextInput',
+        _('Text Input'),
+        _('A text field the player can type text into.'),
+        'Florian Rival',
+        'MIT'
+      )
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Text Input'))
+      .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -89,7 +85,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -227,7 +222,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -246,7 +240,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -272,19 +265,24 @@ module.exports = {
     const object = extension
       .addObject(
         'TextInputObject',
-        _('Text input (experimental)'),
+        _('Text input'),
         _('A text field the player can type text into.'),
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
-      .setCategoryFullName(_('Form control'))
-      .addUnsupportedBaseObjectCapability('effect')
+      .setCategoryFullName(_('User interface'))
+      // Effects are unsupported because the object is not rendered with PIXI.
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
-      );
+      )
+      .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -293,12 +291,27 @@ module.exports = {
         _('the text'),
         _('the text'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
+      )
+      .setHidden()
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
+      .setFunctionName('setText')
+      .setGetter('getText');
+
+    object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
-      .setFunctionName('setString')
-      .setGetter('getString');
+      .setFunctionName('getText');
 
     object
       .addExpressionAndConditionAndAction(
@@ -308,10 +321,13 @@ module.exports = {
         _('the placeholder'),
         _('the placeholder'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters(
+        'string',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
+      )
       .setFunctionName('setPlaceholder')
       .setGetter('getPlaceholder');
 
@@ -326,7 +342,7 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setFontSize')
       .setGetter('getFontSize');
 
@@ -341,7 +357,7 @@ module.exports = {
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('getFontResourceName');
 
     // TODO: could this be merged with the previous expression and condition?
@@ -355,7 +371,7 @@ module.exports = {
         'res/actions/font24.png',
         'res/actions/font.png'
       )
-      .addParameter('object', _('Bitmap text'), 'TextInputObject', false)
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
       .addParameter('fontResource', _('Font resource name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setFontResourceName');
@@ -368,10 +384,27 @@ module.exports = {
         _('the input type'),
         _('the input type'),
         _('Type'),
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string') // TODO: stringWithSelector?
+      .useStandardParameters(
+        'stringWithSelector',
+        gd.ParameterOptions.makeNewOptions()
+          .setDescription(_('Input type'))
+          .setTypeExtraInfo(
+            JSON.stringify([
+              'text',
+              'text area',
+              'email',
+              'password',
+              'number',
+              'telephone number',
+              'url',
+              'search',
+              'email',
+            ])
+          )
+      )
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 
@@ -416,7 +449,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setFillOpacity')
       .setGetter('getFillOpacity');
 
@@ -446,7 +484,12 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
@@ -458,10 +501,10 @@ module.exports = {
         _('the border width'),
         _('the border width'),
         _('Field appearance'),
-        'res/conditions/outlineSize24.png'
+        'res/conditions/outlineSize24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setBorderWidth')
       .setGetter('getBorderWidth');
 
@@ -475,10 +518,13 @@ module.exports = {
         _('the text input is read-only'),
         _('read-only'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters(
+        'boolean',
+        gd.ParameterOptions.makeNewOptions().setDescription(_('Read-only?'))
+      )
       .setFunctionName('setReadOnly')
       .setGetter('isReadOnly');
 
@@ -490,14 +536,16 @@ module.exports = {
         _('the text input is disabled'),
         _('disabled'),
         '',
-        'res/conditions/text24.png'
+        'res/conditions/text24_black.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('boolean')
+      .useStandardParameters('boolean', gd.ParameterOptions.makeNewOptions())
       .setFunctionName('setDisabled')
       .setGetter('isDisabled');
 
     // Other expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -509,9 +557,15 @@ module.exports = {
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('number')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Opacity (0-255)')
+        )
+      )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addScopedCondition(
@@ -529,11 +583,27 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
+    object
+      .addScopedAction(
+        'Focus',
+        _('Focus'),
+        _(
+          'Focus the input so that text can be entered (like if it was touched/clicked).'
+        ),
+        _('Focus _PARAM0_'),
+        _(''),
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('focus');
+
     return extension;
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -541,10 +611,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -552,9 +619,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TextInput::TextInputObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -567,9 +632,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -582,7 +645,7 @@ module.exports = {
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
       ) {
@@ -590,7 +653,7 @@ module.exports = {
           project,
           layout,
           instance,
-          associatedObject,
+          associatedObjectConfiguration,
           pixiContainer,
           pixiResourcesLoader
         );
@@ -612,13 +675,19 @@ module.exports = {
         this.update();
       }
 
-      static getThumbnail(project, resourcesLoader, object) {
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiText.destroy(true);
+        this._pixiObject.destroy({ children: true });
+      }
+
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
         return 'JsPlatform/Extensions/text_input.svg';
       }
 
       update() {
         const instance = this._instance;
-        const properties = this._associatedObject.getProperties();
+        const properties = this._associatedObjectConfiguration.getProperties();
 
         const placeholder =
           instance.getRawStringProperty('placeholder') ||
@@ -668,8 +737,8 @@ module.exports = {
         let width = DEFAULT_WIDTH;
         let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
-          width = instance.getCustomWidth();
-          height = instance.getCustomHeight();
+          width = this.getCustomWidth();
+          height = this.getCustomHeight();
         }
 
         this._pixiObject.pivot.x = width / 2;

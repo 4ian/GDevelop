@@ -13,13 +13,15 @@ import {
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
   ColorAssetStoreSearchFilter,
+  AssetPackTypeStoreSearchFilter,
 } from './AssetStoreSearchFilter';
-import { type AssetFiltersState } from './AssetStoreContext';
+import { AssetStoreContext } from './AssetStoreContext';
 import FlatButton from '../UI/FlatButton';
 import { Line, Column } from '../UI/Grid';
 import { type RGBColor } from '../Utils/ColorTransformer';
 import { HexColorField } from './HexColorField';
 import Slider from '../UI/Slider';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Choice = {|
   label: React.Node,
@@ -218,26 +220,53 @@ const ColorFilter = ({
   );
 };
 
-export const clearAllFilters = (assetFiltersState: AssetFiltersState): void => {
-  assetFiltersState.setAnimatedFilter(new AnimatedAssetStoreSearchFilter());
-  assetFiltersState.setViewpointFilter(new TagAssetStoreSearchFilter());
-  assetFiltersState.setDimensionFilter(new DimensionAssetStoreSearchFilter());
-  assetFiltersState.setObjectTypeFilter(new ObjectTypeAssetStoreSearchFilter());
-  assetFiltersState.setColorFilter(new ColorAssetStoreSearchFilter());
-  assetFiltersState.setLicenseFilter(new LicenseAssetStoreSearchFilter());
-};
-
-type AssetStoreFilterPanelProps = {|
-  assetFiltersState: AssetFiltersState,
-  onChoiceChange: () => void,
-|};
-
-export const AssetStoreFilterPanel = ({
-  assetFiltersState,
-  onChoiceChange,
-}: AssetStoreFilterPanelProps) => {
+export const AssetStoreFilterPanel = () => {
+  const {
+    assetFiltersState,
+    assetPackFiltersState,
+    clearAllFilters,
+    shopNavigationState,
+  } = React.useContext(AssetStoreContext);
+  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+  const onChoiceChange = React.useCallback(
+    () => {
+      shopNavigationState.openSearchResultPage();
+    },
+    [shopNavigationState]
+  );
   return (
-    <Column>
+    <Column noMargin>
+      <MultipleChoiceFilter
+        filterKey="PackType"
+        title={<Trans>Pack type</Trans>}
+        choices={[
+          { label: t`Free`, value: 'free' },
+          { label: t`Premium`, value: 'premium' },
+          { label: t`Owned`, value: 'owned' },
+        ]}
+        isChoiceChecked={choice =>
+          (choice === 'free' && assetPackFiltersState.typeFilter.isFree) ||
+          (choice === 'premium' &&
+            assetPackFiltersState.typeFilter.isPremium) ||
+          (choice === 'owned' && assetPackFiltersState.typeFilter.isOwned)
+        }
+        setChoiceChecked={(choice, checked) => {
+          const typeFilter = assetPackFiltersState.typeFilter;
+          const isFree = choice === 'free' ? checked : typeFilter.isFree;
+          const isPremium =
+            choice === 'premium' ? checked : typeFilter.isPremium;
+          const isOwned = choice === 'owned' ? checked : typeFilter.isOwned;
+          assetPackFiltersState.setTypeFilter(
+            new AssetPackTypeStoreSearchFilter({
+              isFree,
+              isPremium,
+              isOwned,
+              receivedAssetPacks,
+            })
+          );
+          onChoiceChange();
+        }}
+      />
       <MultipleChoiceFilter
         filterKey="Animation"
         title={<Trans>Animation</Trans>}
@@ -307,6 +336,7 @@ export const AssetStoreFilterPanel = ({
           { label: t`Sprite`, value: 'sprite' },
           { label: t`Tiled sprite`, value: 'tiled' },
           { label: t`Panel sprite`, value: '9patch' },
+          { label: t`3D model`, value: 'Scene3D::Model3DObject' },
         ]}
         values={assetFiltersState.objectTypeFilter.objectTypes}
         setValues={values => {
@@ -351,7 +381,7 @@ export const AssetStoreFilterPanel = ({
           label={<Trans>Clear all filters</Trans>}
           primary={false}
           onClick={() => {
-            clearAllFilters(assetFiltersState);
+            clearAllFilters();
             onChoiceChange();
           }}
         />

@@ -25,19 +25,21 @@ class SystemInfoJsExtension : public gd::PlatformExtension {
     DeclareSystemInfoExtension(*this);
 
     GetAllConditions()["SystemInfo::IsMobile"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
+    GetAllConditions()["SystemInfo::IsNativeMobileApp"]
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isNativeMobileApp");
+    GetAllConditions()["SystemInfo::IsNativeDesktopApp"]
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isNativeDesktopApp");
     GetAllConditions()["SystemInfo::IsWebGLSupported"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isWebGLSupported");
     GetAllConditions()["SystemInfo::IsPreview"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.isPreview");
     GetAllConditions()["SystemInfo::HasTouchScreen"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
         .SetFunctionName("gdjs.evtTools.systemInfo.hasTouchScreen");
 

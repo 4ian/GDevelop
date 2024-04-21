@@ -110,11 +110,11 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
             .GetBoolAttribute("automatic", true));
 
     if (spriteElement.HasChild("CustomCollisionMask"))
-      sprite.SetCollisionMaskAutomatic(
+      sprite.SetFullImageCollisionMask(
           !spriteElement.GetChild("CustomCollisionMask")
                .GetBoolAttribute("custom", false));
     else
-      sprite.SetCollisionMaskAutomatic(
+      sprite.SetFullImageCollisionMask(
           !spriteElement.GetBoolAttribute("hasCustomCollisionMask", false));
 
     std::vector<Polygon2d> mask;
@@ -173,7 +173,7 @@ void SaveSpritesDirection(const vector<Sprite>& sprites,
         .SetAttribute("automatic", sprites[i].IsDefaultCenterPoint());
 
     spriteElement.SetAttribute("hasCustomCollisionMask",
-                               !sprites[i].IsCollisionMaskAutomatic());
+                               !sprites[i].IsFullImageCollisionMask());
 
     gd::SerializerElement& collisionMaskElement =
         spriteElement.AddChild("customCollisionMask");

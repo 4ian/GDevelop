@@ -9,6 +9,10 @@ name: Build Storybook
 on:
   # Launch on all commits.
   push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**" # Don't run on new tags
   # Allows to run this workflow manually from the Actions tab,
   # to publish on Chromatic (not done by default).
   workflow_dispatch:
@@ -17,26 +21,22 @@ jobs:
   build-storybook:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+          cache-dependency-path: "newIDE/app/package-lock.json"
+
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.BUILD_STORYBOOK_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 50
-
-      # Cache npm dependencies to speed up the workflow
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-newIDE-app-node_modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('newIDE/app/package-lock.json') }}
 
       - name: Install newIDE dependencies
         run: npm install
@@ -57,8 +57,8 @@ jobs:
 
       - name: Log urls to the Storybook
         run: |
-          echo "Find the latest Storybook for this branch on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
-          echo "Find the Storybook for this commit on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
+          echo "Find the latest Storybook for this branch on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
+          echo "Find the Storybook for this commit on https://gdevelop-storybook.s3.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
 
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic

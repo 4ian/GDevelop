@@ -3,17 +3,15 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import EventsSheet from '../../../EventsSheet';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
-import fakeResourceExternalEditors from '../../FakeResourceExternalEditors';
+import fakeResourceManagementProps from '../../FakeResourceManagement';
 
 export default {
   title: 'EventsSheet/EventsSheet',
   component: EventsSheet,
-  decorators: [muiDecorator],
 };
 
 export const DefaultNoScope = () => (
@@ -21,16 +19,12 @@ export const DefaultNoScope = () => (
     <FixedHeightFlexContainer height={500}>
       <EventsSheet
         project={testProject.project}
-        scope={{ layout: testProject.testLayout }}
+        scope={{ project: testProject.project, layout: testProject.testLayout }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.testLayout}
         events={testProject.testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={fakeResourceManagementProps}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}
@@ -48,16 +42,15 @@ export const EmptyNoScope = () => (
     <FixedHeightFlexContainer height={500}>
       <EventsSheet
         project={testProject.project}
-        scope={{ layout: testProject.emptyLayout }}
+        scope={{
+          project: testProject.project,
+          layout: testProject.emptyLayout,
+        }}
         globalObjectsContainer={testProject.project}
         objectsContainer={testProject.emptyLayout}
         events={testProject.emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
+        resourceManagementProps={fakeResourceManagementProps}
         onOpenLayout={action('open layout')}
         onOpenSettings={action('open settings')}
         setToolbar={() => {}}

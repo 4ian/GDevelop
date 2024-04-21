@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react';
 
-type CallbackEvent = {|
+export type ClientCoordinates = {|
   /* The X position, relative to the viewport, not including scroll offset, of the long touch */
-  clientX: number,
+  +clientX: number,
   /* The Y position, relative to the viewport, not including scroll offset, of the long touch */
-  clientY: number,
+  +clientY: number,
 |};
 
 // Find the position of an event on the screen
-const getClientXY = (event: TouchEvent): CallbackEvent => {
+const getClientXY = (event: TouchEvent): ClientCoordinates => {
   if (event.touches && event.touches.length > 0) {
     return {
       clientX: event.touches[0].clientX,
@@ -23,8 +23,10 @@ const getClientXY = (event: TouchEvent): CallbackEvent => {
   };
 };
 
-const delay = 600; // ms
+const defaultDelay = 600; // ms
 const moveTolerance = 10; // px
+
+const contextLocks: { [string]: true } = {};
 
 /**
  * A hook to listen to a long touch ("long press") on an element, to workaround the
@@ -33,15 +35,31 @@ const moveTolerance = 10; // px
  * A long press is characterized by starting a touch and staying pressed, without
  * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
-export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
+export const useLongTouch = (
+  callback: (e: ClientCoordinates) => void,
+  options?: {
+    /**
+     * To be set when nested elements with watched touches events are in conflict to run a callback.
+     * Priority will be given to the nested element.
+     */
+    context?: string,
+    delay?: number,
+  }
+) => {
   const timeout = React.useRef<?TimeoutID>(null);
-  const currentTouchCallbackEvent = React.useRef<CallbackEvent>({
+  const context = options && options.context ? options.context : null;
+  const delay = options && options.delay ? options.delay : defaultDelay;
+  const currentClientCoordinates = React.useRef<ClientCoordinates>({
     clientX: 0,
     clientY: 0,
   });
-  const clear = React.useCallback(() => {
-    timeout.current && clearTimeout(timeout.current);
-  }, []);
+  const clear = React.useCallback(
+    () => {
+      if (context) delete contextLocks[context];
+      timeout.current && clearTimeout(timeout.current);
+    },
+    [context]
+  );
 
   React.useEffect(
     () => {
@@ -75,13 +93,17 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
       // if there is one already. This can happen if start is called
       // multiple times.
       timeout.current && clearTimeout(timeout.current);
+      if (context) {
+        if (contextLocks[context]) return;
+        contextLocks[context] = true;
+      }
 
-      currentTouchCallbackEvent.current = getClientXY(event);
+      currentClientCoordinates.current = getClientXY(event);
       timeout.current = setTimeout(() => {
-        callback(currentTouchCallbackEvent.current);
+        callback(currentClientCoordinates.current);
       }, delay);
     },
-    [callback]
+    [callback, context, delay]
   );
 
   const onMove = React.useCallback(
@@ -96,7 +118,7 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
       // If touch moved too far from the initial touch position,
       // it's not a long press anymore.
       const touch = event.touches[0];
-      const { clientX, clientY } = currentTouchCallbackEvent.current;
+      const { clientX, clientY } = currentClientCoordinates.current;
       if (
         Math.abs(touch.clientX - clientX) > moveTolerance ||
         Math.abs(touch.clientY - clientY) > moveTolerance
@@ -105,7 +127,7 @@ export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
         return;
       }
     },
-    [currentTouchCallbackEvent, clear]
+    [currentClientCoordinates, clear]
   );
 
   return {

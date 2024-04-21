@@ -4,7 +4,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
   type HotReloaderLog,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 
 /** Represents what should be run when a preview is launched */
 export type PreviewState = {|
@@ -54,6 +54,9 @@ export const usePreviewDebuggerServerWatcher = (
         },
         onConnectionOpened: ({ id, debuggerIds }) => {
           setDebuggerIds([...debuggerIds]);
+        },
+        onConnectionErrored: ({ id }) => {
+          // Nothing to do (onConnectionClosed is called if necessary).
         },
         onServerStateChanged: () => {
           // Nothing to do.

@@ -7,6 +7,7 @@ const reservedShortcuts = [
   'CmdOrCtrl+KeyX', // Cut
   'CmdOrCtrl+KeyC', // Copy
   'CmdOrCtrl+KeyV', // Paste
+  'CmdOrCtrl+KeyD', // Duplicate
   'CmdOrCtrl+Shift+KeyV', // Paste with style
   'CmdOrCtrl+KeyA', // Select all
   'Delete', // Delete

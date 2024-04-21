@@ -96,10 +96,12 @@ namespace gdjs {
     _runtimegame: gdjs.RuntimeGame;
     _hotReloader: gdjs.HotReloader;
     _originalConsole = originalConsole;
+    _inGameDebugger: gdjs.InGameDebugger;
 
     constructor(runtimeGame: RuntimeGame) {
       this._runtimegame = runtimeGame;
       this._hotReloader = new gdjs.HotReloader(runtimeGame);
+      this._inGameDebugger = new gdjs.InGameDebugger(runtimeGame);
 
       const redirectJsLog = (
         type: 'info' | 'warning' | 'error',
@@ -165,40 +167,42 @@ namespace gdjs {
     protected handleCommand(data: any) {
       const that = this;
       const runtimeGame = this._runtimegame;
-      if (data && data.command) {
-        if (data.command === 'play') {
-          runtimeGame.pause(false);
-        } else if (data.command === 'pause') {
-          runtimeGame.pause(true);
-          that.sendRuntimeGameDump();
-        } else if (data.command === 'refresh') {
-          that.sendRuntimeGameDump();
-        } else if (data.command === 'set') {
-          that.set(data.path, data.newValue);
-        } else if (data.command === 'call') {
-          that.call(data.path, data.args);
-        } else if (data.command === 'profiler.start') {
-          runtimeGame.startCurrentSceneProfiler(function (stoppedProfiler) {
-            that.sendProfilerOutput(
-              stoppedProfiler.getFramesAverageMeasures(),
-              stoppedProfiler.getStats()
-            );
-            that.sendProfilerStopped();
-          });
-          that.sendProfilerStarted();
-        } else if (data.command === 'profiler.stop') {
-          runtimeGame.stopCurrentSceneProfiler();
-        } else if (data.command === 'hotReload') {
-          that._hotReloader.hotReload().then((logs) => {
-            that.sendHotReloaderLogs(logs);
-          });
-        } else {
-          logger.info(
-            'Unknown command "' + data.command + '" received by the debugger.'
+      if (!data || !data.command) {
+        // Not a command that's meant to be handled by the debugger, return silently to
+        // avoid polluting the console.
+        return;
+      }
+
+      if (data.command === 'play') {
+        runtimeGame.pause(false);
+      } else if (data.command === 'pause') {
+        runtimeGame.pause(true);
+        that.sendRuntimeGameDump();
+      } else if (data.command === 'refresh') {
+        that.sendRuntimeGameDump();
+      } else if (data.command === 'set') {
+        that.set(data.path, data.newValue);
+      } else if (data.command === 'call') {
+        that.call(data.path, data.args);
+      } else if (data.command === 'profiler.start') {
+        runtimeGame.startCurrentSceneProfiler(function (stoppedProfiler) {
+          that.sendProfilerOutput(
+            stoppedProfiler.getFramesAverageMeasures(),
+            stoppedProfiler.getStats()
           );
-        }
+          that.sendProfilerStopped();
+        });
+        that.sendProfilerStarted();
+      } else if (data.command === 'profiler.stop') {
+        runtimeGame.stopCurrentSceneProfiler();
+      } else if (data.command === 'hotReload') {
+        that._hotReloader.hotReload().then((logs) => {
+          that.sendHotReloaderLogs(logs);
+        });
       } else {
-        logger.info('Debugger received a message with badly formatted data.');
+        logger.info(
+          'Unknown command "' + data.command + '" received by the debugger.'
+        );
       }
     }
 
@@ -208,6 +212,12 @@ namespace gdjs {
      * @param message
      */
     protected abstract _sendMessage(message: string): void;
+
+    onUncaughtException(exception: Error): void {
+      logger.error('Uncaught exception: ' + exception);
+
+      this._inGameDebugger.setUncaughtException(exception);
+    }
 
     /**
      * Send a message (a log) to debugger server.
@@ -339,7 +349,9 @@ namespace gdjs {
         // Avoid circular reference from behavior to parent runtimeObject
         // Exclude rendering related objects:
         '_renderer',
+        '_gameRenderer',
         '_imageManager',
+        '_rendererEffects',
         // Exclude PIXI textures:
         'baseTexture',
         '_baseTexture',
@@ -403,6 +415,30 @@ namespace gdjs {
       this._sendMessage(
         circularSafeStringify({
           command: 'profiler.stopped',
+          payload: null,
+        })
+      );
+    }
+
+    /**
+     * Callback called when the game is paused.
+     */
+    sendGamePaused(): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'game.paused',
+          payload: null,
+        })
+      );
+    }
+
+    /**
+     * Callback called when the game is resumed.
+     */
+    sendGameResumed(): void {
+      this._sendMessage(
+        circularSafeStringify({
+          command: 'game.resumed',
           payload: null,
         })
       );

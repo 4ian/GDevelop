@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,23 +13,14 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension /*: gdPlatformExtension */ = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'P2P',
-        _('P2P (experimental)'),
+        _('P2P'),
         'Allow game instances to communicate remotely using messages sent via WebRTC (P2P).',
         'Arthur Pacaud (arthuro555)',
         'MIT'
@@ -36,7 +28,7 @@ module.exports = {
       .setExtensionHelpPath('/all-features/p2p')
       .setCategory('Network');
     extension
-      .addInstructionOrExpressionGroupMetadata(_('P2P (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('P2P'))
       .setIcon('JsPlatform/Extensions/p2picon.svg');
 
     extension
@@ -149,7 +141,7 @@ module.exports = {
         'JsPlatform/Extensions/p2picon.svg'
       )
       .addParameter('string', _('Host'), '', false)
-      .addParameter('number', _('Port'), '', false)
+      .addParameter('expression', _('Port'), '', false)
       .addParameter('string', _('Path'), '', false)
       .addParameter('string', _('Key'), '', false)
       .addParameter('yesorno', _('SSl enabled?'), '', false)
@@ -181,6 +173,33 @@ module.exports = {
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
       .setFunctionName('gdjs.evtTools.p2p.useCustomICECandidate');
+
+    extension
+      .addAction(
+        'ForceRelayServer',
+        _('Disable IP address sharing'),
+        _(
+          'Disables the sharing of IP addresses with the other peers. ' +
+            'This action needs to be called BEFORE connecting to the broker server.'
+        ),
+        _('Disable IP sharing: _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter(
+        'yesorno',
+        _('Disable sharing of IP addresses'),
+        'Generally, it is recommended to keep sharing of IP addressed enabled ' +
+          'to make connections faster and more often possible. ' +
+          'Disabling IP address sharing will force all connections to pass messages through a ' +
+          'TURN relay server, you can make P2P use one by adding one as an ICE candidate.',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.forceUseRelayServer');
 
     extension
       .addAction(
@@ -474,10 +493,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

@@ -3,12 +3,12 @@ import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { IconButton } from '@material-ui/core';
 
-import Add from '@material-ui/icons/Add';
-import Undo from '@material-ui/icons/Undo';
-import Redo from '@material-ui/icons/Redo';
-import Delete from '@material-ui/icons/Delete';
+import Add from '../UI/CustomSvgIcons/Add';
+import Undo from '../UI/CustomSvgIcons/Undo';
+import Redo from '../UI/CustomSvgIcons/Redo';
+import Trash from '../UI/CustomSvgIcons/Trash';
 import Copy from '../UI/CustomSvgIcons/Copy';
-import Paste from '../UI/CustomSvgIcons/Paste';
+import Clipboard from '../UI/CustomSvgIcons/Clipboard';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
@@ -30,9 +30,10 @@ type Props = {|
   onAdd: () => void,
   searchText: string,
   onChangeSearchText: string => void,
+  iconStyle?: any,
 |};
 
-const VariablesListToolbar = (props: Props) => {
+const VariablesListToolbar = React.memo<Props>((props: Props) => {
   const buttons = [
     {
       key: 'copy',
@@ -45,7 +46,7 @@ const VariablesListToolbar = (props: Props) => {
     },
     {
       key: 'paste',
-      Icon: Paste,
+      Icon: Clipboard,
       label: <Trans>Paste</Trans>,
       tooltip: t`Paste`,
       onClick: props.onPaste,
@@ -54,7 +55,7 @@ const VariablesListToolbar = (props: Props) => {
     },
     {
       key: 'delete',
-      Icon: Delete,
+      Icon: Trash,
       label: <Trans>Delete</Trans>,
       tooltip: t`Delete`,
       onClick: props.onDelete,
@@ -98,7 +99,7 @@ const VariablesListToolbar = (props: Props) => {
                     size="small"
                     disabled={disabled}
                   >
-                    <Icon />
+                    <Icon style={props.iconStyle} />
                   </IconButton>
                 ) : (
                   <FlatButton
@@ -130,7 +131,7 @@ const VariablesListToolbar = (props: Props) => {
             onClick={props.onAdd}
             size="small"
           >
-            <Add />
+            <Add style={props.iconStyle} />
           </IconButton>
         ) : (
           <FlatButton
@@ -144,6 +145,6 @@ const VariablesListToolbar = (props: Props) => {
       </Column>
     </Line>
   );
-};
+});
 
 export default VariablesListToolbar;

@@ -8,6 +8,7 @@ import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
 import optionalRequire from '../../Utils/OptionalRequire';
+import useForceUpdate from '../../Utils/UseForceUpdate';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
@@ -28,6 +29,7 @@ const MaterialUIContextMenu = React.forwardRef<
   ]);
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
+  const forceUpdate = useForceUpdate();
 
   const menuImplementation = new MaterialUIMenuImplementation({
     onClose: () => setOpenMenu(false),
@@ -53,12 +55,23 @@ const MaterialUIContextMenu = React.forwardRef<
             top: anchorPosition[1],
           }}
           anchorReference={'anchorPosition'}
-          onClose={() => setOpenMenu(false)}
+          onClose={(event, reason) => {
+            if (reason === 'backdropClick') {
+              // Prevent any side effect of a backdrop click that should only
+              // close the context menu.
+              // When used in the ElementWithMenu component, there are cases where
+              // the event propagates to the element on which the menu is set up and
+              // then the event bubbles up, triggering click events on its way up.
+              event.stopPropagation();
+            }
+            setOpenMenu(false);
+          }}
           TransitionComponent={Fade}
           {...menuImplementation.getMenuProps()}
         >
           {menuImplementation.buildFromTemplate(
-            props.buildMenuTemplate(i18n, buildOptions)
+            props.buildMenuTemplate(i18n, buildOptions),
+            forceUpdate
           )}
         </Menu>
       )}

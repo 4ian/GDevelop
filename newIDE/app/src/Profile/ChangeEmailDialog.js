@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { User as FirebaseUser } from 'firebase/auth';
@@ -13,6 +13,8 @@ import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
 import TextField from '../UI/TextField';
 import { getEmailErrorText } from './CreateAccountDialog';
+import { emailRegex } from './ForgotPasswordDialog';
+import Form from '../UI/Form';
 
 type Props = {|
   firebaseUser: FirebaseUser,
@@ -22,72 +24,81 @@ type Props = {|
   error: ?AuthError,
 |};
 
-type State = {|
-  form: ChangeEmailForm,
-|};
+const ChangeEmailDialog = ({
+  onClose,
+  onChangeEmail,
+  firebaseUser,
+  changeEmailInProgress,
+  error,
+}: Props) => {
+  const [email, setEmail] = React.useState(firebaseUser.email);
+  const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 
-export default class ChangeEmailDialog extends Component<Props, State> {
-  state = {
-    form: {
-      email: this.props.firebaseUser.email,
-    },
+  const doChangeEmail = async () => {
+    const trimmedEmail = email.trim();
+    setEmail(trimmedEmail);
+    setIsEmailValid(emailRegex.test(trimmedEmail));
+
+    if (changeEmailInProgress || !email || !isEmailValid) return;
+
+    await onChangeEmail({
+      email,
+    });
   };
 
-  _onChangeEmail = () => {
-    if (this.props.changeEmailInProgress) return;
-
-    const { form } = this.state;
-    this.props.onChangeEmail(form);
-  };
-
-  render() {
-    const { onClose, changeEmailInProgress, error } = this.props;
-    const actions = [
-      <FlatButton
-        label={<Trans>Back</Trans>}
-        disabled={changeEmailInProgress}
-        key="back"
-        primary={false}
-        onClick={onClose}
-      />,
-      <LeftLoader isLoading={changeEmailInProgress} key="change-email">
-        <DialogPrimaryButton
-          label={<Trans>Save</Trans>}
-          primary
-          onClick={this._onChangeEmail}
+  return (
+    <Dialog
+      title={<Trans>Change your email</Trans>}
+      actions={[
+        <FlatButton
+          label={<Trans>Back</Trans>}
           disabled={changeEmailInProgress}
-        />
-      </LeftLoader>,
-    ];
-
-    return (
-      <Dialog
-        title={<Trans>Change your email</Trans>}
-        actions={actions}
-        maxWidth="sm"
-        cannotBeDismissed={changeEmailInProgress}
-        onRequestClose={onClose}
-        onApply={this._onChangeEmail}
-        open
-      >
+          key="back"
+          primary={false}
+          onClick={onClose}
+        />,
+        <LeftLoader isLoading={changeEmailInProgress} key="change-email">
+          <DialogPrimaryButton
+            label={<Trans>Save</Trans>}
+            primary
+            onClick={doChangeEmail}
+            disabled={changeEmailInProgress}
+          />
+        </LeftLoader>,
+      ]}
+      maxWidth="xs"
+      cannotBeDismissed={changeEmailInProgress}
+      onRequestClose={onClose}
+      onApply={doChangeEmail}
+      open
+    >
+      <Form onSubmit={doChangeEmail} autoComplete="on" name="changeEmail">
         <ColumnStackLayout noMargin>
           <TextField
-            value={this.state.form.email}
+            value={email}
             floatingLabelText={<Trans>Email</Trans>}
-            errorText={getEmailErrorText(error)}
+            errorText={
+              getEmailErrorText(error) ||
+              (!isEmailValid ? <Trans>Invalid email address</Trans> : null)
+            }
             fullWidth
+            type="email"
+            disabled={changeEmailInProgress}
             required
             onChange={(e, value) => {
-              this.setState({
-                form: {
-                  ...this.state.form,
-                  email: value,
-                },
-              });
+              if (!isEmailValid) setIsEmailValid(true);
+              setEmail(value);
+            }}
+            onBlur={event => {
+              const trimmedEmail = event.currentTarget.value.trim();
+              setEmail(trimmedEmail);
+              setIsEmailValid(emailRegex.test(trimmedEmail));
             }}
           />
         </ColumnStackLayout>
-      </Dialog>
-    );
-  }
-}
+      </Form>
+    </Dialog>
+  );
+};
+
+export default ChangeEmailDialog;

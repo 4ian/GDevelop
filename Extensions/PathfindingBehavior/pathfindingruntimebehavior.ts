@@ -10,6 +10,10 @@ namespace gdjs {
    */
   export class PathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
     _path: Array<FloatPoint> = [];
+    /** Used by the path simplification algorithm */
+    static _smoothingResultVertices: Array<FloatPoint> = [];
+    /** Used by the path simplification algorithm */
+    static _smoothingWorkingVertices: Array<FloatPoint> = [];
 
     //Behavior configuration:
     _allowDiagonals: boolean;
@@ -23,6 +27,7 @@ namespace gdjs {
     _gridOffsetX: float;
     _gridOffsetY: float;
     _extraBorder: float;
+    _smoothingMaxCellGap: float;
 
     //Attributes used for traveling on the path:
     _pathFound: boolean = false;
@@ -38,11 +43,11 @@ namespace gdjs {
     _movementAngle: float = 0;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
 
       //The path computed and followed by the object (Array of arrays containing x and y position)
       if (this._path === undefined) {
@@ -60,7 +65,10 @@ namespace gdjs {
       this._gridOffsetX = behaviorData.gridOffsetX || 0;
       this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
-      this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
+      this._smoothingMaxCellGap = behaviorData.smoothingMaxCellGap || 0;
+      this._manager = gdjs.PathfindingObstaclesManager.getManager(
+        instanceContainer
+      );
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
         this._manager
       );
@@ -99,6 +107,12 @@ namespace gdjs {
       }
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this.setExtraBorder(newBehaviorData.extraBorder);
+      }
+      if (
+        oldBehaviorData.smoothingMaxCellGap !==
+        newBehaviorData.smoothingMaxCellGap
+      ) {
+        this._smoothingMaxCellGap = newBehaviorData.smoothingMaxCellGap;
       }
       return true;
     }
@@ -165,9 +179,8 @@ namespace gdjs {
 
     movementAngleIsAround(degreeAngle: float, tolerance: float) {
       return (
-        gdjs.evtTools.common.angleDifference(
-          this._movementAngle,
-          degreeAngle
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
         ) <= tolerance
       );
     }
@@ -313,7 +326,11 @@ namespace gdjs {
     /**
      * Compute and move on the path to the specified destination.
      */
-    moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
+    moveTo(
+      instanceContainer: gdjs.RuntimeInstanceContainer,
+      x: float,
+      y: float
+    ) {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
@@ -371,6 +388,20 @@ namespace gdjs {
         this._path.reverse();
         this._path[0][0] = owner.getX();
         this._path[0][1] = owner.getY();
+
+        if (this._allowDiagonals && this._smoothingMaxCellGap > 0) {
+          gdjs.pathfinding.simplifyPath(
+            this._path,
+            this._smoothingMaxCellGap *
+              Math.min(this._cellWidth, this._cellHeight),
+            gdjs.PathfindingRuntimeBehavior._smoothingResultVertices,
+            gdjs.PathfindingRuntimeBehavior._smoothingWorkingVertices
+          );
+          let swapArray = this._path;
+          this._path = gdjs.PathfindingRuntimeBehavior._smoothingResultVertices;
+          gdjs.PathfindingRuntimeBehavior._smoothingResultVertices = swapArray;
+        }
+
         this._enterSegment(0);
         this._pathFound = true;
         return;
@@ -403,13 +434,13 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       if (this._path.length === 0 || this._reachedEnd) {
         return;
       }
 
       // Update the speed of the object
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
       const previousSpeed = this._speed;
       if (this._speed !== this._maxSpeed) {
         this._speed += this._acceleration * timeDelta;
@@ -452,8 +483,7 @@ namespace gdjs {
         ) {
           this.owner.rotateTowardAngle(
             this._movementAngle + this._angleOffset,
-            this._angularSpeed,
-            runtimeScene
+            this._angularSpeed
           );
         }
       } else {
@@ -463,7 +493,7 @@ namespace gdjs {
       this.owner.setY(newPos[1]);
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     /**
      * Compute the euclidean distance between two positions.

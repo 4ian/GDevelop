@@ -21,14 +21,14 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/common-conversions");
   extension.AddInstructionOrExpressionGroupMetadata(_("Conversion"))
-      .SetIcon("res/conditions/toujours24.png");
+      .SetIcon("res/conditions/toujours24_black.png");
 
   extension
       .AddExpression("ToNumber",
                      _("Text > Number"),
                      _("Convert the text to a number"),
                      "",
-                     "res/conditions/toujours24.png")
+                     "res/conditions/toujours24_black.png")
       .AddParameter("string", _("Text to convert to a number"));
 
   extension
@@ -36,7 +36,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Number > Text"),
                         _("Convert the result of the expression to text"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
       .AddParameter("expression", _("Expression to be converted to text"));
 
   extension
@@ -45,7 +45,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Convert the result of the expression to text, "
                           "without using the scientific notation"),
                         "",
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
       .AddParameter("expression", _("Expression to be converted to text"));
 
   extension
@@ -54,7 +54,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           _("Degrees > Radians"),
           _("Converts the angle, expressed in degrees, into radians"),
           "",
-          "res/conditions/toujours24.png")
+          "res/conditions/toujours24_black.png")
       .AddParameter("expression", _("Angle, in degrees"));
 
   extension
@@ -63,7 +63,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           _("Radians > Degrees"),
           _("Converts the angle, expressed in radians, into degrees"),
           "",
-          "res/conditions/toujours24.png")
+          "res/conditions/toujours24_black.png")
       .AddParameter("expression", _("Angle, in radians"));
 
   extension
@@ -71,7 +71,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Convert scene variable to JSON"),
                         _("Convert a scene variable to JSON"),
                         _("JSON"),
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
       .AddParameter("scenevar", _("Scene variable to be stringified"));
 
   extension
@@ -79,7 +79,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Convert global variable to JSON"),
                         _("Convert a global variable to JSON"),
                         _("JSON"),
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
       .AddParameter("globalvar", _("The global variable to be stringified"));
 
   extension
@@ -87,7 +87,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
                         _("Convert object variable to JSON"),
                         _("Convert an object variable to JSON"),
                         _("JSON"),
-                        "res/conditions/toujours24.png")
+                        "res/conditions/toujours24_black.png")
       .AddParameter("objectPtr", _("The object with the variable"))
       .AddParameter("objectvar", _("The object variable to be stringified"));
 
@@ -96,7 +96,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "JSONToVariableStructure",
           _("Convert JSON to a scene variable"),
           _("Parse a JSON object and store it into a scene variable"),
-          _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
+          _("Convert JSON string _PARAM0_ and store it into variable _PARAM1_"),
           "",
           "res/actions/net24.png",
           "res/actions/net.png")
@@ -108,7 +108,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .AddAction("JSONToGlobalVariableStructure",
                  _("Convert JSON to global variable"),
                  _("Parse a JSON object and store it into a global variable"),
-                 _("Parse JSON string _PARAM0_ and store it into global "
+                 _("Convert JSON string _PARAM0_ and store it into global "
                    "variable _PARAM1_"),
                  "",
                  "res/actions/net24.png",

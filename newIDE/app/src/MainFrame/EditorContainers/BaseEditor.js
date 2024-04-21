@@ -1,38 +1,39 @@
 // @flow
 import * as React from 'react';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource';
-import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
+import { type ResourceManagementProps } from '../../ResourcesList/ResourceSource';
+import type { StorageProvider } from '../../ProjectsStorage';
+import { type PreviewDebuggerServer } from '../../ExportAndShare/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import {
-  type OnCreateFromExampleShortHeaderFunction,
-  type OnCreateBlankFunction,
-  type OnOpenProjectAfterCreationFunction,
-} from '../../ProjectCreation/CreateProjectDialog';
-import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+  type FileMetadataAndStorageProviderName,
+  type FileMetadata,
+} from '../../ProjectsStorage';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
 
 export type EditorContainerExtraProps = {|
+  // Events function extension editor
   initiallyFocusedFunctionName?: ?string,
   initiallyFocusedBehaviorName?: ?string,
+
+  // Homepage
+  storageProviders?: Array<StorageProvider>,
 |};
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,
   project: ?gdProject,
+  fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
   setToolbar: (?React.Node) => void,
 
   // Some optional extra props to pass to the rendered editor
   extraEditorProps: ?EditorContainerExtraProps,
 
   // Resources:
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourceManagementProps: ResourceManagementProps,
 
   unsavedChanges: ?UnsavedChanges,
 
@@ -55,6 +56,9 @@ export type RenderEditorContainerProps = {|
 
   // Events function management:
   onLoadEventsFunctionsExtensions: () => Promise<void>,
+  onReloadEventsFunctionsExtensionMetadata: (
+    extension: gdEventsFunctionsExtension
+  ) => void,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction,
@@ -66,18 +70,23 @@ export type RenderEditorContainerProps = {|
 
   // Project opening
   canOpen: boolean,
-  onOpen: () => void,
-  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
+  onChooseProject: () => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenProjectManager: () => void,
-  onCloseProject: () => Promise<void>,
+  onCloseProject: () => Promise<boolean>,
 
   // Other dialogs opening:
-  onCreateProject: () => void,
-  onOpenHelpFinder: () => void,
+  onOpenExampleStore: () => void,
+  onSelectExampleShortHeader: ExampleShortHeader => void,
+  onPreviewPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
   onOpenLanguageDialog: () => void,
-  onOpenOnboardingDialog: () => void,
-  onChangeSubscription: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
   onOpenProfile: () => void,
+  onOpenPreferences: () => void,
+  onOpenAbout: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -86,11 +95,17 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  canInstallPrivateAsset: () => boolean,
 
   // Project creation
-  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onCreateBlank: OnCreateBlankFunction,
-  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  onOpenNewProjectSetupDialog: () => void,
+
+  // Project save
+  onSave: () => Promise<void>,
+  canSave: boolean,
+
+  // Object editing
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

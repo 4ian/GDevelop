@@ -12,6 +12,7 @@ import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
 } from '../EditorContainers/BaseEditor';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 // Supported editors
 type EditorRef =
@@ -23,27 +24,91 @@ type EditorRef =
   | ResourcesEditorContainer
   | SceneEditorContainer;
 
+type TabOptions = {| data?: HTMLDataset |};
+
 export type EditorTab = {|
-  // The function to render the tab editor.
+  /** The function to render the tab editor. */
   renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
-  // A reference to the editor.
+  /** A reference to the editor. */
   editorRef: ?EditorRef,
-  // The label shown on the tab.
+  /** The label shown on the tab. */
   label?: string,
   icon?: React.Node,
-  // The name of the layout/external layout/external events/extension.
+  /** the html dataset object to set on the tab button. */
+  tabOptions?: TabOptions,
+  /** The name of the layout/external layout/external events/extension. */
   projectItemName: ?string,
-  // A unique key for the tab.
+  /** A unique key for the tab. */
   key: string,
-  // Extra props to pass to editors
+  /** Extra props to pass to editors. */
   extraEditorProps: ?EditorContainerExtraProps,
-  // If set to false, the tab can't be closed.
+  /** If set to false, the tab can't be closed. */
   closable: boolean,
 |};
 
-export type EditorTabsState = {
+export type EditorTabsState = {|
   editors: Array<EditorTab>,
   currentTab: number,
+|};
+
+export type EditorKind =
+  | 'layout'
+  | 'layout events'
+  | 'external layout'
+  | 'external events'
+  | 'events functions extension'
+  | 'debugger'
+  | 'resources'
+  | 'start page';
+
+type EditorTabMetadata = {|
+  /** The name of the layout/external layout/external events/extension. */
+  projectItemName: ?string,
+  /** The editor kind. */
+  editorKind: EditorKind,
+|};
+
+export type EditorTabsPersistedState = {|
+  editors: Array<EditorTabMetadata>,
+  currentTab: number,
+|};
+
+export type EditorOpeningOptions = {|
+  label?: string,
+  icon?: React.Node,
+  projectItemName: ?string,
+  tabOptions?: TabOptions,
+  renderEditorContainer: (
+    props: RenderEditorContainerPropsWithRef
+  ) => React.Node,
+  key: string,
+  extraEditorProps?: EditorContainerExtraProps,
+  dontFocusTab?: boolean,
+  closable?: boolean,
+|};
+
+export const getEditorTabMetadata = (
+  editorTab: EditorTab
+): EditorTabMetadata => {
+  return {
+    projectItemName: editorTab.projectItemName,
+    editorKind:
+      editorTab.editorRef instanceof SceneEditorContainer
+        ? 'layout'
+        : editorTab.editorRef instanceof ExternalEventsEditorContainer
+        ? 'external events'
+        : editorTab.editorRef instanceof ExternalLayoutEditorContainer
+        ? 'external layout'
+        : editorTab.editorRef instanceof ResourcesEditorContainer
+        ? 'resources'
+        : editorTab.editorRef instanceof EventsEditorContainer
+        ? 'layout events'
+        : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
+        ? 'events functions extension'
+        : editorTab.editorRef instanceof DebuggerEditorContainer
+        ? 'debugger'
+        : 'start page',
+  };
 };
 
 export const getEditorTabsInitialState = (): EditorTabsState => {
@@ -59,23 +124,13 @@ export const openEditorTab = (
     label,
     icon,
     projectItemName,
+    tabOptions,
     renderEditorContainer,
     key,
     extraEditorProps,
     dontFocusTab,
     closable,
-  }: {|
-    label?: string,
-    icon?: React.Node,
-    projectItemName: ?string,
-    renderEditorContainer: (
-      props: RenderEditorContainerPropsWithRef
-    ) => React.Node,
-    key: string,
-    extraEditorProps?: EditorContainerExtraProps,
-    dontFocusTab?: boolean,
-    closable?: boolean,
-  |}
+  }: EditorOpeningOptions
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
@@ -92,6 +147,7 @@ export const openEditorTab = (
     label,
     icon,
     projectItemName,
+    tabOptions,
     renderEditorContainer,
     key,
     extraEditorProps,
@@ -101,7 +157,11 @@ export const openEditorTab = (
 
   return {
     ...state,
-    editors: [...state.editors, editorTab],
+    editors:
+      // Make sure the home page is always the first tab.
+      key === 'start page'
+        ? [editorTab, ...state.editors]
+        : [...state.editors, editorTab],
     currentTab: dontFocusTab ? state.currentTab : state.editors.length,
   };
 };
@@ -114,6 +174,10 @@ export const changeCurrentTab = (
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
   };
+};
+
+export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
+  return state.editors.some(editor => editor.key === 'start page');
 };
 
 export const closeTabsExceptIf = (
@@ -197,12 +261,12 @@ export const saveUiSettings = (state: EditorTabsState) => {
  * Notify the editors that the preview will start. This gives a chance
  * to editors with changes to commit them (like modified extensions).
  */
-export const notifyPreviewWillStart = (state: EditorTabsState) => {
+export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
   state.editors.forEach(editorTab => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
-      editor.previewWillStart();
+      editor.previewOrExportWillStart();
     }
   });
 };
@@ -262,14 +326,15 @@ export const closeExternalEventsTabs = (
 
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
-  eventsFunctionsExtension: gdEventsFunctionsExtension
+  eventsFunctionsExtensionName: string
 ) => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
       return (
-        !editor.getEventsFunctionsExtension() ||
-        editor.getEventsFunctionsExtension() !== eventsFunctionsExtension
+        !editor.getEventsFunctionsExtensionName() ||
+        editor.getEventsFunctionsExtensionName() !==
+          eventsFunctionsExtensionName
       );
     }
 

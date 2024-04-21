@@ -22,8 +22,18 @@ export type InstancesEditorSettings = {|
   windowMask: boolean,
 |};
 
+export const getRecommendedInitialZoomFactor = (
+  largestSizeInPixels: number
+) => {
+  // 700 is an empirical value obtained multiplying the largest size (1920) with
+  // the zoom factor (0.36) so that the screen black rectangle fits nicely on the canvas
+  // with only the left and right side panels opened on a Macbook screen.
+  return 700 / largestSizeInPixels;
+};
+
 export const prepareInstancesEditorSettings = (
-  object: any
+  object: any,
+  projectLargestResolutionSizeInPixels: number
 ): InstancesEditorSettings => {
   return {
     grid: object.grid || false,
@@ -38,7 +48,11 @@ export const prepareInstancesEditorSettings = (
         : rgbToHexNumber(158, 180, 255),
     gridAlpha: object.gridAlpha !== undefined ? object.gridAlpha : 0.8,
     snap: object.snap || false,
-    zoomFactor: Math.max(object.zoomFactor || 1, 0.0001),
+    zoomFactor: Math.max(
+      object.zoomFactor ||
+        getRecommendedInitialZoomFactor(projectLargestResolutionSizeInPixels),
+      0.01
+    ),
     windowMask: object.windowMask || false,
   };
 };

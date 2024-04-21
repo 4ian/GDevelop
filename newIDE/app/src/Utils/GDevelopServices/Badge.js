@@ -1,8 +1,10 @@
 // @flow
 import axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
+import { type Profile } from './Authentication';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
@@ -11,6 +13,8 @@ export const TRIVIAL_FIRST_WEB_EXPORT = 'trivial_first-web-export';
 export const TRIVIAL_FIRST_EXTENSION = 'trivial_first-extension';
 export const TRIVIAL_FIRST_EFFECT = 'trivial_first-effect';
 export const TRIVIAL_FIRST_DEBUG = 'trivial_first-debug';
+export const getTutorialCompletedAchievementId = (tutorialId: string) =>
+  'trivial_in-app-tutorial-completed_' + tutorialId;
 
 export type Badge = {|
   seen: boolean,
@@ -39,22 +43,26 @@ const isAchievementAlreadyClaimed = (
   return badges.map(badge => badge.achievementId).includes(achievementId);
 };
 
-const createOrEnsureBadgeForUser = async (
-  authenticatedUser: AuthenticatedUser,
-  achievementId: string
-): Promise<?Badge> => {
-  const {
+export const createOrEnsureBadgeForUser = async (
+  {
     badges,
-    firebaseUser,
+    profile,
     getAuthorizationHeader,
     onBadgesChanged,
-  } = authenticatedUser;
-  if (!badges || !firebaseUser) return null;
+  }: {
+    badges: ?Array<Badge>,
+    profile: ?Profile,
+    getAuthorizationHeader: () => Promise<string>,
+    onBadgesChanged: () => Promise<void>,
+  },
+  achievementId: string
+): Promise<?Badge> => {
+  if (!badges || !profile) return null;
   if (isAchievementAlreadyClaimed(badges, achievementId)) {
     return null;
   }
 
-  const userId = firebaseUser.uid;
+  const userId = profile.id;
   try {
     const authorizationHeader = await getAuthorizationHeader();
     const response = await axios.post(
@@ -73,11 +81,12 @@ const createOrEnsureBadgeForUser = async (
     );
     onBadgesChanged();
     return response.data;
-  } catch (err) {
-    if (err.response && err.response.status === 409) {
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 409) {
       console.warn('Badge already exists');
     } else {
-      throw err;
+      throw error;
     }
   }
 };
@@ -110,10 +119,15 @@ export const addCreateBadgePreHookIfNotClaimed = <
   };
 };
 
-export const getAchievements = (): Promise<Array<Achievement>> => {
-  return axios
-    .get(`${GDevelopUserApi.baseUrl}/achievement`)
-    .then(response => response.data);
+export const getAchievements = async (): Promise<Array<Achievement>> => {
+  const response = await axios.get(`${GDevelopUserApi.baseUrl}/achievement`);
+
+  const achievements = response.data;
+  if (!Array.isArray(achievements)) {
+    throw new Error('Invalid response from the achievements API');
+  }
+
+  return achievements;
 };
 
 export const markBadgesAsSeen = async (

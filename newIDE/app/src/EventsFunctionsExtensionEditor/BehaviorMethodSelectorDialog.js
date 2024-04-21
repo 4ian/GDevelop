@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { type EventsFunctionCreationParameters } from '../EventsFunctionsList';
+import { type EventsFunctionCreationParameters } from '../EventsFunctionsList/EventsFunctionTreeViewItemContent';
 import FlatButton from '../UI/FlatButton';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
@@ -17,8 +17,8 @@ import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import { Line } from '../UI/Grid';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -73,6 +73,7 @@ export default function BehaviorMethodSelectorDialog({
 
   return (
     <Dialog
+      title={<Trans>Choose a new behavior function ("method")</Trans>}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -88,8 +89,6 @@ export default function BehaviorMethodSelectorDialog({
         />,
       ]}
       open
-      noMargin
-      title={<Trans>Choose a new behavior function ("method")</Trans>}
       onRequestClose={onCancel}
     >
       <List>

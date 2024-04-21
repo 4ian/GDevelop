@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   actionsContainer,
   conditionsContainer,
@@ -10,7 +10,7 @@ import {
 type Props = {|
   renderConditionsList: ({ style: Object, className: string }) => React.Node,
   renderActionsList: ({ className: string }) => React.Node,
-  windowWidth: WidthType,
+  windowSize: WindowSizeType,
   className?: string,
   leftIndentWidth: number,
 |};
@@ -31,7 +31,8 @@ const styles = {
  * and stacked on a small one.
  */
 const ConditionsActionsColumns = (props: Props) => {
-  if (props.windowWidth === 'small') {
+  const isMobile = props.windowSize === 'small';
+  if (isMobile) {
     return (
       <div style={styles.oneColumnContainer} className={props.className}>
         {props.renderConditionsList({

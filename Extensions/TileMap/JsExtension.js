@@ -1,5 +1,5 @@
-// @flow
-
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /// <reference path="helper/TileMapHelper.d.ts" />
 
 /**
@@ -15,20 +15,13 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
-const defineTileMap = function (
-  extension,
-  _ /*: (string) => string */,
-  gd /*: libGDevelop */) {
-  
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
+const defineTileMap = function (extension, _, gd) {
   var objectTileMap = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateProperty = function (
     objectContent,
     propertyName,
@@ -54,6 +47,10 @@ const defineTileMap = function (
       objectContent.layerIndex = parseFloat(newValue);
       return true;
     }
+    if (propertyName === 'levelIndex') {
+      objectContent.levelIndex = parseFloat(newValue);
+      return true;
+    }
     if (propertyName === 'animationSpeedScale') {
       objectContent.animationSpeedScale = parseFloat(newValue);
       return true;
@@ -65,7 +62,6 @@ const defineTileMap = function (
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -73,25 +69,27 @@ const defineTileMap = function (
       'tilemapJsonFile',
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
+        .addExtraInfo('tilemap')
         .addExtraInfo('json')
-        .setLabel(_('Tilemap JSON file'))
+        .setLabel(_('Tilemap file (Tiled or LDtk)'))
         .setDescription(
-          _('This is the JSON file that was saved or exported from Tiled.')
+          _('This is the file that was saved or exported from Tiled or LDtk.')
         )
-        .setGroup(_('Tilemap and tileset'))
+        .setGroup(_('LDtk or Tiled'))
     );
     objectProperties.set(
       'tilesetJsonFile',
       new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
         .setType('resource')
+        .addExtraInfo('tileset')
         .addExtraInfo('json')
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
           _(
-            "Optional, don't specify it if you've not saved the tileset in a different file."
+            "Optional: specify this if you've saved the tileset in a different file as the Tiled tilemap."
           )
         )
-        .setGroup(_('Tilemap and tileset'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'tilemapAtlasImage',
@@ -99,7 +97,8 @@ const defineTileMap = function (
         .setType('resource')
         .addExtraInfo('image')
         .setLabel(_('Atlas image'))
-        .setGroup(_('Tilemap and tileset'))
+        .setDescription(_('The Atlas image containing the tileset.'))
+        .setGroup(_('Tiled only'))
     );
     objectProperties.set(
       'displayMode',
@@ -121,6 +120,14 @@ const defineTileMap = function (
             'If "index" is selected as the display mode, this is the index of the layer to display.'
           )
         )
+        .setGroup(_('Appearance'))
+    );
+    objectProperties.set(
+      'levelIndex',
+      new gd.PropertyDescriptor((objectContent.levelIndex || 0).toString())
+        .setType('number')
+        .setLabel(_('Level index to display'))
+        .setDescription(_('Select which level to render via its index (LDtk)'))
         .setGroup(_('Appearance'))
     );
     objectProperties.set(
@@ -147,12 +154,12 @@ const defineTileMap = function (
       tilemapAtlasImage: '',
       displayMode: 'visible',
       layerIndex: 0,
+      levelIndex: 0,
       animationSpeedScale: 1,
       animationFps: 4,
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -163,7 +170,6 @@ const defineTileMap = function (
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   objectTileMap.getInitialInstanceProperties = function (
     content,
     instance,
@@ -179,52 +185,62 @@ const defineTileMap = function (
       'TileMap',
       _('Tilemap'),
       _(
-        'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
+        'Displays a tiled-based map, made with the Tiled editor (https://www.mapeditor.org/) or the LDtk editor (https://ldtk.io/).'
       ),
       'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )
     .setCategoryFullName(_('Advanced'))
+    .addDefaultBehavior('EffectCapability::EffectBehavior')
+    .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+    .addDefaultBehavior('ScalableCapability::ScalableBehavior')
+    .addDefaultBehavior('OpacityCapability::OpacityBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
-    .addIncludeFile(
-      'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
-    )
-    .addIncludeFile(
-      'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
-    )
+    .addIncludeFile('Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js')
+    .addIncludeFile('Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 
   object
     .addCondition(
       'TilemapJsonFile',
-      _('Tilemap JSON file'),
-      _('Check the Tilemap JSON file being used.'),
-      _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
+      _('Tilemap file (Tiled or LDtk)'),
+      _('Check the tilemap file (Tiled or LDtk) being used.'),
+      _('The tilemap file of _PARAM0_ is _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .addParameter(
+      'tilemapResource',
+      _('Tilemap file (Tiled or LDtk)'),
+      '',
+      false
+    )
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
 
   object
     .addAction(
       'SetTilemapJsonFile',
-      _('Tilemap JSON file'),
+      _('Tilemap file (Tiled or LDtk)'),
       _(
-        'Set the JSON file containing the Tilemap data to display. This is usually the JSON file exported from Tiled.'
+        'Set the Tiled or LDtk file containing the Tilemap data to display. This is usually the main file exported from Tiled/LDtk.'
       ),
-      _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
+      _('Set the tilemap file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .addParameter(
+      'tilemapResource',
+      _('Tilemap file (Tiled or LDtk)'),
+      '',
+      false
+    )
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
 
@@ -238,8 +254,8 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .addParameter('tilesetResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilesetJsonFile');
 
@@ -248,15 +264,15 @@ const defineTileMap = function (
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
-        'Set the JSON file with the tileset data (sometimes that is embeded in the Tilemap, so not needed)'
+        'Set the JSON file with the tileset data (sometimes that is embedded in the Tilemap, so not needed)'
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .addParameter('tilesetResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
 
@@ -270,7 +286,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter(
       'stringWithSelector',
       _('Display mode'),
@@ -290,7 +306,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter(
       'stringWithSelector',
       _('Display mode'),
@@ -310,8 +326,11 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
 
@@ -325,8 +344,11 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
     .getCodeExtraInformation()
     .setFunctionName('setLayerIndex')
     .setGetter('getLayerIndex');
@@ -339,9 +361,23 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
+
+  object
+    .addExpressionAndCondition(
+      'number',
+      'LevelIndex',
+      _('Level index'),
+      _('the level index being displayed.'),
+      _('the level index'),
+      '',
+      'JsPlatform/Extensions/tile_map.svg'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardParameters('number', gd.ParameterOptions.makeNewOptions())
+    .setFunctionName('getLevelIndex');
 
   object
     .addCondition(
@@ -353,8 +389,13 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Speed scale to compare to (1 by default)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('getAnimationSpeedScale');
 
@@ -362,14 +403,19 @@ const defineTileMap = function (
     .addAction(
       'SetAnimationSpeedScale',
       _('Animation speed scale'),
-      _('Set the animation speed scale of the Tilemap (1 by default).'),
+      _('Set the animation speed scale of the Tilemap.'),
       _('the animation speed scale'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Speed scale (1 by default)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('setAnimationSpeedScale')
     .setGetter('getAnimationSpeedScale');
@@ -382,7 +428,7 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getAnimationSpeedScale');
 
@@ -390,14 +436,19 @@ const defineTileMap = function (
     .addCondition(
       'AnimationFps',
       _('Animation speed (FPS)'),
-      _('Compare the animation speed (in frames per second).'),
+      _('Compare the animation speed.'),
       _('the animation speed (FPS)'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardRelationalOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Animation speed to compare to (in frames per second)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
 
@@ -405,14 +456,19 @@ const defineTileMap = function (
     .addAction(
       'SetAnimationFps',
       _('Animation speed (FPS)'),
-      _('Set the animation speed (in frames per second) of the Tilemap.'),
+      _('Set the animation speed of the Tilemap.'),
       _('the animation speed (FPS)'),
       '',
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardOperatorParameters('number')
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Animation speed (in frames per second)')
+      )
+    )
     .getCodeExtraInformation()
     .setFunctionName('setAnimationFps')
     .setGetter('getAnimationFps');
@@ -425,18 +481,130 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
+
+  // Deprecated
+  object
+    .addAction(
+      'Scale',
+      _('Scale'),
+      _('Modify the scale of the specified object.'),
+      _('the scale'),
+      _('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale')
+    .setGetter('getScale');
+
+  // Deprecated
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleX',
+      _('Scale on X axis'),
+      _("the width's scale of an object"),
+      _("the width's scale"),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .setFunctionName('setScaleX')
+    .setGetter('getScaleX');
+
+  // Deprecated
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleY',
+      _('Scale on Y axis'),
+      _("the height's scale of an object"),
+      _("the height's scale"),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .setFunctionName('setScaleY')
+    .setGetter('getScaleY');
+
+  // Deprecated
+  object
+    .addAction(
+      'Width',
+      _('Width'),
+      _('Change the width of an object.'),
+      _('the width'),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scaleWidth_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth');
+
+  // Deprecated
+  object
+    .addAction(
+      'Height',
+      _('Height'),
+      _('Change the height of an object.'),
+      _('the height'),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scaleHeight_black.png'
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight');
 };
 
-const defineCollisionMask = function (
-  extension,
-  _ /*: (string) => string */,
-  gd /*: libGDevelop */) {
-  
+/**
+ * @param {gd.PlatformExtension} extension
+ * @param {(translationSource: string) => string} _
+ * @param {GDNamespace} gd
+ */
+const defineCollisionMask = function (extension, _, gd) {
   var collisionMaskObject = new gd.ObjectJsImplementation();
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateProperty = function (
     objectContent,
     propertyName,
@@ -481,7 +649,6 @@ const defineCollisionMask = function (
 
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getProperties = function (objectContent) {
     var objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -489,16 +656,20 @@ const defineCollisionMask = function (
       'tilemapJsonFile',
       new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
         .setType('resource')
+        .addExtraInfo('tilemap')
         .addExtraInfo('json')
         .setLabel(_('Tilemap JSON file'))
         .setDescription(
-          _('This is the JSON file that was saved or exported from Tiled.')
+          _(
+            'This is the JSON file that was saved or exported from Tiled. LDtk is not supported yet for collisions.'
+          )
         )
     );
     objectProperties.set(
       'tilesetJsonFile',
       new gd.PropertyDescriptor(objectContent.tilesetJsonFile || '')
         .setType('resource')
+        .addExtraInfo('tileset')
         .addExtraInfo('json')
         .setLabel(_('Tileset JSON file (optional)'))
         .setDescription(
@@ -524,9 +695,7 @@ const defineCollisionMask = function (
         .setType('boolean')
         .setLabel(_('Debug mode'))
         .setDescription(
-          _(
-            'When activated, it displays the hitboxes in the given color.'
-          )
+          _('When activated, it displays the hitboxes in the given color.')
         )
     );
     objectProperties.set(
@@ -537,13 +706,21 @@ const defineCollisionMask = function (
     );
     objectProperties.set(
       'outlineOpacity',
-      new gd.PropertyDescriptor(objectContent.outlineOpacity === undefined ? '64' : objectContent.outlineOpacity.toString())
+      new gd.PropertyDescriptor(
+        objectContent.outlineOpacity === undefined
+          ? '64'
+          : objectContent.outlineOpacity.toString()
+      )
         .setType('number')
         .setLabel(_('Outline opacity (0-255)'))
     );
     objectProperties.set(
       'outlineSize',
-      new gd.PropertyDescriptor(objectContent.outlineSize === undefined ? '1' : objectContent.outlineSize.toString())
+      new gd.PropertyDescriptor(
+        objectContent.outlineSize === undefined
+          ? '1'
+          : objectContent.outlineSize.toString()
+      )
         .setType('number')
         .setLabel(_('Outline size (in pixels)'))
     );
@@ -555,7 +732,11 @@ const defineCollisionMask = function (
     );
     objectProperties.set(
       'fillOpacity',
-      new gd.PropertyDescriptor(objectContent.fillOpacity === undefined ? '32' : objectContent.fillOpacity.toString())
+      new gd.PropertyDescriptor(
+        objectContent.fillOpacity === undefined
+          ? '32'
+          : objectContent.fillOpacity.toString()
+      )
         .setType('number')
         .setLabel(_('Fill opacity (0-255)'))
     );
@@ -576,7 +757,6 @@ const defineCollisionMask = function (
     })
   );
 
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.updateInitialInstanceProperty = function (
     objectContent,
     instance,
@@ -587,7 +767,6 @@ const defineCollisionMask = function (
   ) {
     return false;
   };
-  // $FlowExpectedError - ignore Flow warning as we're creating an object
   collisionMaskObject.getInitialInstanceProperties = function (
     content,
     instance,
@@ -601,14 +780,15 @@ const defineCollisionMask = function (
   const object = extension
     .addObject(
       'CollisionMask',
-      _('Tilemap collision mask (experimental)'),
-      _(
-        'Invisible object handling collisions with parts of a tilemap.'
-      ),
+      _('Tilemap collision mask'),
+      _('Invisible object handling collisions with parts of a tilemap.'),
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
+    .addDefaultBehavior('EffectCapability::EffectBehavior')
+    .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+    .addDefaultBehavior('ScalableCapability::ScalableBehavior')
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
@@ -619,7 +799,7 @@ const defineCollisionMask = function (
     );
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilemapJsonFile',
       _('Tilemap JSON file'),
       _('Check the Tilemap JSON file being used.'),
@@ -628,13 +808,18 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilemapJsonFile',
       _('Tilemap JSON file'),
       _(
@@ -645,13 +830,18 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
 
   object
-    .addCondition(
+    .addScopedCondition(
       'TilesetJsonFile',
       _('Tileset JSON file'),
       _('Check the tileset JSON file being used.'),
@@ -660,13 +850,18 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilesetJsonFile');
 
   object
-    .addAction(
+    .addScopedAction(
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
@@ -677,33 +872,202 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
+
+  // Deprecated
+  object
+    .addScopedAction(
+      'Scale',
+      _('Scale'),
+      _('Modify the scale of the specified object.'),
+      _('the scale'),
+      _('Size'),
+      'res/actions/scale24_black.png',
+      'res/actions/scale_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale')
+    .setGetter('getScale');
+
+  // Deprecated
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleX',
+      _('Scale on X axis'),
+      _("the width's scale of an object"),
+      _("the width's scale"),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .setFunctionName('setScaleX')
+    .setGetter('getScaleX');
+
+  // Deprecated
+  object
+    .addExpressionAndConditionAndAction(
+      'number',
+      'ScaleY',
+      _('Scale on Y axis'),
+      _("the height's scale of an object"),
+      _("the height's scale"),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions().setDescription(
+        _('Scale (1 by default)')
+      )
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .setFunctionName('setScaleY')
+    .setGetter('getScaleY');
+
+  // Deprecated
+  object
+    .addScopedAction(
+      'Width',
+      _('Width'),
+      _('Change the width of an object.'),
+      _('the width'),
+      _('Size'),
+      'res/actions/scaleWidth24_black.png',
+      'res/actions/scaleWidth_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth');
+
+  // Deprecated
+  object
+    .addScopedAction(
+      'Height',
+      _('Height'),
+      _('Change the height of an object.'),
+      _('the height'),
+      _('Size'),
+      'res/actions/scaleHeight24_black.png',
+      'res/actions/scaleHeight_black.png'
+    )
+    .addParameter(
+      'object',
+      _('Tile map collision mask'),
+      'CollisionMask',
+      false
+    )
+    .useStandardOperatorParameters(
+      'number',
+      gd.ParameterOptions.makeNewOptions()
+    )
+    .markAsAdvanced()
+    .setHidden()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight');
 };
 
+/** @type {ExtensionModule} */
 module.exports = {
-
   createExtension: function (
     _ /*: (string) => string */,
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
+
     extension
       .setExtensionInformation(
         'TileMap',
         _('Tilemap'),
-        "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc...",
+        _(
+          "The Tilemap object can be used to display tile-based objects. It's a good way to create maps for RPG, strategy games or create objects by assembling tiles, useful for platformer, retro-looking games, etc..."
+        ),
         'Todor Imreorov',
         'Open source (MIT License)'
       )
+      .setCategory('Advanced')
       .setExtensionHelpPath('/objects/tilemap');
-    
-      defineTileMap(extension, _, gd);
-      defineCollisionMask(extension, _, gd);
+
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Tilemap'))
+      .setIcon('JsPlatform/Extensions/tile_map.svg');
+
+    defineTileMap(extension, _, gd);
+    defineCollisionMask(extension, _, gd);
 
     return extension;
+  },
+
+  registerClearCache: function (
+    objectsRenderingService /*: ObjectsRenderingService */
+  ) {
+    const TilemapHelper = objectsRenderingService.requireModule(
+      __dirname,
+      'helper/TileMapHelper'
+    );
+
+    const clearCaches = (
+      project /* InstanceHolder - gdProject in the editor */
+    ) => {
+      /** @type {TileMapHelper.TileMapManager} */
+      const manager = TilemapHelper.TileMapManager.getManager(project);
+      manager.clearCaches();
+    };
+
+    objectsRenderingService.registerClearCache(clearCaches);
   },
 
   /**
@@ -717,10 +1081,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -728,9 +1089,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -749,9 +1108,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -769,222 +1126,297 @@ module.exports = {
       'pako/dist/pako.min'
     );
 
+    // When on the webapp, and using webpack, the extension does not seem to
+    // be able to register itself properly. So we do it manually.
+    // (This should be done here https://github.com/pixijs/tilemap/blob/master/src/index.ts#L43-L47)
+    PIXI.extensions.add({
+      name: 'tilemap',
+      type: PIXI.ExtensionType.RendererPlugin,
+      ref: Tilemap.TileRenderer,
+    });
+
     /**
      * Renderer for instances of TileMap inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedTileMapInstance
-     * @constructor
      */
-    function RenderedTileMapInstance(
-      project,
-      layout,
-      instance,
-      associatedObject,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedTileMapInstance extends RenderedInstance {
+      constructor(
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
-
-      this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
-
-      // Implement `containsPoint` so that we can set `interactive` to true and
-      // the Tilemap will properly emit events when hovered/clicked.
-      // By default, this is not implemented in pixi-tilemap.
-      this._pixiObject.containsPoint = (position) => {
-        // Turns the world position to the local object coordinates
-        const localPosition = new PIXI.Point();
-        this._pixiObject.worldTransform.applyInverse(position, localPosition);
-
-        // Check if the point is inside the object bounds
-        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-        const originalHeight =
-          this._pixiObject.height / this._pixiObject.scale.y;
-
-        return (
-          localPosition.x >= 0 &&
-          localPosition.x < originalWidth &&
-          localPosition.y >= 0 &&
-          localPosition.y < originalHeight
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
         );
-      };
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
-      this.updateTileMap();
-    }
 
-    RenderedTileMapInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
+        // This setting allows tile maps with more than 16K tiles.
+        Tilemap.settings.use32bitIndex = true;
 
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedTileMapInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      object
-    ) {
-      return 'JsPlatform/Extensions/tile_map.svg';
-    };
+        this.tileMapPixiObject = new Tilemap.CompositeTilemap();
+        this._pixiObject = this.tileMapPixiObject;
 
-    /**
-     * This is used to reload the Tilemap
-     */
-    RenderedTileMapInstance.prototype.updateTileMap = function () {
-      // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
-        .getProperties(this.project)
-        .get('tilemapAtlasImage')
-        .getValue();
-      const tilemapJsonFile = this._associatedObject
-        .getProperties(this.project)
-        .get('tilemapJsonFile')
-        .getValue();
-      const tilesetJsonFile = this._associatedObject
-        .getProperties(this.project)
-        .get('tilesetJsonFile')
-        .getValue();
-      const layerIndex = parseInt(
-        this._associatedObject
-          .getProperties(this.project)
-          .get('layerIndex')
-          .getValue(),
-        10
-      );
-      const displayMode = this._associatedObject
-        .getProperties(this.project)
-        .get('displayMode')
-        .getValue();
+        // Implement `containsPoint` so that we can set `interactive` to true and
+        // the Tilemap will properly emit events when hovered/clicked.
+        // By default, this is not implemented in pixi-tilemap.
+        this._pixiObject.containsPoint = (position) => {
+          // Turns the world position to the local object coordinates
+          const localPosition = new PIXI.Point();
+          this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
-      /** @type {TileMapHelper.TileMapManager} */
-      const manager = TilemapHelper.TileMapManager.getManager(this._project);
-      manager.getOrLoadTileMap(
-        this._loadTiledMapWithCallback.bind(this),
-        tilemapJsonFile,
-        tilesetJsonFile,
-        pako,
-        (tileMap) => {
-          if (!tileMap) {
-            // _loadTiledMapWithCallback already log errors
-            return;
-          }
+          return (
+            localPosition.x >= 0 &&
+            localPosition.x < this.width &&
+            localPosition.y >= 0 &&
+            localPosition.y < this.height
+          );
+        };
+        this._pixiContainer.addChild(this._pixiObject);
+        this.width = 48;
+        this.height = 48;
+        this.update();
+        this.updateTileMap();
+      }
 
-          /** @type {TileMapHelper.TileTextureCache} */
-          const textureCache = manager.getOrLoadTextureCache(
-            this._loadTiledMapWithCallback.bind(this),
-            (textureName) =>
-              this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-            tilemapAtlasImage,
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        // Keep textures because they are shared by all tile maps.
+        this._pixiObject.destroy(false);
+      }
+
+      onLoadingError() {
+        this.errorPixiObject =
+          this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+        this._pixiContainer.addChild(this.errorPixiObject);
+        this._pixiObject = this.errorPixiObject;
+      }
+
+      onLoadingSuccess() {
+        if (this.errorPixiObject) {
+          this._pixiContainer.removeChild(this.errorPixiObject);
+          this.errorPixiObject = null;
+          this._pixiObject = this.tileMapPixiObject;
+        }
+      }
+
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/tile_map.svg';
+      }
+
+      /**
+       * This is used to reload the Tilemap
+       */
+      updateTileMap() {
+        // Get the tileset resource to use
+        const tilemapAtlasImage = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemapAtlasImage')
+          .getValue();
+        const tilemapJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemapJsonFile')
+          .getValue();
+        const tilesetJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilesetJsonFile')
+          .getValue();
+        const layerIndex = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('layerIndex')
+            .getValue(),
+          10
+        );
+        const levelIndex = parseInt(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('levelIndex')
+            .getValue(),
+          10
+        );
+        const displayMode = this._associatedObjectConfiguration
+          .getProperties()
+          .get('displayMode')
+          .getValue();
+
+        const tilemapResource = this._project
+          .getResourcesManager()
+          .getResource(tilemapJsonFile);
+
+        let metadata = {};
+        try {
+          const tilemapMetadataAsString = tilemapResource.getMetadata();
+          if (tilemapMetadataAsString)
+            metadata = JSON.parse(tilemapMetadataAsString);
+        } catch (error) {
+          console.warn('Malformed metadata in a tilemap object:', error);
+        }
+        const mapping = metadata.embeddedResourcesMapping || {};
+
+        const atlasTexture = this._pixiResourcesLoader.getPIXITexture(
+          this._project,
+          tilemapAtlasImage
+        );
+
+        const loadTileMap = () => {
+          /** @type {TileMapHelper.TileMapManager} */
+          const manager = TilemapHelper.TileMapManager.getManager(
+            this._project
+          );
+          manager.getOrLoadTileMap(
+            this._loadTileMapWithCallback.bind(this),
             tilemapJsonFile,
             tilesetJsonFile,
-            (textureCache) => {
-              if (!textureCache) {
-                // getOrLoadTextureCache already log warns and errors.
+            levelIndex,
+            pako,
+            (tileMap) => {
+              if (!tileMap) {
+                this.onLoadingError();
+                // _loadTileMapWithCallback already log errors
                 return;
               }
 
-              TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                this._pixiObject,
-                tileMap,
-                textureCache,
-                displayMode,
-                layerIndex
+              /** @type {TileMapHelper.TileTextureCache} */
+              manager.getOrLoadTextureCache(
+                this._loadTileMapWithCallback.bind(this),
+                (textureName) =>
+                  this._pixiResourcesLoader.getPIXITexture(
+                    this._project,
+                    mapping[textureName] || textureName
+                  ),
+                tilemapAtlasImage,
+                tilemapJsonFile,
+                tilesetJsonFile,
+                levelIndex,
+                (textureCache) => {
+                  if (!textureCache) {
+                    this.onLoadingError();
+                    // getOrLoadTextureCache already log warns and errors.
+                    return;
+                  }
+                  this.onLoadingSuccess();
+
+                  this.width = tileMap.getWidth();
+                  this.height = tileMap.getHeight();
+                  TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
+                    this.tileMapPixiObject,
+                    tileMap,
+                    textureCache,
+                    displayMode,
+                    layerIndex
+                  );
+                }
               );
             }
           );
+        };
+
+        if (atlasTexture.valid) {
+          loadTileMap();
+        } else {
+          // Wait for the atlas image to load.
+          atlasTexture.once('update', () => {
+            loadTileMap();
+          });
         }
-      );
-    };
+      }
 
-    // GDJS doesn't use Promise to avoid allocation.
-    RenderedTileMapInstance.prototype._loadTiledMapWithCallback = function (
-      tilemapJsonFile,
-      tilesetJsonFile,
-      callback
-    ) {
-      this._loadTiledMap(tilemapJsonFile, tilesetJsonFile).then(callback);
-    };
+      // GDJS doesn't use Promise to avoid allocation.
+      _loadTileMapWithCallback(tilemapJsonFile, tilesetJsonFile, callback) {
+        this._loadTileMap(tilemapJsonFile, tilesetJsonFile).then(callback);
+      }
 
-    RenderedTileMapInstance.prototype._loadTiledMap = async function (
-      tilemapJsonFile,
-      tilesetJsonFile) {
-
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
-
+      async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
         try {
-        const tilesetJsonData = tilesetJsonFile
-          ? await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilesetJsonFile
-            )
-          : null;
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
-        if (tilesetJsonData) {
-          tileMapJsonData.tilesets = [tilesetJsonData];
-        }
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
+
+          if (tileMap.kind === 'tiled') {
+            const tilesetJsonData = tilesetJsonFile
+              ? await this._pixiResourcesLoader.getResourceJsonData(
+                  this._project,
+                  tilesetJsonFile
+                )
+              : null;
+
+            if (tilesetJsonData) {
+              tileMapJsonData.tilesets = [tilesetJsonData];
+            }
+          }
+
+          return tileMap;
         } catch (err) {
           console.error('Unable to load a Tilemap JSON data: ', err);
         }
-        return tileMapJsonData;
-    };
-
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedTileMapInstance.prototype.update = function () {
-      if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
-      } else {
-        this._pixiObject.scale.x = 1;
-        this._pixiObject.scale.y = 1;
+        return null;
       }
 
-      // Place the center of rotation in the center of the object. Because pivot position in Pixi
-      // is in the **local coordinates of the object**, we need to find back the original width
-      // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-      const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
-      this._pixiObject.pivot.x = originalWidth / 2;
-      this._pixiObject.pivot.y = originalHeight / 2;
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        if (this._instance.hasCustomSize()) {
+          this._pixiObject.scale.x = this.getCustomWidth() / this.width;
+          this._pixiObject.scale.y = this.getCustomHeight() / this.height;
+        } else {
+          this._pixiObject.scale.x = 1;
+          this._pixiObject.scale.y = 1;
+        }
 
-      // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
-      // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
-      // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+        // Place the center of rotation in the center of the object. Because pivot position in Pixi
+        // is in the **local coordinates of the object**, we need to find back the original width
+        // and height of the object before scaling (then divide by 2 to find the center)
+        const originalWidth = this.width;
+        const originalHeight = this.height;
+        this._pixiObject.pivot.x = originalWidth / 2;
+        this._pixiObject.pivot.y = originalHeight / 2;
 
-      // Rotation works as intended because we put the pivot in the center
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-    };
+        // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
+        // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
+        // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
+        this._pixiObject.x =
+          this._instance.getX() +
+          this._pixiObject.pivot.x * this._pixiObject.scale.x;
+        this._pixiObject.y =
+          this._instance.getY() +
+          this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width / this._pixiObject.scale.x;
-    };
+        // Rotation works as intended because we put the pivot in the center
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+      }
 
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height / this._pixiObject.scale.y;
-    };
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this.width;
+      }
+
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this.height;
+      }
+    }
 
     objectsRenderingService.registerInstanceRenderer(
       'TileMap::TileMap',
@@ -993,246 +1425,243 @@ module.exports = {
 
     /**
      * Renderer for instances of TileMap inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedTileMapInstance
-     * @constructor
      */
-     function RenderedCollisionMaskInstance(
-      project,
-      layout,
-      instance,
-      associatedObject,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedCollisionMaskInstance extends RenderedInstance {
+      constructor(
         project,
         layout,
         instance,
-        associatedObject,
+        associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
-
-      this._pixiObject = new PIXI.Graphics();
-
-      // Implement `containsPoint` so that we can set `interactive` to true and
-      // the Tilemap will properly emit events when hovered/clicked.
-      // By default, this is not implemented in pixi-tilemap.
-      this._pixiObject.containsPoint = (position) => {
-        // Turns the world position to the local object coordinates
-        const localPosition = new PIXI.Point();
-        this._pixiObject.worldTransform.applyInverse(position, localPosition);
-
-        // Check if the point is inside the object bounds
-        return (
-          localPosition.x >= 0 &&
-          localPosition.x < this.width &&
-          localPosition.y >= 0 &&
-          localPosition.y < this.height
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
         );
-      };
-      this._pixiContainer.addChild(this._pixiObject);
-      this.width = 20;
-      this.height = 20;
-      this.update();
-      this.updateTileMap();
-    }
 
-    RenderedCollisionMaskInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
+        this.tileMapPixiObject = new PIXI.Graphics();
+        this._pixiObject = this.tileMapPixiObject;
 
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-     RenderedCollisionMaskInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      object
-    ) {
-      return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
-    };
+        // Implement `containsPoint` so that we can set `interactive` to true and
+        // the Tilemap will properly emit events when hovered/clicked.
+        // By default, this is not implemented in pixi-tilemap.
+        this._pixiObject.containsPoint = (position) => {
+          // Turns the world position to the local object coordinates
+          const localPosition = new PIXI.Point();
+          this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
-    /**
-     * This is used to reload the Tilemap
-     */
-     RenderedCollisionMaskInstance.prototype.updateTileMap = function () {
-      // Get the tileset resource to use
-      const tilemapAtlasImage = this._associatedObject
-      .getProperties(this.project)
-      .get('tilemapAtlasImage')
-      .getValue();
-    const tilemapJsonFile = this._associatedObject
-      .getProperties(this.project)
-      .get('tilemapJsonFile')
-      .getValue();
-    const tilesetJsonFile = this._associatedObject
-      .getProperties(this.project)
-      .get('tilesetJsonFile')
-      .getValue();
-    const collisionMaskTag = this._associatedObject
-      .getProperties(this.project)
-      .get('collisionMaskTag')
-      .getValue();
-    const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
-        .getProperties(this.project)
-        .get('outlineColor')
-        .getValue()
-    );
-    const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
-      this._associatedObject
-        .getProperties(this.project)
-        .get('fillColor')
-        .getValue()
-    );
-    const outlineOpacity = this._associatedObject
-      .getProperties(this.project)
-      .get('outlineOpacity')
-      .getValue() / 255;
-    const fillOpacity = this._associatedObject
-      .getProperties(this.project)
-      .get('fillOpacity')
-      .getValue() / 255;
-    const outlineSize = 1;
+          // Check if the point is inside the object bounds
+          return (
+            localPosition.x >= 0 &&
+            localPosition.x < this.width &&
+            localPosition.y >= 0 &&
+            localPosition.y < this.height
+          );
+        };
+        this._pixiContainer.addChild(this._pixiObject);
+        this.width = 48;
+        this.height = 48;
+        this.update();
+        this.updateTileMap();
+      }
 
-      /** @type {TileMapHelper.TileMapManager} */
-      const manager = TilemapHelper.TileMapManager.getManager(this._project);
-      manager.getOrLoadTileMap(
-        this._loadTiledMapWithCallback.bind(this),
-        tilemapJsonFile,
-        tilesetJsonFile,
-        pako,
-        (tileMap) => {
-          if (!tileMap) {
-            // _loadTiledMapWithCallback already log errors
-            return;
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiObject.destroy();
+      }
+
+      onLoadingError() {
+        this.errorPixiObject =
+          this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+        this._pixiContainer.addChild(this.errorPixiObject);
+        this._pixiObject = this.errorPixiObject;
+      }
+
+      onLoadingSuccess() {
+        if (this.errorPixiObject) {
+          this._pixiContainer.removeChild(this.errorPixiObject);
+          this.errorPixiObject = null;
+          this._pixiObject = this.tileMapPixiObject;
+        }
+      }
+
+      /**
+       * Return the path to the thumbnail of the specified object.
+       */
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
+      }
+
+      /**
+       * This is used to reload the Tilemap
+       */
+      updateTileMap() {
+        // This might become useful in the future
+        /*
+        const tilemapAtlasImage = this._associatedObjectConfiguration
+          .getProperties(this.project)
+          .get('tilemapAtlasImage')
+          .getValue();
+        */
+        const tilemapJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilemapJsonFile')
+          .getValue();
+        const tilesetJsonFile = this._associatedObjectConfiguration
+          .getProperties()
+          .get('tilesetJsonFile')
+          .getValue();
+        const collisionMaskTag = this._associatedObjectConfiguration
+          .getProperties()
+          .get('collisionMaskTag')
+          .getValue();
+        const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('outlineColor')
+            .getValue()
+        );
+        const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
+          this._associatedObjectConfiguration
+            .getProperties()
+            .get('fillColor')
+            .getValue()
+        );
+        const outlineOpacity =
+          +this._associatedObjectConfiguration
+            .getProperties()
+            .get('outlineOpacity')
+            .getValue() / 255;
+        const fillOpacity =
+          +this._associatedObjectConfiguration
+            .getProperties()
+            .get('fillOpacity')
+            .getValue() / 255;
+        const outlineSize = 1;
+
+        /** @type {TileMapHelper.TileMapManager} */
+        const manager = TilemapHelper.TileMapManager.getManager(this._project);
+        manager.getOrLoadTileMap(
+          this._loadTiledMapWithCallback.bind(this),
+          tilemapJsonFile,
+          tilesetJsonFile,
+          0, // levelIndex
+          pako,
+          (tileMap) => {
+            if (!tileMap) {
+              this.onLoadingError();
+              // _loadTiledMapWithCallback already log errors
+              return;
+            }
+            this.onLoadingSuccess();
+
+            this.width = tileMap.getWidth();
+            this.height = tileMap.getHeight();
+            TilemapHelper.PixiTileMapHelper.updatePixiCollisionMask(
+              this._pixiObject,
+              tileMap,
+              collisionMaskTag,
+              outlineSize,
+              outlineColor,
+              outlineOpacity,
+              fillColor,
+              fillOpacity
+            );
           }
+        );
+      }
 
-          this.width = tileMap.getWidth();
-          this.height = tileMap.getHeight();
-          TilemapHelper.PixiTileMapHelper.updatePixiCollisionMask(
-            this._pixiObject,
-            tileMap,
-            collisionMaskTag,
-            outlineSize,
-            outlineColor,
-            outlineOpacity,
-            fillColor,
-            fillOpacity
+      // GDJS doesn't use Promise to avoid allocation.
+      _loadTiledMapWithCallback(tilemapJsonFile, tilesetJsonFile, callback) {
+        this._loadTileMap(tilemapJsonFile, tilesetJsonFile).then(callback);
+      }
+
+      async _loadTileMap(tilemapJsonFile, tilesetJsonFile) {
+        try {
+          const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
           );
 
-          // const textureCache = manager.getOrLoadTextureCache(
-          //   this._loadTiledMapWithCallback.bind(this),
-          //   (textureName) =>
-          //     this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-          //   tilemapAtlasImage,
-          //   tilemapJsonFile,
-          //   tilesetJsonFile,
-          //   (textureCache) => {
-          //     if (!textureCache) {
-          //       return;
-          //     }
+          const tileMap = TilemapHelper.TileMapManager.identify(
+            tileMapJsonData
+          );
 
-          //     let tileId = -1;
-          //     for (const definition of tileMap.getTileDefinitions()) {
-          //       if (definition.getTag() === collisionMaskTag) {
-          //         tileId = definition.getTag();
-          //       }
-          //     }
-          //     if (tileId >= 0) {
-          //       const texture = textureCache.findTileTexture(tileId, false, false, false);
-          //       // TODO set the thumbnail from this texture
-          //     }
-          //   }
-          // );
-        }
-      );
-    };
+          if (tileMap.kind === 'tiled') {
+            const tilesetJsonData = tilesetJsonFile
+              ? await this._pixiResourcesLoader.getResourceJsonData(
+                  this._project,
+                  tilesetJsonFile
+                )
+              : null;
 
-    // GDJS doesn't use Promise to avoid allocation.
-    RenderedCollisionMaskInstance.prototype._loadTiledMapWithCallback = function (
-      tilemapJsonFile,
-      tilesetJsonFile,
-      callback
-    ) {
-      this._loadTiledMap(tilemapJsonFile, tilesetJsonFile).then(callback);
-    };
-
-    RenderedCollisionMaskInstance.prototype._loadTiledMap = async function (
-      tilemapJsonFile,
-      tilesetJsonFile) {
-
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
-
-        try {
-        const tilesetJsonData = tilesetJsonFile
-          ? await this._pixiResourcesLoader.getResourceJsonData(
-              this._project,
-              tilesetJsonFile
-            )
-          : null;
-
-        if (tilesetJsonData) {
-          tileMapJsonData.tilesets = [tilesetJsonData];
-        }
+            if (tilesetJsonData) {
+              tileMapJsonData.tilesets = [tilesetJsonData];
+            }
+          }
+          return tileMap;
         } catch (err) {
           console.error('Unable to load a Tilemap JSON data: ', err);
         }
-        return tileMapJsonData;
-    };
-
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-     RenderedCollisionMaskInstance.prototype.update = function () {
-      if (this._instance.hasCustomSize()) {
-        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
-        this._pixiObject.scale.y = this._instance.getCustomHeight() / this.height;
-      } else {
-        this._pixiObject.scale.x = 1;
-        this._pixiObject.scale.y = 1;
+        return null;
       }
 
-      // Place the center of rotation in the center of the object. Because pivot position in Pixi
-      // is in the **local coordinates of the object**, we need to find back the original width
-      // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this.width / this._pixiObject.scale.x;
-      const originalHeight = this.height / this._pixiObject.scale.y;
-      this._pixiObject.pivot.x = originalWidth / 2;
-      this._pixiObject.pivot.y = originalHeight / 2;
+      /**
+       * This is called to update the PIXI object on the scene editor
+       */
+      update() {
+        if (this._instance.hasCustomSize()) {
+          this._pixiObject.scale.x = this.getCustomWidth() / this.width;
+          this._pixiObject.scale.y = this.getCustomHeight() / this.height;
+        } else {
+          this._pixiObject.scale.x = 1;
+          this._pixiObject.scale.y = 1;
+        }
 
-      // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
-      // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
-      // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this.width / 2;
-      this._pixiObject.y = this._instance.getY() + this.height / 2;
+        // Place the center of rotation in the center of the object. Because pivot position in Pixi
+        // is in the **local coordinates of the object**, we need to find back the original width
+        // and height of the object before scaling (then divide by 2 to find the center)
+        const originalWidth = this.width;
+        const originalHeight = this.height;
+        this._pixiObject.pivot.x = originalWidth / 2;
+        this._pixiObject.pivot.y = originalHeight / 2;
 
-      // Rotation works as intended because we put the pivot in the center
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-    };
+        // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
+        // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
+        // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
+        this._pixiObject.x =
+          this._instance.getX() +
+          this._pixiObject.pivot.x * this._pixiObject.scale.x;
+        this._pixiObject.y =
+          this._instance.getY() +
+          this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-     RenderedCollisionMaskInstance.prototype.getDefaultWidth = function () {
-      return this.width;
-    };
+        // Rotation works as intended because we put the pivot in the center
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+      }
 
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-     RenderedCollisionMaskInstance.prototype.getDefaultHeight = function () {
-      return this.height;
-    };
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this.width;
+      }
+
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this.height;
+      }
+    }
 
     objectsRenderingService.registerInstanceRenderer(
       'TileMap::CollisionMask',

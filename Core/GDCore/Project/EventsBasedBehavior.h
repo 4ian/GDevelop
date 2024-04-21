@@ -3,13 +3,13 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EVENTSBASEDBEHAVIOR_H
 #define GDCORE_EVENTSBASEDBEHAVIOR_H
 
 #include <vector>
+#include "GDCore/Project/AbstractEventsBasedEntity.h"
 #include "GDCore/Project/NamedPropertyDescriptor.h"
-#include "GDCore/Tools/SerializableWithNameList.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -28,7 +28,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsBasedBehavior {
+class GD_CORE_API EventsBasedBehavior: public AbstractEventsBasedEntity {
  public:
   EventsBasedBehavior();
   virtual ~EventsBasedBehavior(){};
@@ -39,43 +39,24 @@ class GD_CORE_API EventsBasedBehavior {
    */
   EventsBasedBehavior* Clone() const { return new EventsBasedBehavior(*this); };
 
-  /**
-   * \brief Get the description of the behavior, that is displayed in the
-   * editor.
-   */
-  const gd::String& GetDescription() const { return description; };
-
-  /**
-   * \brief Set the description of the behavior, to be displayed in the editor.
-   */
-  EventsBasedBehavior& SetDescription(const gd::String& description_) {
-    description = description_;
+  EventsBasedBehavior& SetDescription(const gd::String& description_) override {
+    AbstractEventsBasedEntity::SetDescription(description_);
     return *this;
   }
-
-  /**
-   * \brief Get the internal name of the behavior.
-   */
-  const gd::String& GetName() const { return name; };
 
   /**
    * \brief Set the internal name of the behavior.
    */
   EventsBasedBehavior& SetName(const gd::String& name_) {
-    name = name_;
+    AbstractEventsBasedEntity::SetName(name_);
     return *this;
   }
-
-  /**
-   * \brief Get the name of the behavior, that is displayed in the editor.
-   */
-  const gd::String& GetFullName() const { return fullName; };
 
   /**
    * \brief Set the name of the behavior, to be displayed in the editor.
    */
   EventsBasedBehavior& SetFullName(const gd::String& fullName_) {
-    fullName = fullName_;
+    AbstractEventsBasedEntity::SetFullName(fullName_);
     return *this;
   }
 
@@ -93,75 +74,75 @@ class GD_CORE_API EventsBasedBehavior {
   }
 
   /**
-   * \brief Return a reference to the functions of the events based behavior.
+   * \brief Check if the behavior is private - it can't be used outside of its
+   * extension.
    */
-  EventsFunctionsContainer& GetEventsFunctions() {
-    return eventsFunctionsContainer;
+  bool IsPrivate() const { return isPrivate; }
+
+  /**
+   * \brief Set that the behavior is private - it can't be used outside of its
+   * extension.
+   */
+  EventsBasedBehavior& SetPrivate(bool _isPrivate) {
+    isPrivate = _isPrivate;
+    return *this;
   }
 
   /**
-   * \brief Return a const reference to the functions of the events based
-   * behavior.
+   * \brief Return a reference to the list of shared properties.
    */
-  const EventsFunctionsContainer& GetEventsFunctions() const {
-    return eventsFunctionsContainer;
+  gd::PropertiesContainer& GetSharedPropertyDescriptors() {
+    return sharedPropertyDescriptors;
   }
 
   /**
-   * \brief Return a reference to the list of the properties.
+   * \brief Return a const reference to the list of shared properties.
    */
-  SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors() {
-    return propertyDescriptors;
-  }
-
-  /**
-   * \brief Return a const reference to the list of the properties.
-   */
-  const SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors()
+  const gd::PropertiesContainer& GetSharedPropertyDescriptors()
       const {
-    return propertyDescriptors;
+    return sharedPropertyDescriptors;
   }
 
   /**
-   * \brief Get the name of the action to change a property.
+   * \brief Get the name of the action to change a shared property.
    */
-  static gd::String GetPropertyActionName(const gd::String& propertyName) { return "SetProperty" + propertyName; };
+  static gd::String GetSharedPropertyActionName(const gd::String &propertyName) {
+    return "SetSharedProperty" + propertyName;
+  };
 
   /**
-   * \brief Get the name of the condition to compare a property.
+   * \brief Get the name of the condition to compare a shared property.
    */
-  static gd::String GetPropertyConditionName(const gd::String& propertyName) { return "Property" + propertyName; };
+  static gd::String GetSharedPropertyConditionName(const gd::String &propertyName) {
+    return "SharedProperty" + propertyName;
+  };
 
   /**
-   * \brief Get the name of the expression to get a property.
+   * \brief Get the name of the expression to get a shared property.
    */
-  static gd::String GetPropertyExpressionName(const gd::String& propertyName) { return "Property" + propertyName; };
-
-  /** \name Serialization
-   */
-  ///@{
-  /**
-   * \brief Serialize the EventsBasedBehavior to the specified element
-   */
-  void SerializeTo(gd::SerializerElement& element) const;
+  static gd::String
+  GetSharedPropertyExpressionName(const gd::String &propertyName) {
+    return "SharedProperty" + propertyName;
+  };
 
   /**
-   * \brief Load the EventsBasedBehavior from the specified element
+   * \brief Get the name of the action to toggle a boolean shared property.
    */
+  static gd::String GetSharedPropertyToggleActionName(const gd::String &propertyName) {
+    return "ToggleSharedProperty" + propertyName;
+  };
+
+  void SerializeTo(SerializerElement& element) const override;
+
   void UnserializeFrom(gd::Project& project,
-                       const gd::SerializerElement& element);
-  ///@}
+                       const SerializerElement& element) override;
 
  private:
-  gd::String name;
-  gd::String fullName;
-  gd::String description;
   gd::String objectType;
-  gd::EventsFunctionsContainer eventsFunctionsContainer;
-  SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
+  bool isPrivate = false;
+  gd::PropertiesContainer sharedPropertyDescriptors;
 };
 
 }  // namespace gd
 
 #endif  // GDCORE_EVENTSBASEDBEHAVIOR_H
-#endif

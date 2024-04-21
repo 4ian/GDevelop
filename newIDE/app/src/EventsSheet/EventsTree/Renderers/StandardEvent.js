@@ -27,7 +27,7 @@ export default class StandardEvent extends React.Component<
     return (
       <ConditionsActionsColumns
         leftIndentWidth={this.props.leftIndentWidth}
-        windowWidth={this.props.windowWidth}
+        windowSize={this.props.windowSize}
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
@@ -35,6 +35,7 @@ export default class StandardEvent extends React.Component<
         })}
         renderConditionsList={({ style, className }) => (
           <InstructionsList
+            platform={this.props.project.getCurrentPlatform()}
             instrsList={standardEvent.getConditions()}
             style={style}
             className={className}
@@ -52,13 +53,17 @@ export default class StandardEvent extends React.Component<
             disabled={this.props.disabled}
             renderObjectThumbnail={this.props.renderObjectThumbnail}
             screenType={this.props.screenType}
-            windowWidth={this.props.windowWidth}
+            windowSize={this.props.windowSize}
+            scope={this.props.scope}
+            resourcesManager={this.props.project.getResourcesManager()}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            idPrefix={this.props.idPrefix}
           />
         )}
         renderActionsList={({ className }) => (
           <InstructionsList
+            platform={this.props.project.getCurrentPlatform()}
             instrsList={standardEvent.getActions()}
             style={
               {
@@ -80,9 +85,12 @@ export default class StandardEvent extends React.Component<
             disabled={this.props.disabled}
             renderObjectThumbnail={this.props.renderObjectThumbnail}
             screenType={this.props.screenType}
-            windowWidth={this.props.windowWidth}
+            windowSize={this.props.windowSize}
+            scope={this.props.scope}
+            resourcesManager={this.props.project.getResourcesManager()}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
+            idPrefix={this.props.idPrefix}
           />
         )}
       />

@@ -2,10 +2,10 @@
 const styles = {
   nameColumn: { width: '40%' },
   coordinateColumn: {
-    width: 60,
+    width: 96,
   },
   toolColumn: {
-    width: 36,
+    width: 24,
     height: 32,
   },
 };

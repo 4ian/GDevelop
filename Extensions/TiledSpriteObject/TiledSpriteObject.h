@@ -8,32 +8,31 @@ This project is released under the MIT License.
 #ifndef TILEDSPRITEOBJECT_H
 #define TILEDSPRITEOBJECT_H
 #include <memory>
-#include "GDCore/Project/Object.h"
+
+#include "GDCore/Project/ObjectConfiguration.h"
 namespace gd {
 class InitialInstance;
 class Project;
-}
+}  // namespace gd
 
 /**
  * TiledSprite Object
  */
-class GD_EXTENSION_API TiledSpriteObject : public gd::Object {
+class GD_EXTENSION_API TiledSpriteObject : public gd::ObjectConfiguration {
  public:
-  TiledSpriteObject(gd::String name_);
+  TiledSpriteObject();
   virtual ~TiledSpriteObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::ObjectConfiguration> Clone() const {
     return gd::make_unique<TiledSpriteObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
-#endif
 
-  virtual float GetWidth() const { return width; };
-  virtual float GetHeight() const { return height; };
+  virtual double GetWidth() const { return width; };
+  virtual double GetHeight() const { return height; };
 
-  virtual void SetWidth(float newWidth) { width = newWidth; };
-  virtual void SetHeight(float newHeight) { height = newHeight; };
+  virtual void SetWidth(double newWidth) { width = newWidth; };
+  virtual void SetHeight(double newHeight) { height = newHeight; };
 
   void SetTexture(const gd::String &newTextureName) {
     textureName = newTextureName;
@@ -49,8 +48,8 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::Object {
   virtual void DoSerializeTo(gd::SerializerElement &element) const;
 #endif
 
-  float width;
-  float height;
+  double width;
+  double height;
   bool smooth;
 };
 

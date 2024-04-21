@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 namespace gd {
@@ -43,6 +44,11 @@ class GD_CORE_API ExpressionParser2NodePrinter
    */
   const gd::String& GetOutput() { return output; };
 
+  static gd::String PrintStringLiteral(const gd::String& str) {
+    return "\"" +
+           str.FindAndReplace("\\", "\\\\").FindAndReplace("\"", "\\\"") + "\"";
+  }
+
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
     output += "(";
@@ -69,10 +75,7 @@ class GD_CORE_API ExpressionParser2NodePrinter
   }
   void OnVisitNumberNode(NumberNode& node) override { output += node.number; }
   void OnVisitTextNode(TextNode& node) override {
-    output +=
-        "\"" +
-        node.text.FindAndReplace("\\", "\\\\").FindAndReplace("\"", "\\\"") +
-        "\"";
+    output += PrintStringLiteral(node.text);
   }
   void OnVisitVariableNode(VariableNode& node) override {
     output += node.name;
@@ -97,8 +100,8 @@ class GD_CORE_API ExpressionParser2NodePrinter
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.behaviorFunctionName.empty()) {
-      output +=
-          node.objectName + "." + node.objectFunctionOrBehaviorName + "::" + node.behaviorFunctionName;
+      output += node.objectName + "." + node.objectFunctionOrBehaviorName +
+                "::" + node.behaviorFunctionName;
     } else {
       output += node.objectName + "." + node.objectFunctionOrBehaviorName;
     }

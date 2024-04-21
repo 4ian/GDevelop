@@ -1,9 +1,9 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
-import { type StorageProvider, type FileMetadata } from '../index';
-import DownloadSaveAsDialog from './DownloadSaveAsDialog';
-import SaveAlt from '@material-ui/icons/SaveAlt';
+import Download from '../../UI/CustomSvgIcons/Download';
+import { type StorageProvider, type SaveAsLocation } from '../index';
+import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
 
 /**
  * "Storage" allowing to download a copy of the game.
@@ -12,22 +12,22 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 export default ({
   internalName: 'DownloadFile',
   name: t`Download a copy`,
-  renderIcon: () => <SaveAlt />,
+  renderIcon: props => <Download fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
-    onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
-      const newFileMetadata = fileMetadata
-        ? {
-            ...fileMetadata,
-            lastModifiedDate: Date.now(),
-          }
-        : fileMetadata;
+    onSaveProjectAs: async (
+      project: gdProject,
+      saveAsLocation: ?SaveAsLocation, // Unused - everything is done in memory.
+      options
+    ) => {
+      options.onStartSaving();
+
       return new Promise(resolve => {
         setDialog(() => (
-          <DownloadSaveAsDialog
+          <DownloadFileSaveAsDialog
             onDone={() => {
               closeDialog();
-              resolve({ wasSaved: false, fileMetadata: newFileMetadata });
+              resolve({ wasSaved: false, fileMetadata: null });
             }}
             project={project}
           />

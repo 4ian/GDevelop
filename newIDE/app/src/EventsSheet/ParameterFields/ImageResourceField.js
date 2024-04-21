@@ -2,35 +2,31 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourceSelector, {
+  type ResourceSelectorInterface,
+} from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
+  type FieldFocusFunction,
 } from './ParameterFieldCommons';
 
 const ImageResourceField = React.forwardRef<
   ParameterFieldProps,
   ParameterFieldInterface
 >((props, ref) => {
-  const fieldRef = React.useRef<?ResourceSelector>(null);
-
-  const focus = (selectAll: boolean = false) => {
-    if (fieldRef.current) fieldRef.current.focus(selectAll);
+  const field = React.useRef<?ResourceSelectorInterface>(null);
+  const focus: FieldFocusFunction = options => {
+    if (field.current) field.current.focus(options);
   };
-
   React.useImperativeHandle(ref, () => ({
     focus,
   }));
 
-  if (
-    !props.resourceSources ||
-    !props.onChooseResource ||
-    !props.resourceExternalEditors ||
-    !props.project
-  ) {
+  if (!props.resourceManagementProps || !props.project) {
     console.error(
-      'Missing project, resourceSources, onChooseResource or resourceExternalEditors for ImageResourceField'
+      'Missing project or resourceManagementProps for ImageResourceField'
     );
     return null;
   }
@@ -39,9 +35,7 @@ const ImageResourceField = React.forwardRef<
     <ResourceSelector
       margin={props.isInline ? 'none' : 'dense'}
       project={props.project}
-      resourceSources={props.resourceSources}
-      onChooseResource={props.onChooseResource}
-      resourceExternalEditors={props.resourceExternalEditors}
+      resourceManagementProps={props.resourceManagementProps}
       resourcesLoader={ResourcesLoader}
       resourceKind="image"
       fullWidth
@@ -50,7 +44,7 @@ const ImageResourceField = React.forwardRef<
       floatingLabelText={<Trans>Choose the image file to use</Trans>}
       onRequestClose={props.onRequestClose}
       onApply={props.onApply}
-      ref={fieldRef}
+      ref={field}
     />
   );
 });

@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,31 +13,22 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'DialogueTree',
-        _('Dialogue Tree (experimental)'),
+        _('Dialogue Tree'),
         'Handle dialogue trees, made using Yarn Spinner. Useful to make complex dialogues with multiple choices. The Yarn Spinner editor is embedded in GDevelop so you can edit your dialogues without leaving GDevelop.',
         'Todor Imreorov',
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/dialogue-tree')
-      .setCategory('Advanced');
+      .setCategory('Game mechanic');
     extension
-      .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree (experimental)'))
+      .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree'))
       .setIcon('JsPlatform/Extensions/yarn32.png');
 
     extension
@@ -46,7 +38,7 @@ module.exports = {
         _(
           'Load a dialogue data object - Yarn json format, stored in a scene variable. Use this command to load all the Dialogue data at the beginning of the game.'
         ),
-        _('Load dialogue data from Scene variable _PARAM1_'),
+        _('Load dialogue data from Scene variable _PARAM0_'),
         '',
         'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
@@ -721,10 +713,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

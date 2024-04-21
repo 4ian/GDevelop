@@ -5,27 +5,35 @@
 namespace gdjs {
   /** Base parameters for gdjs.TextRuntimeObject */
   export type TextObjectDataType = {
-    /** The size of the characters */
-    characterSize: number;
-    /** The font name */
-    font: string;
-    /** Is Bold? */
-    bold: boolean;
-    /** Is Italic? */
-    italic: boolean;
-    /** Is Underlined? */
-    underlined: boolean;
-    /** The text color in an RGB representation */
-    color: {
-      /** The Red level from 0 to 255 */
-      r: number;
-      /** The Green level from 0 to 255 */
-      g: number;
-      /** The Blue level from 0 to 255 */
-      b: number;
+    content: {
+      /** The size of the characters */
+      characterSize: number;
+      /** The font name */
+      font: string;
+      /** Is Bold? */
+      bold: boolean;
+      /** Is Italic? */
+      italic: boolean;
+      /** Is Underlined? */
+      underlined: boolean;
+      /** The text color in an RGB representation */
+      color: string;
+      /** The text of the object */
+      text: string;
+      textAlignment: string;
+
+      isOutlineEnabled: boolean;
+      outlineThickness: float;
+      /** The outline color in an RGB representation */
+      outlineColor: string;
+      isShadowEnabled: boolean;
+      /** The shadow color in an RGB representation */
+      shadowColor: string;
+      shadowOpacity: float;
+      shadowDistance: float;
+      shadowAngle: float;
+      shadowBlurRadius: float;
     };
-    /** The text of the object */
-    string: string;
   };
 
   export type TextObjectData = ObjectData & TextObjectDataType;
@@ -33,7 +41,9 @@ namespace gdjs {
   /**
    * Displays a text.
    */
-  export class TextRuntimeObject extends gdjs.RuntimeObject {
+  export class TextRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.TextContainer, gdjs.OpacityHandler {
     _characterSize: number;
     _fontName: string;
     _bold: boolean;
@@ -46,14 +56,20 @@ namespace gdjs {
     opacity: float = 255;
     _textAlign: string = 'left';
     _wrapping: boolean = false;
-    _wrappingWidth: float = 1;
-    _outlineThickness: number = 0;
-    _outlineColor: integer[] = [255, 255, 255];
-    _shadow: boolean = false;
-    _shadowColor: integer[] = [0, 0, 0];
-    _shadowDistance: number = 1;
-    _shadowBlur: integer = 1;
-    _shadowAngle: float = 0;
+    // A wrapping of 1 makes games crash on Firefox
+    _wrappingWidth: float = 100;
+
+    _isOutlineEnabled: boolean;
+    _outlineThickness: float;
+    _outlineColor: integer[];
+
+    _shadow: boolean;
+    _shadowColor: integer[];
+    _shadowOpacity: float;
+    _shadowDistance: float;
+    _shadowAngle: float;
+    _shadowBlur: float;
+
     _padding: integer = 5;
     _str: string;
     _renderer: gdjs.TextRuntimeObjectRenderer;
@@ -63,26 +79,39 @@ namespace gdjs {
     _scaleY: number = 1;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The container the object belongs to.
      * @param textObjectData The initial properties of the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textObjectData: TextObjectData
     ) {
-      super(runtimeScene, textObjectData);
-      this._characterSize = Math.max(1, textObjectData.characterSize);
-      this._fontName = textObjectData.font;
-      this._bold = textObjectData.bold;
-      this._italic = textObjectData.italic;
-      this._underlined = textObjectData.underlined;
-      this._color = [
-        textObjectData.color.r,
-        textObjectData.color.g,
-        textObjectData.color.b,
-      ];
-      this._str = textObjectData.string;
-      this._renderer = new gdjs.TextRuntimeObjectRenderer(this, runtimeScene);
+      super(instanceContainer, textObjectData);
+      const content = textObjectData.content;
+      this._characterSize = Math.max(1, content.characterSize);
+      this._fontName = content.font;
+      this._bold = content.bold;
+      this._italic = content.italic;
+      this._underlined = content.underlined;
+      this._color = gdjs.rgbOrHexToRGBColor(content.color);
+      this._str = content.text;
+      this._textAlign = content.textAlignment;
+
+      this._isOutlineEnabled = content.isOutlineEnabled;
+      this._outlineThickness = content.outlineThickness;
+      this._outlineColor = gdjs.rgbOrHexToRGBColor(content.outlineColor);
+
+      this._shadow = content.isShadowEnabled;
+      this._shadowColor = gdjs.rgbOrHexToRGBColor(content.shadowColor);
+      this._shadowOpacity = content.shadowOpacity;
+      this._shadowDistance = content.shadowDistance;
+      this._shadowBlur = content.shadowBlurRadius;
+      this._shadowAngle = content.shadowAngle;
+
+      this._renderer = new gdjs.TextRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -92,37 +121,58 @@ namespace gdjs {
       oldObjectData: TextObjectData,
       newObjectData: TextObjectData
     ): boolean {
-      if (oldObjectData.characterSize !== newObjectData.characterSize) {
-        this.setCharacterSize(newObjectData.characterSize);
+      const oldContent = oldObjectData.content;
+      const newContent = newObjectData.content;
+      if (oldContent.characterSize !== newContent.characterSize) {
+        this.setCharacterSize(newContent.characterSize);
       }
-      if (oldObjectData.font !== newObjectData.font) {
-        this.setFontName(newObjectData.font);
+      if (oldContent.font !== newContent.font) {
+        this.setFontName(newContent.font);
       }
-      if (oldObjectData.bold !== newObjectData.bold) {
-        this.setBold(newObjectData.bold);
+      if (oldContent.bold !== newContent.bold) {
+        this.setBold(newContent.bold);
       }
-      if (oldObjectData.italic !== newObjectData.italic) {
-        this.setItalic(newObjectData.italic);
+      if (oldContent.italic !== newContent.italic) {
+        this.setItalic(newContent.italic);
       }
-      if (
-        oldObjectData.color.r !== newObjectData.color.r ||
-        oldObjectData.color.g !== newObjectData.color.g ||
-        oldObjectData.color.b !== newObjectData.color.b
-      ) {
-        this.setColor(
-          '' +
-            newObjectData.color.r +
-            ';' +
-            newObjectData.color.g +
-            ';' +
-            newObjectData.color.b
-        );
+      if (oldContent.color !== newContent.color) {
+        this.setColor(newContent.color);
       }
-      if (oldObjectData.string !== newObjectData.string) {
-        this.setString(newObjectData.string);
+      if (oldContent.text !== newContent.text) {
+        this.setText(newContent.text);
       }
-      if (oldObjectData.underlined !== newObjectData.underlined) {
+      if (oldContent.underlined !== newContent.underlined) {
         return false;
+      }
+      if (oldContent.textAlignment !== newContent.textAlignment) {
+        this.setTextAlignment(newContent.textAlignment);
+      }
+      if (oldContent.isOutlineEnabled !== newContent.isOutlineEnabled) {
+        this.setOutlineEnabled(newContent.isOutlineEnabled);
+      }
+      if (oldContent.outlineThickness !== newContent.outlineThickness) {
+        this.setOutlineThickness(newContent.outlineThickness);
+      }
+      if (oldContent.outlineColor !== newContent.outlineColor) {
+        this.setOutlineColor(newContent.outlineColor);
+      }
+      if (oldContent.isShadowEnabled !== newContent.isShadowEnabled) {
+        this.showShadow(newContent.isShadowEnabled);
+      }
+      if (oldContent.shadowColor !== newContent.shadowColor) {
+        this.setShadowColor(newContent.shadowColor);
+      }
+      if (oldContent.shadowOpacity !== newContent.shadowOpacity) {
+        this.setShadowOpacity(newContent.shadowOpacity);
+      }
+      if (oldContent.shadowDistance !== newContent.shadowDistance) {
+        this.setShadowDistance(newContent.shadowDistance);
+      }
+      if (oldContent.shadowAngle !== newContent.shadowAngle) {
+        this.setShadowAngle(newContent.shadowAngle);
+      }
+      if (oldContent.shadowBlurRadius !== newContent.shadowBlurRadius) {
+        this.setShadowBlurRadius(newContent.shadowBlurRadius);
       }
       return true;
     }
@@ -131,8 +181,13 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene: gdjs.RuntimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
+    }
+
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
     }
 
     /**
@@ -140,8 +195,8 @@ namespace gdjs {
      */
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       if (initialInstanceData.customSize) {
-        this.setWrapping(true);
         this.setWrappingWidth(initialInstanceData.width);
+        this.setWrapping(true);
       } else {
         this.setWrapping(false);
       }
@@ -151,14 +206,14 @@ namespace gdjs {
      * Update the rendered object position.
      */
     private _updateTextPosition() {
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
       this._renderer.updatePosition();
     }
 
     /**
      * Set object position on X axis.
      */
-    setX(x): void {
+    setX(x: float): void {
       super.setX(x);
       this._updateTextPosition();
     }
@@ -166,7 +221,7 @@ namespace gdjs {
     /**
      * Set object position on Y axis.
      */
-    setY(y): void {
+    setY(y: float): void {
       super.setY(y);
       this._updateTextPosition();
     }
@@ -183,7 +238,7 @@ namespace gdjs {
     /**
      * Set object opacity.
      */
-    setOpacity(opacity): void {
+    setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
       }
@@ -203,20 +258,37 @@ namespace gdjs {
 
     /**
      * Get the string displayed by the object.
+     * @deprecated use `getText` instead
      */
     getString(): string {
+      return this.getText();
+    }
+
+    /**
+     * Set the string displayed by the object.
+     * @param text The new text
+     * @deprecated use `setText` instead
+     */
+    setString(text: string): void {
+      this.setText(text);
+    }
+
+    /**
+     * Get the string displayed by the object.
+     */
+    getText(): string {
       return this._str;
     }
 
     /**
      * Set the string displayed by the object.
-     * @param str The new text
+     * @param text The new text
      */
-    setString(str: string): void {
-      if (str === this._str) {
+    setText(text: string): void {
+      if (text === this._str) {
         return;
       }
-      this._str = str;
+      this._str = text;
       this._renderer.updateString();
       this._updateTextPosition();
     }
@@ -260,7 +332,7 @@ namespace gdjs {
      * Set bold for the object text.
      * @param enable {boolean} true to have a bold text, false otherwise.
      */
-    setBold(enable): void {
+    setBold(enable: boolean): void {
       this._bold = enable;
       this._renderer.updateStyle();
     }
@@ -276,7 +348,7 @@ namespace gdjs {
      * Set italic for the object text.
      * @param enable {boolean} true to have an italic text, false otherwise.
      */
-    setItalic(enable): void {
+    setItalic(enable: boolean): void {
       this._italic = enable;
       this._renderer.updateStyle();
     }
@@ -285,7 +357,7 @@ namespace gdjs {
      * Get width of the text.
      */
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._wrapping ? this._wrappingWidth : this._renderer.getWidth();
     }
 
     /**
@@ -296,10 +368,24 @@ namespace gdjs {
     }
 
     /**
-     * Get scale of the text.
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
+     */
+    getScaleMean(): float {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): float {
-      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -326,7 +412,7 @@ namespace gdjs {
       this._scaleX = newScale;
       this._scaleY = newScale;
       this._renderer.setScale(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -338,7 +424,7 @@ namespace gdjs {
 
       this._scaleX = newScale;
       this._renderer.setScaleX(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -350,7 +436,7 @@ namespace gdjs {
 
       this._scaleY = newScale;
       this._renderer.setScaleY(newScale);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -410,7 +496,7 @@ namespace gdjs {
 
       this._wrapping = enable;
       this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -428,17 +514,22 @@ namespace gdjs {
       if (width <= 1) {
         width = 1;
       }
-      if (this._wrappingWidth === width) return;
-
+      if (this._wrappingWidth === width) {
+        return;
+      }
       this._wrappingWidth = width;
-      this._renderer.updateStyle();
-      this.hitBoxesDirty = true;
+
+      if (this._wrapping) {
+        this._renderer.updateStyle();
+        this.invalidateHitboxes();
+      }
     }
 
     /**
      * Set the outline for the text object.
      * @param str color as a "R;G;B" string, for example: "255;0;0"
      * @param thickness thickness of the outline (0 = disabled)
+     * @deprecated Prefer independent setters.
      */
     setOutline(str: string, thickness: number): void {
       const color = str.split(';');
@@ -452,12 +543,48 @@ namespace gdjs {
       this._renderer.updateStyle();
     }
 
+    isOutlineEnabled(): boolean {
+      return this._isOutlineEnabled;
+    }
+
+    setOutlineEnabled(enable: boolean): void {
+      this._isOutlineEnabled = enable;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the outline thickness of the text object.
+     * @return the outline thickness
+     */
+    getOutlineThickness(): number {
+      return this._outlineThickness;
+    }
+
+    /**
+     * Set the outline thickness of the text object.
+     * @param value the outline thickness
+     */
+    setOutlineThickness(value: float): void {
+      this._outlineThickness = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Set the shadow color of the text object.
+     * @param color the shadow color as a "R;G;B" string, for example: "255;0;0"
+     */
+    setOutlineColor(color: string): void {
+      this._outlineColor = gdjs.rgbOrHexToRGBColor(color);
+      this._renderer.updateStyle();
+    }
+
     /**
      * Set the shadow for the text object.
      * @param str color as a "R;G;B" string, for example: "255;0;0"
      * @param distance distance between the shadow and the text, in pixels.
-     * @param blur amout of shadow blur, in pixels.
+     * @param blur amount of shadow blur, in pixels.
      * @param angle shadow offset direction, in degrees.
+     * @deprecated Prefer independent setters.
      */
     setShadow(
       str: string,
@@ -476,6 +603,96 @@ namespace gdjs {
       this._shadowBlur = blur;
       this._shadowAngle = angle;
       this._shadow = true;
+      this._renderer.updateStyle();
+    }
+
+    isShadowEnabled(): boolean {
+      return this._shadow;
+    }
+
+    /**
+     * Show the shadow of the text object.
+     * @param enable true to show the shadow, false to hide it
+     */
+    showShadow(enable: boolean): void {
+      this._shadow = enable;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the shadow opacity of the text object.
+     * @return the opacity (0 - 255)
+     */
+    getShadowOpacity(): number {
+      return this._shadowOpacity;
+    }
+
+    /**
+     * Set the shadow opacity of the text object.
+     * @param value the opacity (0 - 255)
+     */
+    setShadowOpacity(value: float): void {
+      this._shadowOpacity = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the shadow offset distance of the text object.
+     * @return the shadow offset distance
+     */
+    getShadowDistance(): number {
+      return this._shadowDistance;
+    }
+
+    /**
+     * Set the shadow offset distance of the text object.
+     * @param value the shadow offset distance
+     */
+    setShadowDistance(value: float): void {
+      this._shadowDistance = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the shadow offset angle of the text object.
+     * @return the shadow offset angle in degrees
+     */
+    getShadowAngle(): number {
+      return this._shadowAngle;
+    }
+
+    /**
+     * Set the shadow offset angle of the text object.
+     * @param value the shadow offset angle in degrees
+     */
+    setShadowAngle(value: float): void {
+      this._shadowAngle = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Get the shadow blur radius of the text object.
+     * @return the shadow blur radius
+     */
+    getShadowBlurRadius(): number {
+      return this._shadowBlur;
+    }
+
+    /**
+     * Set the shadow blur radius of the text object.
+     * @param value the shadow blur radius
+     */
+    setShadowBlurRadius(value: float): void {
+      this._shadowBlur = value;
+      this._renderer.updateStyle();
+    }
+
+    /**
+     * Set the shadow color of the text object.
+     * @param color the shadow color as a "R;G;B" string, for example: "255;0;0"
+     */
+    setShadowColor(color: string): void {
+      this._shadowColor = gdjs.rgbOrHexToRGBColor(color);
       this._renderer.updateStyle();
     }
 
@@ -529,15 +746,6 @@ namespace gdjs {
       }
       this._gradientType = strGradientType;
       this._useGradient = this._gradient.length > 1 ? true : false;
-      this._renderer.updateStyle();
-    }
-
-    /**
-     * Show the shadow of the text object.
-     * @param enable true to show the shadow, false to hide it
-     */
-    showShadow(enable: boolean): void {
-      this._shadow = enable;
       this._renderer.updateStyle();
     }
 

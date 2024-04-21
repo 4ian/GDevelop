@@ -2,7 +2,6 @@
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
-import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
 import { FiltersChooser } from '../../UI/Search/FiltersChooser';
@@ -12,6 +11,11 @@ import { ResourceCard } from './ResourceCard';
 import Subheader from '../../UI/Subheader';
 import { CategoryChooser } from '../../UI/Search/CategoryChooser';
 import { t, Trans } from '@lingui/macro';
+import Paper from '../../UI/Paper';
+
+const styles = {
+  paper: { width: 250 },
+};
 
 type Props = {
   onChoose: Resource => void,
@@ -43,7 +47,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
   return (
     <Column expand noMargin useFullHeight>
       <Line>
-        <Column expand>
+        <Column expand noMargin>
           <SearchBar
             value={searchText}
             onChange={setSearchText}
@@ -59,29 +63,32 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
         }
         noMargin
       >
-        <Background noFullHeight noExpand width={250}>
+        <Column noMargin>
           <ScrollView>
-            <Subheader>
-              <Trans>Categories</Trans>
-            </Subheader>
-            <CategoryChooser
-              allItemsLabel={<Trans>All assets</Trans>}
-              allFilters={filters}
-              filtersState={filtersState}
-              error={error}
-            />
-            <Subheader>
-              <Trans>Filters</Trans>
-            </Subheader>
-            <FiltersChooser
-              allFilters={filters}
-              filtersState={filtersState}
-              error={error}
-            />
+            <Paper style={styles.paper} background="medium">
+              <Subheader>
+                <Trans>Categories</Trans>
+              </Subheader>
+              <CategoryChooser
+                allItemsLabel={<Trans>All assets</Trans>}
+                allFilters={filters}
+                filtersState={filtersState}
+                error={error}
+              />
+              <Subheader>
+                <Trans>Filters</Trans>
+              </Subheader>
+              <FiltersChooser
+                allFilters={filters}
+                filtersState={filtersState}
+                error={error}
+              />
+            </Paper>
           </ScrollView>
-        </Background>
+        </Column>
         <BoxSearchResults
           baseSize={128}
+          spacing={8}
           onRetry={fetchResourcesAndFilters}
           error={error}
           searchItems={searchResultsForResourceKind}

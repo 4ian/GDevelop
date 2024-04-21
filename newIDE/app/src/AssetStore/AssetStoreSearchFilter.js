@@ -1,6 +1,11 @@
 // @flow
 import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type PrivateAssetPack,
+  type PublicAssetPack,
+} from '../Utils/GDevelopServices/Asset';
+import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import {
   type RGBColor,
   rgbToHsl,
@@ -27,6 +32,10 @@ export class ObjectTypeAssetStoreSearchFilter
       ? 1
       : 0;
   }
+
+  hasFilters(): boolean {
+    return this.objectTypes.size > 0;
+  }
 }
 
 export class LicenseAssetStoreSearchFilter
@@ -52,6 +61,57 @@ export class LicenseAssetStoreSearchFilter
       ? 1
       : 0;
   }
+
+  hasFilters(): boolean {
+    return this.attributionFreeOnly;
+  }
+}
+
+export class AssetPackTypeStoreSearchFilter
+  implements SearchFilter<PublicAssetPack | PrivateAssetPackListingData> {
+  isFree: boolean;
+  isPremium: boolean;
+  isOwned: boolean;
+  receivedAssetPacks: Array<PrivateAssetPack>;
+
+  constructor({
+    isFree = false,
+    isPremium = false,
+    isOwned = false,
+    receivedAssetPacks = [],
+  }: {|
+    isFree?: boolean,
+    isPremium?: boolean,
+    isOwned?: boolean,
+    receivedAssetPacks?: ?Array<PrivateAssetPack>,
+  |}) {
+    this.isFree = isFree;
+    this.isPremium = isPremium;
+    this.isOwned = isOwned;
+    this.receivedAssetPacks = receivedAssetPacks || [];
+  }
+
+  getPertinence(
+    searchItem: PublicAssetPack | PrivateAssetPackListingData
+  ): number {
+    // Return all packs when no filter is selected.
+    if (!this.isFree && !this.isPremium && !this.isOwned) return 1;
+    if (
+      this.isOwned &&
+      searchItem.prices &&
+      this.receivedAssetPacks
+        .map(assetPack => assetPack.id)
+        .includes(searchItem.id)
+    )
+      return 1;
+    if (this.isPremium && searchItem.prices) return 1;
+    if (this.isFree && !searchItem.prices) return 1;
+    return 0;
+  }
+
+  hasFilters(): boolean {
+    return this.isFree || this.isPremium || this.isOwned;
+  }
 }
 
 export class AnimatedAssetStoreSearchFilter
@@ -75,6 +135,10 @@ export class AnimatedAssetStoreSearchFilter
       ? 1
       : 0;
   }
+
+  hasFilters(): boolean {
+    return this.mustBeAnimated || this.mustHaveSeveralState;
+  }
 }
 
 export class DimensionAssetStoreSearchFilter
@@ -94,6 +158,10 @@ export class DimensionAssetStoreSearchFilter
   }
 
   getPertinence(searchItem: AssetShortHeader): number {
+    // Assets with no defined dimensions are always pertinent. (ex: particle emitter)
+    if (!searchItem.width || !searchItem.height) {
+      return 1;
+    }
     return ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
       this.dimensionMin <= searchItem.width) &&
       (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
@@ -104,6 +172,13 @@ export class DimensionAssetStoreSearchFilter
           searchItem.height <= this.dimensionMax))
       ? 1
       : 0;
+  }
+
+  hasFilters(): boolean {
+    return (
+      this.dimensionMin !== DimensionAssetStoreSearchFilter.boundMin ||
+      this.dimensionMax !== DimensionAssetStoreSearchFilter.boundMax
+    );
   }
 }
 
@@ -179,6 +254,10 @@ export class ColorAssetStoreSearchFilter
       scoreMax = Math.max(scoreMax, score);
     }
     return scoreMax;
+  }
+
+  hasFilters(): boolean {
+    return !!this.color;
   }
 }
 
@@ -271,5 +350,9 @@ export class SimilarAssetStoreSearchFilter
     }
 
     return colorSimilitude;
+  }
+
+  hasFilters(): boolean {
+    return true;
   }
 }

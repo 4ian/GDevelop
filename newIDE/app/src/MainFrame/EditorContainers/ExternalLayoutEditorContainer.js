@@ -21,6 +21,10 @@ import Text from '../../UI/Text';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import TutorialButton from '../../UI/TutorialButton';
 import HelpButton from '../../UI/HelpButton';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../ResourcesWatcher';
 
 const styles = {
   container: {
@@ -38,6 +42,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
   State
 > {
   editor: ?SceneEditor;
+  resourceExternallyChangedCallbackId: ?string;
   state = {
     externalPropertiesDialogOpen: false,
   };
@@ -63,6 +68,14 @@ export class ExternalLayoutEditorContainer extends React.Component<
         projectItemName
       );
     }
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
   }
 
   componentDidUpdate(prevProps: RenderEditorContainerProps) {
@@ -76,12 +89,24 @@ export class ExternalLayoutEditorContainer extends React.Component<
     }
   }
 
+  onResourceExternallyChanged(resourceInfo: {| identifier: string |}) {
+    const { editor } = this;
+    if (editor) {
+      editor.onResourceExternallyChanged(resourceInfo);
+    }
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
 
   forceUpdateEditor() {
-    // No updates to be done.
+    const { editor } = this;
+    if (editor) {
+      editor.forceUpdateObjectsList();
+      editor.forceUpdateObjectGroupsList();
+      editor.forceUpdateLayersList();
+    }
   }
 
   getExternalLayout(): ?gdExternalLayout {
@@ -165,9 +190,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
         {layout && (
           <SceneEditor
             setToolbar={this.props.setToolbar}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             ref={editor => (this.editor = editor)}
@@ -178,12 +201,18 @@ export class ExternalLayoutEditorContainer extends React.Component<
               prepareInstancesEditorSettings(
                 serializeToJSObject(
                   externalLayout.getAssociatedEditorSettings()
+                ),
+                Math.max(
+                  project.getGameResolutionWidth(),
+                  project.getGameResolutionHeight()
                 )
               )
             }
             onOpenEvents={this.props.onOpenEvents}
             onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
+            canInstallPrivateAsset={this.props.canInstallPrivateAsset}
+            openBehaviorEvents={this.props.openBehaviorEvents}
           />
         )}
         {!layout && (
@@ -191,7 +220,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external layout, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">
@@ -204,7 +233,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             <Line justifyContent="flex-start" noMargin>
               <TutorialButton
                 tutorialId="Intermediate-externals"
-                label="Watch the tutorial"
+                label={<Trans>Watch tutorial</Trans>}
                 renderIfNotFound={
                   <HelpButton helpPagePath="/interface/events-editor/external-events" />
                 }

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { testProject } from '../../GDevelopJsInitializerDecorator';
@@ -10,17 +9,12 @@ import LeaderboardIdField from '../../../EventsSheet/ParameterFields/Leaderboard
 import ValueStateHolder from '../../ValueStateHolder';
 
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
-import {
-  type Leaderboard,
-  type LeaderboardSortOption,
-} from '../../../Utils/GDevelopServices/Play';
-
-const gd: libGDevelop = global.gd;
+import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 
 export default {
   title: 'ParameterFields/LeaderboardIdField',
   component: LeaderboardIdField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const mockedLeaderboards = Array(5)
@@ -37,6 +31,7 @@ const mockedLeaderboards = Array(5)
 const mockedEntries = Array(8)
   .fill(0)
   .map((_, index) => ({
+    leaderboardId: '489165zad49-a8ad6-4a984-dcz8da-hjqn983qh0',
     id: `fze8f4ze9f489ze4f9zef4${index}`,
     playerName: `player${index % 2}`,
     score: Math.round(Math.random() * 20 + 150),
@@ -55,7 +50,6 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
     currentLeaderboard,
     setCurrentLeaderboard,
   ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
-  const [sort, setSort] = React.useState<LeaderboardSortOption>('ASC');
   return (
     <LeaderboardContext.Provider
       value={{
@@ -94,7 +88,10 @@ export const Default = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -112,7 +109,10 @@ export const InitialValidLeaderboard = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}
@@ -130,7 +130,10 @@ export const InitialInvalidLeaderboard = () => (
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
+          scope={{
+            project: testProject.project,
+            layout: testProject.testLayout,
+          }}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
           value={value}

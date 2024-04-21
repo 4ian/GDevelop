@@ -14,7 +14,7 @@
 }
 
 .mosaic-gd-theme .mosaic-window {
-  border-radius: 0 !important;
+  border: 0 !important;
 }
 
 .mosaic-gd-theme .mosaic-window-body {
@@ -23,7 +23,7 @@
 
 /* Make the horizontal split to have the same thickness as the vertical */
 .mosaic-gd-theme .mosaic-split.-column {
-  margin-top: -2px;
+  margin-top: -3px;
   height: 4px;
 }
 
@@ -31,6 +31,7 @@
 .mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-window,
 .mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview {
   box-shadow: none;
+  border: 0;
 }
 
 .mosaic-gd-theme .mosaic-tile {
@@ -40,8 +41,8 @@
 }
 
 .mosaic-gd-theme .mosaic-window-toolbar {
-  border-top-right-radius: 0 !important;
-  border-top-left-radius: 0 !important;
+  border-top-right-radius: 4px !important;
+  border-top-left-radius: 4px !important;
 }
 
 .mosaic-gd-theme .draggable .mosaic-window-title {

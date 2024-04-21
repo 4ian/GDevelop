@@ -1,0 +1,11 @@
+diff --git a/node_modules/@pixi/events/lib/FederatedEventMap.d.ts b/node_modules/@pixi/events/lib/FederatedEventMap.d.ts
+index 5190d4f..b42103c 100644
+--- a/node_modules/@pixi/events/lib/FederatedEventMap.d.ts
++++ b/node_modules/@pixi/events/lib/FederatedEventMap.d.ts
+@@ -43,5 +43,6 @@ export declare type FederatedEventEmitterTypes = {
+ } & {
+     [K in keyof GlobalFederatedEventMap]: [event: GlobalFederatedEventMap[K]];
+ } & {
++    // @ts-ignore
+     [K: ({} & string) | ({} & symbol)]: any;
+ };

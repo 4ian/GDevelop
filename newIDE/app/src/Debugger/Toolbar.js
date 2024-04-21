@@ -1,18 +1,25 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
-import ToolbarIcon from '../UI/ToolbarIcon';
-import ToolbarSeparator from '../UI/ToolbarSeparator';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import ProfilerIcon from '../UI/CustomSvgIcons/Profiler';
+import ConsoleIcon from '../UI/CustomSvgIcons/Console';
+import PlayIcon from '../UI/CustomSvgIcons/Preview';
+import PauseIcon from '../UI/CustomSvgIcons/Pause';
+import IconButton from '../UI/IconButton';
 
 type Props = {|
   onPlay: () => void,
   canPlay: boolean,
   onPause: () => void,
   canPause: boolean,
-  onOpenProfiler: () => void,
+  isProfilerShown: boolean,
+  onToggleProfiler: () => void,
   canOpenProfiler: boolean,
-  onOpenConsole: () => void,
+  isConsoleShown: boolean,
+  onToggleConsole: () => void,
   canOpenConsole: boolean,
 |};
 
@@ -23,39 +30,53 @@ export class Toolbar extends React.PureComponent<Props> {
       onPause,
       canPlay,
       canPause,
-      onOpenProfiler,
+      onToggleProfiler,
       canOpenProfiler,
-      onOpenConsole,
+      onToggleConsole,
       canOpenConsole,
+      isProfilerShown,
+      isConsoleShown,
     } = this.props;
 
     return (
       <ToolbarGroup lastChild>
-        <ToolbarIcon
-          onClick={onPlay}
-          src="res/ribbon_default/preview64.png"
-          disabled={!canPlay}
-          tooltip={t`Play the game`}
-        />
-        <ToolbarIcon
-          onClick={onPause}
-          src="res/ribbon_default/pause64.png"
-          disabled={!canPause}
-          tooltip={t`Pause the game`}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={onOpenProfiler}
-          src="res/ribbon_default/profiler32.png"
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onToggleProfiler}
           disabled={!canOpenProfiler}
+          selected={isProfilerShown}
           tooltip={t`Open the performance profiler`}
-        />
-        <ToolbarIcon
-          onClick={onOpenConsole}
-          src="res/ribbon_default/source_cpp32.png"
+        >
+          <ProfilerIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          color="default"
+          onClick={onToggleConsole}
           disabled={!canOpenConsole}
+          selected={isConsoleShown}
           tooltip={t`Open the console`}
-        />
+        >
+          <ConsoleIcon />
+        </IconButton>
+
+        {canPause ? (
+          <FlatButton
+            primary
+            onClick={onPause}
+            leftIcon={<PauseIcon />}
+            label={<Trans>Pause</Trans>}
+          />
+        ) : (
+          <RaisedButton
+            primary
+            onClick={onPlay}
+            icon={<PlayIcon />}
+            label={<Trans>Play</Trans>}
+            disabled={!canPlay}
+          />
+        )}
       </ToolbarGroup>
     );
   }

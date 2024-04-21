@@ -33,24 +33,16 @@ class PanelSpriteObjectJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetOpacity"]
         .SetFunctionName("setOpacity")
-        .SetGetter("getOpacity")
-        .SetIncludeFile(
-            "Extensions/PanelSpriteObject/panelspriteruntimeobject.js");
+        .SetGetter("getOpacity");
     GetAllConditionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Opacity"]
-        .SetFunctionName("getOpacity")
-        .SetIncludeFile(
-            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+        .SetFunctionName("getOpacity");
     GetAllExpressionsForObject(
         "PanelSpriteObject::PanelSprite")["Opacity"]
-        .SetFunctionName("getOpacity")
-        .SetIncludeFile(
-            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+        .SetFunctionName("getOpacity");
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetColor"]
-        .SetFunctionName("setColor")
-        .SetIncludeFile(
-            "Extensions/TiledSpriteObject/panelspriteruntimeobject.js");
+        .SetFunctionName("setColor");
 
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Width"]
@@ -68,6 +60,9 @@ class PanelSpriteObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getHeight");
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Image"]
+        .SetFunctionName("setTexture");
+    GetAllActionsForObject(
+        "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetImageFromResource"]
         .SetFunctionName("setTexture");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

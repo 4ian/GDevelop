@@ -580,7 +580,7 @@ namespace gdjs {
               if (!definition) {
                 continue;
               }
-              if (definition.hasTag(this.tag)) {
+              if (definition.hasTaggedHitBox(this.tag)) {
                 polygonItr = tile.getHitboxes()[Symbol.iterator]();
                 listNext = polygonItr.next();
               }
@@ -661,7 +661,7 @@ namespace gdjs {
        */
       getDefinition(): TileMapHelper.TileDefinition {
         return this.layer.tileMap.getTileDefinition(
-          this.layer._source.get(this.x, this.y)!
+          this.layer._source.getTileId(this.x, this.y)!
         )!;
       }
 
@@ -714,7 +714,8 @@ namespace gdjs {
           tileTransformation.flipY(height / 2);
         }
         if (this.layer.isFlippedDiagonally(this.x, this.y)) {
-          tileTransformation.flipDiagonally();
+          tileTransformation.flipX(width / 2);
+          tileTransformation.rotateAround(Math.PI / 2, width / 2, height / 2);
         }
         tileTransformation.preConcatenate(layerTransformation);
 

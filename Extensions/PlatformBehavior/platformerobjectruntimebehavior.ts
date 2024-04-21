@@ -62,7 +62,7 @@ namespace gdjs {
     private _yGrabOffset: any;
     private _xGrabTolerance: any;
 
-    _useLegacyTrajectory: boolean = true;
+    _useLegacyTrajectory: boolean;
 
     _canGoDownFromJumpthru: boolean = false;
 
@@ -117,11 +117,11 @@ namespace gdjs {
     private _manager: gdjs.PlatformObjectsManager;
 
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
       owner: gdjs.RuntimeObject
     ) {
-      super(runtimeScene, behaviorData, owner);
+      super(instanceContainer, behaviorData, owner);
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.maxFallingSpeed;
       this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
@@ -146,7 +146,7 @@ namespace gdjs {
       this._potentialCollidingObjects = [];
       this._overlappedJumpThru = [];
 
-      this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
+      this._manager = gdjs.PlatformObjectsManager.getManager(instanceContainer);
 
       this._falling = new Falling(this);
       this._onFloor = new OnFloor(this);
@@ -210,7 +210,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -219,13 +219,13 @@ namespace gdjs {
       const RSHIFTKEY = 2016;
       const SPACEKEY = 32;
       const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const timeDelta = this.owner.getElapsedTime() / 1000;
 
       //0.1) Get the player input:
       this._requestedDeltaX = 0;
       this._requestedDeltaY = 0;
 
-      const inputManager = runtimeScene.getGame().getInputManager();
+      const inputManager = instanceContainer.getGame().getInputManager();
       this._leftKey ||
         (this._leftKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(LEFTKEY));
@@ -274,6 +274,7 @@ namespace gdjs {
       this._updateOverlappedJumpThru();
 
       //1) X axis:
+      const beforeMovingXState = this._state;
       this._state.checkTransitionBeforeX();
       this._state.beforeMovingX();
 
@@ -285,8 +286,10 @@ namespace gdjs {
 
       const oldX = object.getX();
       this._moveX();
+      const mayCollideWall = object.getX() !== oldX + this._requestedDeltaX;
 
       //2) Y axis:
+      const beforeMovingYState = this._state;
       this._state.checkTransitionBeforeY(timeDelta);
       this._state.beforeMovingY(timeDelta, oldX);
 
@@ -294,9 +297,28 @@ namespace gdjs {
       this._moveY();
 
       //3) Update the current floor data for the next tick:
+      const beforeLastTransitionYState = this._state;
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
+      }
+
+      if (
+        // When the character is against a wall and the player hold left or
+        // right, the speed shouldn't stack because starting at full speed when
+        // jumping over the wall would look strange.
+        mayCollideWall &&
+        // Whereas, when the state has change, the collision is probably a
+        // landing or a collision from the floor when stating to jump. The
+        // speed must not be lost in these cases.
+        this._state === beforeMovingXState &&
+        this._state === beforeMovingYState &&
+        this._state === beforeLastTransitionYState &&
+        // When the character is on the floor, it will try to walk on the
+        // obstacles and already stop if necessary.
+        this._state !== this._onFloor
+      ) {
+        this._currentSpeed = 0;
       }
 
       this._wasLeftKeyPressed = this._leftKey;
@@ -329,17 +351,29 @@ namespace gdjs {
       this._lastDeltaY = object.getY() - oldY;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    doStepPostEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {}
 
     private _updateSpeed(timeDelta: float): float {
       const previousSpeed = this._currentSpeed;
-      //Change the speed according to the player's input.
-      // @ts-ignore
-      if (this._leftKey) {
-        this._currentSpeed -= this._acceleration * timeDelta;
-      }
-      if (this._rightKey) {
-        this._currentSpeed += this._acceleration * timeDelta;
+      // Change the speed according to the player's input.
+      // TODO Give priority to the last key for faster reaction time.
+      if (this._leftKey !== this._rightKey) {
+        if (this._leftKey) {
+          if (this._currentSpeed <= 0) {
+            this._currentSpeed -= this._acceleration * timeDelta;
+          } else {
+            // Turn back at least as fast as it would stop.
+            this._currentSpeed -=
+              Math.max(this._acceleration, this._deceleration) * timeDelta;
+          }
+        } else if (this._rightKey) {
+          if (this._currentSpeed >= 0) {
+            this._currentSpeed += this._acceleration * timeDelta;
+          } else {
+            this._currentSpeed +=
+              Math.max(this._acceleration, this._deceleration) * timeDelta;
+          }
+        }
       }
 
       //Take deceleration into account only if no key is pressed.
@@ -411,15 +445,6 @@ namespace gdjs {
               Math.round(object.getX()) + (this._requestedDeltaX > 0 ? -1 : 1)
             );
           }
-        }
-
-        // When the character is on the floor it will try to walk on the obstacles.
-        // So, it should not be stopped.
-        if (
-          this._state !== this._onFloor &&
-          object.getX() !== oldX + this._requestedDeltaX
-        ) {
-          this._currentSpeed = 0;
         }
       }
     }
@@ -1144,6 +1169,14 @@ namespace gdjs {
     }
 
     /**
+     * Get maximum angle of a slope for the Platformer Object to run on it as a floor.
+     * @returns the slope maximum angle, in degrees.
+     */
+    getSlopeMaxAngle(): float {
+      return this._slopeMaxAngle;
+    }
+
+    /**
      * Get the maximum falling speed of the Platformer Object.
      * @returns The maximum falling speed.
      */
@@ -1354,7 +1387,7 @@ namespace gdjs {
 
       // Avoid a `_slopeClimbingFactor` set to exactly 0.
       // Otherwise, this can lead the floor finding functions to consider
-      // a floor to be "too high" to reach, even if the object is very slighlty
+      // a floor to be "too high" to reach, even if the object is very slightly
       // inside it, which can happen because of rounding errors.
       // See "Floating-point error mitigations" tests.
       if (this._slopeClimbingFactor < 1 / 1024) {
@@ -1659,13 +1692,15 @@ namespace gdjs {
 
     beforeUpdatingObstacles(timeDelta: float) {
       const object = this._behavior.owner;
-      //Stick the object to the floor if its height has changed.
+      // Stick the object to the floor if its height has changed.
       if (this._oldHeight !== object.getHeight()) {
-        object.setY(
-          this._floorLastY -
-            object.getHeight() +
-            (object.getY() - object.getDrawableY())
-        );
+        // TODO This should probably be done after the events because
+        // the character stays at the wrong place during 1 frame.
+        const deltaY =
+          ((this._oldHeight - object.getHeight()) *
+            (object.getHeight() + object.getDrawableY() - object.getY())) /
+          object.getHeight();
+        object.setY(object.getY() + deltaY);
       }
       // Directly follow the floor movement on the Y axis by moving the character.
       // For the X axis, we follow the floor movement using `_requestedDeltaX`

@@ -1,23 +1,21 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TiledSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.TiledSpriteRuntimeObject;
     _tiledSprite: PIXI.TilingSprite;
 
     constructor(
       runtimeObject: gdjs.TiledSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textureName: string
     ) {
       this._object = runtimeObject;
-      const texture = runtimeScene
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);
       this._tiledSprite = new PIXI.TilingSprite(texture, 1024, 1024);
 
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._tiledSprite, runtimeObject.getZOrder());
@@ -42,8 +40,11 @@ namespace gdjs {
         this._object.y + this._tiledSprite.height / 2;
     }
 
-    setTexture(textureName, runtimeScene): void {
-      const texture = runtimeScene
+    setTexture(
+      textureName: string,
+      instanceContainer: RuntimeInstanceContainer
+    ): void {
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
         .getPIXITexture(textureName);
@@ -63,13 +64,13 @@ namespace gdjs {
       return this._tiledSprite.height;
     }
 
-    setWidth(width): void {
+    setWidth(width: float): void {
       this._tiledSprite.width = width;
       this._tiledSprite.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
+    setHeight(height: float): void {
       this._tiledSprite.height = height;
       this._tiledSprite.pivot.y = height / 2;
       this.updatePosition();
@@ -91,12 +92,11 @@ namespace gdjs {
         -this._object._yOffset % this._tiledSprite.texture.height;
     }
 
-    setColor(rgbColor): void {
+    setColor(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;
       }
-      // @ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number'.
       this._tiledSprite.tint =
         '0x' +
         gdjs.rgbToHex(
@@ -107,7 +107,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._tiledSprite.tint);
+      const rgb = new PIXI.Color(this._tiledSprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +
@@ -123,6 +123,11 @@ namespace gdjs {
 
     getTextureHeight() {
       return this._tiledSprite.texture.height;
+    }
+
+    destroy(): void {
+      // Keep textures because they are shared by all sprites.
+      this._tiledSprite.destroy(false);
     }
   }
 

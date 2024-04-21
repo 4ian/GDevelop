@@ -12,6 +12,7 @@ declare class gdInitialInstancesContainer {
   someInstancesAreOnLayer(layer: string): boolean;
   renameInstancesOfObject(oldName: string, newName: string): void;
   removeInstance(inst: gdInitialInstance): void;
+  getLayerInstancesCount(layerName: string): number;
   insertNewInitialInstance(): gdInitialInstance;
   insertInitialInstance(inst: gdInitialInstance): gdInitialInstance;
   serializeTo(element: gdSerializerElement): void;

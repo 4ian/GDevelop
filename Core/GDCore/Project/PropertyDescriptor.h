@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "GDCore/String.h"
+#include "GDCore/Project/MeasurementUnit.h"
+
 namespace gd {
 class SerializerElement;
 }
@@ -28,12 +30,16 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false),
+        deprecated(false), advanced(false),
+        measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor() : hidden(false){};
+  PropertyDescriptor()
+      : hidden(false), deprecated(false), advanced(false),
+        measurementUnit(gd::MeasurementUnit::GetUndefined()){};
 
   /**
    * \brief Destructor
@@ -103,12 +109,21 @@ class GD_CORE_API PropertyDescriptor {
     extraInformation.push_back(info);
     return *this;
   }
+  
+  /**
+   * \brief Change the unit of measurement of the property value.
+   */
+  PropertyDescriptor& SetMeasurementUnit(const gd::MeasurementUnit &measurementUnit_) {
+    measurementUnit = measurementUnit_;
+    return *this;
+  }
 
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
+  const gd::MeasurementUnit& GetMeasurementUnit() const { return measurementUnit; }
 
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
@@ -130,6 +145,32 @@ class GD_CORE_API PropertyDescriptor {
    * \brief Check if the property should be shown or hidden in the editor.
    */
   bool IsHidden() const { return hidden; }
+
+  /**
+   * \brief Set if the property is deprecated.
+   */
+  PropertyDescriptor& SetDeprecated(bool enable = true) {
+    deprecated = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property is deprecated.
+   */
+  bool IsDeprecated() const { return deprecated; }
+
+  /**
+   * \brief Set if the property is marked as advanced.
+   */
+  PropertyDescriptor& SetAdvanced(bool enable = true) {
+    advanced = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property is marked as advanced.
+   */
+  bool IsAdvanced() const { return advanced; }
 
   /** \name Serialization
    */
@@ -168,6 +209,9 @@ class GD_CORE_API PropertyDescriptor {
                          ///< choices, if a property is a displayed as a combo
                          ///< box.
   bool hidden;
+  bool deprecated;
+  bool advanced;
+  gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
 };
 
 }  // namespace gd

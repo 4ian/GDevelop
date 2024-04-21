@@ -2,8 +2,10 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import UpdateIcon from '../UI/CustomSvgIcons/Update';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
@@ -11,26 +13,28 @@ export type HotReloadPreviewButtonProps = {|
   launchProjectWithLoadingScreenPreview: () => void,
 |};
 
-export const NewPreviewIcon = PlayCircleFilledIcon;
-export const HotReloadPreviewIcon = OfflineBoltIcon;
-
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
-  return (
+  const { isMobile } = useResponsiveWindowSize();
+  const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
+  const label = hasPreviewsRunning ? (
+    <Trans>Apply changes to preview</Trans>
+  ) : (
+    <Trans>Run a preview</Trans>
+  );
+
+  // Hide the text on mobile, to avoid taking too much space.
+  return !isMobile ? (
     <FlatButton
-      leftIcon={
-        hasPreviewsRunning ? <HotReloadPreviewIcon /> : <NewPreviewIcon />
-      }
-      label={
-        hasPreviewsRunning ? (
-          <Trans>Apply changes to preview</Trans>
-        ) : (
-          <Trans>Run a preview</Trans>
-        )
-      }
-      onClick={() => launchProjectDataOnlyPreview()}
+      leftIcon={icon}
+      label={label}
+      onClick={launchProjectDataOnlyPreview}
     />
+  ) : (
+    <IconButton onClick={launchProjectDataOnlyPreview} size="small">
+      {icon}
+    </IconButton>
   );
 }

@@ -16,6 +16,7 @@
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/Watermark.h"
 #include "GDCore/String.h"
 namespace gd {
 class Platform;
@@ -24,7 +25,10 @@ class ExternalEvents;
 class ResourcesManager;
 class ExternalLayout;
 class EventsFunctionsExtension;
+class EventsBasedObject;
+class EventsBasedBehavior;
 class Object;
+class ObjectConfiguration;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
@@ -78,7 +82,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * \brief Change the project description
    */
-  void SetDescription(const gd::String& description_) { description = description_; };
+  void SetDescription(const gd::String& description_) {
+    description = description_;
+  };
 
   /**
    * \brief Get the project description
@@ -118,10 +124,24 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>& GetAuthorIds() { return authorIds; };
 
   /**
+   * \brief Get the author usernames of the project.
+   */
+  const std::vector<gd::String>& GetAuthorUsernames() const {
+    return authorUsernames;
+  };
+
+  /**
+   * \brief Get the author usernames of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetAuthorUsernames() { return authorUsernames; };
+
+  /**
    * Define the project as playable with a keyboard.
    * \param enable True to define the project as playable with a keyboard.
    */
-  void SetPlayableWithKeyboard(bool playable = true) { isPlayableWithKeyboard = playable; }
+  void SetPlayableWithKeyboard(bool playable = true) {
+    isPlayableWithKeyboard = playable;
+  }
 
   /**
    * Check if the project is defined as playable with a keyboard.
@@ -132,7 +152,9 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Define the project as playable with a gamepad.
    * \param enable True to define the project as playable with a gamepad.
    */
-  void SetPlayableWithGamepad(bool playable = true) { isPlayableWithGamepad = playable; }
+  void SetPlayableWithGamepad(bool playable = true) {
+    isPlayableWithGamepad = playable;
+  }
 
   /**
    * Check if the project is defined as playable with a gamepad.
@@ -143,7 +165,9 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Define the project as playable on a mobile.
    * \param enable True to define the project as playable on a mobile.
    */
-  void SetPlayableWithMobile(bool playable = true) { isPlayableWithMobile = playable; }
+  void SetPlayableWithMobile(bool playable = true) {
+    isPlayableWithMobile = playable;
+  }
 
   /**
    * Check if the project is defined as playable on a mobile.
@@ -162,7 +186,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetPackageName() const { return packageName; }
 
-    /**
+  /**
    * \brief Change the slug of the template from which the project is created.
    */
   void SetTemplateSlug(const gd::String& templateSlug_) {
@@ -252,6 +276,16 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return a reference to loading screen setup for the project
    */
   const gd::LoadingScreen& GetLoadingScreen() const { return loadingScreen; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  gd::Watermark& GetWatermark() { return watermark; }
+
+  /**
+   * \brief Return a reference to watermark setup for the project
+   */
+  const gd::Watermark& GetWatermark() const { return watermark; }
 
   /**
    * Change game's main window default width.
@@ -360,6 +394,32 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetPixelsRounding(bool enable) { pixelsRounding = enable; }
 
   /**
+   * Return the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  const gd::String& GetAntialiasingMode() const { return antialiasingMode; }
+
+  /**
+   * Set the antialiasing mode used by the game ("none" or "MSAA").
+   */
+  void SetAntialiasingMode(const gd::String& antialiasingMode_) {
+    antialiasingMode = antialiasingMode_;
+  }
+
+  /**
+   * Return true if antialising is enabled on mobiles.
+   */
+  bool IsAntialisingEnabledOnMobile() const {
+    return isAntialisingEnabledOnMobile;
+  }
+
+  /**
+   * Set whether antialising is enabled on mobiles or not.
+   */
+  void SetAntialisingEnabledOnMobile(bool enable) {
+    isAntialisingEnabledOnMobile = enable;
+  }
+
+  /**
    * \brief Return if the project should set 0 as Z-order for objects created
    * from events (which is deprecated) - instead of the highest Z order that was
    * found on each layer when the scene started.
@@ -456,19 +516,19 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * Create an object of the given type with the specified name.
    *
-   * \note A project can use more than one platform. In this case, the first
-   * platform supporting the object is used, unless \a platformName argument is
-   * not empty.<br> It is assumed that each platform provides an equivalent
-   * object.
-   *
    * \param type The type of the object
    * \param name The name of the object
-   * \param platformName The name of the platform to be used. If empty, the
-   * first platform supporting the object is used.
    */
   std::unique_ptr<gd::Object> CreateObject(const gd::String& type,
-                                           const gd::String& name,
-                                           const gd::String& platformName = "");
+                                           const gd::String& name) const;
+
+  /**
+   * Create an object configuration of the given type.
+   *
+   * \param type The type of the object
+   */
+  std::unique_ptr<gd::ObjectConfiguration> CreateObjectConfiguration(
+      const gd::String& type) const;
 
   /**
    * Create an event of the given type.
@@ -521,6 +581,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return the position of the layout called "name" in the layout list
    */
   std::size_t GetLayoutPosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified layout.
+   */
+  void MoveLayout(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * \brief Swap the specified layouts.
@@ -626,6 +691,11 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetExternalEventsPosition(const gd::String& name) const;
 
   /**
+   * Change the position of the specified external events.
+   */
+  void MoveExternalEvents(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
    * \brief Swap the specified external events.
    *
    * Do nothing if indexes are not correct.
@@ -698,6 +768,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * layout list
    */
   std::size_t GetExternalLayoutPosition(const gd::String& name) const;
+
+  /**
+   * Change the position of the specified external layout.
+   */
+  void MoveExternalLayout(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * \brief Swap the specified external layouts.
@@ -789,6 +864,11 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
 
   /**
+   * Change the position of the specified events function extension.
+   */
+  void MoveEventsFunctionsExtension(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
    * \brief Swap the specified events functions extensions.
    *
    * Do nothing if indexes are not correct.
@@ -827,6 +907,39 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Remove all the events functions extensions.
    */
   void ClearEventsFunctionsExtensions();
+
+  /**
+   * \brief  Check if events based object with a given type exists.
+   */
+  bool HasEventsBasedObject(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based object with a given type.
+   */
+  gd::EventsBasedObject& GetEventsBasedObject(const gd::String& type);
+
+  /**
+   * \brief Return the events based object with a given type.
+   */
+  const gd::EventsBasedObject& GetEventsBasedObject(
+      const gd::String& type) const;
+
+  /**
+   * \brief  Check if events based behavior with a given type exists.
+   */
+  bool HasEventsBasedBehavior(const gd::String& type) const;
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  gd::EventsBasedBehavior& GetEventsBasedBehavior(const gd::String& type);
+
+  /**
+   * \brief Return the events based behavior with a given type.
+   */
+  const gd::EventsBasedBehavior& GetEventsBasedBehavior(
+      const gd::String& type) const;
+
   ///@}
 
   /** \name Resources management
@@ -847,16 +960,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   ResourcesManager& GetResourcesManager() { return resourcesManager; }
 
-  /**
-   * \brief Called ( e.g. during compilation ) so as to inventory internal
-   * resources, sometimes update their filename or any other work or resources.
-   *
-   * See WholeProjectRefactorer for the same thing for events.
-   *
-   * \see WholeProjectRefactorer
-   * \see ArbitraryResourceWorker
-   */
-  void ExposeResources(gd::ArbitraryResourceWorker& worker);
   ///@}
 
   /** \name Variable management
@@ -880,7 +983,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   ///@}
 
-  /** \name Other
+  /** \name Identifier names
    */
   ///@{
 
@@ -888,7 +991,13 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Return true if \a name is valid (can be used safely for an object,
    * behavior, events function name, etc...).
    */
-  static bool ValidateName(const gd::String& name);
+  static bool IsNameSafe(const gd::String& name);
+
+  /**
+   * Return a name, based on the one passed in parameter, that can be safely
+   * used for an object, behavior, events function name, etc...
+   */
+  static gd::String GetSafeName(const gd::String& name);
   ///@}
 
   /** \name External source files
@@ -963,8 +1072,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
                                       ///< to the window size at runtime
   gd::String
-      sizeOnStartupMode;   ///< How to adapt the game size to the screen. Can be
-                           ///< "adaptWidth", "adaptHeight" or empty
+      sizeOnStartupMode;  ///< How to adapt the game size to the screen. Can be
+                          ///< "adaptWidth", "adaptHeight" or empty
+  gd::String antialiasingMode;
+  bool isAntialisingEnabledOnMobile;
   gd::String projectUuid;  ///< UUID useful to identify the game in online
                            ///< services or database that would require it.
   bool useDeprecatedZeroAsDefaultZOrder;  ///< If true, objects created from
@@ -988,17 +1099,18 @@ class GD_CORE_API Project : public ObjectsContainer {
       externalSourceFiles;  ///< List of external source files used.
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
-      authorIds;           ///< Game author ids, from GDevelop users DB.
+      authorIds;  ///< Game author ids, from GDevelop users DB.
   std::vector<gd::String>
-      categories;           ///< Game categories
-  bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
-  bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
-  bool isPlayableWithMobile;   ///< The project is playable on a mobile.
-  gd::String packageName;  ///< Game package name
-  gd::String templateSlug; ///< The slug of the template from which the game is
-                           ///< created.
-  gd::String orientation;  ///< Lock game orientation (on mobile devices).
-                           ///< "default", "landscape" or "portrait".
+      authorUsernames;  ///< Game author usernames, from GDevelop users DB.
+  std::vector<gd::String> categories;  ///< Game categories
+  bool isPlayableWithKeyboard;  ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad;   ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile;    ///< The project is playable on a mobile.
+  gd::String packageName;       ///< Game package name
+  gd::String templateSlug;  ///< The slug of the template from which the game is
+                            ///< created.
+  gd::String orientation;   ///< Lock game orientation (on mobile devices).
+                            ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String
@@ -1008,6 +1120,7 @@ class GD_CORE_API Project : public ObjectsContainer {
       currentPlatform;  ///< The platform being used to edit the project.
   gd::PlatformSpecificAssets platformSpecificAssets;
   gd::LoadingScreen loadingScreen;
+  gd::Watermark watermark;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;  ///< List of all externals events
   ExtensionProperties

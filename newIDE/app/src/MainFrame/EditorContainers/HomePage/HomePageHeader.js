@@ -1,93 +1,103 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import TranslateIcon from '@material-ui/icons/Translate';
 import FlatButton from '../../../UI/FlatButton';
-import { Line, Column } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import { LineStackLayout } from '../../../UI/Layout';
 import UserChip from '../../../UI/User/UserChip';
-import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
-import { hasPendingNotifications } from '../../../Utils/Notification';
+import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
+import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import RaisedButton from '../../../UI/RaisedButton';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
+import IconButton from '../../../UI/IconButton';
+import { isNativeMobileApp } from '../../../Utils/Platform';
+import NotificationChip from '../../../UI/User/NotificationChip';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 const electron = optionalRequire('electron');
 
 type Props = {|
-  project: ?gdProject,
+  hasProject: boolean,
   onOpenProjectManager: () => void,
   onOpenProfile: () => void,
   onOpenLanguageDialog: () => void,
+  onSave: () => Promise<void>,
+  canSave: boolean,
 |};
 
 export const HomePageHeader = ({
-  project,
+  hasProject,
   onOpenProjectManager,
   onOpenProfile,
   onOpenLanguageDialog,
+  onSave,
+  canSave,
 }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
 
   return (
     <I18n>
       {({ i18n }) => (
-        <div
-          style={{
-            borderBottom: `1px solid ${GDevelopTheme.home.separator.color}`,
-            backgroundColor: GDevelopTheme.home.header.backgroundColor,
-          }}
+        <LineStackLayout
+          justifyContent="space-between"
+          alignItems="center"
+          noMargin
+          expand
         >
-          <Line expand>
-            <LineStackLayout
-              justifyContent="space-between"
-              alignItems="center"
-              noMargin
-              expand
-            >
-              <Column>
-                {!!project && windowWidth !== 'small' && (
-                  <Line noMargin>
-                    <RaisedButton
-                      label={<Trans>Project Manager</Trans>}
-                      onClick={onOpenProjectManager}
-                      primary
-                    />
-                  </Line>
-                )}
-              </Column>
-              <Column>
-                <LineStackLayout noMargin alignItems="center">
-                  {!electron && windowWidth !== 'small' && (
-                    <FlatButton
-                      label={<Trans>Download desktop app</Trans>}
-                      onClick={() =>
-                        Window.openExternalURL('https://gdevelop.io/download')
-                      }
-                    />
-                  )}
-                  <UserChip
-                    profile={authenticatedUser.profile}
-                    onClick={onOpenProfile}
-                    displayNotificationBadge={hasPendingNotifications(
-                      authenticatedUser
-                    )}
-                  />
-                  <TextButton
-                    label={i18n.language.toUpperCase()}
-                    onClick={onOpenLanguageDialog}
-                    icon={<TranslateIcon fontSize="small" />}
-                  />
-                </LineStackLayout>
-              </Column>
+          <Column noMargin>
+            <Line noMargin>
+              <IconButton
+                size="small"
+                id="main-toolbar-project-manager-button"
+                onClick={onOpenProjectManager}
+                tooltip={t`Project Manager`}
+                color="default"
+                disabled={!hasProject}
+              >
+                <ProjectManagerIcon />
+              </IconButton>
+              {!!hasProject && (
+                <IconButton
+                  size="small"
+                  id="main-toolbar-save-button"
+                  onClick={onSave}
+                  tooltip={t`Save project`}
+                  color="default"
+                  disabled={!canSave}
+                >
+                  <FloppyIcon />
+                </IconButton>
+              )}
+            </Line>
+          </Column>
+          <Column>
+            <LineStackLayout noMargin alignItems="center">
+              {!electron && !isNativeMobileApp() && (
+                <FlatButton
+                  label={<Trans>Get the app</Trans>}
+                  onClick={() =>
+                    Window.openExternalURL('https://gdevelop.io/download')
+                  }
+                />
+              )}
+              <UserChip onOpenProfile={onOpenProfile} />
+              <NotificationChip />
+              {isMobile ? (
+                <IconButton size="small" onClick={onOpenLanguageDialog}>
+                  <TranslateIcon fontSize="small" />
+                </IconButton>
+              ) : (
+                <TextButton
+                  label={i18n.language.toUpperCase()}
+                  onClick={onOpenLanguageDialog}
+                  icon={<TranslateIcon fontSize="small" />}
+                />
+              )}
             </LineStackLayout>
-          </Line>
-        </div>
+          </Column>
+        </LineStackLayout>
       )}
     </I18n>
   );

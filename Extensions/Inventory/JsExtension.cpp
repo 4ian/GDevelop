@@ -26,68 +26,60 @@ class InventoryJsExtension : public gd::PlatformExtension {
     DeclareInventoryExtension(*this);
 
     GetAllActions()["Inventory::Add"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.add");
     GetAllActions()["Inventory::Remove"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.remove");
     GetAllActions()["Inventory::SetMaximum"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.setMaximum");
     GetAllActions()["Inventory::SetUnlimited"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.setUnlimited");
     GetAllActions()["Inventory::Equip"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.equip");
 
     GetAllActions()["Inventory::SerializeToVariable"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.serializeToVariable");
     GetAllActions()["Inventory::UnserializeFromVariable"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.unserializeFromVariable");
 
     GetAllConditions()["Inventory::Count"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.count");
     GetAllConditions()["Inventory::Has"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.has");
     GetAllConditions()["Inventory::IsFull"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.isFull");
     GetAllConditions()["Inventory::IsEquipped"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.isEquipped");
 
     GetAllExpressions()["Inventory::Count"]
-        .codeExtraInformation
         .SetIncludeFile("Extensions/Inventory/inventory.js")
         .AddIncludeFile("Extensions/Inventory/inventorytools.js")
         .SetFunctionName("gdjs.evtTools.inventory.count");
+	GetAllExpressions()["Inventory::Maximum"]
+		.SetIncludeFile("Extensions/Inventory/inventory.js")
+		.AddIncludeFile("Extensions/Inventory/inventorytools.js")
+		.SetFunctionName("gdjs.evtTools.inventory.maximum");
 
     StripUnimplementedInstructionsAndExpressions();
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

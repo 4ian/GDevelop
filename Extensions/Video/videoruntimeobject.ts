@@ -24,7 +24,9 @@ namespace gdjs {
    * video will have the same state for this video (paused/playing, current time,
    * volume, etc...).
    */
-  export class VideoRuntimeObject extends gdjs.RuntimeObject {
+  export class VideoRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     _opacity: float;
     _loop: boolean;
     _volume: float;
@@ -37,19 +39,22 @@ namespace gdjs {
     _playbackSpeed: any;
 
     /**
-     * @param runtimeScene The scene the object belongs to.
+     * @param instanceContainer The scene the object belongs to.
      * @param videoObjectData The data defining the object
      */
     constructor(
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       videoObjectData: VideoObjectData
     ) {
-      super(runtimeScene, videoObjectData);
+      super(instanceContainer, videoObjectData);
       this._opacity = videoObjectData.content.opacity;
       this._loop = videoObjectData.content.loop;
       this._volume = videoObjectData.content.volume;
       this._videoResource = videoObjectData.content.videoResource;
-      this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
+      this._renderer = new gdjs.VideoRuntimeObjectRenderer(
+        this,
+        instanceContainer
+      );
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -92,12 +97,12 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(runtimeScene): void {
-      super.onDestroyFromScene(runtimeScene);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.onDestroy();
     }
 
-    update(runtimeScene): void {
+    update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -153,7 +158,7 @@ namespace gdjs {
       if (this._renderer.getWidth() === width) return;
 
       this._renderer.setWidth(width);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -164,7 +169,7 @@ namespace gdjs {
       if (this._renderer.getHeight() === height) return;
 
       this._renderer.setHeight(height);
-      this.hitBoxesDirty = true;
+      this.invalidateHitboxes();
     }
 
     /**
@@ -237,7 +242,7 @@ namespace gdjs {
 
     /**
      * Get the volume of the video object.
-     * @returns The current video's volume, betwenn 0 and 100.
+     * @returns The current video's volume, between 0 and 100.
      */
     getVolume(): number {
       return (

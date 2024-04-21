@@ -1,3 +1,0 @@
-* electron-builder is version 21.2.0 because 22.3.6, 22.4.0 and 22.4.1 have an issue on macOS 10.13 (`Symbol not found: ____chkstk_darwin`) when building **Windows NSIS installer**. See [this issue here](https://github.com/electron-userland/electron-builder/issues/4629).
-  * When the official build is made on a version on macOS not having this issue (i.e: probably 10.15+), upgrading to latest electron-builder version should work (for example, version 22.4.0 works successfully for macOS and Linux builds).
-  * `com.apple.security.cs.disable-library-validation` entitlement for macOS might not be needed with a new version of electron-builder?

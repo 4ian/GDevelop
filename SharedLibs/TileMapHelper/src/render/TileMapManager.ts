@@ -1,11 +1,9 @@
 import { ResourceCache } from "./ResourceCache";
-import { TiledMap } from "../tiled/TiledFormat";
-import { TiledTileMapLoader } from "../tiled/TiledTileMapLoader";
 import { EditableTileMap } from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./TileMapPixiHelper";
-
-import PIXI = GlobalPIXIModule.PIXI;
+import { TileMapLoader } from "../load/TileMapLoader";
+import { TileMapFileContent } from "../load/TileMapFileContent";
 
 /**
  * A holder to share tile maps across the 2 extension objects.
@@ -40,39 +38,78 @@ export class TileMapManager {
   }
 
   /**
-   * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+   * @param data JSON data.
+   * @returns The data enclosed with its detected kind.
+   */
+  static identify(data: any): TileMapFileContent | null {
+    if (data.tiledversion) {
+      console.info("Detected the json file was created in Tiled");
+      return {
+        kind: "tiled",
+        data,
+      };
+    }
+
+    if (data.__header__ && data.__header__.app === "LDtk") {
+      console.info("Detected the json/ldtk file was created in LDtk");
+      return {
+        kind: "ldtk",
+        data,
+      };
+    }
+
+    console.warn(
+      "The loaded Tile Map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
+    );
+
+    return null;
+  }
+
+  /**
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param pako The zlib library.
    * @param callback A function called when the tile map is parsed.
    */
   getOrLoadTileMap(
-    loadTiledMap: (
+    loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tiledMap: TiledMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void {
-    const key = tileMapJsonResourceName + "|" + tileSetJsonResourceName;
+    const key =
+      tileMapJsonResourceName +
+      "|" +
+      tileSetJsonResourceName +
+      "|" +
+      levelIndex;
 
     this._tileMapCache.getOrLoad(
       key,
       (callback) => {
-        loadTiledMap(
+        loadTileMap(
           tileMapJsonResourceName,
           tileSetJsonResourceName,
-          (tiledMap: TiledMap | null) => {
-            if (!tiledMap) {
+          (tileMapFileContent: TileMapFileContent | null) => {
+            if (!tileMapFileContent) {
               callback(null);
               return;
             }
 
-            const collisionTileMap = TiledTileMapLoader.load(pako, tiledMap);
-            callback(collisionTileMap);
+            const editableTileMap = TileMapLoader.load(
+              tileMapFileContent,
+              levelIndex,
+              pako
+            );
+            callback(editableTileMap);
           }
         );
       },
@@ -81,23 +118,25 @@ export class TileMapManager {
   }
 
   /**
-   * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+   * @param loadTileMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
    * @param atlasImageResourceName The resource name of the atlas image.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param levelIndex The level of the tile map to load from.
    * @param callback A function called when the tiles textures are split.
    */
   getOrLoadTextureCache(
-    loadTiledMap: (
+    loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tiledMap: TiledMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
     atlasImageResourceName: string,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
+    levelIndex: number,
     callback: (textureCache: TileTextureCache | null) => void
   ): void {
     const key =
@@ -105,17 +144,19 @@ export class TileMapManager {
       "|" +
       tileSetJsonResourceName +
       "|" +
-      atlasImageResourceName;
+      atlasImageResourceName +
+      "|" +
+      levelIndex;
 
     this._textureCacheCaches.getOrLoad(
       key,
       (callback) => {
-        loadTiledMap(
+        loadTileMap(
           tileMapJsonResourceName,
           tileSetJsonResourceName,
-          (tiledMap: TiledMap | null) => {
-            if (!tiledMap) {
-              // loadTiledMap already log errors.
+          (tileMapFileContent: TileMapFileContent | null) => {
+            if (!tileMapFileContent) {
+              // loadTileMap already log errors.
               callback(null);
               return;
             }
@@ -124,7 +165,8 @@ export class TileMapManager {
               ? getTexture(atlasImageResourceName)
               : null;
             const textureCache = PixiTileMapHelper.parseAtlas(
-              tiledMap,
+              tileMapFileContent,
+              levelIndex,
               atlasTexture,
               getTexture
             );
@@ -134,5 +176,10 @@ export class TileMapManager {
       },
       callback
     );
+  }
+
+  clearCaches(): void {
+    this._tileMapCache = new ResourceCache<EditableTileMap>();
+    this._textureCacheCaches = new ResourceCache<TileTextureCache>();
   }
 }

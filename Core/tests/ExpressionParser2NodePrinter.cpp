@@ -132,11 +132,11 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("number", "123 !!! 456", "123 ! !! 456");
   }
 
-  SECTION("Numbers and texts mismatchs") {
+  SECTION("Numbers and texts mismatches") {
     testPrinter("number", "123 + \"hello world\"");
     testPrinter("string", "\"hello world\" + 123");
   }
-  SECTION("Numbers and texts mismatchs with parenthesis") {
+  SECTION("Numbers and texts mismatches with parenthesis") {
     testPrinter("number", "((123)) + (\"hello world\")");
     testPrinter("string", "((\"hello world\") + (123))");
   }

@@ -12,10 +12,12 @@ declare interface ProjectData {
   gdVersion: GdVersionData;
   properties: ProjectPropertiesData;
   resources: ResourcesData;
+  usedResources: ResourceReference[];
   objects: ObjectData[];
   variables: RootVariableData[];
   layouts: LayoutData[];
   externalLayouts: ExternalLayoutData[];
+  eventsFunctionsExtensions: EventsFunctionsExtensionData[];
 }
 
 /** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
@@ -27,7 +29,7 @@ declare type ObjectData = {
   /** The list of default variables. */
   variables: Array<RootVariableData>;
   /** The list of default behaviors. */
-  behaviors: Array<BehaviorData>;
+  behaviors: Array<BehaviorData & any>;
   /** The list of effects. */
   effects: Array<EffectData>;
 };
@@ -82,6 +84,17 @@ declare interface LayoutData {
   objects: ObjectData[];
   layers: LayerData[];
   behaviorsSharedData: BehaviorSharedData[];
+  usedResources: ResourceReference[];
+}
+
+declare interface EventsFunctionsExtensionData {
+  name: string;
+  eventsBasedObjects: EventsBasedObjectData[];
+}
+
+declare interface EventsBasedObjectData {
+  name: string;
+  objects: Array<ObjectData & any>;
 }
 
 declare interface BehaviorSharedData {
@@ -96,16 +109,26 @@ declare interface ExternalLayoutData {
 
 declare interface InstanceData {
   persistentUuid: string;
-  angle: number;
-  customSize: boolean;
-  height: number;
+
   layer: string;
   locked: boolean;
   name: string;
-  width: number;
+
   x: number;
   y: number;
+  z?: number;
+
+  angle: number;
+  rotationX?: number;
+  rotationY?: number;
+
   zOrder: number;
+
+  customSize: boolean;
+  width: number;
+  height: number;
+  depth?: number;
+
   numberProperties: InstanceNumberProperty[];
   stringProperties: InstanceStringProperty[];
   initialVariables: RootVariableData[];
@@ -122,12 +145,17 @@ declare interface InstanceStringProperty {
 
 declare interface LayerData {
   name: string;
+  renderingType?: '' | '2d' | '3d' | '2d+3d';
+  cameraType?: 'perspective' | 'orthographic';
   visibility: boolean;
   cameras: CameraData[];
   effects: EffectData[];
   ambientLightColorR: number;
   ambientLightColorG: number;
   ambientLightColorB: number;
+  camera3DFieldOfView?: float;
+  camera3DFarPlaneDistance?: float;
+  camera3DNearPlaneDistance?: float;
   isLightingLayer: boolean;
   followBaseLayerCamera: boolean;
 }
@@ -165,11 +193,15 @@ declare interface ProjectPropertiesData {
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
   pixelsRounding: boolean;
+  antialiasingMode: 'none' | 'MSAA';
+  antialisingEnabledOnMobile: boolean;
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;
   name: string;
   author: string;
+  authorIds: string[];
+  authorUsernames: string[];
   windowWidth: number;
   windowHeight: number;
   latestCompilationDirectory: string;
@@ -177,6 +209,7 @@ declare interface ProjectPropertiesData {
   minFPS: number;
   verticalSync: boolean;
   loadingScreen: LoadingScreenData;
+  watermark: WatermarkData;
   currentPlatform: string;
   extensionProperties: Array<ExtensionProperty>;
   useDeprecatedZeroAsDefaultZOrder?: boolean;
@@ -187,6 +220,17 @@ declare interface ExtensionProperty {
   extension: string;
   property: string;
   value: string;
+}
+
+declare interface WatermarkData {
+  showWatermark: boolean;
+  placement:
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'bottom'
+    | 'top';
 }
 
 declare interface LoadingScreenData {
@@ -223,10 +267,19 @@ declare interface ResourceData {
   preloadInCache?: boolean;
 }
 
+declare interface ResourceReference {
+  name: string;
+}
+
 declare type ResourceKind =
   | 'audio'
   | 'image'
   | 'font'
   | 'video'
   | 'json'
-  | 'bitmapFont';
+  | 'tilemap'
+  | 'tileset'
+  | 'bitmapFont'
+  | 'model3D'
+  | 'atlas'
+  | 'spine';

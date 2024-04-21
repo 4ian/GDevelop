@@ -1,18 +1,20 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import {
   type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
   getParameterValueOrDefault,
 } from './ParameterFieldCommons';
-import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { MarkdownText } from '../../UI/MarkdownText';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import Button from '@material-ui/core/Button';
+import TwoStatesButton, {
+  type TwoStatesButtonInterface,
+} from '../../UI/TwoStatesButton';
 
 const styles = {
   description: {
@@ -20,18 +22,17 @@ const styles = {
   },
 };
 
-export default class TrueFalseField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _trueButton = React.createRef<Button>();
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function TrueFalseField(props: ParameterFieldProps, ref) {
+    const button = React.useRef<?TwoStatesButtonInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (button.current) button.current.focusLeftButton();
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus() {
-    focusButton(this._trueButton);
-  }
-
-  render() {
-    const { parameterMetadata, value } = this.props;
+    const { parameterMetadata, value } = props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
@@ -46,23 +47,13 @@ export default class TrueFalseField extends Component<
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>
-          <ButtonGroup>
-            <Button
-              variant={effectiveValue === 'True' ? 'contained' : 'outlined'}
-              color={effectiveValue === 'True' ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('True')}
-              ref={this._trueButton}
-            >
-              <Trans>True</Trans>
-            </Button>
-            <Button
-              variant={effectiveValue !== 'True' ? 'contained' : 'outlined'}
-              color={effectiveValue !== 'True' ? 'secondary' : 'default'}
-              onClick={() => this.props.onChange('False')}
-            >
-              <Trans>False</Trans>
-            </Button>
-          </ButtonGroup>
+          <TwoStatesButton
+            value={effectiveValue}
+            leftButton={{ label: <Trans>True</Trans>, value: 'True' }}
+            rightButton={{ label: <Trans>False</Trans>, value: 'False' }}
+            onChange={props.onChange}
+            ref={button}
+          />
         </Line>
         {longDescription ? (
           <FormHelperText variant="filled" margin="dense">
@@ -72,7 +63,7 @@ export default class TrueFalseField extends Component<
       </Column>
     );
   }
-}
+);
 
 export const renderInlineTrueFalse = ({
   value,

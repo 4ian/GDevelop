@@ -2,15 +2,24 @@
 import * as React from 'react';
 import { ListItem } from '../List';
 import ListIcon from '../ListIcon';
-import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
-import ThemeConsumer from '../Theme/ThemeConsumer';
+import TextField, {
+  noMarginTextFieldInListItemTopOffset,
+  type TextFieldInterface,
+} from '../TextField';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
-import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
+import { type HTMLDataset } from '../../Utils/HTMLDataset';
+import {
+  shouldCloseOrCancel,
+  shouldValidate,
+} from '../KeyboardShortcuts/InteractionKeys';
 import { textEllipsisStyle } from '../TextEllipsis';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import Text from '../Text';
 
 const styles = {
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
+    fontSize: 12,
   },
 };
 
@@ -20,6 +29,7 @@ type Props<Item> = {|
   item: Item,
   itemName: string,
   id?: ?string,
+  data?: HTMLDataset,
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
@@ -32,145 +42,149 @@ type Props<Item> = {|
   onEdit?: ?(Item) => void,
   hideMenuButton: boolean,
   scaleUpItemIconWhenSelected?: boolean,
-  connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
 |};
 
-class ItemRow<Item> extends React.Component<Props<Item>> {
-  textField: ?TextField;
+function ItemRow<Item>({
+  item,
+  itemName,
+  id,
+  data,
+  isBold,
+  onRename,
+  editingName,
+  getThumbnail,
+  renderItemLabel,
+  selected,
+  onItemSelected,
+  errorStatus,
+  buildMenuTemplate,
+  onEdit,
+  hideMenuButton,
+  scaleUpItemIconWhenSelected,
+}: Props<Item>) {
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+  const shouldDiscardChanges = React.useRef<boolean>(false);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  componentDidMount() {
-    if (this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
+  React.useEffect(
+    () => {
+      if (editingName) {
+        shouldDiscardChanges.current = false;
+        const timeoutId = setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [editingName]
+  );
 
-  componentDidUpdate(prevProps: Props<Item>) {
-    if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
+  const label = editingName ? (
+    <TextField
+      id="rename-item-field"
+      margin="none"
+      ref={textFieldRef}
+      defaultValue={itemName}
+      onBlur={e => {
+        onRename(
+          shouldDiscardChanges.current ? itemName : e.currentTarget.value
+        );
+      }}
+      onKeyPress={event => {
+        if (shouldValidate(event)) {
+          if (textFieldRef.current) textFieldRef.current.blur();
+        }
+      }}
+      onKeyUp={event => {
+        if (shouldCloseOrCancel(event)) {
+          const { current: currentTextField } = textFieldRef;
+          if (currentTextField) {
+            shouldDiscardChanges.current = true;
+            currentTextField.blur();
+          }
+        }
+      }}
+      fullWidth
+      style={styles.textField}
+    />
+  ) : (
+    <div
+      title={typeof itemName === 'string' ? itemName : undefined}
+      style={{
+        ...textEllipsisStyle,
+        color: selected ? gdevelopTheme.listItem.selectedTextColor : undefined,
+        fontStyle: isBold ? 'italic' : undefined,
+        fontWeight: isBold ? 'bold' : 'normal',
+      }}
+    >
+      {renderItemLabel ? (
+        renderItemLabel()
+      ) : (
+        <Text noMargin size="body-small">
+          {itemName}
+        </Text>
+      )}
+    </div>
+  );
 
-  render() {
-    const {
-      item,
-      itemName,
-      id,
-      renderItemLabel,
-      isBold,
-      selected,
-      getThumbnail,
-      errorStatus,
-      onEdit,
-      onItemSelected,
-      hideMenuButton,
-      scaleUpItemIconWhenSelected,
-      connectIconDragSource,
-    } = this.props;
+  const itemStyle = {
+    backgroundColor: selected
+      ? errorStatus === ''
+        ? gdevelopTheme.listItem.selectedBackgroundColor
+        : errorStatus === 'error'
+        ? gdevelopTheme.listItem.selectedErrorBackgroundColor
+        : gdevelopTheme.listItem.selectedWarningBackgroundColor
+      : undefined,
+    color:
+      errorStatus === ''
+        ? undefined
+        : errorStatus === 'error'
+        ? gdevelopTheme.listItem.errorTextColor
+        : gdevelopTheme.listItem.warningTextColor,
+  };
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const label = this.props.editingName ? (
-            <TextField
-              id="rename-item-field"
-              margin="none"
-              ref={textField => (this.textField = textField)}
-              defaultValue={itemName}
-              onBlur={e => this.props.onRename(e.currentTarget.value)}
-              onKeyPress={event => {
-                if (shouldValidate(event)) {
-                  if (this.textField) this.textField.blur();
-                }
-              }}
-              fullWidth
-              style={styles.textField}
-            />
-          ) : (
-            <div
-              title={typeof itemName === 'string' ? itemName : undefined}
-              style={{
-                ...textEllipsisStyle,
-                color: selected
-                  ? muiTheme.listItem.selectedTextColor
-                  : undefined,
-                fontStyle: isBold ? 'italic' : undefined,
-                fontWeight: isBold ? 'bold' : 'normal',
-              }}
-            >
-              {renderItemLabel ? renderItemLabel() : itemName}
-            </div>
-          );
+  const leftIcon = getThumbnail ? (
+    <ListIcon
+      iconSize={24}
+      src={getThumbnail()}
+      cssAnimation={
+        scaleUpItemIconWhenSelected && selected
+          ? 'scale-and-jiggle 0.8s forwards'
+          : ''
+      }
+    />
+  ) : null;
 
-          const itemStyle = {
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-            backgroundColor: selected
-              ? errorStatus === ''
-                ? muiTheme.listItem.selectedBackgroundColor
-                : errorStatus === 'error'
-                ? muiTheme.listItem.selectedErrorBackgroundColor
-                : muiTheme.listItem.selectedWarningBackgroundColor
-              : undefined,
-            color:
-              errorStatus === ''
-                ? undefined
-                : errorStatus === 'error'
-                ? muiTheme.listItem.errorTextColor
-                : muiTheme.listItem.warningTextColor,
-          };
+  return (
+    <ListItem
+      style={{ ...itemStyle }}
+      primaryText={label}
+      leftIcon={leftIcon}
+      displayMenuButton={!hideMenuButton}
+      rightIconColor={
+        selected
+          ? gdevelopTheme.listItem.selectedRightIconColor
+          : gdevelopTheme.listItem.rightIconColor
+      }
+      buildMenuTemplate={buildMenuTemplate}
+      onClick={() => {
+        if (!onItemSelected) return;
+        if (editingName) return;
 
-          const leftIcon = getThumbnail ? (
-            <ListIcon
-              iconSize={24}
-              src={getThumbnail()}
-              cssAnimation={
-                scaleUpItemIconWhenSelected && selected
-                  ? 'scale-and-jiggle 0.8s forwards'
-                  : ''
-              }
-            />
-          ) : null;
+        onItemSelected(selected ? null : item);
+      }}
+      onDoubleClick={event => {
+        if (event.button !== LEFT_MOUSE_BUTTON) return;
+        if (!onEdit) return;
+        if (editingName) return;
 
-          return (
-            <ListItem
-              style={{ ...itemStyle }}
-              primaryText={label}
-              leftIcon={
-                connectIconDragSource && leftIcon
-                  ? connectIconDragSource(<div>{leftIcon}</div>)
-                  : leftIcon
-              }
-              displayMenuButton={!hideMenuButton}
-              rightIconColor={
-                selected
-                  ? muiTheme.listItem.selectedRightIconColor
-                  : muiTheme.listItem.rightIconColor
-              }
-              buildMenuTemplate={this.props.buildMenuTemplate}
-              onClick={() => {
-                if (!onItemSelected) return;
-                if (this.props.editingName) return;
-
-                onItemSelected(selected ? null : item);
-              }}
-              onDoubleClick={event => {
-                if (event.button !== LEFT_MOUSE_BUTTON) return;
-                if (!onEdit) return;
-                if (this.props.editingName) return;
-
-                onItemSelected(null);
-                onEdit(item);
-              }}
-              id={id}
-            />
-          );
-        }}
-      </ThemeConsumer>
-    );
-  }
+        onItemSelected(null);
+        onEdit(item);
+      }}
+      id={id}
+      data={data}
+    />
+  );
 }
 
 export default ItemRow;

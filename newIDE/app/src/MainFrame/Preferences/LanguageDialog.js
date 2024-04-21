@@ -11,7 +11,7 @@ import LanguageSelector from './LanguageSelector';
 
 type Props = {|
   open: boolean,
-  onClose: (languageDidChange: boolean) => void,
+  onClose: (options: {| languageDidChange: boolean |}) => void,
 |};
 
 const LanguageDialog = ({ open, onClose }: Props) => {
@@ -31,6 +31,7 @@ const LanguageDialog = ({ open, onClose }: Props) => {
 
         return (
           <Dialog
+            title={<Trans>Language</Trans>}
             actions={[
               <FlatButton
                 label={
@@ -42,7 +43,7 @@ const LanguageDialog = ({ open, onClose }: Props) => {
                 }
                 primary={false}
                 onClick={() => {
-                  onClose(languageDidChange);
+                  onClose({ languageDidChange });
                 }}
                 disabled={isLoadingLanguage}
                 key="close"
@@ -61,9 +62,9 @@ const LanguageDialog = ({ open, onClose }: Props) => {
               />,
             ]}
             cannotBeDismissed={isLoadingLanguage}
-            onRequestClose={() => onClose(languageDidChange)}
+            onRequestClose={() => onClose({ languageDidChange })}
             open={open}
-            title={<Trans>Language</Trans>}
+            maxWidth="sm"
           >
             <LanguageSelector
               onLanguageChanged={() => setLanguageDidChange(true)}

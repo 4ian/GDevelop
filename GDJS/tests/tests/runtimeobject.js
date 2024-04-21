@@ -4,14 +4,15 @@
  * See README.md for more information.
  */
 
- describe('gdjs.RuntimeObject', () => {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    // @ts-ignore TODO: make a function to create an empty game and use it across tests.
-    properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] },
+describe('gdjs.RuntimeObject', () => {
+  /** @type {gdjs.RuntimeGame} */
+  let runtimeGame;
+  /** @type {gdjs.TestRuntimeScene} */
+  let runtimeScene;
+  beforeEach(function () {
+    runtimeGame = gdjs.getPixiRuntimeGame();
+    runtimeScene = new gdjs.TestRuntimeScene(runtimeGame);
   });
-  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
   it('should compute distances properly', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -228,11 +229,21 @@
 
     // Vertical raycast, far from the origin, to the edge of the object:
     object1.setPosition(20, 300);
-    expect(object1.raycastTest(25, 500, 25, 300+19, true).collision).to.be(true);
-    expect(object1.raycastTest(25, 500, 25, 300+20, true).collision).to.be(true);
-    expect(object1.raycastTest(25, 500, 25, 300+20.1, true).collision).to.be(false);
-    expect(object1.raycastTest(25, 500, 25, 300+20.5, true).collision).to.be(false);
-    expect(object1.raycastTest(25, 500, 25, 300+21, true).collision).to.be(false);
+    expect(object1.raycastTest(25, 500, 25, 300 + 19, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20.1, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 20.5, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(25, 500, 25, 300 + 21, true).collision).to.be(
+      false
+    );
 
     // Horizontal raycast, far from the origin:
     object1.setPosition(200, 30);
@@ -240,14 +251,330 @@
 
     // Horizontal raycast, far from the origin, to the edge of the object:
     object1.setPosition(200, 30);
-    expect(object1.raycastTest(500, 35, 200+9, 35, true).collision).to.be(true);
-    expect(object1.raycastTest(500, 35, 200+10, 35, true).collision).to.be(true);
-    expect(object1.raycastTest(500, 35, 200+10.1, 35, true).collision).to.be(false);
-    expect(object1.raycastTest(500, 35, 200+10.5, 35, true).collision).to.be(false);
-    expect(object1.raycastTest(500, 35, 200+11, 35, true).collision).to.be(false);
+    expect(object1.raycastTest(500, 35, 200 + 9, 35, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10, 35, true).collision).to.be(
+      true
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10.1, 35, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(500, 35, 200 + 10.5, 35, true).collision).to.be(
+      false
+    );
+    expect(object1.raycastTest(500, 35, 200 + 11, 35, true).collision).to.be(
+      false
+    );
 
     // Raycast not intersecting with the object
     object1.setPosition(20, 30);
     expect(object1.raycastTest(10, 10, 105, 55, true).collision).to.be(false);
+  });
+
+  it('handles raycast (object with multiple hitboxes)', () => {
+    const objectWithTwoHitboxes = new gdjs.TestSpriteRuntimeObject(
+      runtimeScene,
+      {
+        name: 'objectWithTwoHitboxes',
+        type: '',
+        behaviors: [],
+        effects: [],
+        animations: [
+          {
+            name: 'animation',
+            directions: [
+              {
+                sprites: [
+                  {
+                    originPoint: { x: 0, y: 0 },
+                    centerPoint: { x: 50, y: 50 },
+                    points: [
+                      { name: 'Center', x: 0, y: 0 },
+                      { name: 'Origin', x: 50, y: 50 },
+                    ],
+                    hasCustomCollisionMask: true,
+                    customCollisionMask: [
+                      [
+                        { x: 75, y: 100 },
+                        { x: 0, y: 100 },
+                        { x: 0, y: 25 },
+                      ],
+                      [
+                        { x: 25, y: 0 },
+                        { x: 100, y: 75 },
+                        { x: 100, y: 0 },
+                      ],
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }
+    );
+    runtimeScene.addObject(objectWithTwoHitboxes);
+    objectWithTwoHitboxes.setUnscaledWidthAndHeight(100, 100);
+    objectWithTwoHitboxes.setCustomWidthAndHeight(100, 100);
+
+    // Ray going through the "tunnel" left by the two triangle hitboxes:
+    objectWithTwoHitboxes.setPosition(0, 0);
+    expect(
+      objectWithTwoHitboxes.raycastTest(0, 0, 300, 300, true).collision
+    ).to.be(false);
+    expect(
+      objectWithTwoHitboxes.raycastTest(0, 10, 300, 300 + 10, true).collision
+    ).to.be(false);
+    expect(
+      objectWithTwoHitboxes.raycastTest(10, 0, 300 + 10, 300, true).collision
+    ).to.be(false);
+
+    const rayCastFromCenterToRightResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToRightResult.collision).to.be(true);
+    expect(rayCastFromCenterToRightResult.closeX).to.be(75);
+    expect(rayCastFromCenterToRightResult.closeY).to.be(50);
+
+    const rayCastFromCenterToRightFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      300,
+      50,
+      false
+    );
+    expect(rayCastFromCenterToRightFarResult.collision).to.be(true);
+    expect(rayCastFromCenterToRightFarResult.farX).to.be(100);
+    expect(rayCastFromCenterToRightFarResult.farY).to.be(50);
+
+    const rayCastFromCenterToLeftResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      -300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToLeftResult.collision).to.be(true);
+    expect(rayCastFromCenterToLeftResult.closeX).to.be(25);
+    expect(rayCastFromCenterToLeftResult.closeY).to.be(50);
+
+    const rayCastFromCenterToLeftFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      50,
+      -300,
+      50,
+      true
+    );
+    expect(rayCastFromCenterToLeftFarResult.collision).to.be(true);
+    expect(rayCastFromCenterToLeftFarResult.farX).to.be(0);
+    expect(rayCastFromCenterToLeftFarResult.farY).to.be(50);
+
+    const rayCastFromMiddleTopResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      -20,
+      50,
+      300,
+      true
+    );
+    expect(rayCastFromMiddleTopResult.collision).to.be(true);
+    expect(rayCastFromMiddleTopResult.closeX).to.be(50);
+    expect(rayCastFromMiddleTopResult.closeY).to.be(0);
+
+    const rayCastFromMiddleTopFarResult = objectWithTwoHitboxes.raycastTest(
+      50,
+      -20,
+      50,
+      300,
+      false
+    );
+    expect(rayCastFromMiddleTopFarResult.collision).to.be(true);
+    expect(rayCastFromMiddleTopFarResult.farX).to.be(50);
+    expect(rayCastFromMiddleTopFarResult.farY).to.be(100);
+
+    const rayCastFromMiddleLeftResult = objectWithTwoHitboxes.raycastTest(
+      -20,
+      50,
+      300,
+      50,
+      true
+    );
+    expect(rayCastFromMiddleLeftResult.collision).to.be(true);
+    expect(rayCastFromMiddleLeftResult.closeX).to.be(0);
+    expect(rayCastFromMiddleLeftResult.closeY).to.be(50);
+
+    const rayCastFromMiddleLeftFarResult = objectWithTwoHitboxes.raycastTest(
+      -20,
+      50,
+      300,
+      50,
+      false
+    );
+    expect(rayCastFromMiddleLeftFarResult.collision).to.be(true);
+    expect(rayCastFromMiddleLeftFarResult.farX).to.be(100);
+    expect(rayCastFromMiddleLeftFarResult.farY).to.be(50);
+  });
+
+  it('can be moved with a permanent force', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(100, 40, 1);
+
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with 2 permanent forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+    object.addForce(25, 30, 1);
+
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with an instant force', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(100, 40, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+
+    // The object no longer moves.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with 2 instant forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(75, 10, 0);
+      object.addForce(25, 30, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+
+    // The object no longer moves.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can be moved with permanent and instant forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+
+    for (let index = 0; index < 15; index++) {
+      const oldX = object.getX();
+      const oldY = object.getY();
+      object.addForce(25, 30, 0);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getX()).to.above(oldX);
+      expect(object.getY()).to.above(oldY);
+    }
+    expect(object.getX()).to.be(15 + 100 / 4);
+    expect(object.getY()).to.be(20 + 40 / 4 + 0.000000000000018);
+  });
+
+  it('can clear forces', () => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      variables: [],
+      behaviors: [],
+      effects: [],
+    });
+    runtimeScene.addObject(object);
+    object.setPosition(15, 20);
+
+    object.addForce(75, 10, 1);
+    object.addForce(25, 30, 0);
+    object.addForce(75, 10, 0);
+    object.addForce(25, 30, 1);
+    object.clearForces();
+
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(object.getX()).to.be(15);
+    expect(object.getY()).to.be(20);
   });
 });

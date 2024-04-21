@@ -2,9 +2,10 @@
 import { roundPosition } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
 import { type InstancesEditorSettings } from './InstancesEditorSettings';
+import { type InstanceMeasurer } from './InstancesRenderer';
 
 export default class InstancesMover {
-  instanceMeasurer: any;
+  instanceMeasurer: InstanceMeasurer;
   instancesEditorSettings: InstancesEditorSettings;
   instancePositions: { [number]: { x: number, y: number } };
   totalDeltaX: number;
@@ -18,7 +19,7 @@ export default class InstancesMover {
     instanceMeasurer,
     instancesEditorSettings,
   }: {
-    instanceMeasurer: any,
+    instanceMeasurer: InstanceMeasurer,
     instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
@@ -138,7 +139,10 @@ export default class InstancesMover {
           y: selectedInstance.getY(),
         };
       }
-      selectedInstance.setX(
+      // We round the position to the nearest pixel when an instance is moved in the editor.
+      // This is to avoid having a lot of decimals in the position of instances.
+      // It does not prevent the user from having decimals, when editing the position manually.
+      const newX = Math.round(
         initialPosition.x +
           this._getMoveDeltaX(
             roundedTotalDeltaX,
@@ -146,7 +150,7 @@ export default class InstancesMover {
             followAxis
           )
       );
-      selectedInstance.setY(
+      const newY = Math.round(
         initialPosition.y +
           this._getMoveDeltaY(
             roundedTotalDeltaX,
@@ -154,6 +158,8 @@ export default class InstancesMover {
             followAxis
           )
       );
+      selectedInstance.setX(newX);
+      selectedInstance.setY(newY);
     }
   }
 
@@ -162,5 +168,9 @@ export default class InstancesMover {
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+  }
+
+  isMoving() {
+    return !!this._initialSelectionAABB;
   }
 }

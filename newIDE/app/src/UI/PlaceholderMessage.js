@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
+import Paper from './Paper';
 
 type Props = {|
   children: React.Node,
+  showOnTop?: boolean,
 |};
 
 const PlaceholderMessage = (props: Props) => {
@@ -19,14 +20,17 @@ const PlaceholderMessage = (props: Props) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        zIndex: props.showOnTop ? 9999 : undefined, // Ensure it's above most things
       }}
     >
       <Paper
         elevation={3}
         style={{
           padding: 10,
-          margin: 5,
+          width: '100%', // Make it take full width, especially on mobile.
+          maxWidth: 600, // But not too big for desktop.
         }}
+        background="dark"
       >
         {props.children}
       </Paper>

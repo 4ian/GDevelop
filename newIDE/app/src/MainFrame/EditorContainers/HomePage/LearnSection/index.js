@@ -1,14 +1,24 @@
 // @flow
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { type HomeTab } from '../HomePageMenu';
-import { type TutorialCategory } from '../../../../Utils/GDevelopServices/Tutorial';
+import {
+  type TutorialCategory,
+  type Tutorial,
+} from '../../../../Utils/GDevelopServices/Tutorial';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
 import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { Paper } from '@material-ui/core';
+import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
+import Window from '../../../../Utils/Window';
+import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
+import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
+import Paper from '../../../../UI/Paper';
+import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -39,6 +49,29 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   },
 };
 
+export const formatTutorialToImageTileComponent = (
+  i18n: I18nType,
+  tutorial: Tutorial
+): ImageTileComponent => ({
+  title: selectMessageByLocale(i18n, tutorial.titleByLocale) || tutorial.title,
+  description:
+    selectMessageByLocale(i18n, tutorial.descriptionByLocale) ||
+    tutorial.description,
+  onClick: () => {
+    sendTutorialOpened(tutorial.id);
+    Window.openExternalURL(
+      selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
+    );
+  },
+  imageUrl:
+    selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
+    tutorial.thumbnailUrl,
+  overlayText: tutorial.duration
+    ? secondsToMinutesAndSeconds(tutorial.duration)
+    : '\u{1F4D8}',
+  overlayTextPosition: 'bottomRight',
+});
+
 const styles = {
   paper: {
     flex: 1,
@@ -47,17 +80,15 @@ const styles = {
 };
 
 type Props = {|
-  onOpenOnboardingDialog: () => void,
-  onCreateProject: () => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
-  onOpenHelpFinder: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
 |};
 
 const LearnSection = ({
-  onOpenOnboardingDialog,
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
-  onOpenHelpFinder,
+  selectInAppTutorial,
 }: Props) => {
   const {
     tutorials,
@@ -79,7 +110,7 @@ const LearnSection = ({
 
   if (tutorialLoadingError)
     return (
-      <Paper square style={styles.paper}>
+      <Paper square style={styles.paper} background="dark">
         <PlaceholderError onRetry={fetchTutorials}>
           <Trans>
             Can't load the tutorials. Verify your internet connection or retry
@@ -93,12 +124,11 @@ const LearnSection = ({
 
   return !selectedCategory ? (
     <MainPage
-      onCreateProject={onCreateProject}
-      onOpenHelpFinder={onOpenHelpFinder}
-      onOpenOnboardingDialog={onOpenOnboardingDialog}
+      onOpenExampleStore={onOpenExampleStore}
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
+      selectInAppTutorial={selectInAppTutorial}
     />
   ) : (
     <TutorialsCategoryPage
@@ -109,4 +139,13 @@ const LearnSection = ({
   );
 };
 
-export default LearnSection;
+const LearnSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Learn section</Trans>}
+    scope="start-page-learn"
+  >
+    <LearnSection {...props} />
+  </ErrorBoundary>
+);
+
+export default LearnSectionWithErrorBoundary;

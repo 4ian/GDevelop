@@ -6,8 +6,10 @@
 
 #ifndef GDCORE_OBJECTGROUPSCONTAINER_H
 #define GDCORE_OBJECTGROUPSCONTAINER_H
-#include <vector>
 #include <algorithm>
+#include <memory>
+#include <vector>
+
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -26,8 +28,10 @@ namespace gd {
  */
 class GD_CORE_API ObjectGroupsContainer {
  public:
-  ObjectGroupsContainer(){};
+  ObjectGroupsContainer();
+  ObjectGroupsContainer(const ObjectGroupsContainer&);
   virtual ~ObjectGroupsContainer(){};
+  ObjectGroupsContainer& operator=(const ObjectGroupsContainer& rhs);
 
   /**
    * \brief Return true if the specified group is in the container
@@ -112,6 +116,11 @@ class GD_CORE_API ObjectGroupsContainer {
    * \brief Clear all groups of the container.
    */
   inline void Clear() { objectGroups.clear(); }
+
+  /**
+   * \brief Call the callback for each group name matching the specified search.
+   */
+  void ForEachNameMatchingSearch(const gd::String& search, std::function<void(const gd::String& name)> fn) const;
   ///@}
 
   /** \name Saving and loading
@@ -171,8 +180,14 @@ class GD_CORE_API ObjectGroupsContainer {
   const ObjectGroup& at(size_t index) const { return Get(index); };
   ///@}
 
+  /**
+   * Initialize from another object groups container. Used by copy-ctor and
+   * assign-op. Don't forget to update me if members were changed!
+   */
+  void Init(const gd::ObjectGroupsContainer& other);
+
  private:
-  std::vector<ObjectGroup> objectGroups;
+  std::vector<std::unique_ptr<gd::ObjectGroup>> objectGroups;
   static ObjectGroup badGroup;
 };
 

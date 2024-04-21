@@ -1,12 +1,16 @@
 // @flow
-import { t } from '@lingui/macro';
-
 import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
+
 import { List, ListItem } from '../UI/List';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
-import EmptyMessage from '../UI/EmptyMessage';
 import { Column } from '../UI/Grid';
-import { Paper } from '@material-ui/core';
+import ListIcon from '../UI/ListIcon';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import getObjectByName from '../Utils/GetObjectByName';
+import Paper from '../UI/Paper';
+import { ColumnStackLayout } from '../UI/Layout';
+import AlertMessage from '../UI/AlertMessage';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -19,6 +23,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   onSizeUpdated?: () => void,
+  onObjectGroupUpdated?: () => void,
 |};
 
 const ObjectGroupEditor = ({
@@ -27,24 +32,30 @@ const ObjectGroupEditor = ({
   globalObjectsContainer,
   objectsContainer,
   onSizeUpdated,
+  onObjectGroupUpdated,
 }: Props) => {
-  const [newObjectName, setNewObjectName] = React.useState<string>('');
+  const [objectName, setObjectName] = React.useState<string>('');
   const objectsInGroup = group.getAllObjectsNames().toJSArray();
 
   const removeObject = (objectName: string) => {
     group.removeObject(objectName);
 
     if (onSizeUpdated) onSizeUpdated();
+    if (onObjectGroupUpdated) onObjectGroupUpdated();
   };
 
   const addObject = (objectName: string) => {
     group.addObject(objectName);
-    setNewObjectName('');
+    setObjectName('');
     if (onSizeUpdated) onSizeUpdated();
+    if (onObjectGroupUpdated) onObjectGroupUpdated();
   };
 
   const renderExplanation = () => {
     let type = undefined;
+    if (objectsInGroup.length === 0) {
+      return null;
+    }
     objectsInGroup.forEach(objectName => {
       const objectType = gd.getTypeOfObject(
         globalObjectsContainer,
@@ -56,48 +67,78 @@ const ObjectGroupEditor = ({
       else type = '';
     });
 
-    let message = '';
-    if (type === undefined) {
-      message = 'This group is empty';
-    } else if (type === '') {
-      message =
-        "This group contains objects of different kinds. You'll only be able to use actions and conditions common to all objects with this group.";
-    } else {
-      message = `This group contains objects of the same kind (${type}). You can use actions and conditions related to this kind of objects in events with this group.`;
-    }
+    const message =
+      type === '' ? (
+        <>
+          <Trans>
+            This group contains objects of different kinds. You'll only be able
+            to use actions and conditions common to all objects with this group.
+          </Trans>{' '}
+          <Trans>
+            Variables declared in all objects of the group will be visible in
+            event expressions.
+          </Trans>
+        </>
+      ) : (
+        <>
+          <Trans>
+            This group contains objects of the same kind ({type}). You can use
+            actions and conditions related to this kind of objects in events
+            with this group.
+          </Trans>{' '}
+          <Trans>
+            Variables declared in all objects of the group will be visible in
+            event expressions.
+          </Trans>
+        </>
+      );
 
-    return <EmptyMessage>{message}</EmptyMessage>;
+    return <AlertMessage kind="info">{message}</AlertMessage>;
   };
 
   return (
-    <Column>
-      <div>
-        {renderExplanation()}
-        <List>
-          {group
-            .getAllObjectsNames()
-            .toJSArray()
-            .map(objectName => {
-              return (
-                <ListItem
-                  key={objectName}
-                  primaryText={objectName}
-                  displayRemoveButton
-                  onRemove={() => removeObject(objectName)}
+    <ColumnStackLayout noMargin>
+      {renderExplanation()}
+      <List>
+        {group
+          .getAllObjectsNames()
+          .toJSArray()
+          .map(objectName => {
+            let object = getObjectByName(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName
+            );
+            const icon =
+              project && object ? (
+                <ListIcon
+                  iconSize={24}
+                  src={ObjectsRenderingService.getThumbnail(
+                    project,
+                    object.getConfiguration()
+                  )}
                 />
-              );
-            })}
-        </List>
-      </div>
-      <Paper style={styles.objectSelector}>
-        <Column>
+              ) : null;
+            return (
+              <ListItem
+                key={objectName}
+                primaryText={objectName}
+                displayRemoveButton
+                onRemove={() => removeObject(objectName)}
+                leftIcon={icon}
+              />
+            );
+          })}
+      </List>
+      <Paper style={styles.objectSelector} background="medium">
+        <Column noMargin>
           <ObjectSelector
             project={project}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
-            value={newObjectName}
+            value={objectName}
             excludedObjectOrGroupNames={objectsInGroup}
-            onChange={setNewObjectName}
+            onChange={setObjectName}
             onChoose={addObject}
             openOnFocus
             noGroups
@@ -106,7 +147,7 @@ const ObjectGroupEditor = ({
           />
         </Column>
       </Paper>
-    </Column>
+    </ColumnStackLayout>
   );
 };
 

@@ -16,6 +16,11 @@ import { Line } from '../../UI/Grid';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import HelpButton from '../../UI/HelpButton';
 import TutorialButton from '../../UI/TutorialButton';
+import EditSceneIcon from '../../UI/CustomSvgIcons/EditScene';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../ResourcesWatcher';
 
 const styles = {
   container: {
@@ -23,6 +28,8 @@ const styles = {
     flex: 1,
   },
 };
+
+const editSceneIconReactNode = <EditSceneIcon />;
 
 type State = {|
   externalPropertiesDialogOpen: boolean,
@@ -33,6 +40,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   State
 > {
   editor: ?EventsSheetInterface;
+  resourceExternallyChangedCallbackId: ?string;
 
   state = {
     externalPropertiesDialogOpen: false,
@@ -44,6 +52,21 @@ export class ExternalEventsEditorContainer extends React.Component<
     // Especially important to note that when becoming inactive, a "last" update is allowed.
     return this.props.isActive || nextProps.isActive;
   }
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
+
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this.editor) this.editor.onResourceExternallyChanged(resourceInfo);
+  };
 
   getProject(): ?gdProject {
     return this.props.project;
@@ -143,15 +166,14 @@ export class ExternalEventsEditorContainer extends React.Component<
             ref={editor => (this.editor = editor)}
             setToolbar={this.props.setToolbar}
             onOpenLayout={this.props.onOpenLayout}
-            resourceSources={this.props.resourceSources}
-            onChooseResource={this.props.onChooseResource}
-            resourceExternalEditors={this.props.resourceExternalEditors}
+            resourceManagementProps={this.props.resourceManagementProps}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
             onCreateEventsFunction={this.onCreateEventsFunction}
             onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={{
+              project,
               layout,
               externalEvents,
             }}
@@ -159,6 +181,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             objectsContainer={layout}
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
+            settingsIcon={editSceneIconReactNode}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
             isActive={this.props.isActive}
           />
@@ -168,7 +191,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             <Text>
               <Trans>
                 To edit the external events, choose the scene in which it will
-                be included:
+                be included
               </Trans>
             </Text>
             <Line justifyContent="center">
@@ -181,7 +204,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             <Line justifyContent="flex-start" noMargin>
               <TutorialButton
                 tutorialId="Intermediate-externals"
-                label="Watch the tutorial"
+                label={<Trans>Watch tutorial</Trans>}
                 renderIfNotFound={
                   <HelpButton helpPagePath="/interface/events-editor/external-events" />
                 }

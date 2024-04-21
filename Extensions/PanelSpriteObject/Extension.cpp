@@ -24,6 +24,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Victor Levasseur and Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/panel_sprite");
+  extension
+      .AddInstructionOrExpressionGroupMetadata(
+          _("Panel Sprite (9-patch) Object"))
+      .SetIcon("CppPlatform/Extensions/PanelSpriteIcon.png");
 
   gd::ObjectMetadata& obj =
       extension
@@ -34,8 +38,12 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "from "
                 "the full image."),
               "CppPlatform/Extensions/PanelSpriteIcon.png")
-          .SetCategoryFullName(_("General"));
+          .SetCategoryFullName(_("General"))
+          .AddDefaultBehavior("EffectCapability::EffectBehavior")
+          .AddDefaultBehavior("ResizableCapability::ResizableBehavior")
+          .AddDefaultBehavior("OpacityCapability::OpacityBehavior");
 
+  // Deprecated
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Panel Sprite, between 0 (fully "
@@ -46,8 +54,13 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number");
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity to compare to (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddAction(
          "SetOpacity",
          _("Change Panel Sprite opacity"),
@@ -59,14 +72,20 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
          "res/actions/opacity.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Opacity (0-255)")))
+      .SetHidden();
 
+  // Deprecated
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),
                     _("Visibility"),
                     "res/actions/opacity.png")
-      .AddParameter("object", _("Panel Sprite"), "PanelSprite");
+      .AddParameter("object", _("Panel Sprite"), "PanelSprite")
+      .SetHidden();
 
   obj.AddAction(
          "SetColor",
@@ -80,54 +99,66 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("color", _("Tint"));
 
+  // Deprecated
   obj.AddAction("Width",
                 _("Width"),
                 _("Modify the width of a Panel Sprite."),
                 _("the width"),
                 _("Size and angle"),
-                "res/actions/scaleWidth24.png",
-                "res/actions/scaleWidth.png")
+                "res/actions/scaleWidth24_black.png",
+                "res/actions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetWidth")
       .SetGetter("GetWidth");
 
+  // Deprecated
   obj.AddCondition("Width",
                    _("Width"),
                    _("Check the width of a Panel Sprite."),
                    _("the width"),
                    _("Size and angle"),
-                   "res/conditions/scaleWidth24.png",
-                   "res/conditions/scaleWidth.png")
+                   "res/conditions/scaleWidth24_black.png",
+                   "res/conditions/scaleWidth_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("GetWidth");
 
+  // Deprecated
   obj.AddAction("Height",
                 _("Height"),
                 _("Modify the height of a Panel Sprite."),
                 _("the height"),
                 _("Size and angle"),
-                "res/actions/scaleHeight24.png",
-                "res/actions/scaleHeight.png")
+                "res/actions/scaleHeight24_black.png",
+                "res/actions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters("number",
+                                     gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
+  // Deprecated
   obj.AddCondition("Height",
                    _("Height"),
                    _("Check the height of a Panel Sprite."),
                    _("the height"),
                    _("Size and angle"),
-                   "res/conditions/scaleHeight24.png",
-                   "res/conditions/scaleHeight.png")
+                   "res/conditions/scaleHeight24_black.png",
+                   "res/conditions/scaleHeight_black.png")
 
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number", gd::ParameterOptions::MakeNewOptions())
+      .SetHidden()
       .SetFunctionName("SetHeight")
       .SetGetter("GetHeight");
 
@@ -136,12 +167,15 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "Modify the angle of a Panel Sprite.",
                 "the angle",
                 _("Size and angle"),
-                "res/actions/rotate24.png",
-                "res/actions/rotate.png")
+                "res/actions/rotate24_black.png",
+                "res/actions/rotate_black.png")
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardOperatorParameters("number")
+      .UseStandardOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle (in degrees)")))
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 
@@ -150,17 +184,21 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                    "Check the angle of a Panel Sprite.",
                    "the angle",
                    _("Size and angle"),
-                   "res/conditions/rotate24.png",
-                   "res/conditions/rotate.png")
+                   "res/conditions/rotate24_black.png",
+                   "res/conditions/rotate_black.png")
 
       .SetHidden()  // Deprecated
       .AddParameter("object", _("Object"), "PanelSprite")
-      .UseStandardRelationalOperatorParameters("number")
+      .UseStandardRelationalOperatorParameters(
+          "number",
+          gd::ParameterOptions::MakeNewOptions().SetDescription(
+              _("Angle to compare to (in degrees)")))
       .SetFunctionName("SetAngle")
       .SetGetter("GetAngle");
 
+  // Deprecated
   obj.AddAction("Image",
-                _("Image name"),
+                _("Image name (deprecated)"),
                 _("Change the image of a Panel Sprite."),
                 _("Set image _PARAM1_ on _PARAM0_"),
                 _("Image"),
@@ -168,6 +206,19 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
                 "res/imageicon.png")
       .AddParameter("object", _("Object"), "PanelSprite")
       .AddParameter("string", _("Image name"))
+      .AddCodeOnlyParameter("currentScene", "0")
+      .SetHidden()
+      .SetFunctionName("ChangeAndReloadImage");
+
+  obj.AddAction("SetImageFromResource",
+                _("Image name"),
+                _("Change the image of a Panel Sprite."),
+                _("Set image _PARAM1_ on _PARAM0_"),
+                _("Image"),
+                "res/imageicon24.png",
+                "res/imageicon.png")
+      .AddParameter("object", _("Object"), "PanelSprite")
+      .AddParameter("imageResource", _("Image file (or image resource name)"))
       .AddCodeOnlyParameter("currentScene", "0")
       .SetFunctionName("ChangeAndReloadImage");
 }

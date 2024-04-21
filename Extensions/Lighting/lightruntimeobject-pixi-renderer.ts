@@ -1,13 +1,12 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Light object');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   /**
    * Pixi renderer for light runtime objects.
    */
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;
-    _runtimeScene: gdjs.RuntimeScene;
+    _instanceContainer: gdjs.RuntimeInstanceContainer;
     _manager: gdjs.LightObstaclesManager;
     _radius: number;
     _color: [number, number, number];
@@ -30,10 +29,10 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.LightRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene
+      instanceContainer: gdjs.RuntimeInstanceContainer
     ) {
       this._object = runtimeObject;
-      this._runtimeScene = runtimeScene;
+      this._instanceContainer = instanceContainer;
       this._manager = runtimeObject.getObstaclesManager();
       this._radius = runtimeObject.getRadius();
       const objectColor = runtimeObject._color;
@@ -57,14 +56,14 @@ namespace gdjs {
       ]);
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
-      this._isPreview = runtimeScene.getGame().isPreview();
+      this._isPreview = instanceContainer.getGame().isPreview();
       this._lightBoundingPoly = gdjs.Polygon.createRectangle(0, 0);
 
       this.updateDebugMode();
 
       // Objects will be added in lighting layer, this is just to maintain consistency.
       if (this._light) {
-        runtimeScene
+        instanceContainer
           .getLayer('')
           .getRenderer()
           .addRendererObject(
@@ -198,7 +197,7 @@ namespace gdjs {
       const texture = this._object.getTexture();
       this._texture =
         texture !== ''
-          ? (this._runtimeScene
+          ? (this._instanceContainer
               .getGame()
               .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
               texture
@@ -303,7 +302,7 @@ namespace gdjs {
       }
       const verticesCount = vertices.length;
 
-      // If the array buffer which is already allocated is atmost
+      // If the array buffer which is already allocated is at most
       // twice the size of memory required, we could avoid re-allocation
       // and instead use a subarray. Otherwise, allocate new array buffers as
       // there would be memory wastage.

@@ -1,11 +1,12 @@
 # bondage.js [![Build Status](https://travis-ci.org/jhayley/bondage.js.svg?branch=master)](https://travis-ci.org/jhayley/bondage.js)
+
 [Yarn](https://github.com/InfiniteAmmoInc/Yarn) parser for Javascript, in the same vein as [YarnSpinner](https://github.com/thesecretlab/YarnSpinner).
 
 # Usage
 
 #### As a Web Tool
 
-To run through your yarn files in your browser, go to http://hayley.zone/bondage.js, paste your yarn data in the field, then hit "compile".
+To run through your yarn files in your browser, go to <http://hayley.zone/bondage.js>, paste your yarn data in the field, then hit "compile".
 
 #### As a Command Line Tool
 Installation: `npm install -g bondage`

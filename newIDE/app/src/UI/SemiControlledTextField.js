@@ -1,11 +1,8 @@
 // @flow
 import * as React from 'react';
-import TextField from './TextField';
-
-type State = {|
-  focused: boolean,
-  text: ?any,
-|};
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import TextField, { type TextFieldInterface } from './TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 
 type Props = {|
   onChange: string => void,
@@ -35,11 +32,13 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
-  hintText?: React.Node,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
   maxLength?: number,
+  precision?: number,
   max?: number,
   min?: number,
   multiline?: boolean,
@@ -48,7 +47,17 @@ type Props = {|
   style?: Object,
   rows?: number,
   rowsMax?: number,
-  autoFocus?: boolean,
+  autoFocus?: 'desktop' | 'desktopAndMobileDevices',
+  endAdornment?: React.Node,
+|};
+
+export type SemiControlledTextFieldInterface = {|
+  focus: FieldFocusFunction,
+  forceSetValue: (text: string) => void,
+  forceSetSelection: (start: number, end: number) => void,
+  getInputNode: () => ?HTMLInputElement,
+  getFieldWidth: () => ?number,
+  getCaretPosition: () => ?number,
 |};
 
 /**
@@ -57,80 +66,87 @@ type Props = {|
  * is typing. This is useful if the parent component can do modifications on the value:
  * the user won't be interrupted or have the value changed until he blurs the field.
  */
-export default class SemiControlledTextField extends React.Component<
+const SemiControlledTextField = React.forwardRef<
   Props,
-  State
-> {
-  state = {
-    focused: false,
-    text: null,
+  SemiControlledTextFieldInterface
+>((props, ref) => {
+  const [focused, setFocused] = React.useState<boolean>(false);
+  const [text, setText] = React.useState<?string>(null);
+  const textFieldRef = React.useRef<?TextFieldInterface>(null);
+
+  const forceSetValue = (text: string) => {
+    setText(text);
   };
 
-  _field: ?TextField = null;
-
-  forceSetValue(text: string) {
-    this.setState({ text });
-  }
-
-  forceSetSelection(selectionStart: number, selectionEnd: number) {
-    const input = this.getInputNode();
+  const forceSetSelection = (selectionStart: number, selectionEnd: number) => {
+    const input = getInputNode();
     if (input) {
       input.selectionStart = selectionStart;
       input.selectionEnd = selectionEnd;
     }
-  }
+  };
 
-  focus() {
-    if (this._field) this._field.focus();
-  }
+  const focus: FieldFocusFunction = options => {
+    if (textFieldRef.current) textFieldRef.current.focus(options);
+  };
 
-  getInputNode(): ?HTMLInputElement {
-    if (this._field) return this._field.getInputNode();
-  }
+  const getInputNode = (): ?HTMLInputElement => {
+    if (textFieldRef.current) return textFieldRef.current.getInputNode();
+  };
 
-  render() {
-    const {
-      value,
-      onChange,
-      commitOnBlur,
-      onFocus,
-      onBlur,
-      type,
-      ...otherProps
-    } = this.props;
+  const getFieldWidth = () => {
+    if (textFieldRef.current) return textFieldRef.current.getFieldWidth();
+  };
 
-    return (
-      // $FlowFixMe
-      <TextField
-        {...otherProps}
-        type={type || 'text'}
-        ref={field => (this._field = field)}
-        value={this.state.focused ? this.state.text : value}
-        onFocus={event => {
-          this.setState({
-            focused: true,
-            text: this.props.value,
-          });
+  const getCaretPosition = () => {
+    if (textFieldRef.current) return textFieldRef.current.getCaretPosition();
+  };
 
-          if (onFocus) onFocus(event);
-        }}
-        onChange={(event, newValue) => {
-          this.setState({
-            text: newValue,
-          });
+  React.useImperativeHandle(ref, () => ({
+    focus,
+    getInputNode,
+    forceSetSelection,
+    forceSetValue,
+    getFieldWidth,
+    getCaretPosition,
+  }));
 
-          if (!commitOnBlur) onChange(newValue);
-        }}
-        onBlur={event => {
-          onChange(event.currentTarget.value);
-          this.setState({
-            focused: false,
-            text: null,
-          });
+  const {
+    value,
+    onChange,
+    commitOnBlur,
+    onFocus,
+    onBlur,
+    type,
+    ...otherProps
+  } = props;
 
-          if (onBlur) onBlur(event);
-        }}
-      />
-    );
-  }
-}
+  return (
+    // $FlowFixMe
+    <TextField
+      {...otherProps}
+      type={type || 'text'}
+      ref={textFieldRef}
+      value={focused ? text : value}
+      onFocus={event => {
+        setFocused(true);
+        setText(value);
+
+        if (onFocus) onFocus(event);
+      }}
+      onChange={(event, newValue) => {
+        setText(newValue);
+        if (!commitOnBlur) onChange(newValue);
+      }}
+      onBlur={event => {
+        onChange(event.currentTarget.value);
+        setFocused(false);
+        setText(null);
+
+        if (onBlur) onBlur(event);
+      }}
+    />
+  );
+});
+
+export default SemiControlledTextField;

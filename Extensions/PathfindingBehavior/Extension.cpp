@@ -5,10 +5,10 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
-#include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"
 
@@ -21,7 +21,11 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
           "avoiding obstacles on the way.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("Movement")
+      .SetTags("pathfinding, obstacle, collision")
       .SetExtensionHelpPath("/behaviors/pathfinding");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Pathfinding behavior"))
+      .SetIcon("CppPlatform/Extensions/AStaricon16.png");
 
   {
     gd::BehaviorMetadata& aut =
@@ -86,7 +90,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters("number",
+                                       gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("SetCellWidth")
         .SetGetter("GetCellWidth");
 
@@ -100,7 +105,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("GetCellWidth");
 
     aut.AddAction("CellHeight",
@@ -113,7 +119,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters("number",
+                                       gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("SetCellHeight")
         .SetGetter("GetCellHeight");
 
@@ -127,7 +134,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("GetCellHeight");
 
     aut.AddAction("Acceleration",
@@ -140,7 +148,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters("number",
+                                       gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("SetAcceleration")
         .SetGetter("GetAcceleration");
 
@@ -154,7 +163,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("GetAcceleration");
 
     aut.AddAction("MaxSpeed",
@@ -167,7 +177,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Max speed (in pixels per second)")))
         .SetFunctionName("SetMaxSpeed")
         .SetGetter("GetMaxSpeed");
 
@@ -181,7 +194,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Max speed to compare to (in pixels per second)")))
         .SetFunctionName("GetMaxSpeed");
 
     aut.AddAction("Speed",
@@ -194,7 +210,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Speed (in pixels per second)")))
         .SetFunctionName("SetSpeed")
         .SetGetter("GetSpeed");
 
@@ -208,17 +227,20 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Speed to compare to (in pixels per second)")))
         .SetFunctionName("GetSpeed");
 
-    aut.AddScopedCondition("MovementAngleIsAround",
-                          _("Angle of movement on its path"),
-                          _("Compare the angle of movement of an object on its path."),
-                          _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
-                              ": _PARAM3_ degrees)"),
-                          _("Movement on the path"),
-                         "CppPlatform/Extensions/AStaricon24.png",
-                         "CppPlatform/Extensions/AStaricon16.png")
+    aut.AddScopedCondition(
+           "MovementAngleIsAround",
+           _("Angle of movement on its path"),
+           _("Compare the angle of movement of an object on its path."),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
+           _("Movement on the path"),
+           "CppPlatform/Extensions/AStaricon24.png",
+           "CppPlatform/Extensions/AStaricon16.png")
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -235,7 +257,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Max angular speed (in degrees per second)")))
         .SetFunctionName("SetAngularMaxSpeed")
         .SetGetter("GetAngularMaxSpeed");
 
@@ -250,7 +275,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Max angular speed to compare to (in degrees per second)")))
         .SetFunctionName("GetAngularMaxSpeed");
 
     aut.AddAction(
@@ -264,7 +292,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Angle (in degrees)")))
         .SetFunctionName("SetAngleOffset")
         .SetGetter("GetAngleOffset");
 
@@ -278,7 +309,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number",
+            gd::ParameterOptions::MakeNewOptions().SetDescription(
+                _("Angle to compare to (in degrees)")))
         .SetFunctionName("GetAngleOffset");
 
     aut.AddAction(
@@ -293,7 +327,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters("number",
+                                       gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("SetExtraBorder")
         .SetGetter("GetExtraBorder");
 
@@ -308,7 +343,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("GetExtraBorder");
 
     aut.AddAction(
@@ -545,7 +581,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardParameters("number");
+        .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
 
     aut.AddExpressionAndConditionAndAction("number",
                       "GridOffsetY",
@@ -556,7 +592,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .UseStandardParameters("number");
+        .UseStandardParameters("number", gd::ParameterOptions::MakeNewOptions());
 
   }
   {
@@ -581,7 +617,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .UseStandardOperatorParameters("number")
+        .UseStandardOperatorParameters("number",
+                                       gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("SetCost")
         .SetGetter("GetCost");
 
@@ -595,12 +632,13 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .UseStandardRelationalOperatorParameters("number")
+        .UseStandardRelationalOperatorParameters(
+            "number", gd::ParameterOptions::MakeNewOptions())
         .SetFunctionName("GetCost");
 
     aut.AddAction("SetImpassable",
-                  _("Should object be impassable?"),
-                  _("Decide if the object is an impassable obstacle"),
+                  _("Should object be impassable"),
+                  _("Decide if the object is an impassable obstacle."),
                   _("Set _PARAM0_ as an impassable obstacle: _PARAM2_"),
                   _("Obstacles"),
                   "CppPlatform/Extensions/pathfindingobstacleicon24.png",
@@ -608,12 +646,12 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
-        .AddParameter("yesorno", _("Impassable?"))
+        .AddParameter("yesorno", _("Impassable"))
         .SetFunctionName("SetImpassable");
 
     aut.AddCondition("IsImpassable",
-                     _("Is object impassable?"),
-                     _("Check if the obstacle is impassable"),
+                     _("Impassable obstacle"),
+                     _("Check if the obstacle is impassable."),
                      _("_PARAM0_ is impassable"),
                      _("Obstacles"),
                      "CppPlatform/Extensions/pathfindingobstacleicon24.png",

@@ -6,9 +6,9 @@ import Button from '@material-ui/core/Button';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
-import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
-import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
-import GDevelopThemeContext from '../Theme/ThemeContext';
+import { useScreenType } from '../Responsive/ScreenTypeMeasurer';
+import GDevelopThemeContext from '../Theme/GDevelopThemeContext';
+import InAppTutorialContext from '../../InAppTutorial/InAppTutorialContext';
 
 type Props = {|
   identifier: AlertMessageIdentifier,
@@ -23,11 +23,14 @@ const DismissableInfoBar = ({
   touchScreenMessage,
   message,
 }: Props) => {
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
-  return isUserflowRunning ? null : (
+  return !!currentlyRunningInAppTutorial ? null : (
     <Snackbar
       open={show && !preferences.values.hiddenAlertMessages[identifier]}
       message={
@@ -37,7 +40,6 @@ const DismissableInfoBar = ({
       }
       action={
         <Button
-          key="undo"
           color={
             gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
           }

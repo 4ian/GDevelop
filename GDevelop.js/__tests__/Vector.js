@@ -2,10 +2,9 @@ const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.j
 
 describe('libGD.js - gd.Vector* tests', function() {
   let gd = null;
-  beforeAll((done) => (initializeGDevelopJs().then(module => {
-    gd = module;
-    done();
-  })));
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('gd.VectorString', function() {
     let vector = null;

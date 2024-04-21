@@ -17,14 +17,12 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
-#endif
+
 namespace gd {
 class BaseEvent;
 class Object;
 class Project;
-class BehaviorContent;
 class InitialInstancesContainer;
 }  // namespace gd
 class TiXmlElement;
@@ -131,7 +129,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
    */
   ///@{
 
-#if defined(GD_IDE_ONLY)
   /**
    * Get the events of the layout
    */
@@ -141,7 +138,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Get the events of the layout
    */
   gd::EventsList& GetEvents() { return events; }
-#endif
+
   ///@}
 
   /** \name Variable management
@@ -238,12 +235,10 @@ class GD_CORE_API Layout : public ObjectsContainer {
    */
   void MoveLayer(std::size_t oldIndex, std::size_t newIndex);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the layers.
    */
   void SerializeLayersTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layers.
@@ -274,21 +269,21 @@ class GD_CORE_API Layout : public ObjectsContainer {
   /**
    * \brief Get the shared data stored for a behavior
    */
-  const gd::BehaviorContent& GetBehaviorSharedData(
+  const gd::BehaviorsSharedData& GetBehaviorSharedData(
       const gd::String& behaviorName) const;
 
   /**
    * \brief Get the shared data stored for a behavior
    */
-  gd::BehaviorContent& GetBehaviorSharedData(const gd::String& behaviorName);
+  gd::BehaviorsSharedData& GetBehaviorSharedData(const gd::String& behaviorName);
 
   /**
    * \brief Get a map of all shared data stored for behaviors
    */
-  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>&
   GetAllBehaviorSharedData() const;
 
-#if defined(GD_IDE_ONLY)
+
   /**
    * Return the settings associated to the layout.
    * \see gd::EditorSettings
@@ -304,7 +299,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
   gd::EditorSettings& GetAssociatedEditorSettings() {
     return editorSettings;
   }
-#endif
 
   /** \name Other properties
    */
@@ -345,48 +339,16 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * launched
    */
   bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
-
-  /**
-   * Set OpenGL default field of view
-   */
-  void SetOpenGLFOV(float oglFOV_) { oglFOV = oglFOV_; }
-
-  /**
-   * Get OpenGL default field of view
-   */
-  float GetOpenGLFOV() const { return oglFOV; }
-
-  /**
-   * Set OpenGL near clipping plan
-   */
-  void SetOpenGLZNear(float oglZNear_) { oglZNear = oglZNear_; }
-
-  /**
-   * Get OpenGL near clipping plan
-   */
-  float GetOpenGLZNear() const { return oglZNear; }
-
-  /**
-   * Set OpenGL far clipping plan
-   */
-  void SetOpenGLZFar(float oglZFar_) { oglZFar = oglZFar_; }
-
-  /**
-   * Get OpenGL far clipping plan
-   */
-  float GetOpenGLZFar() const { return oglZFar; }
 ///@}
 
 /** \name Saving and loading
  * Members functions related to saving and loading the object.
  */
 ///@{
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the layout.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layout.
@@ -395,7 +357,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
 ///@}
 
 // TODO: GD C++ Platform specific code below
-#if defined(GD_IDE_ONLY)
   /**
    * Get the profiler associated with the scene. Can be NULL.
    */
@@ -405,7 +366,6 @@ class GD_CORE_API Layout : public ObjectsContainer {
    * Set the profiler associated with the scene. Can be NULL.
    */
   void SetProfiler(BaseProfiler* profiler_) { profiler = profiler_; };
-#endif
 
  private:
   gd::String name;         ///< Scene name
@@ -417,38 +377,38 @@ class GD_CORE_API Layout : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Variables list
   gd::InitialInstancesContainer initialInstances;  ///< Initial instances
   std::vector<gd::Layer> initialLayers;            ///< Initial layers
-  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+  std::map<gd::String, std::unique_ptr<gd::BehaviorsSharedData>>
       behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
                              ///< startup.
   bool standardSortMethod;   ///< True to sort objects using standard sort.
-  float oglFOV;              ///< OpenGL Field Of View value
-  float oglZNear;            ///< OpenGL Near Z position
-  float oglZFar;             ///< OpenGL Far Z position
   bool disableInputWhenNotFocused;  /// If set to true, the input must be
                                     /// disabled when the window do not have the
                                     /// focus.
   static gd::Layer badLayer;  ///< Null object, returned when GetLayer can not
                               ///< find an appropriate layer.
-  static gd::BehaviorContent
-      badBehaviorContent;  ///< Null object, returned when
+  static gd::BehaviorsSharedData
+      badBehaviorSharedData;  ///< Null object, returned when
                            ///< GetBehaviorSharedData can not find the
                            ///< specified behavior shared data.
-#if defined(GD_IDE_ONLY)
+
   EventsList events;  ///< Scene events
   gd::EditorSettings editorSettings;
-#endif
 
 // TODO: GD C++ Platform specific code below
-#if defined(GD_IDE_ONLY)
+
   BaseProfiler* profiler;  ///< Pointer to the profiler. Can be NULL.
-#endif
 
   /**
    * Initialize from another layout. Used by copy-ctor and assign-op.
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::Layout& other);
+
+  std::unique_ptr<gd::BehaviorsSharedData> CreateBehaviorsSharedData(
+      gd::Project& project,
+      const gd::String& name,
+      const gd::String& behaviorsType);
 };
 
 /**
@@ -475,6 +435,7 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  * \note If a group contains only objects of a same type, then the group has
  * this type. Otherwise, it is considered as an object without any specific
  * type.
+ * \deprecated Use gd::ObjectsContainersList::GetTypeOfObject instead.
  *
  * @return Type of the object/group.
  */
@@ -482,10 +443,45 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        const ObjectsContainer& layout,
                                        gd::String objectName,
                                        bool searchInGroups = true);
+/**
+ * \brief Check if an object or all objects of a group has a behavior.
+ * \deprecated Use gd::ObjectsContainersList::HasBehaviorInObjectOrGroup instead.
+ */
+bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
+                                            const gd::ObjectsContainer &layout,
+                                            const gd::String &objectOrGroupName,
+                                            const gd::String &behaviorName,
+                                            bool searchInGroups = true);
+/**
+ * \brief Get the names of behavior of a given type if an object or all objects of a group has it.
+ */
+std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
+    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
+    const gd::String &objectOrGroupName, const gd::String &behaviorType,
+    bool searchInGroups);
 
+/**
+ * \brief Check if a behavior is a default one or doesn't exist in an object or
+ * all objects of a group.
+ */
+bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
+                                   gd::String objectOrGroupName,
+                                   gd::String behaviorName,
+                                   bool searchInGroups = true);
+
+/**
+ * \brief Get the type of a behavior if an object or all objects of a group has it.
+ */
+gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
+                                            const gd::ObjectsContainer &layout,
+                                            const gd::String &objectOrGroupName,
+                                            const gd::String &behaviorName,
+                                            bool searchInGroups = true);
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
+ * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
  */
 gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
                                          const ObjectsContainer& layout,
@@ -502,7 +498,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
 std::vector<gd::String> GD_CORE_API
 GetBehaviorsOfObject(const ObjectsContainer& game,
                      const ObjectsContainer& layout,
-                     gd::String objectName,
+                     const gd::String& objectName,
                      bool searchInGroups = true);
 
 }  // namespace gd

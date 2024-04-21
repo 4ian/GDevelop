@@ -2,29 +2,45 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Container from '@material-ui/core/Container';
-import Add from '@material-ui/icons/Add';
 import { ColumnStackLayout } from './Layout';
+import { ResponsiveLineStackLayout } from './Layout';
 import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
 import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import TutorialButton from './TutorialButton';
 import CircularProgress from './CircularProgress';
+import Add from './CustomSvgIcons/Add';
 
 type Props = {|
   title: React.Node,
   description: React.Node,
-  actionLabel: React.Node,
   helpPagePath?: string,
+  helpPageAnchor?: string,
   tutorialId?: string,
-  actionButtonId?: string,
-  onAction: () => void,
   isLoading?: boolean,
+  actionButtonId?: string,
+  actionLabel: React.Node,
   actionIcon?: React.Node,
+  onAction: () => void,
+  secondaryActionLabel?: React.Node,
+  secondaryActionIcon?: React.Node,
+  onSecondaryAction?: () => void,
 |};
 
-const DefaultHelpButton = ({ helpPagePath }: { helpPagePath?: string }) => (
-  <HelpButton label={<Trans>Read the doc</Trans>} helpPagePath={helpPagePath} />
+const DefaultHelpButton = ({
+  helpPagePath,
+  helpPageAnchor,
+}: {
+  helpPagePath?: string,
+  helpPageAnchor?: string,
+}) => (
+  <HelpButton
+    label={<Trans>Read the doc</Trans>}
+    helpPagePath={helpPagePath}
+    anchor={helpPageAnchor}
+  />
 );
 
 /**
@@ -48,32 +64,49 @@ export const EmptyPlaceholder = (props: Props) => (
         </Text>
         <LargeSpacer />
         <ColumnStackLayout alignItems="center" noMargin>
-          <RaisedButton
-            label={props.actionLabel}
-            primary
-            onClick={props.onAction}
-            disabled={!!props.isLoading}
-            icon={
-              props.isLoading ? (
-                <CircularProgress size={24} />
-              ) : props.actionIcon ? (
-                props.actionIcon
-              ) : (
-                <Add />
-              )
-            }
-            id={props.actionButtonId}
-          />
+          <ResponsiveLineStackLayout noMargin>
+            {props.secondaryActionLabel && props.onSecondaryAction && (
+              <FlatButton
+                label={props.secondaryActionLabel}
+                primary
+                onClick={props.onSecondaryAction}
+                disabled={!!props.isLoading}
+                leftIcon={props.secondaryActionIcon}
+              />
+            )}
+            <RaisedButton
+              label={props.actionLabel}
+              primary
+              onClick={props.onAction}
+              disabled={!!props.isLoading}
+              icon={
+                props.isLoading ? (
+                  <CircularProgress size={24} />
+                ) : props.actionIcon ? (
+                  props.actionIcon
+                ) : (
+                  <Add />
+                )
+              }
+              id={props.actionButtonId}
+            />
+          </ResponsiveLineStackLayout>
           {props.tutorialId ? (
             <TutorialButton
               tutorialId={props.tutorialId}
-              label="Watch tutorial"
+              label={<Trans>Watch tutorial</Trans>}
               renderIfNotFound={
-                <DefaultHelpButton helpPagePath={props.helpPagePath} />
+                <DefaultHelpButton
+                  helpPagePath={props.helpPagePath}
+                  helpPageAnchor={props.helpPageAnchor}
+                />
               }
             />
           ) : (
-            <DefaultHelpButton helpPagePath={props.helpPagePath} />
+            <DefaultHelpButton
+              helpPagePath={props.helpPagePath}
+              helpPageAnchor={props.helpPageAnchor}
+            />
           )}
         </ColumnStackLayout>
       </Column>

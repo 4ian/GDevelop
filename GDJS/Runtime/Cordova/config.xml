@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION" xmlns="http://www.w3.org/ns/widgets"
+    xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>GDJS_PROJECTNAME</name>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
@@ -14,7 +15,11 @@
     <platform name="android">
         <allow-intent href="market:*" />
 
+        <!-- Increase timeout value for low-end android devices -->
+        <preference name="loadUrlTimeoutValue" value="60000" />
+
         <!-- GDJS_ICONS_ANDROID -->
+        <preference name="AndroidWindowSplashScreenBackground" value="#000000" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
@@ -27,7 +32,7 @@
 
     <preference name="AndroidXEnabled" value="true" />
 
-    <preference name="BackgroundColor" value="0xff000000"/>
+    <preference name="BackgroundColor" value="0xff000000" />
 
     <!-- Android Fullscreen -->
     <preference name="Fullscreen" value="true" />

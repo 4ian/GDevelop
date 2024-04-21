@@ -1,96 +1,109 @@
+// @flow
 import RenderedInstance from './RenderedInstance';
+import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 import * as PIXI from 'pixi.js-legacy';
-const gd /* TODO: add flow in this file */ = global.gd;
+const gd: libGDevelop = global.gd;
 
 /**
  * Renderer for gd.TiledSpriteObject
- *
- * @extends RenderedInstance
- * @class RenderedTiledSpriteInstance
- * @constructor
  */
-function RenderedTiledSpriteInstance(
-  project,
-  layout,
-  instance,
-  associatedObject,
-  pixiContainer,
-  pixiResourcesLoader
-) {
-  RenderedInstance.call(
-    this,
-    project,
-    layout,
-    instance,
-    associatedObject,
-    pixiContainer,
-    pixiResourcesLoader
-  );
+export default class RenderedTiledSpriteInstance extends RenderedInstance {
+  _texture: PIXI.Texture;
 
-  //Setup the PIXI object:
-  var tiledSprite = gd.asTiledSpriteObject(associatedObject);
-  this._texture = tiledSprite.getTexture();
-  this._pixiObject = new PIXI.TilingSprite(
-    this._pixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
-    tiledSprite.getWidth(),
-    tiledSprite.getHeight()
-  );
-  this._pixiObject.anchor.x = 0.5;
-  this._pixiObject.anchor.y = 0.5;
-  this._pixiContainer.addChild(this._pixiObject);
-}
-RenderedTiledSpriteInstance.prototype = Object.create(
-  RenderedInstance.prototype
-);
+  constructor(
+    project: gdProject,
+    layout: gdLayout,
+    instance: gdInitialInstance,
+    associatedObjectConfiguration: gdObjectConfiguration,
+    pixiContainer: PIXI.Container,
+    pixiResourcesLoader: Class<PixiResourcesLoader>
+  ) {
+    super(
+      project,
+      layout,
+      instance,
+      associatedObjectConfiguration,
+      pixiContainer,
+      pixiResourcesLoader
+    );
 
-/**
- * Return a URL for thumbnail of the specified object.
- */
-RenderedTiledSpriteInstance.getThumbnail = function(
-  project,
-  resourcesLoader,
-  object
-) {
-  var tiledSprite = gd.asTiledSpriteObject(object);
-
-  return resourcesLoader.getResourceFullUrl(
-    project,
-    tiledSprite.getTexture(),
-    {}
-  );
-};
-
-RenderedTiledSpriteInstance.prototype.update = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-  if (this._instance.hasCustomSize()) {
-    this._pixiObject.width = this._instance.getCustomWidth();
-    this._pixiObject.height = this._instance.getCustomHeight();
-  } else {
-    this._pixiObject.width = tiledSprite.getWidth();
-    this._pixiObject.height = tiledSprite.getHeight();
+    //Setup the PIXI object:
+    const tiledSprite = gd.asTiledSpriteConfiguration(
+      associatedObjectConfiguration
+    );
+    this._texture = tiledSprite.getTexture();
+    this._pixiObject = new PIXI.TilingSprite(
+      PixiResourcesLoader.getPIXITexture(project, tiledSprite.getTexture()),
+      tiledSprite.getWidth(),
+      tiledSprite.getHeight()
+    );
+    this._pixiObject.anchor.x = 0.5;
+    this._pixiObject.anchor.y = 0.5;
+    this._pixiContainer.addChild(this._pixiObject);
   }
 
-  if (this._texture !== tiledSprite.getTexture()) {
-    this._texture = tiledSprite.getTexture();
-    this._pixiObject.texture = this._pixiResourcesLoader.getPIXITexture(
-      this._project,
-      tiledSprite.getTexture()
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    // Keep textures because they are shared by all sprites.
+    this._pixiObject.destroy(false);
+  }
+
+  /**
+   * Return a URL for thumbnail of the specified object.
+   */
+  static getThumbnail(
+    project: gdProject,
+    resourcesLoader: Class<ResourcesLoader>,
+    objectConfiguration: gdObjectConfiguration
+  ) {
+    const tiledSprite = gd.asTiledSpriteConfiguration(objectConfiguration);
+
+    return ResourcesLoader.getResourceFullUrl(
+      project,
+      tiledSprite.getTexture(),
+      {}
     );
   }
 
-  this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
-  this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
-  this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
-};
+  update() {
+    const tiledSprite = gd.asTiledSpriteConfiguration(
+      this._associatedObjectConfiguration
+    );
+    if (this._instance.hasCustomSize()) {
+      this._pixiObject.width = this.getCustomWidth();
+      this._pixiObject.height = this.getCustomHeight();
+    } else {
+      this._pixiObject.width = tiledSprite.getWidth();
+      this._pixiObject.height = tiledSprite.getHeight();
+    }
 
-RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-  return tiledSprite.getWidth();
-};
+    if (this._texture !== tiledSprite.getTexture()) {
+      this._texture = tiledSprite.getTexture();
+      this._pixiObject.texture = PixiResourcesLoader.getPIXITexture(
+        this._project,
+        tiledSprite.getTexture()
+      );
+    }
 
-RenderedTiledSpriteInstance.prototype.getDefaultHeight = function() {
-  var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
-  return tiledSprite.getHeight();
-};
+    this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
+    this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+    this._pixiObject.rotation = RenderedInstance.toRad(
+      this._instance.getAngle()
+    );
+  }
 
-export default RenderedTiledSpriteInstance;
+  getDefaultWidth() {
+    const tiledSprite = gd.asTiledSpriteConfiguration(
+      this._associatedObjectConfiguration
+    );
+    return tiledSprite.getWidth();
+  }
+
+  getDefaultHeight() {
+    const tiledSprite = gd.asTiledSpriteConfiguration(
+      this._associatedObjectConfiguration
+    );
+    return tiledSprite.getHeight();
+  }
+}

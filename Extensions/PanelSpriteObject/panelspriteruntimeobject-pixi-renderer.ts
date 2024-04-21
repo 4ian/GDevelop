@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
     /**
@@ -20,12 +19,12 @@ namespace gdjs {
 
     constructor(
       runtimeObject: gdjs.PanelSpriteRuntimeObject,
-      runtimeScene: gdjs.RuntimeScene,
+      instanceContainer: gdjs.RuntimeInstanceContainer,
       textureName: string,
       tiled: boolean
     ) {
       this._object = runtimeObject;
-      const texture = (runtimeScene
+      const texture = (instanceContainer
         .getGame()
         .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
         textureName
@@ -33,39 +32,36 @@ namespace gdjs {
       const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
       this._spritesContainer = new PIXI.Container();
       this._wrapperContainer = new PIXI.Container();
-      // @ts-ignore
-      this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
+      this._centerSprite = new StretchedSprite(
+        new PIXI.Texture(texture.baseTexture)
+      );
       this._borderSprites = [
-        // @ts-ignore
-        new StretchedSprite(new PIXI.Texture(texture)),
-        //Right
+        // Right
+        new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
+        // Top-Right
         new PIXI.Sprite(texture),
-        //Top-Right
-        // @ts-ignore
-        new StretchedSprite(new PIXI.Texture(texture)),
-        //Top
+        // Top
+        new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
+        // Top-Left
         new PIXI.Sprite(texture),
-        //Top-Left
-        // @ts-ignore
-        new StretchedSprite(new PIXI.Texture(texture)),
-        //Left
+        // Left
+        new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
+        // Bottom-Left
         new PIXI.Sprite(texture),
-        //Bottom-Left
-        // @ts-ignore
-        new StretchedSprite(new PIXI.Texture(texture)),
-        //Bottom
+        // Bottom
+        new StretchedSprite(new PIXI.Texture(texture.baseTexture)),
         new PIXI.Sprite(texture),
       ];
 
       //Bottom-Right
-      this.setTexture(textureName, runtimeScene);
+      this.setTexture(textureName, instanceContainer);
       this._spritesContainer.removeChildren();
       this._spritesContainer.addChild(this._centerSprite);
       for (let i = 0; i < this._borderSprites.length; ++i) {
         this._spritesContainer.addChild(this._borderSprites[i]);
       }
       this._wrapperContainer.addChild(this._spritesContainer);
-      runtimeScene
+      instanceContainer
         .getLayer('')
         .getRenderer()
         .addRendererObject(this._wrapperContainer, runtimeObject.getZOrder());
@@ -77,11 +73,19 @@ namespace gdjs {
 
     ensureUpToDate() {
       if (this._spritesContainer.visible && this._wasRendered) {
-        // Cache the rendered sprites as a bitmap to speed up rendering when
-        // lots of panel sprites are on the scene.
-        // Sadly, because of this, we need a wrapper container to workaround
-        // a PixiJS issue with alpha (see updateOpacity).
-        this._spritesContainer.cacheAsBitmap = true;
+        // PIXI uses PIXI.SCALE_MODES.LINEAR for the cached image:
+        // this._spritesContainer._cacheData.sprite._texture.baseTexture.scaleMode
+        // There seems to be no way to configure this so the optimization is disabled.
+        if (
+          this._centerSprite.texture.baseTexture.scaleMode !==
+          PIXI.SCALE_MODES.NEAREST
+        ) {
+          // Cache the rendered sprites as a bitmap to speed up rendering when
+          // lots of panel sprites are on the scene.
+          // Sadly, because of this, we need a wrapper container to workaround
+          // a PixiJS issue with alpha (see updateOpacity).
+          this._spritesContainer.cacheAsBitmap = true;
+        }
       }
       this._wasRendered = true;
     }
@@ -91,6 +95,10 @@ namespace gdjs {
       // in Pixi will create a flicker when cacheAsBitmap is set to true.
       // (see https://github.com/pixijs/pixijs/issues/4610)
       this._wrapperContainer.alpha = this._object.opacity / 255;
+      // When the opacity is updated, the cache must be invalidated, otherwise
+      // there is a risk of the panel sprite has been cached previously with a
+      // different opacity (and cannot be updated anymore).
+      this._spritesContainer.cacheAsBitmap = false;
     }
 
     updateAngle(): void {
@@ -188,12 +196,15 @@ namespace gdjs {
       this._spritesContainer.cacheAsBitmap = false;
     }
 
-    setTexture(textureName, runtimeScene): void {
+    setTexture(
+      textureName: string,
+      instanceContainer: gdjs.RuntimeInstanceContainer
+    ): void {
       const obj = this._object;
-      const texture = runtimeScene
+      const texture = instanceContainer
         .getGame()
         .getImageManager()
-        .getPIXITexture(textureName);
+        .getPIXITexture(textureName).baseTexture;
       this._textureWidth = texture.width;
       this._textureHeight = texture.height;
 
@@ -365,7 +376,7 @@ namespace gdjs {
     }
 
     getColor() {
-      const rgb = PIXI.utils.hex2rgb(this._centerSprite.tint);
+      const rgb = new PIXI.Color(this._centerSprite.tint).toRgbArray();
       return (
         Math.floor(rgb[0] * 255) +
         ';' +
@@ -381,6 +392,18 @@ namespace gdjs {
 
     getTextureHeight() {
       return this._textureHeight;
+    }
+
+    destroy() {
+      // Destroy textures because they are instantiated by this class.
+      for (const borderSprite of this._borderSprites) {
+        borderSprite.destroy({ texture: true });
+      }
+      this._centerSprite.destroy({ texture: true });
+      // Destroy the containers without handling children because they are
+      // already handled above.
+      this._wrapperContainer.destroy(false);
+      this._spritesContainer.destroy(false);
     }
   }
 

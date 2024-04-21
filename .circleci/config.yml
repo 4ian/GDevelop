@@ -15,7 +15,7 @@ jobs:
   # Build the **entire** app for macOS.
   build-macos:
     macos:
-      xcode: 12.5.1
+      xcode: 14.2.0
     steps:
       - checkout
 
@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -62,13 +62,14 @@ jobs:
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
+      # To test signing the code in the CI, add "export CSC_FOR_PULL_REQUEST=true && " before the command.
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
+          command: export CSC_FOR_PULL_REQUEST=true && export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && CI=false npm run build -- --mac --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf "newIDE/electron-app/dist/mac/GDevelop 5.app"
+          command: rm -rf "newIDE/electron-app/dist/mac-universal/GDevelop 5.app"
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -101,12 +102,12 @@ jobs:
           command: sudo apt-get update && sudo apt install cmake
 
       - run:
-         name: Install Python3 dependencies for Emscripten
-         command: sudo apt install python-is-python3 python3-distutils -y
+          name: Install Python3 dependencies for Emscripten
+          command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       - run:
           name: Install system dependencies for Electron builder
@@ -126,7 +127,8 @@ jobs:
       # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
 
       # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
       - run:
@@ -143,11 +145,11 @@ jobs:
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux AppImage zip deb --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf newIDE/electron-app/dist/linux-unpacked
+          command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/linux-arm64-unpacked
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -178,12 +180,12 @@ jobs:
           command: sudo apt-get update && sudo apt install cmake
 
       - run:
-         name: Install Python3 dependencies for Emscripten
-         command: sudo apt install python-is-python3 python3-distutils -y
+          name: Install Python3 dependencies for Emscripten
+          command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)
-          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 3.1.21 && ./emsdk activate 3.1.21 && cd ..
 
       # GDevelop.js dependencies
       - restore_cache:
@@ -199,7 +201,8 @@ jobs:
       # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
-          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+          # Use "--runInBand" as it's faster and avoid deadlocks on CircleCI Linux machines (probably because limited in processes number).
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test -- --runInBand && cd ..
 
       - save_cache:
           paths:

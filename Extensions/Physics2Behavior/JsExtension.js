@@ -586,7 +586,8 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Time scale (1 by default)'))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.setTimeScale');
 
     aut
@@ -4094,7 +4095,8 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.objectsCollide');
 
     extension
@@ -4112,7 +4114,8 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
 
     extension
@@ -4130,7 +4133,8 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
 
     return extension;

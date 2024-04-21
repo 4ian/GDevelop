@@ -13,6 +13,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
@@ -89,5 +90,4 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) =>
-  renderVariableWithIcon(props, 'res/types/globalvar.png', 'global variable');
+) => renderVariableWithIcon(props, GlobalIcon, 'global variable');

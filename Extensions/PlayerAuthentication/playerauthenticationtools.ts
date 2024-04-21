@@ -171,7 +171,7 @@ namespace gdjs {
       if (!_checkedLocalStorage) {
         readAuthenticatedUserFromLocalStorage();
       }
-      return _userId || null;
+      return _userId || '';
     };
 
     /**

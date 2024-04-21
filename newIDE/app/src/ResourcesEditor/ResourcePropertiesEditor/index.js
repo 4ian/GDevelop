@@ -16,16 +16,10 @@ import {
   type ResourceManagementProps,
 } from '../../ResourcesList/ResourceSource';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-
-const styles = {
-  propertiesContainer: {
-    padding: 8,
-    overflowY: 'scroll',
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
-    overflowX: 'hidden',
-    flex: 1,
-  },
-};
+import { EmbeddedResourcesMappingTable } from './EmbeddedResourcesMappingTable';
+import { Spacer } from '../../UI/Grid';
+import ScrollView from '../../UI/ScrollView';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 type Props = {|
   project: gdProject,
@@ -152,15 +146,10 @@ const ResourcePropertiesEditor = React.forwardRef<
         );
 
         return (
-          <div
-            style={styles.propertiesContainer}
-            key={resources.map(resource => '' + resource.ptr).join(';')}
-          >
-            <PropertiesEditor
-              schema={schema.concat(resourceSchema)}
-              instances={resources}
-            />
-          </div>
+          <PropertiesEditor
+            schema={schema.concat(resourceSchema)}
+            instances={resources}
+          />
         );
       },
       [resources, schema, forceUpdate]
@@ -181,9 +170,18 @@ const ResourcePropertiesEditor = React.forwardRef<
     return (
       <Background maxWidth>
         {renderPreview()}
-        {!resources || !resources.length
-          ? renderEmpty()
-          : renderResourcesProperties()}
+        <Spacer />
+        <ScrollView>
+          <ColumnStackLayout
+            expand
+            key={resources.map(resource => '' + resource.ptr).join(';')}
+          >
+            {!resources || !resources.length
+              ? renderEmpty()
+              : renderResourcesProperties()}
+            <EmbeddedResourcesMappingTable resources={resources} />
+          </ColumnStackLayout>
+        </ScrollView>
       </Background>
     );
   }

@@ -11,7 +11,11 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
         const threeCamera = layerRenderer.getThreeCamera();
-        const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
+        const fov = threeCamera
+          ? threeCamera instanceof THREE.OrthographicCamera
+            ? null
+            : threeCamera.fov
+          : assumedFovIn2D;
         return layer.getCameraZ(fov, cameraIndex);
       };
 
@@ -24,7 +28,11 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const layerRenderer = layer.getRenderer();
         const threeCamera = layerRenderer.getThreeCamera();
-        const fov = threeCamera ? threeCamera.fov : assumedFovIn2D;
+        const fov = threeCamera
+          ? threeCamera instanceof THREE.OrthographicCamera
+            ? null
+            : threeCamera.fov
+          : assumedFovIn2D;
         layer.setCameraZ(z, fov, cameraIndex);
       };
 
@@ -213,8 +221,11 @@ namespace gdjs {
         const layerRenderer = layer.getRenderer();
 
         const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return 45;
-        return threeCamera.fov;
+        return threeCamera
+          ? threeCamera instanceof THREE.OrthographicCamera
+            ? 0
+            : threeCamera.fov
+          : assumedFovIn2D;
       };
 
       export const setFov = (
@@ -227,7 +238,8 @@ namespace gdjs {
         const layerRenderer = layer.getRenderer();
 
         const threeCamera = layerRenderer.getThreeCamera();
-        if (!threeCamera) return;
+        if (!threeCamera || threeCamera instanceof THREE.OrthographicCamera)
+          return;
 
         threeCamera.fov = Math.min(Math.max(angle, 0), 180);
         layerRenderer.setThreeCameraDirty(true);

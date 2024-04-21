@@ -1,16 +1,13 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import {
-  listUserPurchases,
-  type PrivateAssetPackListingData,
-} from '../../Utils/GDevelopServices/Shop';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import CreateProfile from '../../Profile/CreateProfile';
 import Text from '../../UI/Text';
 import { useInterval } from '../../Utils/UseInterval';
-import { getStripeCheckoutUrl } from '../../Utils/GDevelopServices/Shop';
+import { getPurchaseCheckoutUrl } from '../../Utils/GDevelopServices/Shop';
 import Window from '../../Utils/Window';
 import { Line, Spacer } from '../../UI/Grid';
 import CircularProgress from '../../UI/CircularProgress';
@@ -18,74 +15,35 @@ import BackgroundText from '../../UI/BackgroundText';
 import Mark from '../../UI/CustomSvgIcons/Mark';
 import FlatButton from '../../UI/FlatButton';
 import { ColumnStackLayout, LineStackLayout } from '../../UI/Layout';
-import TextField from '../../UI/TextField';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import {
   shouldUseAppStoreProduct,
   purchaseAppStoreProduct,
 } from '../../Utils/AppStorePurchases';
-import Form from '../../UI/Form';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
-
-const PasswordPromptDialog = (props: {
-  passwordValue: string,
-  setPasswordValue: (newValue: string) => void,
-  onClose: () => void,
-  onApply: () => Promise<void>,
-}) => (
-  <Dialog
-    open
-    maxWidth="xs"
-    title={<Trans>Asset store password</Trans>}
-    onApply={props.onApply}
-    onRequestClose={props.onClose}
-    actions={[
-      <FlatButton
-        key="cancel"
-        label={<Trans>Close</Trans>}
-        onClick={props.onClose}
-      />,
-      <DialogPrimaryButton
-        key="continue"
-        primary
-        label={<Trans>Continue</Trans>}
-        onClick={props.onApply}
-      />,
-    ]}
-  >
-    <Form onSubmit={props.onApply} name="asset-store-password">
-      <TextField
-        fullWidth
-        autoFocus="desktopAndMobileDevices"
-        value={props.passwordValue}
-        floatingLabelText={<Trans>Password</Trans>}
-        type="password"
-        onChange={(e, value) => {
-          props.setPasswordValue(value);
-        }}
-      />
-    </Form>
-  </Dialog>
-);
+import PasswordPromptDialog from '../PasswordPromptDialog';
 
 type Props = {|
   privateAssetPackListingData: PrivateAssetPackListingData,
+  usageType: string,
   onClose: () => void,
   simulateAppStoreProduct?: boolean,
 |};
 
 const PrivateAssetPackPurchaseDialog = ({
   privateAssetPackListingData,
+  usageType,
   onClose,
   simulateAppStoreProduct,
 }: Props) => {
   const {
     profile,
-    getAuthorizationHeader,
     onOpenLoginDialog,
     onOpenCreateAccountDialog,
     receivedAssetPacks,
     onPurchaseSuccessful,
+    onRefreshAssetPackPurchases,
+    assetPackPurchases,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [
@@ -120,14 +78,26 @@ const PrivateAssetPackPurchaseDialog = ({
       return;
     }
 
+    const price = privateAssetPackListingData.prices.find(
+      price => price.usageType === usageType
+    );
+    if (!price) {
+      console.error('Unable to find the price for the usage type', usageType);
+      await showAlert({
+        title: t`An error happened`,
+        message: t`Unable to find the price for this asset pack. Please try again later.`,
+      });
+      return;
+    }
+
     // Purchase with web.
     try {
       setIsPurchasing(true);
-      const checkoutUrl = await getStripeCheckoutUrl(getAuthorizationHeader, {
+      const checkoutUrl = getPurchaseCheckoutUrl({
         productId: privateAssetPackListingData.id,
-        priceName: privateAssetPackListingData.prices[0].name,
+        priceName: price.name,
         userId: profile.id,
-        customerEmail: profile.email,
+        userEmail: profile.email,
         ...(password ? { password } : undefined),
       });
       Window.openExternalURL(checkoutUrl);
@@ -163,45 +133,45 @@ const PrivateAssetPackPurchaseDialog = ({
     else onStartPurchase();
   };
 
-  const checkUserPurchases = React.useCallback(
-    async () => {
-      if (!profile) return;
-      try {
-        const userPurchases = await listUserPurchases(getAuthorizationHeader, {
-          userId: profile.id,
-          productType: 'asset-pack',
-          role: 'receiver',
-        });
+  React.useEffect(
+    () => {
+      onWillPurchase();
+    },
+    // Launch the start process directly when the dialog is opened, to avoid an extra click.
+    // eslint-disable-next-line
+    []
+  );
+
+  React.useEffect(
+    () => {
+      const checkIfPurchaseIsDone = async () => {
         if (
-          userPurchases.find(
+          isPurchasing &&
+          assetPackPurchases &&
+          assetPackPurchases.find(
             userPurchase =>
               userPurchase.productId === privateAssetPackListingData.id
           )
         ) {
           // We found the purchase, the user has bought the asset pack.
-          // We do not close the dialog yet, as we need to trigger a refresh of the asset store.
+          // We do not close the dialog yet, as we need to trigger a refresh of the products received.
           await onPurchaseSuccessful();
         }
-      } catch (error) {
-        console.error('Unable to get the user purchases', error);
-        await showAlert({
-          title: t`An error happened`,
-          message: t`An error happened while checking if your purchase was successful. If you have completed the payment, close and re-open the store to see your asset pack!`,
-        });
-      }
+      };
+      checkIfPurchaseIsDone();
     },
     [
-      profile,
-      getAuthorizationHeader,
+      isPurchasing,
+      assetPackPurchases,
       privateAssetPackListingData,
       onPurchaseSuccessful,
-      showAlert,
+      onRefreshAssetPackPurchases,
     ]
   );
 
   useInterval(
     () => {
-      checkUserPurchases();
+      onRefreshAssetPackPurchases();
     },
     isPurchasing ? 3900 : null
   );

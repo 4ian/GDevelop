@@ -8,6 +8,7 @@ type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
+  secondary?: boolean,
   allowBrowserAutoTranslate?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,
@@ -33,6 +34,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
     {
       label,
       primary,
+      secondary,
       icon,
       keyboardFocused,
       disabled,
@@ -53,7 +55,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
         variant="text"
         size="small"
         translate={allowBrowserAutoTranslate ? undefined : 'no'}
-        color={primary ? 'secondary' : 'default'}
+        color={primary ? 'primary' : secondary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}

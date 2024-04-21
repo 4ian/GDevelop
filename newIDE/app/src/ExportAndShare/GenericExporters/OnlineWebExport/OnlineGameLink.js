@@ -15,7 +15,6 @@ import InfoBar from '../../../UI/Messages/InfoBar';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import {
-  getGame,
   getGameUrl,
   updateGame,
   setGameSlug,
@@ -31,28 +30,36 @@ import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import { ColumnStackLayout } from '../../../UI/Layout';
-import LinearProgress from '../../../UI/LinearProgress';
 import useAlertDialog from '../../../UI/Alert/useAlertDialog';
 import CircularProgress from '../../../UI/CircularProgress';
+import { GameRegistration } from '../../../GameDashboard/GameRegistration';
+import QrCode from '../../../UI/QrCode';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
+  game: ?Game,
   project: gdProject,
   onSaveProject: () => Promise<void>,
   isSavingProject: boolean,
   errored: boolean,
   exportStep: BuildStep,
+  onGameUpdated: () => Promise<void>,
+  automaticallyOpenGameProperties?: boolean,
 |};
 
 const timeForExport = 5; // seconds.
 
 const OnlineGameLink = ({
   build,
+  game,
   project,
   onSaveProject,
   isSavingProject,
   errored,
   exportStep,
+  onGameUpdated,
+  automaticallyOpenGameProperties,
 }: OnlineGameLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
@@ -60,11 +67,11 @@ const OnlineGameLink = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );
+  const { isMobile } = useResponsiveWindowSize();
   const [
     isOnlineGamePropertiesDialogOpen,
     setIsOnlineGamePropertiesDialogOpen,
   ] = React.useState<boolean>(false);
-  const [game, setGame] = React.useState<?Game>(null);
   const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -79,7 +86,7 @@ const OnlineGameLink = ({
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
   const gameUrl = getGameUrl(game);
-  const buildUrl =
+  const buildOrGameUrl =
     exportPending || !isBuildComplete
       ? null
       : isBuildPublished
@@ -101,25 +108,6 @@ const OnlineGameLink = ({
       }
     },
     [exportPending, timeBeforeExportFinished]
-  );
-
-  const loadGame = React.useCallback(
-    async () => {
-      const gameId = build && build.gameId;
-      if (!profile || !gameId) return;
-
-      const { id } = profile;
-      try {
-        setIsGameLoading(true);
-        const game = await getGame(getAuthorizationHeader, id, gameId);
-        setGame(game);
-      } catch (err) {
-        console.error('Unable to load the game', err);
-      } finally {
-        setIsGameLoading(false);
-      }
-    },
-    [build, getAuthorizationHeader, profile]
   );
 
   const tryUpdateAuthors = React.useCallback(
@@ -187,22 +175,21 @@ const OnlineGameLink = ({
 
   React.useEffect(
     () => {
-      // Load game only once
-      if (!game && isBuildComplete) {
-        loadGame();
-      }
-    },
-    [game, loadGame, isBuildComplete]
-  );
-
-  React.useEffect(
-    () => {
       if (exportStep === 'done') {
         setTimeBeforeExportFinished(timeForExport); // reset.
         setIsShareDialogOpen(true);
       }
     },
-    [exportStep]
+    [exportStep, automaticallyOpenGameProperties]
+  );
+
+  React.useEffect(
+    () => {
+      if (isBuildComplete && automaticallyOpenGameProperties) {
+        setIsOnlineGamePropertiesDialogOpen(true);
+      }
+    },
+    [isBuildComplete, automaticallyOpenGameProperties]
   );
 
   const onGameUpdate = React.useCallback(
@@ -234,7 +221,7 @@ const OnlineGameLink = ({
           tryUpdateSlug(partialGameChange, i18n),
         ]);
         // Update game again as cached values on the game entity might have changed.
-        await loadGame();
+        await onGameUpdated();
         // If one of the update failed, return false so that the dialog is not closed.
         if (!authorsUpdated || !slugUpdated) {
           return false;
@@ -260,7 +247,7 @@ const OnlineGameLink = ({
       project,
       tryUpdateAuthors,
       tryUpdateSlug,
-      loadGame,
+      onGameUpdated,
       showAlert,
     ]
   );
@@ -275,7 +262,7 @@ const OnlineGameLink = ({
       onClick={() => setIsShareDialogOpen(false)}
     />,
     // Ensure there is a game loaded, meaning the user owns the game.
-    game && buildUrl && !isBuildPublished && (
+    game && buildOrGameUrl && !isBuildPublished && (
       <DialogPrimaryButton
         key="publish"
         label={<Trans>Verify and Publish to gd.games</Trans>}
@@ -289,14 +276,12 @@ const OnlineGameLink = ({
       {({ i18n }) => (
         <>
           {exportPending && (
-            <>
+            <Column alignItems="center">
               <Text>
-                <Trans>
-                  The game is being exported and the link generated...
-                </Trans>
+                <Trans>Uploading your game...</Trans>
               </Text>
               <Line expand>
-                <LinearProgress
+                <CircularProgress
                   value={
                     ((timeForExport - timeBeforeExportFinished) /
                       timeForExport) *
@@ -309,47 +294,59 @@ const OnlineGameLink = ({
                   }
                 />
               </Line>
-            </>
+            </Column>
           )}
           {isShareDialogOpen && (
             <Dialog
               title={<Trans>Share your game</Trans>}
               id="export-game-share-dialog"
               minHeight="sm"
+              maxWidth="md"
               actions={dialogActions}
               open
               onRequestClose={() => setIsShareDialogOpen(false)}
               onApply={() => {
-                if (game && buildUrl && !isBuildPublished) {
+                if (game && buildOrGameUrl && !isBuildPublished) {
                   setIsOnlineGamePropertiesDialogOpen(true);
                 }
               }}
+              flexColumnBody
             >
-              {buildUrl && !isGameLoading ? (
+              {buildOrGameUrl && !isGameLoading ? (
                 <ColumnStackLayout noMargin>
-                  <ShareLink url={buildUrl} />
-                  {isBuildPublished && navigator.share && (
-                    <ShareButton url={buildUrl} />
-                  )}
-                  {isBuildPublished && !navigator.share && (
-                    <ColumnStackLayout noMargin expand>
+                  <ShareLink url={buildOrGameUrl} />
+                  <ColumnStackLayout noMargin expand>
+                    {navigator.share ? (
+                      <ShareButton url={buildOrGameUrl} />
+                    ) : (
                       <Column
                         expand
                         justifyContent="flex-end"
                         noMargin
                         alignItems="flex-end"
                       >
-                        <SocialShareButtons url={buildUrl} />
+                        <SocialShareButtons url={buildOrGameUrl} />
                       </Column>
-                      <AlertMessage kind="info">
-                        <Trans>
-                          Your game has a page on gd.games. You can administrate
-                          it from the Games Dashboard in GDevelop.
-                        </Trans>
-                      </AlertMessage>
-                    </ColumnStackLayout>
-                  )}
-                  {!isBuildPublished && game && (
+                    )}
+                    <Line noMargin>
+                      <Text>
+                        <Trans>Share it with this QR code:</Trans>
+                      </Text>
+                    </Line>
+                    <Line noMargin justifyContent="center">
+                      <QrCode
+                        url={buildOrGameUrl}
+                        size={isMobile ? 100 : 150}
+                      />
+                    </Line>
+                  </ColumnStackLayout>
+                  {isBuildPublished ? (
+                    <GameRegistration
+                      project={project}
+                      hideLoader
+                      suggestAdditionalActions
+                    />
+                  ) : game ? (
                     <AlertMessage kind="info">
                       <Trans>
                         This link is private. You can share it with
@@ -358,15 +355,23 @@ const OnlineGameLink = ({
                         gd.games - GDevelop gaming platform.
                       </Trans>
                     </AlertMessage>
-                  )}
+                  ) : null}
                 </ColumnStackLayout>
               ) : (
-                <ColumnStackLayout alignItems="center">
+                <ColumnStackLayout
+                  alignItems="center"
+                  justifyContent="center"
+                  expand
+                >
                   <Line>
                     <CircularProgress size={40} />
                   </Line>
                   <Text>
-                    <Trans>Loading your link...</Trans>
+                    {automaticallyOpenGameProperties ? (
+                      <Trans>Loading your game...</Trans>
+                    ) : (
+                      <Trans>Loading your link...</Trans>
+                    )}
                   </Text>
                 </ColumnStackLayout>
               )}
@@ -382,7 +387,15 @@ const OnlineGameLink = ({
               project={project}
               onSaveProject={onSaveProject}
               buildId={build.id}
-              onClose={() => setIsOnlineGamePropertiesDialogOpen(false)}
+              onClose={() => {
+                setIsOnlineGamePropertiesDialogOpen(false);
+                if (automaticallyOpenGameProperties) {
+                  // If the dialog was automatically opened,
+                  // Also close the share dialog, as they are probably not
+                  // looking for a new link.
+                  setIsShareDialogOpen(false);
+                }
+              }}
               onApply={async partialGameChange => {
                 const isGameUpdated = await onGameUpdate(
                   partialGameChange,

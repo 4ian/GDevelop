@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
-
 import TextField from '../../UI/TextField';
 import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
@@ -13,7 +11,7 @@ import CircularProgress from '../../UI/CircularProgress';
 export default {
   title: 'UI Building Blocks/TextField',
   component: TextField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const TextFieldStoryTemplate = (args: {|

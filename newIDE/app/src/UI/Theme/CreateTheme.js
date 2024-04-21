@@ -7,17 +7,6 @@ const closeableTabSizeOverrides = {
   closeButtonWidth: 24,
 };
 
-export function getRootClassNames(theme: string) {
-  return {
-    mosaicRootClassName: theme,
-    eventsSheetRootClassName: theme,
-    treeViewRootClassName: theme,
-    tableRootClassName: theme,
-    markdownRootClassName: theme,
-    uiRootClassName: theme,
-  };
-}
-
 export function getMuiOverrides({
   tabTextColor,
   tabSelectedTextColor,
@@ -467,6 +456,10 @@ export function createGdevelopTheme({
         warning: styles['ThemeMessageWarningColor'],
         error: styles['ThemeMessageErrorColor'],
         valid: styles['ThemeMessageValidColor'],
+        hot: {
+          backgroundColor: styles['ThemeMessageHotBackgroundColor'],
+          color: styles['ThemeMessageHotColor'],
+        },
       },
       titlebar: {
         backgroundColor: styles['ThemeSurfaceTitlebarBackgroundColor'],
@@ -604,6 +597,7 @@ export function createGdevelopTheme({
           light: styles['ThemeSurfaceAlternateCanvasLightBackgroundColor'],
         },
       },
+      notification: { badgeColor: styles['ThemeNotificationBadgeColor'] },
       emptyMessage: {
         shadowColor: styles['ThemeMessageEmptyShadowColor'],
       },
@@ -612,7 +606,7 @@ export function createGdevelopTheme({
           styles['ThemeIconButtonSelectedBackgroundColor'],
         selectedColor: styles['ThemeIconButtonSelectedColor'],
       },
-      ...getRootClassNames(rootClassNameIdentifier),
+      uiRootClassName: rootClassNameIdentifier,
       logo: {
         src: 'res/GD-logo-big.png',
       },
@@ -630,6 +624,10 @@ export function createGdevelopTheme({
         success: styles['ThemeSuccessColor'],
         error: styles['ThemeErrorColor'],
         warning: styles['ThemeWarningColor'],
+      },
+      credits: {
+        backgroundColor: styles['ThemePrimaryLight'],
+        color: styles['ThemePrimaryTextContrastColor'],
       },
     },
     muiThemeOptions: {

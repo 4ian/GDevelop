@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import {
@@ -25,7 +24,7 @@ import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 export default {
   title: 'AssetStore/AssetStore/AssetPackInstallDialog',
   component: AssetPackInstallDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const mockApiDataForPublicAssets = [

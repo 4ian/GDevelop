@@ -4,7 +4,6 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import { BuildCard } from '../../../ExportAndShare/Builds/BuildCard';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import {
@@ -21,7 +20,7 @@ import {
 export default {
   title: 'Builds/BuildCard',
   component: BuildCard,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const WebBuildCard = () => (

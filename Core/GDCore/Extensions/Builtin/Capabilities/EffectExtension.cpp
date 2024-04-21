@@ -24,7 +24,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
-      .SetIcon("res/actions/effect24.png");
+      .SetIcon("res/actions/effect_black.svg");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "EffectBehavior",
@@ -32,7 +32,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
       "Effect",
       _("Apply visual effects to objects."),
       "",
-      "res/actions/effect24.png",
+      "res/actions/effect_black.svg",
       "EffectBehavior",
       std::make_shared<gd::Behavior>(),
       std::make_shared<gd::BehaviorsSharedData>())
@@ -43,8 +43,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                 _("Enable an effect on the object"),
                 _("Enable effect _PARAM2_ on _PARAM0_: _PARAM3_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
@@ -58,8 +58,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                       "names) in the effects window."),
                 _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of _PARAM0_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
@@ -75,8 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                       "names) in the effects window."),
                 _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of _PARAM0_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
@@ -91,8 +91,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                       "names) in the effects window."),
                 _("Enable _PARAM3_ for effect _PARAM2_ of _PARAM0_: _PARAM4_"),
                 _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
+                "res/actions/effect_black.svg",
+                "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))
@@ -105,8 +105,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsEffectExtension(
                    _("Check if the effect on an object is enabled."),
                    _("Effect _PARAM2_ of _PARAM0_ is enabled"),
                    _("Effects"),
-                   "res/actions/effect24.png",
-                   "res/actions/effect.png")
+                   "res/actions/effect_black.svg",
+                   "res/actions/effect_black.svg")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "EffectBehavior")
       .AddParameter("objectEffectName", _("Effect name"))

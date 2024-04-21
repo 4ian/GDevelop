@@ -439,6 +439,14 @@ class ExporterHelper {
                                        gd::String exportDir);
 
   /**
+   * \brief Generate any HTML5 specific file.
+   *
+   * \param project The project to be used to generate the files.
+   * \param exportDir The directory where the files must be created.
+   */
+  bool ExportHtml5Files(const gd::Project &project, gd::String exportDir);
+
+  /**
    * \brief Create a preview for the specified options.
    * \note The preview is not launched, it is the caller responsibility to open
    * a browser pointing to the preview.

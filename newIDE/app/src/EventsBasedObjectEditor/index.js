@@ -10,15 +10,32 @@ import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import Checkbox from '../UI/Checkbox';
+import HelpButton from '../UI/HelpButton';
+import { Line } from '../UI/Grid';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
+export default function EventsBasedObjectEditor({
+  eventsBasedObject,
+  unsavedChanges,
+}: Props) {
   const forceUpdate = useForceUpdate();
+
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   return (
     <ColumnStackLayout expand noMargin>
@@ -51,7 +68,7 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         value={eventsBasedObject.getFullName()}
         onChange={text => {
           eventsBasedObject.setFullName(text);
-          forceUpdate();
+          onChange();
         }}
         fullWidth
       />
@@ -63,7 +80,7 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         value={eventsBasedObject.getDescription()}
         onChange={text => {
           eventsBasedObject.setDescription(text);
-          forceUpdate();
+          onChange();
         }}
         multiline
         fullWidth
@@ -77,7 +94,7 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         }
         onChange={newName => {
           eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
-          forceUpdate();
+          onChange();
         }}
         fullWidth
       />
@@ -86,7 +103,23 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         checked={eventsBasedObject.isRenderedIn3D()}
         onCheck={(e, checked) => {
           eventsBasedObject.markAsRenderedIn3D(checked);
-          forceUpdate();
+          onChange();
+        }}
+      />
+      <Checkbox
+        label={<Trans>Has animations</Trans>}
+        checked={eventsBasedObject.isAnimatable()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsAnimatable(checked);
+          onChange();
+        }}
+      />
+      <Checkbox
+        label={<Trans>Contains text</Trans>}
+        checked={eventsBasedObject.isTextContainer()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsTextContainer(checked);
+          onChange();
         }}
       />
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===
@@ -96,11 +129,14 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
           kind="info"
         >
           <Trans>
-            Once you're done, close this dialog and start adding some functions
-            to the object. Then, test the object by adding to a scene.
+            Once you're done, start adding some functions to the object. Then,
+            test the object by adding it to a scene.
           </Trans>
         </DismissableAlertMessage>
       )}
+      <Line noMargin>
+        <HelpButton key="help" helpPagePath="/objects/events-based-objects" />
+      </Line>
     </ColumnStackLayout>
   );
 }

@@ -3,7 +3,7 @@ import * as React from 'react';
 import MUITabs from '@material-ui/core/Tabs';
 import MUITab from '@material-ui/core/Tab';
 import { makeStyles } from '@material-ui/core/styles';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 
 const styles = {
@@ -79,15 +79,15 @@ export function Tabs<TabName>({
   options,
   variant,
 }: TabsProps<TabName>) {
-  const windowWidth = useResponsiveWindowWidth();
+  const { windowSize } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   // Ensure tabs are scrollable when they reach too many options on the screen.
   const shouldScroll =
-    (windowWidth === 'small' && options.length >= 2) ||
-    (windowWidth === 'medium' && options.length >= 4) ||
-    (windowWidth === 'large' && options.length >= 7) ||
-    (windowWidth === 'xlarge' && options.length >= 8);
+    (windowSize === 'small' && options.length >= 2) ||
+    (windowSize === 'medium' && options.length >= 4) ||
+    (windowSize === 'large' && options.length >= 7) ||
+    (windowSize === 'xlarge' && options.length >= 8);
   const automaticScreenVariant = shouldScroll ? 'scrollable' : 'fullWidth';
   return (
     <MUITabs

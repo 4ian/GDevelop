@@ -1,7 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource';
+import type {
+  ResourceKind,
+  ResourceImportationBehavior,
+} from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -204,6 +207,7 @@ export type PreferencesValues = {|
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
+  resourcesImporationBehavior: ResourceImportationBehavior,
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
   showGetStartedSectionByDefault: boolean,
@@ -276,6 +280,7 @@ export type Preferences = {|
   getIsMenuBarHiddenInPreview: () => boolean,
   setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
   setBackdropClickBehavior: (value: string) => void,
+  setResourcesImporationBehavior: (value: string) => void,
   getIsAlwaysOnTopInPreview: () => boolean,
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
@@ -345,6 +350,7 @@ export const initialPreferences = {
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
+    resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
     showGetStartedSectionByDefault: true,
@@ -401,6 +407,7 @@ export const initialPreferences = {
   getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
+  setResourcesImporationBehavior: () => {},
   getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},

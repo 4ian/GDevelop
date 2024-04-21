@@ -43,6 +43,7 @@ import useAlertDialog from '../UI/Alert/useAlertDialog';
 import PasteIcon from '../UI/CustomSvgIcons/Clipboard';
 import CopyIcon from '../UI/CustomSvgIcons/Copy';
 import ResponsiveFlatButton from '../UI/ResponsiveFlatButton';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const gd: libGDevelop = global.gd;
 
@@ -281,6 +282,7 @@ type Props = {|
 |};
 
 const BehaviorsEditor = (props: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedBehaviorName,
@@ -598,7 +600,9 @@ const BehaviorsEditor = (props: Props) => {
             helpPagePath="/behaviors"
             tutorialId="intro-behaviors-and-functions"
             actionButtonId="add-behavior-button"
-            actionLabel={<Trans>Add a behavior</Trans>}
+            actionLabel={
+              isMobile ? <Trans>Add</Trans> : <Trans>Add a behavior</Trans>
+            }
             onAction={() => setNewBehaviorDialogOpen(true)}
             secondaryActionIcon={<PasteIcon />}
             secondaryActionLabel={
@@ -645,7 +649,13 @@ const BehaviorsEditor = (props: Props) => {
                 <ResponsiveFlatButton
                   key={'copy-all-behaviors'}
                   leftIcon={<CopyIcon />}
-                  label={<Trans>Copy all behaviors</Trans>}
+                  label={
+                    isMobile ? (
+                      <Trans>Copy all</Trans>
+                    ) : (
+                      <Trans>Copy all behaviors</Trans>
+                    )
+                  }
                   onClick={() => {
                     copyAllBehaviors();
                   }}
@@ -663,7 +673,13 @@ const BehaviorsEditor = (props: Props) => {
               <LineStackLayout justifyContent="flex-end" expand>
                 <RaisedButton
                   key="add-behavior-line"
-                  label={<Trans>Add a behavior</Trans>}
+                  label={
+                    isMobile ? (
+                      <Trans>Add</Trans>
+                    ) : (
+                      <Trans>Add a behavior</Trans>
+                    )
+                  }
                   primary
                   onClick={() => setNewBehaviorDialogOpen(true)}
                   icon={<Add />}

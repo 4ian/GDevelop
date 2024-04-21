@@ -61,7 +61,7 @@ public:
       std::map<gd::String, gd::String> &behaviorMethodMangledNames);
 
   static gd::ObjectMetadata &GenerateObjectMetadata(
-      const gd::Project &project, gd::PlatformExtension &extension,
+      gd::Project &project, gd::PlatformExtension &extension,
       const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedObject &eventsBasedObject,
       std::map<gd::String, gd::String> &objectMethodMangledNames);
@@ -312,6 +312,10 @@ private:
       const gd::EventsFunction &eventsFunction,
       gd::MultipleInstructionMetadata &multipleInstructionMetadata,
       const int userDefinedFirstParameterIndex);
+
+  static void
+  UpdateCustomObjectDefaultBehaviors(gd::Project &project,
+                                     const gd::ObjectMetadata &objectMetadata);
 
   static gd::String RemoveTrailingDot(const gd::String &description);
 

@@ -37,11 +37,14 @@ import ErrorBoundary from '../UI/ErrorBoundary';
 import { FullThemeProvider } from '../UI/Theme/FullThemeProvider';
 import { useShopNavigation } from '../AssetStore/AssetStoreNavigator';
 import { Trans } from '@lingui/macro';
+import { CreditsPackageStoreStateProvider } from '../AssetStore/CreditsPackages/CreditsPackageStoreContext';
+import { ProductLicenseStoreStateProvider } from '../AssetStore/ProductLicense/ProductLicenseStoreContext';
+import { MarketingPlansStoreStateProvider } from '../MarketingPlans/MarketingPlansStoreContext';
+import { CommunityLeaderboardsStateProvider } from '../CommunityLeaderboards/CommunityLeaderboardsContext';
 
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
-  onlyAppStoreShopItems?: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
@@ -61,7 +64,6 @@ const Providers = ({
   makeEventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener,
-  onlyAppStoreShopItems,
 }: Props) => {
   const shopNavigationState = useShopNavigation();
   return (
@@ -100,9 +102,6 @@ const Providers = ({
                                     <SubscriptionSuggestionProvider>
                                       <CommandsContextProvider>
                                         <AssetStoreStateProvider
-                                          onlyAppStorePrivateAssetPacks={
-                                            onlyAppStoreShopItems
-                                          }
                                           shopNavigationState={
                                             shopNavigationState
                                           }
@@ -110,24 +109,31 @@ const Providers = ({
                                           <ResourceStoreStateProvider>
                                             <ExampleStoreStateProvider>
                                               <PrivateGameTemplateStoreStateProvider
-                                                onlyAppStorePrivateGameTemplates={
-                                                  onlyAppStoreShopItems
-                                                }
                                                 shopNavigationState={
                                                   shopNavigationState
                                                 }
                                               >
-                                                <ExtensionStoreStateProvider>
-                                                  <BehaviorStoreStateProvider>
-                                                    <TutorialStateProvider>
-                                                      <AnnouncementsFeedStateProvider>
-                                                        <PrivateAssetsAuthorizationProvider>
-                                                          {children({ i18n })}
-                                                        </PrivateAssetsAuthorizationProvider>
-                                                      </AnnouncementsFeedStateProvider>
-                                                    </TutorialStateProvider>
-                                                  </BehaviorStoreStateProvider>
-                                                </ExtensionStoreStateProvider>
+                                                <CreditsPackageStoreStateProvider>
+                                                  <ProductLicenseStoreStateProvider>
+                                                    <MarketingPlansStoreStateProvider>
+                                                      <ExtensionStoreStateProvider>
+                                                        <BehaviorStoreStateProvider>
+                                                          <TutorialStateProvider>
+                                                            <AnnouncementsFeedStateProvider>
+                                                              <CommunityLeaderboardsStateProvider>
+                                                                <PrivateAssetsAuthorizationProvider>
+                                                                  {children({
+                                                                    i18n,
+                                                                  })}
+                                                                </PrivateAssetsAuthorizationProvider>
+                                                              </CommunityLeaderboardsStateProvider>
+                                                            </AnnouncementsFeedStateProvider>
+                                                          </TutorialStateProvider>
+                                                        </BehaviorStoreStateProvider>
+                                                      </ExtensionStoreStateProvider>
+                                                    </MarketingPlansStoreStateProvider>
+                                                  </ProductLicenseStoreStateProvider>
+                                                </CreditsPackageStoreStateProvider>
                                               </PrivateGameTemplateStoreStateProvider>
                                             </ExampleStoreStateProvider>
                                           </ResourceStoreStateProvider>

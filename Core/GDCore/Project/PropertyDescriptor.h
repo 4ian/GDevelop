@@ -30,12 +30,16 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false),
+        deprecated(false), advanced(false),
+        measurementUnit(gd::MeasurementUnit::GetUndefined()) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor() : hidden(false), measurementUnit(gd::MeasurementUnit::GetUndefined()) {};
+  PropertyDescriptor()
+      : hidden(false), deprecated(false), advanced(false),
+        measurementUnit(gd::MeasurementUnit::GetUndefined()){};
 
   /**
    * \brief Destructor
@@ -142,6 +146,32 @@ class GD_CORE_API PropertyDescriptor {
    */
   bool IsHidden() const { return hidden; }
 
+  /**
+   * \brief Set if the property is deprecated.
+   */
+  PropertyDescriptor& SetDeprecated(bool enable = true) {
+    deprecated = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property is deprecated.
+   */
+  bool IsDeprecated() const { return deprecated; }
+
+  /**
+   * \brief Set if the property is marked as advanced.
+   */
+  PropertyDescriptor& SetAdvanced(bool enable = true) {
+    advanced = enable;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the property is marked as advanced.
+   */
+  bool IsAdvanced() const { return advanced; }
+
   /** \name Serialization
    */
   ///@{
@@ -179,6 +209,8 @@ class GD_CORE_API PropertyDescriptor {
                          ///< choices, if a property is a displayed as a combo
                          ///< box.
   bool hidden;
+  bool deprecated;
+  bool advanced;
   gd::MeasurementUnit measurementUnit; //< The unit of measurement of the property vale.
 };
 

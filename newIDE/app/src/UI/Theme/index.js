@@ -2,7 +2,6 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import { isLtr } from '../../Utils/i18n/RtlLanguages';
 import DefaultLightTheme from './DefaultLightTheme';
-import { type WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
 import { themes } from './ThemeRegistry';
 import { rtlMuiOverrides, smallScreenMuiOverrides } from './CreateTheme';
 
@@ -25,15 +24,13 @@ const defaultThemeName = 'GDevelop default Dark';
 export function getFullTheme({
   themeName,
   language,
-  windowWidth,
+  isMobile,
 }: {|
   themeName: string,
   language: string,
-  windowWidth: WidthType,
+  isMobile: boolean,
 |}): FullTheme {
   let theme: Theme = themes[themeName];
-
-  const isMobileScreen = windowWidth === 'small';
 
   if (!theme) {
     console.warn(
@@ -49,7 +46,7 @@ export function getFullTheme({
     muiTheme: createMuiTheme(
       muiThemeOptions,
       {
-        ...(isMobileScreen ? { overrides: smallScreenMuiOverrides } : {}),
+        ...(isMobile ? { overrides: smallScreenMuiOverrides } : {}),
       },
       { ...(ltr ? {} : { overrides: rtlMuiOverrides }) }
     ),

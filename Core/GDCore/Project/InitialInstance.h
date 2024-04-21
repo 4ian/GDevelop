@@ -206,6 +206,17 @@ class GD_CORE_API InitialInstance {
    */
   void SetSealed(bool enable = true) { sealed = enable; }
 
+  /**
+   * \brief Return true if the dimensions (width, height and depth) should keep
+   * the same ratio.
+   */
+  bool ShouldKeepRatio() const { return keepRatio; };
+
+  /**
+   * \brief Define if instance's dimensions should keep the same ratio.
+   */
+  void SetShouldKeepRatio(bool enable = true) { keepRatio = enable; }
+
   ///@}
 
   /** \name Variable management
@@ -340,11 +351,13 @@ class GD_CORE_API InitialInstance {
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
   bool sealed;                              ///< True if the instance is sealed
+  bool keepRatio;                           ///< True if the instance's dimensions
+                                            ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
-                                      ///< useful for hot reloading.
+                                      ///  useful for hot reloading.
 
   static gd::String*
-      badStringProperyValue;  ///< Empty string returned by GetRawStringProperty
+      badStringPropertyValue;  ///< Empty string returned by GetRawStringProperty
 };
 
 }  // namespace gd

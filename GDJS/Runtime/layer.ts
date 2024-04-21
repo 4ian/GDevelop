@@ -30,6 +30,12 @@ namespace gdjs {
 
       this._cameraX = this.getWidth() / 2;
       this._cameraY = this.getHeight() / 2;
+      if (this.getCameraType() === gdjs.RuntimeLayerCameraType.ORTHOGRAPHIC) {
+        this._cameraZ =
+          (this._initialCamera3DFarPlaneDistance +
+            this._initialCamera3DNearPlaneDistance) /
+          2;
+      }
 
       // Let the renderer do its final set up:
       this._renderer.onCreated();
@@ -43,18 +49,24 @@ namespace gdjs {
       oldGameResolutionOriginX: float,
       oldGameResolutionOriginY: float
     ): void {
-      // Adapt position of the camera center as:
-      // * Most cameras following a player/object on the scene will be updating this
-      // in events anyway.
+      // Adapt position of the camera center only if the camera has never moved as:
+      // * When the camera follows a player/object, it will rarely be at the default position.
       // * Cameras not following a player/object are usually UIs which are intuitively
       // expected not to "move". Not adapting the center position would make the camera
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
-      this._cameraX +=
-        this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
-      this._cameraY +=
-        this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
+      if (
+        this._cameraX === oldGameResolutionOriginX &&
+        this._cameraY === oldGameResolutionOriginY &&
+        this._zoomFactor === 1
+      ) {
+        this._cameraX +=
+          this._runtimeScene.getViewportOriginX() - oldGameResolutionOriginX;
+        this._cameraY +=
+          this._runtimeScene.getViewportOriginY() - oldGameResolutionOriginY;
+      }
       this._renderer.updatePosition();
+      this._renderer.updateResolution();
     }
 
     /**
@@ -154,18 +166,20 @@ namespace gdjs {
      * @param fov The field of view.
      * @param cameraId The camera number. Currently ignored.
      */
-    setCameraZ(z: float, fov: float = 45, cameraId?: integer): void {
-      const cameraFovInRadians = gdjs.toRad(fov);
+    setCameraZ(z: float, fov: float | null, cameraId?: integer): void {
+      if (fov) {
+        const cameraFovInRadians = gdjs.toRad(fov);
 
-      // The zoom factor is capped to a not too big value to avoid infinity.
-      // MAX_SAFE_INTEGER is an arbitrary choice. It's big but not too big.
-      const zoomFactor = Math.min(
-        Number.MAX_SAFE_INTEGER,
-        (0.5 * this.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians))
-      );
+        // The zoom factor is capped to a not too big value to avoid infinity.
+        // MAX_SAFE_INTEGER is an arbitrary choice. It's big but not too big.
+        const zoomFactor = Math.min(
+          Number.MAX_SAFE_INTEGER,
+          (0.5 * this.getHeight()) / (z * Math.tan(0.5 * cameraFovInRadians))
+        );
 
-      if (zoomFactor > 0) {
-        this._zoomFactor = zoomFactor;
+        if (zoomFactor > 0) {
+          this._zoomFactor = zoomFactor;
+        }
       }
 
       this._cameraZ = z;
@@ -180,8 +194,8 @@ namespace gdjs {
      * @param cameraId The camera number. Currently ignored.
      * @return The z position of the camera
      */
-    getCameraZ(fov: float = 45, cameraId?: integer): float {
-      if (!this._isCameraZDirty) {
+    getCameraZ(fov: float | null, cameraId?: integer): float {
+      if (!this._isCameraZDirty || !fov) {
         return this._cameraZ;
       }
 

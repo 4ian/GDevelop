@@ -5,13 +5,13 @@ import { retryIfFailed } from '../../Utils/RetryIfFailed';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type FileMetadata } from '../index';
 import {
-  extractFilenameWithExtensionFromProductAuthorizedUrl,
+  extractDecodedFilenameWithExtensionFromProductAuthorizedUrl,
   fetchTokenForPrivateGameTemplateAuthorizationIfNeeded,
   isPrivateGameTemplateResourceAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
 import {
-  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../../Utils/GDevelopServices/Asset';
 import {
@@ -21,7 +21,7 @@ import {
 } from '../../ResourcesList/ResourceUtils';
 import { sanitizeFilename } from '../../Utils/Filename';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
+import { extractDecodedFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import axios from 'axios';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -136,17 +136,19 @@ export const moveUrlResourcesToLocalFiles = async ({
           let filename;
           if (isProductAuthorizedResourceUrl(resourceFile)) {
             // Resource is coming from a private asset or private game template.
-            filename = extractFilenameWithExtensionFromProductAuthorizedUrl(
+            filename = extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
               resourceFile
             );
           } else if (isPublicAssetResourceUrl(resourceFile)) {
             // Resource is coming from a public asset.
-            filename = extractFilenameWithExtensionFromPublicAssetResourceUrl(
+            filename = extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
               resourceFile
             );
           } else {
             // Resource is a project resource or a generic url.
-            filename = extractFilenameFromProjectResourceUrl(resourceFile);
+            filename = extractDecodedFilenameFromProjectResourceUrl(
+              resourceFile
+            );
           }
 
           // Find a new file for the resource to download.

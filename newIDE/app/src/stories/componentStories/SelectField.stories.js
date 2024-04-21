@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
-
 import SelectField from '../../UI/SelectField';
 import { ColumnStackLayout } from '../../UI/Layout';
 import paperDecorator from '../PaperDecorator';
@@ -13,7 +11,7 @@ import Text from '../../UI/Text';
 export default {
   title: 'UI Building Blocks/SelectField',
   component: SelectField,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

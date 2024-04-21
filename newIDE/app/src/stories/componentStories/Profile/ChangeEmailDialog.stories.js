@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ChangeEmailDialog from '../../../Profile/ChangeEmailDialog';
 
 export default {
   title: 'Profile/ChangeEmailDialog',
   component: ChangeEmailDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const defaultProps = {

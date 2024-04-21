@@ -24,58 +24,41 @@ namespace gdjs {
       runtimeObject: gdjs.RuntimeObject,
       objectData: any
     ) {
-      let texture = null;
-      const graphics = new PIXI.Graphics();
-      graphics.lineStyle(0, 0, 0);
-      graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 1);
-      if (objectData.rendererType === 'Point') {
-        graphics.drawCircle(0, 0, objectData.rendererParam1);
-      } else if (objectData.rendererType === 'Line') {
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-
-        // Draw an almost-invisible rectangle in the left hand to force PIXI to take a full texture with our line at the right hand
-        graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 0.001);
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-      } else if (objectData.textureParticleName) {
-        const sprite = new PIXI.Sprite(
-          (instanceContainer
-            .getGame()
-            .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-            objectData.textureParticleName
-          )
-        );
-        sprite.width = objectData.rendererParam1;
-        sprite.height = objectData.rendererParam2;
-        graphics.addChild(sprite);
-      } else {
-        graphics.drawRect(
-          0,
-          0,
-          objectData.rendererParam1,
-          objectData.rendererParam2
-        );
-      }
-      graphics.endFill();
-
-      // Render the texture from graphics using the PIXI Renderer.
-      // TODO: could be optimized by generating the texture only once per object type,
-      // instead of at each object creation.
       const pixiRenderer = instanceContainer
         .getGame()
         .getRenderer()
         .getPIXIRenderer();
-      //@ts-expect-error Pixi has wrong type definitions for this method
-      texture = pixiRenderer.generateTexture(graphics);
+      const imageManager = instanceContainer
+        .getGame()
+        .getImageManager() as gdjs.PixiImageManager;
+      let particleTexture: PIXI.Texture = PIXI.Texture.WHITE;
+      if (pixiRenderer) {
+        if (objectData.rendererType === 'Point') {
+          particleTexture = imageManager.getOrCreateDiskTexture(
+            objectData.rendererParam1,
+            pixiRenderer
+          );
+        } else if (objectData.rendererType === 'Line') {
+          particleTexture = imageManager.getOrCreateRectangleTexture(
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        } else if (objectData.textureParticleName) {
+          particleTexture = imageManager.getOrCreateScaledTexture(
+            objectData.textureParticleName,
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        } else {
+          particleTexture = imageManager.getOrCreateRectangleTexture(
+            objectData.rendererParam1,
+            objectData.rendererParam2,
+            pixiRenderer
+          );
+        }
+      }
 
       const configuration = {
         ease: undefined,
@@ -85,7 +68,10 @@ namespace gdjs {
           max: objectData.particleLifeTimeMax,
         },
         // A negative flow is "infinite flow" (all particles burst)
-        frequency: objectData.flow < 0 ? 0.0001 : 1.0 / objectData.flow,
+        frequency:
+          objectData.flow < 0
+            ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+            : 1.0 / objectData.flow,
         spawnChance: 1,
         particlesPerWave: objectData.flow < 0 ? objectData.maxParticleNb : 1,
         maxParticles: objectData.maxParticleNb,
@@ -198,7 +184,7 @@ namespace gdjs {
           {
             type: 'textureSingle',
             config: {
-              texture: texture,
+              texture: particleTexture,
             },
           },
           {
@@ -236,8 +222,9 @@ namespace gdjs {
     }
 
     update(delta: float): void {
+      const wasEmitting = this.emitter.emit;
       this.emitter.update(delta);
-      if (!this.started && this.getParticleCount() > 0) {
+      if (!this.started && wasEmitting) {
         this.started = true;
       }
     }
@@ -363,7 +350,10 @@ namespace gdjs {
     }
 
     setFlow(flow: number, tank: number): void {
-      this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
+      this.emitter.frequency =
+        flow < 0
+          ? ParticleEmitterObjectPixiRenderer.frequencyMinimumValue
+          : 1.0 / flow;
       this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
         flow,
         tank
@@ -436,11 +426,33 @@ namespace gdjs {
       return this.started;
     }
 
+    /**
+     * @returns `true` at the end of emission or at the start if it's paused.
+     * Returns false if there is no limit.
+     */
+    _mayHaveEndedEmission(): boolean {
+      return (
+        // No end can be reached if there is no flow.
+        this.emitter.frequency >
+          ParticleEmitterObjectPixiRenderer.frequencyMinimumValue &&
+        // No end can be reached when there is no limit.
+        this.emitter.emitterLifetime >= 0 &&
+        // Pixi stops the emission at the end.
+        !this.emitter.emit &&
+        // Pixi reset `_emitterLife` to `emitterLifetime` at the end of emission
+        // so there is no way to know if it is the end or the start.
+        // @ts-ignore Use a private attribute.
+        this.emitter._emitterLife === this.emitter.emitterLifetime
+      );
+    }
+
     static computeLifetime(flow: number, tank: number): float {
       if (tank < 0) return -1;
       else if (flow < 0) return 0.001;
       else return (tank + 0.1) / flow;
     }
+
+    private static readonly frequencyMinimumValue = 0.0001;
   }
 
   // @ts-ignore - Register the class to let the engine use it.

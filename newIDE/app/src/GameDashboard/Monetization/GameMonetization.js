@@ -9,13 +9,14 @@ import InlineCheckbox from '../../UI/InlineCheckbox';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type Game, updateGame } from '../../Utils/GDevelopServices/Game';
+import Text from '../../UI/Text';
 
 type Props = {|
   game: Game,
   onGameUpdated: (updatedGame: Game) => void,
 |};
 
-export const GameMonetization = ({ game, onGameUpdated }: Props) => {
+const GameMonetization = ({ game, onGameUpdated }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -30,6 +31,7 @@ export const GameMonetization = ({ game, onGameUpdated }: Props) => {
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
+          <Text size="sub-title">Ads</Text>
           <AlertMessage kind="info">
             <Trans>
               In the future, games that generate enough revenue will be able to
@@ -84,3 +86,5 @@ export const GameMonetization = ({ game, onGameUpdated }: Props) => {
     </I18n>
   );
 };
+
+export default GameMonetization;

@@ -319,6 +319,9 @@ export type Comment = {
   createdAt: number,
   processedAt?: number,
   updatedAt: number,
+  qualityRatingPerRole?: {
+    owner?: string,
+  },
 };
 
 export const listComments = async (
@@ -354,17 +357,19 @@ export const updateComment = async (
     gameId,
     commentId,
     processed,
+    qualityRating,
   }: {|
     gameId: string,
     commentId: string,
-    processed: boolean,
+    processed?: boolean,
+    qualityRating?: string,
   |}
 ) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.patch(
         `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
-        { processed },
+        { processed, qualityRating },
         {
           params: { userId },
           headers: {

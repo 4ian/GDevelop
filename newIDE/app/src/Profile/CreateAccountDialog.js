@@ -8,6 +8,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type RegisterForm,
   type AuthError,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { type UsernameAvailability } from '../Utils/GDevelopServices/User';
 import LeftLoader from '../UI/LeftLoader';
@@ -20,14 +21,13 @@ import Text from '../UI/Text';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
 import { Column } from '../UI/Grid';
 import Link from '../UI/Link';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import CreateAccountForm from './CreateAccountForm';
 
-const getStyles = ({ windowWidth }) => {
-  const isMobileScreen = windowWidth === 'small';
+const getStyles = ({ isMobile }) => {
   return {
     formContainer: {
-      width: isMobileScreen ? '95%' : '60%',
+      width: isMobile ? '95%' : '60%',
       marginTop: 20,
     },
   };
@@ -37,6 +37,7 @@ type Props = {|
   onClose: () => void,
   onGoToLogin: () => void,
   onCreateAccount: (form: RegisterForm) => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
 |};
@@ -111,11 +112,12 @@ const CreateAccountDialog = ({
   onClose,
   onGoToLogin,
   onCreateAccount,
+  onLoginWithProvider,
   createAccountInProgress,
   error,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const styles = getStyles({ windowWidth });
+  const { isMobile } = useResponsiveWindowSize();
+  const styles = getStyles({ isMobile });
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');
@@ -158,7 +160,6 @@ const CreateAccountDialog = ({
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}
-          disabled={createAccountInProgress}
           key="close"
           primary={false}
           onClick={onClose}
@@ -217,6 +218,7 @@ const CreateAccountDialog = ({
         <div style={styles.formContainer}>
           <CreateAccountForm
             onCreateAccount={createAccount}
+            onLoginWithProvider={onLoginWithProvider}
             email={email}
             onChangeEmail={setEmail}
             password={password}

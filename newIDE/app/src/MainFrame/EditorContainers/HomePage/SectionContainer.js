@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react';
-import { Column, Line } from '../../../UI/Grid';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Column, Line, Spacer } from '../../../UI/Grid';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
 import TextButton from '../../../UI/TextButton';
 import { Trans } from '@lingui/macro';
 import Paper from '../../../UI/Paper';
 import { LineStackLayout } from '../../../UI/Layout';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
 
 export const SECTION_PADDING = 30;
 
@@ -39,7 +41,6 @@ const styles = {
   },
   scrollContainer: {
     overflowY: 'scroll', // Force a scrollbar to prevent layout shifts.
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
   noScrollContainer: {
     overflowY: 'hidden',
@@ -56,6 +57,7 @@ type Props = {|
   flexBody?: boolean,
   renderFooter?: () => React.Node,
   noScroll?: boolean,
+  showUrgentAnnouncements?: boolean,
 |};
 
 const SectionContainer = ({
@@ -68,15 +70,16 @@ const SectionContainer = ({
   flexBody,
   renderFooter,
   noScroll,
+  showUrgentAnnouncements,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
+  const { announcements } = React.useContext(AnnouncementsFeedContext);
   const containerStyle: {|
     paddingTop: number,
     paddingLeft: number,
     paddingRight: number,
-  |} = isMobileScreen ? styles.mobileContainer : styles.desktopContainer;
-  const scrollStyle: {| overflowY: string, scrollbarWidth?: string |} = noScroll
+  |} = isMobile ? styles.mobileContainer : styles.desktopContainer;
+  const scrollStyle: {| overflowY: string |} = noScroll
     ? styles.noScrollContainer
     : styles.scrollContainer;
   const paperStyle = {
@@ -90,6 +93,12 @@ const SectionContainer = ({
     <Column useFullHeight noMargin expand>
       <Paper style={paperStyle} square background="dark">
         <Column noOverflowParent expand>
+          {showUrgentAnnouncements && (
+            <>
+              <AnnouncementsFeed canClose level="urgent" hideLoader />
+              {announcements && announcements.length > 0 && <Spacer />}
+            </>
+          )}
           {backAction && (
             <Line>
               <TextButton
@@ -124,7 +133,7 @@ const SectionContainer = ({
       </Paper>
       {renderFooter && (
         <Paper
-          style={isMobileScreen ? styles.mobileFooter : styles.desktopFooter}
+          style={isMobile ? styles.mobileFooter : styles.desktopFooter}
           square
           background="dark"
         >

@@ -4,9 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef IMAGESUSEDINVENTORIZER_H
-#define IMAGESUSEDINVENTORIZER_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -38,6 +36,7 @@ public:
       : gd::ArbitraryResourceWorker(resourcesManager){};
   virtual ~ResourcesInUseHelper(){};
 
+  const std::vector<gd::String>& GetAllResources();
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };
   std::set<gd::String>& GetAllAudios() { return GetAll("audio"); };
   std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
@@ -47,6 +46,8 @@ public:
   std::set<gd::String>& GetAllVideos() { return GetAll("video"); };
   std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
   std::set<gd::String>& GetAll3DModels() { return GetAll("model3D"); };
+  std::set<gd::String>& GetAllAtlases() { return GetAll("atlas"); };
+  std::set<gd::String>& GetAllSpines() { return GetAll("spine"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
     if (resourceType == "image") return allImages;
     if (resourceType == "audio") return allAudios;
@@ -57,6 +58,8 @@ public:
     if (resourceType == "video") return allVideos;
     if (resourceType == "bitmapFont") return allBitmapFonts;
     if (resourceType == "model3D") return allModel3Ds;
+    if (resourceType == "atlas") return allAtlases;
+    if (resourceType == "spine") return allSpines;
 
     return emptyResources;
   };
@@ -64,35 +67,42 @@ public:
   virtual void ExposeFile(gd::String& resource) override{
       /*Don't care, we just list resource names*/
   };
-  virtual void ExposeImage(gd::String& imageResourceName) override {
-    allImages.insert(imageResourceName);
+  virtual void ExposeImage(gd::String& resourceName) override {
+    allImages.insert(resourceName);
   };
-  virtual void ExposeAudio(gd::String& audioResourceName) override {
-    allAudios.insert(audioResourceName);
+  virtual void ExposeAudio(gd::String& resourceName) override {
+    allAudios.insert(resourceName);
   };
-  virtual void ExposeFont(gd::String& fontResourceName) override {
-    allFonts.insert(fontResourceName);
+  virtual void ExposeFont(gd::String& resourceName) override {
+    allFonts.insert(resourceName);
   };
-  virtual void ExposeJson(gd::String& jsonResourceName) override {
-    allJsons.insert(jsonResourceName);
+  virtual void ExposeJson(gd::String& resourceName) override {
+    allJsons.insert(resourceName);
   };
-  virtual void ExposeTilemap(gd::String& tilemapResourceName) override {
-    allTilemaps.insert(tilemapResourceName);
+  virtual void ExposeTilemap(gd::String& resourceName) override {
+    allTilemaps.insert(resourceName);
   };
-  virtual void ExposeTileset(gd::String& tilesetResourceName) override {
-    allTilesets.insert(tilesetResourceName);
+  virtual void ExposeTileset(gd::String& resourceName) override {
+    allTilesets.insert(resourceName);
   };
-  virtual void ExposeVideo(gd::String& videoResourceName) override {
-    allVideos.insert(videoResourceName);
+  virtual void ExposeVideo(gd::String& resourceName) override {
+    allVideos.insert(resourceName);
   };
-  virtual void ExposeBitmapFont(gd::String& bitmapFontResourceName) override {
-    allBitmapFonts.insert(bitmapFontResourceName);
+  virtual void ExposeBitmapFont(gd::String& resourceName) override {
+    allBitmapFonts.insert(resourceName);
   };
   virtual void ExposeModel3D(gd::String& resourceName) override {
     allModel3Ds.insert(resourceName);
   };
+  virtual void ExposeAtlas(gd::String& resourceName) override {
+    allAtlases.insert(resourceName);
+  };
+  virtual void ExposeSpine(gd::String& resourceName) override {
+    allSpines.insert(resourceName);
+  };
 
  protected:
+  std::vector<gd::String> allResources;
   std::set<gd::String> allImages;
   std::set<gd::String> allAudios;
   std::set<gd::String> allFonts;
@@ -102,10 +112,11 @@ public:
   std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
   std::set<gd::String> allModel3Ds;
+  std::set<gd::String> allAtlases;
+  std::set<gd::String> allSpines;
   std::set<gd::String> emptyResources;
+
+  static const std::vector<gd::String> resourceTypes;
 };
 
 }  // namespace gd
-
-#endif  // IMAGESUSEDINVENTORIZER_H
-#endif

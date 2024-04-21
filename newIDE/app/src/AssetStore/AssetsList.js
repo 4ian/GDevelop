@@ -17,9 +17,9 @@ import {
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import GridList from '@material-ui/core/GridList';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -36,7 +36,7 @@ import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAss
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { Column, LargeSpacer, Line } from '../UI/Grid';
 import Text from '../UI/Text';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { ResponsiveLineStackLayout, LineStackLayout } from '../UI/Layout';
 import {
   getUserPublicProfile,
   type UserPublicProfile,
@@ -48,11 +48,16 @@ import Breadcrumbs from '../UI/Breadcrumbs';
 import { getFolderTagsFromAssetShortHeaders } from './TagsHelper';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 import { type AssetStorePageState } from './AssetStoreNavigator';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import HelpIcon from '../UI/HelpIcon';
+import { OwnedProductLicense } from './ProductLicense/ProductLicenseOptions';
+import { getUserProductPurchaseUsageType } from './ProductPageHelper';
 
 const ASSETS_DISPLAY_LIMIT = 250;
 
-const getAssetSize = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getAssetSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return 80;
     case 'medium':
@@ -65,10 +70,13 @@ const getAssetSize = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -80,9 +88,13 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getAssetFoldersColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getAssetFoldersColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
+      return isLandscape ? 2 : 1;
     case 'medium':
       return 1;
     case 'large':
@@ -93,20 +105,38 @@ const getAssetFoldersColumns = (windowWidth: WidthType) => {
   }
 };
 
+const getPageBreakAssetLowerIndex = (pageBreakIndex: number) =>
+  ASSETS_DISPLAY_LIMIT * pageBreakIndex;
+const getPageBreakAssetUpperIndex = (pageBreakIndex: number) =>
+  ASSETS_DISPLAY_LIMIT * (pageBreakIndex + 1);
+
 export const getAssetShortHeadersToDisplay = (
   allAssetShortHeaders: AssetShortHeader[],
-  selectedFolders: string[]
+  selectedFolders: string[],
+  pageBreakIndex: number = 0
 ): AssetShortHeader[] => {
-  return allAssetShortHeaders
-    .filter(assetShortHeader => {
-      if (!selectedFolders.length) return true;
-      const allAssetTags = assetShortHeader.tags;
-      // Check that the asset has all the selected folders tags.
-      return selectedFolders.every(folderTag =>
-        allAssetTags.includes(folderTag)
-      );
-    })
-    .splice(0, ASSETS_DISPLAY_LIMIT); // Limit the number of displayed assets to avoid performance issues
+  let assetShortHeaders = allAssetShortHeaders.filter(assetShortHeader => {
+    if (!selectedFolders.length) return true;
+    const allAssetTags = assetShortHeader.tags;
+    // Check that the asset has all the selected folders tags.
+    return selectedFolders.every(folderTag => allAssetTags.includes(folderTag));
+  });
+  // Limit the number of displayed assets to avoid performance issues
+  const pageBreakAssetLowerIndex = getPageBreakAssetLowerIndex(pageBreakIndex);
+  const pageBreakAssetUpperIndex = Math.min(
+    getPageBreakAssetUpperIndex(pageBreakIndex),
+    assetShortHeaders.length
+  );
+  if (
+    pageBreakAssetLowerIndex !== 0 ||
+    pageBreakAssetUpperIndex !== assetShortHeaders.length
+  ) {
+    assetShortHeaders = assetShortHeaders.slice(
+      pageBreakAssetLowerIndex,
+      pageBreakAssetUpperIndex
+    );
+  }
+  return assetShortHeaders;
 };
 
 const cellSpacing = 8;
@@ -120,14 +150,75 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
   },
+  previewImageContainer: {
+    display: 'flex',
+    flex: 0.7,
+    alignItems: 'flex-start',
+  },
   previewImage: {
-    width: 200,
+    width: '100%',
     // Prevent cumulative layout shift by enforcing
     // the 16:9 ratio.
     aspectRatio: '16 / 9',
-    objectFit: 'cover',
+    objectFit: 'contain',
     position: 'relative',
   },
+  openProductContainer: {
+    display: 'flex',
+    paddingLeft: 32, // To align with licensing options.
+    marginTop: 8,
+    marginBottom: 8,
+  },
+};
+
+type PageBreakNavigationProps = {|
+  currentPage: AssetStorePageState,
+  pageBreakIndex: number,
+  setPageBreakIndex: number => void,
+  assetShortHeaders: Array<AssetShortHeader>,
+  scrollView: ?ScrollViewInterface,
+|};
+
+const PageBreakNavigation = ({
+  currentPage,
+  pageBreakIndex,
+  setPageBreakIndex,
+  assetShortHeaders,
+  scrollView,
+}: PageBreakNavigationProps) => {
+  return (
+    <Column>
+      <LineStackLayout justifyContent="center">
+        <FlatButton
+          key="previous-assets"
+          label={<Trans>Show previous assets</Trans>}
+          onClick={() => {
+            currentPage.pageBreakIndex = Math.max(
+              0,
+              (currentPage.pageBreakIndex || 0) - 1
+            );
+            setPageBreakIndex(currentPage.pageBreakIndex);
+            scrollView && scrollView.scrollToPosition(0);
+          }}
+          disabled={pageBreakIndex <= 0}
+        />
+        <RaisedButton
+          key="next-assets"
+          primary
+          label={<Trans>Show next assets</Trans>}
+          onClick={() => {
+            currentPage.pageBreakIndex = (currentPage.pageBreakIndex || 0) + 1;
+            setPageBreakIndex(currentPage.pageBreakIndex);
+            scrollView && scrollView.scrollToPosition(0);
+          }}
+          disabled={
+            assetShortHeaders.length <
+            getPageBreakAssetUpperIndex(pageBreakIndex)
+          }
+        />
+      </LineStackLayout>
+    </Column>
+  );
 };
 
 export type AssetsListInterface = {|
@@ -144,7 +235,10 @@ type Props = {|
   noResultsPlaceHolder?: React.Node,
   error?: ?Error,
   onPrivateAssetPackSelection?: (
-    privateAssetPackListingData: PrivateAssetPackListingData
+    privateAssetPackListingData: PrivateAssetPackListingData,
+    options?: {|
+      forceProductPage?: boolean,
+    |}
   ) => void,
   onPublicAssetPackSelection?: (assetPack: PublicAssetPack) => void,
   onPrivateGameTemplateSelection?: (
@@ -193,9 +287,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       error: gameTemplateStoreError,
       fetchGameTemplates,
     } = React.useContext(PrivateGameTemplateStoreContext);
-    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
-      AuthenticatedUserContext
-    );
+    const {
+      receivedAssetPacks,
+      receivedGameTemplates,
+      assetPackPurchases,
+    } = React.useContext(AuthenticatedUserContext);
     const [
       authorPublicProfile,
       setAuthorPublicProfile,
@@ -220,7 +316,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
       [currentPage]
     );
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
       getScrollPosition: () => {
@@ -345,7 +441,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (
           !allPrivateAssetPackListingDatas ||
           !openedAssetPack ||
-          !openedAssetPack.id // public pack selected.
+          // public pack selected.
+          !openedAssetPack.id
         )
           return null;
 
@@ -359,19 +456,26 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [allPrivateAssetPackListingDatas, openedAssetPack]
     );
 
+    const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
+      (currentPage && currentPage.pageBreakIndex) || 0
+    );
+
     const assetTiles = React.useMemo(
       () => {
-        if (!assetShortHeaders) return null; // Loading
-        if (hasAssetPackFiltersApplied && !openedAssetPack) return []; // Don't show assets if filtering on asset packs.)
+        // Loading
+        if (!assetShortHeaders) return null;
+        // Don't show assets if filtering on asset packs.)
+        if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
 
         return getAssetShortHeadersToDisplay(
           assetShortHeaders,
-          selectedFolders
+          selectedFolders,
+          pageBreakIndex
         ).map(assetShortHeader => (
           <AssetCardTile
             assetShortHeader={assetShortHeader}
             onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={getAssetSize(windowWidth)}
+            size={getAssetSize(windowSize)}
             key={assetShortHeader.id}
             margin={cellSpacing / 2}
           />
@@ -379,11 +483,12 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
       [
         assetShortHeaders,
-        onOpenDetails,
-        windowWidth,
-        selectedFolders,
         hasAssetPackFiltersApplied,
         openedAssetPack,
+        selectedFolders,
+        pageBreakIndex,
+        windowSize,
+        onOpenDetails,
       ]
     );
 
@@ -392,7 +497,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (
           !publicAssetPacks ||
           !onPublicAssetPackSelection ||
-          hasAssetFiltersApplied // Don't show public packs if filtering on assets.
+          // Don't show public packs if filtering on assets.
+          hasAssetFiltersApplied
         )
           return [];
         return publicAssetPacks.map((assetPack, index) => (
@@ -416,7 +522,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (
           !privateAssetPackListingDatas ||
           !receivedAssetPacks ||
-          hasAssetFiltersApplied // Don't show private packs if filtering on assets.
+          // Don't show private packs if filtering on assets.
+          hasAssetFiltersApplied
         ) {
           return {
             allStandAlonePackTiles: [],
@@ -490,8 +597,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
         if (
           !privateGameTemplateListingDatas ||
           !onPrivateGameTemplateSelection ||
-          hasAssetFiltersApplied || // Don't show private game templates if filtering on assets.
-          hasAssetPackFiltersApplied // Don't show private game templates if filtering on asset packs.
+          // Don't show private game templates if filtering on assets.
+          hasAssetFiltersApplied ||
+          // Don't show private game templates if filtering on asset packs.
+          hasAssetPackFiltersApplied
         )
           return [];
 
@@ -576,6 +685,23 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [openedAssetPack, licenses]
     );
 
+    const privateAssetPackLicense = React.useMemo(
+      () =>
+        getUserProductPurchaseUsageType({
+          productId:
+            openedAssetPack && openedAssetPack.id ? openedAssetPack.id : null,
+          receivedProducts: receivedAssetPacks,
+          productPurchases: assetPackPurchases,
+          allProductListingDatas: allPrivateAssetPackListingDatas,
+        }),
+      [
+        assetPackPurchases,
+        openedAssetPack,
+        allPrivateAssetPackListingDatas,
+        receivedAssetPacks,
+      ]
+    );
+
     return (
       <ScrollView
         ref={scrollView}
@@ -594,11 +720,25 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             </Trans>
           </PlaceholderError>
         )}
-        {!openedAssetPack && gameTemplateTiles.length ? (
+        {currentPage &&
+          assetShortHeaders &&
+          assetShortHeaders.length > getPageBreakAssetUpperIndex(0) &&
+          pageBreakIndex > 0 && (
+            <PageBreakNavigation
+              currentPage={currentPage}
+              pageBreakIndex={pageBreakIndex}
+              setPageBreakIndex={setPageBreakIndex}
+              assetShortHeaders={assetShortHeaders}
+              scrollView={scrollView.current}
+            />
+          )}
+        {!openedAssetPack &&
+        gameTemplateTiles.length &&
+        pageBreakIndex === 0 ? (
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -608,11 +748,13 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             </Column>
           </Line>
         ) : null}
-        {!openedAssetPack && allBundlePackTiles.length ? (
+        {!openedAssetPack &&
+        allBundlePackTiles.length &&
+        pageBreakIndex === 0 ? (
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -622,11 +764,13 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             </Column>
           </Line>
         ) : null}
-        {!openedAssetPack && allStandAlonePackTiles.length ? (
+        {!openedAssetPack &&
+        allStandAlonePackTiles.length &&
+        pageBreakIndex === 0 ? (
           <Line expand>
             <Column noMargin expand>
               <GridList
-                cols={getShopItemsColumns(windowWidth)}
+                cols={getShopItemsColumns(windowSize, isLandscape)}
                 style={styles.grid}
                 cellHeight="auto"
                 spacing={cellSpacing / 2}
@@ -640,7 +784,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
           <Column>
             <ResponsiveLineStackLayout>
               {packMainImageUrl && (
-                <Line>
+                <div style={styles.previewImageContainer}>
                   <CorsAwareImage
                     key={openedAssetPack.name}
                     style={styles.previewImage}
@@ -654,7 +798,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                     alt={`Preview image of asset pack ${openedAssetPack.name}`}
                   />
                   <LargeSpacer />
-                </Line>
+                </div>
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
@@ -707,6 +851,45 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                     </Link>
                   </Text>
                 )}
+                {privateAssetPackLicense && onPrivateAssetPackSelection && (
+                  <Column noMargin>
+                    <Line noMargin>
+                      <Text size="sub-title">
+                        <Trans>Licensing</Trans>
+                      </Text>
+                      <HelpIcon
+                        size="small"
+                        helpPagePath="https://gdevelop.io/page/asset-store-license-agreement"
+                      />
+                    </Line>
+                    <OwnedProductLicense
+                      productType="asset-pack"
+                      ownedLicense={privateAssetPackLicense}
+                    />
+                    <div style={styles.openProductContainer}>
+                      <FlatButton
+                        label={<Trans>Open in Store</Trans>}
+                        onClick={() => {
+                          // Ensure this is a private pack and we are on the store.
+                          if (
+                            !openedAssetPack.id ||
+                            !allPrivateAssetPackListingDatas ||
+                            !currentPage
+                          )
+                            return;
+                          const assetPackListingData = allPrivateAssetPackListingDatas.find(
+                            listingData => listingData.id === openedAssetPack.id
+                          );
+                          if (!assetPackListingData) return;
+                          onPrivateAssetPackSelection(assetPackListingData, {
+                            forceProductPage: true,
+                          });
+                        }}
+                        primary
+                      />
+                    </div>
+                  </Column>
+                )}
               </Column>
             </ResponsiveLineStackLayout>
           </Column>
@@ -746,7 +929,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             <GridList
               style={styles.grid}
               cellHeight="auto"
-              cols={getAssetFoldersColumns(windowWidth)}
+              cols={getAssetFoldersColumns(windowSize, isLandscape)}
               spacing={cellSpacing / 2}
             >
               {folderTiles}
@@ -767,16 +950,23 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             assetPack={openedAssetPack}
           />
         ) : null}
-        {assetTiles && // loading is finished.
-        !assetTiles.length && // No assets to show.
-        !allBundlePackTiles.length && // No bundles to show.
-        !allStandAlonePackTiles.length && // No packs to show.
-        !gameTemplateTiles.length && // no templates to show.
-        (!openedAssetPack ||
-          !openedAssetPack.content ||
-          !isAssetPackAudioOnly(openedAssetPack)) && // It's not an audio pack.
+        {// loading is finished.
+        assetTiles &&
+          // No assets to show.
+          !assetTiles.length &&
+          // No bundles to show.
+          !allBundlePackTiles.length &&
+          // No packs to show.
+          !allStandAlonePackTiles.length &&
+          // no templates to show.
+          !gameTemplateTiles.length &&
+          (!openedAssetPack ||
+            !openedAssetPack.content ||
+            // It's not an audio pack.
+            !isAssetPackAudioOnly(openedAssetPack)) &&
           noResultComponent}
         {onPrivateAssetPackSelection &&
+          onPrivateGameTemplateSelection &&
           openAuthorPublicProfileDialog &&
           authorPublicProfile && (
             <PublicProfileDialog
@@ -787,6 +977,23 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                 setOpenAuthorPublicProfileDialog(false);
                 setAuthorPublicProfile(null);
               }}
+              onGameTemplateOpen={gameTemplateListingData => {
+                onPrivateGameTemplateSelection(gameTemplateListingData);
+                setOpenAuthorPublicProfileDialog(false);
+                setAuthorPublicProfile(null);
+              }}
+            />
+          )}
+
+        {currentPage &&
+          assetShortHeaders &&
+          assetShortHeaders.length > getPageBreakAssetUpperIndex(0) && (
+            <PageBreakNavigation
+              currentPage={currentPage}
+              pageBreakIndex={pageBreakIndex}
+              setPageBreakIndex={setPageBreakIndex}
+              assetShortHeaders={assetShortHeaders}
+              scrollView={scrollView.current}
             />
           )}
       </ScrollView>

@@ -12,7 +12,6 @@ namespace gdjs {
    * @see gdjs.CustomRuntimeObject
    */
   export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
-    _renderer: gdjs.CustomObjectRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     /** The parent container that contains the object associated with this container. */
@@ -35,11 +34,6 @@ namespace gdjs {
       this._parent = parent;
       this._customObject = customObject;
       this._runtimeScene = parent.getScene();
-      this._renderer = new gdjs.CustomObjectRenderer(
-        customObject,
-        this,
-        parent
-      );
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
     }
 
@@ -264,8 +258,10 @@ namespace gdjs {
     /**
      * Get the renderer associated to the RuntimeScene.
      */
-    getRenderer(): gdjs.CustomObjectRenderer {
-      return this._renderer;
+    getRenderer():
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer {
+      return this._customObject.getRenderer();
     }
 
     getDebuggerRenderer() {

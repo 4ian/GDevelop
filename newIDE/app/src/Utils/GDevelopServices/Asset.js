@@ -450,7 +450,7 @@ const resourceFilenameRegex = new RegExp(
     GDevelopPublicAssetResourcesStorageStagingBaseUrl
   )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
 );
-export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
+export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   url: string
 ): string => {
   const matches = resourceFilenameRegex.exec(url);
@@ -458,5 +458,8 @@ export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
     throw new Error('The URL is not a valid public asset resource URL: ' + url);
   }
   const filenameWithExtension = matches[4];
-  return filenameWithExtension;
+  const decodedFilenameWithExtension = decodeURIComponent(
+    filenameWithExtension
+  );
+  return decodedFilenameWithExtension;
 };

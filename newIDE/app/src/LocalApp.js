@@ -30,11 +30,14 @@ import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import LocalLoginProvider from './LoginProvider/LocalLoginProvider';
 
 const gd: libGDevelop = global.gd;
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
+  const loginProvider = new LocalLoginProvider(authentication.auth);
+  authentication.setLoginProvider(loginProvider);
 
   const appArguments = Window.getArguments();
   const isDev = Window.isDev();

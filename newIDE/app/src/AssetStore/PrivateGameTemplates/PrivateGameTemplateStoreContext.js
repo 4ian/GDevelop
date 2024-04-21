@@ -17,6 +17,7 @@ import { getPrivateGameTemplateListingDataFromUserFriendlySlug } from '../AssetS
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { t } from '@lingui/macro';
 import { sendGameTemplateInformationOpened } from '../../Utils/Analytics/EventSender';
+import { PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for game templates.
@@ -54,50 +55,50 @@ type PrivateGameTemplateStoreState = {|
   },
 |};
 
+export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState = {
+  gameTemplateFilters: null,
+  fetchGameTemplates: () => {},
+  privateGameTemplateListingDatas: null,
+  error: null,
+  shop: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+    setInitialGameTemplateUserFriendlySlug: (
+      initialGameTemplateUserFriendlySlug: string
+    ) => {},
+  },
+  exampleStore: {
+    privateGameTemplateListingDatasSearchResults: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  },
+};
+
 export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
-  {
-    gameTemplateFilters: null,
-    fetchGameTemplates: () => {},
-    privateGameTemplateListingDatas: null,
-    error: null,
-    shop: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-      setInitialGameTemplateUserFriendlySlug: (
-        initialGameTemplateUserFriendlySlug: string
-      ) => {},
-    },
-    exampleStore: {
-      privateGameTemplateListingDatasSearchResults: null,
-      searchText: '',
-      setSearchText: () => {},
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-    },
-  }
+  initialPrivateGameTemplateStoreState
 );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
-  onlyAppStorePrivateGameTemplates?: ?boolean,
   shopNavigationState: NavigationState,
   children: React.Node,
 |};
 
 export const PrivateGameTemplateStoreStateProvider = ({
-  onlyAppStorePrivateGameTemplates,
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
@@ -135,35 +136,33 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const fetchedPivateGameTemplateListingDatas = await listListedPrivateGameTemplates(
-            {
-              onlyAppStorePrivateGameTemplates,
-            }
-          );
+          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
 
           console.info(
             `Loaded ${
-              fetchedPivateGameTemplateListingDatas
-                ? fetchedPivateGameTemplateListingDatas.length
+              fetchedPrivateGameTemplateListingDatas
+                ? fetchedPrivateGameTemplateListingDatas.length
                 : 0
             } game templates from the store.`
           );
 
           setPrivateGameTemplateListingDatas(
-            fetchedPivateGameTemplateListingDatas
+            fetchedPrivateGameTemplateListingDatas
           );
+          const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+            (allCategories, privateGameTemplateListingData) => {
+              return allCategories.concat(
+                privateGameTemplateListingData.categories.map(category =>
+                  capitalize(category)
+                )
+              );
+            },
+            []
+          );
+          const uniqueDefaultTags = Array.from(new Set(defaultTags));
           const gameTemplateFilters: Filters = {
             allTags: [],
-            defaultTags: fetchedPivateGameTemplateListingDatas.reduce(
-              (allCategories, privateGameTemplateListingData) => {
-                return allCategories.concat(
-                  privateGameTemplateListingData.categories.map(category =>
-                    capitalize(category)
-                  )
-                );
-              },
-              []
-            ),
+            defaultTags: uniqueDefaultTags,
             tagsTree: [],
           };
           setGameTemplateFilters(gameTemplateFilters);
@@ -178,11 +177,7 @@ export const PrivateGameTemplateStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [
-      isLoading,
-      onlyAppStorePrivateGameTemplates,
-      privateGameTemplateListingDatas,
-    ]
+    [privateGameTemplateListingDatas]
   );
 
   // When the game templates are loaded,
@@ -250,10 +245,10 @@ export const PrivateGameTemplateStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching game templates from the store...');
         fetchGameTemplates();
-      }, 5000);
+      }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
-    [fetchGameTemplates, isLoading]
+    [fetchGameTemplates]
   );
 
   const privateGameTemplateListingDatasById = React.useMemo(

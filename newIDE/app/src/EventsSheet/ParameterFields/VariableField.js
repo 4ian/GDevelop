@@ -24,6 +24,7 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import ShareExternal from '../../UI/CustomSvgIcons/ShareExternal';
 import intersection from 'lodash/intersection';
+import SvgIcon, { type SvgIconProps } from '@material-ui/core/SvgIcon';
 
 type Props = {
   ...ParameterFieldProps,
@@ -265,12 +266,16 @@ export const renderVariableWithIcon = (
     InvalidParameterValue,
     MissingParameterValue,
   }: ParameterInlineRendererProps,
-  iconPath: string,
+  VariableIcon: SvgIconProps => React.Element<typeof SvgIcon>,
   tooltip: string
 ) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
+
+  const IconAndNameContainer = expressionIsValid
+    ? React.Fragment
+    : InvalidParameterValue;
 
   return (
     <span
@@ -282,18 +287,14 @@ export const renderVariableWithIcon = (
           VariableNameQuickAnalyzeResults.OK,
       })}
     >
-      <img
-        className={classNames({
-          [icon]: true,
-        })}
-        src={iconPath}
-        alt=""
-      />
-      {expressionIsValid ? (
-        value
-      ) : (
-        <InvalidParameterValue>{value}</InvalidParameterValue>
-      )}
+      <IconAndNameContainer>
+        <VariableIcon
+          className={classNames({
+            [icon]: true,
+          })}
+        />
+        {value}
+      </IconAndNameContainer>
     </span>
   );
 };

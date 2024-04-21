@@ -517,6 +517,7 @@ interface Project {
     void RemoveLayout([Const] DOMString name);
     void SetFirstLayout([Const] DOMString name);
     [Const, Ref] DOMString GetFirstLayout();
+    unsigned long GetLayoutPosition([Const] DOMString name);
 
     boolean HasExternalEventsNamed([Const] DOMString name);
     [Ref] ExternalEvents GetExternalEvents([Const] DOMString name);
@@ -526,6 +527,7 @@ interface Project {
     unsigned long GetExternalEventsCount();
     [Ref] ExternalEvents InsertNewExternalEvents([Const] DOMString name, unsigned long position);
     void RemoveExternalEvents([Const] DOMString name);
+    unsigned long GetExternalEventsPosition([Const] DOMString name);
 
     boolean HasExternalLayoutNamed([Const] DOMString name);
     [Ref] ExternalLayout GetExternalLayout([Const] DOMString name);
@@ -535,6 +537,7 @@ interface Project {
     unsigned long GetExternalLayoutsCount();
     [Ref] ExternalLayout InsertNewExternalLayout([Const] DOMString name, unsigned long position);
     void RemoveExternalLayout([Const] DOMString name);
+    unsigned long GetExternalLayoutPosition([Const] DOMString name);
 
     boolean HasEventsFunctionsExtensionNamed([Const] DOMString name);
     [Ref] EventsFunctionsExtension GetEventsFunctionsExtension([Const] DOMString name);
@@ -545,6 +548,7 @@ interface Project {
     [Ref] EventsFunctionsExtension InsertNewEventsFunctionsExtension([Const] DOMString name, unsigned long position);
     [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
+    unsigned long GetEventsFunctionsExtensionPosition([Const] DOMString name);
 
     boolean HasEventsBasedBehavior([Const] DOMString type);
     [Ref] EventsBasedBehavior GetEventsBasedBehavior([Const] DOMString type);
@@ -713,7 +717,6 @@ interface gdObject {
     [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
-    boolean Is3DObject();
 
     [Ref] ObjectConfiguration GetConfiguration();
 
@@ -769,6 +772,8 @@ interface CustomObjectConfiguration {
 
     [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
     boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
+
+    [Ref] SpriteAnimationList GetAnimations();
 };
 CustomObjectConfiguration implements ObjectConfiguration;
 
@@ -909,6 +914,8 @@ interface Layer {
     [Const, Ref] DOMString GetName();
     void SetRenderingType([Const] DOMString renderingType);
     [Const, Ref] DOMString GetRenderingType();
+    void SetCameraType([Const] DOMString cameraType);
+    [Const, Ref] DOMString GetCameraType();
     void SetVisibility(boolean visible);
     boolean GetVisibility();
     void SetLocked(boolean isLocked);
@@ -957,9 +964,13 @@ interface PropertyDescriptor {
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
+    boolean IsHidden();
+    [Ref] PropertyDescriptor SetDeprecated(boolean enable);
+    boolean IsDeprecated();
+    [Ref] PropertyDescriptor SetAdvanced(boolean enable);
+    boolean IsAdvanced();
     [Const, Ref] MeasurementUnit GetMeasurementUnit();
     [Ref] PropertyDescriptor SetMeasurementUnit([Const, Ref] MeasurementUnit measurementUnit);
-    boolean IsHidden();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1117,6 +1128,11 @@ interface JsonResource {
 };
 JsonResource implements Resource;
 
+interface SpineResource {
+    void SpineResource();
+};
+SpineResource implements JsonResource;
+
 interface TilemapResource {
     void TilemapResource();
 };
@@ -1131,6 +1147,11 @@ interface Model3DResource {
     void Model3DResource();
 };
 Model3DResource implements Resource;
+
+interface AtlasResource {
+    void AtlasResource();
+};
+AtlasResource implements Resource;
 
 interface InitialInstance {
     void InitialInstance();
@@ -1154,6 +1175,8 @@ interface InitialInstance {
     void SetLocked(boolean lock);
     boolean IsSealed();
     void SetSealed(boolean seal);
+    boolean ShouldKeepRatio();
+    void SetShouldKeepRatio(boolean keepRatio);
     long GetZOrder();
     void SetZOrder(long zOrder);
     [Const, Ref] DOMString GetLayer();
@@ -1297,6 +1320,12 @@ interface Serializer {
     [Value] SerializerElement STATIC_FromJSON([Const] DOMString json);
 };
 
+interface ObjectAssetSerializer {
+    void STATIC_SerializeTo([Ref] Project project, [Const, Ref] gdObject obj,
+        [Const] DOMString objectFullName, [Ref] SerializerElement element,
+        [Ref] VectorString usedResourceNames);
+};
+
 interface InstructionsList {
     void InstructionsList();
 
@@ -1361,8 +1390,8 @@ interface ParameterOptions {
 interface AbstractFunctionMetadata {
     [Ref] AbstractFunctionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] AbstractFunctionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] AbstractFunctionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1412,8 +1441,8 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetRelevantForCustomObjectEventsOnly();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] InstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1477,8 +1506,8 @@ interface ExpressionMetadata {
     [Ref] ExpressionMetadata AddParameter(
         [Const] DOMString type,
         [Const] DOMString description,
-        [Const] DOMString optionalObjectType,
-        boolean parameterIsOptional);
+        [Const] optional DOMString optionalObjectType,
+        optional boolean parameterIsOptional);
     [Ref] ExpressionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1499,8 +1528,8 @@ ExpressionMetadata implements AbstractFunctionMetadata;
 interface MultipleInstructionMetadata {
     [Ref] MultipleInstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
-                                        [Const] DOMString optionalObjectType,
-                                        boolean parameterIsOptional);
+                                        [Const] optional DOMString optionalObjectType,
+                                        optional boolean parameterIsOptional);
     [Ref] MultipleInstructionMetadata AddCodeOnlyParameter(
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
@@ -1828,6 +1857,9 @@ interface BehaviorMetadata {
 
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
+
+    [Value] MapStringPropertyDescriptor GetProperties();
+    [Value] MapStringPropertyDescriptor GetSharedProperties();
 };
 
 interface EffectMetadata {
@@ -1933,22 +1965,11 @@ interface PlatformExtension {
         Behavior instance,
         BehaviorsSharedData sharedDatasInstance);
 
-    [Ref] BehaviorMetadata AddEventsBasedBehavior([Const] DOMString name,
-        [Const] DOMString fullname,
-        [Const] DOMString description,
-        [Const] DOMString group,
-        [Const] DOMString icon24x24);
-
     [Ref] ObjectMetadata WRAPPED_AddObject([Const] DOMString name,
         [Const] DOMString fullname,
         [Const] DOMString description,
         [Const] DOMString icon24x24,
         ObjectConfiguration instance);
-
-    [Ref] ObjectMetadata AddEventsBasedObject([Const] DOMString name,
-        [Const] DOMString fullname,
-        [Const] DOMString description,
-        [Const] DOMString icon24x24);
 
     [Ref] EffectMetadata AddEffect([Const] DOMString name);
 
@@ -2773,6 +2794,10 @@ interface EventsBasedObject {
 
     [Ref] EventsBasedObject MarkAsRenderedIn3D(boolean isRenderedIn3D);
     boolean IsRenderedIn3D();
+    [Ref] EventsBasedObject MarkAsAnimatable(boolean isAnimatable);
+    boolean IsAnimatable();
+    [Ref] EventsBasedObject MarkAsTextContainer(boolean isTextContainer);
+    boolean IsTextContainer();
 
     [Const, Value] DOMString STATIC_GetPropertyActionName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetPropertyConditionName([Const] DOMString propertyName);
@@ -3028,6 +3053,7 @@ interface ObjectsUsingResourceCollector {
 interface ResourcesInUseHelper {
     void ResourcesInUseHelper([Ref] ResourcesManager resourcesManager);
 
+    [Const, Ref] VectorString GetAllResources();
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();
@@ -3151,8 +3177,8 @@ interface Animation {
     void SetUseMultipleDirections(boolean enable);
 };
 
-interface SpriteObject {
-    void SpriteObject();
+interface SpriteAnimationList {
+    void SpriteAnimationList();
 
     void AddAnimation([Const, Ref] Animation animation);
     [Ref] Animation GetAnimation(unsigned long index);
@@ -3163,11 +3189,17 @@ interface SpriteObject {
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
 
-    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
-    boolean GetUpdateIfNotVisible();
-
     boolean AdaptCollisionMaskAutomatically();
     void SetAdaptCollisionMaskAutomatically(boolean adaptCollisionMaskAutomatically);
+};
+
+interface SpriteObject {
+    void SpriteObject();
+
+    [Ref] SpriteAnimationList GetAnimations();
+
+    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
+    boolean GetUpdateIfNotVisible();
 };
 SpriteObject implements ObjectConfiguration;
 
@@ -3199,6 +3231,35 @@ interface Model3DObjectConfiguration {
 };
 Model3DObjectConfiguration implements ObjectConfiguration;
 
+
+interface SpineAnimation {
+    void SpineAnimation();
+
+    void SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+
+    void SetSource([Const] DOMString name);
+    [Const, Ref] DOMString GetSource();
+
+    void SetShouldLoop(boolean shouldLoop);
+    boolean ShouldLoop();
+};
+
+interface SpineObjectConfiguration {
+    void SpineObjectConfiguration();
+
+    void AddAnimation([Const, Ref] SpineAnimation animation);
+    [Ref] SpineAnimation GetAnimation(unsigned long index);
+    boolean HasAnimationNamed([Const] DOMString name);
+    unsigned long GetAnimationsCount();
+    void RemoveAnimation(unsigned long index);
+    void RemoveAllAnimations();
+    boolean HasNoAnimations();
+    void SwapAnimations(unsigned long first, unsigned long second);
+    void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+};
+SpineObjectConfiguration implements ObjectConfiguration;
+
 interface Vector2f {
     void Vector2f();
 
@@ -3223,8 +3284,8 @@ interface VectorVector2f {
 interface TextObject {
     void TextObject();
 
-    void SetString([Const] DOMString string);
-    [Const, Ref] DOMString GetString();
+    void SetText([Const] DOMString string);
+    [Const, Ref] DOMString GetText();
     void SetCharacterSize(double size);
     double GetCharacterSize();
     void SetFontName([Const] DOMString string);
@@ -3235,12 +3296,30 @@ interface TextObject {
     void SetItalic(boolean enable);
     boolean IsUnderlined();
     void SetUnderlined(boolean enable);
-    void SetColor(unsigned long r, unsigned long g, unsigned long b);
-    unsigned long GetColorR();
-    unsigned long GetColorG();
-    unsigned long GetColorB();
+    void SetColor([Const] DOMString color);
+    [Const, Ref] DOMString GetColor();
     void SetTextAlignment([Const] DOMString textAlignment);
     [Const, Ref] DOMString GetTextAlignment();
+
+    void SetOutlineEnabled(boolean enable);
+    boolean IsOutlineEnabled();
+    void SetOutlineThickness(double value);
+    double GetOutlineThickness();
+    void SetOutlineColor([Const] DOMString color);
+    [Const, Ref] DOMString GetOutlineColor();
+
+    void SetShadowEnabled(boolean enable);
+    boolean IsShadowEnabled();
+    void SetShadowColor([Const] DOMString color);
+    [Const, Ref] DOMString GetShadowColor();
+    void SetShadowOpacity(double value);
+    double GetShadowOpacity();
+    void SetShadowAngle(double value);
+    double GetShadowAngle();
+    void SetShadowDistance(double value);
+    double GetShadowDistance();
+    void SetShadowBlurRadius(double value);
+    double GetShadowBlurRadius();
 };
 TextObject implements ObjectConfiguration;
 
@@ -3543,7 +3622,7 @@ interface MetadataDeclarationHelper {
         [Ref] MapStringString behaviorMethodMangledNames);
 
     [Ref] ObjectMetadata STATIC_GenerateObjectMetadata(
-        [Const, Ref] Project project,
+        [Ref] Project project,
         [Ref] PlatformExtension extension,
         [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedObject eventsBasedObject,

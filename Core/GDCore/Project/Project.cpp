@@ -102,20 +102,18 @@ std::unique_ptr<gd::Object> Project::CreateObject(
     behavior->SetDefaultBehavior(true);
   };
 
-  if (Project::HasEventsBasedObject(objectType)) {
-    addDefaultBehavior("EffectCapability::EffectBehavior");
-    addDefaultBehavior("ResizableCapability::ResizableBehavior");
-    addDefaultBehavior("ScalableCapability::ScalableBehavior");
-    addDefaultBehavior("FlippableCapability::FlippableBehavior");
-  } else {
-    auto& objectMetadata =
-        gd::MetadataProvider::GetObjectMetadata(platform, objectType);
-    if (MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
-      gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
-    }
-    for (auto& behaviorType : objectMetadata.GetDefaultBehaviors()) {
+  auto &objectMetadata =
+      gd::MetadataProvider::GetObjectMetadata(platform, objectType);
+  if (!MetadataProvider::IsBadObjectMetadata(objectMetadata)) {
+    for (auto &behaviorType : objectMetadata.GetDefaultBehaviors()) {
       addDefaultBehavior(behaviorType);
     }
+  }
+  // During project deserialization, event-based object metadata are not yet
+  // generated. Default behaviors will be added by
+  // MetadataDeclarationHelper::UpdateCustomObjectDefaultBehaviors
+  else if (!project.HasEventsBasedObject(objectType)) {
+    gd::LogWarning("Object: " + name + " has an unknown type: " + objectType);
   }
 
   return std::move(object);

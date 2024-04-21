@@ -12,7 +12,7 @@ import {
 import { type FileMetadata } from '../index';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
-  extractFilenameWithExtensionFromProductAuthorizedUrl,
+  extractDecodedFilenameWithExtensionFromProductAuthorizedUrl,
   isProductAuthorizedResourceUrl,
 } from '../../Utils/GDevelopServices/Shop';
 import {
@@ -64,7 +64,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
             if (isProductAuthorizedResourceUrl(resourceFile)) {
               // This is a file that is temporarily accessible thanks to a token,
               // so it should be downloaded and stored in the Cloud resources.
-              const filenameWithExtension = extractFilenameWithExtensionFromProductAuthorizedUrl(
+              const filenameWithExtension = extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               );
               return {

@@ -20,7 +20,7 @@ import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDispla
 import { serializeToJSObject } from '../Utils/Serializer';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { shortenString } from '../Utils/StringHelpers';
@@ -122,7 +122,7 @@ type State = {|
   layerRemoved: ?string,
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
-  exportedObject: ?gdObject,
+  isAssetExporterDialogOpen: boolean,
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
@@ -171,7 +171,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedLayer: null,
       editedLayerInitialTab: 'properties',
-      exportedObject: null,
+      isAssetExporterDialogOpen: false,
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
@@ -236,10 +236,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         // through the RenderedInstance's, triggering crashes. So the scene rendering
         // is paused during this period.
         editorDisplay.startSceneRendering(false);
-        await PixiResourcesLoader.reloadTextureForResource(
-          project,
-          resourceName
-        );
+        await PixiResourcesLoader.reloadResource(project, resourceName);
 
         editorDisplay.forceUpdateObjectsList();
 
@@ -471,9 +468,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  openObjectExporterDialog = (object: ?gdObject) => {
+  openObjectExporterDialog = (open: boolean = true) => {
     this.setState({
-      exportedObject: object,
+      isAssetExporterDialogOpen: open,
     });
   };
 
@@ -873,13 +870,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _onRenameLayer = (
-    oldName: string,
-    newName: string,
-    done: boolean => void
-  ) => {
-    this.props.initialInstances.moveInstancesToLayer(oldName, newName);
-    done(true);
+  _onLayerRenamed = () => {
     this.forceUpdatePropertiesEditor();
   };
 
@@ -1374,7 +1365,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project, layout } = this.props;
 
     const object = getObjectByName(project, layout, instance.getObjectName());
-    return !!object && object.is3DObject();
+    return (
+      !!object &&
+      gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D()
+    );
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
@@ -1656,11 +1653,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => {
-          const EditorsDisplay =
-            windowWidth === 'small'
-              ? SwipeableDrawerEditorsDisplay
-              : MosaicEditorsDisplay;
+        {({ isMobile }) => {
+          const EditorsDisplay = isMobile
+            ? SwipeableDrawerEditorsDisplay
+            : MosaicEditorsDisplay;
           return (
             <div
               style={styles.container}
@@ -1696,12 +1692,12 @@ export default class SceneEditor extends React.Component<Props, State> {
                 selectedObjectFolderOrObjectsWithContext={
                   selectedObjectFolderOrObjectsWithContext
                 }
-                onRenameLayer={this._onRenameLayer}
+                onLayerRenamed={this._onLayerRenamed}
                 onRemoveLayer={this._onRemoveLayer}
                 onSelectLayer={(layer: string) =>
                   this.setState({ selectedLayer: layer })
                 }
-                onExportObject={this.openObjectExporterDialog}
+                onExportAssets={this.openObjectExporterDialog}
                 onDeleteObjects={this._onDeleteObjects}
                 getValidatedObjectOrGroupName={
                   this._getValidatedObjectOrGroupName
@@ -1837,12 +1833,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                   </React.Fragment>
                 )}
               </I18n>
-              {this.state.exportedObject && (
+              {this.state.isAssetExporterDialogOpen && (
                 <ObjectExporterDialog
-                  object={this.state.exportedObject}
-                  onClose={() => {
-                    this.openObjectExporterDialog(null);
-                  }}
+                  project={project}
+                  layout={layout}
+                  onClose={() => this.openObjectExporterDialog(false)}
                 />
               )}
               {!!this.state.editedGroup && (

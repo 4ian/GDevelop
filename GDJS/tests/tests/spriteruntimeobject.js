@@ -202,7 +202,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.be(
+      expect(object.getAnimationElapsedTime()).to.be(
         stepDurationInMilliseconds / 1000
       );
 
@@ -232,7 +232,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       }
 
       // Almost at the animation end.
-      expect(object._animationElapsedTime).to.be.within(
+      expect(object.getAnimationElapsedTime()).to.be.within(
         3 * firstAnimationTimeBetweenFrames - stepDurationInMilliseconds / 1000,
         3 * firstAnimationTimeBetweenFrames - 0.001
       );
@@ -241,7 +241,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // The animation ended.
-      expect(object._animationElapsedTime).to.be(
+      expect(object.getAnimationElapsedTime()).to.be(
         3 * firstAnimationTimeBetweenFrames
       );
       expect(object.getAnimationFrame()).to.be(2);
@@ -249,7 +249,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // No change.
-      expect(object._animationElapsedTime).to.be(
+      expect(object.getAnimationElapsedTime()).to.be(
         3 * firstAnimationTimeBetweenFrames
       );
       expect(object.getAnimationFrame()).to.be(2);
@@ -272,7 +272,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       }
 
       // Almost at the animation end.
-      expect(object._animationElapsedTime).to.be.within(
+      expect(object.getAnimationElapsedTime()).to.be.within(
         3 * firstAnimationTimeBetweenFrames - stepDurationInMilliseconds / 1000,
         3 * firstAnimationTimeBetweenFrames - 0.001
       );
@@ -281,7 +281,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // The animation looped to the beginning.
-      expect(object._animationElapsedTime).to.within(0.01, 0.02);
+      expect(object.getAnimationElapsedTime()).to.within(0.01, 0.02);
       expect(object.getAnimationFrame()).to.be(0);
     });
   });
@@ -302,7 +302,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.be(
+      expect(object.getAnimationElapsedTime()).to.be(
         2 * firstAnimationTimeBetweenFrames - stepDurationInMilliseconds / 1000
       );
       expect(object.getAnimationFrame()).to.be(1);
@@ -326,7 +326,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       }
 
       // Almost at the animation beginning.
-      expect(object._animationElapsedTime).to.be.within(
+      expect(object.getAnimationElapsedTime()).to.be.within(
         0.001,
         stepDurationInMilliseconds / 60
       );
@@ -335,13 +335,13 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // Reached the animation beginning.
-      expect(object._animationElapsedTime).to.be(0);
+      expect(object.getAnimationElapsedTime()).to.be(0);
       expect(object.getAnimationFrame()).to.be(0);
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // No change.
-      expect(object._animationElapsedTime).to.be(0);
+      expect(object.getAnimationElapsedTime()).to.be(0);
       expect(object.getAnimationFrame()).to.be(0);
     });
 
@@ -364,7 +364,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       }
 
       // Almost at the animation beginning.
-      expect(object._animationElapsedTime).to.be.within(
+      expect(object.getAnimationElapsedTime()).to.be.within(
         0.001,
         stepDurationInMilliseconds / 60
       );
@@ -373,7 +373,7 @@ describe('gdjs.SpriteRuntimeObject', () => {
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
       // Reached the animation beginning.
-      expect(object._animationElapsedTime).to.be.within(
+      expect(object.getAnimationElapsedTime()).to.be.within(
         3 * firstAnimationTimeBetweenFrames - 0.004,
         3 * firstAnimationTimeBetweenFrames - 0.003
       );
@@ -395,16 +395,16 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.not.be(0);
+      expect(object.getAnimationElapsedTime()).to.not.be(0);
 
       object.setAnimation(1);
 
       expect(object.getAnimationFrame()).to.be(0);
-      expect(object._animationElapsedTime).to.be(0);
+      expect(object.getAnimationElapsedTime()).to.be(0);
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.not.be(0);
+      expect(object.getAnimationElapsedTime()).to.not.be(0);
     });
 
     it('should reset the elapsed time on a frame when changing animation frame', () => {
@@ -420,18 +420,18 @@ describe('gdjs.SpriteRuntimeObject', () => {
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.not.be(0);
+      expect(object.getAnimationElapsedTime()).to.not.be(0);
 
       object.setAnimationFrame(2);
 
       expect(object.getAnimationFrame()).to.be(2);
-      expect(object._animationElapsedTime).to.be(
+      expect(object.getAnimationElapsedTime()).to.be(
         2 * firstAnimationTimeBetweenFrames
       );
 
       runtimeScene.renderAndStep(stepDurationInMilliseconds);
 
-      expect(object._animationElapsedTime).to.not.be(0);
+      expect(object.getAnimationElapsedTime()).to.not.be(0);
     });
   });
 });

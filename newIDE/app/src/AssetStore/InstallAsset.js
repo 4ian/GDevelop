@@ -3,7 +3,7 @@ import {
   type Asset,
   isPixelArt,
   isPublicAssetResourceUrl,
-  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { unserializeFromJSObject } from '../Utils/Serializer';
@@ -81,7 +81,9 @@ export const installResource = (
   const resourceOriginCleanedName: string = isPublicAssetResourceUrl(
     resourceFileUrl
   )
-    ? extractFilenameWithExtensionFromPublicAssetResourceUrl(resourceFileUrl)
+    ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
+        resourceFileUrl
+      )
     : resourceOriginRawName;
   const resourceOriginIdentifier: string = serializedResource.origin
     ? serializedResource.origin.identifier
@@ -121,6 +123,10 @@ export const installResource = (
     newResource = new gd.JsonResource();
   } else if (serializedResource.kind === 'model3D') {
     newResource = new gd.Model3DResource();
+  } else if (serializedResource.kind === 'atlas') {
+    newResource = new gd.AtlasResource();
+  } else if (serializedResource.kind === 'spine') {
+    newResource = new gd.SpineResource();
   } else {
     throw new Error(
       `Resource of kind "${serializedResource.kind}" is not supported.`

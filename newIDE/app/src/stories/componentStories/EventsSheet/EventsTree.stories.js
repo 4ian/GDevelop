@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import EventsTree from '../../../EventsSheet/EventsTree';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
@@ -15,7 +14,6 @@ import { type Tutorial } from '../../../Utils/GDevelopServices/Tutorial';
 export default {
   title: 'EventsSheet/EventsTree',
   component: EventsTree,
-  decorators: [muiDecorator],
 };
 
 const eventsTreeTutorials: Array<Tutorial> = [
@@ -71,7 +69,7 @@ export const DefaultMediumScreenScopeInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'medium'}
+          windowSize={'medium'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -115,7 +113,7 @@ export const DefaultSmallScreenScopeInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'small'}
+          windowSize={'small'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -156,7 +154,7 @@ export const DefaultMediumScreenScopeNotInLayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'medium'}
+          windowSize={'medium'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}
@@ -200,7 +198,7 @@ export const EmptySmallScreenScopeInALayout = () => (
           onEventMoved={() => {}}
           showObjectThumbnails={true}
           screenType={'normal'}
-          windowWidth={'small'}
+          windowSize={'small'}
           eventsSheetHeight={500}
           preferences={initialPreferences}
           tutorials={eventsTreeTutorials}

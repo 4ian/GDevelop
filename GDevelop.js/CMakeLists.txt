@@ -81,6 +81,7 @@ target_link_libraries(GD "-s MODULARIZE=1")
 target_link_libraries(GD "-s EXPORT_NAME=\"initializeGDevelopJs\"") # Global function name for browsers
 target_link_libraries(GD "-s TOTAL_MEMORY=48MB") # Get some initial memory size that is a bit bigger than the default.
 target_link_libraries(GD "-s ALLOW_MEMORY_GROWTH=1")
+target_link_libraries(GD "-s NODEJS_CATCH_EXIT=0") # Don't print the entire GDCore code on error when running in node
 target_link_libraries(GD "-s ERROR_ON_UNDEFINED_SYMBOLS=0")
 target_link_libraries(GD "-s \"EXPORTED_FUNCTIONS=['_free']\"")
 
@@ -119,3 +120,4 @@ target_link_libraries(GD PathfindingBehavior)
 target_link_libraries(GD PhysicsBehavior)
 target_link_libraries(GD ParticleSystem)
 target_link_libraries(GD Scene3D)
+target_link_libraries(GD SpineObject)

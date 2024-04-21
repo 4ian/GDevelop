@@ -18,7 +18,7 @@ import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 import {
-  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 
@@ -40,7 +40,7 @@ const ResourceStoreChooser = ({
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
         const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
-          ? extractFilenameWithExtensionFromPublicAssetResourceUrl(
+          ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
               chosenResourceUrl
             )
           : path.basename(chosenResourceUrl);

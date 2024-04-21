@@ -10,6 +10,9 @@ import {
 } from '../../Utils/GDevelopServices/Usage';
 import AuthenticatedUserContext from '../AuthenticatedUserContext';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
+import useSubscriptionPlans, {
+  getAvailableSubscriptionPlansWithPrices,
+} from '../../Utils/UseSubscriptionPlans';
 
 export type SubscriptionAnalyticsMetadata = {|
   reason: SubscriptionDialogDisplayReason,
@@ -52,6 +55,9 @@ export const SubscriptionSuggestionProvider = ({
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
 
   const closeSubscriptionDialog = () => setAnalyticsMetadata(null);
 
@@ -91,12 +97,60 @@ export const SubscriptionSuggestionProvider = ({
     openSubscriptionDialog,
   ]);
 
+  const availableSubscriptionPlansWithPrices = React.useMemo(
+    () =>
+      subscriptionPlansWithPricingSystems
+        ? getAvailableSubscriptionPlansWithPrices(
+            subscriptionPlansWithPricingSystems
+          )
+        : null,
+    [subscriptionPlansWithPricingSystems]
+  );
+
+  const userLegacySubscriptionPlanWithPricingSystem = React.useMemo(
+    () => {
+      if (
+        !authenticatedUser.subscription ||
+        !authenticatedUser.subscription.planId ||
+        !authenticatedUser.subscription.pricingSystemId ||
+        !subscriptionPlansWithPricingSystems
+      ) {
+        return null;
+      }
+      const {
+        planId: userPlanId,
+        pricingSystemId: userPricingSystemId,
+      } = authenticatedUser.subscription;
+      const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
+        planWithPricingSystems => planWithPricingSystems.id === userPlanId
+      );
+      if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
+        return null;
+      }
+      const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
+        pricingSystem => pricingSystem.id === userPricingSystemId
+      );
+      if (!userPricingSystem) return null;
+      return {
+        ...userPlanWithPricingSystems,
+        pricingSystems: [userPricingSystem],
+      };
+    },
+    [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+  );
+
   return (
     <SubscriptionSuggestionContext.Provider value={value}>
       {children}
       {analyticsMetadata && (
         <SubscriptionDialog
           open
+          subscriptionPlansWithPricingSystems={
+            availableSubscriptionPlansWithPrices
+          }
+          userLegacySubscriptionPlanWithPricingSystem={
+            userLegacySubscriptionPlanWithPricingSystem
+          }
           onClose={closeSubscriptionDialog}
           analyticsMetadata={analyticsMetadata}
           filter={filter}

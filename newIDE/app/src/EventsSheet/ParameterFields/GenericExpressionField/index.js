@@ -41,7 +41,7 @@ import {
   getNonRenderedCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
-import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   shouldCloseOrCancel,
   shouldSubmit,
@@ -191,6 +191,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       this._fieldElementWidth = this._field.getFieldWidth();
       this._inputElement = this._field ? this._field.getInputNode() : null;
     }
+  }
+
+  componentWillUnmount() {
+    this._enqueueValidation.cancel();
   }
 
   focus: FieldFocusFunction = options => {
@@ -631,10 +635,10 @@ export default class ExpressionField extends React.Component<Props, State> {
                         }
                       >
                         <ResponsiveWindowMeasurer>
-                          {screenSize => (
+                          {({ isMobile }) => (
                             <Paper
                               style={
-                                screenSize === 'small'
+                                isMobile
                                   ? styles.expressionSelectorPopoverContentSmall
                                   : styles.expressionSelectorPopoverContent
                               }

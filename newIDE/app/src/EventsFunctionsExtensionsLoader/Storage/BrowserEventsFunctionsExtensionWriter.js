@@ -36,38 +36,11 @@ export default class BrowserEventsFunctionsExtensionWriter {
     try {
       await downloadStringContentAsFile(
         filename,
-        JSON.stringify(serializedObject)
+        JSON.stringify(serializedObject, null, 2)
       );
     } catch (error) {
       console.error('Unable to write the events function extension:', error);
       throw error;
     }
-  };
-
-  static chooseCustomObjectFile = async (
-    objectName?: string
-  ): Promise<?string> => {
-    return objectName;
-  };
-
-  static writeCustomObject = (
-    customObject: gdObject,
-    filename: string
-  ): Promise<void> => {
-    const exportedObject = customObject.clone().get();
-    exportedObject.getVariables().clear();
-    exportedObject.getEffects().clear();
-    exportedObject
-      .getAllBehaviorNames()
-      .toJSArray()
-      .forEach(name => exportedObject.removeBehavior(name));
-    const serializedObject = serializeToJSObject(exportedObject);
-    return downloadStringContentAsFile(
-      filename,
-      JSON.stringify(serializedObject)
-    ).catch(err => {
-      console.error('Unable to write the events function extension:', err);
-      throw err;
-    });
   };
 }

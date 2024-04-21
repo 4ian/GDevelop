@@ -7,7 +7,7 @@ import Checkbox from '../../UI/Checkbox';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { MiniToolbarText } from '../../UI/MiniToolbar';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
@@ -18,6 +18,13 @@ import Tooltip from '@material-ui/core/Tooltip';
 import LeftTextAlignment from '../../UI/CustomSvgIcons/LeftTextAlignment';
 import CenterTextAlignment from '../../UI/CustomSvgIcons/CenterTextAlignment';
 import RightTextAlignment from '../../UI/CustomSvgIcons/RightTextAlignment';
+import Text from '../../UI/Text';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+} from '../../Utils/ColorTransformer';
+import ColorField from '../../UI/ColorField';
+import { rgbOrHexToRGBString } from '../../Utils/ColorTransformer';
 
 const gd = global.gd;
 
@@ -41,6 +48,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
       objectConfiguration,
       project,
       resourceManagementProps,
+      renderObjectNameField,
     } = this.props;
     const textObjectConfiguration = gd.asTextObjectConfiguration(
       objectConfiguration
@@ -49,7 +57,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     const textAlignment = textObjectConfiguration.getTextAlignment();
 
     return (
-      <Column noMargin>
+      <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <ResponsiveLineStackLayout noMargin alignItems="center">
           <Line noMargin alignItems="center">
             <MiniToolbarText firstChild>
@@ -75,18 +84,13 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             <ColorPicker
               style={styles.toolbarItem}
               disableAlpha
-              color={{
-                r: textObjectConfiguration.getColorR(),
-                g: textObjectConfiguration.getColorG(),
-                b: textObjectConfiguration.getColorB(),
-                a: 255,
-              }}
+              color={rgbStringAndAlphaToRGBColor(
+                textObjectConfiguration.getColor(),
+                255
+              )}
               onChangeComplete={color => {
-                textObjectConfiguration.setColor(
-                  color.rgb.r,
-                  color.rgb.g,
-                  color.rgb.b
-                );
+                const rgbString = rgbColorToRGBString(color.rgb);
+                textObjectConfiguration.setColor(rgbString);
                 this.forceUpdate();
               }}
             />
@@ -152,49 +156,167 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             </ButtonGroup>
           </Line>
         </ResponsiveLineStackLayout>
-        <Line>
-          <Column expand noMargin>
-            <ResourceSelector
-              project={project}
-              resourceManagementProps={resourceManagementProps}
-              resourcesLoader={ResourcesLoader}
-              resourceKind="font"
+        <ResourceSelector
+          project={project}
+          resourceManagementProps={resourceManagementProps}
+          resourcesLoader={ResourcesLoader}
+          resourceKind="font"
+          fullWidth
+          canBeReset
+          initialResourceName={textObjectConfiguration.getFontName()}
+          onChange={resourceName => {
+            textObjectConfiguration.setFontName(resourceName);
+            this.forceUpdate();
+          }}
+          floatingLabelText={<Trans>Choose a font</Trans>}
+          hintText={<Trans>Choose a font</Trans>}
+        />
+        <Line noMargin>
+          <SemiControlledTextField
+            floatingLabelText={<Trans>Initial text to display</Trans>}
+            floatingLabelFixed
+            id="text-object-initial-text"
+            commitOnBlur
+            translatableHintText={t`Enter the text to be displayed by the object`}
+            fullWidth
+            multiline
+            rows={8}
+            rowsMax={8}
+            value={textObjectConfiguration.getText()}
+            onChange={value => {
+              textObjectConfiguration.setText(value);
+              this.forceUpdate();
+              this.props.onSizeUpdated();
+            }}
+          />
+        </Line>
+        <Text size="block-title" noMargin>
+          <Trans>Outline</Trans>
+        </Text>
+        <Checkbox
+          label={<Trans>Enabled</Trans>}
+          checked={textObjectConfiguration.isOutlineEnabled()}
+          onCheck={(e, checked) => {
+            textObjectConfiguration.setOutlineEnabled(checked);
+            this.forceUpdate();
+          }}
+        />
+        <ResponsiveLineStackLayout noMargin noColumnMargin>
+          <Column noMargin expand>
+            <ColorField
+              floatingLabelText={<Trans>Color</Trans>}
+              disableAlpha
               fullWidth
-              canBeReset
-              initialResourceName={textObjectConfiguration.getFontName()}
-              onChange={resourceName => {
-                textObjectConfiguration.setFontName(resourceName);
+              color={textObjectConfiguration.getOutlineColor()}
+              onChange={color => {
+                const rgbString =
+                  color.length === 0 ? '' : rgbOrHexToRGBString(color);
+                textObjectConfiguration.setOutlineColor(rgbString);
                 this.forceUpdate();
               }}
-              floatingLabelText={<Trans>Choose a font</Trans>}
-              hintText={<Trans>Choose a font</Trans>}
             />
           </Column>
-        </Line>
-        <Line noMargin>
-          <Column expand noMargin>
-            <Line>
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Initial text to display</Trans>}
-                floatingLabelFixed
-                id="text-object-initial-text"
-                commitOnBlur
-                translatableHintText={t`Enter the text to be displayed by the object`}
-                fullWidth
-                multiline
-                rows={8}
-                rowsMax={8}
-                value={textObjectConfiguration.getString()}
-                onChange={value => {
-                  textObjectConfiguration.setString(value);
-                  this.forceUpdate();
-                  this.props.onSizeUpdated();
-                }}
-              />
-            </Line>
+          <Column noMargin expand>
+            <SemiControlledTextField
+              floatingLabelFixed
+              floatingLabelText={<Trans>Thickness</Trans>}
+              type="number"
+              value={textObjectConfiguration.getOutlineThickness()}
+              onChange={value => {
+                textObjectConfiguration.setOutlineThickness(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
           </Column>
-        </Line>
-      </Column>
+        </ResponsiveLineStackLayout>
+        <Text size="block-title" noMargin>
+          <Trans>Shadow</Trans>
+        </Text>
+        <Checkbox
+          label={<Trans>Enabled</Trans>}
+          checked={textObjectConfiguration.isShadowEnabled()}
+          onCheck={(e, checked) => {
+            textObjectConfiguration.setShadowEnabled(checked);
+            this.forceUpdate();
+          }}
+        />
+        <ResponsiveLineStackLayout noMargin noColumnMargin>
+          <Column noMargin expand>
+            <SemiControlledTextField
+              floatingLabelFixed
+              floatingLabelText={<Trans>Distance</Trans>}
+              type="number"
+              value={textObjectConfiguration.getShadowDistance()}
+              onChange={value => {
+                textObjectConfiguration.setShadowDistance(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column noMargin expand>
+            <SemiControlledTextField
+              floatingLabelFixed
+              floatingLabelText={<Trans>Angle</Trans>}
+              type="number"
+              value={textObjectConfiguration.getShadowAngle()}
+              onChange={value => {
+                textObjectConfiguration.setShadowAngle(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
+          <Column noMargin expand>
+            <ColorField
+              floatingLabelText={<Trans>Color</Trans>}
+              disableAlpha
+              fullWidth
+              color={textObjectConfiguration.getShadowColor()}
+              onChange={color => {
+                const rgbString =
+                  color.length === 0 ? '' : rgbOrHexToRGBString(color);
+                textObjectConfiguration.setShadowColor(rgbString);
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column noMargin expand>
+            <SemiControlledTextField
+              floatingLabelFixed
+              floatingLabelText={<Trans>Opacity (0 - 255)</Trans>}
+              type="number"
+              value={textObjectConfiguration.getShadowOpacity()}
+              onChange={value => {
+                textObjectConfiguration.setShadowOpacity(
+                  parseInt(value, 10) || 0
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+        </ResponsiveLineStackLayout>
+        <Column noMargin expand>
+          <SemiControlledTextField
+            floatingLabelFixed
+            floatingLabelText={<Trans>Blur radius</Trans>}
+            type="number"
+            value={textObjectConfiguration.getShadowBlurRadius()}
+            onChange={value => {
+              textObjectConfiguration.setShadowBlurRadius(
+                parseInt(value, 10) || 0
+              );
+              this.forceUpdate();
+            }}
+          />
+        </Column>
+      </ColumnStackLayout>
     );
   }
 }

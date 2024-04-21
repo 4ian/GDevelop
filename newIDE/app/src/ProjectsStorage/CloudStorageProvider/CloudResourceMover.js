@@ -8,7 +8,7 @@ import {
   getCredentialsForCloudProject,
   type UploadedProjectResourceFiles,
   uploadProjectResourceFiles,
-  extractFilenameFromProjectResourceUrl,
+  extractDecodedFilenameFromProjectResourceUrl,
   extractProjectUuidFromProjectResourceUrl,
 } from '../../Utils/GDevelopServices/Project';
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
@@ -19,7 +19,7 @@ import {
 } from '../../Utils/BlobDownloader';
 import { isBlobURL, isURL } from '../../ResourcesList/ResourceUtils';
 import {
-  extractFilenameWithExtensionFromProductAuthorizedUrl,
+  extractDecodedFilenameWithExtensionFromProductAuthorizedUrl,
   fetchTokenForPrivateGameTemplateAuthorizationIfNeeded,
   isPrivateGameTemplateResourceAuthorizedUrl,
 } from '../../Utils/GDevelopServices/Shop';
@@ -91,7 +91,9 @@ export const moveUrlResourcesToCloudProject = async ({
             resourceToFetchAndUpload.push({
               resource,
               url: resourceFile,
-              filename: extractFilenameFromProjectResourceUrl(resourceFile),
+              filename: extractDecodedFilenameFromProjectResourceUrl(
+                resourceFile
+              ),
             });
           } else if (
             isPrivateGameTemplateResourceAuthorizedUrl(resourceFile) &&
@@ -108,7 +110,7 @@ export const moveUrlResourcesToCloudProject = async ({
             resourceToFetchAndUpload.push({
               resource,
               url: encodedResourceUrl,
-              filename: extractFilenameWithExtensionFromProductAuthorizedUrl(
+              filename: extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               ),
             });

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -14,14 +13,17 @@ import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire';
 import LocalFileSystem, { type UrlFileDescriptor } from './LocalFileSystem';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineElectronExport';
 import { downloadUrlsToLocalFiles } from '../../Utils/LocalFileDownloader';
+
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -43,6 +45,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = string;
 
+const exportPipelineName = 'local-online-electron';
+
 export const localOnlineElectronExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -50,7 +54,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'local-online-electron',
+  name: exportPipelineName,
   onlineBuildType: 'electron-build',
   limitedBuilds: true,
   packageNameWarningType: 'desktop',
@@ -72,7 +76,9 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Create installation file</Trans>,
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -174,7 +180,8 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -186,7 +193,8 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
       uploadBucketKey,
       exportState.targets,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

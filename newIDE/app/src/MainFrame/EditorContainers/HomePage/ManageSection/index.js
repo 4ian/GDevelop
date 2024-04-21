@@ -40,7 +40,6 @@ type Props = {|
   project: ?gdProject,
   games: ?Array<Game>,
   onRefreshGames: () => Promise<void>,
-  onGameUpdated: Game => void,
   gamesFetchingError: ?Error,
   openedGame: ?Game,
   setOpenedGame: (?Game) => void,
@@ -52,7 +51,6 @@ const ManageSection = ({
   project,
   games,
   onRefreshGames,
-  onGameUpdated,
   gamesFetchingError,
   openedGame,
   setOpenedGame,
@@ -65,6 +63,15 @@ const ManageSection = ({
     onOpenCreateAccountDialog,
     onOpenLoginDialog,
   } = authenticatedUser;
+
+  React.useEffect(
+    () => {
+      onRefreshGames();
+    },
+    // Refresh the games when the section is opened, useful when a game gets registered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const onBack = React.useCallback(
     () => {
@@ -87,7 +94,7 @@ const ManageSection = ({
         <LargeSpacer />
         <SectionRow expand>
           <Paper
-            background="medium"
+            background="dark"
             square={false}
             style={styles.gameDetailsContainer}
           >
@@ -100,7 +107,7 @@ const ManageSection = ({
               <GameDetails
                 game={openedGame}
                 project={project}
-                onGameUpdated={onGameUpdated}
+                onGameUpdated={onRefreshGames}
                 onGameDeleted={() => {
                   onBack();
                   onRefreshGames();
@@ -207,7 +214,6 @@ const ManageSection = ({
               project={project}
               games={games}
               onRefreshGames={onRefreshGames}
-              onGameUpdated={onGameUpdated}
               onOpenGame={setOpenedGame}
             />
           )

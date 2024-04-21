@@ -88,6 +88,32 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
    */
+  const addCube = (runtimeScene) => {
+    const object = new gdjs.Cube3DRuntimeObject(runtimeScene, {
+      name: 'Cube',
+      type: 'Scene3D::Cube3DObject',
+      effects: [],
+      variables: [],
+      behaviors: [
+        {
+          type: 'Tween::TweenBehavior',
+          name: behaviorName,
+        },
+      ],
+      // @ts-ignore
+      content: {
+        width: 64,
+        height: 64,
+        depth: 64,
+      },
+    });
+    runtimeScene.addObject(object);
+    return object;
+  };
+
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   */
   const addTextObject = (runtimeScene) => {
     const object = new gdjs.TextRuntimeObject(runtimeScene, {
       name: 'Text',
@@ -100,18 +126,25 @@ describe('gdjs.TweenRuntimeBehavior', () => {
           name: behaviorName,
         },
       ],
-      characterSize: 20,
-      font: '',
-      bold: false,
-      italic: false,
-      underlined: false,
-      color: {
-        r: 0,
-        g: 0,
-        b: 0,
+      content: {
+        characterSize: 20,
+        font: '',
+        bold: false,
+        italic: false,
+        underlined: false,
+        color: '0;0;0',
+        text: '',
+        textAlignment: 'left',
+        isOutlineEnabled: false,
+        outlineThickness: 2,
+        outlineColor: '255;255;255',
+        isShadowEnabled: false,
+        shadowColor: '0;0;0',
+        shadowOpacity: 128,
+        shadowDistance: 4,
+        shadowAngle: 90,
+        shadowBlurRadius: 2,
       },
-      string: '',
-      textAlignment: 'left',
     });
     runtimeScene.addObject(object);
     return object;
@@ -123,6 +156,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   let object;
   /** @type {gdjs.SpriteRuntimeObject} */
   let sprite;
+  /** @type {gdjs.Cube3DRuntimeObject} */
+  let cube;
   /** @type {gdjs.TextRuntimeObject} */
   let textObject;
   /** @type {gdjs.TweenRuntimeBehavior} */
@@ -130,17 +165,22 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   /** @type {gdjs.TweenRuntimeBehavior} */
   let spriteBehavior;
   /** @type {gdjs.TweenRuntimeBehavior} */
+  let cubeBehavior;
+  /** @type {gdjs.TweenRuntimeBehavior} */
   let textObjectBehavior;
   beforeEach(() => {
     runtimeScene = createScene();
     runtimeScene.getLayer('').setTimeScale(1.5);
     object = addObject(runtimeScene);
     sprite = addSprite(runtimeScene);
+    cube = addCube(runtimeScene);
     textObject = addTextObject(runtimeScene);
     //@ts-ignore
     behavior = object.getBehavior(behaviorName);
     //@ts-ignore
     spriteBehavior = sprite.getBehavior(behaviorName);
+    //@ts-ignore
+    cubeBehavior = cube.getBehavior(behaviorName);
     //@ts-ignore
     textObjectBehavior = textObject.getBehavior(behaviorName);
   });
@@ -404,11 +444,53 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getY()).to.be(440);
   });
 
+  it('can tween the position on Z axis', () => {
+    cube.setZ(200);
+    cubeBehavior.addObjectPositionZTween2(
+      null,
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => cube.getZ());
+    expect(cube.getZ()).to.be(440);
+  });
+
   it('can tween the angle', () => {
     object.setAngle(200);
     behavior.addObjectAngleTween2('MyTween', 600, 'linear', 0.25, false);
     checkProgress(6, () => object.getAngle());
     expect(object.getAngle()).to.be(440);
+  });
+
+  it('can tween the rotation X', () => {
+    cube.setRotationX(200);
+    cubeBehavior.addObjectRotationXTween(
+      null,
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => cube.getRotationX());
+    expect(cube.getRotationX()).to.be(440);
+  });
+
+  it('can tween the rotation Y', () => {
+    cube.setRotationY(200);
+    cubeBehavior.addObjectRotationYTween(
+      null,
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => cube.getRotationY());
+    expect(cube.getRotationY()).to.be(440);
   });
 
   it('can tween the width', () => {
@@ -423,6 +505,20 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     behavior.addObjectHeightTween2('MyTween', 600, 'linear', 0.25, false);
     checkProgress(6, () => object.getHeight());
     expect(object.getHeight()).to.be(440);
+  });
+
+  it('can tween the depth', () => {
+    cube.setDepth(200);
+    cubeBehavior.addObjectDepthTween2(
+      null,
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false
+    );
+    checkProgress(6, () => cube.getDepth());
+    expect(cube.getDepth()).to.be(440);
   });
 
   it('can tween a number effect property', () => {
@@ -540,6 +636,53 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(sprite.getY()).to.be(400);
   });
 
+  it('can tween the scale on X axis to 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(1);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      0,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
+    for (let i = 0; i < 11; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(sprite.getScaleX()).to.be(0);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale on X axis from 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(0);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      1,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 1 directly at the end.
+    for (let i = 0; i < 11; i++) {
+      expect(sprite.getScale()).to.be(0);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getScaleX()).to.be(1);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
   it('can tween the scale on X axis from center', () => {
     sprite.setPosition(100, 400);
     sprite.setScaleX(200);
@@ -572,6 +715,53 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     checkProgress(6, () => sprite.getScaleY());
     // The interpolation is exponential.
     expect(sprite.getScaleY()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale on Y axis to 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleY(1);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      0,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
+    for (let i = 0; i < 11; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(sprite.getScaleY()).to.be(0);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale on Y axis from 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleY(0);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      1,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 1 directly at the end.
+    for (let i = 0; i < 11; i++) {
+      expect(sprite.getScale()).to.be(0);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getScaleY()).to.be(1);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
   });
@@ -623,45 +813,126 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getY()).to.be(660);
   });
 
-  it('can tween the scales', () => {
+  it('can tween the scale', () => {
     sprite.setPosition(100, 400);
-    sprite.setScaleX(200);
-    sprite.setScaleY(300);
-    spriteBehavior.addObjectScaleTween2(
+    sprite.setScale(200);
+    spriteBehavior.addObjectScaleTween3(
       'MyTween',
       600,
-      900,
       'linear',
       0.25,
       false,
       false
     );
-    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    checkProgress(6, () => sprite.getScale());
     // The interpolation is exponential.
-    expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getScale()).to.be(386.6364089863524);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale to 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScale(1);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      0,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 0 directly.
+    for (let i = 0; i < 11; i++) {
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(sprite.getScale()).to.be(0);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scale from 0', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScale(0);
+    spriteBehavior.addObjectScaleTween3(
+      'MyTween',
+      1,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    // The interpolation is exponential.
+    // It would need an infinite speed to go away from 0.
+    // This is why the scale is set to 1 directly at the end.
+    for (let i = 0; i < 11; i++) {
+      expect(sprite.getScale()).to.be(0);
+      runtimeScene.renderAndStep(1000 / 60);
+    }
+    expect(spriteBehavior.hasFinished('MyTween')).to.be(true);
+    expect(sprite.getScale()).to.be(1);
     expect(sprite.getX()).to.be(100);
     expect(sprite.getY()).to.be(400);
   });
 
   it('can tween the scales from center', () => {
     sprite.setPosition(100, 400);
-    sprite.setScaleX(200);
-    sprite.setScaleY(300);
-    spriteBehavior.addObjectScaleTween2(
+    sprite.setScale(200);
+    spriteBehavior.addObjectScaleTween3(
       'MyTween',
       600,
-      900,
       'linear',
       0.25,
       false,
       true
     );
-    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    checkProgress(6, () => sprite.getScale());
     // The interpolation is exponential.
-    expect(sprite.getScaleX()).to.be(386.6364089863524);
-    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getScale()).to.be(386.6364089863524);
     expect(sprite.getX()).to.be(-5872.3650875632775);
-    expect(sprite.getY()).to.be(-8558.547631344918);
+    expect(sprite.getY()).to.be(-5572.3650875632775);
+  });
+
+  it('can tween the scale of a cube', () => {
+    cube.setPosition(100, 400);
+    cube.setZ(800);
+    cube.setScale(200);
+    cubeBehavior.addObjectScaleTween3(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    checkProgress(6, () => cube.getScale());
+    // The interpolation is exponential.
+    expect(cube.getScale()).to.be(386.6364089863524);
+    expect(cube.getX()).to.be(100);
+    expect(cube.getY()).to.be(400);
+    expect(cube.getZ()).to.be(800);
+  });
+
+  it('can tween the scales of a cube from center', () => {
+    cube.setPosition(100, 400);
+    cube.setZ(800);
+    cube.setScale(200);
+    cubeBehavior.addObjectScaleTween3(
+      'MyTween',
+      600,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, () => cube.getScale());
+    // The interpolation is exponential.
+    expect(cube.getScale()).to.be(386.6364089863524);
+    expect(cube.getX()).to.be(-5872.3650875632775);
+    expect(cube.getY()).to.be(-5572.3650875632775);
+    expect(cube.getZ()).to.be(-5172.3650875632775);
   });
 });

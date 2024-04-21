@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { testProject } from '../../../GDevelopJsInitializerDecorator';
 
@@ -21,7 +20,7 @@ import {
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionInstallDialog',
   component: ExtensionInstallDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {

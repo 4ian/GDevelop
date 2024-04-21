@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
@@ -16,7 +15,7 @@ import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 export default {
   title: 'AssetStore/AssetStore',
   component: AssetStore,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {
@@ -56,10 +55,17 @@ const Wrapper = ({ children }: { children: React.Node }) => {
 
 export const Default = () => (
   <Wrapper>
-    <AssetStore />
+    <AssetStore displayPromotions />
   </Wrapper>
 );
 Default.parameters = apiDataFakePacks;
+
+export const WithoutPromotions = () => (
+  <Wrapper>
+    <AssetStore displayPromotions={false} />
+  </Wrapper>
+);
+WithoutPromotions.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
   <Wrapper>

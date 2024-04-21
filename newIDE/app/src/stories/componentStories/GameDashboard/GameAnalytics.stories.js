@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import paperDecorator from '../../PaperDecorator';
 import { GameAnalyticsPanel } from '../../../GameDashboard/GameAnalyticsPanel';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -25,7 +23,7 @@ import MockAdapter from 'axios-mock-adapter';
 export default {
   title: 'GameDashboard/GameAnalytics',
   component: GameAnalyticsPanel,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const ErrorLoadingAnalytics = () => {

@@ -7,7 +7,6 @@ import { action } from '@storybook/addon-actions';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
 import fakeHotReloadPreviewButtonProps from '../../FakeHotReloadPreviewButtonProps';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import alertDecorator from '../../AlertDecorator';
 import ObjectsList from '../../../ObjectsList';
@@ -18,7 +17,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'LayoutEditor/ObjectsList',
   component: ObjectsList,
-  decorators: [alertDecorator, paperDecorator, muiDecorator],
+  decorators: [alertDecorator, paperDecorator],
 };
 
 export const Default = () => (
@@ -31,7 +30,7 @@ export const Default = () => (
         layout={testProject.testLayout}
         resourceManagementProps={fakeResourceManagementProps}
         onEditObject={action('On edit object')}
-        onExportObject={action('On export object')}
+        onExportAssets={action('On export assets')}
         onAddObjectInstance={action('On add instance to the scene')}
         onObjectCreated={action('On object created')}
         selectedObjectFolderOrObjectsWithContext={[]}
@@ -61,7 +60,7 @@ export const WithSerializedObjectView = () => (
           layout={testProject.testLayout}
           resourceManagementProps={fakeResourceManagementProps}
           onEditObject={action('On edit object')}
-          onExportObject={action('On export object')}
+          onExportAssets={action('On export assets')}
           onAddObjectInstance={action('On add instance to the scene')}
           onObjectCreated={action('On object created')}
           selectedObjectFolderOrObjectsWithContext={[]}

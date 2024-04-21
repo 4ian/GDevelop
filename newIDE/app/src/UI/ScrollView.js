@@ -6,7 +6,6 @@ import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 const styles = {
   container: {
     flex: 1,
-    scrollbarWidth: 'thin', // For Firefox, to avoid having a very large scrollbar.
   },
 };
 
@@ -19,7 +18,7 @@ type Props = {|
    */
   autoHideScrollbar?: ?boolean,
   style?: ?Object,
-  onScroll?: number => void,
+  onScroll?: ({ remainingScreensToBottom: number }) => void,
 |};
 
 export type ScrollViewInterface = {|
@@ -94,9 +93,12 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
-        const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-          .top;
-        onScroll(scrollViewElement.scrollTop + scrollViewYPosition);
+        onScroll({
+          remainingScreensToBottom:
+            (scrollViewElement.scrollHeight -
+              (scrollViewElement.clientHeight + scrollViewElement.scrollTop)) /
+            scrollViewElement.clientHeight,
+        });
       },
       [onScroll]
     );

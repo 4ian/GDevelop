@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import InfoBar from '../../../UI/Messages/InfoBar';
@@ -13,7 +12,7 @@ import { Line } from '../../../UI/Grid';
 export default {
   title: 'UI Building Blocks/InfoBar',
   component: InfoBar,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

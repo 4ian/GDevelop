@@ -5,12 +5,10 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import GoogleDriveSaveAsDialog from '../../../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
-import muiDecorator from '../../ThemeDecorator';
 
 export default {
   title: 'Storage Providers/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog',
   component: GoogleDriveSaveAsDialog,
-  decorators: [muiDecorator],
 };
 
 export const DefaultFakePickedFileSaveWorking = () => (

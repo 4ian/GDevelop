@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import { HomePage } from '../../../MainFrame/EditorContainers/HomePage';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -124,13 +123,11 @@ const WrappedHomePage = ({
                 onChooseProject={() => action('onChooseProject')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
                 onOpenExampleStore={() => action('onOpenExampleStore')()}
-                onOpenExampleStoreWithExampleShortHeader={() =>
-                  action('onOpenExampleStoreWithExampleShortHeader')()
+                onSelectExampleShortHeader={() =>
+                  action('onSelectExampleShortHeader')()
                 }
-                onOpenExampleStoreWithPrivateGameTemplateListingData={() =>
-                  action(
-                    'onOpenExampleStoreWithPrivateGameTemplateListingData'
-                  )()
+                onPreviewPrivateGameTemplateListingData={() =>
+                  action('onPreviewPrivateGameTemplateListingData')()
                 }
                 onOpenPrivateGameTemplateListingData={() =>
                   action('onOpenPrivateGameTemplateListingData')()
@@ -160,7 +157,7 @@ const WrappedHomePage = ({
 export default {
   title: 'HomePage',
   component: WrappedHomePage,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [GDevelopJsInitializerDecorator],
 };
 
 export const BuildSectionLoading = () => (

@@ -1258,10 +1258,7 @@ namespace gdjs {
         runtimeObject.setLayer(newInstance.layer);
         somethingChanged = true;
       }
-      if (
-        gdjs.RuntimeObject3D &&
-        runtimeObject instanceof gdjs.RuntimeObject3D
-      ) {
+      if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
         if (oldInstance.z !== newInstance.z && newInstance.z !== undefined) {
           runtimeObject.setZ(newInstance.z);
           somethingChanged = true;
@@ -1312,10 +1309,7 @@ namespace gdjs {
           sizeChanged = true;
         }
       }
-      if (
-        gdjs.RuntimeObject3D &&
-        runtimeObject instanceof gdjs.RuntimeObject3D
-      ) {
+      if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(runtimeObject)) {
         // A custom depth was set or changed
         if (
           oldInstance.depth !== newInstance.depth &&

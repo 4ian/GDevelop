@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import NewBehaviorDialog from '../../../BehaviorsEditor/NewBehaviorDialog';
 import { BehaviorStoreStateProvider } from '../../../AssetStore/BehaviorStore/BehaviorStoreContext';
 import { GDevelopAssetApi } from '../../../Utils/GDevelopServices/ApiConfigs';
@@ -20,7 +19,6 @@ import PreferencesContext, {
 export default {
   title: 'ObjectEditor/NewBehaviorDialog',
   component: NewBehaviorDialog,
-  decorators: [muiDecorator],
 };
 
 const apiDataServerSideError = {

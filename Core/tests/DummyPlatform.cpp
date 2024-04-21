@@ -489,7 +489,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                           "Effect",
                           _("Apply visual effects to objects."),
                           "",
-                          "res/actions/effect24.png", "EffectBehavior",
+                          "res/actions/effect_black.svg", "EffectBehavior",
                           std::make_shared<gd::Behavior>(),
                           std::make_shared<gd::BehaviorsSharedData>())
             .SetHidden();

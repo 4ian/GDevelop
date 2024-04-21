@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import SpriteEditor from '../../../ObjectEditor/Editors/SpriteEditor';
 import CollisionMasksEditor from '../../../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
@@ -20,13 +19,14 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'ObjectEditor/SpriteEditor',
   component: SpriteEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
+        renderObjectNameField={() => null}
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
         layout={testProject.testLayout}
@@ -43,6 +43,7 @@ export const AnimationLocked = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <SpriteEditor
+        renderObjectNameField={() => null}
         isAnimationListLocked
         objectConfiguration={testProject.spriteObjectConfiguration}
         project={testProject.project}
@@ -56,12 +57,29 @@ export const AnimationLocked = () => (
   </SerializedObjectDisplay>
 );
 
+export const Empty = () => (
+  <SerializedObjectDisplay object={testProject.emptySpriteObjectConfiguration}>
+    <DragAndDropContextProvider>
+      <SpriteEditor
+        renderObjectNameField={() => null}
+        objectConfiguration={testProject.emptySpriteObjectConfiguration}
+        project={testProject.project}
+        layout={testProject.testLayout}
+        resourceManagementProps={fakeResourceManagementProps}
+        onSizeUpdated={() => {}}
+        object={testProject.emptySpriteObject}
+        objectName="FakeObjectName"
+      />
+    </DragAndDropContextProvider>
+  </SerializedObjectDisplay>
+);
+
 export const Points = () => (
   <SerializedObjectDisplay object={testProject.spriteObjectConfiguration}>
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <PointsEditor
-          objectConfiguration={testProject.spriteObjectConfiguration}
+          animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
           onRenamedPoint={action('Renamed a point')}
@@ -76,7 +94,7 @@ export const CollisionMasks = () => (
     <DragAndDropContextProvider>
       <FixedHeightFlexContainer height={500}>
         <CollisionMasksEditor
-          objectConfiguration={testProject.spriteObjectConfiguration}
+          animations={testProject.spriteObjectConfiguration.getAnimations()}
           project={testProject.project}
           resourcesLoader={ResourcesLoader}
           onCreateMatchingSpriteCollisionMask={action(

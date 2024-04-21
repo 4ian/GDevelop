@@ -8,6 +8,7 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import {
   getUserBadges,
+  listDefaultRecommendations,
   listRecommendations,
 } from '../Utils/GDevelopServices/User';
 import Authentication, {
@@ -17,6 +18,7 @@ import Authentication, {
   type ChangeEmailForm,
   type AuthError,
   type ForgotPasswordForm,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
@@ -53,6 +55,10 @@ import Snackbar from '@material-ui/core/Snackbar';
 import RequestDeduplicator from '../Utils/RequestDeduplicator';
 import { burstCloudProjectAutoSaveCache } from '../ProjectsStorage/CloudStorageProvider/CloudProjectOpener';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import { userCancellationErrorName } from '../LoginProvider/Utils';
+import { listUserPurchases } from '../Utils/GDevelopServices/Shop';
+import { listNotifications } from '../Utils/GDevelopServices/Notification';
 
 type Props = {|
   authentication: Authentication,
@@ -89,6 +95,7 @@ const cleanUserTracesOnDevice = async () => {
 };
 
 const TEN_SECONDS = 10 * 1000;
+const ONE_MINUTE = 6 * TEN_SECONDS;
 
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
@@ -117,6 +124,8 @@ export default class AuthenticatedUserProvider extends React.Component<
   };
   _automaticallyUpdateUserProfile = true;
   _hasNotifiedUserAboutEmailVerification = false;
+  _abortController: ?AbortController = null;
+  _notificationPollingIntervalId: ?IntervalID = null;
 
   // Cloud projects are requested in 2 different places at app opening.
   // - First one comes from user authenticating and automatically fetching
@@ -186,6 +195,8 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogin: this._doLogin,
+        onLoginWithProvider: this._doLoginWithProvider,
+        onCancelLogin: this._cancelLogin,
         onLogout: this._doLogout,
         onCreateAccount: this._doCreateAccount,
         onEditProfile: this._doEdit,
@@ -202,7 +213,10 @@ export default class AuthenticatedUserProvider extends React.Component<
         },
         onRefreshSubscription: this._fetchUserSubscriptionLimitsAndUsages,
         onRefreshLimits: this._fetchUserLimits,
-        onPurchaseSuccessful: this._fetchUserPurchases,
+        onRefreshGameTemplatePurchases: this._fetchUserGameTemplatePurchases,
+        onRefreshAssetPackPurchases: this._fetchUserAssetPackPurchases,
+        onRefreshNotifications: this._fetchUserNotifications,
+        onPurchaseSuccessful: this._fetchUserProducts,
         onSendEmailVerification: this._doSendEmailVerification,
         onOpenEmailVerificationDialog: ({
           sendEmailAutomatically,
@@ -229,6 +243,10 @@ export default class AuthenticatedUserProvider extends React.Component<
   // - When the user logs out.
   // - When the user deletes their account.
   _markAuthenticatedUserAsLoggedOut() {
+    if (this._notificationPollingIntervalId) {
+      clearInterval(this._notificationPollingIntervalId);
+      this._notificationPollingIntervalId = null;
+    }
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
@@ -236,6 +254,19 @@ export default class AuthenticatedUserProvider extends React.Component<
       },
     }));
     this._hasNotifiedUserAboutEmailVerification = false;
+
+    listDefaultRecommendations().then(
+      recommendations =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            recommendations,
+          },
+        })),
+      error => {
+        console.error('Error while loading default recommendations:', error);
+      }
+    );
   }
 
   _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
@@ -244,6 +275,10 @@ export default class AuthenticatedUserProvider extends React.Component<
     try {
       const firebaseUser = await authentication.getFirebaseUser();
       if (!firebaseUser) {
+        if (this._notificationPollingIntervalId) {
+          clearInterval(this._notificationPollingIntervalId);
+          this._notificationPollingIntervalId = null;
+        }
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
@@ -447,7 +482,40 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading received game templates:', error);
       }
     );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'game-template',
+      role: 'receiver',
+    }).then(
+      gameTemplatePurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            gameTemplatePurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading game template purchases:', error);
+      }
+    );
+    listUserPurchases(authentication.getAuthorizationHeader, {
+      userId: firebaseUser.uid,
+      productType: 'asset-pack',
+      role: 'receiver',
+    }).then(
+      assetPackPurchases =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            assetPackPurchases,
+          },
+        })),
+      error => {
+        console.error('Error while loading asset pack purchases:', error);
+      }
+    );
     this._fetchUserBadges();
+    this._fetchUserNotifications();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -466,6 +534,15 @@ export default class AuthenticatedUserProvider extends React.Component<
         // Catch the error so that the user profile is still fetched.
         console.error('Error while updating the user profile:', error);
       }
+    }
+
+    if (!this._notificationPollingIntervalId) {
+      this._notificationPollingIntervalId = setInterval(() => {
+        // This property is correctly updated by Electron, browsers and capacitor.
+        if (document.visibilityState === 'visible') {
+          this._fetchUserNotifications();
+        }
+      }, 10 * ONE_MINUTE);
     }
 
     this.setState(
@@ -503,6 +580,28 @@ export default class AuthenticatedUserProvider extends React.Component<
       }));
     } catch (error) {
       console.error('Error while loading user subscriptions:', error);
+    }
+  };
+
+  _fetchUserNotifications = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const notifications = await listNotifications(
+        authentication.getAuthorizationHeader,
+        { userId: firebaseUser.uid }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          notifications,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user notifications:', error);
     }
   };
 
@@ -628,7 +727,59 @@ export default class AuthenticatedUserProvider extends React.Component<
     }
   };
 
-  _fetchUserPurchases = async () => {
+  _fetchUserGameTemplatePurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const gameTemplatePurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'game-template',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          gameTemplatePurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading game template purchases:', error);
+    }
+  };
+
+  _fetchUserAssetPackPurchases = async () => {
+    const { authentication } = this.props;
+    const firebaseUser = this.state.authenticatedUser.firebaseUser;
+    if (!firebaseUser) return;
+
+    try {
+      const assetPackPurchases = await listUserPurchases(
+        authentication.getAuthorizationHeader,
+        {
+          userId: firebaseUser.uid,
+          productType: 'asset-pack',
+          role: 'receiver',
+        }
+      );
+
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          assetPackPurchases,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading asset pack purchases:', error);
+    }
+  };
+
+  _fetchUserProducts = async () => {
     await Promise.all([
       this._fetchUserAssetPacks(),
       this._fetchUserAssetShortHeaders(),
@@ -729,6 +880,77 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  _showLoginSnackbar = (authenticatedUser: AuthenticatedUser) => {
+    const username = authenticatedUser.profile
+      ? authenticatedUser.profile.username
+      : null;
+    this.showUserSnackbar({
+      message: username ? (
+        <Trans>👋 Good to see you {username}!</Trans>
+      ) : (
+        <Trans>👋 Good to see you!</Trans>
+      ),
+    });
+  };
+
+  _doLoginWithProvider = async (provider: IdentityProvider) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      loginInProgress: true,
+      apiCallError: null,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: true,
+        authenticationError: null,
+      },
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      this._abortController = new AbortController();
+      await authentication.loginWithProvider({
+        provider,
+        signal: this._abortController.signal,
+      });
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openLoginDialog(false);
+      this.openCreateAccountDialog(false);
+      this._showLoginSnackbar(this.state.authenticatedUser);
+    } catch (apiCallError) {
+      if (apiCallError.name !== userCancellationErrorName) {
+        showErrorBox({
+          rawError: apiCallError,
+          errorId: 'login-with-provider',
+          doNotReport: true,
+          message: `An error occurred while logging in with provider ${provider}. Please check your internet connection or try again later.`,
+        });
+        this.setState({
+          apiCallError,
+          authenticatedUser: {
+            ...this.state.authenticatedUser,
+            authenticationError: apiCallError,
+          },
+        });
+      }
+    }
+    this.setState({
+      loginInProgress: false,
+      authenticatedUser: {
+        ...this.state.authenticatedUser,
+        creatingOrLoggingInAccount: false,
+      },
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _cancelLogin = () => {
+    if (this._abortController) {
+      this._abortController.abort();
+      this._abortController = null;
+    }
+  };
+
   _doLogin = async (form: LoginForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -747,15 +969,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       await authentication.login(form);
       await this._fetchUserProfileWithoutThrowingErrors();
       this.openLoginDialog(false);
-      const profile = this.state.authenticatedUser.profile;
-      const username = profile ? profile.username : null;
-      this.showUserSnackbar({
-        message: username ? (
-          <Trans>👋 Good to see you {username}!</Trans>
-        ) : (
-          <Trans>👋 Good to see you!</Trans>
-        ),
-      });
+      this._showLoginSnackbar(this.state.authenticatedUser);
     } catch (apiCallError) {
       this.setState({
         apiCallError,
@@ -928,7 +1142,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     await authentication.sendFirebaseEmailVerification();
   };
 
-  _doAcceptGameStatsEmail = async () => {
+  _doAcceptGameStatsEmail = async (value: boolean) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
@@ -939,7 +1153,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._automaticallyUpdateUserProfile = false;
     try {
       await authentication.acceptGameStatsEmail(
-        authentication.getAuthorizationHeader
+        authentication.getAuthorizationHeader,
+        value
       );
       await this._fetchUserProfileWithoutThrowingErrors();
     } catch (apiCallError) {
@@ -1056,9 +1271,14 @@ export default class AuthenticatedUserProvider extends React.Component<
             </AuthenticatedUserContext.Provider>
             {this.state.loginDialogOpen && (
               <LoginDialog
-                onClose={() => this.openLoginDialog(false)}
+                onClose={() => {
+                  this._cancelLogin();
+                  this.openLoginDialog(false);
+                }}
                 onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
                 onLogin={this._doLogin}
+                onLogout={this._doLogout}
+                onLoginWithProvider={this._doLoginWithProvider}
                 loginInProgress={this.state.loginInProgress}
                 error={this.state.apiCallError}
                 onForgotPassword={this._doForgotPassword}
@@ -1097,6 +1317,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 onCreateAccount={form =>
                   this._doCreateAccount(form, preferences)
                 }
+                onLoginWithProvider={this._doLoginWithProvider}
                 createAccountInProgress={this.state.createAccountInProgress}
                 error={this.state.apiCallError}
               />

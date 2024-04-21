@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -247,7 +239,7 @@ module.exports = {
           'Model3DObject',
           _('3D Model'),
           _('An animated 3D model.'),
-          'JsPlatform/Extensions/3d_box.svg',
+          'JsPlatform/Extensions/3d_model.svg',
           new gd.Model3DObjectConfiguration()
         )
         .setCategoryFullName(_('General'))
@@ -811,7 +803,6 @@ module.exports = {
     }
 
     const Cube3DObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -860,7 +851,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -1100,7 +1090,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError
     Cube3DObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -1112,7 +1101,6 @@ module.exports = {
       return false;
     };
 
-    // $FlowExpectedError
     Cube3DObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -1665,7 +1653,7 @@ module.exports = {
           'Change the camera rotation to look at an object. The camera top always face the screen.'
         ),
         _('Change the camera rotation of _PARAM2_ to look at _PARAM1_'),
-        _("Layers and cameras"),
+        _('Layers and cameras'),
         'res/conditions/3d_box.svg',
         'res/conditions/3d_box.svg'
       )
@@ -1939,6 +1927,86 @@ module.exports = {
         .setType('number')
         .setGroup(_('Orientation'));
     }
+    {
+      const effect = extension
+        .addEffect('HueAndSaturation')
+        .setFullName(_('Hue and saturation'))
+        .setDescription(_('Adjust hue and saturation.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/HueAndSaturationEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('hue')
+        .setValue('0')
+        .setLabel(_('Hue in degrees (between -180 and 180)'))
+        .setType('number');
+      properties
+        .getOrCreate('saturation')
+        .setValue('0')
+        .setLabel(_('Saturation (between -1 and 1)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('Exposure')
+        .setFullName(_('Exposure'))
+        .setDescription(_('Adjust exposure.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/ExposureEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('exposure')
+        .setValue('1')
+        .setLabel(_('Exposure (positive value)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('Bloom')
+        .setFullName(_('Bloom'))
+        .setDescription(_('Apply a bloom effect.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/BloomEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('strength')
+        .setValue('1')
+        .setLabel(_('Strength (between 0 and 3)'))
+        .setType('number');
+      properties
+        .getOrCreate('radius')
+        .setValue('0')
+        .setLabel(_('Radius (between 0 and 1)'))
+        .setType('number');
+      properties
+        .getOrCreate('threshold')
+        .setValue('0')
+        .setLabel(_('Threshold (between 0 and 1)'))
+        .setType('number');
+    }
+    {
+      const effect = extension
+        .addEffect('BrightnessAndContrast')
+        .setFullName(_('Brightness and contrast.'))
+        .setDescription(_('Adjust brightness and contrast.'))
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/BrightnessAndContrastEffect.js');
+      const properties = effect.getProperties();
+      properties
+        .getOrCreate('brightness')
+        .setValue('0')
+        .setLabel(_('Brightness (between -1 and 1)'))
+        .setType('number');
+      properties
+        .getOrCreate('contrast')
+        .setValue('0')
+        .setLabel(_('Contrast (between -1 and 1)'))
+        .setType('number');
+    }
     // Don't forget to update the alert condition in Model3DEditor.js when
     // adding a new light.
 
@@ -1954,10 +2022,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -1965,17 +2030,13 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {},
+  registerEditorConfigurations: function (objectsEditorService) {},
   /**
    * Register renderers for instance of objects on the scene editor.
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const Rendered3DInstance = objectsRenderingService.Rendered3DInstance;
     const PIXI = objectsRenderingService.PIXI;
@@ -1983,39 +2044,25 @@ module.exports = {
     const THREE_ADDONS = objectsRenderingService.THREE_ADDONS;
 
     const materialIndexToFaceIndex = {
-      // $FlowFixMe
       0: 3,
-      // $FlowFixMe
       1: 2,
-      // $FlowFixMe
       2: 5,
-      // $FlowFixMe
       3: 4,
-      // $FlowFixMe
       4: 0,
-      // $FlowFixMe
       5: 1,
     };
 
     const noRepeatTextureVertexIndexToUvMapping = {
-      // $FlowFixMe
       0: [0, 0],
-      // $FlowFixMe
       1: [1, 0],
-      // $FlowFixMe
       2: [0, 1],
-      // $FlowFixMe
       3: [1, 1],
     };
 
     const noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ = {
-      // $FlowFixMe
       0: [0, 1],
-      // $FlowFixMe
       1: [0, 0],
-      // $FlowFixMe
       2: [1, 1],
-      // $FlowFixMe
       3: [1, 0],
     };
 
@@ -2061,6 +2108,11 @@ module.exports = {
     };
 
     class RenderedCube3DObject2DInstance extends RenderedInstance {
+      /** @type {number} */
+      _centerX = 0;
+      /** @type {number} */
+      _centerY = 0;
+
       constructor(
         project,
         layout,
@@ -2077,10 +2129,9 @@ module.exports = {
           pixiContainer,
           pixiResourcesLoader
         );
-        /**
-         * Name of the resource that is rendered.
-         * If no face is visible, this will be null.
-         */
+
+        // Name of the resource that is rendered.
+        // If no face is visible, this will be null.
         this._renderedResourceName = undefined;
         const properties = associatedObjectConfiguration.getProperties();
         this._defaultWidth = parseFloat(properties.get('width').getValue());
@@ -2110,12 +2161,9 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        const instance = this._instance;
-
-        const textureResourceName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            objectConfiguration
-          );
+        const textureResourceName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          objectConfiguration
+        );
         if (textureResourceName) {
           return resourcesLoader.getResourceFullUrl(
             project,
@@ -2127,20 +2175,18 @@ module.exports = {
       }
 
       updateTextureIfNeeded() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
         if (textureName === this._renderedResourceName) return;
 
         this.updateTexture();
       }
 
       updateTexture() {
-        const textureName =
-          RenderedCube3DObject2DInstance._getResourceNameToDisplay(
-            this._associatedObjectConfiguration
-          );
+        const textureName = RenderedCube3DObject2DInstance._getResourceNameToDisplay(
+          this._associatedObjectConfiguration
+        );
 
         if (!textureName) {
           this._renderFallbackObject = true;
@@ -2398,10 +2444,9 @@ module.exports = {
             continue;
           }
 
-          const shouldRepeatTexture =
-            this._shouldRepeatTextureOnFace[
-              materialIndexToFaceIndex[materialIndex]
-            ];
+          const shouldRepeatTexture = this._shouldRepeatTextureOnFace[
+            materialIndexToFaceIndex[materialIndex]
+          ];
 
           const shouldOrientateFacesTowardsY = this._facesOrientation === 'Y';
 
@@ -2436,13 +2481,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                 }
               }
               break;
@@ -2472,13 +2520,16 @@ module.exports = {
                 }
               } else {
                 if (shouldOrientateFacesTowardsY) {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMapping[vertexIndex % 4];
+                  [x, y] = noRepeatTextureVertexIndexToUvMapping[
+                    vertexIndex % 4
+                  ];
                 } else {
-                  [x, y] =
-                    noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
-                      vertexIndex % 4
-                    ];
+                  [
+                    x,
+                    y,
+                  ] = noRepeatTextureVertexIndexToUvMappingForLeftAndRightFacesTowardsZ[
+                    vertexIndex % 4
+                  ];
                   x = -x;
                   y = -y;
                 }
@@ -2624,6 +2675,8 @@ module.exports = {
       RenderedCube3DObject3DInstance
     );
 
+    const epsilon = 1 / (1 << 16);
+
     class Model3DRendered2DInstance extends RenderedInstance {
       _modelOriginPoint = [0, 0, 0];
 
@@ -2695,7 +2748,7 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
-        return 'JsPlatform/Extensions/3d_box.svg';
+        return 'JsPlatform/Extensions/3d_model.svg';
       }
 
       getOriginX() {
@@ -2746,13 +2799,24 @@ module.exports = {
         );
         threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
+        const shouldKeepModelOrigin = !this._originPoint;
+        if (shouldKeepModelOrigin) {
+          // Keep the origin as part of the model.
+          // For instance, a model can be 1 face of a cube and we want to keep the
+          // inside as part of the object even if it's just void.
+          // It also avoids to have the origin outside of the object box.
+          boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+        }
 
         const modelWidth = boundingBox.max.x - boundingBox.min.x;
         const modelHeight = boundingBox.max.y - boundingBox.min.y;
         const modelDepth = boundingBox.max.z - boundingBox.min.z;
-        this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
-        this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
-        this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+        this._modelOriginPoint[0] =
+          modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
+        this._modelOriginPoint[1] =
+          modelHeight < epsilon ? 0 : -boundingBox.min.y / modelHeight;
+        this._modelOriginPoint[2] =
+          modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth;
 
         // The model is flipped on Y axis.
         this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
@@ -2761,19 +2825,10 @@ module.exports = {
         const centerPoint = this._centerPoint;
         if (centerPoint) {
           threeObject.position.set(
-            -(
-              boundingBox.min.x +
-              (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
-            ),
+            -(boundingBox.min.x + modelWidth * centerPoint[0]),
             // The model is flipped on Y axis.
-            -(
-              boundingBox.min.y +
-              (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
-            ),
-            -(
-              boundingBox.min.z +
-              (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
-            )
+            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
+            -(boundingBox.min.z + modelDepth * centerPoint[2])
           );
         }
 
@@ -2786,9 +2841,9 @@ module.exports = {
         );
 
         // Stretch the model in a 1x1x1 cube.
-        const scaleX = 1 / modelWidth;
-        const scaleY = 1 / modelHeight;
-        const scaleZ = 1 / modelDepth;
+        const scaleX = modelWidth < epsilon ? 1 : 1 / modelWidth;
+        const scaleY = modelHeight < epsilon ? 1 : 1 / modelHeight;
+        const scaleZ = modelDepth < epsilon ? 1 : 1 / modelDepth;
 
         const scaleMatrix = new THREE.Matrix4();
         // Flip on Y because the Y axis is on the opposite side of direct basis.
@@ -2799,10 +2854,22 @@ module.exports = {
 
         if (keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
-          const widthRatio = originalWidth / modelWidth;
-          const heightRatio = originalHeight / modelHeight;
-          const depthRatio = originalDepth / modelDepth;
-          const scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          const widthRatio =
+            modelWidth < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalWidth / modelWidth;
+          const heightRatio =
+            modelHeight < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalHeight / modelHeight;
+          const depthRatio =
+            modelDepth < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalDepth / modelDepth;
+          let scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          if (!Number.isFinite(scaleRatio)) {
+            scaleRatio = 1;
+          }
 
           this._defaultWidth = scaleRatio * modelWidth;
           this._defaultHeight = scaleRatio * modelHeight;
@@ -2954,6 +3021,11 @@ module.exports = {
         return this.getHeight() * originPoint[1];
       }
 
+      getOriginZ() {
+        const originPoint = this.getOriginPoint();
+        return this.getDepth() * originPoint[2];
+      }
+
       getCenterX() {
         const centerPoint = this.getCenterPoint();
         return this.getWidth() * centerPoint[0];
@@ -2962,6 +3034,11 @@ module.exports = {
       getCenterY() {
         const centerPoint = this.getCenterPoint();
         return this.getHeight() * centerPoint[1];
+      }
+
+      getCenterZ() {
+        const centerPoint = this.getCenterPoint();
+        return this.getDepth() * centerPoint[2];
       }
 
       getOriginPoint() {
@@ -2990,12 +3067,24 @@ module.exports = {
         threeObject.updateMatrixWorld(true);
         const boundingBox = new THREE.Box3().setFromObject(threeObject);
 
+        const shouldKeepModelOrigin = !this._originPoint;
+        if (shouldKeepModelOrigin) {
+          // Keep the origin as part of the model.
+          // For instance, a model can be 1 face of a cube and we want to keep the
+          // inside as part of the object even if it's just void.
+          // It also avoids to have the origin outside of the object box.
+          boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+        }
+
         const modelWidth = boundingBox.max.x - boundingBox.min.x;
         const modelHeight = boundingBox.max.y - boundingBox.min.y;
         const modelDepth = boundingBox.max.z - boundingBox.min.z;
-        this._modelOriginPoint[0] = -boundingBox.min.x / modelWidth;
-        this._modelOriginPoint[1] = -boundingBox.min.y / modelHeight;
-        this._modelOriginPoint[2] = -boundingBox.min.z / modelDepth;
+        this._modelOriginPoint[0] =
+          modelWidth < epsilon ? 0 : -boundingBox.min.x / modelWidth;
+        this._modelOriginPoint[1] =
+          modelHeight < epsilon ? 0 : -boundingBox.min.y / modelHeight;
+        this._modelOriginPoint[2] =
+          modelDepth < epsilon ? 0 : -boundingBox.min.z / modelDepth;
 
         // The model is flipped on Y axis.
         this._modelOriginPoint[1] = 1 - this._modelOriginPoint[1];
@@ -3004,19 +3093,10 @@ module.exports = {
         const centerPoint = this._centerPoint;
         if (centerPoint) {
           threeObject.position.set(
-            -(
-              boundingBox.min.x +
-              (boundingBox.max.x - boundingBox.min.x) * centerPoint[0]
-            ),
+            -(boundingBox.min.x + modelWidth * centerPoint[0]),
             // The model is flipped on Y axis.
-            -(
-              boundingBox.min.y +
-              (boundingBox.max.y - boundingBox.min.y) * (1 - centerPoint[1])
-            ),
-            -(
-              boundingBox.min.z +
-              (boundingBox.max.z - boundingBox.min.z) * centerPoint[2]
-            )
+            -(boundingBox.min.y + modelHeight * (1 - centerPoint[1])),
+            -(boundingBox.min.z + modelDepth * centerPoint[2])
           );
         }
 
@@ -3029,9 +3109,9 @@ module.exports = {
         );
 
         // Stretch the model in a 1x1x1 cube.
-        const scaleX = 1 / modelWidth;
-        const scaleY = 1 / modelHeight;
-        const scaleZ = 1 / modelDepth;
+        const scaleX = modelWidth < epsilon ? 1 : 1 / modelWidth;
+        const scaleY = modelHeight < epsilon ? 1 : 1 / modelHeight;
+        const scaleZ = modelDepth < epsilon ? 1 : 1 / modelDepth;
 
         const scaleMatrix = new THREE.Matrix4();
         // Flip on Y because the Y axis is on the opposite side of direct basis.
@@ -3042,14 +3122,63 @@ module.exports = {
 
         if (keepAspectRatio) {
           // Reduce the object dimensions to keep aspect ratio.
-          const widthRatio = originalWidth / modelWidth;
-          const heightRatio = originalHeight / modelHeight;
-          const depthRatio = originalDepth / modelDepth;
-          const scaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          const widthRatio =
+            modelWidth < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalWidth / modelWidth;
+          const heightRatio =
+            modelHeight < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalHeight / modelHeight;
+          const depthRatio =
+            modelDepth < epsilon
+              ? Number.POSITIVE_INFINITY
+              : originalDepth / modelDepth;
+          const minScaleRatio = Math.min(widthRatio, heightRatio, depthRatio);
+          if (!Number.isFinite(minScaleRatio)) {
+            this._defaultWidth = modelWidth;
+            this._defaultHeight = modelHeight;
+            this._defaultDepth = modelDepth;
+          } else {
+            if (widthRatio === minScaleRatio) {
+              this._defaultWidth = originalWidth;
+              this._defaultHeight = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelWidth,
+                newReferenceValue: originalWidth,
+                valueToApplyTo: modelDepth,
+              });
+            } else if (heightRatio === minScaleRatio) {
+              this._defaultWidth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelWidth,
+              });
 
-          this._defaultWidth = scaleRatio * modelWidth;
-          this._defaultHeight = scaleRatio * modelHeight;
-          this._defaultDepth = scaleRatio * modelDepth;
+              this._defaultHeight = originalHeight;
+              this._defaultDepth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelHeight,
+                newReferenceValue: originalHeight,
+                valueToApplyTo: modelDepth,
+              });
+            } else {
+              this._defaultWidth = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelWidth,
+              });
+              this._defaultHeight = Rendered3DInstance.applyRatio({
+                oldReferenceValue: modelDepth,
+                newReferenceValue: originalDepth,
+                valueToApplyTo: modelHeight,
+              });
+              this._defaultDepth = originalDepth;
+            }
+          }
         }
       }
 

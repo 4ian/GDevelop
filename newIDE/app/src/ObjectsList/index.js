@@ -25,7 +25,6 @@ import TreeView, { type TreeViewInterface } from '../UI/TreeView';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import { getInstanceCountInLayoutForObject } from '../Utils/Layout';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { getShortcutDisplayName } from '../KeyboardShortcuts';
@@ -51,7 +50,7 @@ import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import Link from '../UI/Link';
 import { getHelpLink } from '../Utils/HelpLink';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
@@ -112,6 +111,7 @@ const objectTypeToDefaultName = {
   'TextInput::TextInputObject': 'NewTextInput',
   'Scene3D::Model3DObject': 'New3DModel',
   'Scene3D::Cube3DObject': 'New3DBox',
+  'SpineObject::SpineObject': 'NewSpine',
   'Video::VideoObject': 'NewVideo',
 };
 
@@ -213,7 +213,7 @@ type Props = {|
   canSetAsGlobalObject?: boolean,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onExportObject: (object: gdObject) => void,
+  onExportAssets: () => void,
   onObjectCreated: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
@@ -248,7 +248,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       canSetAsGlobalObject,
 
       onEditObject,
-      onExportObject,
+      onExportAssets,
       onObjectCreated,
       onObjectFolderOrObjectWithContextSelected,
       onObjectPasted,
@@ -268,8 +268,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
     const { showDeleteConfirmation } = useAlertDialog();
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     const forceUpdateList = React.useCallback(
       () => {
@@ -278,10 +277,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
       },
       [forceUpdate]
     );
-    const eventsFunctionsExtensionsState = React.useContext(
-      EventsFunctionsExtensionsContext
-    );
-    const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
     const [newObjectDialogOpen, setNewObjectDialogOpen] = React.useState<{
       from: ObjectFolderOrObjectWithContext | null,
@@ -702,7 +697,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         if (!objectFolderOrObjectWithContext) return;
         const treeView = treeViewRef.current;
         if (treeView) {
-          if (isMobileScreen) {
+          if (isMobile) {
             // Position item at top of the screen to make sure it will be visible
             // once the keyboard is open.
             treeView.scrollToItem(objectFolderOrObjectWithContext, 'start');
@@ -710,7 +705,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
           treeView.renameItem(objectFolderOrObjectWithContext);
         }
       },
-      [isMobileScreen]
+      [isMobile]
     );
 
     const duplicateObject = React.useCallback(
@@ -1293,7 +1288,21 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
 
     const renderObjectMenuTemplate = React.useCallback(
       (i18n: I18nType) => (item: TreeViewItem, index: number) => {
-        if (item.isRoot || item.isPlaceholder) return [];
+        if (item.isPlaceholder) {
+          return [];
+        }
+        if (item.isRoot) {
+          if (item.id === 'scene-objects') {
+            return [
+              {
+                label: i18n._(t`Export as assets`),
+                click: () => onExportAssets(),
+              },
+            ];
+          }
+          return [];
+        }
+
         const { objectFolderOrObject, global } = item;
 
         const container = global ? project : objectsContainer;
@@ -1446,13 +1455,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
               'EffectCapability::EffectBehavior'
             ),
           },
-          eventsFunctionsExtensionWriter &&
-          project.hasEventsBasedObject(object.getType())
-            ? {
-                label: i18n._(t`Export object`),
-                click: () => onExportObject && onExportObject(object),
-              }
-            : null,
           { type: 'separator' },
           {
             label: i18n._(t`Set as global object`),
@@ -1501,7 +1503,6 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         objectsContainer,
         initialInstances,
         preferences.values.userShortcutMap,
-        eventsFunctionsExtensionWriter,
         canSetAsGlobalObject,
         onSelectAllInstancesOfObjectInLayout,
         paste,
@@ -1515,7 +1516,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
         cutObjectFolderOrObjectWithContext,
         duplicateObject,
         onEditObject,
-        onExportObject,
+        onExportAssets,
         selectObjectFolderOrObjectWithContext,
         setAsGlobalObject,
         onAddObjectInstance,
@@ -1628,6 +1629,7 @@ const ObjectsList = React.forwardRef<Props, ObjectsListInterface>(
                       reactDndType={objectWithContextReactDndType}
                       initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                       arrowKeyNavigationProps={arrowKeyNavigationProps}
+                      shouldSelectUponContextMenuOpening
                     />
                   )}
                 </AutoSizer>

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import HighlightingTooltip from '../../../UI/HighlightingTooltip';
@@ -15,7 +14,7 @@ import TreeLeaves from '../../../UI/CustomSvgIcons/TreeLeaves';
 export default {
   title: 'UI Building Blocks/HighlightingTooltip',
   component: HighlightingTooltip,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const WithThumbnailSetByHref = () => {

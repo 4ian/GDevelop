@@ -62,6 +62,14 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autConditions["PlatformBehavior::IsFalling"].SetFunctionName("isFalling");
       autConditions["PlatformBehavior::IsGrabbingPlatform"].SetFunctionName(
           "isGrabbingPlatform");
+      autConditions["PlatformBehavior::IsObjectOnGivenFloor"].SetFunctionName(
+          "gdjs.evtTools.platform.isOnPlatform")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformtools.js");
 
       autConditions["PlatformBehavior::Gravity"].SetFunctionName("getGravity");
       autActions["PlatformBehavior::Gravity"]

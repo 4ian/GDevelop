@@ -36,9 +36,10 @@ export default class LayerRenderer {
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
-  /**Used for instances culling on rendering */
+  onUpInstance: (gdInitialInstance, number, number) => void;
+  /** Used for instances culling on rendering. */
   viewTopLeft: [number, number];
-  /** Used for instances culling on rendering */
+  /** Used for instances culling on rendering. */
   viewBottomRight: [number, number];
 
   renderedInstances: { [number]: RenderedInstance | Rendered3DInstance } = {};
@@ -91,6 +92,7 @@ export default class LayerRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+    onUpInstance,
     pixiRenderer,
     showObjectInstancesIn3D,
   }: {
@@ -112,6 +114,7 @@ export default class LayerRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
+    onUpInstance: (gdInitialInstance, number, number) => void,
     pixiRenderer: PIXI.Renderer,
     showObjectInstancesIn3D: boolean,
   }) {
@@ -129,9 +132,10 @@ export default class LayerRenderer {
     this.onMoveInstance = onMoveInstance;
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
+    this.onUpInstance = onUpInstance;
 
-    this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
-    this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
+    this.viewTopLeft = [0, 0];
+    this.viewBottomRight = [0, 0];
 
     this.pixiContainer = new PIXI.Container();
 
@@ -155,7 +159,13 @@ export default class LayerRenderer {
       if (!renderedInstance) return;
 
       const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
-      if (pixiObject) pixiObject.zOrder = instance.getZOrder();
+      if (pixiObject) {
+        if (renderedInstance instanceof Rendered3DInstance) {
+          pixiObject.zOrder = instance.getZ() + renderedInstance.getDepth();
+        } else {
+          pixiObject.zOrder = instance.getZOrder();
+        }
+      }
 
       try {
         // "Culling" improves rendering performance of large levels
@@ -172,6 +182,9 @@ export default class LayerRenderer {
 
         if (renderedInstance instanceof Rendered3DInstance) {
           const threeObject = renderedInstance.getThreeObject();
+          if (threeObject) {
+            threeObject.visible = isVisible;
+          }
           if (this._threeGroup && threeObject) {
             this._threeGroup.add(threeObject);
           }
@@ -246,7 +259,7 @@ export default class LayerRenderer {
   };
 
   getUnrotatedInstanceSize = (instance: gdInitialInstance) => {
-    const renderedInstance = this.renderedInstances[instance.ptr];
+    const renderedInstance = this.getRendererOfInstance(instance);
     const hasCustomSize = instance.hasCustomSize();
     const hasCustomDepth = instance.hasCustomDepth();
     const width = hasCustomSize
@@ -403,6 +416,19 @@ export default class LayerRenderer {
         }
       );
       renderedInstance._pixiObject.addEventListener(
+        'mouseup',
+        (event: PIXI.InteractionEvent) => {
+          if (event.data.originalEvent.button === 0) {
+            const viewPoint = event.data.global;
+            const scenePoint = this.viewPosition.toSceneCoordinates(
+              viewPoint.x,
+              viewPoint.y
+            );
+            this.onUpInstance(instance, scenePoint[0], scenePoint[1]);
+          }
+        }
+      );
+      renderedInstance._pixiObject.addEventListener(
         'rightclick',
         interactionEvent => {
           const {
@@ -440,6 +466,18 @@ export default class LayerRenderer {
           viewPoint.y
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+      });
+      renderedInstance._pixiObject.addEventListener('touchend', event => {
+        if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
+          return null;
+        }
+
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onUpInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.addEventListener('mouseout', () => {
         this.onOutInstance(instance);
@@ -481,11 +519,17 @@ export default class LayerRenderer {
   }
 
   _computeViewBounds() {
-    // Add a margin of 100 pixels around the view. Culling will hide PIXI objects,
-    // and hidden objects won't respond to events. Hence, a margin allow the cursor to go
-    // slightly out of the canvas when moving an instance, and still have the instance
-    // to follow the cursor.
-    const margin = 100;
+    /**
+     * Add a margin around the view. Culling will hide PIXI and THREE objects,
+     * and hidden objects won't respond to events.
+     * Hence, this margin allows for two things:
+     * - it allows the cursor to go slightly out of the canvas when moving an
+     *   instance, and still have the instance to follow the cursor.
+     * - THREE objects, depending on their shape and orientation, should appear
+     *   on the screen even though their coordinates are off the view. This margin
+     *   should cover most of the cases.
+     */
+    const margin = 1000;
     this.viewTopLeft = this.viewPosition.toSceneCoordinates(-margin, -margin);
     this.viewBottomRight = this.viewPosition.toSceneCoordinates(
       this.viewPosition.getWidth() + margin,

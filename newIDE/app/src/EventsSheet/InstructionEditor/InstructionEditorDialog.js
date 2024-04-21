@@ -16,11 +16,8 @@ import InstructionOrObjectSelector, {
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
-import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
-import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { SelectColumns } from '../../UI/Responsive/SelectColumns';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   useInstructionEditor,
   getInstructionMetadata,
@@ -34,7 +31,7 @@ import {
 } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
-import { useShouldAutofocusInput } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
 
 const styles = {
@@ -144,10 +141,8 @@ const InstructionEditorDialog = ({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
-  const windowWidth: WidthType = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const isMediumScreen = windowWidth === 'medium';
-  const isLargeScreen = windowWidth === 'large' || windowWidth === 'xlarge';
+  const { isMobile, windowSize, isMediumScreen } = useResponsiveWindowSize();
+  const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
   const instructionType: string = instruction.getType();
   const [
     newBehaviorDialogOpen,
@@ -321,7 +316,7 @@ const InstructionEditorDialog = ({
           />,
         ]}
         secondaryActions={[
-          (isMobileScreen || isMediumScreen) &&
+          (isMobile || isMediumScreen) &&
           step !== 'object-or-free-instructions' ? (
             <FlatButton
               label={<Trans>Back</Trans>}
@@ -335,7 +330,7 @@ const InstructionEditorDialog = ({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              (isMobileScreen || step === 'object-or-free-instructions') ? (
+              (isMobile || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>

@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import './SimpleTextField.css';
+import classes from './SimpleTextField.module.css';
+import classNames from 'classnames';
 
 type SimpleTextFieldProps = {|
   disabled: boolean,
@@ -98,9 +99,10 @@ export const SimpleTextField = React.memo<
 
       return (
         <div
-          className={`gd-simple-text-field ${
-            props.disabled ? 'gd-disabled' : ''
-          }`}
+          className={classNames({
+            [classes.simpleTextField]: true,
+            [classes.disabled]: props.disabled,
+          })}
         >
           <input
             id={props.id}

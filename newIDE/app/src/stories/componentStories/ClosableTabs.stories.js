@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../ThemeDecorator';
 import {
   ClosableTabs,
   ClosableTab,
@@ -22,7 +21,7 @@ import fakeResourceManagementProps from '../FakeResourceManagement';
 export default {
   title: 'UI Building Blocks/ClosableTabs',
   component: ClosableTabs,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [GDevelopJsInitializerDecorator],
 };
 
 export const ThreeTabs = () => (
@@ -266,7 +265,7 @@ export const WithObjectsList = () => (
                   layout={testProject.testLayout}
                   resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
-                  onExportObject={action('On export object')}
+                  onExportAssets={action('On export assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
                   selectedObjectFolderOrObjectsWithContext={[]}
                   getValidatedObjectOrGroupName={newName => newName}

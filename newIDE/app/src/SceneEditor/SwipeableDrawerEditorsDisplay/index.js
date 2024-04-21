@@ -5,9 +5,6 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
 import InstancesEditor from '../../InstancesEditor';
-import InstancePropertiesEditor, {
-  type InstancePropertiesEditorInterface,
-} from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import ObjectsList, { type ObjectsListInterface } from '../../ObjectsList';
 import ObjectGroupsList, {
@@ -23,7 +20,7 @@ import SwipeableDrawer from './SwipeableDrawer';
 import BottomToolbar from './BottomToolbar';
 import { FullSizeMeasurer } from '../../UI/FullSizeMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import { useScreenType } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 import Paper from '../../UI/Paper';
 import { type EditorId } from '..';
 import {
@@ -31,6 +28,9 @@ import {
   type SceneEditorsDisplayProps,
 } from '../EditorsDisplay.flow';
 import ErrorBoundary from '../../UI/ErrorBoundary';
+import CompactInstancePropertiesEditorContainer, {
+  type CompactInstancePropertiesEditorInterface,
+} from '../../InstancesEditor/CompactInstancePropertiesEditor';
 
 export const swipeableDrawerContainerId = 'swipeable-drawer-container';
 
@@ -66,7 +66,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const { values } = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
-  const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
@@ -291,7 +291,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       }
                       canInstallPrivateAsset={props.canInstallPrivateAsset}
                       onEditObject={props.onEditObject}
-                      onExportObject={props.onExportObject}
+                      onExportAssets={props.onExportAssets}
                       onDeleteObjects={(objectWithContext, cb) =>
                         props.onDeleteObjects(i18n, objectWithContext, cb)
                       }
@@ -328,7 +328,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
               {selectedEditorId === 'properties' && (
                 <I18n>
                   {({ i18n }) => (
-                    <InstancePropertiesEditor
+                    <CompactInstancePropertiesEditorContainer
                       i18n={i18n}
                       project={project}
                       layout={layout}
@@ -391,7 +391,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                   onEditLayerEffects={props.editLayerEffects}
                   onEditLayer={props.editLayer}
                   onRemoveLayer={props.onRemoveLayer}
-                  onRenameLayer={props.onRenameLayer}
+                  onLayerRenamed={props.onLayerRenamed}
                   onCreateLayer={forceUpdateInstancesPropertiesEditor}
                   layersContainer={layout}
                   unsavedChanges={props.unsavedChanges}

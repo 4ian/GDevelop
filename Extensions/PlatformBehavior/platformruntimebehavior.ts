@@ -262,6 +262,9 @@ namespace gdjs {
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as PlatformerObjectRuntimeBehavior;
+      if (!behavior1) {
+        return false;
+      }
       return behavior1.isOnFloorObject(object2);
     }
   }

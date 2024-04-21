@@ -12,7 +12,10 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
 } from './PreferencesContext';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource';
+import type {
+  ResourceKind,
+  ResourceImportationBehavior,
+} from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -23,6 +26,7 @@ import {
   setLanguageInDOM,
   selectLanguageOrLocale,
 } from '../../Utils/Language';
+import { CHECK_APP_UPDATES_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -135,6 +139,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
+    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
+      this
+    ),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
@@ -178,7 +185,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    setTimeout(() => this._checkUpdates(), 10000);
+    setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
   }
 
   _setLanguage(language: string) {
@@ -807,6 +814,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, backdropClickBehavior },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setResourcesImporationBehavior(
+    resourcesImporationBehavior: ResourceImportationBehavior
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, resourcesImporationBehavior },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

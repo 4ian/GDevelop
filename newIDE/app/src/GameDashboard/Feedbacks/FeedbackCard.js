@@ -28,6 +28,10 @@ import Link from '../../UI/Link';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
 import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
 import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
+import Dislike from '../../UI/CustomSvgIcons/Dislike';
+import Like from '../../UI/CustomSvgIcons/Like';
+import Danger from '../../UI/CustomSvgIcons/Danger';
+import Heart from '../../UI/CustomSvgIcons/Heart';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
@@ -116,6 +120,36 @@ const FeedbackCard = ({
     processComment
   );
 
+  const [ownerQualityRating, setOwnerQualityRating] = useOptimisticState(
+    (comment.qualityRatingPerRole && comment.qualityRatingPerRole.owner) ||
+      null,
+    async (qualityRating, i18n) => {
+      if (!profile) return;
+      try {
+        const updatedComment: Comment = await updateComment(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            gameId: comment.gameId,
+            commentId: comment.id,
+            qualityRating,
+          }
+        );
+        onCommentUpdated(updatedComment);
+      } catch (error) {
+        console.error(`Unable to update comment: `, error);
+        showErrorBox({
+          message:
+            i18n._(t`Unable to change quality rating of feedback.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'feedback-card-set-quality-rating-error',
+        });
+      }
+    }
+  );
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -123,17 +157,71 @@ const FeedbackCard = ({
           <Card
             disabled={processed}
             cardCornerAction={
-              <IconButton
-                size="small"
-                tooltip={processed ? t`Mark as unread` : t`Mark as read`}
-                onClick={() => setProcessed(!processed, i18n)}
-              >
-                {processed ? (
-                  <CheckCircleFilled htmlColor={theme.message.valid} />
-                ) : (
-                  <CheckCircle />
-                )}
-              </IconButton>
+              <LineStackLayout noMargin>
+                <IconButton
+                  size="small"
+                  tooltip={t`Rank this comment as great`}
+                  onClick={() => setOwnerQualityRating('great', i18n)}
+                >
+                  <Heart
+                    htmlColor={
+                      ownerQualityRating === 'great'
+                        ? theme.message.valid
+                        : undefined
+                    }
+                  />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  tooltip={t`Rank this comment as good`}
+                  onClick={() => setOwnerQualityRating('good', i18n)}
+                >
+                  <Like
+                    htmlColor={
+                      ownerQualityRating === 'good'
+                        ? theme.message.valid
+                        : undefined
+                    }
+                  />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  tooltip={t`Rank this comment as bad`}
+                  onClick={() => setOwnerQualityRating('bad', i18n)}
+                >
+                  <Dislike
+                    htmlColor={
+                      ownerQualityRating === 'bad'
+                        ? theme.message.warning
+                        : undefined
+                    }
+                  />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  tooltip={t`Report this comment as abusive, harmful or spam`}
+                  onClick={() => setOwnerQualityRating('harmful', i18n)}
+                >
+                  <Danger
+                    htmlColor={
+                      ownerQualityRating === 'harmful'
+                        ? theme.message.error
+                        : undefined
+                    }
+                  />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  tooltip={processed ? t`Mark as unread` : t`Mark as read`}
+                  onClick={() => setProcessed(!processed, i18n)}
+                >
+                  {processed ? (
+                    <CheckCircleFilled htmlColor={theme.message.valid} />
+                  ) : (
+                    <CheckCircle />
+                  )}
+                </IconButton>
+              </LineStackLayout>
             }
             header={
               <BackgroundText style={styles.backgroundText}>

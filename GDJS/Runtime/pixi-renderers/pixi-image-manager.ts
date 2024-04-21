@@ -57,6 +57,10 @@ namespace gdjs {
     private _loadedThreeTextures: Hashtable<THREE.Texture>;
     private _loadedThreeMaterials: Hashtable<THREE.Material>;
 
+    private _diskTextures = new Map<float, PIXI.Texture>();
+    private _rectangleTextures = new Map<string, PIXI.Texture>();
+    private _scaledTextures = new Map<string, PIXI.Texture>();
+
     private _resourceLoader: gdjs.ResourceLoader;
 
     /**
@@ -224,7 +228,7 @@ namespace gdjs {
         useTransparentTexture,
         forceBasicMaterial,
       }: { useTransparentTexture: boolean; forceBasicMaterial: boolean }
-    ) {
+    ): THREE.Material {
       const cacheKey = `${resourceName}|${useTransparentTexture ? 1 : 0}|${
         forceBasicMaterial ? 1 : 0
       }`;
@@ -340,12 +344,15 @@ namespace gdjs {
             });
 
             const baseTexture = texture.baseTexture;
-
-            baseTexture.on('loaded', () => {
-              this._loadedTextures.set(resource, texture);
-              applyTextureSettings(texture, resource);
-              resolve();
-            });
+            baseTexture
+              .on('loaded', () => {
+                this._loadedTextures.set(resource, texture);
+                applyTextureSettings(texture, resource);
+                resolve();
+              })
+              .on('error', (error) => {
+                reject(error);
+              });
           });
         } else {
           // If the file has no extension, PIXI.assets.load cannot find
@@ -376,6 +383,85 @@ namespace gdjs {
       } catch (error) {
         logFileLoadingError(resource.file, error);
       }
+    }
+
+    /**
+     * Return a texture containing a circle filled with white.
+     * @param radius The circle radius
+     * @param pixiRenderer The renderer used to generate the texture
+     */
+    getOrCreateDiskTexture(
+      radius: float,
+      pixiRenderer: PIXI.Renderer
+    ): PIXI.Texture {
+      let particleTexture = this._diskTextures.get(radius);
+      if (!particleTexture) {
+        const graphics = new PIXI.Graphics();
+        graphics.lineStyle(0, 0, 0);
+        graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 1);
+        graphics.drawCircle(0, 0, radius);
+        graphics.endFill();
+        particleTexture = pixiRenderer.generateTexture(graphics);
+        graphics.destroy();
+
+        this._diskTextures.set(radius, particleTexture);
+      }
+      return particleTexture;
+    }
+
+    /**
+     * Return a texture filled with white.
+     * @param width The texture width
+     * @param height The texture height
+     * @param pixiRenderer The renderer used to generate the texture
+     */
+    getOrCreateRectangleTexture(
+      width: float,
+      height: float,
+      pixiRenderer: PIXI.Renderer
+    ): PIXI.Texture {
+      const key = `${width}_${height}`;
+      let particleTexture = this._rectangleTextures.get(key);
+      if (!particleTexture) {
+        const graphics = new PIXI.Graphics();
+        graphics.lineStyle(0, 0, 0);
+        graphics.beginFill(gdjs.rgbToHexNumber(255, 255, 255), 1);
+        graphics.drawRect(0, 0, width, height);
+        graphics.endFill();
+        particleTexture = pixiRenderer.generateTexture(graphics);
+        graphics.destroy();
+
+        this._rectangleTextures.set(key, particleTexture);
+      }
+      return particleTexture;
+    }
+
+    /**
+     * Return a texture rescaled according to given dimensions.
+     * @param width The texture width
+     * @param height The texture height
+     * @param pixiRenderer The renderer used to generate the texture
+     */
+    getOrCreateScaledTexture(
+      imageResourceName: string,
+      width: float,
+      height: float,
+      pixiRenderer: PIXI.Renderer
+    ): PIXI.Texture {
+      const key = `${imageResourceName}_${width}_${height}`;
+      let particleTexture = this._scaledTextures.get(key);
+      if (!particleTexture) {
+        const graphics = new PIXI.Graphics();
+        const sprite = new PIXI.Sprite(this.getPIXITexture(imageResourceName));
+        sprite.width = width;
+        sprite.height = height;
+        graphics.addChild(sprite);
+        particleTexture = pixiRenderer.generateTexture(graphics);
+        graphics.destroy();
+
+        this._scaledTextures.set(key, particleTexture);
+      }
+      return particleTexture;
     }
   }
 

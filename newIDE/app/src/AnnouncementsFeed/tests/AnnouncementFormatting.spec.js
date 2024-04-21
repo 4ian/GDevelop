@@ -24,13 +24,15 @@ describe('getAnnouncementContent', () => {
     const result = getAnnouncementContent(makeFakeI18n(), announcement);
     expect(result).toEqual({
       title: 'Announcement title',
-      message: 'This is the announcement message.',
+      desktopMessage: 'This is the announcement message.',
+      mobileMessage: 'This is the announcement message.',
+      isClickableContent: false,
     });
   });
 
   it('should return an object with message only when announcement has no title and no link', () => {
     const imageMessage = '![Big Game Jam 4](https://example.com/image.png)';
-    const announcement = {
+    const announcement: Announcement = {
       id: 'big-game-jam-4',
       level: 'urgent',
       titleByLocale: {
@@ -43,14 +45,16 @@ describe('getAnnouncementContent', () => {
     const result = getAnnouncementContent(makeFakeI18n(), announcement);
     expect(result).toEqual({
       title: '',
-      message: imageMessage,
+      desktopMessage: imageMessage,
+      mobileMessage: imageMessage,
+      isClickableContent: false,
     });
   });
 
   it('should return an object with message only when announcement has no title and an external link', () => {
     const imageWithLinkMessage =
       '[![Big Game Jam 4](https://resources.gdevelop.io/announcements/Big_Game_Jam_4.png)](https://itch.io/jam/gdevelop-game-jam-4)';
-    const announcement = {
+    const announcement: Announcement = {
       id: 'big-game-jam-4',
       level: 'urgent',
       titleByLocale: {
@@ -63,7 +67,9 @@ describe('getAnnouncementContent', () => {
     const result = getAnnouncementContent(makeFakeI18n(), announcement);
     expect(result).toEqual({
       title: '',
-      message: imageWithLinkMessage,
+      desktopMessage: imageWithLinkMessage,
+      mobileMessage: imageWithLinkMessage,
+      isClickableContent: true,
     });
   });
 
@@ -71,7 +77,7 @@ describe('getAnnouncementContent', () => {
     const imageMarkdown =
       '![GDevelop Mega Pack on GDevelop asset store](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)';
     const imageWithInternalLinkMessage = `[${imageMarkdown}](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824)`;
-    const announcement = {
+    const announcement: Announcement = {
       id: 'gdevelop-mega-pack',
       level: 'urgent',
       titleByLocale: {
@@ -84,14 +90,66 @@ describe('getAnnouncementContent', () => {
     const result = getAnnouncementContent(makeFakeI18n(), announcement);
     expect(result).toEqual({
       title: '',
-      message: imageMarkdown, // The link is removed from the message.
-      routeNavigationParams: {
+      desktopMessage: imageMarkdown, // The link is removed from the message.
+      desktopRouteNavigationParams: {
         route: 'asset-store',
         params: {
           'asset-pack':
             'gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824',
         },
       },
+      mobileMessage: imageMarkdown,
+      mobileRouteNavigationParams: {
+        route: 'asset-store',
+        params: {
+          'asset-pack':
+            'gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824',
+        },
+      },
+      isClickableContent: true,
+    });
+  });
+
+  it('should return mobile and desktop messages and navigation params', () => {
+    const imageMarkdown =
+      '![GDevelop Mega Pack on GDevelop asset store](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)';
+    const imageWithInternalLinkMessage = `[${imageMarkdown}](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824)`;
+    const mobileImageMarkdown =
+      '![GDevelop Mega Pack on GDevelop asset store](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated_Mobile.png)';
+    const mobileImageWithInternalLinkMessage = `[${mobileImageMarkdown}](https://editor.gdevelop.io/?initial-dialog=asset-store&asset-pack=gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824)`;
+    const announcement: Announcement = {
+      id: 'gdevelop-mega-pack',
+      level: 'urgent',
+      titleByLocale: {
+        en: '',
+      },
+      markdownMessageByLocale: {
+        en: imageWithInternalLinkMessage,
+      },
+      mobileMarkdownMessageByLocale: {
+        en: mobileImageWithInternalLinkMessage,
+      },
+    };
+    const result = getAnnouncementContent(makeFakeI18n(), announcement);
+    expect(result).toEqual({
+      title: '',
+      desktopMessage: imageMarkdown, // The link is removed from the message.
+      desktopRouteNavigationParams: {
+        route: 'asset-store',
+        params: {
+          'asset-pack':
+            'gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824',
+        },
+      },
+      mobileMessage: mobileImageMarkdown, // The link is removed from the message.
+      mobileRouteNavigationParams: {
+        route: 'asset-store',
+        params: {
+          'asset-pack':
+            'gdevelop-mega-bundle-43994a30-c54b-4f5d-baf5-6e1f99b13824',
+        },
+      },
+      isClickableContent: true,
     });
   });
 });

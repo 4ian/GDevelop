@@ -288,6 +288,8 @@ class GD_CORE_API ExpressionMetadata : public gd::AbstractFunctionMetadata {
 
   /**
    * \brief Erase any existing include file and add the specified include.
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
    */
   ExpressionMetadata& SetIncludeFile(
       const gd::String& includeFile) override {

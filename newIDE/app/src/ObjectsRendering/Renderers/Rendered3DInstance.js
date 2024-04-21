@@ -44,8 +44,23 @@ export default class Rendered3DInstance {
   /**
    * Convert an angle from degrees to radians.
    */
-  static toRad(angleInDegrees: number) {
+  static toRad(angleInDegrees: number): number {
     return (angleInDegrees / 180) * Math.PI;
+  }
+
+  /**
+   * Applies ratio to value without intermediary value to avoid precision issues.
+   */
+  static applyRatio({
+    oldReferenceValue,
+    newReferenceValue,
+    valueToApplyTo,
+  }: {|
+    oldReferenceValue: number,
+    newReferenceValue: number,
+    valueToApplyTo: number,
+  |}): number {
+    return (newReferenceValue / oldReferenceValue) * valueToApplyTo;
   }
 
   /**
@@ -86,6 +101,10 @@ export default class Rendered3DInstance {
     return 0;
   }
 
+  getOriginZ() {
+    return 0;
+  }
+
   getCenterX() {
     return this.getWidth() / 2;
   }
@@ -94,22 +113,38 @@ export default class Rendered3DInstance {
     return this.getHeight() / 2;
   }
 
+  getCenterZ() {
+    return this.getDepth() / 2;
+  }
+
+  getCustomWidth(): number {
+    return this._instance.getCustomWidth();
+  }
+
+  getCustomHeight(): number {
+    return this._instance.getCustomHeight();
+  }
+
+  getCustomDepth(): number {
+    return this._instance.getCustomDepth();
+  }
+
   getWidth(): number {
     return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
+      ? this.getCustomWidth()
       : this.getDefaultWidth();
   }
 
   getHeight(): number {
     return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
+      ? this.getCustomHeight()
       : this.getDefaultHeight();
   }
 
   getDepth(): number {
     // For compatibility, a custom depth can be used, without necessarily a custom width/height.
     return this._instance.hasCustomDepth()
-      ? this._instance.getCustomDepth()
+      ? this.getCustomDepth()
       : this.getDefaultDepth();
   }
 

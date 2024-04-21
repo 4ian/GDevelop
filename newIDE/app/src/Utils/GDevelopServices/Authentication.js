@@ -6,14 +6,14 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   sendEmailVerification,
   updateEmail,
 } from 'firebase/auth';
-import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
+import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
+import type { LoginProvider } from '../../LoginProvider';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type CommunityLinks, type UserSurvey } from './User';
 
@@ -103,13 +103,17 @@ export type AuthError = {
     | 'auth/requires-recent-login'
     | 'auth/too-many-requests'
     | 'auth/internal-error'
-    | 'auth/network-request-failed',
+    | 'auth/network-request-failed'
+    | 'auth/account-exists-with-different-credential',
 };
+
+export type IdentityProvider = 'google' | 'apple' | 'github';
 
 export default class Authentication {
   auth: Auth;
   _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
   _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
+  loginProvider: ?LoginProvider;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
@@ -124,6 +128,10 @@ export default class Authentication {
       }
     });
   }
+
+  setLoginProvider = (loginProvider: LoginProvider) => {
+    this.loginProvider = loginProvider;
+  };
 
   addUserLogoutListener = (cb: () => void | Promise<void>) => {
     this._onUserLogoutCallbacks.push(cb);
@@ -200,12 +208,40 @@ export default class Authentication {
   };
 
   login = (form: LoginForm): Promise<void> => {
-    return signInWithEmailAndPassword(this.auth, form.email, form.password)
+    const { loginProvider } = this;
+    if (!loginProvider) {
+      throw new Error('Login provider not set.');
+    }
+    return loginProvider
+      .loginWithEmailAndPassword(form)
       .then(userCredentials => {
         // The user is now stored in `this.auth`.
       })
       .catch(error => {
         console.error('Error while login:', error);
+        throw error;
+      });
+  };
+
+  loginWithProvider = ({
+    provider,
+    signal,
+  }: {|
+    provider: IdentityProvider,
+    signal?: AbortSignal,
+  |}): Promise<void> => {
+    const { loginProvider } = this;
+    if (!loginProvider) {
+      throw new Error('Login provider not set.');
+    }
+
+    return loginProvider
+      .loginOrSignupWithProvider({ provider, signal })
+      .then(userCredentials => {
+        // The user is now stored in `this.auth`.
+      })
+      .catch(error => {
+        console.error('Error while login with provider:', error);
         throw error;
       });
   };
@@ -368,7 +404,8 @@ export default class Authentication {
   };
 
   acceptGameStatsEmail = async (
-    getAuthorizationHeader: () => Promise<string>
+    getAuthorizationHeader: () => Promise<string>,
+    value: boolean
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -380,7 +417,7 @@ export default class Authentication {
       .then(authorizationHeader => {
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
-          { getGameStatsEmail: true },
+          { getGameStatsEmail: value },
           {
             params: { userId: currentUser.uid },
             headers: { Authorization: authorizationHeader },

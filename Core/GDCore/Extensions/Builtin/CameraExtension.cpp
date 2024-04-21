@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))
       .SetIcon("res/conditions/camera24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
-      .SetIcon("res/actions/effect24.png");
+      .SetIcon("res/actions/effect_black.svg");
 
   extension
       .AddExpressionAndConditionAndAction(
@@ -450,8 +450,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                 "names) in the effects window."),
           _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
@@ -469,8 +469,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                 "names) in the effects window."),
           _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
@@ -488,8 +488,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                 "names) in the effects window."),
           _("Enable _PARAM3_ for effect _PARAM2_ of layer _PARAM1_: _PARAM4_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
@@ -504,8 +504,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("The effect on a layer is enabled"),
                     _("Effect _PARAM2_ on layer _PARAM1_ is enabled"),
                     _(""),
-                    "res/actions/effect24.png",
-                    "res/actions/effect.png")
+                    "res/actions/effect_black.svg",
+                    "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
@@ -518,8 +518,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  _("Enable an effect on a layer"),
                  _("Enable effect _PARAM2_ on layer _PARAM1_: _PARAM3_"),
                  _("Effects"),
-                 "res/actions/effect24.png",
-                 "res/actions/effect.png")
+                 "res/actions/effect_black.svg",
+                 "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")

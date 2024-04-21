@@ -6,7 +6,6 @@ import { action } from '@storybook/addon-actions';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import EventsFunctionsExtensionEditor from '../../../EventsFunctionsExtensionEditor';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
@@ -19,7 +18,6 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'EventsFunctionsExtensionEditor/index',
   component: EventsFunctionsExtensionEditor,
-  decorators: [muiDecorator],
 };
 
 export const Default = () => (

@@ -9,9 +9,8 @@ import {
   type DraggedItem,
 } from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from './DropIndicator';
-import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
-import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
-import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../Responsive/ResponsiveWindowMeasurer';
+import { ScreenTypeMeasurer } from '../Responsive/ScreenTypeMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
 
 const OVERSCAN_CELLS_COUNT = 20;
@@ -64,7 +63,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     }
   }
 
-  _renderItemRow(item: Item, index: number, windowWidth: WidthType) {
+  _renderItemRow(item: Item, index: number, isMobile: boolean) {
     const {
       selectedItems,
       getItemThumbnail,
@@ -78,8 +77,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       renderItemLabel,
       scaleUpItemIconWhenSelected,
     } = this.props;
-
-    const isMobileScreen = windowWidth === 'small';
 
     const nameBeingEdited = renamedItem === item;
     const itemName = getItemName(item);
@@ -107,7 +104,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
-        hideMenuButton={isMobileScreen}
+        hideMenuButton={isMobile}
         scaleUpItemIconWhenSelected={scaleUpItemIconWhenSelected}
       />
     );
@@ -137,7 +134,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {({ isMobile }) => (
           <ScreenTypeMeasurer>
             {screenType => (
               <List
@@ -267,7 +264,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           const dropTarget = connectDropTarget(
                             <div>
                               {isOver && <DropIndicator canDrop={canDrop} />}
-                              {this._renderItemRow(item, index, windowWidth)}
+                              {this._renderItemRow(item, index, isMobile)}
                             </div>
                           );
 

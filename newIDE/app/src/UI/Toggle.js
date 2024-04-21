@@ -56,7 +56,7 @@ type Props = {|
 |};
 
 /**
- * A text field based on Material-UI text field.
+ * A toggle based on Material-UI Toggle.
  */
 const Toggle = ({
   label,

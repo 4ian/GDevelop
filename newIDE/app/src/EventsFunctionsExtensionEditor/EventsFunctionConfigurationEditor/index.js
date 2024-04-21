@@ -5,13 +5,14 @@ import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
 import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
-import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
+import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import newNameGenerator from '../../Utils/NewNameGenerator';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,7 +26,7 @@ type Props = {|
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: (whatChanged?: 'type') => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,

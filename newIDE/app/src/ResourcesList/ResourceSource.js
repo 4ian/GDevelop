@@ -24,7 +24,9 @@ export type ResourceKind =
   | 'tilemap'
   | 'tileset'
   | 'bitmapFont'
-  | 'model3D';
+  | 'model3D'
+  | 'atlas'
+  | 'spine';
 
 export const allResourceKindsAndMetadata = [
   {
@@ -55,7 +57,9 @@ export const allResourceKindsAndMetadata = [
     kind: 'json',
     displayName: t`Json`,
     fileExtensions: ['json'],
-    createNewResource: () => new gd.JsonResource(),
+    createNewResource: () => {
+      return new gd.JsonResource();
+    },
   },
   {
     kind: 'tilemap',
@@ -81,6 +85,20 @@ export const allResourceKindsAndMetadata = [
     fileExtensions: ['glb'],
     createNewResource: () => new gd.Model3DResource(),
   },
+  {
+    kind: 'atlas',
+    displayName: t`Atlas`,
+    fileExtensions: ['atlas'],
+    createNewResource: () => new gd.AtlasResource(),
+  },
+  {
+    kind: 'spine',
+    displayName: t`Spine Json`,
+    fileExtensions: ['json'],
+    createNewResource: () => {
+      return new gd.SpineResource();
+    },
+  },
 ];
 
 const constructors = {};
@@ -98,6 +116,8 @@ export type ChooseResourceOptions = {|
   resourceKind: ResourceKind,
 |};
 
+export type ResourceImportationBehavior = 'import' | 'relative' | 'ask';
+
 export type ChooseResourceProps = {|
   i18n: I18nType,
   project: gdProject,
@@ -111,6 +131,7 @@ export type ChooseResourceProps = {|
   ) => void,
   options: ChooseResourceOptions,
   automaticallyOpenIfPossible?: boolean,
+  resourcesImporationBehavior: ResourceImportationBehavior,
 |};
 
 export type ResourceSourceComponentProps = {|

@@ -28,8 +28,8 @@ import {
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome, type AssetsHomeInterface } from './AssetsHome';
 import TextButton from '../UI/TextButton';
@@ -41,7 +41,6 @@ import PrivateAssetPackInformationPage from './PrivateAssets/PrivateAssetPackInf
 import PlaceholderError from '../UI/PlaceholderError';
 import AlertMessage from '../UI/AlertMessage';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import PrivateAssetPackPurchaseDialog from './PrivateAssets/PrivateAssetPackPurchaseDialog';
 import { LineStackLayout } from '../UI/Layout';
 import {
   isHomePage,
@@ -54,11 +53,11 @@ import PrivateAssetPackAudioFilesDownloadButton from './PrivateAssets/PrivateAss
 import Text from '../UI/Text';
 import { capitalize } from 'lodash';
 import PrivateGameTemplateInformationPage from './PrivateGameTemplates/PrivateGameTemplateInformationPage';
-import PrivateGameTemplatePurchaseDialog from './PrivateGameTemplates/PrivateGameTemplatePurchaseDialog';
 import { PrivateGameTemplateStoreContext } from './PrivateGameTemplates/PrivateGameTemplateStoreContext';
 
 type Props = {|
   hideGameTemplates?: boolean, // TODO: if we add more options, use an array instead.
+  displayPromotions?: boolean,
   onOpenPrivateGameTemplateListingData?: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -94,7 +93,14 @@ const identifyAssetPackKind = ({
 };
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
-  ({ hideGameTemplates, onOpenPrivateGameTemplateListingData }: Props, ref) => {
+  (
+    {
+      hideGameTemplates,
+      displayPromotions,
+      onOpenPrivateGameTemplateListingData,
+    }: Props,
+    ref
+  ) => {
     const {
       assetShortHeadersSearchResults,
       publicAssetPacksSearchResults,
@@ -107,7 +113,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       searchText,
       setSearchText: setAssetStoreSearchText,
       clearAllFilters: clearAllAssetStoreFilters,
-      assetPackRandomOrdering,
     } = React.useContext(AssetStoreContext);
     const {
       privateGameTemplateListingDatas,
@@ -132,32 +137,25 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const searchBar = React.useRef<?SearchBarInterface>(null);
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
 
-    const windowWidth = useResponsiveWindowWidth();
-    const isMobileScreen = windowWidth === 'small';
+    const { isMobile } = useResponsiveWindowSize();
 
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
     const openFiltersPanelIfAppropriate = React.useCallback(
       () => {
-        if (isMobileScreen) {
+        if (isMobile) {
           // Never open automatically the filters on small screens
           return;
         }
 
         setIsFiltersPanelOpen(true);
       },
-      [isMobileScreen]
+      [isMobile]
     );
 
-    const [
-      purchasingPrivateAssetPackListingData,
-      setPurchasingPrivateAssetPackListingData,
-    ] = React.useState<?PrivateAssetPackListingData>(null);
-    const [
-      purchasingPrivateGameTemplateListingData,
-      setPurchasingPrivateGameTemplateListingData,
-    ] = React.useState<?PrivateGameTemplateListingData>(null);
-    const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
+    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
+      AuthenticatedUserContext
+    );
 
     // The saved scroll position must not be reset by a scroll event until it
     // has been applied.
@@ -348,14 +346,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     // if the user owns it, we set it as the chosen category,
     // otherwise we open the page to buy it.
     const selectPrivateAssetPack = React.useCallback(
-      (privateAssetPackListingData: PrivateAssetPackListingData) => {
+      (
+        privateAssetPackListingData: PrivateAssetPackListingData,
+        options?: {|
+          forceProductPage?: boolean,
+        |}
+      ) => {
         const receivedAssetPack = receivedAssetPacks
           ? receivedAssetPacks.find(
               pack => pack.id === privateAssetPackListingData.id
             )
           : null;
 
-        if (!receivedAssetPack) {
+        if (!receivedAssetPack || (options && options.forceProductPage)) {
           // The user has not received the pack, open the page to buy it.
           sendAssetPackInformationOpened({
             assetPackName: privateAssetPackListingData.name,
@@ -439,44 +442,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [shopNavigationState, saveScrollPosition]
     );
 
-    // If the user has received the pack they are currently viewing,
-    // we update the window to show it if they are not already on the pack page.
-    React.useEffect(
-      () => {
-        if (!purchasingPrivateAssetPackListingData) return;
-        // Ensure the user is not already on the pack page, to trigger the effect only once.
-        const isOnPrivatePackPage =
-          currentPage.openedAssetPack &&
-          currentPage.openedAssetPack.id &&
-          currentPage.openedAssetPack.id ===
-            purchasingPrivateAssetPackListingData.id;
-        if (receivedAssetPacks && !isOnPrivatePackPage) {
-          const receivedAssetPack = receivedAssetPacks.find(
-            pack => pack.id === purchasingPrivateAssetPackListingData.id
-          );
-          if (receivedAssetPack) {
-            // The user has received the pack, close the pack information dialog, and open the pack in the search.
-            setSearchText('');
-            shopNavigationState.clearPreviousPageFromHistory(); // Clear the previous page from history to avoid going back to the pack information page.
-            shopNavigationState.openPackPage({
-              assetPack: receivedAssetPack,
-              previousSearchText: '', // We were on a pack page.
-            });
-            openFiltersPanelIfAppropriate();
-          }
-        }
-      },
-      [
-        receivedAssetPacks,
-        purchasingPrivateAssetPackListingData,
-        shopNavigationState,
-        currentPage,
-        saveScrollPosition,
-        setSearchText,
-        openFiltersPanelIfAppropriate,
-      ]
-    );
-
     // When a tag is selected from the asset details page,
     // first determine if it's a public or private pack,
     // then set it as the chosen category, clear old filters and open the filters panel.
@@ -526,7 +491,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [shouldAutofocusSearchbar]
     );
 
-    const privateAssetPackFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
+    const privateAssetPackListingDatasFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
       () => {
         if (
           !openedPrivateAssetPackListingData ||
@@ -549,6 +514,37 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         openedPrivateAssetPackListingData,
         privateAssetPackListingDatas,
         receivedAssetPacks,
+      ]
+    );
+
+    const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+      () => {
+        if (
+          !openedPrivateGameTemplateListingData ||
+          !privateGameTemplateListingDatas ||
+          !receivedGameTemplates
+        )
+          return null;
+
+        const receivedGameTemplateIds = receivedGameTemplates.map(
+          template => template.id
+        );
+
+        return privateGameTemplateListingDatas
+          .filter(
+            template =>
+              template.sellerId ===
+                openedPrivateGameTemplateListingData.sellerId &&
+              !receivedGameTemplateIds.includes(template.sellerId)
+          )
+          .sort((template1, template2) =>
+            template1.name.localeCompare(template2.name)
+          );
+      },
+      [
+        openedPrivateGameTemplateListingData,
+        privateGameTemplateListingDatas,
+        receivedGameTemplates,
       ]
     );
 
@@ -616,7 +612,6 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                   <TextButton
                     icon={<ChevronArrowLeft />}
                     label={<Trans>Back</Trans>}
-                    primary={false}
                     onClick={async () => {
                       const page = shopNavigationState.backToPreviousPage();
                       const isUpdatingSearchtext = reApplySearchTextIfNeeded(
@@ -688,8 +683,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               </PlaceholderError>
             ) : publicAssetPacks &&
               privateAssetPackListingDatas &&
-              privateGameTemplateListingDatas &&
-              assetPackRandomOrdering ? (
+              privateGameTemplateListingDatas ? (
               <AssetsHome
                 ref={assetsHome}
                 publicAssetPacks={publicAssetPacks}
@@ -697,13 +691,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 privateGameTemplateListingDatas={
                   privateGameTemplateListingDatas
                 }
-                assetPackRandomOrdering={assetPackRandomOrdering}
                 onPublicAssetPackSelection={selectPublicAssetPack}
                 onPrivateAssetPackSelection={selectPrivateAssetPack}
                 onPrivateGameTemplateSelection={selectPrivateGameTemplate}
                 onCategorySelection={selectShopCategory}
                 openedShopCategory={openedShopCategory}
                 hideGameTemplates={hideGameTemplates}
+                displayPromotions={displayPromotions}
               />
             ) : (
               <PlaceholderLoader />
@@ -736,19 +730,15 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               onOpenDetails={onOpenDetails}
               onAssetLoaded={() => applyBackScrollPosition(currentPage)}
               onPrivateAssetPackSelection={selectPrivateAssetPack}
+              onPrivateGameTemplateSelection={selectPrivateGameTemplate}
             />
           ) : !!openedPrivateAssetPackListingData ? (
             <PrivateAssetPackInformationPage
               privateAssetPackListingData={openedPrivateAssetPackListingData}
-              onOpenPurchaseDialog={() =>
-                setPurchasingPrivateAssetPackListingData(
-                  openedPrivateAssetPackListingData
-                )
-              }
-              isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
               onAssetPackOpen={selectPrivateAssetPack}
-              privateAssetPacksFromSameCreatorListingData={
-                privateAssetPackFromSameCreator
+              onGameTemplateOpen={selectPrivateGameTemplate}
+              privateAssetPackListingDatasFromSameCreator={
+                privateAssetPackListingDatasFromSameCreator
               }
             />
           ) : !!openedPrivateGameTemplateListingData ? (
@@ -756,36 +746,19 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
               privateGameTemplateListingData={
                 openedPrivateGameTemplateListingData
               }
-              onOpenPurchaseDialog={() =>
-                setPurchasingPrivateGameTemplateListingData(
-                  openedPrivateGameTemplateListingData
-                )
-              }
-              isPurchaseDialogOpen={!!purchasingPrivateAssetPackListingData}
-              onGameTemplateOpen={() => {
+              onCreateWithGameTemplate={() => {
                 onOpenPrivateGameTemplateListingData &&
                   onOpenPrivateGameTemplateListingData(
                     openedPrivateGameTemplateListingData
                   );
               }}
+              onAssetPackOpen={selectPrivateAssetPack}
+              onGameTemplateOpen={selectPrivateGameTemplate}
+              privateGameTemplateListingDatasFromSameCreator={
+                privateGameTemplateListingDatasFromSameCreator
+              }
             />
           ) : null}
-          {!!purchasingPrivateAssetPackListingData && (
-            <PrivateAssetPackPurchaseDialog
-              privateAssetPackListingData={
-                purchasingPrivateAssetPackListingData
-              }
-              onClose={() => setPurchasingPrivateAssetPackListingData(null)}
-            />
-          )}
-          {!!purchasingPrivateGameTemplateListingData && (
-            <PrivateGameTemplatePurchaseDialog
-              privateGameTemplateListingData={
-                purchasingPrivateGameTemplateListingData
-              }
-              onClose={() => setPurchasingPrivateGameTemplateListingData(null)}
-            />
-          )}
           {canShowFiltersPanel && (
             <ResponsivePaperOrDrawer
               onClose={() => setIsFiltersPanelOpen(false)}

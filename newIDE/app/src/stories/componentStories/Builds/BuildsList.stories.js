@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import BuildsList from '../../../ExportAndShare/Builds/BuildsList';
@@ -22,7 +21,7 @@ import {
 export default {
   title: 'Builds/BuildsList',
   component: BuildsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const buildArray = [

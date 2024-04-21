@@ -26,7 +26,7 @@ import Card from '../../UI/Card';
 
 import BuildProgressAndActions from './BuildProgressAndActions';
 
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import {
   deleteBuild,
   updateBuild,
@@ -37,8 +37,9 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
 import CircularProgress from '../../UI/CircularProgress';
 import ThreeDotsMenu from '../../UI/CustomSvgIcons/ThreeDotsMenu';
-import Mobile from '../../UI/CustomSvgIcons/Mobile';
 import Desktop from '../../UI/CustomSvgIcons/Desktop';
+import Apple from '../../UI/CustomSvgIcons/Apple';
+import Android from '../../UI/CustomSvgIcons/Android';
 
 const styles = {
   icon: {
@@ -54,11 +55,17 @@ const styles = {
 };
 
 const formatBuildText = (
-  buildType: 'cordova-build' | 'electron-build' | 'web-build'
+  buildType:
+    | 'cordova-build'
+    | 'cordova-ios-build'
+    | 'electron-build'
+    | 'web-build'
 ) => {
   switch (buildType) {
     case 'cordova-build':
       return <Trans>Android Build</Trans>;
+    case 'cordova-ios-build':
+      return <Trans>iOS Build</Trans>;
     case 'electron-build':
       return <Trans>Windows/macOS/Linux Build</Trans>;
     case 'web-build':
@@ -69,11 +76,17 @@ const formatBuildText = (
 };
 
 const getIcon = (
-  buildType: 'cordova-build' | 'electron-build' | 'web-build'
+  buildType:
+    | 'cordova-build'
+    | 'cordova-ios-build'
+    | 'electron-build'
+    | 'web-build'
 ) => {
   switch (buildType) {
     case 'cordova-build':
-      return <Mobile style={styles.icon} />;
+      return <Android style={styles.icon} />;
+    case 'cordova-ios-build':
+      return <Apple style={styles.icon} />;
     case 'electron-build':
       return <Desktop style={styles.icon} />;
     case 'web-build':
@@ -104,7 +117,7 @@ const BUILD_DEFAULT_NAME_TIME_FORMAT = 'yyyy-MM-dd-HH-mm-ss';
 type Props = {|
   build: Build,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
   onBuildUpdated: Build => void,
@@ -139,8 +152,7 @@ export const BuildCard = ({
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const nameInput = React.useRef<?TextFieldInterface>(null);
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
 
@@ -245,7 +257,7 @@ export const BuildCard = ({
             }
             header={
               <Line noMargin alignItems="start" justifyContent="space-between">
-                {!isMobileScreen && <BuildAndCreatedAt build={build} />}
+                {!isMobile && <BuildAndCreatedAt build={build} />}
                 <Column expand noMargin justifyContent="center">
                   <Line noMargin justifyContent="end">
                     {isOnlineBuild ? (
@@ -274,7 +286,7 @@ export const BuildCard = ({
             }
           >
             <Column expand noMargin>
-              {isMobileScreen && <BuildAndCreatedAt build={build} />}
+              {isMobile && <BuildAndCreatedAt build={build} />}
               <Spacer />
               <Line noMargin>
                 {isEditingName ? (

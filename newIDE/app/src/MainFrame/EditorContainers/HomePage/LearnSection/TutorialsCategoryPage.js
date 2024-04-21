@@ -8,10 +8,10 @@ import {
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return 1;
     case 'medium':
@@ -49,7 +49,7 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
               items={filteredTutorials.map(tutorial =>
                 formatTutorialToImageTileComponent(i18n, tutorial)
               )}
-              getColumnsFromWidth={getColumnsFromWidth}
+              getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
         </SectionContainer>

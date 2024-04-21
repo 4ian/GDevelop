@@ -10,7 +10,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import HelpButton from '../../UI/HelpButton';
-import { type HeaderProps } from '../ExportPipeline.flow';
+import { type HeaderProps, type ExportFlowProps } from '../ExportPipeline.flow';
+import BuildStepsProgress from '../Builds/BuildStepsProgress';
+import RaisedButton from '../../UI/RaisedButton';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 export type ExportState = {|
   targets: Array<TargetName>,
@@ -21,11 +24,16 @@ export type ExportState = {|
 export const SetupExportHeader = ({
   exportState,
   updateExportState,
+  isExporting,
+  build,
 }: HeaderProps<ExportState>) => {
+  // Build is finished, hide options.
+  if (!!build && build.status === 'complete') return null;
+
   return (
     <Column noMargin expand>
       <Line>
-        <Text>
+        <Text align="center">
           <Trans>
             Packaging your game for Android will create an APK file that can be
             installed on Android phones or an Android App Bundle that can be
@@ -33,45 +41,49 @@ export const SetupExportHeader = ({
           </Trans>
         </Text>
       </Line>
-      <RadioGroup
-        value={exportState.targets[0] || 'androidApk'}
-        onChange={event => {
-          const targetName = event.target.value;
-          updateExportState(prevExportState => ({
-            ...prevExportState,
-            targets: [targetName],
-          }));
-        }}
-      >
-        <FormControlLabel
-          value={'androidApk'}
-          control={<Radio color="secondary" />}
-          label={
-            <Trans>
-              APK (for testing on device or sharing outside Google Play)
-            </Trans>
-          }
-        />
-        <FormControlLabel
-          value={'androidAppBundle'}
-          control={<Radio color="secondary" />}
-          label={
-            <Trans>Android App Bundle (for publishing on Google Play)</Trans>
-          }
-        />
-      </RadioGroup>
-      <Line noMargin justifyContent="flex-end">
-        <FlatButton
-          label={<Trans>Signing options</Trans>}
-          onClick={() => {
+      <Column>
+        <RadioGroup
+          value={exportState.targets[0] || 'androidApk'}
+          onChange={event => {
+            const targetName = event.target.value;
             updateExportState(prevExportState => ({
               ...prevExportState,
-              signingDialogOpen: true,
+              targets: [targetName],
             }));
           }}
-          disabled={exportState.targets[0] !== 'androidAppBundle'}
-        />
-      </Line>
+        >
+          <FormControlLabel
+            value={'androidApk'}
+            control={<Radio color="secondary" disabled={isExporting} />}
+            label={
+              <Trans>
+                APK (for testing on device or sharing outside Google Play)
+              </Trans>
+            }
+          />
+          <FormControlLabel
+            value={'androidAppBundle'}
+            control={<Radio color="secondary" disabled={isExporting} />}
+            label={
+              <Trans>Android App Bundle (for publishing on Google Play)</Trans>
+            }
+          />
+        </RadioGroup>
+        <Line noMargin justifyContent="flex-end">
+          <FlatButton
+            label={<Trans>Signing options</Trans>}
+            onClick={() => {
+              updateExportState(prevExportState => ({
+                ...prevExportState,
+                signingDialogOpen: true,
+              }));
+            }}
+            disabled={
+              exportState.targets[0] !== 'androidAppBundle' || isExporting
+            }
+          />
+        </Line>
+      </Column>
       {exportState.signingDialogOpen && (
         <Dialog
           title={<Trans>Signing options</Trans>}
@@ -91,7 +103,7 @@ export const SetupExportHeader = ({
           ]}
           secondaryActions={[
             <HelpButton
-              helpPagePath="/publishing/android_and_ios/play-store/upgrading-from-apk-to-aab"
+              helpPagePath="/publishing/android/play-store/upgrading-from-apk-to-aab"
               key="help"
             />,
           ]}
@@ -151,9 +163,57 @@ export const SetupExportHeader = ({
   );
 };
 
+type OnlineCordovaExportFlowProps = {|
+  ...ExportFlowProps,
+  exportPipelineName: string,
+|};
+
+export const ExportFlow = ({
+  disabled,
+  launchExport,
+  isExporting,
+  exportPipelineName,
+  exportStep,
+  build,
+  stepMaxProgress,
+  stepCurrentProgress,
+  errored,
+}: OnlineCordovaExportFlowProps) => {
+  const isExportingOrbuildRunningOrFinished =
+    isExporting || (!!build && build.status !== 'error');
+
+  return (
+    <ColumnStackLayout noMargin>
+      {!isExportingOrbuildRunningOrFinished && (
+        <Line justifyContent="center">
+          <RaisedButton
+            label={<Trans>Create package for Android</Trans>}
+            primary
+            id={`launch-export-${exportPipelineName}-button`}
+            onClick={launchExport}
+            disabled={disabled}
+          />
+        </Line>
+      )}
+      {isExportingOrbuildRunningOrFinished && (
+        <Line expand>
+          <BuildStepsProgress
+            exportStep={exportStep}
+            hasBuildStep={true}
+            build={build}
+            stepMaxProgress={stepMaxProgress}
+            stepCurrentProgress={stepCurrentProgress}
+            errored={errored}
+          />
+        </Line>
+      )}
+    </ColumnStackLayout>
+  );
+};
+
 export const onlineCordovaExporter = {
   key: 'onlinecordovaexport',
   tabName: <Trans>Mobile</Trans>,
-  name: <Trans>Android (&amp; iOS coming soon)</Trans>,
-  helpPage: '/publishing/android_and_ios',
+  name: <Trans>Android</Trans>,
+  helpPage: '/publishing/android',
 };

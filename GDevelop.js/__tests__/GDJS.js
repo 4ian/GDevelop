@@ -57,6 +57,7 @@ describe('libGD.js - GDJS related tests', function () {
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Electron/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
@@ -67,16 +68,16 @@ describe('libGD.js - GDJS related tests', function () {
       exporter.delete();
 
       // Check the index.html contains the include files.
-      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/index.html');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('gd.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('affinetransformation.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
-      expect(fs.writeToFile.mock.calls[2][1]).toContain('data.js');
+      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/index.html');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('gd.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('affinetransformation.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('pixi-renderers/runtimescene-pixi-renderer.js');
+      expect(fs.writeToFile.mock.calls[1][1]).toContain('data.js');
 
       // Check the webmanifest was properly generated.
-      expect(fs.writeToFile.mock.calls[1][0]).toBe('/fake-export-dir/manifest.webmanifest');
-      expect(() => JSON.parse(fs.writeToFile.mock.calls[1][1])).not.toThrow();
-      expect(JSON.parse(fs.writeToFile.mock.calls[1][1])).toEqual({
+      expect(fs.writeToFile.mock.calls[2][0]).toBe('/fake-export-dir/manifest.webmanifest');
+      expect(() => JSON.parse(fs.writeToFile.mock.calls[2][1])).not.toThrow();
+      expect(JSON.parse(fs.writeToFile.mock.calls[2][1])).toEqual({
         "name": "My great project with spaces and \"quotes\"!",
         "short_name": "My great project with spaces and \"quotes\"!",
         "id": "com.example.gamename",
@@ -92,7 +93,7 @@ describe('libGD.js - GDJS related tests', function () {
     it('properly exports Cordova files', () => {
       // Create a simple project
       const project = gd.ProjectHelper.createNewGDJSProject();
-      project.setName('My great project with spaces and "quotes"!');
+      project.setName('My great project with spaces and "quotes" and (parentheses)!');
       project.setVersion('1.2.3');
 
       // Prepare a fake file system
@@ -100,6 +101,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
@@ -114,7 +116,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-export-dir/config.xml',
         `
 <widget id="com.example.gamename" version="1.2.3">
-  <name>My great project with spaces and &quot;quotes&quot;!</name>
+  <name>My great project with spaces and &quot;quotes&quot; and parentheses!</name>
   <platform name="android">
 
   </platform>
@@ -124,14 +126,15 @@ describe('libGD.js - GDJS related tests', function () {
 
 </widget>`
       );
+      console.dir(fs.writeToFile.mock.calls);
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `
 {
-  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
-  \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_32and_32_40parentheses_41_33\",
+  \"displayName\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"version\": \"1.2.3\",
-  \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"description\": \"My great project with spaces and \\\"quotes\\\" and (parentheses)!\",
   \"author\": \"\"
 }`
       );
@@ -157,6 +160,7 @@ describe('libGD.js - GDJS related tests', function () {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
         '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Cordova/www/LICENSE.GDevelop.txt': "",
       });
 
       // Export and check the content of written files.
@@ -603,19 +607,17 @@ describe('libGD.js - GDJS related tests', function () {
   describe('TextObject', function () {
     it('should expose TextObject specific methods', function () {
       var object = new gd.TextObject('MyTextObject');
-      object.setString('Hello');
+      object.setText('Hello');
       object.setFontName('Hello.ttf');
       object.setCharacterSize(10);
       object.setBold(true);
-      object.setColor(1, 2, 3);
+      object.setColor('1;2;3');
 
-      expect(object.getString()).toBe('Hello');
+      expect(object.getText()).toBe('Hello');
       expect(object.getFontName()).toBe('Hello.ttf');
       expect(object.getCharacterSize()).toBe(10);
       expect(object.isBold()).toBe(true);
-      expect(object.getColorR()).toBe(1);
-      expect(object.getColorG()).toBe(2);
-      expect(object.getColorB()).toBe(3);
+      expect(object.getColor()).toBe('1;2;3');
     });
   });
   describe('TiledSpriteObject', function () {

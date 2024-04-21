@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropContextProvider';
 import {
@@ -27,7 +26,7 @@ import sample from 'lodash/sample';
 export default {
   title: 'HomePage/TeamSection',
   component: TeamSection,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const team: Team = {

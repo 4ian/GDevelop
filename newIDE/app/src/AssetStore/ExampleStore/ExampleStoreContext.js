@@ -10,6 +10,7 @@ import {
   useSearchStructuredItem,
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
+import { EXAMPLES_FETCH_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for examples.
@@ -125,7 +126,7 @@ export const ExampleStoreStateProvider = ({
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching examples from the example store...');
         fetchExamplesAndFilters();
-      }, 5000);
+      }, EXAMPLES_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [fetchExamplesAndFilters, exampleShortHeadersById, isLoading]

@@ -21,7 +21,7 @@ import {
 } from '../../Utils/BlobDownloader';
 import { useGenericRetryableProcessWithProgress } from '../../Utils/UseGenericRetryableProcessWithProgress';
 import { checkIfIsGDevelopCloudBucketUrl } from '../../Utils/CrossOrigin';
-import { extractFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
+import { extractDecodedFilenameFromProjectResourceUrl } from '../../Utils/GDevelopServices/Project';
 import {
   archiveFiles,
   type BlobFileDescriptor,
@@ -89,7 +89,9 @@ export const downloadResourcesAsBlobs = async ({
               return {
                 resource,
                 url: resourceFile,
-                filename: extractFilenameFromProjectResourceUrl(resourceFile),
+                filename: extractDecodedFilenameFromProjectResourceUrl(
+                  resourceFile
+                ),
               };
             } else {
               // Public URL resource: nothing to do.

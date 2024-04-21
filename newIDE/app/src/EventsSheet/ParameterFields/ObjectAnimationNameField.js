@@ -67,11 +67,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const spriteConfiguration = gd.asSpriteConfiguration(
           object.getConfiguration()
         );
+        const animations = spriteConfiguration.getAnimations();
 
-        return mapFor(0, spriteConfiguration.getAnimationsCount(), index => {
-          const animationName = spriteConfiguration
-            .getAnimation(index)
-            .getName();
+        return mapFor(0, animations.getAnimationsCount(), index => {
+          const animationName = animations.getAnimation(index).getName();
           return animationName.length > 0 ? animationName : null;
         }).filter(Boolean);
       } else if (object.getType() === 'Scene3D::Model3DObject') {
@@ -87,6 +86,34 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         })
           .filter(Boolean)
           .sort();
+      } else if (object.getType() === 'SpineObject::SpineObject') {
+        const spineConfiguration = gd.asSpineConfiguration(
+          object.getConfiguration()
+        );
+
+        return mapFor(0, spineConfiguration.getAnimationsCount(), index => {
+          const animationName = spineConfiguration
+            .getAnimation(index)
+            .getName();
+          return animationName.length > 0 ? animationName : null;
+        })
+          .filter(Boolean)
+          .sort();
+      } else if (project.hasEventsBasedObject(object.getType())) {
+        const eventsBasedObject = project.getEventsBasedObject(
+          object.getType()
+        );
+        if (eventsBasedObject.isAnimatable()) {
+          const customObjectConfiguration = gd.asCustomObjectConfiguration(
+            object.getConfiguration()
+          );
+          const animations = customObjectConfiguration.getAnimations();
+
+          return mapFor(0, animations.getAnimationsCount(), index => {
+            const animationName = animations.getAnimation(index).getName();
+            return animationName.length > 0 ? animationName : null;
+          }).filter(Boolean);
+        }
       }
 
       return [];

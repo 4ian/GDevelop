@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -18,7 +17,7 @@ import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
 export default {
   title: 'GameDashboard/GameRegistration',
   component: GameRegistration,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const NoProjectLoaded = () => (
@@ -32,6 +31,16 @@ export const NotLoggedIn = () => (
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const NotLoggedInWithoutLogin = () => (
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    <GameRegistration
+      project={testProject.project}
+      onGameRegistered={() => {}}
+      hideLogin
     />
   </AuthenticatedUserContext.Provider>
 );
@@ -96,16 +105,16 @@ ErrorLoadingGame.parameters = {
   ],
 };
 
-export const RegisteredWithGameStatsEmail = () => (
+export const RegisteredWithAdditionalActions = () => (
   <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
-      suggestGameStatsEmail
+      suggestAdditionalActions
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithGameStatsEmail.parameters = {
+RegisteredWithAdditionalActions.parameters = {
   mockData: [
     {
       url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,

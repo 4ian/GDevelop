@@ -37,16 +37,12 @@ export type SceneEditorsDisplayProps = {|
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
-  onRenameLayer: (
-    oldName: string,
-    newName: string,
-    done: (boolean) => void
-  ) => void,
+  onLayerRenamed: () => void,
   onObjectCreated: gdObject => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
-  onExportObject: (object: ?gdObject) => void,
+  onExportAssets: () => void,
   onDeleteObjects: (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],

@@ -1,26 +1,36 @@
-/* The default scrollbar for the app */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* The default scrollbar for the app (for "legacy" browsers with `::-webkit-scrollbar-*` support) */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-thumb {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.07);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #8d8d8dcc;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #8d8d8d;
+  }
 }
 
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-thumb {
-  border: 1px solid transparent;
-  background-clip: padding-box;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.07);
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #8d8d8dcc;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #8d8d8d;
+/* The default scrollbar for the app (for modern browsers with `scrollbar-*` support) */
+@supports (scrollbar-width: auto) {
+  * {
+    scrollbar-color: #8d8d8dcc rgba(0, 0, 0, 0.07);
+    scrollbar-width: thin;
+  }
 }
 
 /** The scrollbar for tabs or toolbars: either invisible or very thing */

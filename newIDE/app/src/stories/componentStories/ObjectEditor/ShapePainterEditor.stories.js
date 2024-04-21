@@ -5,7 +5,6 @@ import * as React from 'react';
 // Keep first as it creates the `global.gd` object:
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ShapePainterEditor from '../../../ObjectEditor/Editors/ShapePainterEditor';
 import SerializedObjectDisplay from '../../SerializedObjectDisplay';
@@ -14,7 +13,7 @@ import fakeResourceManagementProps from '../../FakeResourceManagement';
 export default {
   title: 'ObjectEditor/ShapePainterEditor',
   component: ShapePainterEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

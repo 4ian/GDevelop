@@ -14,9 +14,9 @@ import {
 import { Line, Column } from '../UI/Grid';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../UI/Responsive/ResponsiveWindowMeasurer';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { mergeArraysPerGroup } from '../Utils/Array';
 import {
@@ -25,13 +25,19 @@ import {
   PublicAssetPackTile,
   PrivateGameTemplateTile,
 } from './ShopTiles';
+import { useDebounce } from '../Utils/UseDebounce';
+import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
+import { ColumnStackLayout } from '../UI/Layout';
 
 const cellSpacing = 2;
 
-const getCategoryColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getCategoryColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 2;
+      return isLandscape ? 4 : 2;
     case 'medium':
       return 3;
     case 'large':
@@ -43,10 +49,13 @@ const getCategoryColumns = (windowWidth: WidthType) => {
   }
 };
 
-const getShopItemsColumns = (windowWidth: WidthType) => {
-  switch (windowWidth) {
+const getShopItemsColumns = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -59,15 +68,15 @@ const getShopItemsColumns = (windowWidth: WidthType) => {
 };
 
 export const shopCategories = {
-  'full-game-pack': {
-    title: <Trans>Full Game Packs</Trans>,
-    imageAlt: 'Full game asset packs category',
-    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
-  },
   'game-template': {
-    title: <Trans>Game Templates</Trans>,
+    title: <Trans>Ready-made games</Trans>,
     imageAlt: 'Premium game templates category',
     imageSource: 'res/shop-categories/Game_Templates.jpeg',
+  },
+  'full-game-pack': {
+    title: <Trans>Full Game Asset Packs</Trans>,
+    imageAlt: 'Full game asset packs category',
+    imageSource: 'res/shop-categories/Full_game_pack.jpeg',
   },
   character: {
     title: <Trans>Characters</Trans>,
@@ -114,6 +123,27 @@ const styles = {
   },
 };
 
+const useProgressiveReveal = <T>({
+  list,
+  numberPerPage,
+}: {|
+  list: Array<T>,
+  numberPerPage: number,
+|}): {|
+  displayedList: Array<T>,
+  onShowMore: () => void,
+|} => {
+  const [pageCount, setPageCount] = React.useState(1);
+  const onShowMore = useDebounce(() => {
+    setPageCount(pageCount + 1);
+  }, 20);
+
+  return {
+    displayedList: list.slice(0, pageCount * numberPerPage),
+    onShowMore,
+  };
+};
+
 export type AssetsHomeInterface = {|
   getScrollPosition: () => number,
   scrollToPosition: (y: number) => void,
@@ -123,16 +153,13 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
-  assetPackRandomOrdering: {|
-    starterPacks: Array<number>,
-    privateAssetPacks: Array<number>,
-  |},
   onPublicAssetPackSelection: PublicAssetPack => void,
   onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
   onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
   onCategorySelection: string => void,
   openedShopCategory: string | null,
   hideGameTemplates?: boolean,
+  displayPromotions?: boolean,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -141,17 +168,17 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       publicAssetPacks: { starterPacks },
       privateAssetPackListingDatas,
       privateGameTemplateListingDatas,
-      assetPackRandomOrdering,
       onPublicAssetPackSelection,
       onPrivateAssetPackSelection,
       onPrivateGameTemplateSelection,
       onCategorySelection,
       openedShopCategory,
       hideGameTemplates,
+      displayPromotions,
     }: Props,
     ref
   ) => {
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
     );
@@ -209,12 +236,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           !openedShopCategory ||
           assetPack.categories.includes(openedShopCategory)
       )
-      .map((pack, index) => ({
-        pos: assetPackRandomOrdering.starterPacks[index],
-        pack,
-      }))
-      .sort((a, b) => a.pos - b.pos)
-      .map(sortObject => sortObject.pack)
       .map((assetPack, index) => (
         <PublicAssetPackTile
           assetPack={assetPack}
@@ -236,13 +257,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               !openedShopCategory ||
               assetPackListingData.categories.includes(openedShopCategory)
           )
-          .map((listingData, index) => ({
-            pos: assetPackRandomOrdering.privateAssetPacks[index],
-            listingData,
-          }))
-          .sort((a, b) => a.pos - b.pos)
-          .map(sortObject => sortObject.listingData)
-          .filter(Boolean)
           .forEach(assetPackListingData => {
             const isPackOwned =
               !!receivedAssetPacks &&
@@ -297,7 +311,6 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       [
         privateAssetPackListingDatas,
         openedShopCategory,
-        assetPackRandomOrdering,
         onPrivateAssetPackSelection,
         starterPacksTiles,
         receivedAssetPacks,
@@ -336,11 +349,24 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       ]
     );
 
+    const {
+      displayedList: displayedStandAloneTiles,
+      onShowMore: onShowMoreStandAloneTiles,
+    } = useProgressiveReveal({
+      list: allStandAloneTiles,
+      numberPerPage: 25,
+    });
+
     return (
       <ScrollView
         ref={scrollView}
         id="asset-store-home"
         data={{ isFiltered: !!openedShopCategory ? 'true' : 'false' }}
+        onScroll={({ remainingScreensToBottom }) => {
+          if (remainingScreensToBottom <= 1.5) {
+            onShowMoreStandAloneTiles();
+          }
+        }}
       >
         {openedShopCategory ? null : (
           <>
@@ -352,7 +378,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getCategoryColumns(windowWidth)}
+              cols={getCategoryColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -361,6 +387,15 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </GridList>
           </>
         )}
+        {displayPromotions ? (
+          <ColumnStackLayout>
+            <Text size="block-title">
+              <Trans>Promotions</Trans>
+            </Text>
+
+            <PromotionsSlideshow />
+          </ColumnStackLayout>
+        ) : null}
         {allBundleTiles.length ? (
           <>
             <Column>
@@ -371,7 +406,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Line>
             </Column>
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -399,7 +434,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
               </Column>
             )}
             <GridList
-              cols={getShopItemsColumns(windowWidth)}
+              cols={getShopItemsColumns(windowSize, isLandscape)}
               style={styles.grid}
               cellHeight="auto"
               spacing={cellSpacing}
@@ -418,12 +453,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
           </Column>
         )}
         <GridList
-          cols={getShopItemsColumns(windowWidth)}
+          cols={getShopItemsColumns(windowSize, isLandscape)}
           style={styles.grid}
           cellHeight="auto"
           spacing={cellSpacing}
         >
-          {allStandAloneTiles}
+          {displayedStandAloneTiles}
         </GridList>
       </ScrollView>
     );

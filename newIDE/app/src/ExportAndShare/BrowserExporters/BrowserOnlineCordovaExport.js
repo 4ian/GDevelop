@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -19,13 +18,16 @@ import {
   archiveFiles,
 } from '../../Utils/BrowserArchiver';
 import {
+  type ExportFlowProps,
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
 import {
   type ExportState,
   SetupExportHeader,
+  ExportFlow,
 } from '../GenericExporters/OnlineCordovaExport';
+
 const gd: libGDevelop = global.gd;
 
 type PreparedExporter = {|
@@ -46,6 +48,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-online-cordova';
+
 export const browserOnlineCordovaExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -53,7 +57,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-cordova',
+  name: exportPipelineName,
   onlineBuildType: 'cordova-build',
   limitedBuilds: true,
   packageNameWarningType: 'mobile',
@@ -77,7 +81,11 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
 
   renderHeader: props => <SetupExportHeader {...props} />,
 
-  renderLaunchButtonLabel: () => <Trans>Create package for Android</Trans>,
+  shouldSuggestBumpingVersionNumber: () => true,
+
+  renderExportFlow: (props: ExportFlowProps) => (
+    <ExportFlow {...props} exportPipelineName={exportPipelineName} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -173,7 +181,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -186,7 +195,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
       exportState.targets,
       exportState.keystore,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

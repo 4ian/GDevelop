@@ -630,16 +630,18 @@ const resourceFilenameRegex = new RegExp(
   )}\\/(.*)\\/resources\\/(.*\\/)*([a-zA-Z0-9]+)-([^\\?\\n\\r]+)`
 );
 
-export const extractFilenameFromProjectResourceUrl = (url: string): string => {
+export const extractDecodedFilenameFromProjectResourceUrl = (
+  url: string
+): string => {
   if (url.startsWith(GDevelopProjectResourcesStorage.baseUrl)) {
     const matches = resourceFilenameRegex.exec(url);
     if (matches) {
-      return matches[4];
+      return decodeURIComponent(matches[4]);
     }
   }
 
   if (url.lastIndexOf('/') !== -1) {
-    return url.substring(url.lastIndexOf('/') + 1);
+    return decodeURIComponent(url.substring(url.lastIndexOf('/') + 1));
   }
   return url;
 };

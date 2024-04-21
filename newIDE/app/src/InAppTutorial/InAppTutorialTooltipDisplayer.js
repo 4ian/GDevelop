@@ -20,7 +20,8 @@ import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import TextButton from '../UI/TextButton';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -129,15 +130,16 @@ type TooltipBodyProps = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const TooltipBody = ({
   tooltip,
   buttonLabel,
   goToNextStep,
+  fillAutomatically,
 }: TooltipBodyProps) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const titleAndDescription = (
     <Column noMargin>
       {tooltip.title && (
@@ -160,8 +162,8 @@ const TooltipBody = ({
       style={{
         ...styles.descriptionImage,
         width: tooltip.image.width || '100%',
-        maxWidth: isMobileScreen ? 150 : '100%',
-        maxHeight: isMobileScreen ? 150 : '100%',
+        maxWidth: isMobile ? 150 : '100%',
+        maxHeight: isMobile ? 150 : '100%',
       }}
     />
   );
@@ -171,7 +173,7 @@ const TooltipBody = ({
       <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
     </Column>
   );
-  const imageAndButton = isMobileScreen ? (
+  const imageAndButton = isMobile ? (
     <LineStackLayout noMargin alignItems="center">
       {image}
       {button}
@@ -183,10 +185,18 @@ const TooltipBody = ({
     </Column>
   );
 
+  const fillAutomaticallyButton = fillAutomatically && (
+    <TextButton
+      onClick={fillAutomatically}
+      label={<Trans>Fill automatically</Trans>}
+      primary
+    />
+  );
   return (
     <Column noMargin>
       {titleAndDescription}
       {imageAndButton}
+      {fillAutomaticallyButton}
     </Column>
   );
 };
@@ -288,6 +298,7 @@ type Props = {|
   progress: number,
   endTutorial: () => void,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -298,9 +309,9 @@ const InAppTutorialTooltipDisplayer = ({
   progress,
   endTutorial,
   goToNextStep,
+  fillAutomatically,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -328,7 +339,7 @@ const InAppTutorialTooltipDisplayer = ({
 
   const classes = useClasses();
   const placement =
-    isMobileScreen && tooltip.mobilePlacement
+    isMobile && tooltip.mobilePlacement
       ? tooltip.mobilePlacement
       : tooltip.placement || 'bottom';
   const backgroundColor =
@@ -360,7 +371,7 @@ const InAppTutorialTooltipDisplayer = ({
       style={{
         zIndex: getDisplayZIndexForHighlighter(anchorElement),
         maxWidth: 'min(90%, 300px)',
-        width: isMobileScreen ? '100%' : undefined,
+        width: isMobile ? '100%' : undefined,
       }}
     >
       {({ TransitionProps }) => (
@@ -390,6 +401,7 @@ const InAppTutorialTooltipDisplayer = ({
                   tooltip={tooltip}
                   buttonLabel={buttonLabel}
                   goToNextStep={goToNextStep}
+                  fillAutomatically={fillAutomatically}
                 />
               )}
             </Column>

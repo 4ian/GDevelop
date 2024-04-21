@@ -216,11 +216,6 @@ const ElectronMainMenu = ({
     shouldApply: isFocusedOnMainWindow,
   });
   useIPCEventListener({
-    ipcEvent: 'main-menu-open-games-dashboard',
-    callback: callbacks.onOpenGamesDashboard,
-    shouldApply: isFocusedOnMainWindow,
-  });
-  useIPCEventListener({
     ipcEvent: 'update-status',
     callback: callbacks.setElectronUpdateStatus,
     shouldApply: true, // Keep logic around app update even if on preview window

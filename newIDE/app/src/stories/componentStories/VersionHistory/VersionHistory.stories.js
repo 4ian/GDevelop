@@ -4,12 +4,11 @@ import * as React from 'react';
 
 import { type ExpandedCloudProjectVersion } from '../../../Utils/GDevelopServices/Project';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import VersionHistory from '../../../VersionHistory';
 import MockAdapter from 'axios-mock-adapter';
 import type { OpenedVersionStatus } from '../../../VersionHistory';
-import { apiClient as projectApiAxiosClient } from '../../../Utils/GDevelopServices/User';
+import { client as userApiAxiosClient } from '../../../Utils/GDevelopServices/User';
 import { GDevelopUserApi } from '../../../Utils/GDevelopServices/ApiConfigs';
 import { delay } from '../../../Utils/Delay';
 import {
@@ -23,7 +22,7 @@ import OpenedVersionStatusChip from '../../../VersionHistory/OpenedVersionStatus
 export default {
   title: 'VersionHistory',
   component: VersionHistory,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const projectId = 'fb4d878a-1935-4916-b681-f9235475d354';
@@ -155,7 +154,7 @@ export const Default = () => {
     openedVersionStatus,
     setOpenedVersionStatus,
   ] = React.useState<?OpenedVersionStatus>(null);
-  const projectServiceMock = new MockAdapter(projectApiAxiosClient, {
+  const projectServiceMock = new MockAdapter(userApiAxiosClient, {
     delayResponse: 1000,
   });
   const latestVersion = versions[0];

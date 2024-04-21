@@ -7,6 +7,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import Dialog, { DialogPrimaryButton } from '../Dialog';
 import FlatButton from '../FlatButton';
 import { MarkdownText } from '../MarkdownText';
+import Text from '../Text';
 
 type Props = {|
   open: boolean,
@@ -17,6 +18,7 @@ type Props = {|
   confirmButtonLabel?: MessageDescriptor,
   dismissButtonLabel?: MessageDescriptor,
   level: 'info' | 'warning' | 'error',
+  maxWidth?: 'xs' | 'sm' | 'md',
   makeDismissButtonPrimary?: boolean,
 |};
 
@@ -77,10 +79,17 @@ function ConfirmDialog(props: Props) {
             title={i18n._(props.title)}
             open={props.open}
             actions={dialogActions}
-            maxWidth="xs"
+            maxWidth={props.maxWidth || 'xs'}
             noMobileFullScreen
+            onRequestClose={props.onDismiss}
+            onApply={props.onConfirm}
           >
-            <MarkdownText translatableSource={props.message} isStandaloneText />
+            <Text>
+              <MarkdownText
+                translatableSource={props.message}
+                isStandaloneText
+              />
+            </Text>
           </Dialog>
         );
       }}

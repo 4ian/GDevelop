@@ -14,7 +14,6 @@ import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import InlineCheckbox from '../UI/InlineCheckbox';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
@@ -23,8 +22,6 @@ import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
 import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
-import Visibility from '../UI/CustomSvgIcons/Visibility';
-import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
 import Add from '../UI/CustomSvgIcons/Add';
 import { DragHandleIcon } from '../UI/DragHandle';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
@@ -84,6 +81,7 @@ type Props = {|
   isSceneProperties?: boolean,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onEventsFunctionsAdded: () => void,
   behaviorObjectType?: string,
 |};
 
@@ -116,7 +114,7 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
 };
 
 export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
-  const { properties, onPropertiesUpdated } = props;
+  const { properties, onPropertiesUpdated, onEventsFunctionsAdded } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const [
     justAddedPropertyName,
@@ -333,6 +331,33 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [properties]
   );
 
+  const setHidden = React.useCallback(
+    (property: gdNamedPropertyDescriptor, enable: boolean) => {
+      property.setHidden(enable);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [forceUpdate, onPropertiesUpdated]
+  );
+
+  const setAdvanced = React.useCallback(
+    (property: gdNamedPropertyDescriptor, enable: boolean) => {
+      property.setAdvanced(enable);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [forceUpdate, onPropertiesUpdated]
+  );
+
+  const setDeprecated = React.useCallback(
+    (property: gdNamedPropertyDescriptor, enable: boolean) => {
+      property.setDeprecated(enable);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [forceUpdate, onPropertiesUpdated]
+  );
+
   const isClipboardContainingProperties = Clipboard.has(
     PROPERTIES_CLIPBOARD_KIND
   );
@@ -430,29 +455,58 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         alignItems="center"
                                         justifyContent="flex-end"
                                       >
-                                        <InlineCheckbox
-                                          label={
-                                            property.isHidden() ? (
-                                              <Trans>Hidden</Trans>
-                                            ) : (
-                                              <Trans>Visible in editor</Trans>
-                                            )
+                                        <SelectField
+                                          value={
+                                            property.isHidden()
+                                              ? 'Hidden'
+                                              : property.isDeprecated()
+                                              ? 'Deprecated'
+                                              : property.isAdvanced()
+                                              ? 'Advanced'
+                                              : 'Visible'
                                           }
-                                          checked={!property.isHidden()}
-                                          onCheck={(e, checked) => {
-                                            property.setHidden(!checked);
-                                            forceUpdate();
-                                            props.onPropertiesUpdated &&
-                                              props.onPropertiesUpdated();
+                                          onChange={(e, i, value: string) => {
+                                            if (value === 'Hidden') {
+                                              setHidden(property, true);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, false);
+                                            } else if (value === 'Deprecated') {
+                                              setHidden(property, false);
+                                              setDeprecated(property, true);
+                                              setAdvanced(property, false);
+                                            } else if (value === 'Advanced') {
+                                              setHidden(property, false);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, true);
+                                            } else if (value === 'Visible') {
+                                              setHidden(property, false);
+                                              setDeprecated(property, false);
+                                              setAdvanced(property, false);
+                                            }
                                           }}
-                                          checkedIcon={<Visibility />}
-                                          uncheckedIcon={<VisibilityOff />}
-                                          disabled={
-                                            property.getType() === 'Behavior' &&
-                                            // Allow to make it visible just in case.
-                                            !property.isHidden()
-                                          }
-                                        />
+                                          fullWidth
+                                        >
+                                          <SelectOption
+                                            key="visibility-visible"
+                                            value="Visible"
+                                            label={t`Visible in editor`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-advanced"
+                                            value="Advanced"
+                                            label={t`Advanced`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-deprecated"
+                                            value="Deprecated"
+                                            label={t`Deprecated`}
+                                          />
+                                          <SelectOption
+                                            key="visibility-hidden"
+                                            value="Hidden"
+                                            label={t`Hidden`}
+                                          />
+                                        </SelectField>
                                       </Line>
                                     </ResponsiveLineStackLayout>
                                     <ElementWithMenu
@@ -493,14 +547,16 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           label: i18n._(
                                             t`Generate expression and action`
                                           ),
-                                          click: () =>
+                                          click: () => {
                                             gd.PropertyFunctionGenerator.generateBehaviorGetterAndSetter(
                                               props.project,
                                               props.extension,
                                               props.eventsBasedBehavior,
                                               property,
                                               !!props.isSceneProperties
-                                            ),
+                                            );
+                                            onEventsFunctionsAdded();
+                                          },
                                           enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
                                             props.eventsBasedBehavior,
                                             property

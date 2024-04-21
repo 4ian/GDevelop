@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 import {
@@ -20,7 +19,7 @@ import Text from '../../../../UI/Text';
 export default {
   title: 'Subscription/SubscriptionSuggestionContext',
   component: SubscriptionSuggestionContext,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const SubscriptionDialogTestOpener = ({ label }: {| label: string |}) => {

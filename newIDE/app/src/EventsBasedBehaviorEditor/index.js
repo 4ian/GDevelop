@@ -12,6 +12,11 @@ import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import HelpButton from '../UI/HelpButton';
+import { Line } from '../UI/Grid';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import Checkbox from '../UI/Checkbox';
+import { type ExtensionItemConfigurationAttribute } from '../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -19,14 +24,28 @@ type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsBasedBehavior: gdEventsBasedBehavior,
+  unsavedChanges?: ?UnsavedChanges,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
 |};
 
 export default function EventsBasedBehaviorEditor({
   project,
   eventsFunctionsExtension,
   eventsBasedBehavior,
+  unsavedChanges,
+  onConfigurationUpdated,
 }: Props) {
   const forceUpdate = useForceUpdate();
+
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   // An array containing all the object types that are using the behavior
   const allObjectTypes: Array<string> = React.useMemo(
@@ -67,7 +86,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getFullName()}
             onChange={text => {
               eventsBasedBehavior.setFullName(text);
-              forceUpdate();
+              onChange();
             }}
             fullWidth
           />
@@ -80,7 +99,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getDescription()}
             onChange={text => {
               eventsBasedBehavior.setDescription(text);
-              forceUpdate();
+              onChange();
             }}
             multiline
             fullWidth
@@ -94,7 +113,7 @@ export default function EventsBasedBehaviorEditor({
             value={eventsBasedBehavior.getObjectType()}
             onChange={(objectType: string) => {
               eventsBasedBehavior.setObjectType(objectType);
-              forceUpdate();
+              onChange();
             }}
             allowedObjectTypes={
               allObjectTypes.length === 0
@@ -119,6 +138,15 @@ export default function EventsBasedBehaviorEditor({
               </Trans>
             </AlertMessage>
           )}
+          <Checkbox
+            label={<Trans>Private</Trans>}
+            checked={eventsBasedBehavior.isPrivate()}
+            onCheck={(e, checked) => {
+              eventsBasedBehavior.setPrivate(checked);
+              if (onConfigurationUpdated) onConfigurationUpdated('isPrivate');
+              onChange();
+            }}
+          />
           {eventsBasedBehavior
             .getEventsFunctions()
             .getEventsFunctionsCount() === 0 && (
@@ -127,12 +155,17 @@ export default function EventsBasedBehaviorEditor({
               kind="info"
             >
               <Trans>
-                Once you're done, close this dialog and start adding some
-                functions to the behavior. Then, test the behavior by adding it
-                to an object in a scene.
+                Once you're done, start adding some functions to the behavior.
+                Then, test the behavior by adding it to an object in a scene.
               </Trans>
             </DismissableAlertMessage>
           )}
+          <Line noMargin>
+            <HelpButton
+              key="help"
+              helpPagePath="/behaviors/events-based-behaviors"
+            />
+          </Line>
         </ColumnStackLayout>
       )}
     </I18n>

@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import TextField, { type TextFieldInterface } from '../TextField';
 import ColorPicker, { type ColorResult } from './ColorPicker';
@@ -97,7 +97,7 @@ const ColorField = ({
       {!disableAlpha && (
         <TextField
           id={`${id || ''}-alpha`}
-          floatingLabelText="Alpha"
+          floatingLabelText={<Trans>Alpha</Trans>}
           floatingLabelFixed
           style={{ width: '30%' }}
           translatableHintText={t`Number between 0 and 1`}

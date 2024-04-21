@@ -14,8 +14,11 @@ import TikTok from '../../../UI/CustomSvgIcons/TikTok';
 import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
-import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import ErrorBoundary from '../../../UI/ErrorBoundary';
+import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
+import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
+import PromotionsSlideshow from '../../../Promotions/PromotionsSlideshow';
+import { UserAndGameLeaderboards } from './CommunitySection/UserAndGameLeaderboards';
 
 const styles = {
   list: {
@@ -64,14 +67,26 @@ const communityItems = [
 ];
 
 const CommunitySection = () => {
+  const { announcements } = React.useContext(AnnouncementsFeedContext);
+
+  const shouldDisplayAnnouncementsTitle =
+    announcements && announcements.length > 0;
+
   return (
-    <SectionContainer title={<Trans>Community</Trans>}>
+    <SectionContainer title={<Trans>Community</Trans>} showUrgentAnnouncements>
       <SectionRow>
         <ColumnStackLayout noMargin expand>
+          {shouldDisplayAnnouncementsTitle && (
+            <Text size="title">
+              <Trans>News and announcements</Trans>
+            </Text>
+          )}
+          <PromotionsSlideshow />
+          <AnnouncementsFeed canClose={false} level="normal" />
           <Text size="title">
-            <Trans>News and announcements</Trans>
+            <Trans>Rankings</Trans>
           </Text>
-          <AnnouncementsFeed canClose={false} />
+          <UserAndGameLeaderboards />
           <Text size="title">
             <Trans>Join the conversation</Trans>
           </Text>

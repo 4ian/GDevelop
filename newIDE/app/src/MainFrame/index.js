@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import './MainFrame.css';
-import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
@@ -12,7 +11,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -74,12 +72,11 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext, {
   type InAppTutorialUserProgress,
@@ -89,7 +86,6 @@ import {
   type ShareDialogWithoutExportsProps,
   type ShareTab,
 } from '../ExportAndShare/ShareDialog';
-import ExampleStoreDialog from '../AssetStore/ExampleStore/ExampleStoreDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -130,7 +126,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import useExampleOrGameTemplateDialogs from './UseExampleOrGameTemplateDialogs';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
@@ -163,7 +159,6 @@ import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import TabsTitlebar from './TabsTitlebar';
-import RouterContext from './RouterContext';
 import {
   useStableUpToDateCallback,
   useStableUpToDateRef,
@@ -176,28 +171,18 @@ import {
 import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
 import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
 import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
-import { dataObjectToProps } from '../Utils/HTMLDataset';
 import useCreateProject from '../Utils/UseCreateProject';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
 import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
-import { type PrivateGameTemplateListingData } from '../Utils/GDevelopServices/Shop';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 import useResourcesWatcher from './ResourcesWatcher';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 import useVersionHistory from '../VersionHistory/UseVersionHistory';
+import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  drawerContent: {
-    width: 320,
-    overflowX: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-};
 
 const editorKindToRenderer: {
   [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
@@ -377,18 +362,7 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    exampleStoreDialogOpen,
-    setExampleStoreDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
-  const [
-    selectedPrivateGameTemplateListingData,
-    setSelectedPrivateGameTemplateListingData,
-  ] = React.useState<?PrivateGameTemplateListingData>(null);
+
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
   );
@@ -513,6 +487,18 @@ const MainFrame = (props: Props) => {
     isProjectSplitInMultipleFiles: currentProject
       ? currentProject.isFolderProject()
       : false,
+  });
+  const {
+    selectedExampleShortHeader,
+    selectedPrivateGameTemplateListingData,
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplate,
+    renderExampleOrGameTemplateDialogs,
+    closeExampleStoreDialog,
+    openExampleStoreDialog,
+  } = useExampleOrGameTemplateDialogs({
+    isProjectOpening,
+    onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
   });
 
   /**
@@ -691,7 +677,6 @@ const MainFrame = (props: Props) => {
     },
     openProfileDialog,
   });
-  const { navigateToRoute } = React.useContext(RouterContext);
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -923,7 +908,7 @@ const MainFrame = (props: Props) => {
         currentProject: project,
         currentFileMetadata: fileMetadata,
       }));
-      setExampleStoreDialogOpen(false);
+      closeExampleStoreDialog({ deselectExampleAndGameTemplate: false });
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -964,6 +949,7 @@ const MainFrame = (props: Props) => {
       setState,
       closeProject,
       preferences,
+      closeExampleStoreDialog,
       eventsFunctionsExtensionsState,
       getStorageProvider,
       getStorageProviderOperations,
@@ -1073,10 +1059,10 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSaveFileMetadata = await checkForAutosave();
         let content;
         let openingError: Error | null = null;
         try {
+          const autoSaveFileMetadata = await checkForAutosave();
           const result = await onOpen(
             autoSaveFileMetadata,
             setLoaderModalProgress
@@ -1159,7 +1145,7 @@ const MainFrame = (props: Props) => {
     getStorageProviderOperations,
     afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
       setNewProjectSetupDialogOpen(false);
-      await closeExampleStoreDialog();
+      closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
       findLeaderboardsToReplace(project, oldProjectId);
       openSceneOrProjectManager({
         currentProject: project,
@@ -1661,14 +1647,14 @@ const MainFrame = (props: Props) => {
     [hasPreviewsRunning, launchPreview]
   );
 
-  const openLayout = React.useCallback(
+  const getEditorsTabStateWithScene = React.useCallback(
     (
+      editorTabs: EditorTabsState,
       name: string,
       {
-        openEventsEditor = true,
-        openSceneEditor = true,
-      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
-      editorTabs = state.editorTabs
+        openEventsEditor,
+        openSceneEditor,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean }
     ): EditorTabsState => {
       const sceneEditorOptions = getEditorOpeningOptions({
         kind: 'layout',
@@ -1683,17 +1669,35 @@ const MainFrame = (props: Props) => {
       const tabsWithSceneEditor = openSceneEditor
         ? openEditorTab(editorTabs, sceneEditorOptions)
         : editorTabs;
-      const tabsWithSceneAndEventsEditors = openEventsEditor
+      return openEventsEditor
         ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
         : tabsWithSceneEditor;
+    },
+    [getEditorOpeningOptions]
+  );
 
+  const openLayout = React.useCallback(
+    (
+      name: string,
+      {
+        openEventsEditor = true,
+        openSceneEditor = true,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
+      editorTabs?: EditorTabsState
+    ): void => {
       setState(state => ({
         ...state,
-        editorTabs: tabsWithSceneAndEventsEditors,
+        editorTabs: getEditorsTabStateWithScene(
+          editorTabs || state.editorTabs,
+          name,
+          {
+            openEventsEditor,
+            openSceneEditor,
+          }
+        ),
       }));
-      return tabsWithSceneAndEventsEditors;
     },
-    [setState, state.editorTabs, getEditorOpeningOptions]
+    [setState, getEditorsTabStateWithScene]
   );
 
   const openExternalEvents = React.useCallback(
@@ -1705,7 +1709,6 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external events', name })
         ),
       }));
-      openProjectManager(false);
     },
     [setState, getEditorOpeningOptions]
   );
@@ -1719,9 +1722,8 @@ const MainFrame = (props: Props) => {
           getEditorOpeningOptions({ kind: 'external layout', name })
         ),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openEventsFunctionsExtension = React.useCallback(
@@ -1743,9 +1745,8 @@ const MainFrame = (props: Props) => {
           },
         }),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, getEditorOpeningOptions]
+    [setState, getEditorOpeningOptions]
   );
 
   const openResources = React.useCallback(
@@ -1921,29 +1922,6 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openExampleStoreDialogWithExampleShortHeader = React.useCallback(
-    (exampleShortHeader: ExampleShortHeader) => {
-      setSelectedExampleShortHeader(exampleShortHeader);
-      setExampleStoreDialogOpen(true);
-    },
-    []
-  );
-  const openExampleStoreDialogWithPrivateGameTemplateListingData = React.useCallback(
-    (privateGameTemplateListingData: PrivateGameTemplateListingData) => {
-      setSelectedPrivateGameTemplateListingData(privateGameTemplateListingData);
-      setExampleStoreDialogOpen(true);
-    },
-    []
-  );
-  const closeExampleStoreDialog = React.useCallback(
-    () => {
-      setExampleStoreDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      setSelectedPrivateGameTemplateListingData(null);
-    },
-    [setExampleStoreDialogOpen]
-  );
-
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
       setState(state => ({
@@ -1992,6 +1970,32 @@ const MainFrame = (props: Props) => {
     [openLayout, i18n]
   );
 
+  const getEditorsTabStateWithAllScenes = React.useCallback(
+    (newState: {|
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    |}): EditorTabsState => {
+      const { currentProject, editorTabs } = newState;
+      if (!currentProject) return editorTabs;
+      const layoutsCount = currentProject.getLayoutsCount();
+      if (layoutsCount === 0) return editorTabs;
+
+      let editorTabsWithAllScenes = editorTabs;
+      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+        editorTabsWithAllScenes = getEditorsTabStateWithScene(
+          editorTabsWithAllScenes,
+          currentProject.getLayoutAt(layoutIndex).getName(),
+          {
+            openSceneEditor: true,
+            openEventsEditor: true,
+          }
+        );
+      }
+      return editorTabsWithAllScenes;
+    },
+    [getEditorsTabStateWithScene]
+  );
+
   const openAllScenes = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -2002,23 +2006,16 @@ const MainFrame = (props: Props) => {
       const layoutsCount = currentProject.getLayoutsCount();
       if (layoutsCount === 0) return;
 
-      let editorTabs = state.editorTabs;
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorsTabStateWithAllScenes(newState),
+      }));
 
-      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-        editorTabs = openLayout(
-          currentProject.getLayoutAt(layoutIndex).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      }
       setIsLoadingProject(false);
       setLoaderModalProgress(null, null);
       openProjectManager(false);
     },
-    [openLayout, state.editorTabs]
+    [getEditorsTabStateWithAllScenes, setState]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -2981,7 +2978,6 @@ const MainFrame = (props: Props) => {
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
     onOpenCommandPalette: openCommandPalette,
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -3023,7 +3019,7 @@ const MainFrame = (props: Props) => {
     onCloseApp: closeApp,
     onExportProject: () => openShareDialog('publish'),
     onInviteCollaborators: () => openShareDialog('invite'),
-    onCreateProject: () => setExampleStoreDialogOpen(true),
+    onCreateProject: openExampleStoreDialog,
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -3032,7 +3028,6 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
 
@@ -3066,28 +3061,14 @@ const MainFrame = (props: Props) => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      <Drawer
-        open={projectManagerOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={toggleProjectManager}
-        {...dataObjectToProps({
-          open: projectManagerOpen ? 'true' : undefined,
-        })}
+      <ProjectManagerDrawer
+        projectManagerOpen={projectManagerOpen}
+        toggleProjectManager={toggleProjectManager}
+        title={
+          state.currentProject ? state.currentProject.getName() : 'No project'
+        }
       >
-        <DrawerTopBar
-          title={
-            state.currentProject ? state.currentProject.getName() : 'No project'
-          }
-          onClose={toggleProjectManager}
-          id="project-manager-drawer"
-        />
-        {currentProject && (
+        {currentProject ? (
           <ProjectManager
             project={currentProject}
             onChangeProjectName={onChangeProjectName}
@@ -3107,10 +3088,7 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onOpenResources={() => {
-              openResources();
-              openProjectManager(false);
-            }}
+            onOpenResources={openResources}
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }
@@ -3130,13 +3108,8 @@ const MainFrame = (props: Props) => {
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
           />
-        )}
-        {!state.currentProject && (
-          <EmptyMessage>
-            <Trans>To begin, open or create a new project.</Trans>
-          </EmptyMessage>
-        )}
-      </Drawer>
+        ) : null}
+      </ProjectManagerDrawer>
       <TabsTitlebar
         onBuildMenuTemplate={() =>
           adaptFromDeclarativeTemplate(
@@ -3256,13 +3229,18 @@ const MainFrame = (props: Props) => {
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenExampleStore: () => setExampleStoreDialogOpen(true),
-                    onOpenExampleStoreWithExampleShortHeader: openExampleStoreDialogWithExampleShortHeader,
-                    onOpenExampleStoreWithPrivateGameTemplateListingData: openExampleStoreDialogWithPrivateGameTemplateListingData,
+                    onOpenExampleStore: openExampleStoreDialog,
+                    onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: true,
+                      }),
                     onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
-                      setSelectedPrivateGameTemplateListingData(
-                        privateGameTemplateListingData
-                      );
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: false,
+                      });
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProfile: () => openProfileDialog(true),
@@ -3340,24 +3318,6 @@ const MainFrame = (props: Props) => {
           storageProvider: getStorageProvider(),
           initialTab: shareDialogInitialTab,
         })}
-      {exampleStoreDialogOpen && (
-        <ExampleStoreDialog
-          open
-          onClose={closeExampleStoreDialog}
-          isProjectOpening={isProjectOpening}
-          selectedExampleShortHeader={selectedExampleShortHeader}
-          selectedPrivateGameTemplateListingData={
-            selectedPrivateGameTemplateListingData
-          }
-          onSelectExampleShortHeader={setSelectedExampleShortHeader}
-          onSelectPrivateGameTemplateListingData={
-            setSelectedPrivateGameTemplateListingData
-          }
-          onOpenNewProjectSetupDialog={() => {
-            setNewProjectSetupDialogOpen(true);
-          }}
-        />
-      )}
       {!!currentProject && platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
           project={currentProject}
@@ -3400,7 +3360,6 @@ const MainFrame = (props: Props) => {
       )}
       {profileDialogOpen && (
         <ProfileDialog
-          currentProject={currentProject}
           open
           onClose={() => {
             openProfileDialog(false);
@@ -3496,6 +3455,7 @@ const MainFrame = (props: Props) => {
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
       {renderVersionHistoryPanel()}
+      {renderExampleOrGameTemplateDialogs()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}
@@ -3520,6 +3480,7 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             setSelectedInAppTutorialInfo(null);
           }}
+          isProjectOpening={isProjectOpening}
         />
       )}
       {state.gdjsDevelopmentWatcherEnabled &&

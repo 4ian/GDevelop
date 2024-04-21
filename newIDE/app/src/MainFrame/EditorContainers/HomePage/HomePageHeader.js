@@ -11,10 +11,11 @@ import ProjectManagerIcon from '../../../UI/CustomSvgIcons/ProjectManager';
 import FloppyIcon from '../../../UI/CustomSvgIcons/Floppy';
 import Window from '../../../Utils/Window';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import TextButton from '../../../UI/TextButton';
 import IconButton from '../../../UI/IconButton';
 import { isNativeMobileApp } from '../../../Utils/Platform';
+import NotificationChip from '../../../UI/User/NotificationChip';
+import { useResponsiveWindowSize } from '../../../UI/Responsive/ResponsiveWindowMeasurer';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -24,7 +25,6 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onSave: () => Promise<void>,
   canSave: boolean,
-  showUserChip: boolean,
 |};
 
 export const HomePageHeader = ({
@@ -34,10 +34,9 @@ export const HomePageHeader = ({
   onOpenLanguageDialog,
   onSave,
   canSave,
-  showUserChip,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -75,20 +74,27 @@ export const HomePageHeader = ({
           </Column>
           <Column>
             <LineStackLayout noMargin alignItems="center">
-              {!electron && !isNativeMobileApp() && !isMobileScreen && (
+              {!electron && !isNativeMobileApp() && (
                 <FlatButton
-                  label={<Trans>Download desktop app</Trans>}
+                  label={<Trans>Get the app</Trans>}
                   onClick={() =>
                     Window.openExternalURL('https://gdevelop.io/download')
                   }
                 />
               )}
-              {showUserChip && <UserChip onOpenProfile={onOpenProfile} />}
-              <TextButton
-                label={i18n.language.toUpperCase()}
-                onClick={onOpenLanguageDialog}
-                icon={<TranslateIcon fontSize="small" />}
-              />
+              <UserChip onOpenProfile={onOpenProfile} />
+              <NotificationChip />
+              {isMobile ? (
+                <IconButton size="small" onClick={onOpenLanguageDialog}>
+                  <TranslateIcon fontSize="small" />
+                </IconButton>
+              ) : (
+                <TextButton
+                  label={i18n.language.toUpperCase()}
+                  onClick={onOpenLanguageDialog}
+                  icon={<TranslateIcon fontSize="small" />}
+                />
+              )}
             </LineStackLayout>
           </Column>
         </LineStackLayout>

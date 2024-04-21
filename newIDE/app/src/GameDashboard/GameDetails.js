@@ -41,11 +41,13 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
-import { GameMonetization } from './Monetization/GameMonetization';
+import GameMonetization from './Monetization/GameMonetization';
 import RouterContext from '../MainFrame/RouterContext';
 import { sendGameDetailsOpened } from '../Utils/Analytics/EventSender';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
+import MarketingPlans from '../MarketingPlans/MarketingPlans';
 
 export type GameDetailsTab =
   | 'details'
@@ -53,7 +55,7 @@ export type GameDetailsTab =
   | 'feedback'
   | 'analytics'
   | 'leaderboards'
-  | 'monetization';
+  | 'marketing';
 
 export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
   {
@@ -77,15 +79,15 @@ export const gameDetailsTabs: TabOptions<GameDetailsTab> = [
     label: <Trans>Leaderboards</Trans>,
   },
   {
-    value: 'monetization',
-    label: <Trans>Monetization</Trans>,
+    value: 'marketing',
+    label: <Trans>Marketing & Ads</Trans>,
   },
 ];
 
 type Props = {|
   game: Game,
   project: ?gdProject,
-  onGameUpdated: (updatedGame: Game) => void,
+  onGameUpdated: () => Promise<void>,
   onGameDeleted: () => void,
   onLoading: boolean => void,
   currentTab: GameDetailsTab,
@@ -170,11 +172,11 @@ const GameDetails = ({
   );
 
   const handleGameUpdated = React.useCallback(
-    (updatedGame: Game) => {
+    () => {
       // Set Public Game to null to show the loader.
       // It will be refetched thanks to loadPublicGame, because Game is updated.
       setPublicGame(null);
-      onGameUpdated(updatedGame);
+      onGameUpdated();
     },
     [onGameUpdated]
   );
@@ -198,7 +200,7 @@ const GameDetails = ({
     try {
       setIsGameUpdating(true);
       const gameId = project.getProjectUuid();
-      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
+      await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
@@ -268,7 +270,7 @@ const GameDetails = ({
         setIsGameUpdating(false);
         return false;
       }
-      handleGameUpdated(updatedGame);
+      handleGameUpdated();
     } catch (error) {
       console.error(
         'Unable to update the game:',
@@ -330,15 +332,10 @@ const GameDetails = ({
       const { id } = profile;
       try {
         setIsGameUpdating(true);
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            publicWebBuildId: null,
-          }
-        );
-        handleGameUpdated(updatedGame);
+        await updateGame(getAuthorizationHeader, id, game.id, {
+          publicWebBuildId: null,
+        });
+        handleGameUpdated();
       } catch (err) {
         console.error('Unable to update the game', err);
       } finally {
@@ -576,8 +573,13 @@ const GameDetails = ({
                 game={game}
               />
             ) : null}
-            {currentTab === 'monetization' ? (
-              <ColumnStackLayout noMargin>
+            {currentTab === 'marketing' ? (
+              <ColumnStackLayout noMargin expand>
+                <CreditsStatusBanner displayPurchaseAction />
+                <Text size="sub-title">
+                  <Trans>Marketing Campaigns</Trans>
+                </Text>
+                <MarketingPlans game={game} />
                 <GameMonetization
                   game={game}
                   onGameUpdated={handleGameUpdated}

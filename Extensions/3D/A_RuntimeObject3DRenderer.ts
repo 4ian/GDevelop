@@ -24,8 +24,8 @@ namespace gdjs {
 
     updatePosition() {
       this._threeObject3D.position.set(
-        this._object.x + this._object.getWidth() / 2,
-        this._object.y + this._object.getHeight() / 2,
+        this._object.getX() + this._object.getWidth() / 2,
+        this._object.getY() + this._object.getHeight() / 2,
         this._object.getZ() + this._object.getDepth() / 2
       );
     }

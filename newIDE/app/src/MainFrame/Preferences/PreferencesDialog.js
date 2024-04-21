@@ -22,7 +22,7 @@ import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
 import Link from '../../UI/Link';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { adaptAcceleratorString } from '../../UI/AcceleratorString';
 import { getElectronAccelerator } from '../../KeyboardShortcuts';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -36,8 +36,7 @@ type Props = {|
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
     false
@@ -62,6 +61,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
+    setResourcesImporationBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
     setShowCommunityExtensions,
@@ -101,7 +101,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               : []),
           ]}
           // Enforce scroll on very small screens, because the tabs have long names.
-          variant={isMobileScreen ? 'scrollable' : undefined}
+          variant={isMobile ? 'scrollable' : undefined}
         />
       }
     >
@@ -226,6 +226,30 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="apply" label={t`Apply changes`} />
             <SelectOption value="nothing" label={t`Do nothing`} />
           </SelectField>
+          {!!electron && (
+            <SelectField
+              floatingLabelText={
+                <Trans>
+                  Importing resources outside from the project folder
+                </Trans>
+              }
+              value={values.resourcesImporationBehavior}
+              onChange={(e, i, value: string) =>
+                setResourcesImporationBehavior(value)
+              }
+              fullWidth
+            >
+              <SelectOption
+                value="import"
+                label={t`Copy them into the project folder`}
+              />
+              <SelectOption
+                value="relative"
+                label={t`Keep their original location`}
+              />
+              <SelectOption value="ask" label={t`Ask every time`} />
+            </SelectField>
+          )}
           <Text size="block-title">
             <Trans>Updates</Trans>
           </Text>

@@ -23,12 +23,11 @@ import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
 import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../../../UI/AlertMessage';
-const gd: libGDevelop = global.gd;
 
 const styles = {
   leftContainer: {
@@ -58,7 +57,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  objectConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onMasksUpdated?: () => void,
@@ -66,7 +65,7 @@ type Props = {|
 |};
 
 const CollisionMasksEditor = ({
-  objectConfiguration,
+  animations,
   resourcesLoader,
   project,
   onMasksUpdated,
@@ -83,15 +82,15 @@ const CollisionMasksEditor = ({
     null
   );
 
-  const [spriteWidth, setSpriteWidth] = React.useState(0);
-  const [spriteHeight, setSpriteHeight] = React.useState(0);
+  const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
+    [number, number]
+  >([0, 0]);
   const forceUpdate = useForceUpdate();
 
   const { showConfirmation } = useAlertDialog();
 
-  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const { animation, sprite } = getCurrentElements(
-    spriteConfiguration,
+    animations,
     animationIndex,
     directionIndex,
     spriteIndex
@@ -102,9 +101,7 @@ const CollisionMasksEditor = ({
     sameCollisionMasksForAnimations,
     setSameCollisionMasksForAnimations,
   ] = React.useState(
-    sprite
-      ? allObjectSpritesHaveSameCollisionMaskAs(sprite, spriteConfiguration)
-      : false
+    sprite ? allObjectSpritesHaveSameCollisionMaskAs(sprite, animations) : false
   );
 
   // Note: sprite & animation should always be defined so this value will be correctly initialised.
@@ -121,8 +118,8 @@ const CollisionMasksEditor = ({
     (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
+          mapFor(0, animations.getAnimationsCount(), i => {
+            const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
         } else if (sameCollisionMasksForSprites) {
@@ -133,7 +130,7 @@ const CollisionMasksEditor = ({
       forceUpdate(); // Refresh the preview and the list
       if (onMasksUpdated) onMasksUpdated();
     },
-    [animation, sprite, spriteConfiguration, forceUpdate, onMasksUpdated]
+    [animation, sprite, animations, forceUpdate, onMasksUpdated]
   );
 
   const chooseAnimation = index => {
@@ -171,7 +168,7 @@ const CollisionMasksEditor = ({
       if (!sprite) return;
       if (fullImage) {
         // Revert to non-automatic collision mask.
-        spriteConfiguration.setAdaptCollisionMaskAutomatically(false);
+        animations.setAdaptCollisionMaskAutomatically(false);
       }
       sprite.setFullImageCollisionMask(fullImage);
       updateCollisionMasks(
@@ -184,7 +181,7 @@ const CollisionMasksEditor = ({
       updateCollisionMasks,
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
-      spriteConfiguration,
+      animations,
     ]
   );
 
@@ -245,11 +242,6 @@ const CollisionMasksEditor = ({
     [sameCollisionMasksForAnimations, updateCollisionMasks, showConfirmation]
   );
 
-  const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
-    setSpriteWidth(spriteWidth);
-    setSpriteHeight(spriteHeight);
-  };
-
   const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
     async value => {
       // If enabling automatic while custom was selected, then ask for confirmation.
@@ -264,7 +256,7 @@ const CollisionMasksEditor = ({
         if (!answer) return;
       }
 
-      spriteConfiguration.setAdaptCollisionMaskAutomatically(value);
+      animations.setAdaptCollisionMaskAutomatically(value);
 
       // Recompute collision mask when enabling automatic, and enable same masks for all animations & sprites.
       if (value) {
@@ -275,7 +267,7 @@ const CollisionMasksEditor = ({
       forceUpdate();
     },
     [
-      spriteConfiguration,
+      animations,
       forceUpdate,
       onCreateMatchingSpriteCollisionMask,
       showConfirmation,
@@ -294,14 +286,14 @@ const CollisionMasksEditor = ({
   const onPolygonsUpdated = React.useCallback(
     () => {
       // Revert to non-automatic collision mask.
-      spriteConfiguration.setAdaptCollisionMaskAutomatically(false);
+      animations.setAdaptCollisionMaskAutomatically(false);
       updateCollisionMasks(
         sameCollisionMasksForAnimations,
         sameCollisionMasksForSprites
       );
     },
     [
-      spriteConfiguration,
+      animations,
       updateCollisionMasks,
       sameCollisionMasksForAnimations,
       sameCollisionMasksForSprites,
@@ -309,19 +301,17 @@ const CollisionMasksEditor = ({
   );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
-  const editorNodes = isMobileScreen
-    ? verticalMosaicNodes
-    : horizontalMosaicNodes;
+  const { isMobile } = useResponsiveWindowSize();
+  const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!objectConfiguration.getAnimationsCount()) return null;
+  if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
@@ -336,13 +326,13 @@ const CollisionMasksEditor = ({
                 project,
                 resourceName
               )}
-              onSize={setCurrentSpriteSize}
+              onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (
                   <CollisionMasksPreview
                     {...overlayProps}
                     isDefaultBoundingBox={sprite.isFullImageCollisionMask()}
-                    hideControls={spriteConfiguration.adaptCollisionMaskAutomatically()}
+                    hideControls={animations.adaptCollisionMaskAutomatically()}
                     polygons={sprite.getCustomCollisionMask()}
                     onPolygonsUpdated={onPolygonsUpdated}
                     highlightedVerticePtr={highlightedVerticePtr}
@@ -359,13 +349,14 @@ const CollisionMasksEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>
             <Line>
               <Column expand noMargin>
                 <SpriteSelector
-                  spriteConfiguration={spriteConfiguration}
+                  animations={animations}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}
@@ -388,7 +379,7 @@ const CollisionMasksEditor = ({
                     </Trans>
                   }
                   hideControlsForSprite={(sprite: gdSprite) =>
-                    spriteConfiguration.adaptCollisionMaskAutomatically() ||
+                    animations.adaptCollisionMaskAutomatically() ||
                     sprite.isFullImageCollisionMask()
                   }
                 />
@@ -397,7 +388,7 @@ const CollisionMasksEditor = ({
             <ScrollView>
               {!!sprite &&
                 !sprite.isFullImageCollisionMask() &&
-                !spriteConfiguration.adaptCollisionMaskAutomatically() && (
+                !animations.adaptCollisionMaskAutomatically() && (
                   <React.Fragment>
                     <PolygonsList
                       polygons={sprite.getCustomCollisionMask()}
@@ -411,14 +402,13 @@ const CollisionMasksEditor = ({
                       onHoverVertice={setHighlightedVerticePtr}
                       onClickVertice={setSelectedVerticePtr}
                       selectedVerticePtr={selectedVerticePtr}
-                      spriteWidth={spriteWidth}
-                      spriteHeight={spriteHeight}
+                      spriteSize={currentSpriteSize}
                     />
                   </React.Fragment>
                 )}
               {!!sprite &&
                 !sprite.isFullImageCollisionMask() &&
-                spriteConfiguration.adaptCollisionMaskAutomatically() && (
+                animations.adaptCollisionMaskAutomatically() && (
                   <React.Fragment>
                     <AlertMessage kind="info">
                       <Trans>

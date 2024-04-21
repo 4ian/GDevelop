@@ -39,6 +39,7 @@ void Layer::SetCameraCount(std::size_t n) {
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
   element.SetAttribute("renderingType", GetRenderingType());
+  element.SetAttribute("cameraType", GetCameraType());
   element.SetAttribute("visibility", GetVisibility());
   element.SetAttribute("isLocked", IsLocked());
   element.SetAttribute("isLightingLayer", IsLightingLayer());
@@ -78,6 +79,7 @@ void Layer::SerializeTo(SerializerElement& element) const {
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
   SetRenderingType(element.GetStringAttribute("renderingType", ""));
+  SetCameraType(element.GetStringAttribute("cameraType", "perspective"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLocked(element.GetBoolAttribute("isLocked", false));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));

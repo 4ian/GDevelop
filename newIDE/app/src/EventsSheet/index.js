@@ -90,8 +90,8 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useScreenType } from '../UI/Responsive/ScreenTypeMeasurer';
+import { ResponsiveWindowMeasurer } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
@@ -1790,7 +1790,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {({ windowSize }) => (
           <EventsSearcher
             key={events.ptr}
             ref={eventSearcher => (this._eventSearcher = eventSearcher)}
@@ -1876,7 +1876,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     preferences.values.eventsSheetShowObjectThumbnails
                   }
                   screenType={screenType}
-                  windowWidth={windowWidth}
+                  windowSize={windowSize}
                   eventsSheetHeight={
                     this._containerDiv.current
                       ? this._containerDiv.current.clientHeight

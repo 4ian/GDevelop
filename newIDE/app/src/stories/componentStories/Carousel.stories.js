@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import Carousel from '../../UI/Carousel';
@@ -12,7 +11,7 @@ import ChevronArrowRight from '../../UI/CustomSvgIcons/ChevronArrowRight';
 export default {
   title: 'Carousel',
   component: Carousel,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const LoadingWithoutTitleSkeleton = () => (
@@ -22,6 +21,7 @@ export const LoadingWithoutTitleSkeleton = () => (
     displayItemTitles={false}
     browseAllLabel={<Trans>Browse all</Trans>}
     browseAllIcon={<ChevronArrowRight fontSize="small" />}
+    displayArrowsOnDesktop
   />
 );
 export const OnlyFewSquareImages = () => {
@@ -65,6 +65,7 @@ export const OnlyFewSquareImages = () => {
       items={items}
       displayItemTitles={false}
       browseAllLink="https://www.youtube.com/c/GDevelopApp/videos"
+      displayArrowsOnDesktop
     />
   );
 };
@@ -171,6 +172,7 @@ export const RoundedImagesWithOverlay = () => {
       onBrowseAllClick={() => action('Browse all button clicked')}
       browseAllIcon={<ChevronArrowRight fontSize="small" />}
       roundedImages
+      displayArrowsOnDesktop
     />
   );
 };
@@ -184,7 +186,6 @@ export const WithoutArrows = () => {
       onBrowseAllClick={() => action('Browse all button clicked')}
       browseAllIcon={<ChevronArrowRight fontSize="small" />}
       roundedImages
-      hideArrows
     />
   );
 };
@@ -196,5 +197,6 @@ export const WithError = () => (
     browseAllLabel={<Trans>Browse all</Trans>}
     error={<Trans>Unexpected error</Trans>}
     browseAllIcon={<ChevronArrowRight fontSize="small" />}
+    displayArrowsOnDesktop
   />
 );

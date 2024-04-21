@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import { ErrorFallbackComponent } from '../../UI/ErrorBoundary';
 import { generateUUID } from 'three/src/math/MathUtils';
@@ -9,7 +8,7 @@ import { generateUUID } from 'three/src/math/MathUtils';
 export default {
   title: 'ErrorBoundary/ErrorFallbackComponent',
   component: ErrorFallbackComponent,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const fakeError = new Error('Fake error for storybook');

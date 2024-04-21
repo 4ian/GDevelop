@@ -88,6 +88,32 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
    */
+  const addCube = (runtimeScene) => {
+    const object = new gdjs.Cube3DRuntimeObject(runtimeScene, {
+      name: 'Cube',
+      type: 'Scene3D::Cube3DObject',
+      effects: [],
+      variables: [],
+      behaviors: [
+        {
+          type: 'Tween::TweenBehavior',
+          name: behaviorName,
+        },
+      ],
+      // @ts-ignore
+      content: {
+        width: 64,
+        height: 64,
+        depth: 64,
+      },
+    });
+    runtimeScene.addObject(object);
+    return object;
+  };
+
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   */
   const addTextObject = (runtimeScene) => {
     const object = new gdjs.TextRuntimeObject(runtimeScene, {
       name: 'Text',
@@ -100,18 +126,25 @@ describe('gdjs.TweenRuntimeBehavior', () => {
           name: behaviorName,
         },
       ],
-      characterSize: 20,
-      font: '',
-      bold: false,
-      italic: false,
-      underlined: false,
-      color: {
-        r: 0,
-        g: 0,
-        b: 0,
+      content: {
+        characterSize: 20,
+        font: '',
+        bold: false,
+        italic: false,
+        underlined: false,
+        color: '0;0;0',
+        text: '',
+        textAlignment: 'left',
+        isOutlineEnabled: false,
+        outlineThickness: 2,
+        outlineColor: '255;255;255',
+        isShadowEnabled: false,
+        shadowColor: '0;0;0',
+        shadowOpacity: 128,
+        shadowDistance: 4,
+        shadowAngle: 90,
+        shadowBlurRadius: 2,
       },
-      string: '',
-      textAlignment: 'left',
     });
     runtimeScene.addObject(object);
     return object;
@@ -123,6 +156,8 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   let object;
   /** @type {gdjs.SpriteRuntimeObject} */
   let sprite;
+  /** @type {gdjs.Cube3DRuntimeObject} */
+  let cube;
   /** @type {gdjs.TextRuntimeObject} */
   let textObject;
   /** @type {gdjs.TweenRuntimeBehavior} */
@@ -130,17 +165,22 @@ describe('gdjs.TweenRuntimeBehavior', () => {
   /** @type {gdjs.TweenRuntimeBehavior} */
   let spriteBehavior;
   /** @type {gdjs.TweenRuntimeBehavior} */
+  let cubeBehavior;
+  /** @type {gdjs.TweenRuntimeBehavior} */
   let textObjectBehavior;
   beforeEach(() => {
     runtimeScene = createScene();
     runtimeScene.getLayer('').setTimeScale(1.5);
     object = addObject(runtimeScene);
     sprite = addSprite(runtimeScene);
+    cube = addCube(runtimeScene);
     textObject = addTextObject(runtimeScene);
     //@ts-ignore
     behavior = object.getBehavior(behaviorName);
     //@ts-ignore
     spriteBehavior = sprite.getBehavior(behaviorName);
+    //@ts-ignore
+    cubeBehavior = cube.getBehavior(behaviorName);
     //@ts-ignore
     textObjectBehavior = textObject.getBehavior(behaviorName);
   });
@@ -216,6 +256,19 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(object.getY()).to.be(440);
   });
 
+  it('can tween the position on Z axis', () => {
+    cube.setZ(200);
+    cubeBehavior.addObjectPositionZTween(
+      'MyTween',
+      600,
+      'linear',
+      250 / 1.5,
+      false
+    );
+    checkProgress(6, () => cube.getZ());
+    expect(cube.getZ()).to.be(440);
+  });
+
   it('can tween the angle', () => {
     object.setAngle(200);
     behavior.addObjectAngleTween('MyTween', 600, 'linear', 250 / 1.5, false);
@@ -235,6 +288,19 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     behavior.addObjectHeightTween('MyTween', 600, 'linear', 250 / 1.5, false);
     checkProgress(6, () => object.getHeight());
     expect(object.getHeight()).to.be(440);
+  });
+
+  it('can tween the depth', () => {
+    cube.setDepth(200);
+    cubeBehavior.addObjectDepthTween(
+      'MyTween',
+      600,
+      'linear',
+      250 / 1.5,
+      false
+    );
+    checkProgress(6, () => cube.getDepth());
+    expect(cube.getDepth()).to.be(440);
   });
 
   it('can tween the opacity', () => {
@@ -423,5 +489,47 @@ describe('gdjs.TweenRuntimeBehavior', () => {
     expect(sprite.getScaleY()).to.be(660);
     expect(sprite.getX()).to.be(-7580);
     expect(sprite.getY()).to.be(-11120);
+  });
+
+  it('can tween the scales in seconds', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(200);
+    sprite.setScaleY(300);
+    spriteBehavior.addObjectScaleTween2(
+      'MyTween',
+      600,
+      900,
+      'linear',
+      0.25,
+      false,
+      false
+    );
+    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    // The interpolation is exponential.
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getX()).to.be(100);
+    expect(sprite.getY()).to.be(400);
+  });
+
+  it('can tween the scales from center in seconds', () => {
+    sprite.setPosition(100, 400);
+    sprite.setScaleX(200);
+    sprite.setScaleY(300);
+    spriteBehavior.addObjectScaleTween2(
+      'MyTween',
+      600,
+      900,
+      'linear',
+      0.25,
+      false,
+      true
+    );
+    checkProgress(6, [() => sprite.getScaleX(), () => sprite.getScaleY()]);
+    // The interpolation is exponential.
+    expect(sprite.getScaleX()).to.be(386.6364089863524);
+    expect(sprite.getScaleY()).to.be(579.9546134795287);
+    expect(sprite.getX()).to.be(-5872.3650875632775);
+    expect(sprite.getY()).to.be(-8558.547631344918);
   });
 });

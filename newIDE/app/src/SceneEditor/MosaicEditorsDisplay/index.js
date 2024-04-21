@@ -4,13 +4,12 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import EditorMosaic from '../../UI/EditorMosaic';
+import EditorMosaic, {
+  type EditorMosaicInterface,
+} from '../../UI/EditorMosaic';
 import InstancesEditor from '../../InstancesEditor';
-import InstancePropertiesEditor, {
-  type InstancePropertiesEditorInterface,
-} from '../../InstancesEditor/InstancePropertiesEditor';
 import LayersList, { type LayersListInterface } from '../../LayersList';
 import FullSizeInstancesEditorWithScrollbars from '../../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import CloseButton from '../../UI/EditorMosaic/CloseButton';
@@ -29,6 +28,9 @@ import {
   type SceneEditorsDisplayProps,
   type SceneEditorsDisplayInterface,
 } from '../EditorsDisplay.flow';
+import CompactInstancePropertiesEditorContainer, {
+  type CompactInstancePropertiesEditorInterface,
+} from '../../InstancesEditor/CompactInstancePropertiesEditor';
 
 const initialMosaicEditorNodes = {
   direction: 'row',
@@ -84,22 +86,21 @@ const MosaicEditorsDisplay = React.forwardRef<
     selectedLayer,
     onSelectInstances,
   } = props;
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const {
     getDefaultEditorMosaicNode,
     setDefaultEditorMosaicNode,
   } = React.useContext(PreferencesContext);
   const selectedInstances = props.instancesSelection.getSelectedInstances();
 
-  const instancesPropertiesEditorRef = React.useRef<?InstancePropertiesEditorInterface>(
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
     null
   );
   const layersListRef = React.useRef<?LayersListInterface>(null);
   const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
-  const editorMosaicRef = React.useRef<?EditorMosaic>(null);
+  const editorMosaicRef = React.useRef<?EditorMosaicInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
   const forceUpdateInstancesPropertiesEditor = React.useCallback(() => {
@@ -241,7 +242,7 @@ const MosaicEditorsDisplay = React.forwardRef<
       renderEditor: () => (
         <I18n>
           {({ i18n }) => (
-            <InstancePropertiesEditor
+            <CompactInstancePropertiesEditorContainer
               i18n={i18n}
               project={project}
               layout={layout}
@@ -269,7 +270,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           onEditLayerEffects={props.editLayerEffects}
           onEditLayer={props.editLayer}
           onRemoveLayer={props.onRemoveLayer}
-          onRenameLayer={props.onRenameLayer}
+          onLayerRenamed={props.onLayerRenamed}
           onCreateLayer={forceUpdateInstancesPropertiesEditor}
           layersContainer={layout}
           unsavedChanges={props.unsavedChanges}
@@ -293,6 +294,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     'instances-editor': {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <FullSizeInstancesEditorWithScrollbars
           project={project}
@@ -347,7 +349,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               canInstallPrivateAsset={props.canInstallPrivateAsset}
               onEditObject={props.onEditObject}
-              onExportObject={props.onExportObject}
+              onExportAssets={props.onExportAssets}
               onDeleteObjects={(objectWithContext, cb) =>
                 props.onDeleteObjects(i18n, objectWithContext, cb)
               }
@@ -403,7 +405,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   return (
     <EditorMosaic
       editors={editors}
-      limitToOneSecondaryEditor={isMobileScreen}
+      limitToOneSecondaryEditor={isMobile}
       initialNodes={
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }

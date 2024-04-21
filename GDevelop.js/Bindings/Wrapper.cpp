@@ -86,6 +86,7 @@
 #include <GDCore/Project/VariablesContainersList.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
+#include <GDCore/IDE/ObjectAssetSerializer.h>
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/Events/CodeGeneration/EventsFunctionsExtensionCodeGenerator.h>
@@ -109,6 +110,8 @@
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"
+#include "../../Extensions/3D/Model3DObjectConfiguration.h"
+#include "../../Extensions/Spine/SpineObjectConfiguration.h"
 #include "BehaviorJsImplementation.h"
 #include "BehaviorSharedDataJsImplementation.h"
 #include "ObjectJsImplementation.h"
@@ -418,6 +421,7 @@ typedef std::vector<std::pair<gd::String, TextFormatting>>
     VectorPairStringTextFormatting;
 typedef std::vector<gd::ObjectGroup> VectorObjectGroup;
 typedef std::map<gd::String, gd::String> MapStringString;
+typedef std::map<gd::String, std::vector<gd::String>> MapStringVectorString;
 typedef std::map<gd::String, bool> MapStringBoolean;
 typedef std::map<gd::String, double> MapStringDouble;
 typedef std::map<gd::String, gd::ExpressionMetadata>
@@ -539,6 +543,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetSafeName GetSafeName
 #define STATIC_ToJSON ToJSON
 #define STATIC_FromJSON(x) FromJSON(x)
+#define STATIC_SerializeTo SerializeTo
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_IsExpression IsExpression
@@ -590,6 +595,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ExposeProjectEvents ExposeProjectEvents
 #define STATIC_ExposeProjectObjects ExposeProjectObjects
 #define STATIC_ExposeWholeProjectResources ExposeWholeProjectResources
+#define STATIC_GetResourceTypes GetResourceTypes
 
 #define STATIC_GetBehaviorMetadata GetBehaviorMetadata
 #define STATIC_GetObjectMetadata GetObjectMetadata
@@ -754,6 +760,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_ShiftSentenceParamIndexes ShiftSentenceParamIndexes
 
 #define STATIC_CopyAllResourcesTo CopyAllResourcesTo
+#define STATIC_CopyObjectResourcesTo CopyObjectResourcesTo
 
 #define STATIC_IsExtensionLifecycleEventsFunction \
   IsExtensionLifecycleEventsFunction

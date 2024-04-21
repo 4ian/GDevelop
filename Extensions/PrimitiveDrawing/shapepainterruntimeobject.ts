@@ -210,6 +210,22 @@ namespace gdjs {
       this._renderer.drawEllipse(centerX, centerY, width, height);
     }
 
+    drawFilletRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      fillet: float
+    ) {
+      this._renderer.drawFilletRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        fillet
+      );
+    }
+
     drawRoundedRectangle(
       startX1: float,
       startY1: float,

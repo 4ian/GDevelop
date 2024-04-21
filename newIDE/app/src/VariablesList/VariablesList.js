@@ -109,10 +109,11 @@ type Props = {|
   /** If set to small, will collapse variable row by default. */
   size?: 'small',
   onVariablesUpdated?: () => void,
+  toolbarIconStyle?: any,
 |};
 
 const variableRowStyles = {
-  chevron: { width: 15 },
+  chevron: { width: 15, alignSelf: 'stretch' },
 };
 
 type VariableRowProps = {|
@@ -284,7 +285,7 @@ const VariableRow = React.memo<VariableRowProps>(
                 <ResponsiveLineStackLayout
                   expand
                   noMargin
-                  width={shouldWrap ? 'small' : undefined}
+                  forceMobileLayout={shouldWrap}
                 >
                   <Line alignItems="center" noMargin expand>
                     {shouldWrap ? null : <Spacer />}
@@ -1659,6 +1660,7 @@ const VariablesList = (props: Props) => {
       onAdd={onAdd}
       searchText={searchText}
       onChangeSearchText={setSearchText}
+      iconStyle={props.toolbarIconStyle}
     />
   );
 
@@ -1682,7 +1684,6 @@ const VariablesList = (props: Props) => {
                   style={{ flex: 1, display: 'flex', minHeight: 0 }}
                   onKeyDown={keyboardShortcuts.onKeyDown}
                   onKeyUp={keyboardShortcuts.onKeyUp}
-                  className={gdevelopTheme.uiRootClassName}
                 >
                   <Column expand useFullHeight noMargin>
                     {isNarrow ? null : toolbar}

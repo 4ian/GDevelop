@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import Home from '../../../UI/CustomSvgIcons/Home';
@@ -41,7 +40,7 @@ const buildFakeMenuTemplate = () => [
 
 export default {
   title: 'UI Building Blocks/Buttons',
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (
@@ -105,6 +104,17 @@ export const Default = () => (
         icon={<Download />}
         primary
         label="Primary Text button"
+        onClick={action('onClick')()}
+      />
+      <TextButton
+        secondary
+        label="Secondary Text button"
+        onClick={action('onClick')()}
+      />
+      <TextButton
+        icon={<Download />}
+        secondary
+        label="Secondary Text button"
         onClick={action('onClick')()}
       />
     </LineStackLayout>

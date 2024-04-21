@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import assignIn from 'lodash/assignIn';
 import {
   type Build,
@@ -21,11 +20,11 @@ import {
 import {
   type ExportPipeline,
   type ExportPipelineContext,
+  type ExportFlowProps,
 } from '../ExportPipeline.flow';
-import {
-  ExplanationHeader,
-  OnlineGameLink,
-} from '../GenericExporters/OnlineWebExport';
+import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
+import OnlineWebExportFlow from '../GenericExporters/OnlineWebExport/OnlineWebExportFlow';
+
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -48,6 +47,8 @@ type ResourcesDownloadOutput = {|
 
 type CompressionOutput = Blob;
 
+const exportPipelineName = 'browser-online-web';
+
 export const browserOnlineWebExportPipeline: ExportPipeline<
   ExportState,
   PreparedExporter,
@@ -55,7 +56,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   ResourcesDownloadOutput,
   CompressionOutput
 > = {
-  name: 'browser-online-web',
+  name: exportPipelineName,
   onlineBuildType: 'web-build',
 
   getInitialExportState: () => null,
@@ -68,26 +69,10 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   isNavigationDisabled: (exportStep, errored) =>
     !errored && !['', 'done'].includes(exportStep),
 
-  renderHeader: ({ game }) => <ExplanationHeader game={game} />,
+  renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
-
-  renderCustomStepsProgress: ({
-    build,
-    project,
-    onSaveProject,
-    isSavingProject,
-    errored,
-    exportStep,
-  }) => (
-    <OnlineGameLink
-      build={build}
-      project={project}
-      onSaveProject={onSaveProject}
-      isSavingProject={isSavingProject}
-      errored={errored}
-      exportStep={exportStep}
-    />
+  renderExportFlow: (props: ExportFlowProps) => (
+    <OnlineWebExportFlow {...props} exportPipelineName={exportPipelineName} />
   ),
 
   prepareExporter: (
@@ -184,7 +169,8 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     options: {|
       gameName: string,
       gameVersion: string,
-    |}
+    |},
+    payWithCredits: boolean
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -195,7 +181,8 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
       firebaseUser.uid,
       uploadBucketKey,
       gameId,
-      options
+      options,
+      payWithCredits
     );
   },
 };

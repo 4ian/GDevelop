@@ -2,7 +2,7 @@ namespace gdjs {
   /**
    * A renderer for debug instances location of a container using Pixi.js.
    *
-   * @see gdjs.CustomObjectPixiRenderer
+   * @see gdjs.CustomRuntimeObject2DPixiRenderer
    */
   export class DebuggerPixiRenderer {
     _instanceContainer: gdjs.RuntimeInstanceContainer;
@@ -46,7 +46,9 @@ namespace gdjs {
 
         // Add on top of all layers:
         this._debugDrawContainer.addChild(this._debugDraw);
-        pixiContainer.addChild(this._debugDrawContainer);
+        if (pixiContainer) {
+          pixiContainer.addChild(this._debugDrawContainer);
+        }
       }
       const debugDraw = this._debugDraw;
 
@@ -262,9 +264,10 @@ namespace gdjs {
 
         // Draw custom point
         if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
-          if (!object._animationFrame) continue;
+          const animationFrame = object._animator.getCurrentFrame();
+          if (!animationFrame) continue;
 
-          for (const customPointName in object._animationFrame.points.items) {
+          for (const customPointName in animationFrame.points.items) {
             let customPoint = object.getPointPosition(customPointName);
 
             customPoint = layer.applyLayerTransformation(
@@ -310,10 +313,12 @@ namespace gdjs {
         this._debugDrawContainer.destroy({
           children: true,
         });
-        const pixiContainer: PIXI.Container = this._instanceContainer
+        const pixiContainer: PIXI.Container | null = this._instanceContainer
           .getRenderer()
           .getRendererObject();
-        pixiContainer.removeChild(this._debugDrawContainer);
+        if (pixiContainer) {
+          pixiContainer.removeChild(this._debugDrawContainer);
+        }
       }
       this._debugDraw = null;
       this._debugDrawContainer = null;

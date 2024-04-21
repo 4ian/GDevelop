@@ -36,6 +36,7 @@ declare class libGDevelop {
   asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
   asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
   asModel3DConfiguration(gdObjectConfiguration): gdModel3DObjectConfiguration;
+  asSpineConfiguration(gdObjectConfiguration): gdSpineObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -109,9 +110,11 @@ declare class libGDevelop {
   BitmapFontResource: Class<gdBitmapFontResource>;
   VideoResource: Class<gdVideoResource>;
   JsonResource: Class<gdJsonResource>;
+  SpineResource: Class<gdSpineResource>;
   TilemapResource: Class<gdTilemapResource>;
   TilesetResource: Class<gdTilesetResource>;
   Model3DResource: Class<gdModel3DResource>;
+  AtlasResource: Class<gdAtlasResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;
@@ -122,6 +125,7 @@ declare class libGDevelop {
   SerializerElement: Class<gdSerializerElement>;
   SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
+  ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
   Expression: Class<gdExpression>;
@@ -227,9 +231,12 @@ declare class libGDevelop {
   Sprite: Class<gdSprite>;
   Direction: Class<gdDirection>;
   Animation: Class<gdAnimation>;
+  SpriteAnimationList: Class<gdSpriteAnimationList>;
   SpriteObject: Class<gdSpriteObject>;
   Model3DAnimation: Class<gdModel3DAnimation>;
   Model3DObjectConfiguration: Class<gdModel3DObjectConfiguration>;
+  SpineAnimation: Class<gdSpineAnimation>;
+  SpineObjectConfiguration: Class<gdSpineObjectConfiguration>;
   Vector2f: Class<gdVector2f>;
   VectorVector2f: Class<gdVectorVector2f>;
   TextObject: Class<gdTextObject>;

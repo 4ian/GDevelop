@@ -10,7 +10,7 @@ import ArrowHeadRight from '../CustomSvgIcons/ArrowHeadRight';
 import Folder from '../CustomSvgIcons/Folder';
 import ListIcon from '../ListIcon';
 import useForceUpdate from '../../Utils/UseForceUpdate';
-import './TreeView.css';
+import classes from './TreeView.module.css';
 import {
   shouldCloseOrCancel,
   shouldValidate,
@@ -20,6 +20,7 @@ import { type ItemData, type ItemBaseAttributes, navigationKeys } from '.';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
+import classNames from 'classnames';
 
 const stopPropagation = e => e.stopPropagation();
 
@@ -72,12 +73,12 @@ const SemiControlledRowInput = ({
   );
 
   return (
-    <div className="item-name-input-container">
+    <div className={classes.itemNameInputContainer}>
       <input
         autoFocus
         ref={inputRef}
         type="text"
-        className="item-name-input"
+        className={classes.itemNameInput}
         value={value}
         spellCheck={false}
         onChange={e => {
@@ -120,6 +121,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const {
     flattenedData,
     onOpen,
+    onClick,
     onSelect,
     onBlurField,
     onEndRenaming,
@@ -128,9 +130,11 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     canDrop,
     onDrop,
     onEditItem,
-    isMobileScreen,
+    isMobile,
     DragSourceAndDropTarget,
     getItemHtmlId,
+    forceDefaultDraggingPreview,
+    shouldSelectUponContextMenuOpening,
   } = data;
   const node = flattenedData[index];
   const left = node.depth * 16;
@@ -157,7 +161,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
     delay: DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE,
   });
 
-  const onClick = React.useCallback(
+  const onClickItem = React.useCallback(
     event => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
@@ -165,16 +169,17 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         return;
       }
       onSelect({ node, exclusive: !(event.metaKey || event.ctrlKey) });
+      onClick(node);
     },
-    [onSelect, node, onOpen]
+    [onClick, onSelect, node, onOpen]
   );
 
   const selectAndOpenContextMenu = React.useCallback(
     (event: MouseEvent) => {
-      onClick(event);
+      onClickItem(event);
       openContextMenu(event);
     },
-    [onClick, openContextMenu]
+    [onClickItem, openContextMenu]
   );
 
   const setIsStayingOver = React.useCallback(
@@ -242,6 +247,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         beginDrag={() => {
           if (!node.selected) onSelect({ node, exclusive: !node.selected });
 
+          if (forceDefaultDraggingPreview) {
+            return {};
+          }
+
           // We return the item name and thumbnail to be used by the
           // drag preview if this is not a folder.
           // We can't use the item itself because it's not serializable.
@@ -263,7 +272,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           // Prevent dragging of item whose name is edited, allowing to select text with click and drag on text.
           renamedItemId !== node.id
         }
-        canDrop={canDrop ? () => canDrop(node.item) : () => true}
+        canDrop={canDrop ? () => canDrop(node.item, whereToDrop) : () => true}
         drop={() => {
           onDrop(node.item, whereToDrop);
         }}
@@ -315,9 +324,10 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
 
           let itemRow = (
             <div
-              className={`row-content-side${
-                node.item.isRoot ? '' : ' row-content-side-left'
-              }${displayAsFolder ? '' : ' row-content-extra-padding'}`}
+              className={classNames(classes.rowContentSide, {
+                [classes.rowContentSideLeft]: !node.item.isRoot,
+                [classes.rowContentExtraPadding]: !displayAsFolder,
+              })}
             >
               {displayAsFolder ? (
                 <>
@@ -335,10 +345,18 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       <ArrowHeadBottom fontSize="small" />
                     )}
                   </IconButton>
-                  {!node.item.isRoot && <Folder className="folder-icon" />}
+                  {node.thumbnailSrc && node.thumbnailSrc !== 'FOLDER' ? (
+                    <div className={classes.thumbnail}>
+                      <ListIcon iconSize={20} src={node.thumbnailSrc} />
+                    </div>
+                  ) : (
+                    !node.item.isRoot && (
+                      <Folder className={classes.folderIcon} />
+                    )
+                  )}
                 </>
               ) : node.thumbnailSrc ? (
-                <div className="thumbnail">
+                <div className={classes.thumbnail}>
                   <ListIcon iconSize={20} src={node.thumbnailSrc} />
                 </div>
               ) : null}
@@ -350,13 +368,14 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 />
               ) : (
                 <span
-                  className={`item-name ${node.extraClass}${
-                    node.item.isRoot
-                      ? ' root-folder'
-                      : node.item.isPlaceholder
-                      ? ' placeholder'
-                      : ''
-                  }`}
+                  className={classNames(
+                    classes.itemName,
+                    {
+                      [classes.rootFolder]: node.item.isRoot,
+                      [classes.placeholder]: node.item.isPlaceholder,
+                    },
+                    node.extraClass
+                  )}
                 >
                   {node.name}
                 </span>
@@ -373,24 +392,55 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             itemRow = connectDragPreview(itemRow);
           }
 
+          const rightButton = node.rightButton;
+
+          const shouldDisplayMenu =
+            !node.shouldHideMenuIcon &&
+            !isMobile &&
+            !node.item.isRoot &&
+            !node.item.isPlaceholder;
+
           const dragSource = connectDragSource(
-            <div className="full-space-container">
+            <div className={classes.fullSpaceContainer}>
               {isOver && whereToDrop === 'before' && (
                 <DropIndicator canDrop={canDrop} />
               )}
               <div
-                className="row-content"
+                className={classes.rowContent}
                 onDoubleClick={
                   onEditItem ? () => onEditItem(node.item) : undefined
                 }
-                onContextMenu={selectAndOpenContextMenu}
+                onContextMenu={
+                  shouldSelectUponContextMenuOpening
+                    ? selectAndOpenContextMenu
+                    : openContextMenu
+                }
                 {...longTouchForContextMenuProps}
               >
                 {itemRow}
-                {!isMobileScreen &&
-                  !node.item.isRoot &&
-                  !node.item.isPlaceholder && (
-                    <div className="row-content-side row-content-side-right">
+                {(node.rightComponent || rightButton || shouldDisplayMenu) && (
+                  <div
+                    className={classNames(
+                      classes.rowContentSide,
+                      classes.rowContentSideRight
+                    )}
+                  >
+                    {node.rightComponent}
+                    {rightButton && (
+                      <IconButton
+                        id={rightButton.id}
+                        size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          if (rightButton.click) {
+                            rightButton.click();
+                          }
+                        }}
+                      >
+                        {rightButton.icon}
+                      </IconButton>
+                    )}
+                    {shouldDisplayMenu && (
                       <IconButton
                         size="small"
                         onClick={e => {
@@ -405,8 +455,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       >
                         <ThreeDotsMenu />
                       </IconButton>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
               </div>
               {isOver && whereToDrop === 'after' && (
                 <DropIndicator canDrop={canDrop} />
@@ -414,22 +465,28 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
             </div>
           );
 
+          const shouldDisplayDropIndicator =
+            isOver &&
+            whereToDrop === 'inside' &&
+            displayAsFolder &&
+            !node.item.isRoot;
+          const dropIndicatorClassName = shouldDisplayDropIndicator
+            ? canDrop
+              ? classes.withCanDropInsideIndicator
+              : classes.withCannotDropInsideIndicator
+            : null;
+
           const dropTarget = connectDropTarget(
             <div
               id={getItemHtmlId ? getItemHtmlId(node.item, index) : undefined}
-              onClick={onClick}
-              className={
-                'row-container' +
-                (node.selected ? ' selected' : '') +
-                (isOver &&
-                whereToDrop === 'inside' &&
-                displayAsFolder &&
-                !node.item.isRoot
-                  ? canDrop
-                    ? ' with-can-drop-inside-indicator'
-                    : ' with-cannot-drop-inside-indicator'
-                  : '')
-              }
+              onClick={onClickItem}
+              className={classNames(
+                classes.rowContainer,
+                dropIndicatorClassName,
+                {
+                  [classes.selected]: node.selected,
+                }
+              )}
               aria-selected={node.selected}
               aria-expanded={displayAsFolder ? !node.collapsed : false}
               {...dataObjectToProps(node.dataset)}
@@ -441,9 +498,9 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
           return (
             <div
               style={{ paddingLeft: left }}
-              className={`full-height-flex-container${
-                node.item.isRoot && index > 0 ? ' with-divider' : ''
-              }`}
+              className={classNames(classes.fullHeightFlexContainer, {
+                [classes.withDivider]: node.item.isRoot && index > 0,
+              })}
             >
               {dropTarget}
             </div>

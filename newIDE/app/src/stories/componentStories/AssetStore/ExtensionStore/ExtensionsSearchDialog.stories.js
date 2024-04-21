@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { I18n } from '@lingui/react';
@@ -15,7 +14,7 @@ import { fakeExtensionsRegistry } from '../../../../fixtures/GDevelopServicesTes
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionSearchDialog',
   component: ExtensionsSearchDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {

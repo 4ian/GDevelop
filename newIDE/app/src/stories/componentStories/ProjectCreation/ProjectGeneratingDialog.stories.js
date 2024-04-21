@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import ProjectGeneratingDialog from '../../../ProjectCreation/ProjectGeneratingDialog';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
@@ -13,7 +12,7 @@ import { fakeSilverAuthenticatedUser } from '../../../fixtures/GDevelopServicesT
 export default {
   title: 'Project Creation/ProjectGeneratingDialog',
   component: ProjectGeneratingDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Generating = () => {

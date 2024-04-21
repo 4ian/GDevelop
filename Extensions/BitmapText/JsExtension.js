@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -42,7 +34,6 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/bitmapfont32.png');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError
     bitmapTextObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -59,7 +50,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError
     bitmapTextObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -127,7 +117,8 @@ module.exports = {
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+        text:
+          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
@@ -139,7 +130,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError
     bitmapTextObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -150,7 +140,6 @@ module.exports = {
     ) {
       return false;
     };
-    // $FlowExpectedError
     bitmapTextObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -176,7 +165,7 @@ module.exports = {
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
       )
       .setCategoryFullName(_('Text'))
-      .addDefaultBehavior("TextContainerCapability::TextContainerBehavior")
+      .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
       .addDefaultBehavior('EffectCapability::EffectBehavior')
       .addDefaultBehavior('OpacityCapability::OpacityBehavior')
       .addDefaultBehavior('ScalableCapability::ScalableBehavior');
@@ -327,33 +316,33 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
-      object
-        .addAction(
-          'SetBitmapFontAndTextureAtlasResourceName2',
-          _('Bitmap files resources'),
-          _('Change the Bitmap Font and/or the atlas image used by the object.'),
-          _(
-            'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
-          ),
-          '',
-          'res/actions/font24.png',
-          'res/actions/font.png'
-        )
-        .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-        .addParameter(
-          'bitmapFontResource',
-          _('Bitmap font resource name'),
-          '',
-          false
-        )
-        .addParameter(
-          'imageResource',
-          _('Texture atlas resource name'),
-          '',
-          false
-        )
-        .getCodeExtraInformation()
-        .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
+    object
+      .addAction(
+        'SetBitmapFontAndTextureAtlasResourceName2',
+        _('Bitmap files resources'),
+        _('Change the Bitmap Font and/or the atlas image used by the object.'),
+        _(
+          'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
+        ),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
+      .addParameter(
+        'bitmapFontResource',
+        _('Bitmap font resource name'),
+        '',
+        false
+      )
+      .addParameter(
+        'imageResource',
+        _('Texture atlas resource name'),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('setBitmapFontAndTextureAtlasResourceName');
 
     object
       .addExpressionAndCondition(
@@ -451,10 +440,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -462,9 +448,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'BitmapText::BitmapTextObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -477,9 +461,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -649,156 +631,144 @@ module.exports = {
     };
 
     /**
-     * Renderer for instances of BitmapText inside the IDE.
-     *
-     * @extends RenderedBitmapTextInstance
-     * @class RenderedBitmapTextInstance
-     * @constructor
+     * Return the path to the thumbnail of the specified object.
+     * This is called to update the PIXI object on the scene editor
      */
-    function RenderedBitmapTextInstance(
-      project,
-      layout,
-      instance,
-      associatedObjectConfiguration,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedBitmapTextInstance extends RenderedInstance {
+      static getThumbnail(project, resourcesLoader, objectConfiguration) {
+        return 'JsPlatform/Extensions/bitmapfont24.png';
+      }
+
+      constructor(
         project,
         layout,
         instance,
         associatedObjectConfiguration,
         pixiContainer,
         pixiResourcesLoader
-      );
-
-      // We'll track changes of the font to trigger the loading of the new font.
-      this._currentBitmapFontResourceName = '';
-      this._currentTextureAtlasResourceName = '';
-
-      this._pixiObject = new PIXI.BitmapText('', {
-        // Use a default font. The proper font will be loaded in `update` method.
-        fontName: getDefaultBitmapFont().font,
-      });
-
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
-    }
-    RenderedBitmapTextInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
-
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedBitmapTextInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      objectConfiguration
-    ) {
-      return 'JsPlatform/Extensions/bitmapfont24.png';
-    };
-
-    // This is called to update the PIXI object on the scene editor
-    RenderedBitmapTextInstance.prototype.update = function () {
-      const properties = this._associatedObjectConfiguration.getProperties();
-
-      // Update the rendered text properties (note: Pixi is only
-      // applying changes if there were changed).
-      const rawText = properties.get('text').getValue();
-      this._pixiObject.text = rawText;
-
-      const opacity = properties.get('opacity').getValue();
-      this._pixiObject.alpha = opacity / 255;
-
-      const align = properties.get('align').getValue();
-      this._pixiObject.align = align;
-
-      const color = properties.get('tint').getValue();
-      this._pixiObject.tint =
-        objectsRenderingService.rgbOrHexToHexNumber(color);
-
-      const scale = properties.get('scale').getValue() || 1;
-      this._pixiObject.scale.set(scale);
-
-      // Track the changes in font to load the new requested font.
-      const bitmapFontResourceName = properties
-        .get('bitmapFontResourceName')
-        .getValue();
-      const textureAtlasResourceName = properties
-        .get('textureAtlasResourceName')
-        .getValue();
-
-      if (
-        this._currentBitmapFontResourceName !== bitmapFontResourceName ||
-        this._currentTextureAtlasResourceName !== textureAtlasResourceName
       ) {
-        // Release the old font (if it was installed).
-        releaseBitmapFont(this._pixiObject.fontName);
+        super(
+          project,
+          layout,
+          instance,
+          associatedObjectConfiguration,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-        // Temporarily go back to the default font, as the PIXI.BitmapText
-        // object does not support being displayed with a font not installed at all.
-        // It will be replaced as soon as the proper font is loaded.
-        this._pixiObject.fontName = getDefaultBitmapFont().font;
+        // We'll track changes of the font to trigger the loading of the new font.
+        this._currentBitmapFontResourceName = '';
+        this._currentTextureAtlasResourceName = '';
 
-        this._currentBitmapFontResourceName = bitmapFontResourceName;
-        this._currentTextureAtlasResourceName = textureAtlasResourceName;
-        obtainBitmapFont(
-          this._pixiResourcesLoader,
-          this._project,
-          this._currentBitmapFontResourceName,
-          this._currentTextureAtlasResourceName
-        ).then((bitmapFont) => {
-          this._pixiObject.fontName = bitmapFont.font;
-          this._pixiObject.fontSize = bitmapFont.size;
-          this._pixiObject.dirty = true;
+        this._pixiObject = new PIXI.BitmapText('', {
+          // Use a default font. The proper font will be loaded in `update` method.
+          fontName: getDefaultBitmapFont().font,
         });
+
+        this._pixiObject.anchor.x = 0.5;
+        this._pixiObject.anchor.y = 0.5;
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
       }
 
-      // Set up the wrapping width if enabled.
-      const wordWrap = properties.get('wordWrap').getValue() === 'true';
-      if (wordWrap && this._instance.hasCustomSize()) {
-        this._pixiObject.maxWidth =
-          this.getCustomWidth() / this._pixiObject.scale.x;
-        this._pixiObject.dirty = true;
-      } else {
-        this._pixiObject.maxWidth = 0;
-        this._pixiObject.dirty = true;
+      update() {
+        const properties = this._associatedObjectConfiguration.getProperties();
+
+        // Update the rendered text properties (note: Pixi is only
+        // applying changes if there were changed).
+        const rawText = properties.get('text').getValue();
+        this._pixiObject.text = rawText;
+
+        const opacity = +properties.get('opacity').getValue();
+        this._pixiObject.alpha = opacity / 255;
+
+        const align = properties.get('align').getValue();
+        this._pixiObject.align = align;
+
+        const color = properties.get('tint').getValue();
+        this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(
+          color
+        );
+
+        const scale = +(properties.get('scale').getValue() || 1);
+        this._pixiObject.scale.set(scale);
+
+        // Track the changes in font to load the new requested font.
+        const bitmapFontResourceName = properties
+          .get('bitmapFontResourceName')
+          .getValue();
+        const textureAtlasResourceName = properties
+          .get('textureAtlasResourceName')
+          .getValue();
+
+        if (
+          this._currentBitmapFontResourceName !== bitmapFontResourceName ||
+          this._currentTextureAtlasResourceName !== textureAtlasResourceName
+        ) {
+          // Release the old font (if it was installed).
+          releaseBitmapFont(this._pixiObject.fontName);
+
+          // Temporarily go back to the default font, as the PIXI.BitmapText
+          // object does not support being displayed with a font not installed at all.
+          // It will be replaced as soon as the proper font is loaded.
+          this._pixiObject.fontName = getDefaultBitmapFont().font;
+
+          this._currentBitmapFontResourceName = bitmapFontResourceName;
+          this._currentTextureAtlasResourceName = textureAtlasResourceName;
+          obtainBitmapFont(
+            this._pixiResourcesLoader,
+            this._project,
+            this._currentBitmapFontResourceName,
+            this._currentTextureAtlasResourceName
+          ).then((bitmapFont) => {
+            this._pixiObject.fontName = bitmapFont.font;
+            this._pixiObject.fontSize = bitmapFont.size;
+            this._pixiObject.dirty = true;
+          });
+        }
+
+        // Set up the wrapping width if enabled.
+        const wordWrap = properties.get('wordWrap').getValue() === 'true';
+        if (wordWrap && this._instance.hasCustomSize()) {
+          this._pixiObject.maxWidth =
+            this.getCustomWidth() / this._pixiObject.scale.x;
+          this._pixiObject.dirty = true;
+        } else {
+          this._pixiObject.maxWidth = 0;
+          this._pixiObject.dirty = true;
+        }
+
+        this._pixiObject.position.x =
+          this._instance.getX() + (this._pixiObject.textWidth * scale) / 2;
+        this._pixiObject.position.y =
+          this._instance.getY() + (this._pixiObject.textHeight * scale) / 2;
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
       }
 
-      this._pixiObject.position.x =
-        this._instance.getX() + (this._pixiObject.textWidth * scale) / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + (this._pixiObject.textHeight * scale) / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-    };
+      onRemovedFromScene() {
+        RenderedInstance.prototype.onRemovedFromScene.call(this);
 
-    RenderedBitmapTextInstance.prototype.onRemovedFromScene = function () {
-      RenderedInstance.prototype.onRemovedFromScene.call(this);
+        const fontName = this._pixiObject.fontName;
+        this._pixiObject.destroy();
+        releaseBitmapFont(fontName);
+      }
 
-      const fontName = this._pixiObject.fontName;
-      this._pixiObject.destroy();
-      releaseBitmapFont(fontName);
-    };
+      /**
+       * Return the width of the instance, when it's not resized.
+       */
+      getDefaultWidth() {
+        return this._pixiObject.width;
+      }
 
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedBitmapTextInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedBitmapTextInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
+      /**
+       * Return the height of the instance, when it's not resized.
+       */
+      getDefaultHeight() {
+        return this._pixiObject.height;
+      }
+    }
 
     objectsRenderingService.registerInstanceRenderer(
       'BitmapText::BitmapTextObject',

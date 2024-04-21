@@ -7,7 +7,7 @@ import { create } from 'jss';
 import rtl from 'jss-rtl';
 import GDevelopThemeContext from './GDevelopThemeContext';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -22,16 +22,29 @@ type Props = {|
 export const FullThemeProvider = ({ children, forcedThemeName }: Props) => {
   const { values } = React.useContext(PreferencesContext);
   const { themeName, language } = values;
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
+
+  const themeNameToUse = forcedThemeName || themeName;
 
   const theme = React.useMemo(
-    () =>
-      getFullTheme({
-        themeName: forcedThemeName || themeName,
+    () => {
+      const fullTheme = getFullTheme({
+        themeName: themeNameToUse,
         language,
-        windowWidth,
-      }),
-    [forcedThemeName, themeName, language, windowWidth]
+        isMobile,
+      });
+
+      try {
+        const { body } = document;
+        if (!body) throw new Error('Document has no body.');
+        body.className = fullTheme.gdevelopTheme.uiRootClassName;
+      } catch (error) {
+        console.error('An error occurred while changing global theme:', error);
+      }
+
+      return fullTheme;
+    },
+    [themeNameToUse, language, isMobile]
   );
 
   return (

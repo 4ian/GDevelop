@@ -3,13 +3,11 @@
 import * as React from 'react';
 
 import { useTimeout } from '../../Utils/UseTimeout';
-import muiDecorator from '../ThemeDecorator';
 import LoaderModal from '../../UI/LoaderModal';
 
 export default {
   title: 'UI Building Blocks/LoaderModal',
   component: LoaderModal,
-  decorators: [muiDecorator],
 };
 
 export const Default = () => <LoaderModal show />;

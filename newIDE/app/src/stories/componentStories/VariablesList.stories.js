@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -49,5 +48,5 @@ export const InstanceWithObjectVariables = () => (
 export default {
   title: 'VariablesList',
   component: VariablesList,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };

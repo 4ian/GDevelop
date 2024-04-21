@@ -46,7 +46,6 @@ export type MainMenuCallbacks = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
-  onOpenGamesDashboard: (open?: boolean) => void,
   setElectronUpdateStatus: ElectronUpdateStatus => void,
 |};
 
@@ -73,7 +72,6 @@ export type MainMenuEvent =
   | 'main-menu-open-preferences'
   | 'main-menu-open-language'
   | 'main-menu-open-profile'
-  | 'main-menu-open-games-dashboard'
   | 'update-status';
 
 const getMainMenuEventCallback = (
@@ -99,7 +97,6 @@ const getMainMenuEventCallback = (
     'main-menu-open-preferences': callbacks.onOpenPreferences,
     'main-menu-open-language': callbacks.onOpenLanguage,
     'main-menu-open-profile': callbacks.onOpenProfile,
-    'main-menu-open-games-dashboard': callbacks.onOpenGamesDashboard,
     'update-status': callbacks.setElectronUpdateStatus,
   };
 
@@ -201,10 +198,6 @@ export const buildMainMenuDeclarativeTemplate = ({
             {
               label: i18n._(t`My Profile`),
               onClickSendEvent: 'main-menu-open-profile',
-            },
-            {
-              label: i18n._(t`Games Dashboard`),
-              onClickSendEvent: 'main-menu-open-games-dashboard',
             },
             {
               label: i18n._(t`Preferences`),
@@ -391,10 +384,6 @@ export const buildMainMenuDeclarativeTemplate = ({
         {
           label: i18n._(t`My Profile`),
           onClickSendEvent: 'main-menu-open-profile',
-        },
-        {
-          label: i18n._(t`Games Dashboard`),
-          onClickSendEvent: 'main-menu-open-games-dashboard',
         },
         {
           label: i18n._(t`Preferences`),

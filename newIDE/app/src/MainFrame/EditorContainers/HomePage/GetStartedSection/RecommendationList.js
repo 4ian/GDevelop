@@ -14,12 +14,13 @@ import GuidedLessons from '../InAppTutorials/GuidedLessons';
 import { formatTutorialToImageTileComponent } from '../LearnSection';
 import ImageTileRow from '../../../../UI/ImageTileRow';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Text from '../../../../UI/Text';
-import { Column } from '../../../../UI/Grid';
+import { Column, Spacer } from '../../../../UI/Grid';
 import { type Tutorial } from '../../../../Utils/GDevelopServices/Tutorial';
+import { type SubscriptionPlanWithPricingSystems } from '../../../../Utils/GDevelopServices/Usage';
 import { CardWidget } from '../CardWidget';
 import Window from '../../../../Utils/Window';
 import { ColumnStackLayout } from '../../../../UI/Layout';
@@ -29,6 +30,9 @@ import {
 } from '../../../../Utils/GDevelopServices/User';
 import PreferencesContext from '../../../Preferences/PreferencesContext';
 import PlanRecommendationRow from './PlanRecommendationRow';
+import { SurveyCard } from './SurveyCard';
+import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 
 const styles = {
   textTutorialContent: {
@@ -46,10 +50,13 @@ const useStyles = makeStyles({
   },
 });
 
-const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getTextTutorialsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 4 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -60,10 +67,13 @@ const getTextTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getVideoTutorialsColumnsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 5 : 1;
     case 'medium':
       return 3;
     case 'large':
@@ -74,10 +84,13 @@ const getVideoTutorialsColumnsFromWidth = (width: WidthType) => {
       return 3;
   }
 };
-const getTutorialsLimitsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getTutorialsLimitsFromWidth = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 3;
+      return isLandscape ? 5 : 3;
     case 'medium':
       return 3;
     case 'large':
@@ -115,7 +128,7 @@ type TextTutorialsRowProps = {|
 
 const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
   const classes = useStyles();
-  const windowWidth = useResponsiveWindowWidth();
+  const { isLandscape, windowSize } = useResponsiveWindowSize();
 
   return (
     <>
@@ -130,7 +143,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         </Text>
       </Column>
       <GridList
-        cols={getTextTutorialsColumnsFromWidth(windowWidth)}
+        cols={getTextTutorialsColumnsFromWidth(windowSize, isLandscape)}
         cellHeight="auto"
         spacing={10}
       >
@@ -161,17 +174,23 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
 type Props = {|
   authenticatedUser: AuthenticatedUser,
   selectInAppTutorial: (tutorialId: string) => void,
+  subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  onStartSurvey: null | (() => void),
+  hasFilledSurveyAlready: boolean,
 |};
 
 const RecommendationList = ({
   authenticatedUser,
   selectInAppTutorial,
+  subscriptionPlansWithPricingSystems,
+  onStartSurvey,
+  hasFilledSurveyAlready,
 }: Props) => {
   const { recommendations, subscription, profile } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
-  if (!recommendations) return null;
+  if (!recommendations) return <PlaceholderLoader />;
 
   const recommendedTutorials = tutorials
     ? recommendations
@@ -219,21 +238,16 @@ const RecommendationList = ({
       {({ i18n }) => {
         const items = [];
 
-        if (recommendedVideoTutorials.length) {
+        if (onStartSurvey && !hasFilledSurveyAlready)
           items.push(
-            <SectionRow key="videos">
-              <ImageTileRow
-                title={<Trans>Watch</Trans>}
-                margin="dense"
-                items={recommendedVideoTutorials.map(tutorial =>
-                  formatTutorialToImageTileComponent(i18n, tutorial)
-                )}
-                getColumnsFromWidth={getVideoTutorialsColumnsFromWidth}
-                getLimitFromWidth={getTutorialsLimitsFromWidth}
+            <SectionRow key="start-survey">
+              <SurveyCard
+                onStartSurvey={onStartSurvey}
+                hasFilledSurveyAlready={false}
               />
             </SectionRow>
           );
-        }
+
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds
             ? guidedLessonsIds
@@ -244,12 +258,7 @@ const RecommendationList = ({
           items.push(
             <SectionRow key="guided-lessons">
               <Text size="section-title" noMargin>
-                <Trans>Do</Trans>
-              </Text>
-              <Text>
-                <Trans>
-                  A selection of in-app tutorials to learn popular mechanics
-                </Trans>
+                <Trans>Build game mechanics</Trans>
               </Text>
               <GuidedLessons
                 selectInAppTutorial={selectInAppTutorial}
@@ -266,6 +275,42 @@ const RecommendationList = ({
             </SectionRow>
           );
         }
+        if (recommendedVideoTutorials.length) {
+          items.push(
+            <SectionRow key="videos">
+              <ImageTileRow
+                title={<Trans>Get started with game creation</Trans>}
+                margin="dense"
+                items={recommendedVideoTutorials.map(tutorial =>
+                  formatTutorialToImageTileComponent(i18n, tutorial)
+                )}
+                getColumnsFromWindowSize={getVideoTutorialsColumnsFromWidth}
+                getLimitFromWindowSize={getTutorialsLimitsFromWidth}
+              />
+            </SectionRow>
+          );
+        }
+
+        if (onStartSurvey && hasFilledSurveyAlready)
+          items.push(
+            <SectionRow key="start-survey">
+              <SurveyCard
+                onStartSurvey={onStartSurvey}
+                hasFilledSurveyAlready
+              />
+            </SectionRow>
+          );
+
+        items.push(
+          <SectionRow key="promotions">
+            <Text size="section-title" noMargin>
+              <Trans>Discover the ecosystem</Trans>
+            </Text>
+            <Spacer />
+            <PromotionsSlideshow />
+          </SectionRow>
+        );
+
         if (recommendedTextTutorials.length) {
           items.push(
             <SectionRow key="texts">
@@ -279,11 +324,17 @@ const RecommendationList = ({
             !profile.isStudent &&
             (!subscription ||
               isPlanRecommendationRelevant(subscription, planRecommendation));
-          if (shouldDisplayPlanRecommendation) {
+          if (
+            shouldDisplayPlanRecommendation &&
+            subscriptionPlansWithPricingSystems
+          ) {
             items.push(
               <SectionRow key="plan">
                 <PlanRecommendationRow
                   recommendationPlanId={planRecommendation.id}
+                  subscriptionPlansWithPricingSystems={
+                    subscriptionPlansWithPricingSystems
+                  }
                   i18n={i18n}
                 />
               </SectionRow>

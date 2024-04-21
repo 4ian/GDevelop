@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import InviteHome from '../../../../ExportAndShare/ShareDialog/InviteHome';
@@ -43,7 +42,7 @@ const notOwnedProjectId = 'not-owned-project-id';
 export default {
   title: 'Share/InviteHome',
   component: InviteHome,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const NotLoggedInOrOffline = () => {

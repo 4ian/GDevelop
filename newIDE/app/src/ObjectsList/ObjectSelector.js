@@ -12,7 +12,7 @@ import ListIcon from '../UI/ListIcon';
 import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 

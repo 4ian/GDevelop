@@ -55,7 +55,7 @@ import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
@@ -210,8 +210,7 @@ export const LeaderboardAdmin = ({
   leaderboardIdToSelectAtOpening,
 }: Props) => {
   const isOnline = useOnlineStatus();
-  const windowWidth = useResponsiveWindowWidth();
-  const isMobileScreen = windowWidth === 'small';
+  const { isMobile } = useResponsiveWindowSize();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
@@ -1198,7 +1197,7 @@ export const LeaderboardAdmin = ({
               <div
                 style={{
                   ...styles.rightColumn,
-                  paddingLeft: isMobileScreen ? 0 : 20,
+                  paddingLeft: isMobile ? 0 : 20,
                 }}
               >
                 <Line alignItems="center" justifyContent="flex-end">

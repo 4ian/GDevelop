@@ -2,20 +2,19 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import LeaderboardAppearanceDialog from '../../../GameDashboard/LeaderboardAdmin/LeaderboardAppearanceDialog';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
   fakeSilverAuthenticatedUser,
-  fakeBusinessAuthenticatedUser,
   fakeAuthenticatedUserWithNoSubscription,
+  fakeStartupAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Leaderboard/LeaderboardAppearanceDialog',
   component: LeaderboardAppearanceDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const WithoutSubscription = () => (
@@ -58,8 +57,8 @@ export const WithSilverSubscription = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const WithBusinessSubscription = () => (
-  <AuthenticatedUserContext.Provider value={fakeBusinessAuthenticatedUser}>
+export const WithStartupSubscription = () => (
+  <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
     <LeaderboardAppearanceDialog
       open
       onClose={() => action('onClose')()}

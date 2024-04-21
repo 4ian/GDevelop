@@ -16,7 +16,47 @@ skip_tags: true # Don't rebuild on tags.
 init:
   - ps: Install-Product node 16
   - cmd: set NODE_OPTIONS=--max-old-space-size=8192
+cache:
+  - '%APPDATA%\npm-cache'               # npm cache
+  - newIDE\app\node_modules -> newIDE\app\package-lock.json
+  - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
+  - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
 install:
+  # Download and install SSL.com eSigner CKA. 
+  # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
+  #
+  # This is necessary because of "signing to be FIPS-140 compliant". See 
+  # https://github.com/electron-userland/electron-builder/issues/6158
+  # 
+  # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
+  # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
+  - ps: >-
+      # Download and Unzip eSignerCKA Setup
+
+      Set-StrictMode -Version 'Latest'
+
+      Invoke-WebRequest -OutFile eSigner_CKA_Setup.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
+
+      Expand-Archive -Force eSigner_CKA_Setup.zip
+
+      Remove-Item eSigner_CKA_Setup.zip
+
+      Move-Item -Destination "eSigner_CKA_Installer.exe" -Path "eSigner_CKA_*\*.exe"
+      
+      # Install it. See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
+
+      New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
+
+      ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
+      
+      # Disable logger.
+
+      # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+
+      # $LogConfig[0] = '<log4net threshold="OFF">'
+
+      # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
+
   # Build GDevelop.js (and run tests to ensure it works).
   # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
   - cmd: >-
@@ -39,7 +79,7 @@ install:
   # setuptools will make distutils available again (but we should migrate our packages probably).
   - cmd: >-
       pip install setuptools
-  
+
       cd newIDE\app
 
       npm -v && npm install
@@ -50,21 +90,54 @@ install:
 
       cd ..\..
 
-# Package the app for Windows (and sign it with the certificate set in environment variables).
+# Package the app for Windows (and sign it).
 # Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
   - ps: >-
       cd newIDE\electron-app
 
+      # Prepare certificate. See https://www.ssl.com/how-to/automate-ev-code-signing-with-signtool-or-certutil-esigner/?_gl=1*vuybcy*_gcl_au*MTEwODg1NDM2Mi4xNzA1ODU1NjM4#automated-code-signing
+
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe config -mode product -user "$Env:ESIGNER_USER_NAME" -pass "$Env:ESIGNER_USER_PASSWORD" -totp "$Env:ESIGNER_USER_TOTP" -key "C:\projects\gdevelop\eSignerCKA\master.key" -r
+
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe unload
+
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe load
+
+      # Find certificate so we can tell electron-builder which one to use.
+
+      $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+
+      echo Certificate: $CodeSigningCert
+
+      # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
+      # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
+
+      $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+
+      # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
+
+      $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
+
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+      # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
+
       node scripts/build.js --win nsis --publish=never
 
-      Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+      # Build the appx (not signed).
+
+      $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+      node scripts/build.js --skip-app-build --win appx --publish=never
 
       cd ..\..
 
   # Clean dist folder to keep only installers/binaries.
   - cmd: >-
-      DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
+      rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
 test_script:

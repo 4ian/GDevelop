@@ -1,14 +1,13 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EditProfileDialog from '../../../Profile/EditProfileDialog';
 
 export default {
   title: 'Profile/EditProfileDialog',
   component: EditProfileDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const defaultProps = {
@@ -52,6 +51,7 @@ const defaultProps = {
     planId: 'planId',
     createdAt: 12345,
     updatedAt: 12345,
+    pricingSystemId: 'whatever',
   },
 };
 export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;

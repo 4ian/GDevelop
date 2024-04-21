@@ -11,6 +11,7 @@ import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialo
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
 import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
 import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 
 type Props = {|
   project: ?gdProject,
@@ -38,13 +39,22 @@ const StoreSection = ({
   const {
     openedAssetPack,
     openedAssetShortHeader,
+    selectedFolders,
   } = shopNavigationState.getCurrentPage();
 
-  const assetShortHeadersToInstall = openedAssetShortHeader
-    ? [openedAssetShortHeader]
-    : openedAssetPack
-    ? assetShortHeadersSearchResults
-    : [];
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return openedAssetShortHeader
+        ? [openedAssetShortHeader]
+        : assetShortHeadersSearchResults
+        ? getAssetShortHeadersToDisplay(
+            assetShortHeadersSearchResults,
+            selectedFolders
+          )
+        : [];
+    },
+    [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]
+  );
 
   const existingAssetStoreIds = React.useMemo(
     () => {
@@ -73,41 +83,46 @@ const StoreSection = ({
         onOpenPrivateGameTemplateListingData={
           onOpenPrivateGameTemplateListingData
         }
+        displayPromotions
       />
-      <Line justifyContent="flex-end">
-        <RaisedButton
-          primary
-          onClick={() => {
-            if (!project) {
-              return; // TODO: create a project, await, and then show dialog.
-            }
+      {(openedAssetPack || openedAssetShortHeader) && (
+        <Line justifyContent="flex-end">
+          <RaisedButton
+            primary
+            onClick={() => {
+              if (!project) {
+                return; // TODO: create a project, await, and then show dialog.
+              }
 
-            setIsAssetPackDialogInstallOpen(true);
-          }}
-          disabled={!project || !assetShortHeadersToInstall.length}
-          label={
-            project ? (
-              openedAssetPack ? (
-                <Trans>Add assets from this pack to the project</Trans>
-              ) : assetShortHeadersToInstall.length === 1 ? (
-                <Trans>Add this asset to the project</Trans>
+              setIsAssetPackDialogInstallOpen(true);
+            }}
+            disabled={!project || !displayedAssetShortHeaders.length}
+            label={
+              project ? (
+                openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                  <Trans>Add this asset to the project</Trans>
+                ) : (
+                  <Trans>Add these assets to the project</Trans>
+                )
+              ) : openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                <Trans>Create a project first to add this asset</Trans>
               ) : (
-                <Trans>Add these assets to the project</Trans>
+                <Trans>
+                  Create a project first to add assets from the asset store
+                </Trans>
               )
-            ) : (
-              <Trans>
-                Create a project first to add assets from the asset store
-              </Trans>
-            )
-          }
-        />
-      </Line>
+            }
+          />
+        </Line>
+      )}
       {project &&
         isAssetPackDialogInstallOpen &&
-        !!assetShortHeadersToInstall.length && (
+        !!displayedAssetShortHeaders.length && (
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
-            assetShortHeaders={assetShortHeadersToInstall}
+            assetShortHeaders={displayedAssetShortHeaders}
             addedAssetIds={existingAssetStoreIds}
             onClose={() => setIsAssetPackDialogInstallOpen(false)}
             onAssetsAdded={() => {

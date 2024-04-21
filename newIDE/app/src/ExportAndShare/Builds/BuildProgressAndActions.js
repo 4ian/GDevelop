@@ -33,6 +33,10 @@ const buildTypesConfig = {
     completeDescription:
       'You can download it on your Android phone and install it.',
   },
+  'cordova-ios-build': {
+    estimatedTimeInSeconds: (build: Build) => 150,
+    completeDescription: '',
+  },
   'electron-build': {
     estimatedTimeInSeconds: (build: Build) =>
       90 + 130 * (build.targets ? build.targets.length : 0),
@@ -71,6 +75,16 @@ const downloadButtons = [
     icon: <Download />,
   },
   {
+    displayName: t`IPA for App Store`,
+    key: 'iosAppStoreIpaKey',
+    icon: <Download />,
+  },
+  {
+    displayName: t`IPA for testing on registered devices`,
+    key: 'iosDevelopmentIpaKey',
+    icon: <Download />,
+  },
+  {
     displayName: t`Linux (AppImage)`,
     key: 'linuxAppImageKey',
     icon: <Download />,
@@ -85,7 +99,7 @@ const downloadButtons = [
 type Props = {|
   build: Build,
   game?: ?Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: () => Promise<void>,
   gameUpdating?: boolean,
   setGameUpdating?: boolean => void,
   onCopyToClipboard?: () => void,
@@ -151,15 +165,10 @@ const BuildProgressAndActions = ({
       if (!answer) return;
       try {
         setGameUpdating(true);
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            publicWebBuildId: buildId,
-          }
-        );
-        onGameUpdated(updatedGame);
+        await updateGame(getAuthorizationHeader, id, game.id, {
+          publicWebBuildId: buildId,
+        });
+        await onGameUpdated();
         setGameUpdating(false);
       } catch (err) {
         console.error('Unable to update the game', err);

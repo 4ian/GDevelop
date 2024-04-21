@@ -23,17 +23,20 @@ import Paper from '../../../../UI/Paper';
 import InlineCheckbox from '../../../../UI/InlineCheckbox';
 import RaisedButton from '../../../../UI/RaisedButton';
 import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import { ColumnStackLayout } from '../../../../UI/Layout';
 import { isOnlyOneFreeAnswerPossible } from './UserSurvey';
 import { type MessageDescriptor } from '../../../../Utils/i18n/MessageDescriptor.flow';
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getColumnsFromWindowSize = (
+  windowSize: WindowSizeType,
+  isLandscape: boolean
+) => {
+  switch (windowSize) {
     case 'small':
-      return 1;
+      return isLandscape ? 3 : 1;
     case 'medium':
       return 2;
     case 'large':
@@ -368,7 +371,7 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
     ref
   ) => {
     const { text, answers, multi } = questionData;
-    const windowWidth = useResponsiveWindowWidth();
+    const { windowSize, isLandscape } = useResponsiveWindowSize();
     const onlyOneFreeAnswerPossible = isOnlyOneFreeAnswerPossible(answers);
     return (
       <I18n>
@@ -385,7 +388,9 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
             ) : null}
             <GridList
               cols={
-                onlyOneFreeAnswerPossible ? 1 : getColumnsFromWidth(windowWidth)
+                onlyOneFreeAnswerPossible
+                  ? 1
+                  : getColumnsFromWindowSize(windowSize, isLandscape)
               }
               spacing={15}
               cellHeight="auto"

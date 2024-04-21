@@ -1,19 +1,18 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import {
-  getFormerSubscriptionPlans,
-  getSubscriptionPlans,
+  type SubscriptionPlanWithPricingSystems,
   type Subscription,
-  type PlanDetails,
   hasMobileAppStoreSubscriptionPlan,
   hasSubscriptionBeenManuallyAdded,
+  getSubscriptionPlanPricingSystem,
+  canPriceBeFoundInGDevelopPrices,
 } from '../../Utils/GDevelopServices/Usage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import RaisedButton from '../../UI/RaisedButton';
-import { Trans } from '@lingui/macro';
 import Text from '../../UI/Text';
 import LeftLoader from '../../UI/LeftLoader';
 import {
@@ -27,14 +26,17 @@ import {
   type SubscriptionType,
 } from './SubscriptionSuggestionContext';
 import Paper from '../../UI/Paper';
-import PlanCard from './PlanCard';
+import PlanSmallCard from './PlanSmallCard';
 import { isNativeMobileApp } from '../../Utils/Platform';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import AlertMessage from '../../UI/AlertMessage';
-import Individuals from './Icons/Individual';
-import Team from './Icons/Team';
-import Education from './Icons/Education';
+import IndividualPlans from './Icons/IndividualPlans';
+import TeamPlans from './Icons/TeamPlans';
+import EducationPlans from './Icons/EducationPlans';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import PlaceholderError from '../../UI/PlaceholderError';
+import Link from '../../UI/Link';
+import Window from '../../Utils/Window';
 
 const styles = {
   diamondIcon: {
@@ -65,22 +67,23 @@ const subscriptionOptions: {
   individual: {
     title: <Trans>For Individuals</Trans>,
     description: <Trans>Hobbyists and indie devs</Trans>,
-    icon: <Individuals style={{ width: 115, height: 100 }} />,
+    icon: <IndividualPlans style={{ width: 115, height: 100 }} />,
   },
   team: {
     title: <Trans>For Teams</Trans>,
     description: <Trans>Companies, studios and agencies</Trans>,
-    icon: <Team style={{ width: 175, height: 100 }} />,
+    icon: <TeamPlans style={{ width: 175, height: 100 }} />,
   },
   education: {
     title: <Trans>For Education</Trans>,
     description: <Trans>Teachers, courses and universities</Trans>,
-    icon: <Education style={{ width: 110, height: 100 }} />,
+    icon: <EducationPlans style={{ width: 110, height: 100 }} />,
   },
 };
 
 type Props = {
   subscription: ?Subscription,
+  subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[],
   onManageSubscription: () => void | Promise<void>,
   isManageSubscriptionLoading: boolean,
   simulateNativeMobileApp?: boolean,
@@ -101,6 +104,7 @@ type Props = {
  */
 const SubscriptionDetails = ({
   subscription,
+  subscriptionPlansWithPricingSystems,
   isManageSubscriptionLoading,
   onManageSubscription,
   simulateNativeMobileApp,
@@ -110,27 +114,103 @@ const SubscriptionDetails = ({
   );
   const { showAlert } = useAlertDialog();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const [
+    userSubscriptionPlanWithPricingSystems,
+    setUserSubscriptionPlanWithPricingSystems,
+  ] = React.useState<?SubscriptionPlanWithPricingSystems>(null);
+  const [error, setError] = React.useState<?React.Node>(null);
+  const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
+    false
+  );
 
-  const userPlan = React.useMemo(
+  React.useEffect(
     () => {
-      if (!subscription) return null;
-      const possiblePlans: Array<PlanDetails> = getSubscriptionPlans().concat(
-        getFormerSubscriptionPlans()
-      );
-      return possiblePlans.find(plan => subscription.planId === plan.planId);
+      (async () => {
+        setError(null);
+        setIsLoadingUserPrice(true);
+        try {
+          if (!subscription) {
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const { planId, pricingSystemId } = subscription;
+          if (!planId || !pricingSystemId) {
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPricingSystems.find(
+            plan => subscription.planId === plan.id
+          );
+          if (!matchingSubscriptionPlanWithPrices) {
+            setError(
+              <Trans>
+                Couldn't find a subscription matching your account. Please get
+                in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          const {
+            pricingSystems,
+            ...subscriptionPlan
+          } = matchingSubscriptionPlanWithPrices;
+
+          if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
+            setUserSubscriptionPlanWithPricingSystems({
+              ...subscriptionPlan,
+              pricingSystems: [],
+            });
+            return;
+          }
+
+          let pricingSystem = pricingSystems.find(
+            price => price.id === subscription.pricingSystemId
+          );
+          if (!pricingSystem) {
+            pricingSystem = await getSubscriptionPlanPricingSystem(
+              pricingSystemId
+            );
+          }
+          if (!pricingSystem) {
+            setError(
+              <Trans>
+                Couldn't find a subscription price matching your account. Please
+                get in touch with us to fix this issue.
+              </Trans>
+            );
+            setUserSubscriptionPlanWithPricingSystems(null);
+            return;
+          }
+
+          setUserSubscriptionPlanWithPricingSystems({
+            ...subscriptionPlan,
+            pricingSystems: [pricingSystem],
+          });
+        } finally {
+          setIsLoadingUserPrice(false);
+        }
+      })();
     },
-    [subscription]
+    [subscription, subscriptionPlansWithPricingSystems]
   );
 
   const redemptionCodeExpirationDate =
     subscription && subscription.redemptionCodeValidUntil;
   const isSubscriptionExpired =
     !!redemptionCodeExpirationDate && redemptionCodeExpirationDate < Date.now();
-
-  if (!subscription) return <PlaceholderLoader />;
-
   const isOnOrSimulateMobileApp =
     isNativeMobileApp() || simulateNativeMobileApp;
+
+  if (error) {
+    return <PlaceholderError>{error}</PlaceholderError>;
+  }
+  if (!subscription || isLoadingUserPrice) {
+    return <PlaceholderLoader />;
+  }
 
   return (
     <Column noMargin>
@@ -141,13 +221,25 @@ const SubscriptionDetails = ({
           </Text>
           <Text size="body" noMargin>
             <Trans>
-              Unlock more exports, cloud projects, leaderboards, collaboration
-              features and remove the GDevelop splashscreen.
+              Publish to Android, iOS, unlock more cloud projects, leaderboards,
+              collaboration features and more online services.{' '}
+              <Link
+                href="https://gdevelop.io/pricing#feature-comparison"
+                onClick={() =>
+                  Window.openExternalURL(
+                    'https://gdevelop.io/pricing#feature-comparison'
+                  )
+                }
+              >
+                Learn more
+              </Link>
             </Trans>
           </Text>
         </Column>
       </Line>
-      {userPlan && userPlan.planId && !isSubscriptionExpired ? (
+      {userSubscriptionPlanWithPricingSystems &&
+      userSubscriptionPlanWithPricingSystems.id &&
+      !isSubscriptionExpired ? (
         isOnOrSimulateMobileApp ? (
           <Paper background="medium" variant="outlined" style={styles.paper}>
             <ResponsiveLineStackLayout alignItems="center" expand noMargin>
@@ -187,8 +279,10 @@ const SubscriptionDetails = ({
         ) : (
           // On web/desktop, displays the subscription as usual:
           <ColumnStackLayout noMargin>
-            <PlanCard
-              plan={userPlan}
+            <PlanSmallCard
+              subscriptionPlanWithPricingSystems={
+                userSubscriptionPlanWithPricingSystems
+              }
               hidePrice={
                 // A redemption code means the price does not really reflect what was paid, so we hide it.
                 !!redemptionCodeExpirationDate ||
@@ -203,10 +297,10 @@ const SubscriptionDetails = ({
                       !hasMobileAppStoreSubscriptionPlan(subscription) &&
                       !hasSubscriptionBeenManuallyAdded(subscription) ? (
                         <FlatButton
-                          key="manage-online"
+                          key="manage-payments"
                           label={
                             <LeftLoader isLoading={isManageSubscriptionLoading}>
-                              <Trans>Manage online</Trans>
+                              <Trans>Manage payments</Trans>
                             </LeftLoader>
                           }
                           primary
@@ -215,7 +309,7 @@ const SubscriptionDetails = ({
                         />
                       ) : null,
                       <RaisedButton
-                        key="manage"
+                        key="manage-subscription"
                         label={<Trans>Manage subscription</Trans>}
                         primary
                         onClick={() =>
@@ -296,7 +390,7 @@ const SubscriptionDetails = ({
             </ResponsiveLineStackLayout>
           </Paper>
         ) : (
-          <ResponsiveLineStackLayout>
+          <ResponsiveLineStackLayout noColumnMargin>
             {Object.keys(subscriptionOptions).map(key => {
               const { title, description, icon } = subscriptionOptions[key];
               return (

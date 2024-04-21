@@ -5,7 +5,6 @@ import { FileToCloudProjectResourceUploader } from '../../../ResourcesList/FileT
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
@@ -20,7 +19,7 @@ const gd: libGDevelop = global.gd;
 export default {
   title: 'ResourcesList/FileToCloudProjectResourceUploader',
   component: FileToCloudProjectResourceUploader,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const Default = () => (

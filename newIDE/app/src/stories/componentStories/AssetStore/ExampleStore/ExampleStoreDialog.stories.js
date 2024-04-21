@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { action } from '@storybook/addon-actions';
 import { ExampleStoreStateProvider } from '../../../../AssetStore/ExampleStore/ExampleStoreContext';
@@ -9,7 +8,7 @@ import ExampleStoreDialog from '../../../../AssetStore/ExampleStore/ExampleStore
 export default {
   title: 'Project Creation/ExampleStoreDialog',
   component: ExampleStoreDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

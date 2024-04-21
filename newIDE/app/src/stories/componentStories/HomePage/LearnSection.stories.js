@@ -31,6 +31,7 @@ export const Default = () => (
       }}
     >
       <LearnSection
+        initialCategory={null}
         onOpenExampleStore={action('onOpenExampleStore')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}
@@ -52,6 +53,7 @@ export const EducationSubscriber = () => (
         }}
       >
         <LearnSection
+          initialCategory={null}
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -74,6 +76,7 @@ export const EducationTeacher = () => (
         }}
       >
         <LearnSection
+          initialCategory={null}
           onOpenExampleStore={action('onOpenExampleStore')}
           onTabChange={() => {}}
           selectInAppTutorial={action('selectInAppTutorial')}
@@ -93,6 +96,7 @@ export const Loading = () => (
       }}
     >
       <LearnSection
+        initialCategory={null}
         onOpenExampleStore={action('onOpenExampleStore')}
         onTabChange={() => {}}
         selectInAppTutorial={action('selectInAppTutorial')}

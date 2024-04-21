@@ -1,5 +1,6 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -62,6 +63,7 @@ type Props = {|
   onInstall?: () => Promise<void>,
   onEdit?: () => void,
   project: gdProject,
+  i18n: I18nType,
 |};
 
 const ExtensionInstallDialog = ({
@@ -71,6 +73,7 @@ const ExtensionInstallDialog = ({
   onInstall,
   onEdit,
   project,
+  i18n,
 }: Props) => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
@@ -114,26 +117,61 @@ const ExtensionInstallDialog = ({
     extensionShortHeader
   );
 
+  const hasBreakingChanges =
+    extensionUpdate && extensionUpdate.type === 'major';
+
+  const potentiallyHasBreakingChanges =
+    extensionUpdate &&
+    (extensionUpdate.type === 'unknown' ||
+      extensionShortHeader.tier === 'community');
+
+  const isDowngrade = extensionUpdate && extensionUpdate.isDowngrade;
+
   const canInstallExtension = !isInstalling && isCompatible;
   const onInstallExtension = React.useCallback(
     () => {
       if (canInstallExtension && onInstall) {
         if (isAlreadyInstalled) {
-          let dialogText =
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
-          if (!isFromStore)
-            dialogText =
-              'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
-
-          const answer = Window.showConfirmDialog(dialogText);
+          const answer = Window.showConfirmDialog(
+            !isFromStore
+              ? i18n._(
+                  t`Another extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?`
+                )
+              : isDowngrade
+              ? i18n._(
+                  t`The currently installed version of this extension has a higher version number than the latest one on the registery. Do you really wish to override your current version with an older one?`
+                )
+              : hasBreakingChanges
+              ? i18n._(
+                  t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : potentiallyHasBreakingChanges
+              ? i18n._(
+                  t`The latest version will be installed, but it cannot be determined whether this update includes breaking changes. Adaptations may be required for your game to keep working. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : extensionUpdate
+              ? i18n._(
+                  t`The extension will be updated. Any modifications you might have made to the extension since installing it will be discarded. Do you want to continue?`
+                )
+              : i18n._(
+                  t`This extension is already in your project, and will be reinstalled. Any modifications you might have made to the extension since installing it will be discarded. Do you want to continue?`
+                )
+          );
           if (!answer) return;
-          onInstall();
-        } else {
-          onInstall();
         }
+        onInstall();
       }
     },
-    [onInstall, canInstallExtension, isAlreadyInstalled, isFromStore]
+    [
+      onInstall,
+      canInstallExtension,
+      isAlreadyInstalled,
+      hasBreakingChanges,
+      potentiallyHasBreakingChanges,
+      isDowngrade,
+      isFromStore,
+      i18n,
+    ]
   );
 
   const showOutOfDateAlert = useOutOfDateAlertDialog();
@@ -177,8 +215,12 @@ const ExtensionInstallDialog = ({
                 ) : isAlreadyInstalled ? (
                   isFromStore ? (
                     extensionUpdate ? (
-                      extensionShortHeader.tier === 'community' ? (
-                        <Trans>Update (could break the project)</Trans>
+                      extensionUpdate.isDowngrade ? (
+                        <Trans>Downgrade</Trans>
+                      ) : potentiallyHasBreakingChanges ? (
+                        <Trans>Update (could potentially break the project)</Trans>
+                      ) : hasBreakingChanges ? (
+                        <Trans>Update (will likely break the project)</Trans>
                       ) : (
                         <Trans>Update</Trans>
                       )

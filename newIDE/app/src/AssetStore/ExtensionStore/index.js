@@ -166,9 +166,9 @@ export const ExtensionStore = ({
                 setSelectedExtensionShortHeader(extensionShortHeader);
               }}
             />
-          </ColumnStackLayout>
-        )}
-      </ResponsiveWindowMeasurer>
+          )}
+        />
+      </ColumnStackLayout>
       <I18n>
         {({ i18n }) =>
           !!selectedExtensionShortHeader && (

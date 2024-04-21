@@ -138,7 +138,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
     {
       // TODO: Fix this test!
-      auto node = parser.ParseExpression("'hello \"\\\"\" \\'world\\''");
+      auto node = parser.ParseExpression("'hello \"\\\"\" \\\'world\\''");
       REQUIRE(node != nullptr);
       // The error comes from the cast here, apparently. Is this not parsed as a TextNode?
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);

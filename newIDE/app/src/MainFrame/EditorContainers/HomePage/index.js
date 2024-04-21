@@ -15,6 +15,7 @@ import PlaySection from './PlaySection';
 import ManageSection from './ManageSection';
 import CommunitySection from './CommunitySection';
 import StoreSection from './StoreSection';
+import { type TutorialCategory } from '../../../Utils/GDevelopServices/Tutorial';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
@@ -199,6 +200,10 @@ export const HomePage = React.memo<Props>(
         : 'build';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
+      const [
+        learnInitialCategory,
+        setLearnInitialCategory,
+      ] = React.useState<TutorialCategory | null>(null);
 
       const { setInitialPackUserFriendlySlug } = React.useContext(
         AssetStoreContext
@@ -475,6 +480,7 @@ export const HomePage = React.memo<Props>(
                       onOpenExampleStore={onOpenExampleStore}
                       onTabChange={setActiveTab}
                       selectInAppTutorial={selectInAppTutorial}
+                      initialCategory={learnInitialCategory}
                     />
                   )}
                   {activeTab === 'play' && <PlaySection />}
@@ -495,6 +501,10 @@ export const HomePage = React.memo<Props>(
                       onOpenRecentFile={onOpenRecentFile}
                       storageProviders={storageProviders}
                       currentFileMetadata={fileMetadata}
+                      onOpenTeachingResources={() => {
+                        setLearnInitialCategory('education-curriculum');
+                        setActiveTab('learn');
+                      }}
                     />
                   )}
                 </div>

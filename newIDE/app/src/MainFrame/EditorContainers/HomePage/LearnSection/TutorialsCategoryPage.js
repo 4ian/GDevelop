@@ -9,6 +9,8 @@ import {
 import { formatTutorialToImageTileComponent, TUTORIAL_CATEGORY_TEXTS } from '.';
 import ImageTileGrid from '../../../../UI/ImageTileGrid';
 import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
 
 const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
   switch (windowSize) {
@@ -32,10 +34,17 @@ type Props = {|
 |};
 
 const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
+  const { limits } = React.useContext(AuthenticatedUserContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
   const filteredTutorials = tutorials.filter(
     tutorial => tutorial.category === category
   );
+
+  const [
+    selectedTutorial,
+    setSelectedTutorial,
+  ] = React.useState<Tutorial | null>(null);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -47,11 +56,22 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
           <SectionRow>
             <ImageTileGrid
               items={filteredTutorials.map(tutorial =>
-                formatTutorialToImageTileComponent(i18n, tutorial)
+                formatTutorialToImageTileComponent({
+                  i18n,
+                  limits,
+                  tutorial,
+                  onSelectTutorial: setSelectedTutorial,
+                })
               )}
               getColumnsFromWindowSize={getColumnsFromWindowSize}
             />
           </SectionRow>
+          {selectedTutorial && (
+            <PrivateTutorialViewDialog
+              tutorial={selectedTutorial}
+              onClose={() => setSelectedTutorial(null)}
+            />
+          )}
         </SectionContainer>
       )}
     </I18n>

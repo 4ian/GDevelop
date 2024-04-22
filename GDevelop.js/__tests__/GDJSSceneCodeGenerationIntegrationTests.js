@@ -19,7 +19,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'SetNumberVariable' },
             parameters: ['Counter', '+', '1'],
           },
         ],
@@ -30,7 +30,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'SetNumberVariable' },
             parameters: ['Counter', '+', '2'],
           },
         ],
@@ -54,7 +54,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'SetNumberVariable' },
             parameters: ['Counter', '+', '4'],
           },
         ],
@@ -69,7 +69,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'SetNumberVariable' },
             parameters: ['Counter', '+', '8'],
           },
         ],
@@ -141,7 +141,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
         conditions: [],
         actions: [
           {
-            type: { value: 'ModVarScene' },
+            type: { value: 'SetNumberVariable' },
             parameters: ['Counter', '+', '1'],
           },
         ],
@@ -240,7 +240,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           conditions: [],
           actions: [
             {
-              type: { value: 'ModVarScene' },
+              type: { value: 'SetNumberVariable' },
               parameters: [
                 'Counter',
                 '+',
@@ -283,7 +283,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           conditions: [],
           actions: [
             {
-              type: { value: 'ModVarScene' },
+              type: { value: 'SetNumberVariable' },
               parameters: [
                 'Counter',
                 '+',
@@ -326,7 +326,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           conditions: [],
           actions: [
             {
-              type: { value: 'ModVarScene' },
+              type: { value: 'SetNumberVariable' },
               parameters: [
                 'Counter',
                 '+',

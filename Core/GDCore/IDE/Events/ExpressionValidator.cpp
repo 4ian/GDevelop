@@ -424,7 +424,6 @@ const gd::String ExpressionValidator::stringTypeString = "string";
 const gd::String ExpressionValidator::numberOrStringTypeString =
     "number|string";
 const gd::String ExpressionValidator::variableTypeString = "variable";
-const gd::String ExpressionValidator::legacyVariableTypeString = "legacyVariable";
 const gd::String ExpressionValidator::objectTypeString = "object";
 const gd::String ExpressionValidator::emptyTypeString = "empty";
 
@@ -441,7 +440,9 @@ const gd::String& ExpressionValidator::TypeToString(Type type) {
     case Type::Variable:
       return variableTypeString;
     case Type::LegacyVariable:
-      return legacyVariableTypeString;
+      // This function is only used to display error.
+      // Users don't care if it's legacy or not.
+      return variableTypeString;
     case Type::Object:
       return objectTypeString;
     case Type::Empty:

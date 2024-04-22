@@ -13,6 +13,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
   it('generates code for a link to an external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
+    layout.getVariables().insertNew('Counter', 0).setValue(0);
     const serializedLayoutEvents = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -104,6 +105,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
   it('generates code for nested links to external events', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const layout = project.insertNewLayout('Scene', 0);
+    layout.getVariables().insertNew('Counter', 0).setValue(0);
     const serializedLayoutEvents = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Link',
@@ -234,6 +236,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     });
 
     it('generates code for structure variables accessed by another variable (1 level)', function () {
+      layout.getVariables().insertNew('Counter', 0).setValue(0);
       const serializedLayoutEvents = gd.Serializer.fromJSObject([
         {
           type: 'BuiltinCommonInstructions::Standard',
@@ -277,6 +280,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     });
 
     it('generates code for structure variables accessed by another variable (2 levels)', function () {
+      layout.getVariables().insertNew('Counter', 0).setValue(0);
       const serializedLayoutEvents = gd.Serializer.fromJSObject([
         {
           type: 'BuiltinCommonInstructions::Standard',
@@ -320,6 +324,7 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
     });
 
     it('generates code for structure variables accessed by another variable (3 levels)', function () {
+      layout.getVariables().insertNew('Counter', 0).setValue(0);
       const serializedLayoutEvents = gd.Serializer.fromJSObject([
         {
           type: 'BuiltinCommonInstructions::Standard',

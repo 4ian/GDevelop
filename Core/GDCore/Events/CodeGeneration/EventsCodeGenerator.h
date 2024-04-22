@@ -545,6 +545,8 @@ class GD_CORE_API EventsCodeGenerator {
 
     } else if (scope == PROJECT_VARIABLE) {
       return "getProjectVariable(" + variableName + ")";
+    } else if (scope == ANY_VARIABLE) {
+      return "getAnyVariable(" + variableName + ")";
     }
 
     return "getVariableForObject(" + objectName + ", " + variableName + ")";

@@ -627,7 +627,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneVariable).getAsNumber() + 1");
     }
     {
       auto node =
@@ -639,7 +639,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsNumber() + getLayoutVariable(MySceneVariable2).getAsNumber()");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneVariable).getAsNumber() + getAnyVariable(MySceneVariable2).getAsNumber()");
     }
   }
   SECTION("Scene variables (conflict with a global variable)") {
@@ -653,7 +653,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(SceneVariableWithNameReused).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(SceneVariableWithNameReused).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels)") {
@@ -667,7 +667,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + 1");
     }
     {
       auto node =
@@ -679,7 +679,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + getLayoutVariable(MySceneStructureVariable2).getChild(\"MyChild\").getAsNumber()");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + getAnyVariable(MySceneStructureVariable2).getChild(\"MyChild\").getAsNumber()");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, string)") {
@@ -693,7 +693,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + 1");
     }
     {
       auto node =
@@ -705,7 +705,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + getLayoutVariable(MySceneStructureVariable2).getChild(\"MyChild\").getAsNumber()");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getAsNumber() + getAnyVariable(MySceneStructureVariable2).getChild(\"MyChild\").getAsNumber()");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, number)") {
@@ -719,7 +719,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(3).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(3).getAsNumber() + 1");
     }
     {
       auto node =
@@ -731,7 +731,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(3).getAsNumber() + getLayoutVariable(MySceneStructureVariable2).getChild(3).getAsNumber()");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(3).getAsNumber() + getAnyVariable(MySceneStructureVariable2).getChild(3).getAsNumber()");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a number variable as index)") {
@@ -745,7 +745,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneVariable).getAsNumber()).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneVariable).getAsNumber()).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a string variable as index)") {
@@ -759,7 +759,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneStringVariable).getAsString()).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneStringVariable).getAsString()).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a non string/number variable as index)") {
@@ -773,7 +773,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneBooleanVariable).getAsNumberOrString()).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneBooleanVariable).getAsNumberOrString()).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a unknown variable type as index)") {
@@ -787,7 +787,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumberOrString()).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumberOrString()).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a unknown variable type and an operator with a number as index)") {
@@ -801,7 +801,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumber() + 2).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumber() + 2).getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a unknown variable type and an operator with a string as index)") {
@@ -815,7 +815,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsString() + \"Test\").getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsString() + \"Test\").getAsNumber() + 1");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a unknown variable type as index) (expression type: number|string)") {
@@ -829,7 +829,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumberOrString()).getAsNumberOrString()");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumberOrString()).getAsNumberOrString()");
     }
   }
   SECTION("Scene variables (2 levels with bracket accessor, using a number variable casted to string as index)") {
@@ -843,7 +843,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStructureVariable).getChild(\"\" + getLayoutVariable(MySceneVariable).getAsString()).getAsNumber() + 1");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStructureVariable).getChild(\"\" + getAnyVariable(MySceneVariable).getAsString()).getAsNumber() + 1");
     }
   }
   SECTION("Object variable with non existing object (invalid)") {
@@ -1028,12 +1028,12 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     SECTION("simple variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "variable", "MySceneVariable", "")
-              == "getLayoutVariable(MySceneVariable)");
+              == "getAnyVariable(MySceneVariable)");
     }
     SECTION("simple (global) variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "variable", "MyGlobalNumberVariable", "")
-              == "getProjectVariable(MyGlobalNumberVariable)");
+              == "getAnyVariable(MyGlobalNumberVariable)");
     }
   }
   SECTION("Valid variables (legacy, pre-scoped variables)") {
@@ -1071,32 +1071,32 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     SECTION("bracket access (using a string variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MySceneStringVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getLayoutVariable(MySceneStringVariable).getAsString())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneStringVariable).getAsString())");
     }
     SECTION("bracket access (using a number variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MySceneVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getLayoutVariable(MySceneVariable).getAsNumber())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneVariable).getAsNumber())");
     }
     SECTION("bracket access (using a string global variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MyGlobalStringVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getProjectVariable(MyGlobalStringVariable).getAsString())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MyGlobalStringVariable).getAsString())");
     }
     SECTION("bracket access (using a number global variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MyGlobalNumberVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getProjectVariable(MyGlobalNumberVariable).getAsNumber())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MyGlobalNumberVariable).getAsNumber())");
     }
     SECTION("bracket access (using a boolean variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MySceneBooleanVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getLayoutVariable(MySceneBooleanVariable).getAsNumberOrString())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneBooleanVariable).getAsNumberOrString())");
     }
     SECTION("bracket access (using a structure variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable[MySceneStructureVariable.MyChild.SubChild]", "")
-              == "getLayoutVariable(myVariable).getChild(getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"SubChild\").getAsNumberOrString())");
+              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"SubChild\").getAsNumberOrString())");
     }
     SECTION("object variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -1106,7 +1106,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     SECTION("object variable with bracket access (using a structure variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "myVariable[MySceneStringVariable]", "MySpriteObject")
-              == "getVariableForObject(MySpriteObject, myVariable).getChild(getLayoutVariable(MySceneStringVariable).getAsString())");
+              == "getVariableForObject(MySpriteObject, myVariable).getChild(getAnyVariable(MySceneStringVariable).getAsString())");
     }
     SECTION("object variable with bracket access (using an object variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -1322,7 +1322,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getLayoutVariable(MySceneVariable).getAsString() + \" points\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getAnyVariable(MySceneVariable).getAsString() + \" points\"");
       }
       {
         auto node =
@@ -1334,7 +1334,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneStringVariable).getAsString()");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneVariable).getAsString() + getAnyVariable(MySceneStringVariable).getAsString()");
       }
     }
     SECTION("Expression/parent type is 'string' (with an unknown variable)") {
@@ -1348,7 +1348,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsString() + \" points\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"You have \" + getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsString() + \" points\"");
       }
     }
     SECTION("Expression/parent type is 'string' (2 number variables)") {
@@ -1362,7 +1362,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneVariable2).getAsString() + \"world\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneVariable).getAsString() + getAnyVariable(MySceneVariable2).getAsString() + \"world\"");
       }
       {
         auto node =
@@ -1374,7 +1374,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneVariable).getAsString() + getLayoutVariable(MySceneVariable2).getAsString() + getLayoutVariable(MySceneStringVariable).getAsString()");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneVariable).getAsString() + getAnyVariable(MySceneVariable2).getAsString() + getAnyVariable(MySceneStringVariable).getAsString()");
       }
     }
     SECTION("Expression/parent type is 'string' (array variable)") {
@@ -1388,7 +1388,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(2).getAsString() + \"world\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getAnyVariable(MySceneNumberArrayVariable).getChild(2).getAsString() + \"world\"");
       }
       {
         auto node =
@@ -1400,7 +1400,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneEmptyArrayVariable).getChild(2).getAsString() + \"world\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getAnyVariable(MySceneEmptyArrayVariable).getChild(2).getAsString() + \"world\"");
       }
     }
 
@@ -1415,7 +1415,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneVariable).getAsNumber() + 456");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getAnyVariable(MySceneVariable).getAsNumber() + 456");
       }
       {
         auto node =
@@ -1427,7 +1427,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneVariable).getAsNumber()");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStringVariable).getAsNumber() + getAnyVariable(MySceneVariable).getAsNumber()");
       }
     }
     SECTION("Expression/parent type is 'string' (with an unknown variable)") {
@@ -1441,7 +1441,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumber() + 456");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"CantKnownTheTypeSoStayGeneric\").getAsNumber() + 456");
       }
     }
     SECTION("Expression/parent type is 'number' (2 string variables)") {
@@ -1455,7 +1455,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneStringVariable).getAsNumber() + 456");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStringVariable).getAsNumber() + getAnyVariable(MySceneStringVariable).getAsNumber() + 456");
       }
       {
         auto node =
@@ -1467,7 +1467,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneStringVariable).getAsNumber() + getLayoutVariable(MySceneVariable).getAsNumber()");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "getAnyVariable(MySceneStringVariable).getAsNumber() + getAnyVariable(MySceneStringVariable).getAsNumber() + getAnyVariable(MySceneVariable).getAsNumber()");
       }
     }
     SECTION("Expression/parent type is 'number' (array variable)") {
@@ -1481,7 +1481,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneNumberArrayVariable).getChild(2).getAsNumber() + 456");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getAnyVariable(MySceneNumberArrayVariable).getChild(2).getAsNumber() + 456");
       }
       {
         auto node =
@@ -1493,7 +1493,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getLayoutVariable(MySceneEmptyArrayVariable).getChild(2).getAsNumber() + 456");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "123 + getAnyVariable(MySceneEmptyArrayVariable).getChild(2).getAsNumber() + 456");
       }
     }
 
@@ -1509,7 +1509,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(2 + getLayoutVariable(MySceneStringVariable).getAsNumber()).getAsString() + \"world\" + getLayoutVariable(MySceneVariable).getAsString() + \"world 2\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getAnyVariable(MySceneNumberArrayVariable).getChild(2 + getAnyVariable(MySceneStringVariable).getAsNumber()).getAsString() + \"world\" + getAnyVariable(MySceneVariable).getAsString() + \"world 2\"");
       }
       {
         auto node =
@@ -1521,7 +1521,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
         REQUIRE(node);
         node->Visit(expressionCodeGenerator);
-        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getLayoutVariable(MySceneNumberArrayVariable).getChild(\"foo\" + getLayoutVariable(MySceneVariable).getAsString() + \"bar\").getAsString() + \"world\" + getLayoutVariable(MySceneVariable).getAsString() + \"world 2\"");
+        REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + getAnyVariable(MySceneNumberArrayVariable).getChild(\"foo\" + getAnyVariable(MySceneVariable).getAsString() + \"bar\").getAsString() + \"world\" + getAnyVariable(MySceneVariable).getAsString() + \"world 2\"");
       }
     }
   }

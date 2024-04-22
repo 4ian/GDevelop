@@ -1,7 +1,8 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks.js');
 const {
-  generateCompiledEventsForLayout,
+  generateCompiledEventsForEventsFunction,
+  generateCompiledEventsFromSerializedEvents,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 
 describe('libGD.js - GDJS Code Generation integration tests', function () {
@@ -10,111 +11,105 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     gd = await initializeGDevelopJs();
   });
 
-  let project = null;
-  let layout = null;
-  beforeEach(() => {
-    project = new gd.ProjectHelper.createNewGDJSProject();
-    layout = project.insertNewLayout('Scene', 0);
-  });
-
   const generateAndRunVariableAffectationWithConditions = (
+    variableValue,
     conditions
   ) => {
-    layout.getVariables().insertNew('SuccessVariable', 0).setValue(0);
-    const serializedLayoutEvents = gd.Serializer.fromJSObject([
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarSceneTxt' },
+            parameters: ['MyVariable', '=', `"${variableValue}"`],
+          },
+        ],
+        events: [],
+      },
       {
         type: 'BuiltinCommonInstructions::Standard',
         conditions,
         actions: [
           {
-            type: { value: 'SetNumberVariable' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '=', '1'],
           },
         ],
         events: [],
       },
     ]);
-    layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
-    const runCompiledEvents = generateCompiledEventsForLayout(
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
-      project,
-      layout
+      serializerElement,
+      { logCode: false }
     );
 
-    const serializedSceneElement = new gd.SerializerElement();
-    layout.serializeTo(serializedSceneElement);
-
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock({
-      sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
-    });
-    serializedSceneElement.delete();
-
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
     return runtimeScene;
   };
 
   it('can generate a string variable condition that is true', function () {
-    layout.getVariables().insertNew('MyVariable', 0).setString("Same value");
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Same value",
       [
         {
-          type: { inverted: false, value: 'StringVariable' },
+          type: { inverted: false, value: 'VarSceneTxt' },
           parameters: ['MyVariable', '=', '"Same value"'],
         },
       ]
     );
 
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
   });
 
   it('can generate a string variable condition that is false', function () {
-    layout.getVariables().insertNew('MyVariable', 0).setString("Not the same");
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Not the same",
       [
         {
-          type: { inverted: false, value: 'StringVariable' },
+          type: { inverted: false, value: 'VarSceneTxt' },
           parameters: ['MyVariable', '=', '"Different"'],
         },
       ]
     );
 
-    expect(
-      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-    ).toBe(0);
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
   });
 
   it('can generate a string variable condition that is true with a contains operator', function () {
-    layout.getVariables().insertNew('MyVariable', 0).setString("Hello world!");
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Hello world!",
       [
         {
-          type: { inverted: false, value: 'StringVariable' },
+          type: { inverted: false, value: 'VarSceneTxt' },
           parameters: ['MyVariable', 'contains', '"world"'],
         },
       ]
     );
 
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
   });
 
   it('can generate a string variable condition that is false with a contains operator', function () {
-    layout.getVariables().insertNew('MyVariable', 0).setString("Hello world!");
     const runtimeScene = generateAndRunVariableAffectationWithConditions(
+      "Hello world!",
       [
         {
-          type: { inverted: false, value: 'StringVariable' },
+          type: { inverted: false, value: 'VarSceneTxt' },
           parameters: ['MyVariable', 'contains', '"Hi!"'],
         },
       ]
     );
 
-    expect(
-      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-    ).toBe(0);
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
   });
 });

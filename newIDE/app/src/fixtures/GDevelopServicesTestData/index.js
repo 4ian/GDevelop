@@ -4032,6 +4032,24 @@ export const commentUnprocessed: Comment = {
   updatedAt: 1515084393000,
 };
 
+export const commentWithNoTextUnprocessed: Comment = {
+  id: 'comment-unprocessed-id',
+  type: 'FEEDBACK',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
+  text: '',
+  ratings: {
+    version: 1,
+    visuals: 2,
+    sound: 4,
+    fun: 6,
+    easeOfUse: 8,
+  },
+  playerName: 'playerName', // For non-authenticated comments.
+  createdAt: 1515084391000,
+  updatedAt: 1515084393000,
+};
+
 export const commentProcessed: Comment = {
   id: 'comment-processed-id',
   type: 'FEEDBACK',

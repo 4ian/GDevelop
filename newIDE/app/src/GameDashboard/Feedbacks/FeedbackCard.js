@@ -21,6 +21,7 @@ import {
   updateComment,
   type Comment,
   type GameRatings,
+  canCommentBeRatedByOwner,
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
@@ -119,6 +120,7 @@ const FeedbackCard = ({
     !!comment.processedAt,
     processComment
   );
+  const canRateComment = canCommentBeRatedByOwner(comment);
 
   const [ownerQualityRating, setOwnerQualityRating] = useOptimisticState(
     (comment.qualityRatingPerRole && comment.qualityRatingPerRole.owner) ||
@@ -158,58 +160,62 @@ const FeedbackCard = ({
             disabled={processed}
             cardCornerAction={
               <LineStackLayout noMargin>
-                <IconButton
-                  size="small"
-                  tooltip={t`Rank this comment as great`}
-                  onClick={() => setOwnerQualityRating('great', i18n)}
-                >
-                  <Heart
-                    htmlColor={
-                      ownerQualityRating === 'great'
-                        ? theme.message.valid
-                        : undefined
-                    }
-                  />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  tooltip={t`Rank this comment as good`}
-                  onClick={() => setOwnerQualityRating('good', i18n)}
-                >
-                  <Like
-                    htmlColor={
-                      ownerQualityRating === 'good'
-                        ? theme.message.valid
-                        : undefined
-                    }
-                  />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  tooltip={t`Rank this comment as bad`}
-                  onClick={() => setOwnerQualityRating('bad', i18n)}
-                >
-                  <Dislike
-                    htmlColor={
-                      ownerQualityRating === 'bad'
-                        ? theme.message.warning
-                        : undefined
-                    }
-                  />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  tooltip={t`Report this comment as abusive, harmful or spam`}
-                  onClick={() => setOwnerQualityRating('harmful', i18n)}
-                >
-                  <Danger
-                    htmlColor={
-                      ownerQualityRating === 'harmful'
-                        ? theme.message.error
-                        : undefined
-                    }
-                  />
-                </IconButton>
+                {canRateComment && (
+                  <LineStackLayout noMargin>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as great`}
+                      onClick={() => setOwnerQualityRating('great', i18n)}
+                    >
+                      <Heart
+                        htmlColor={
+                          ownerQualityRating === 'great'
+                            ? theme.message.valid
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as good`}
+                      onClick={() => setOwnerQualityRating('good', i18n)}
+                    >
+                      <Like
+                        htmlColor={
+                          ownerQualityRating === 'good'
+                            ? theme.message.valid
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as bad`}
+                      onClick={() => setOwnerQualityRating('bad', i18n)}
+                    >
+                      <Dislike
+                        htmlColor={
+                          ownerQualityRating === 'bad'
+                            ? theme.message.warning
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Report this comment as abusive, harmful or spam`}
+                      onClick={() => setOwnerQualityRating('harmful', i18n)}
+                    >
+                      <Danger
+                        htmlColor={
+                          ownerQualityRating === 'harmful'
+                            ? theme.message.error
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                  </LineStackLayout>
+                )}
                 <IconButton
                   size="small"
                   tooltip={processed ? t`Mark as unread` : t`Mark as read`}

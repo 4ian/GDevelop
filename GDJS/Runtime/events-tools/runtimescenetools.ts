@@ -284,6 +284,7 @@ namespace gdjs {
         yPos: float,
         zPos: float
       ) {
+        console.log('creating objects from ext layout');
         const externalLayoutData = scene
           .getGame()
           .getExternalLayoutData(externalLayout);

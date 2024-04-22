@@ -73,6 +73,21 @@ namespace gdjs {
       return false;
     }
 
+    getNetworkSyncData(): Object | null {
+      // To be redefined by behaviors that need to synchronize properties.
+      // If null, the behavior will not be synchronized.
+      return null;
+    }
+
+    /**
+     * Update the behavior properties using the provided data.
+     * @param networkSyncData The new properties of the behavior.
+     */
+    updateFromBehaviorNetworkSyncData(networkSyncData: Object): void {
+      // Do nothing by default.
+      // Must be redefined by behaviors that need to synchronize properties.
+    }
+
     /**
      * Get the name of the behavior.
      * @return The behavior's name.

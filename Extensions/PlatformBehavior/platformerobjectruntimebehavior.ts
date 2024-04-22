@@ -86,6 +86,11 @@ namespace gdjs {
     _releasePlatformKey: boolean = false;
     _releaseLadderKey: boolean = false;
 
+    // This is useful when the object is synchronized by an external source
+    // like in a multiplayer game, and we want to be able to predict the
+    // movement of the object, even if the inputs are not updated every frame.
+    _dontClearInputsBetweenFrames: boolean = false;
+
     // This is useful for extensions that need to know
     // which keys were pressed and doesn't know the mapping
     // done by the scene events.
@@ -156,6 +161,111 @@ namespace gdjs {
       this._state = this._falling;
     }
 
+    getNetworkSyncData() {
+      return {
+        currentSpeed: this._currentSpeed,
+        requestedDeltaX: this._requestedDeltaX,
+        requestedDeltaY: this._requestedDeltaY,
+        lastDeltaY: this._lastDeltaY,
+        currentFallSpeed: this._currentFallSpeed,
+        canJump: this._canJump,
+        lastDirectionIsLeft: this._lastDirectionIsLeft,
+        leftKey: this._wasLeftKeyPressed,
+        rightKey: this._wasRightKeyPressed,
+        ladderKey: this._wasLadderKeyPressed,
+        upKey: this._wasUpKeyPressed,
+        downKey: this._wasDownKeyPressed,
+        jumpKey: this._wasJumpKeyPressed,
+        releasePlatformKey: this._wasReleasePlatformKeyPressed,
+        releaseLadderKey: this._wasReleaseLadderKeyPressed,
+        stateName: this._state.toString(),
+        stateSyncData: this._state.getNetworkSyncData(),
+      };
+    }
+
+    updateFromBehaviorNetworkSyncData(networkSyncData) {
+      // console.log('updateFromBehaviorNetworkSyncData', networkSyncData);
+      if (networkSyncData.currentSpeed !== this._currentSpeed) {
+        this._currentSpeed = networkSyncData.currentSpeed;
+      }
+      if (networkSyncData.requestedDeltaX !== this._requestedDeltaX) {
+        this._requestedDeltaX = networkSyncData.requestedDeltaX;
+      }
+      if (networkSyncData.requestedDeltaY !== this._requestedDeltaY) {
+        this._requestedDeltaY = networkSyncData.requestedDeltaY;
+      }
+      if (networkSyncData.lastDeltaY !== this._lastDeltaY) {
+        this._lastDeltaY = networkSyncData.lastDeltaY;
+      }
+      if (networkSyncData.currentFallSpeed !== this._currentFallSpeed) {
+        this._currentFallSpeed = networkSyncData.currentFallSpeed;
+      }
+      if (networkSyncData.canJump !== this._canJump) {
+        this._canJump = networkSyncData.canJump;
+      }
+      if (networkSyncData.lastDirectionIsLeft !== this._lastDirectionIsLeft) {
+        this._lastDirectionIsLeft = networkSyncData.lastDirectionIsLeft;
+      }
+      if (networkSyncData.leftKey !== this._leftKey) {
+        this._leftKey = networkSyncData.leftKey;
+      }
+      if (networkSyncData.rightKey !== this._rightKey) {
+        this._rightKey = networkSyncData.rightKey;
+      }
+      if (networkSyncData.ladderKey !== this._ladderKey) {
+        this._ladderKey = networkSyncData.ladderKey;
+      }
+      if (networkSyncData.upKey !== this._upKey) {
+        this._upKey = networkSyncData.upKey;
+      }
+      if (networkSyncData.downKey !== this._downKey) {
+        this._downKey = networkSyncData.downKey;
+      }
+      if (networkSyncData.jumpKey !== this._jumpKey) {
+        // console.log('setting jump key');
+        this._jumpKey = networkSyncData.jumpKey;
+      }
+      if (networkSyncData.releasePlatformKey !== this._releasePlatformKey) {
+        this._releasePlatformKey = networkSyncData.releasePlatformKey;
+      }
+      if (networkSyncData.releaseLadderKey !== this._releaseLadderKey) {
+        this._releaseLadderKey = networkSyncData.releaseLadderKey;
+      }
+
+      if (networkSyncData.stateName !== this._state.toString()) {
+        // console.log('data', networkSyncData.stateSyncData);
+        switch (networkSyncData.stateName) {
+          case 'Falling':
+            this._setFalling();
+            break;
+          case 'OnFloor':
+            // Let it handle automatically as we don't know which platform to land on.
+            break;
+          case 'Jumping':
+            this._setJumping();
+            break;
+          case 'GrabbingPlatform':
+            // Let it handle automatically as we don't know which platform to grab.
+            break;
+          case 'OnLadder':
+            this._setOnLadder();
+            break;
+          default:
+            console.error(
+              'Unknown state name: ' + networkSyncData.stateName + '.'
+            );
+            break;
+        }
+      }
+
+      if (networkSyncData.stateName === this._state.toString()) {
+        this._state.updateFromNetworkSyncData(networkSyncData.stateSyncData);
+      }
+
+      // When the object is synchronized from the network, the inputs must not be cleared.
+      this._dontClearInputsBetweenFrames = true;
+    }
+
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
@@ -211,6 +321,8 @@ namespace gdjs {
     }
 
     doStepPreEvents(instanceContainer: gdjs.RuntimeInstanceContainer) {
+      // console.log(this.owner.getName(), 'preEvent jumpkey', this._jumpKey);
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -330,14 +442,18 @@ namespace gdjs {
       this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
       this._wasReleaseLadderKeyPressed = this._releaseLadderKey;
       //4) Do not forget to reset pressed keys
-      this._leftKey = false;
-      this._rightKey = false;
-      this._ladderKey = false;
-      this._upKey = false;
-      this._downKey = false;
-      this._jumpKey = false;
-      this._releasePlatformKey = false;
-      this._releaseLadderKey = false;
+      if (!this._dontClearInputsBetweenFrames) {
+        // Reset the keys only if the inputs are not supposed to survive between frames.
+        // (Most of the time, except if this object is synchronized by an external source)
+        this._leftKey = false;
+        this._rightKey = false;
+        this._ladderKey = false;
+        this._upKey = false;
+        this._downKey = false;
+        this._jumpKey = false;
+        this._releasePlatformKey = false;
+        this._releaseLadderKey = false;
+      }
 
       //5) Track the movement
       this._hasReallyMoved =
@@ -489,6 +605,7 @@ namespace gdjs {
               ))
           ) {
             if (this._state === this._jumping) {
+              // console.log('setFalling in moveY');
               this._setFalling();
             }
             if (
@@ -551,6 +668,7 @@ namespace gdjs {
 
     _checkTransitionJumping() {
       if (this._canJump && this._jumpKey) {
+        // console.log('setJumping in transition jump');
         this._setJumping();
       }
     }
@@ -566,9 +684,10 @@ namespace gdjs {
             ? -this._xGrabTolerance
             : this._xGrabTolerance)
       );
-      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
-        PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
-      );
+      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] =
+        gdjs.staticArray(
+          PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
+        );
       collidingPlatforms.length = 0;
       for (const platform of this._potentialCollidingObjects) {
         if (this._isCollidingWith(platform) && this._canGrab(platform)) {
@@ -621,6 +740,7 @@ namespace gdjs {
       // don't fall if GrabbingPlatform or OnLadder
       if (this._state === this._onFloor) {
         if (!highestGround) {
+          // console.log('setFalling in checktransitionOnFloorOrFalling');
           this._setFalling();
         } else if (highestGround === this._onFloor.getFloorPlatform()) {
           this._onFloor.updateFloorPosition();
@@ -684,6 +804,7 @@ namespace gdjs {
      */
     _releaseGrabbedPlatform() {
       if (this._state === this._grabbingPlatform) {
+        // console.log('setFalling in releaseGrabbedPlatform');
         this._setFalling();
       }
     }
@@ -693,6 +814,7 @@ namespace gdjs {
      */
     _releaseLadder() {
       if (this._state === this._onLadder) {
+        // console.log('setFalling in releaseLadder');
         this._setFalling();
       }
     }
@@ -1419,6 +1541,7 @@ namespace gdjs {
     abortJump(): void {
       if (this._state === this._jumping) {
         this._currentFallSpeed = 0;
+        // console.log('setFalling in abortJump');
         this._setFalling();
       }
     }
@@ -1652,6 +1775,10 @@ namespace gdjs {
      * Use _requestedDeltaY to choose the movement that suits the state before moving vertically.
      */
     beforeMovingY(timeDelta: float, oldX: float): void;
+
+    getNetworkSyncData(): any;
+
+    updateFromNetworkSyncData(syncData: any): void;
   }
 
   /**
@@ -1740,6 +1867,7 @@ namespace gdjs {
           this._floorPlatform!.owner.id
         )
       ) {
+        // console.log('setFalling in checkTransitionBeforeX first if');
         behavior._setFalling();
       } else if (
         this._behavior._downKey &&
@@ -1748,6 +1876,7 @@ namespace gdjs {
         behavior._canGoDownFromJumpthru
       ) {
         behavior._overlappedJumpThru.push(this._floorPlatform!);
+        // console.log('setFalling in checkTransitionBeforeX second if');
         behavior._setFalling();
       }
 
@@ -1794,14 +1923,12 @@ namespace gdjs {
         const deltaMaxY = Math.abs(
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );
-        const {
-          highestGround,
-          isCollidingAnyPlatform,
-        } = behavior._findHighestFloorAndMoveOnTop(
-          behavior._potentialCollidingObjects,
-          -deltaMaxY,
-          deltaMaxY
-        );
+        const { highestGround, isCollidingAnyPlatform } =
+          behavior._findHighestFloorAndMoveOnTop(
+            behavior._potentialCollidingObjects,
+            -deltaMaxY,
+            deltaMaxY
+          );
         if (highestGround && highestGround !== this._floorPlatform) {
           behavior._setOnFloor(highestGround);
         }
@@ -1849,14 +1976,13 @@ namespace gdjs {
 
           // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
-          const {
-            highestGround: highestGroundAtJunction,
-          } = behavior._findHighestFloorAndMoveOnTop(
-            behavior._potentialCollidingObjects,
-            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
-            Math.min(-1, -1 * behavior._slopeClimbingFactor),
-            0
-          );
+          const { highestGround: highestGroundAtJunction } =
+            behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+              Math.min(-1, -1 * behavior._slopeClimbingFactor),
+              0
+            );
           if (highestGroundAtJunction) {
             // The obstacle 1st pixel can be climbed.
             // Now that the character is on the obstacle,
@@ -1869,14 +1995,13 @@ namespace gdjs {
                 Math.abs(remainingDeltaX) - 1
               );
             object.setX(object.getX() + deltaX);
-            const {
-              highestGround: highestGroundOnObstacle,
-            } = behavior._findHighestFloorAndMoveOnTop(
-              behavior._potentialCollidingObjects,
-              // Do an exact slope angle check.
-              -Math.abs(deltaX) * behavior._slopeClimbingFactor,
-              0
-            );
+            const { highestGround: highestGroundOnObstacle } =
+              behavior._findHighestFloorAndMoveOnTop(
+                behavior._potentialCollidingObjects,
+                // Do an exact slope angle check.
+                -Math.abs(deltaX) * behavior._slopeClimbingFactor,
+                0
+              );
             if (highestGroundOnObstacle) {
               // The obstacle slope can be climbed.
               if (Math.abs(remainingDeltaX) >= 2) {
@@ -1885,18 +2010,17 @@ namespace gdjs {
                 // We went too far in order to check that.
                 // Now, find the right position on the obstacles.
                 object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
-                const {
-                  highestGround: highestGroundOnObstacle,
-                } = behavior._findHighestFloorAndMoveOnTop(
-                  behavior._potentialCollidingObjects,
-                  // requestedDeltaX can be small when the object start moving.
-                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-                  Math.min(
-                    -1,
-                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
-                  ),
-                  0
-                );
+                const { highestGround: highestGroundOnObstacle } =
+                  behavior._findHighestFloorAndMoveOnTop(
+                    behavior._potentialCollidingObjects,
+                    // requestedDeltaX can be small when the object start moving.
+                    // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                    Math.min(
+                      -1,
+                      -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                    ),
+                    0
+                  );
                 // Should always be true
                 if (highestGroundOnObstacle) {
                   behavior._setOnFloor(highestGroundOnObstacle);
@@ -1930,6 +2054,20 @@ namespace gdjs {
           }
         }
       }
+    }
+
+    getNetworkSyncData(): any {
+      return {
+        floorLastX: this._floorLastX,
+        floorLastY: this._floorLastY,
+        oldHeight: this._oldHeight,
+      };
+    }
+
+    updateFromNetworkSyncData(data: any) {
+      this._floorLastX = data.floorLastX;
+      this._floorLastY = data.floorLastY;
+      this._oldHeight = data.oldHeight;
     }
 
     toString(): String {
@@ -1988,6 +2126,12 @@ namespace gdjs {
       //Fall
       this._behavior._fall(timeDelta);
     }
+
+    getNetworkSyncData(): any {
+      return {};
+    }
+
+    updateFromNetworkSyncData(data: any) {}
 
     toString(): String {
       return 'Falling';
@@ -2097,9 +2241,27 @@ namespace gdjs {
       }
       this._jumpingFirstDelta = false;
 
+      // console.log('_currentJumpSpeed', this._currentJumpSpeed);
       if (this._currentJumpSpeed < 0) {
+        // console.log('setFalling in beforeMovingY');
         behavior._setFalling();
       }
+    }
+
+    getNetworkSyncData(): any {
+      return {
+        currentJumpSpeed: this._currentJumpSpeed,
+        timeSinceCurrentJumpStart: this._timeSinceCurrentJumpStart,
+        jumpKeyHeldSinceJumpStart: this._jumpKeyHeldSinceJumpStart,
+        jumpingFirstDelta: this._jumpingFirstDelta,
+      };
+    }
+
+    updateFromNetworkSyncData(data: any) {
+      this._currentJumpSpeed = data.currentJumpSpeed;
+      this._timeSinceCurrentJumpStart = data.timeSinceCurrentJumpStart;
+      this._jumpKeyHeldSinceJumpStart = data.jumpKeyHeldSinceJumpStart;
+      this._jumpingFirstDelta = data.jumpingFirstDelta;
     }
 
     toString(): String {
@@ -2174,6 +2336,18 @@ namespace gdjs {
       this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
 
+    getNetworkSyncData(): any {
+      return {
+        grabbedPlatformLastX: this._grabbedPlatformLastX,
+        grabbedPlatformLastY: this._grabbedPlatformLastY,
+      };
+    }
+
+    updateFromNetworkSyncData(data: any) {
+      this._grabbedPlatformLastX = data.grabbedPlatformLastX;
+      this._grabbedPlatformLastY = data.grabbedPlatformLastY;
+    }
+
     toString(): String {
       return 'GrabbingPlatform';
     }
@@ -2206,6 +2380,7 @@ namespace gdjs {
       const behavior = this._behavior;
       //Coming to an extremity of a ladder
       if (!behavior._isOverlappingLadder()) {
+        // console.log('setFalling in checkTransitionBeforeY onLadder');
         behavior._setFalling();
       }
 
@@ -2230,6 +2405,12 @@ namespace gdjs {
       }
     }
 
+    getNetworkSyncData(): any {
+      return {};
+    }
+
+    updateFromNetworkSyncData(data: any) {}
+
     toString(): String {
       return 'OnLadder';
     }
@@ -2239,7 +2420,8 @@ namespace gdjs {
    * A context used to search for a floor.
    */
   class FollowConstraintContext {
-    static readonly instance: FollowConstraintContext = new FollowConstraintContext();
+    static readonly instance: FollowConstraintContext =
+      new FollowConstraintContext();
     /**
      * Character right side
      *

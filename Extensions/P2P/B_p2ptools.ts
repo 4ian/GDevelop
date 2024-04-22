@@ -63,7 +63,7 @@ namespace gdjs {
         }
 
         /**
-         * Deleted the last event data, to be called when it is sure the event was processed thoroughly.
+         * Delete the last event data, to be called when it is sure the event was processed thoroughly.
          */
         popData() {
           this.data.shift();
@@ -372,6 +372,8 @@ namespace gdjs {
         variable.fromJSON(getEventData(eventName));
       };
 
+      export const getEvents = () => events;
+
       /**
        * Connects to a custom broker server.
        * @param host The host of the broker server.
@@ -494,6 +496,11 @@ namespace gdjs {
        * Get the ID of the peer that triggered onConnection.
        */
       export const getConnectedPeer = (): string => connectedPeers[0] || '';
+
+      /**
+       * Returns the list of all currently connected peers.
+       */
+      export const getAllPeers = () => Array.from(connections.keys());
 
       /**
        * A JavaScript-only function to get the raw P2P DataConnection.

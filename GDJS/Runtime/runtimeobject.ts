@@ -176,6 +176,14 @@ namespace gdjs {
     persistentUuid: string | null = null;
 
     /**
+     * A network ID associated to the object to be used
+     * for multiplayer, to identify the object across peers.
+     * We don't use persistentUuid as it's only used for hot-reload.
+     * We don't use the object ID either as it's not unique across peers.
+     */
+    networkId: string | null = null;
+
+    /**
      * A property to be used by external algorithms to indicate if the
      * object is picked or not in an object selection. By construction, this is
      * not "thread safe" or "re-entrant algorithm" safe.
@@ -312,6 +320,7 @@ namespace gdjs {
       //@ts-ignore Reinitialize is like a constructor, it can overwrite the readonly property.
       this.id = runtimeScene.createNewUniqueId();
       this.persistentUuid = null;
+      this.networkId = null;
       this.pick = false;
       this.hitBoxesDirty = true;
       this._defaultHitBoxes.length = 0;
@@ -437,6 +446,75 @@ namespace gdjs {
     ): boolean {
       // If not redefined, mark by default the hot-reload as failed.
       return false;
+    }
+
+    /**
+     * Called when trying to send all information about the state of an object to other peers.
+     * This can be redefined by objects to send more information.
+     * @returns The full network sync data.
+     */
+    getObjectNetworkSyncData(): ObjectNetworkSyncData {
+      const behaviorNetworkSyncData = {};
+      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
+        const behavior = this._behaviors[i];
+        const networkSyncData = behavior.getNetworkSyncData();
+        if (networkSyncData) {
+          behaviorNetworkSyncData[behavior.getName()] = networkSyncData;
+        }
+      }
+
+      return {
+        x: this.x,
+        y: this.y,
+        zOrder: this.zOrder,
+        angle: this.angle,
+        instantForces: this._instantForces.map((force) =>
+          force.getNetworkSyncData()
+        ),
+        permanentForceX: this._permanentForceX,
+        permanentForceY: this._permanentForceY,
+        behaviors: behaviorNetworkSyncData,
+      };
+    }
+
+    /**
+     * Called when the object must be updated using the specified networkSyncData. This is the
+     * case during an update of the object from the network.
+     *
+     * @param oldNetworkSyncData The previous data for the object.
+     * @param newNetworkSyncData The new data for the object.
+     * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
+     */
+    updateFromObjectNetworkSyncData(newNetworkSyncData: ObjectNetworkSyncData) {
+      this.setPosition(newNetworkSyncData.x, newNetworkSyncData.y);
+      this.setZOrder(newNetworkSyncData.zOrder);
+      this.setAngle(newNetworkSyncData.angle);
+
+      // Force clear all forces and reapply them, using the garbage collector to recycle forces.
+      // Is that efficient?
+      this.clearForces();
+      for (
+        let i = 0, len = newNetworkSyncData.instantForces.length;
+        i < len;
+        ++i
+      ) {
+        const forceData = newNetworkSyncData.instantForces[i];
+        const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
+        recycledOrNewForce.updateFromNetworkSyncData(forceData);
+        this._instantForces.push(recycledOrNewForce);
+      }
+      this._permanentForceX = newNetworkSyncData.permanentForceX;
+      this._permanentForceY = newNetworkSyncData.permanentForceY;
+
+      // Loop through all behaviors and update them.
+      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
+        const behavior = this._behaviors[i];
+        if (newNetworkSyncData.behaviors[behavior.getName()]) {
+          behavior.updateFromBehaviorNetworkSyncData(
+            newNetworkSyncData.behaviors[behavior.getName()]
+          );
+        }
+      }
     }
 
     /**

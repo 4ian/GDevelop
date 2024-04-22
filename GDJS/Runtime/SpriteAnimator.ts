@@ -65,6 +65,16 @@ namespace gdjs {
     directions: Array<SpriteDirectionData>;
   };
 
+  /** Represents all the information needed to synchronize the animations of a SpriteRuntimeObject. */
+  export type SpriteAnimatorNetworkSyncData = {
+    animation: integer;
+    direction: integer;
+    frame: integer;
+    elapsedTime: float;
+    speedScale: float;
+    paused: boolean;
+  };
+
   /**
    * Abstraction from graphic libraries texture classes.
    */
@@ -374,6 +384,29 @@ namespace gdjs {
         this.setAnimationIndex(0);
       }
       return true;
+    }
+
+    getNetworkSyncData(): SpriteAnimatorNetworkSyncData {
+      return {
+        animation: this._currentAnimation,
+        direction: this._currentDirection,
+        frame: this._currentFrameIndex,
+        elapsedTime: this._animationElapsedTime,
+        speedScale: this._animationSpeedScale,
+        paused: this._animationPaused,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      networkSyncData: SpriteAnimatorNetworkSyncData
+    ) {
+      this._currentAnimation = networkSyncData.animation;
+      this._currentDirection = networkSyncData.direction;
+      this._currentFrameIndex = networkSyncData.frame;
+      this._animationElapsedTime = networkSyncData.elapsedTime;
+      this._animationSpeedScale = networkSyncData.speedScale;
+      this._animationPaused = networkSyncData.paused;
+      this.invalidateFrame();
     }
 
     /**

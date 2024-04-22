@@ -39,6 +39,36 @@ declare type ObjectData = {
   effects: Array<EffectData>;
 };
 
+/** Object containing initial properties for all objects synchronizing over the network. */
+declare type ObjectNetworkSyncData = {
+  /** The position of the object on the X axis. */
+  x: number;
+  /** The position of the object on the Y axis. */
+  y: number;
+  /** The position of the object on the Z axis. */
+  zOrder: number;
+  /** The angle of the object. */
+  angle: number;
+  /** All the instant forces */
+  instantForces: Array<ForceNetworkSyncData>;
+  /** Permanent force on X */
+  permanentForceX: number;
+  /** Permanent force on Y */
+  permanentForceY: number;
+  /** The behaviors of the object */
+  behaviors: {
+    [behaviorName: string]: any;
+  };
+};
+
+declare type ForceNetworkSyncData = {
+  x: float;
+  y: float;
+  angle: float;
+  length: float;
+  multiplier: number;
+};
+
 declare type VariableType =
   | 'string'
   | 'number'

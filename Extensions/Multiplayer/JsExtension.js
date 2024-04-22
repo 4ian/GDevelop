@@ -46,7 +46,15 @@ module.exports = {
       .addCodeOnlyParameter('currentScene', '')
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.openLobbiesWindow');
 
@@ -64,7 +72,15 @@ module.exports = {
       )
       .setHelpPath('/all-features/multiplayer')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.endLobbyGame');
 
@@ -80,7 +96,15 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.isLobbiesWindowOpen');
 
@@ -95,7 +119,15 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.hasGameJustStarted');
 
@@ -110,7 +142,15 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.hasGameJustEnded');
 
@@ -125,7 +165,15 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.isConnectedToLobby');
 
@@ -138,7 +186,15 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getNumberOfPlayersInLobby');
 
@@ -151,7 +207,15 @@ module.exports = {
         'JsPlatform/Extensions/authentication.svg'
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getCurrentPlayerPositionInLobby');
 
@@ -170,7 +234,15 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerId');
 
@@ -189,9 +261,108 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerUsername');
+
+    // Multiplayer object behavior
+    const multiplayerObjectBehavior = new gd.BehaviorJsImplementation();
+
+    multiplayerObjectBehavior.updateProperty = function (
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
+      return false;
+    };
+
+    multiplayerObjectBehavior.getProperties = function (behaviorContent) {
+      const behaviorProperties = new gd.MapStringPropertyDescriptor();
+      return behaviorProperties;
+    };
+
+    multiplayerObjectBehavior.initializeContent = function (behaviorContent) {};
+
+    const sharedData = new gd.BehaviorsSharedData();
+
+    const behavior = extension
+      .addBehavior(
+        'MultiplayerObjectBehavior',
+        _('Multiplayer object'),
+        'MultiplayerObject',
+        _(
+          'Allow the object to be synchronized with other players in the lobby.'
+        ),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'MultiplayerObjectBehavior',
+        // @ts-ignore - TODO: Fix multiplayerBehavior being a BehaviorJsImplementation instead of an Behavior
+        multiplayerObjectBehavior,
+        sharedData
+      )
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile(
+        'Extensions/Multiplayer/multiplayerobjectruntimebehavior.js'
+      );
+
+    behavior
+      .addExpressionAndConditionAndAction(
+        'number',
+        'playerObjectOwnership',
+        _('Player object ownership'),
+        _('the player owning the object'),
+        _('the player owning the object'),
+        '',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'MultiplayerObjectBehavior')
+      .useStandardParameters(
+        'number',
+        gd.ParameterOptions.makeNewOptions().setDescription(
+          _('Player number (1 by default)')
+        )
+      )
+      .markAsAdvanced()
+      .setFunctionName('setPlayerObjectOwnership')
+      .setGetter('getPlayerObjectOwnership');
+
+    behavior
+      .addScopedAction(
+        'removeObjectOwnership',
+        _('Remove object ownership'),
+        _(
+          'Remove the ownership of the object. It will no longer be synchronized with other players.'
+        ),
+        _('Remove ownership of _PARAM0_'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'MultiplayerObjectBehavior',
+        false
+      )
+      .markAsAdvanced()
+      .setFunctionName('removeObjectOwnership');
 
     return extension;
   },

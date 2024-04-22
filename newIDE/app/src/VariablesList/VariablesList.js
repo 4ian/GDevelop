@@ -1152,8 +1152,13 @@ const VariablesList = (props: Props) => {
       const type = variable.getType();
 
       if (type === gd.Variable.Structure) {
-        newNameGenerator('ChildVariable', name => variable.hasChild(name));
-      } else if (type === gd.Variable.Array) variable.pushNew();
+        const name = newNameGenerator('ChildVariable', name =>
+          variable.hasChild(name)
+        );
+        variable.getChild(name);
+      } else if (type === gd.Variable.Array) {
+        variable.pushNew();
+      }
       _onChange();
       if (variable.isFolded()) variable.setFolded(false);
       forceUpdate();

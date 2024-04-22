@@ -110,7 +110,7 @@ export const VariableDeclaration = (props: Props) => {
             />
             {getVariableTypeLabel(variable, i18n)}
           </span>{' '}
-          with value <span>{getVariableValueAsString(variable, i18n)}</span>
+          with <span>{getVariableValueAsString(variable, i18n)}</span>
         </Trans>
       </span>
     );

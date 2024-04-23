@@ -399,6 +399,10 @@ export const discordUsernameConfig = {
   maxLength: 32,
 };
 
+export const githubUsernameConfig = {
+  maxLength: 39,
+};
+
 export const communityLinksConfig = {
   personalWebsiteLink: {
     icon: <Planet />,

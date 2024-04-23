@@ -12,6 +12,7 @@ import {
 } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
+import { fakeAchievements } from '../../fixtures/GDevelopServicesTestData/FakeAchievements';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
@@ -65,11 +66,16 @@ const getAssetPacksListingData = (
 ];
 
 export const MyCompleteProfileWithoutSubscription = () => (
-  <ProfileDetails profile={indieUserProfile} isAuthenticatedUserProfile />
+  <ProfileDetails
+    achievements={fakeAchievements}
+    profile={indieUserProfile}
+    isAuthenticatedUserProfile
+  />
 );
 
 export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={indieUserProfile}
     isAuthenticatedUserProfile
     subscription={subscriptionForSilverUser}
@@ -78,6 +84,7 @@ export const MyCompleteProfileWithSilverSubscription = () => (
 
 export const MyCompleteProfileWithBusinessSubscription = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={indieUserProfile}
     isAuthenticatedUserProfile
     subscription={subscriptionForStartupUser}
@@ -86,6 +93,7 @@ export const MyCompleteProfileWithBusinessSubscription = () => (
 
 export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={{ ...indieUserProfile, discordUsername: '' }}
     isAuthenticatedUserProfile
   />
@@ -93,6 +101,7 @@ export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
 
 export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={{ ...indieUserProfile, discordUsername: '' }}
     isAuthenticatedUserProfile
     subscription={subscriptionForStartupUser}
@@ -100,11 +109,16 @@ export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
 );
 
 export const OtherUserProfile = () => (
-  <ProfileDetails profile={indieUserProfile} assetPacksListingDatas={[]} />
+  <ProfileDetails
+    achievements={fakeAchievements}
+    profile={indieUserProfile}
+    assetPacksListingDatas={[]}
+  />
 );
 
 export const OtherUserIncompleteProfile = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={{
       ...indieUserWithoutUsernameNorDescriptionProfile,
       discordUsername: '',
@@ -115,16 +129,20 @@ export const OtherUserIncompleteProfile = () => (
 
 export const OtherUserProfileWithPremiumAssetPacks = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={indieUserProfile}
     assetPacksListingDatas={getAssetPacksListingData(indieUserProfile.id)}
     onAssetPackOpen={action('open asset pack')}
   />
 );
 
-export const Loading = () => <ProfileDetails profile={null} />;
+export const Loading = () => (
+  <ProfileDetails achievements={fakeAchievements} profile={null} />
+);
 
 export const Errored = () => (
   <ProfileDetails
+    achievements={fakeAchievements}
     profile={null}
     error={new Error('Connectivity Problems')}
     onRetry={() => {

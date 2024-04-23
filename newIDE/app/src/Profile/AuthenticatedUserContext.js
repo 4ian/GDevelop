@@ -12,7 +12,7 @@ import {
 import { type PreferencesValues } from '../MainFrame/Preferences/PreferencesContext';
 import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
+import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
 import { type Recommendation } from '../Utils/GDevelopServices/User';
 import { type Notification } from '../Utils/GDevelopServices/Notification';
 import {
@@ -57,8 +57,7 @@ export type AuthenticatedUser = {|
   ) => Promise<void>,
   onEditProfile: (
     payload: PatchUserPayload,
-    preferences: PreferencesValues,
-    options: {| throwError: boolean |}
+    preferences: PreferencesValues
   ) => Promise<void>,
   onResetPassword: ForgotPasswordForm => Promise<void>,
   onOpenLoginDialog: () => void,
@@ -82,6 +81,7 @@ export type AuthenticatedUser = {|
   |}) => void,
   onAcceptGameStatsEmail: (value: boolean) => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
+  achievements: ?Array<Achievement>,
 |};
 
 export const initialAuthenticatedUser = {
@@ -129,6 +129,7 @@ export const initialAuthenticatedUser = {
   onOpenEmailVerificationDialog: () => {},
   onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
+  achievements: null,
 };
 
 export const authenticatedUserLoggedOutAttributes = {

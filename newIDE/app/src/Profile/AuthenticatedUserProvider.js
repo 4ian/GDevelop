@@ -11,6 +11,10 @@ import {
   listDefaultRecommendations,
   listRecommendations,
 } from '../Utils/GDevelopServices/User';
+import {
+  type Achievement,
+  getAchievements,
+} from '../Utils/GDevelopServices/Badge';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -840,6 +844,17 @@ export default class AuthenticatedUserProvider extends React.Component<
           badges,
         },
       }));
+
+      // Load achievements only once, as they are the same across all users.
+      if (!this.state.authenticatedUser.achievements) {
+        const achievements = await getAchievements();
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            achievements,
+          },
+        }));
+      }
     } catch (error) {
       console.error('Error while loading user badges:', error);
     }
@@ -991,8 +1006,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   _doEdit = async (
     payload: PatchUserPayload,
-    preferences: PreferencesValues,
-    { throwError }: {| throwError: boolean |}
+    preferences: PreferencesValues
   ) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -1013,17 +1027,16 @@ export default class AuthenticatedUserProvider extends React.Component<
           appLanguage: preferences.language,
           donateLink: payload.donateLink,
           discordUsername: payload.discordUsername,
+          githubUsername: payload.githubUsername,
           communityLinks: payload.communityLinks,
           survey: payload.survey,
         }
       );
       await this._fetchUserProfileWithoutThrowingErrors();
-      this.openEditProfileDialog(false);
     } catch (apiCallError) {
       this.setState({ apiCallError });
-      if (throwError) {
-        throw apiCallError;
-      }
+
+      throw apiCallError;
     } finally {
       this.setState({
         editInProgress: false,
@@ -1259,6 +1272,36 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  _onUpdateGithubStar = async (
+    githubUsername: string,
+    preferences: PreferencesValues
+  ) => {
+    const { authentication } = this.props;
+
+    await this._doEdit(
+      {
+        githubUsername,
+      },
+      preferences
+    );
+
+    this.setState({
+      editInProgress: true,
+    });
+    try {
+      const response = await authentication.updateGitHubStar(
+        authentication.getAuthorizationHeader
+      );
+      this._fetchUserBadges();
+
+      return response;
+    } finally {
+      this.setState({
+        editInProgress: false,
+      });
+    }
+  };
+
   render() {
     return (
       <PreferencesContext.Consumer>
@@ -1288,10 +1331,20 @@ export default class AuthenticatedUserProvider extends React.Component<
               this.state.editProfileDialogOpen && (
                 <EditProfileDialog
                   profile={this.state.authenticatedUser.profile}
+                  achievements={this.state.authenticatedUser.achievements}
+                  badges={this.state.authenticatedUser.badges}
                   subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={form =>
-                    this._doEdit(form, preferences, { throwError: false })
+                  onEdit={async form => {
+                    try {
+                      await this._doEdit(form, preferences);
+                      this.openEditProfileDialog(false);
+                    } catch (error) {
+                      // Ignore errors, we will let the user retry in their profile.
+                    }
+                  }}
+                  onUpdateGitHubStar={githubUsername =>
+                    this._onUpdateGithubStar(githubUsername, preferences)
                   }
                   onDelete={this._doDeleteAccount}
                   actionInProgress={

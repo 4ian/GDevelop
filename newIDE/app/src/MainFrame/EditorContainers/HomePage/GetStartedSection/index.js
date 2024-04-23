@@ -182,7 +182,7 @@ const GetStartedSection = ({
       // Artificial delay to build up expectations.
       recommendationsGettingDelayPromise.current = delay(2500);
       await Promise.all([
-        onEditProfile({ survey }, preferences, { throwError: true }),
+        onEditProfile({ survey }, preferences),
         recommendationsGettingDelayPromise.current,
       ]);
       sendUserSurveyCompleted();

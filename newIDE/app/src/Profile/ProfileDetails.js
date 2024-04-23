@@ -3,7 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import {
   ColumnStackLayout,
   LineStackLayout,
@@ -15,26 +15,16 @@ import Text from '../UI/Text';
 import { I18n } from '@lingui/react';
 import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
-import { type PrivateAssetPackListingData } from '../Utils/GDevelopServices/Shop';
 import { type Achievement } from '../Utils/GDevelopServices/Badge';
 import Window from '../Utils/Window';
 import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 import FlatButton from '../UI/FlatButton';
-import Coffee from '../UI/CustomSvgIcons/Coffee';
-import { GridList } from '@material-ui/core';
-import {
-  useResponsiveWindowSize,
-  type WindowSizeType,
-} from '../UI/Responsive/ResponsiveWindowMeasurer';
-import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import ShareExternal from '../UI/CustomSvgIcons/ShareExternal';
-import Link from '../UI/Link';
 import {
   communityLinksConfig,
   type CommunityLinks,
   syncDiscordUsername,
 } from '../Utils/GDevelopServices/User';
-import { PrivateAssetPackTile } from '../AssetStore/ShopTiles';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import IconButton from '../UI/IconButton';
 import Refresh from '../UI/CustomSvgIcons/Refresh';
@@ -47,36 +37,9 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
-const getAssetPackColumnsFromWidth = (
-  windowSize: WindowSizeType,
-  isLandscape: boolean
-) => {
-  switch (windowSize) {
-    case 'small':
-      return isLandscape ? 4 : 1;
-    case 'medium':
-      return 3;
-    case 'large':
-    case 'xlarge':
-      return 4;
-    default:
-      return 3;
-  }
-};
-
-const styles = {
-  grid: {
-    margin: 0, // Remove the default margin of the grid.
-    // Remove the scroll capability of the grid, the scroll view handles it.
-    overflow: 'unset',
-  },
-};
-
 const CommunityLinksLines = ({
-  isAuthenticatedUserProfile,
   communityLinks,
 }: {|
-  isAuthenticatedUserProfile: boolean,
   communityLinks: Array<{ url: ?string, icon: React.Node }>,
 |}) => (
   <ColumnStackLayout expand noMargin>
@@ -84,15 +47,7 @@ const CommunityLinksLines = ({
       url ? (
         <LineStackLayout noMargin alignItems="center" key={index}>
           {icon}
-          {isAuthenticatedUserProfile ? (
-            <Text noMargin>{url}</Text>
-          ) : (
-            <Link href={url} onClick={() => Window.openExternalURL(url)}>
-              <Text noMargin color="inherit">
-                {url}
-              </Text>
-            </Link>
-          )}
+          <Text noMargin>{url}</Text>
         </LineStackLayout>
       ) : null
     )}
@@ -115,26 +70,20 @@ type Props = {|
   profile: ?DisplayedProfile,
   subscription?: ?Subscription,
   achievements: ?Array<Achievement>,
-  isAuthenticatedUserProfile?: boolean,
   error?: ?Error,
   onRetry?: () => void,
   onOpenChangeEmailDialog?: () => void,
   onOpenEditProfileDialog?: () => void,
-  assetPacksListingDatas?: ?Array<PrivateAssetPackListingData>,
-  onAssetPackOpen?: (assetPack: PrivateAssetPackListingData) => void,
 |};
 
 const ProfileDetails = ({
   profile,
   subscription,
   achievements,
-  isAuthenticatedUserProfile,
   error,
   onRetry,
   onOpenChangeEmailDialog,
   onOpenEditProfileDialog,
-  assetPacksListingDatas,
-  onAssetPackOpen,
 }: Props) => {
   const email = profile ? profile.email : null;
   const donateLink = profile ? profile.donateLink : null;
@@ -155,8 +104,6 @@ const ProfileDetails = ({
   const redditUsername = profile ? communityLinks.redditUsername : null;
   const snapchatUsername = profile ? communityLinks.snapchatUsername : null;
   const discordServerLink = profile ? communityLinks.discordServerLink : null;
-  const { windowSize, isLandscape } = useResponsiveWindowSize();
-  const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const githubStarAchievement =
@@ -205,73 +152,6 @@ const ProfileDetails = ({
     [getAuthorizationHeader, profile, showAlert]
   );
 
-  const assetPackTiles = React.useMemo(
-    () => {
-      if (
-        !onAssetPackOpen ||
-        !assetPacksListingDatas ||
-        !assetPacksListingDatas.length
-      )
-        return null;
-
-      const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-      const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-      const privateAssetPackBundleTiles: Array<React.Node> = [];
-      const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
-
-      assetPacksListingDatas.forEach(assetPackListingData => {
-        const isPackOwned =
-          !!receivedAssetPacks &&
-          !!receivedAssetPacks.find(
-            pack => pack.id === assetPackListingData.id
-          );
-        const tile = (
-          <PrivateAssetPackTile
-            assetPackListingData={assetPackListingData}
-            onSelect={() => {
-              sendAssetPackOpened({
-                assetPackName: assetPackListingData.name,
-                assetPackId: assetPackListingData.id,
-                assetPackTag: null,
-                assetPackKind: 'private',
-                source: 'author-profile',
-              });
-              onAssetPackOpen(assetPackListingData);
-            }}
-            owned={isPackOwned}
-            key={assetPackListingData.id}
-          />
-        );
-        if (
-          assetPackListingData.includedListableProductIds &&
-          !!assetPackListingData.includedListableProductIds.length
-        ) {
-          if (isPackOwned) {
-            privateOwnedAssetPackBundleTiles.push(tile);
-          } else {
-            privateAssetPackBundleTiles.push(tile);
-          }
-        } else {
-          if (isPackOwned) {
-            privateOwnedAssetPackStandAloneTiles.push(tile);
-          } else {
-            privateAssetPackStandAloneTiles.push(tile);
-          }
-        }
-      });
-
-      const allTiles = [
-        ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-        ...privateAssetPackBundleTiles, // Then non-owned bundles.
-        ...privateOwnedAssetPackStandAloneTiles, // Then owned packs.
-        ...privateAssetPackStandAloneTiles, // Then non-owned packs.
-      ];
-
-      return allTiles;
-    },
-    [assetPacksListingDatas, onAssetPackOpen, receivedAssetPacks]
-  );
-
   const canUserBenefitFromDiscordRole = canBenefitFromDiscordRole(subscription);
 
   if (error)
@@ -284,7 +164,7 @@ const ProfileDetails = ({
       </PlaceholderError>
     );
 
-  if (!profile || (!isAuthenticatedUserProfile && !assetPacksListingDatas)) {
+  if (!profile) {
     return <PlaceholderLoader />;
   }
 
@@ -303,22 +183,10 @@ const ProfileDetails = ({
                 }}
               >
                 {profile.username ||
-                  (isAuthenticatedUserProfile
-                    ? i18n._(t`Edit your profile to pick a username!`)
-                    : i18n._(t`No username`))}
+                  i18n._(t`Edit your profile to pick a username!`)}
               </Text>
-              {profile.id &&
-              !isAuthenticatedUserProfile &&
-              !!donateLink && ( // Only show on Public Profile.
-                  <RaisedButton
-                    label={<Trans>Buy me a coffee</Trans>}
-                    primary
-                    onClick={() => Window.openExternalURL(donateLink)}
-                    icon={<Coffee />}
-                  />
-                )}
             </ResponsiveLineStackLayout>
-            {isAuthenticatedUserProfile && email && (
+            {email && (
               <Column noMargin>
                 <Text noMargin size="body-small">
                   <Trans>Email</Trans>
@@ -326,65 +194,59 @@ const ProfileDetails = ({
                 <Text>{email}</Text>
               </Column>
             )}
-            {(isAuthenticatedUserProfile || !!discordUsername) && ( // Always show on private profile.
-              <Column noMargin>
-                <LineStackLayout noMargin alignItems="center">
-                  <Text noMargin size="body-small">
-                    <Trans>Discord username</Trans>
-                  </Text>
-                  {isAuthenticatedUserProfile &&
-                    canUserBenefitFromDiscordRole &&
-                    !!discordUsername && (
-                      <IconButton
-                        onClick={onSyncDiscordUsername}
-                        disabled={discordUsernameSyncStatus !== null}
-                        tooltip={t`Sync your role on GDevelop's Discord server`}
-                        size="small"
-                      >
-                        {discordUsernameSyncStatus === 'success' ? (
-                          <Check fontSize="small" />
-                        ) : (
-                          <Refresh fontSize="small" />
-                        )}
-                      </IconButton>
-                    )}
-                </LineStackLayout>
-                <Text>
-                  {!isAuthenticatedUserProfile ? (
-                    discordUsername
-                  ) : !discordUsername ? (
-                    !canUserBenefitFromDiscordRole ? (
-                      <MarkdownText
-                        translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                      />
-                    ) : (
-                      <MarkdownText
-                        translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                      />
-                    )
-                  ) : (
-                    <>
-                      {discordUsername}
-                      {!canUserBenefitFromDiscordRole && (
-                        <>
-                          {' - '}
-                          <MarkdownText
-                            translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
-                          />
-                        </>
-                      )}
-                    </>
-                  )}
+            <Column noMargin>
+              <LineStackLayout noMargin alignItems="center">
+                <Text noMargin size="body-small">
+                  <Trans>Discord username</Trans>
                 </Text>
-              </Column>
-            )}
-            {(isAuthenticatedUserProfile || !!githubUsername) && ( // Always show on private profile.
+                {canUserBenefitFromDiscordRole && !!discordUsername && (
+                  <IconButton
+                    onClick={onSyncDiscordUsername}
+                    disabled={discordUsernameSyncStatus !== null}
+                    tooltip={t`Sync your role on GDevelop's Discord server`}
+                    size="small"
+                  >
+                    {discordUsernameSyncStatus === 'success' ? (
+                      <Check fontSize="small" />
+                    ) : (
+                      <Refresh fontSize="small" />
+                    )}
+                  </IconButton>
+                )}
+              </LineStackLayout>
+              <Text>
+                {!discordUsername ? (
+                  !canUserBenefitFromDiscordRole ? (
+                    <MarkdownText
+                      translatableSource={t`No discord username defined. Add it and get a Gold, Pro or Education subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                    />
+                  ) : (
+                    <MarkdownText
+                      translatableSource={t`No discord username defined. Add it to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                    />
+                  )
+                ) : (
+                  <>
+                    {discordUsername}
+                    {!canUserBenefitFromDiscordRole && (
+                      <>
+                        {' - '}
+                        <MarkdownText
+                          translatableSource={t`Get a Gold or Pro subscription to claim your role on the [GDevelop Discord](https://discord.gg/gdevelop).`}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </Text>
+            </Column>
+            {
               <Column noMargin>
                 <Text noMargin size="body-small">
                   <Trans>GitHub username</Trans>
                 </Text>
                 <Text>
-                  {isAuthenticatedUserProfile && !githubUsername ? (
+                  {!githubUsername ? (
                     <MarkdownText
                       translatableSource={t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
                         githubStarAchievement.rewardValueInCredits) ||
@@ -395,7 +257,7 @@ const ProfileDetails = ({
                   )}
                 </Text>
               </Column>
-            )}
+            }
             <Column noMargin>
               <Text noMargin size="body-small">
                 <Trans>Bio</Trans>
@@ -468,61 +330,39 @@ const ProfileDetails = ({
                   icon: communityLinksConfig.discordServerLink.icon,
                 },
               ]}
-              isAuthenticatedUserProfile={!!isAuthenticatedUserProfile}
             />
-            {isAuthenticatedUserProfile && (
-              <Column noMargin>
-                <Text noMargin size="body-small">
-                  <Trans>Donate link</Trans>
-                </Text>
-                <Text>{donateLink || <Trans>No link defined.</Trans>}</Text>
-              </Column>
-            )}
-            {isAuthenticatedUserProfile && (
-              <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>
-                <RaisedButton
-                  label={<Trans>Edit my profile</Trans>}
-                  primary
-                  onClick={onOpenEditProfileDialog}
-                />
-                <FlatButton
-                  label={<Trans>Change my email</Trans>}
-                  onClick={onOpenChangeEmailDialog}
-                  disabled={profile.isEmailAutogenerated}
-                />
-                <FlatButton
-                  label={<Trans>Access public profile</Trans>}
-                  onClick={() =>
-                    Window.openExternalURL(
-                      GDevelopGamesPlatform.getUserPublicProfileUrl(
-                        profile.id,
-                        profile.username
-                      )
+
+            <Column noMargin>
+              <Text noMargin size="body-small">
+                <Trans>Donate link</Trans>
+              </Text>
+              <Text>{donateLink || <Trans>No link defined.</Trans>}</Text>
+            </Column>
+
+            <ResponsiveLineStackLayout justifyContent="flex-start" noMargin>
+              <RaisedButton
+                label={<Trans>Edit my profile</Trans>}
+                primary
+                onClick={onOpenEditProfileDialog}
+              />
+              <FlatButton
+                label={<Trans>Change my email</Trans>}
+                onClick={onOpenChangeEmailDialog}
+                disabled={profile.isEmailAutogenerated}
+              />
+              <FlatButton
+                label={<Trans>Access public profile</Trans>}
+                onClick={() =>
+                  Window.openExternalURL(
+                    GDevelopGamesPlatform.getUserPublicProfileUrl(
+                      profile.id,
+                      profile.username
                     )
-                  }
-                  leftIcon={<ShareExternal />}
-                />
-              </ResponsiveLineStackLayout>
-            )}
-            {!isAuthenticatedUserProfile && assetPackTiles && (
-              <ColumnStackLayout expand noMargin>
-                <Line noMargin>
-                  <Text size="block-title">
-                    <Trans>Asset packs</Trans>
-                  </Text>
-                </Line>
-                <Line expand noMargin justifyContent="start">
-                  <GridList
-                    cols={getAssetPackColumnsFromWidth(windowSize, isLandscape)}
-                    cellHeight="auto"
-                    spacing={4}
-                    style={styles.grid}
-                  >
-                    {assetPackTiles}
-                  </GridList>
-                </Line>
-              </ColumnStackLayout>
-            )}
+                  )
+                }
+                leftIcon={<ShareExternal />}
+              />
+            </ResponsiveLineStackLayout>
           </ColumnStackLayout>
         </ResponsiveLineStackLayout>
       )}

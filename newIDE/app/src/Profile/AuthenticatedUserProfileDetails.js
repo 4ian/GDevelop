@@ -60,7 +60,6 @@ const AuthenticatedUserProfileDetails = ({
         }
         subscription={authenticatedUser.subscription}
         achievements={authenticatedUser.achievements}
-        isAuthenticatedUserProfile
         onOpenChangeEmailDialog={onOpenChangeEmailDialog}
         onOpenEditProfileDialog={onOpenEditProfileDialog}
       />

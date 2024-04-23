@@ -2,9 +2,6 @@
 
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import AlertMessage from '../../UI/AlertMessage';
-
-import { Line } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import {

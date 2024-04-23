@@ -11,10 +11,7 @@ import {
   listDefaultRecommendations,
   listRecommendations,
 } from '../Utils/GDevelopServices/User';
-import {
-  type Achievement,
-  getAchievements,
-} from '../Utils/GDevelopServices/Badge';
+import { getAchievements } from '../Utils/GDevelopServices/Badge';
 import Authentication, {
   type LoginForm,
   type RegisterForm,

@@ -66,18 +66,13 @@ const getAssetPacksListingData = (
 ];
 
 export const MyCompleteProfileWithoutSubscription = () => (
-  <ProfileDetails
-    achievements={fakeAchievements}
-    profile={indieUserProfile}
-    isAuthenticatedUserProfile
-  />
+  <ProfileDetails achievements={fakeAchievements} profile={indieUserProfile} />
 );
 
 export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails
     achievements={fakeAchievements}
     profile={indieUserProfile}
-    isAuthenticatedUserProfile
     subscription={subscriptionForSilverUser}
   />
 );
@@ -86,7 +81,6 @@ export const MyCompleteProfileWithBusinessSubscription = () => (
   <ProfileDetails
     achievements={fakeAchievements}
     profile={indieUserProfile}
-    isAuthenticatedUserProfile
     subscription={subscriptionForStartupUser}
   />
 );
@@ -95,7 +89,6 @@ export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
   <ProfileDetails
     achievements={fakeAchievements}
     profile={{ ...indieUserProfile, discordUsername: '' }}
-    isAuthenticatedUserProfile
   />
 );
 
@@ -103,36 +96,7 @@ export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
   <ProfileDetails
     achievements={fakeAchievements}
     profile={{ ...indieUserProfile, discordUsername: '' }}
-    isAuthenticatedUserProfile
     subscription={subscriptionForStartupUser}
-  />
-);
-
-export const OtherUserProfile = () => (
-  <ProfileDetails
-    achievements={fakeAchievements}
-    profile={indieUserProfile}
-    assetPacksListingDatas={[]}
-  />
-);
-
-export const OtherUserIncompleteProfile = () => (
-  <ProfileDetails
-    achievements={fakeAchievements}
-    profile={{
-      ...indieUserWithoutUsernameNorDescriptionProfile,
-      discordUsername: '',
-    }}
-    assetPacksListingDatas={[]}
-  />
-);
-
-export const OtherUserProfileWithPremiumAssetPacks = () => (
-  <ProfileDetails
-    achievements={fakeAchievements}
-    profile={indieUserProfile}
-    assetPacksListingDatas={getAssetPacksListingData(indieUserProfile.id)}
-    onAssetPackOpen={action('open asset pack')}
   />
 );
 

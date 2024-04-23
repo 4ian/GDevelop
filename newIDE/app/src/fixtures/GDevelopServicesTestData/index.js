@@ -36,6 +36,7 @@ import {
   type Promotion,
 } from '../../Utils/GDevelopServices/Announcement';
 import { type PrivateGameTemplateListingData } from '../../Utils/GDevelopServices/Shop';
+import { fakeAchievements } from './FakeAchievements';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -2821,6 +2822,7 @@ export const defaultAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
     console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+  achievements: fakeAchievements,
 };
 
 export const fakeSilverAuthenticatedUser: AuthenticatedUser = {

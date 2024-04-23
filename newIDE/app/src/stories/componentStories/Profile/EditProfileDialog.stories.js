@@ -2,18 +2,34 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
-import EditProfileDialog from '../../../Profile/EditProfileDialog';
+import alertDecorator from '../../AlertDecorator';
+import EditProfileDialog, {
+  type EditProfileDialogProps,
+} from '../../../Profile/EditProfileDialog';
+import { fakeAchievements } from '../../../fixtures/GDevelopServicesTestData/FakeAchievements';
 
 export default {
   title: 'Profile/EditProfileDialog',
   component: EditProfileDialog,
-  decorators: [paperDecorator],
+  decorators: [paperDecorator, alertDecorator],
 };
 
-const defaultProps = {
+const defaultProps: EditProfileDialogProps = {
   onClose: () => action('onClose')(),
-  onEdit: action('onEdit'),
+  onEdit: async () => action('onEdit')(),
   onDelete: action('onDelete'),
+  onUpdateGitHubStar: async () => ({
+    code: 'github-star/badge-already-given',
+  }),
+  achievements: fakeAchievements,
+  badges: [
+    {
+      userId: 'user-id',
+      achievementId: 'github-star',
+      unlockedAt: '',
+      seen: false,
+    },
+  ],
   actionInProgress: false,
   error: null,
   profile: {
@@ -31,6 +47,7 @@ const defaultProps = {
     appLanguage: 'en',
     donateLink: 'https://www.gdevelop-app.com',
     discordUsername: 'indie-user#1234',
+    githubUsername: 'some-github-user',
     communityLinks: {
       personalWebsiteLink: 'https://indie-user.com',
       personalWebsite2Link: 'https://indie-user2.com',
@@ -56,6 +73,48 @@ export const WithSubscription = () => <EditProfileDialog {...defaultProps} />;
 
 export const WithoutSubscription = () => (
   <EditProfileDialog {...defaultProps} subscription={null} />
+);
+
+export const WithoutGithubUsernameAndNoGithubStarBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    badges={[]}
+    profile={{ ...defaultProps.profile, githubUsername: null }}
+    subscription={null}
+  />
+);
+
+export const WithGithubUsernameButNoGithubStarBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateGitHubStar={async () => ({
+      code: 'github-star/badge-given',
+    })}
+  />
+);
+
+export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateGitHubStar={async () => ({
+      code: 'github-star/repository-not-starred',
+    })}
+  />
+);
+
+export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => (
+  <EditProfileDialog
+    {...defaultProps}
+    subscription={null}
+    badges={[]}
+    onUpdateGitHubStar={async () => ({
+      code: 'github-star/user-not-found',
+    })}
+  />
 );
 
 export const ErrorFromBackend = () => (

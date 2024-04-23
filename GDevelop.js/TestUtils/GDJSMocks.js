@@ -143,6 +143,10 @@ class Variable {
     this._value = value;
   }
 
+  toggle(value) {
+    this._value = !value;
+  }
+
   getAsBoolean() {
     return !!this._value;
   }
@@ -369,6 +373,14 @@ class RuntimeObject {
 
   getVariableNumber(variable) {
     return variable.getAsNumber();
+  }
+
+  static getVariableBoolean(variable) {
+    return variable.getAsBoolean();
+  }
+
+  getVariableBoolean(variable) {
+    return variable.getAsBoolean();
   }
 
   /** @param {RuntimeScene} runtimeScene */

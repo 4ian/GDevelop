@@ -251,9 +251,9 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("returnVariable")
       .SetManipulatedType("boolean")
       .SetMutators({
-          {"true", "setBoolean(true)"},
-          {"false", "setBoolean(false)"},
-          {"toggle", "toggle()"},
+          {"True", "setBoolean(true)"},
+          {"False", "setBoolean(false)"},
+          {"Toggle", "toggle()"},
       });
   objectConditions["NumberObjectVariable"].SetFunctionName("getVariableNumber");
   objectConditions["StringObjectVariable"].SetFunctionName("getVariableString");

@@ -29,9 +29,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions,
         events: [],
-      },
-      logCode
-    ]);
+      }
+    ],
+    logCode);
   };
 
   const generateAndRunVariableAffectationWithConditions = (
@@ -49,9 +49,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           },
         ],
         events: [],
-      },
-      logCode
-    ]);
+      }
+    ],
+    logCode);
   };
 
   const generateAndRunEventsForLayout = (

@@ -706,8 +706,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (metadata.GetType() == "operator") {
     argOutput += parameter.GetPlainString();
     if (argOutput != "=" && argOutput != "+" && argOutput != "-" &&
-        argOutput != "/" && argOutput != "*" && argOutput != "true" &&
-        argOutput != "false" && argOutput != "toggle") {
+        argOutput != "/" && argOutput != "*" && argOutput != "True" &&
+        argOutput != "False" && argOutput != "Toggle") {
       cout << "Warning: Bad operator: Set to = by default." << endl;
       argOutput = "=";
     }

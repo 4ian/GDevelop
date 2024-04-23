@@ -457,7 +457,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("operator", _("Value"), "boolean")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
-      .AddCodeOnlyParameter("boolean", _("Value"))
+      .AddCodeOnlyParameter("yesorno", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddCondition("NumberObjectVariable",
@@ -501,7 +501,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("true")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
-      .AddCodeOnlyParameter("boolean", _("Value"))
+      .AddCodeOnlyParameter("yesorno", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   obj.AddAction("ModVarObjet",

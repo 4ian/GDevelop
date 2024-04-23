@@ -300,12 +300,34 @@ class VariablesContainer {
   has(variableName) {
     return this._variables.containsKey(variableName);
   }
+
+  /**
+   * @param {string} name
+   * @param {Variable} newVariable
+   */
+  add(name, newVariable) {
+    const oldVariable = this._variables.get(name);
+
+    // Variable is either already defined, considered as undefined
+    // in the container or missing in the container.
+    // Whatever the case, replace it by the new.
+    this._variables.put(name, newVariable);
+    if (oldVariable) {
+      // If variable is indexed, ensure that the variable as the index
+      // is replaced too. This can be costly (indexOf) but we assume `add` is not
+      // used in performance sensitive code.
+      const variableIndex = this._variablesArray.indexOf(oldVariable);
+      if (variableIndex !== -1) {
+        this._variablesArray[variableIndex] = newVariable;
+      }
+    }
+  }
 }
 
 class RuntimeObject {
   constructor(runtimeScene, objectData) {
     this.name = objectData.name || '';
-    this._variables = new VariablesContainer();
+    this._variables = new VariablesContainer(objectData.variables);
     this._livingOnScene = true;
     this._behaviors = new Map();
     this._x = 0;
@@ -597,15 +619,41 @@ class RuntimeScene {
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
 
+    /** @type {Object.<string, any>} */
+    this._objects = {};
     /** @type {Object.<string, RuntimeObject[]>} */
     this._instances = {};
+
+    if (sceneData) {
+      // the scene objects
+      for (let i = 0, len = sceneData.objects.length; i < len; ++i) {
+        this.registerObject(sceneData.objects[i]);
+      }
+      // Create initial instances of objects
+      this.createObjectsFrom(
+        sceneData.instances
+      );
+    }
+  }
+
+  createObjectsFrom(
+    data
+  ) {
+    for (const instanceData of data) {
+      const newObject = this.createObject(instanceData.name);
+    }
+  }
+
+  registerObject(objectData) {
+    this._objects[objectData.name] = objectData;
+    this._instances[objectData.name] = [];
   }
 
   createObject(objectName) {
     if (!this._instances[objectName]) this._instances[objectName] = [];
 
-    const fakeObjectData = { name: objectName };
-    const newObject = new RuntimeObject(this, fakeObjectData);
+    const objectData = this._objects[objectName] || { name: objectName };
+    const newObject = new RuntimeObject(this, objectData);
     this._instances[objectName].push(newObject);
 
     return newObject;
@@ -810,6 +858,7 @@ function makeMinimalGDJSMock(options) {
       CustomRuntimeObject2D,
       ManuallyResolvableTask,
       Variable,
+      VariablesContainer,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

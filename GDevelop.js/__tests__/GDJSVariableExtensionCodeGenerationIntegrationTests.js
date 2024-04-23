@@ -16,31 +16,46 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     project = new gd.ProjectHelper.createNewGDJSProject();
     scene = project.insertNewLayout('Scene', 0);
   });
-
-  const generateAndRunActionsForLayout = (
-    actions
-  ) => {
-    return generateAndRunEventsForLayout([], actions);
-  };
-
-  const generateAndRunVariableAffectationWithConditions = (
-    conditions
-  ) => {
-    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
-    return generateAndRunEventsForLayout(conditions, [
-      {
-        type: { value: 'SetNumberVariable' },
-        parameters: ['SuccessVariable', '=', '1'],
-      },
-    ]);
-  };
   afterEach(() => {
     project.delete();
   });
 
+  const generateAndRunActionsForLayout = (
+    actions, logCode = false
+  ) => {
+    return generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions,
+        events: [],
+      },
+      logCode
+    ]);
+  };
+
+  const generateAndRunVariableAffectationWithConditions = (
+    conditions, logCode = false
+  ) => {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    return generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions,
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '=', '1'],
+          },
+        ],
+        events: [],
+      },
+      logCode
+    ]);
+  };
+
   const generateAndRunEventsForLayout = (
-    conditions,
-    actions
+    events, logCode = false
   ) => {
     const serializedProjectElement = new gd.SerializerElement();
     project.serializeTo(serializedProjectElement);
@@ -48,20 +63,14 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const serializedSceneElement = new gd.SerializerElement();
     scene.serializeTo(serializedSceneElement);
 
-    const serializedLayoutEvents = gd.Serializer.fromJSObject([
-      {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions,
-        actions,
-        events: [],
-      },
-    ]);
+    const serializedLayoutEvents = gd.Serializer.fromJSObject(events);
     scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
     const runCompiledEvents = generateCompiledEventsForLayout(
       gd,
       project,
-      scene
+      scene,
+      logCode
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock({
@@ -85,7 +94,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('MyVariable').getAsNumber()
     ).toBe(1);
@@ -101,7 +109,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('MyVariable').getAsString()
     ).toBe("Hello");
@@ -117,7 +124,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('MyVariable').getAsBoolean()
     ).toBe(true);
@@ -133,7 +139,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('MyVariable').getAsBoolean()
     ).toBe(true);
@@ -149,7 +154,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -165,7 +169,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -182,7 +185,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -198,7 +200,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -214,7 +215,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -230,7 +230,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(0);
@@ -246,7 +245,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(1);
@@ -262,9 +260,126 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         },
       ]
     );
-
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
     ).toBe(0);
+  });
+
+  it('can generate a local variable expression', function () {
+    scene.getVariables().insertNew('MyVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [{
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{name: "MyLocalVariable", type: "number", value: 123}],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyVariable', '=', 'MyLocalVariable'],
+          },
+        ],
+        events: [],
+      }],
+      true
+    );
+    expect(
+      runtimeScene.getVariables().get('MyVariable').getAsNumber()
+    ).toBe(123);
+  });
+
+  it('can generate a local variable condition', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [{
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{name: "MyLocalVariable", type: "number", value: 123}],
+        conditions: [
+          {
+            type: { inverted: false, value: 'NumberVariable' },
+            parameters: ['MyLocalVariable', '=', '123'],
+          },
+        ],
+        actions: [
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '=', '1'],
+          },
+        ],
+        events: [],
+      }],
+      true
+    );
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a local variable condition giving precedence to the closest local variable', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+
+    project.getVariables().insertNew('MyVariable', 0).setValue(123);
+    scene.getVariables().insertNew('MyVariable', 0).setValue(456);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [{
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{name: "MyLocalVariable", type: "number", value: 789}],
+        conditions: [],
+        actions: [],
+        events: [{
+          type: 'BuiltinCommonInstructions::Standard',
+          variables: [{name: "MyLocalVariable", type: "number", value: 147}],
+          conditions: [
+            {
+              type: { inverted: false, value: 'NumberVariable' },
+              parameters: ['MyLocalVariable', '=', '147'],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['SuccessVariable', '=', '1'],
+            },
+          ],
+          events: [],
+        }],
+      }],
+      true
+    );
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a condition on a local variable from a parent event', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [{
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{name: "MyLocalVariable", type: "number", value: 123}],
+        conditions: [],
+        actions: [],
+        events: [{
+          type: 'BuiltinCommonInstructions::Standard',
+          variables: [],
+          conditions: [
+            {
+              type: { inverted: false, value: 'NumberVariable' },
+              parameters: ['MyLocalVariable', '=', '123'],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['SuccessVariable', '=', '1'],
+            },
+          ],
+          events: [],
+        }],
+      }],
+      true
+    );
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
   });
 });

@@ -312,7 +312,7 @@ function generateCompiledEventsFromSerializedEvents(
 /**
  * Generate a function to run the compiled events of a layout.
  */
-function generateCompiledEventsForLayout(gd, project, layout) {
+function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
   const includeFiles = new gd.SetString();
   const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
 
@@ -324,6 +324,8 @@ function generateCompiledEventsForLayout(gd, project, layout) {
 
   layoutCodeGenerator.delete();
   includeFiles.delete();
+
+  if (logCode) console.log(code);
 
   // Create a function running the generated code.
   const compiledFunction = new Function(

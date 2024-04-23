@@ -42,7 +42,7 @@ class FakeAsyncTasksManager {
   }
 
   /**
-   * @param {gdjs.RuntimeScene} runtimeScene
+   * @param {RuntimeScene} runtimeScene
    */
   processTasks(runtimeScene) {
     for (const task of this.tasks.keys()) {
@@ -137,6 +137,14 @@ class Variable {
 
   setValue(value) {
     this.setNumber(value);
+  }
+
+  setBoolean(value) {
+    this._value = value;
+  }
+
+  getAsBoolean() {
+    return !!this._value;
   }
 
   /**
@@ -237,6 +245,8 @@ class VariablesContainer {
           variable.setNumber(variableData.value);
         } else if (variableData.type === 'string') {
           variable.setString(variableData.value);
+        } else if (variableData.type === 'boolean') {
+          variable.setBoolean(variableData.value);
         } else if (variableData.type === 'structure') {
           variableData.children.forEach((childVariableData) => {
             const childVariable = variable.getChild(childVariableData.name);
@@ -565,9 +575,22 @@ const getPickedInstancesCount = (objectsLists) => {
   return count;
 };
 
+class RuntimeGame {
+  constructor(gameData) {
+    this._variablesContainer = new VariablesContainer(
+      gameData && gameData.variables
+    );
+  }
+
+  getVariables() {
+    return this._variablesContainer;
+  }
+}
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
-  constructor(sceneData) {
+  constructor(sceneData, runtimeGame) {
+    this.game = runtimeGame;
     this._variablesContainer = new VariablesContainer(
       sceneData && sceneData.variables
     );
@@ -638,6 +661,11 @@ class RuntimeScene {
   getScene() {
     return this;
   }
+  
+  getGame() {
+    return this.game;
+  }
+
 }
 
 /**
@@ -732,14 +760,17 @@ function makeMinimalGDJSMock(options) {
   const behaviorCtors = {};
   const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
-  const runtimeScene = new RuntimeScene(options && options.sceneData);
+  const runtimeGame = new RuntimeGame(options && options.gameData);
+  const runtimeScene = new RuntimeScene(options && options.sceneData, runtimeGame);
 
   return {
     gdjs: {
       evtTools: {
         variable: {
           getVariableNumber: (variable) => variable.getAsNumber(),
-          getVariableString: (variable) => variable.getAsString()
+          getVariableString: (variable) => variable.getAsString(),
+          getVariableBoolean: (variable) => variable.getAsBoolean(),
+          toggleVariableBoolean: (variable) => variable.setBoolean(!variable.getAsBoolean())
         },
         object: {
           createObjectOnScene,

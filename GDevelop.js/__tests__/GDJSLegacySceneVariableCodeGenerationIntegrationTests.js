@@ -12,29 +12,29 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
 
   describe('(Scene) variable code generation', () => {
     let project = null;
-    let layout = null;
+    let scene = null;
     beforeEach(() => {
       project = new gd.ProjectHelper.createNewGDJSProject();
-      layout = project.insertNewLayout('Scene', 0);
-      layout.insertNewObject(project, '', 'MyObject', 0);
+      scene = project.insertNewLayout('Scene', 0);
+      scene.insertNewObject(project, '', 'MyObject', 0);
 
       // These variables are "simple" and their type will be known at code generation.
-      layout.getVariables().insertNew('MyNumberVariable', 0).setValue(123);
-      layout.getVariables().insertNew('MyStringVariable', 1).setString('Test');
-      layout
+      scene.getVariables().insertNew('MyNumberVariable', 0).setValue(123);
+      scene.getVariables().insertNew('MyStringVariable', 1).setString('Test');
+      scene
         .getVariables()
         .insertNew('MyOtherStringVariable', 1)
         .setString('SomeChild');
 
       // Use a variable that has a value deep inside a structure - so code generation
       // does not know its type and will issue a `getAsNumberOrString`.
-      layout
+      scene
         .getVariables()
         .insertNew('MyOtherStructureVariable', 1)
         .getChild('Child')
         .getChild('SubChild')
         .setString('SomeOtherChild');
-      const structureVariable = layout
+      const structureVariable = scene
         .getVariables()
         .insertNew('MyStructureVariable', 2);
 
@@ -93,16 +93,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
@@ -136,16 +136,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
@@ -179,16 +179,16 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
           events: [],
         },
       ]);
-      layout.getEvents().unserializeFrom(project, serializedLayoutEvents);
+      scene.getEvents().unserializeFrom(project, serializedLayoutEvents);
 
       const runCompiledEvents = generateCompiledEventsForLayout(
         gd,
         project,
-        layout
+        scene
       );
 
       const serializedSceneElement = new gd.SerializerElement();
-      layout.serializeTo(serializedSceneElement);
+      scene.serializeTo(serializedSceneElement);
 
       const { gdjs, runtimeScene } = makeMinimalGDJSMock({
         sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),

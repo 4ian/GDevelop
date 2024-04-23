@@ -72,11 +72,11 @@ VariablesExtension::VariablesExtension() {
                 instruction.GetParameters()[0].GetPlainString());
 
         gd::String op = instruction.GetParameters()[1].GetPlainString();
-        if (op == "true")
+        if (op == "True")
           return varGetter + ".setBoolean(true);\n";
-        else if (op == "false")
+        else if (op == "False")
           return varGetter + ".setBoolean(false);\n";
-        else if (op == "toggle")
+        else if (op == "Toggle")
           return "gdjs.evtTools.variable.toggleVariableBoolean(" + varGetter + ");\n";
 
         return gd::String("");

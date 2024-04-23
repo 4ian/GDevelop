@@ -33,13 +33,16 @@ const deleteExistingFilesFromDirs = (projectPath: string) => {
     //If multiFile enabled in settings and directories exist!
     entries.forEach(entry => {
       let dirPath = projectPath.concat('\\', entry);
-      if (fs.statSync(dirPath).isDirectory()) {
+      if (
+        fs.statSync(dirPath).isDirectory() &&
+        splittedProjectFolderNames.includes(entry)
+      ) {
         const filenames = fs.readdirSync(dirPath);
         filenames.forEach(file => {
           let result = dirPath.concat('\\', file);
-          fs.unlink(result, (err => {
+          fs.unlink(result, err => {
             if (err) return reject(err);
-          }));
+          });
         });
       }
     });

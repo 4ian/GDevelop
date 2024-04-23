@@ -3,29 +3,12 @@ namespace gdjs {
 
   const logger = new gdjs.Logger('Multiplayer');
   const multiplayerComponents = gdjs.multiplayerComponents;
+  const multiplayerMessageManager = gdjs.multiplayerMessageManager;
   export namespace multiplayer {
-    // For testing purposes, you can simulate network latency and packet loss.
-    // Adds x ms to all network messages, simulating a slow network.
-    const SIMULATE_NETWORK_LATENCY_MS = 0; // In ms.
-    // Gives a random chance of packet loss, simulating a bad network.
-    const SIMULATE_NETWORK_PACKET_LOSS_CHANCE = 0; // Between 0 and 1, % of packets lost.
-    // Adds a latency to random network messages, simulating sporadic network issues.
-    const SIMULATE_NETWORK_RANDOM_SLOW_PACKET_CHANCE = 0; // Between 0 and 1, % of packets that will be slow.
-    const SIMULATE_NETWORK_RANDOM_LATENCY_MS = 0; // In ms.
-
-    const getTimeNow =
-      window.performance && typeof window.performance.now === 'function'
-        ? window.performance.now.bind(window.performance)
-        : Date.now;
-    const eventRetryTime = 200; // Time to wait before retrying an event that was not acknowledged, in ms.
-    const maxRetries = 4; // Maximum number of retries before giving up on an event.
-
     let _hasGameJustStarted = false;
-    let _isGameRunning = false;
     let _hasGameJustEnded = false;
     let _lobbyId: string | null = null;
     let _connectionId: string | null = null;
-    let _playerPositionInLobby: number | null = null;
     let _lobby: {
       id: string;
       name: string;
@@ -39,680 +22,23 @@ namespace gdjs {
     let _websocket: WebSocket | null = null;
     let _heartbeatInterval: NodeJS.Timeout | null = null;
 
-    let _expectedEventAcknowledgements: {
-      [eventName: string]: {
-        [peerId: string]: {
-          acknowledged: boolean;
-          lastEventSentAt: number;
-          originalEventName: string;
-          originalData: any;
-          numberOfRetries?: number;
-          shouldCancelEventIfTimesOut?: boolean;
-        };
-      };
-    } = {};
-    let _lastClockReceivedByInstance: { [instanceId: string]: number } = {};
-
-    export const addExpectedEventAcknowledgement = ({
-      originalEventName,
-      originalData,
-      expectedEventName,
-      otherPeerIds,
-      shouldCancelEventIfTimesOut,
-    }: {
-      originalEventName: string;
-      originalData: any;
-      expectedEventName: string;
-      otherPeerIds: string[];
-      shouldCancelEventIfTimesOut?: boolean;
-    }) => {
-      if (!_isGameRunning) {
-        // This can happen if objects are destroyed at the end of the scene.
-        // We should not add expected events in this case.
-        return;
-      }
-
-      if (!_expectedEventAcknowledgements[expectedEventName]) {
-        _expectedEventAcknowledgements[expectedEventName] = {};
-      }
-
-      logger.info(
-        `Adding expected event ${expectedEventName} from ${otherPeerIds.join(
-          ', '
-        )}.`
-      );
-
-      otherPeerIds.forEach((peerId) => {
-        _expectedEventAcknowledgements[expectedEventName][peerId] = {
-          acknowledged: false,
-          lastEventSentAt: getTimeNow(),
-          originalEventName,
-          originalData,
-          shouldCancelEventIfTimesOut,
-        };
-      });
-    };
-
-    /**
-     * Main function to send events to other players, via P2P.
-     * Takes into account the simulation of network latency and packet loss.
-     */
-    export const sendDataTo = (
-      peerId: string,
-      eventName: string,
-      data: Object
-    ): void => {
-      if (
-        SIMULATE_NETWORK_PACKET_LOSS_CHANCE > 0 &&
-        Math.random() < SIMULATE_NETWORK_PACKET_LOSS_CHANCE
-      ) {
-        return;
-      }
-
-      if (
-        SIMULATE_NETWORK_RANDOM_SLOW_PACKET_CHANCE > 0 &&
-        Math.random() < SIMULATE_NETWORK_RANDOM_SLOW_PACKET_CHANCE
-      ) {
-        setTimeout(() => {
-          gdjs.evtTools.p2p.sendDataTo(peerId, eventName, JSON.stringify(data));
-        }, SIMULATE_NETWORK_RANDOM_LATENCY_MS);
-        return;
-      }
-
-      if (SIMULATE_NETWORK_LATENCY_MS > 0) {
-        setTimeout(() => {
-          gdjs.evtTools.p2p.sendDataTo(peerId, eventName, JSON.stringify(data));
-        }, SIMULATE_NETWORK_LATENCY_MS);
-        return;
-      }
-
-      gdjs.evtTools.p2p.sendDataTo(peerId, eventName, JSON.stringify(data));
-    };
-
-    /**
-     * Main function to send events to all other players, via P2P.
-     * Takes into account the simulation of network latency and packet loss.
-     */
-    export const sendDataToAll = (eventName: string, data: Object): void => {
-      if (
-        SIMULATE_NETWORK_PACKET_LOSS_CHANCE > 0 &&
-        Math.random() < SIMULATE_NETWORK_PACKET_LOSS_CHANCE
-      ) {
-        return;
-      }
-
-      if (
-        SIMULATE_NETWORK_RANDOM_SLOW_PACKET_CHANCE > 0 &&
-        Math.random() < SIMULATE_NETWORK_RANDOM_SLOW_PACKET_CHANCE
-      ) {
-        setTimeout(() => {
-          gdjs.evtTools.p2p.sendDataToAll(eventName, JSON.stringify(data));
-        }, SIMULATE_NETWORK_RANDOM_LATENCY_MS);
-        return;
-      }
-
-      if (SIMULATE_NETWORK_LATENCY_MS > 0) {
-        setTimeout(() => {
-          gdjs.evtTools.p2p.sendDataToAll(eventName, JSON.stringify(data));
-        }, SIMULATE_NETWORK_LATENCY_MS);
-        return;
-      }
-
-      gdjs.evtTools.p2p.sendDataToAll(eventName, JSON.stringify(data));
-    };
-
-    const getInstanceFromNetworkId = ({
-      runtimeScene,
-      objectName,
-      instanceNetworkId,
-      instanceX,
-      instanceY,
-      shouldCreateIfNotFound,
-    }: {
-      runtimeScene: gdjs.RuntimeScene;
-      objectName: string;
-      instanceNetworkId: string;
-      instanceX?: number;
-      instanceY?: number;
-      shouldCreateIfNotFound?: boolean;
-    }): gdjs.RuntimeObject | null => {
-      const instances = runtimeScene.getInstancesOf(objectName);
-      if (!instances) {
-        // object does not exist in the scene, cannot find the instance.
-        return null;
-      }
-      let instance =
-        instances.find(
-          (instance) => instance.networkId === instanceNetworkId
-        ) || null;
-
-      if (!instance) {
-        logger.info(
-          'instance not found with network ID, trying to find it with persistent UUID.'
-        );
-        instance =
-          instances.find(
-            (instance) =>
-              // For objects created from the start, the network ID is not set yet.
-              instance.persistentUuid &&
-              instance.persistentUuid.substring(0, 8) === instanceNetworkId
-          ) || null;
-
-        if (instance) {
-          // Set the network ID, as it was not set yet.
-          instance.networkId = instanceNetworkId;
-        }
-      }
-
-      // If we know the position of the object, we can try to find the closest instance not synchronized yet.
-      if (!instance && instanceX !== undefined && instanceY !== undefined) {
-        logger.info(
-          `instance not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
-        );
-        // Instance not found, it must be a new object.
-        // 2 cases :
-        // - The object was only created on the other player's game, so we create it and assign it the network ID.
-        // - The object may have been created on all sides at the same time, so we try to find instances
-        //   of this object, that do not have a network ID yet, pick the one that is the closest to the
-        //   position of the object created by the other player, and assign it the network ID to start
-        //   synchronizing it.
-
-        // Find all instances that have the MultiplayerObjectRuntimeBehavior and no network ID yet.
-        const instancesWithoutNetworkId = instances.filter(
-          (instance) =>
-            instance.hasBehavior('MultiplayerObject') && !instance.networkId
-        );
-        if (instancesWithoutNetworkId.length > 0) {
-          // Find the instance that is the closest to the position of the object created by the other player.
-          const closestInstance = instancesWithoutNetworkId.reduce(
-            (closestInstance, instance) => {
-              const dx = instance.getX() - instanceX;
-              const dy = instance.getY() - instanceY;
-              const distance = dx * dx + dy * dy;
-              if (distance < closestInstance.distance) {
-                return { instance, distance };
-              }
-              return closestInstance;
-            },
-            {
-              instance: instancesWithoutNetworkId[0],
-              distance: Infinity,
-            }
-          ).instance;
-
-          instance = closestInstance;
-        }
-      }
-
-      // If we still did not find the instance, and we should create it if not found, then create it.
-      if (!instance && shouldCreateIfNotFound) {
-        logger.info('instance not found, creating it.');
-        const newInstance = runtimeScene.createObject(objectName);
-        if (!newInstance) {
-          // Object does not exist in the scene, cannot create the instance.
-          return null;
-        }
-
-        newInstance.networkId = instanceNetworkId;
-        instance = newInstance;
-      }
-
-      return instance;
-    };
+    export let playerPositionInLobby: number | null = null;
+    export let isGameRunning = false;
 
     gdjs.registerRuntimeScenePreEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
-        const p2pEventsMap = gdjs.evtTools.p2p.getEvents();
-        const objectEventNamesArray = Array.from(p2pEventsMap.keys());
-
-        // When we receive ownership change events, update the ownership of the objects in the scene.
-        const objectOwnershipChangeEventNames = objectEventNamesArray.filter(
-          (eventName) => eventName.startsWith('#changeOwner')
+        multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
+        multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
+        multiplayerMessageManager.handleAcknowledgeMessages();
+        multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
+          runtimeScene
         );
-        objectOwnershipChangeEventNames.forEach((eventName) => {
-          if (gdjs.evtTools.p2p.onEvent(eventName, false)) {
-            const data = JSON.parse(gdjs.evtTools.p2p.getEventData(eventName));
-            logger.info(`Received event ${eventName} with data ${data}.`);
-            if (data) {
-              const eventSender = gdjs.evtTools.p2p.getEventSender(eventName);
-              // event name is like #changeOwner#owner_abc#object_abc#instance_abc, extract owner, object and instance id.
-              const regex =
-                /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
-              const matches = regex.exec(eventName);
-              if (!matches) {
-                return;
-              }
-              const objectName = matches[2];
-              const instanceNetworkId = matches[3];
-              const previousOwner = data.previousOwner;
-              const newOwner = data.newOwner;
-
-              const instance = getInstanceFromNetworkId({
-                runtimeScene,
-                objectName,
-                instanceNetworkId,
-                instanceX: data.instanceX,
-                instanceY: data.instanceY,
-                shouldCreateIfNotFound: true,
-              });
-
-              if (!instance) {
-                // Instance not found, it must have been destroyed already.
-                logger.info(
-                  `Instance ${instanceNetworkId} not found, it must have been destroyed.`
-                );
-                return;
-              }
-
-              const behavior = instance.getBehavior(
-                'MultiplayerObject'
-              ) as MultiplayerObjectRuntimeBehavior | null;
-              if (!behavior) {
-                logger.warn(
-                  `Object ${objectName} does not have the MultiplayerObjectBehavior, cannot change ownership.`
-                );
-                return;
-              }
-
-              const isPlayerTheServer = _playerPositionInLobby === 1;
-              const currentPlayerObjectOwnership =
-                behavior.getPlayerObjectOwnership();
-              if (
-                isPlayerTheServer &&
-                currentPlayerObjectOwnership !== previousOwner
-              ) {
-                // We received an ownership change event for an object which thought the previous owner was different.
-                // There may be some lag, and multiple ownership changes may have been sent by the other players.
-                // As the server, let's not change the ownership and let the player revert it.
-                logger.warn(
-                  `Object ${objectName} with instance network ID ${instanceNetworkId} does not have the expected previous owner. Expected ${previousOwner}, got ${currentPlayerObjectOwnership}.`
-                );
-                return;
-              }
-
-              // Force the ownership change.
-              logger.info(
-                `Changing ownership of object ${objectName} to ${newOwner}.`
-              );
-              behavior._playerNumber = newOwner;
-
-              const ownerChangedEventName = eventName.replace(
-                '#changeOwner',
-                '#ownerChanged'
-              );
-
-              logger.info(
-                `Sending acknowledgment of ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${eventSender}.`
-              );
-              // Once the object ownership has changed, we need to acknowledge it to the player who sent this event.
-              sendDataTo(eventSender, ownerChangedEventName, {});
-
-              // If we are player number 1, we are the server,
-              // so we need to relay the ownership change to others,
-              // and expect an acknowledgment from them.
-              if (_playerPositionInLobby === 1) {
-                const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-                gdjs.multiplayer.addExpectedEventAcknowledgement({
-                  originalEventName: eventName,
-                  originalData: data,
-                  expectedEventName: ownerChangedEventName,
-                  otherPeerIds,
-                  // As we are the server, we do not cancel the event if it times out.
-                  shouldCancelEventIfTimesOut: false,
-                });
-                for (const peerId of otherPeerIds) {
-                  logger.info(
-                    `Relaying ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${peerId}.`
-                  );
-                  sendDataTo(peerId, eventName, data);
-                }
-              }
-            }
-          }
-        });
-
-        // When we receive update events, update the objects in the scene.
-        const objectUpdateEventNames = objectEventNamesArray.filter(
-          (eventName) => eventName.startsWith('#update')
-        );
-        objectUpdateEventNames.forEach((eventName) => {
-          if (gdjs.evtTools.p2p.onEvent(eventName, true)) {
-            const data = JSON.parse(gdjs.evtTools.p2p.getEventData(eventName));
-            if (data) {
-              // event name is like #update#owner_abc#object_abc#instance_abc, extract owner, object and instance id.
-              const regex = /#update#owner_(\d+)#object_(.+)#instance_(.+)/;
-              const matches = regex.exec(eventName);
-              if (!matches) {
-                return;
-              }
-              const ownerPlayerNumber = parseInt(matches[1], 10);
-              if (ownerPlayerNumber === _playerPositionInLobby) {
-                // Do not update the object if we receive an event from ourselves.
-                return;
-              }
-              const objectName = matches[2];
-              const instanceNetworkId = matches[3];
-
-              const eventInstanceClock = data['_clock'];
-              const lastClock =
-                _lastClockReceivedByInstance[instanceNetworkId] || 0;
-              if (eventInstanceClock <= lastClock) {
-                // Ignore old events.
-                logger.info('Ignoring old event.');
-                return;
-              }
-
-              const instance = getInstanceFromNetworkId({
-                runtimeScene,
-                objectName,
-                instanceNetworkId,
-                // This can happen if the object was created on the other player's game, and we need to create it.
-                shouldCreateIfNotFound: true,
-              });
-              if (!instance) {
-                // This should not happen as we should have created the instance if it did not exist.
-                return;
-              }
-
-              // If the instance update is not done by the owner of the object, then something is wrong.
-              // We should not update the object until we've received the ownership change event.
-              const behavior = instance.getBehavior(
-                'MultiplayerObject'
-              ) as MultiplayerObjectRuntimeBehavior | null;
-              if (!behavior) {
-                logger.warn(
-                  `Object ${objectName} does not have the MultiplayerObjectBehavior, cannot update it.`
-                );
-                // Object does not have the MultiplayerObjectBehavior, cannot update it.
-                return;
-              }
-
-              if (behavior.getPlayerObjectOwnership() !== ownerPlayerNumber) {
-                // The object is not owned by the player who sent the update event.
-                logger.info(
-                  `Object ${objectName} with instance network ID ${instanceNetworkId} is not owned by the player who sent the update event. Expected ${behavior.getPlayerObjectOwnership()}, got ${ownerPlayerNumber}.`
-                );
-                return;
-              }
-
-              instance.updateFromObjectNetworkSyncData(data);
-              _lastClockReceivedByInstance[instanceNetworkId] =
-                eventInstanceClock;
-
-              // If we are player number 1, we are the server,
-              // so we need to relay the position to others.
-              if (_playerPositionInLobby === 1) {
-                sendDataToAll(eventName, data);
-              }
-            }
-          }
-        });
-
-        // When we receive acknowledgement events, save it in the extension, to avoid sending the event again.
-        const acknowledgedEventNames = objectEventNamesArray.filter(
-          (eventName) =>
-            eventName.startsWith('#destroyed') ||
-            eventName.startsWith('#ownerChanged')
-        );
-        acknowledgedEventNames.forEach((eventName) => {
-          if (gdjs.evtTools.p2p.onEvent(eventName, false)) {
-            logger.info(`Received acknowledgment for event ${eventName}.`);
-            const event = gdjs.evtTools.p2p.getEvent(eventName);
-            let data;
-            while ((data = event.getData())) {
-              const eventSender = event.getSender();
-              // event name is like #destroyed#owner_abc#object_abc#instance_abc, extract owner, object and instance names.
-              const regex = eventName.startsWith('#destroyed')
-                ? /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/
-                : /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
-              const matches = regex.exec(eventName);
-              if (!matches) {
-                // This should not happen.
-                event.popData();
-                return;
-              }
-              if (!_expectedEventAcknowledgements[eventName]) {
-                // This should not happen, but if we receive an acknowledgment for an event we did not expect, let's not error
-                // and just clear that event.
-                event.popData();
-                return;
-              }
-              if (!_expectedEventAcknowledgements[eventName][eventSender]) {
-                // This should not happen, but if we receive an acknowledgment from a sender we did not expect, let's not error
-                // and just clear that event.
-                event.popData();
-                return;
-              }
-              const instanceId = matches[3];
-
-              const eventInstanceClock = data['_clock'];
-              const lastClock = _lastClockReceivedByInstance[instanceId] || 0;
-              if (eventInstanceClock <= lastClock) {
-                // Ignore old events.
-                logger.info('Ignoring old event.');
-                return;
-              }
-
-              logger.info(
-                `Marking event ${eventName} as acknowledged from ${eventSender}.`
-              );
-              // Mark the acknowledgment as received.
-              _expectedEventAcknowledgements[eventName][
-                eventSender
-              ].acknowledged = true;
-              _lastClockReceivedByInstance[instanceId] = eventInstanceClock;
-
-              // We've received this acknowledgement from this sender, remove it from the list
-              // so that the next getSender() will return the next sender.
-              event.popData();
-            }
-          }
-        });
-
-        // When all acknowledgments are received for an event, we can clear the event from our
-        // list of expected acknowledgments.
-        const expectedEventNames = Object.keys(_expectedEventAcknowledgements);
-        expectedEventNames.forEach((acknowledgeEventName) => {
-          const acknowledgements =
-            _expectedEventAcknowledgements[acknowledgeEventName];
-          const peerWhoHaventAcknowledged = Object.keys(
-            acknowledgements
-          ).filter((peerId) => !acknowledgements[peerId].acknowledged);
-          if (!peerWhoHaventAcknowledged.length) {
-            // All peers have acknowledged this event, we can clear the object.
-            logger.info(
-              `All peers have acknowledged event ${acknowledgeEventName}.`
-            );
-            delete _expectedEventAcknowledgements[acknowledgeEventName];
-          } else {
-            // Some peers have not acknowledged the event, let's resend it to them.
-            for (const peerId of peerWhoHaventAcknowledged) {
-              const lastEventSentAt = acknowledgements[peerId].lastEventSentAt;
-              const originalEventName =
-                acknowledgements[peerId].originalEventName;
-              const originalData = acknowledgements[peerId].originalData;
-              if (getTimeNow() - lastEventSentAt > eventRetryTime) {
-                const currentNumberOfRetries =
-                  acknowledgements[peerId].numberOfRetries || 0;
-                if (currentNumberOfRetries >= maxRetries) {
-                  // We have retried too many times, let's give up.
-                  logger.info(
-                    `Giving up on event ${acknowledgeEventName} for ${peerId}.`
-                  );
-                  if (acknowledgements[peerId].shouldCancelEventIfTimesOut) {
-                    // If we should cancel the event if it times out, then revert it based on the original event.
-                    if (originalEventName.startsWith('#changeOwner')) {
-                      const regex =
-                        /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
-                      const matches = regex.exec(originalEventName);
-                      if (!matches) {
-                        // This should not happen, if it does, remove the acknowledgment and return.
-                        delete _expectedEventAcknowledgements[
-                          acknowledgeEventName
-                        ];
-                        return;
-                      }
-                      const objectName = matches[2];
-                      const instanceNetworkId = matches[3];
-                      const instances = runtimeScene.getInstancesOf(objectName);
-                      if (!instances) {
-                        // object does not exist in the scene, cannot revert ownership.
-                        delete _expectedEventAcknowledgements[
-                          acknowledgeEventName
-                        ];
-                        return;
-                      }
-                      let instance = instances.find(
-                        (instance) => instance.networkId === instanceNetworkId
-                      );
-                      if (!instance) {
-                        // Instance not found, it must have been destroyed already, cannot revert ownership.
-                        // Should we recreate it?
-                        delete _expectedEventAcknowledgements[
-                          acknowledgeEventName
-                        ];
-                        return;
-                      }
-
-                      const behavior = instance.getBehavior(
-                        'MultiplayerObject'
-                      ) as MultiplayerObjectRuntimeBehavior | null;
-                      if (!behavior) {
-                        logger.warn(
-                          `Object ${objectName} does not have the MultiplayerObjectBehavior, cannot revert ownership.`
-                        );
-                        // Object does not have the MultiplayerObjectBehavior, cannot revert ownership.
-                        delete _expectedEventAcknowledgements[
-                          acknowledgeEventName
-                        ];
-                        return;
-                      }
-
-                      const previousOwner = originalData.previousOwner;
-                      if (!previousOwner) {
-                        // No previous owner, cannot revert ownership.
-                        delete _expectedEventAcknowledgements[
-                          acknowledgeEventName
-                        ];
-                        return;
-                      }
-
-                      // Force the ownership change.
-                      behavior._playerNumber = previousOwner || 0;
-                    }
-                  }
-                  delete _expectedEventAcknowledgements[acknowledgeEventName];
-                  continue;
-                }
-
-                // We have waited long enough for the acknowledgment, let's resend the event.
-                sendDataTo(peerId, originalEventName, originalData);
-                // Reset the timestamp so that we wait again for the acknowledgment.
-                acknowledgements[peerId].lastEventSentAt = getTimeNow();
-                // Increment the number of retries.
-                acknowledgements[peerId].numberOfRetries =
-                  currentNumberOfRetries + 1;
-              }
-            }
-          }
-        });
       }
     );
 
     gdjs.registerRuntimeScenePostEventsCallback(
       (runtimeScene: gdjs.RuntimeScene) => {
-        const p2pEventsMap = gdjs.evtTools.p2p.getEvents();
-        const objectEventNamesArray = Array.from(p2pEventsMap.keys());
-        const objectDestroyEventNames = objectEventNamesArray.filter(
-          (eventName) => eventName.startsWith('#destroy')
-        );
-        objectDestroyEventNames.forEach((eventName) => {
-          if (gdjs.evtTools.p2p.onEvent(eventName, false)) {
-            const data = JSON.parse(gdjs.evtTools.p2p.getEventData(eventName));
-            const eventSender = gdjs.evtTools.p2p.getEventSender(eventName);
-            if (data && eventSender) {
-              // event name is like #destroy#owner_abc#object_abc#instance_abc, extract owner, object and instance names.
-              const regex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)/;
-              const matches = regex.exec(eventName);
-              if (!matches) {
-                return;
-              }
-              const playerNumber = parseInt(matches[1], 10);
-              if (playerNumber === _playerPositionInLobby) {
-                // Do not destroy the object if we receive an event from ourselves.
-                // Should probably never happen.
-                return;
-              }
-              const objectName = matches[2];
-              const instanceNetworkId = matches[3];
-
-              const eventInstanceClock = data['_clock'];
-              const lastClock =
-                _lastClockReceivedByInstance[instanceNetworkId] || 0;
-              if (eventInstanceClock <= lastClock) {
-                // Ignore old events.
-                logger.info('Ignoring old event.');
-                return;
-              }
-
-              const instance = getInstanceFromNetworkId({
-                runtimeScene,
-                objectName,
-                instanceNetworkId,
-              });
-
-              const destroyedEventName = eventName.replace(
-                '#destroy',
-                '#destroyed'
-              );
-
-              if (!instance) {
-                logger.info(
-                  'Instance was not found in the scene, sending acknowledgment anyway.'
-                );
-                // Instance not found, it must have been destroyed already.
-                // Send an acknowledgment to the player who sent the destroy event in case they missed it.
-                sendDataTo(eventSender, destroyedEventName, {});
-                return;
-              }
-
-              logger.info(
-                `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
-              );
-              instance.deleteFromScene(runtimeScene);
-              _lastClockReceivedByInstance[instanceNetworkId] =
-                eventInstanceClock;
-
-              logger.info(
-                `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${eventSender}.`
-              );
-              // Once the object is destroyed, we need to acknowledge it to the player who sent the destroy event.
-              sendDataTo(eventSender, destroyedEventName, {});
-
-              // If we are player number 1, we need to relay the destruction to others.
-              // And expect an acknowledgment from everyone else as well.
-              if (_playerPositionInLobby === 1) {
-                const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
-                // We don't need to send the event to the player who sent the destroy event.
-                const otherPeerIds = connectedPeerIds.filter(
-                  (peerId) => peerId !== eventSender
-                );
-                gdjs.multiplayer.addExpectedEventAcknowledgement({
-                  originalEventName: eventName,
-                  originalData: data,
-                  expectedEventName: destroyedEventName,
-                  otherPeerIds,
-                });
-                for (const peerId of otherPeerIds) {
-                  logger.info(
-                    `Relaying destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${peerId}.`
-                  );
-                  sendDataTo(peerId, eventName, data);
-                }
-              }
-            }
-          }
-        });
+        multiplayerMessageManager.handleDestroyObjectMessages(runtimeScene);
       }
     );
 
@@ -747,10 +73,10 @@ namespace gdjs {
       if (_connectionId) {
         url.searchParams.set('connectionId', _connectionId);
       }
-      if (_playerPositionInLobby) {
+      if (playerPositionInLobby) {
         url.searchParams.set(
           'positionInLobby',
-          _playerPositionInLobby.toString()
+          playerPositionInLobby.toString()
         );
       }
       const playerId = gdjs.playerAuthentication.getUserId();
@@ -798,7 +124,7 @@ namespace gdjs {
      * Returns 1, 2, 3, ... if the player is in the lobby.
      */
     export const getCurrentPlayerPositionInLobby = () => {
-      return _playerPositionInLobby || 0;
+      return playerPositionInLobby || 0;
     };
 
     /**
@@ -938,7 +264,7 @@ namespace gdjs {
         logger.warn('Already connected to a lobby. Closing the previous one.');
         _websocket.close();
         _connectionId = null;
-        _playerPositionInLobby = null;
+        playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
         _websocket = null;
@@ -1082,7 +408,7 @@ namespace gdjs {
           '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
         _connectionId = null;
-        _playerPositionInLobby = null;
+        playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
         _websocket = null;
@@ -1111,7 +437,7 @@ namespace gdjs {
       gdjs.evtTools.p2p.useDefaultBrokerServer();
 
       _connectionId = connectionId;
-      _playerPositionInLobby = positionInLobby;
+      playerPositionInLobby = positionInLobby;
       // We save the lobbyId here as this is the moment when the player is really connected to the lobby.
       _lobbyId = lobbyId;
 
@@ -1147,7 +473,7 @@ namespace gdjs {
         _websocket.close();
       }
       _connectionId = null;
-      _playerPositionInLobby = null;
+      playerPositionInLobby = null;
       _lobbyId = null;
       _lobby = null;
       _websocket = null;
@@ -1173,7 +499,7 @@ namespace gdjs {
         return;
       }
 
-      _playerPositionInLobby = positionInLobby;
+      playerPositionInLobby = positionInLobby;
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
@@ -1228,7 +554,7 @@ namespace gdjs {
      */
     const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
       _hasGameJustStarted = true;
-      _isGameRunning = true;
+      isGameRunning = true;
       removeLobbiesContainer(runtimeScene);
       focusOnGame(runtimeScene);
     };
@@ -1239,10 +565,10 @@ namespace gdjs {
      */
     const handleGameEndedEvent = function (runtimeScene: gdjs.RuntimeScene) {
       _hasGameJustEnded = true;
-      _isGameRunning = false;
+      isGameRunning = false;
 
       // Clear the expected acknowledgments, as the game is ending.
-      _expectedEventAcknowledgements = {};
+      multiplayerMessageManager.clearExpectedMessageAcknowledgements();
     };
 
     /**

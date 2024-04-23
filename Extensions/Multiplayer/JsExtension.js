@@ -55,6 +55,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.openLobbiesWindow');
 
@@ -81,6 +82,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.endLobbyGame');
 
@@ -105,6 +107,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.isLobbiesWindowOpen');
 
@@ -128,6 +131,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.hasGameJustStarted');
 
@@ -151,6 +155,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.hasGameJustEnded');
 
@@ -174,6 +179,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.isConnectedToLobby');
 
@@ -195,6 +201,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getNumberOfPlayersInLobby');
 
@@ -216,6 +223,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getCurrentPlayerPositionInLobby');
 
@@ -243,6 +251,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerId');
 
@@ -270,6 +279,7 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.getPlayerUsername');
 
@@ -316,6 +326,7 @@ module.exports = {
       .addIncludeFile(
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile(
         'Extensions/Multiplayer/multiplayerobjectruntimebehavior.js'
       );

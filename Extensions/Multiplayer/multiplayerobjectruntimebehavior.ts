@@ -18,27 +18,50 @@ namespace gdjs {
     _lastSyncTimestamp: number = 0;
     // The number of times per second the object should be synchronized.
     _tickRate: number = 60;
+    // To avoid seeing too many logs.
+    _lastLogTimestamp: number = 0;
+    _logTickRate: number = 1;
     _getTimeNow: () => number;
-    // Clock to be incremented every time we send an event, to ensure they are ordered
-    // and old events are ignored.
+    // Clock to be incremented every time we send a message, to ensure they are ordered
+    // and old messages are ignored.
     _clock: number = 0;
+    _destroyInstanceTimeoutId: NodeJS.Timeout | null = null;
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
       behaviorData,
-      owner
+      owner: RuntimeObject
     ) {
       super(instanceContainer, behaviorData, owner);
       this._getTimeNow =
         window.performance && typeof window.performance.now === 'function'
           ? window.performance.now.bind(window.performance)
           : Date.now;
+      // When a synchronized object is created, we assume it will be assigned a networkId quickly if:
+      // - It is a new object created by the current player. -> will be assigned a networkId when sending the update message.
+      // - It is an object created by another player. -> will be assigned a networkId when receiving the update message.
+      // There is a small risk that the object is created by us after we receive an update message from the server,
+      // ending up with 2 objects created, one with a networkId (from the server) and one without (from us).
+      // To handle this case and avoid having an object not synchronized, we set a timeout to destroy the object
+      // if it has not been assigned a networkId after a short delay.
+
+      this._destroyInstanceTimeoutId = setTimeout(() => {
+        if (!owner.networkId) {
+          logger.info(
+            `Object ${owner.getName()} has not been assigned a networkId after a short delay, destroying it.`
+          );
+          owner.deleteFromScene(instanceContainer);
+        }
+      }, 500);
     }
 
-    sendDataToPeersWithIncreasedClock(eventName: string, data: Object) {
+    sendDataToPeersWithIncreasedClock(messageName: string, data: Object) {
       this._clock++;
       data['_clock'] = this._clock;
-      gdjs.multiplayer.sendDataToAll(eventName, data);
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      for (const peerId of connectedPeerIds) {
+        gdjs.multiplayerMessageManager.sendDataTo(peerId, messageName, data);
+      }
     }
 
     isOwnerOrServer() {
@@ -56,6 +79,16 @@ namespace gdjs {
       return (
         this._getTimeNow() - this._lastSyncTimestamp < 1000 / this._tickRate
       );
+    }
+
+    logToConsole(message: string) {
+      if (
+        this._getTimeNow() - this._lastLogTimestamp >
+        1000 / this._logTickRate
+      ) {
+        logger.info(message);
+        this._lastLogTimestamp = this._getTimeNow();
+      }
     }
 
     getOrCreateInstanceNetworkId() {
@@ -82,51 +115,93 @@ namespace gdjs {
         return;
       }
 
+      this.logToConsole(
+        `Synchronizing object ${this.owner.getName()} (instance ${
+          this.owner.networkId
+        }) with player ${this._playerNumber}.`
+      );
+
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const eventName = `#update#owner_${this._playerNumber}#object_${objectName}#instance_${instanceNetworkId}`;
-
-      const networkSyncData = this.owner.getObjectNetworkSyncData();
-      this.sendDataToPeersWithIncreasedClock(eventName, networkSyncData);
+      const { messageName: updateMessageName, messageData: updateMessageData } =
+        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+          objectOwner: this._playerNumber,
+          objectName,
+          instanceNetworkId,
+          objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+        });
+      this.sendDataToPeersWithIncreasedClock(
+        updateMessageName,
+        updateMessageData
+      );
+      this.sendDataToPeersWithIncreasedClock(
+        updateMessageName,
+        updateMessageData
+      );
 
       this._lastSyncTimestamp = this._getTimeNow();
     }
 
     onDestroy() {
+      if (this._destroyInstanceTimeoutId) {
+        clearTimeout(this._destroyInstanceTimeoutId);
+        this._destroyInstanceTimeoutId = null;
+      }
+
       if (!this.isOwnerOrServer()) {
         return;
       }
 
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-
-      const updateEventName = `#update#owner_${this._playerNumber}#object_${objectName}#instance_${instanceNetworkId}`;
       // Ensure we send a final update before the object is destroyed.
-      const networkSyncData = this.owner.getObjectNetworkSyncData();
       logger.info(
         `Sending a final update for object ${objectName} (instance ${instanceNetworkId}) before it is destroyed.`
       );
-      this.sendDataToPeersWithIncreasedClock(updateEventName, networkSyncData);
+      const { messageName: updateMessageName, messageData: updateMessageData } =
+        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+          objectOwner: this._playerNumber,
+          objectName,
+          instanceNetworkId,
+          objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+        });
+      this.sendDataToPeersWithIncreasedClock(
+        updateMessageName,
+        updateMessageData
+      );
 
-      // Before sending the destroy event, we set up the object representing the peers
+      // Before sending the destroy message, we set up the object representing the peers
       // that we need an acknowledgment from.
       // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
       // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
       // In both cases, this represents the list of peers the current user is connected to.
       const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-      const destroyEventName = `#destroy#owner_${this._playerNumber}#object_${objectName}#instance_${instanceNetworkId}`;
-      const destroyedEventName = destroyEventName.replace(
-        '#destroy',
-        '#destroyed'
-      );
-      gdjs.multiplayer.addExpectedEventAcknowledgement({
-        originalEventName: destroyEventName,
-        originalData: { _clock: this._clock + 1 }, // Will be incremented by the time the event is sent.
-        expectedEventName: destroyedEventName,
+      const {
+        messageName: destroyMessageName,
+        messageData: destroyMessageData,
+      } = gdjs.multiplayerMessageManager.createDestroyObjectMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+      });
+      const destroyedMessageName =
+        gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
+          destroyMessageName
+        );
+      gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
+        originalMessageName: destroyMessageName,
+        originalData: {
+          ...destroyMessageData,
+          _clock: this._clock + 1, // Will be incremented by the time the message is sent.
+        },
+        expectedMessageName: destroyedMessageName,
         otherPeerIds,
       });
 
-      this.sendDataToPeersWithIncreasedClock(destroyEventName, {});
+      this.sendDataToPeersWithIncreasedClock(
+        destroyMessageName,
+        destroyMessageData
+      );
     }
 
     setPlayerObjectOwnership(playerNumber: number) {
@@ -149,36 +224,38 @@ namespace gdjs {
       // We expect an acknowledgment from the server, if not, we will retry and eventually revert the ownership.
       const objectName = this.owner.getName();
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
-      const eventName = `#changeOwner#owner_${this._playerNumber}#object_${objectName}#instance_${instanceNetworkId}`;
-      const data = {
-        previousOwner: this._playerNumber,
-        newOwner: playerNumber,
-        instanceX: this.owner.getX(),
-        instanceY: this.owner.getY(),
-      };
+      const { messageName, messageData } =
+        gdjs.multiplayerMessageManager.createChangeOwnerMessage({
+          objectOwner: this._playerNumber,
+          objectName,
+          instanceNetworkId,
+          newObjectOwner: playerNumber,
+          instanceX: this.owner.getX(),
+          instanceY: this.owner.getY(),
+        });
       // Before sending the changeOwner message, we set up the object representing the peers
       // that we need an acknowledgment from.
       // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
       // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
       // In both cases, this represents the list of peers the current user is connected to.
       const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-      const changeOwnerAcknowledgedEventName = eventName.replace(
-        '#changeOwner',
-        '#ownerChanged'
-      );
-      gdjs.multiplayer.addExpectedEventAcknowledgement({
-        originalEventName: eventName,
+      const changeOwnerAcknowledgedMessageName =
+        gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+          messageName
+        );
+      gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
+        originalMessageName: messageName,
         originalData: {
-          ...data,
+          ...messageData,
           _clock: this._clock + 1, // Will be incremented by the time the message is sent.
         },
-        expectedEventName: changeOwnerAcknowledgedEventName,
+        expectedMessageName: changeOwnerAcknowledgedMessageName,
         otherPeerIds,
         // If we are not the server, we should revert the ownership if the server does not acknowledge the change.
-        shouldCancelEventIfTimesOut: currentPlayerNumber !== 1,
+        shouldCancelMessageIfTimesOut: currentPlayerNumber !== 1,
       });
 
-      this.sendDataToPeersWithIncreasedClock(eventName, data);
+      this.sendDataToPeersWithIncreasedClock(messageName, messageData);
       // We also update the ownership locally, so the object can be used immediately.
       // This is a prediction to allow snappy interactions.
       // If we are player 1 or server, we will have the ownership immediately anyway.

@@ -113,10 +113,11 @@ class TaskGroup {
 }
 
 class Variable {
-  constructor() {
+  constructor(data) {
     /** @type {string|number} */
-    this._value = 0;
+    this._value = data ? data.value : 0;
     this._children = {};
+    this._childrenArray = [];
   }
 
   add(value) {
@@ -140,6 +141,7 @@ class Variable {
   }
 
   setBoolean(value) {
+    console.log(value);
     this._value = value;
   }
 
@@ -159,8 +161,14 @@ class Variable {
     if (
       this._children[childName] === undefined ||
       this._children[childName] === null
-    )
+    ) {
+      const index = Number.parseInt(childName);
+      const arrayValue = this._childrenArray[index];
+      if (arrayValue !== undefined) {
+        return arrayValue;
+      }
       this._children[childName] = new Variable();
+    }
     return this._children[childName];
   }
 
@@ -196,7 +204,7 @@ class Variable {
   }
 
   getAsString() {
-    return ('' + this._value) || '';
+    return '' + this._value || '';
   }
 
   concatenateString(str) {
@@ -207,10 +215,30 @@ class Variable {
     return this._value;
   }
 
+  /**
+   * @param {string} childName
+   * @param {Variable} childVariable
+   */
   addChild(childName, childVariable) {
-    // Make sure this is a structure
-    this.castTo('structure');
     this._children[childName] = childVariable;
+    return this;
+  }
+
+  /**
+   * @param {string | number | boolean} value
+   */
+  pushValue(value) {
+    this._childrenArray.push(
+      new Variable({ value })
+    );
+    return this;
+  }
+
+  /**
+   * @param {Variable} variable
+   */
+  pushVariableCopy(variable) {
+    this._childrenArray.push(variable.clone());
     return this;
   }
 
@@ -642,15 +670,11 @@ class RuntimeScene {
         this.registerObject(sceneData.objects[i]);
       }
       // Create initial instances of objects
-      this.createObjectsFrom(
-        sceneData.instances
-      );
+      this.createObjectsFrom(sceneData.instances);
     }
   }
 
-  createObjectsFrom(
-    data
-  ) {
+  createObjectsFrom(data) {
     for (const instanceData of data) {
       const newObject = this.createObject(instanceData.name);
     }
@@ -721,11 +745,10 @@ class RuntimeScene {
   getScene() {
     return this;
   }
-  
+
   getGame() {
     return this.game;
   }
-
 }
 
 /**
@@ -794,7 +817,7 @@ class LongLivedObjectsList {
     runtimeObject.unregisterDestroyCallback(this.callbacks.get(runtimeObject));
     this.callbacks.delete(runtimeObject);
   }
-  
+
   /**
    * @param {Array<VariablesContainer>} variablesContainers
    */
@@ -821,7 +844,10 @@ function makeMinimalGDJSMock(options) {
   const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
   const runtimeGame = new RuntimeGame(options && options.gameData);
-  const runtimeScene = new RuntimeScene(options && options.sceneData, runtimeGame);
+  const runtimeScene = new RuntimeScene(
+    options && options.sceneData,
+    runtimeGame
+  );
 
   return {
     gdjs: {
@@ -830,7 +856,11 @@ function makeMinimalGDJSMock(options) {
           getVariableNumber: (variable) => variable.getAsNumber(),
           getVariableString: (variable) => variable.getAsString(),
           getVariableBoolean: (variable) => variable.getAsBoolean(),
-          toggleVariableBoolean: (variable) => variable.setBoolean(!variable.getAsBoolean())
+          toggleVariableBoolean: (variable) =>
+            variable.setBoolean(!variable.getAsBoolean()),
+          variablePushCopy: (array, variable) =>
+            array.pushVariableCopy(variable),
+          valuePush: (array, value) => array.pushValue(value),
         },
         object: {
           createObjectOnScene,

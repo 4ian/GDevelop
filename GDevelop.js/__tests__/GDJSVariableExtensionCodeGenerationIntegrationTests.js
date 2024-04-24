@@ -265,6 +265,67 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(0);
   });
 
+  it('can generate a push number action', function () {
+    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout(
+      [
+        {
+          type: { value: 'PushNumber' },
+          parameters: ['MyVariable', '123'],
+        },
+      ]
+    );
+    expect(
+      runtimeScene.getVariables().get('MyVariable').getChild('0').getAsNumber()
+    ).toBe(123);
+  });
+
+  it('can generate a push string action', function () {
+    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout(
+      [
+        {
+          type: { value: 'PushString' },
+          parameters: ['MyVariable', '"Hello"'],
+        },
+      ]
+    );
+    expect(
+      runtimeScene.getVariables().get('MyVariable').getChild('0').getAsString()
+    ).toBe("Hello");
+  });
+
+  it('can generate a push boolean action', function () {
+    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout(
+      [
+        {
+          type: { value: 'PushBoolean' },
+          parameters: ['MyVariable', 'True'],
+        },
+      ]
+    );
+    expect(
+      runtimeScene.getVariables().get('MyVariable').getChild('0').getAsBoolean()
+    ).toBe(true);
+  });
+
+  it('can generate a push variable action', function () {
+    scene.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    scene.getVariables().insertNew('MyOtherVariable', 0).setValue(123);
+    const runtimeScene = generateAndRunActionsForLayout(
+      [
+        {
+          type: { value: 'PushVariable' },
+          parameters: ['MyVariable', 'MyOtherVariable'],
+        },
+      ]
+    );
+    expect(
+      runtimeScene.getVariables().get('MyVariable').getChild('0').getAsNumber()
+    ).toBe(123);
+  });
+
   it('can generate a local variable expression', function () {
     scene.getVariables().insertNew('MyVariable', 0).setValue(0);
     const runtimeScene = generateAndRunEventsForLayout(
@@ -279,8 +340,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           },
         ],
         events: [],
-      }],
-      true
+      }]
     );
     expect(
       runtimeScene.getVariables().get('MyVariable').getAsNumber()
@@ -306,8 +366,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           },
         ],
         events: [],
-      }],
-      true
+      }]
     );
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
@@ -342,8 +401,54 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           ],
           events: [],
         }],
-      }],
-      true
+      }]
+    );
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a local variable without affecting parent event local variables', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+
+    project.getVariables().insertNew('MyVariable', 0).setValue(123);
+    scene.getVariables().insertNew('MyVariable', 0).setValue(456);
+    const runtimeScene = generateAndRunEventsForLayout(
+      [{
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{name: "MyLocalVariable", type: "number", value: 789}],
+        conditions: [],
+        actions: [],
+        events: [
+        // Create a new local variable with the same name.
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          variables: [{name: "MyLocalVariable", type: "number", value: 147}],
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['MyLocalVariable', '=', '148'],
+            },
+          ],
+        },
+        // The local variable must be untouched by the previous event.
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: { inverted: false, value: 'NumberVariable' },
+              parameters: ['MyLocalVariable', '=', '789'],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'SetNumberVariable' },
+              parameters: ['SuccessVariable', '=', '1'],
+            },
+          ],
+        }],
+      }]
     );
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
@@ -375,8 +480,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           ],
           events: [],
         }],
-      }],
-      true
+      }]
     );
     expect(
       runtimeScene.getVariables().get('SuccessVariable').getAsNumber()

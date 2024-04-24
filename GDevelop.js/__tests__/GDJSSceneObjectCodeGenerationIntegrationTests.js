@@ -89,12 +89,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     return runtimeScene;
   };
 
-  it('can generate a scene number variable action', function () {
+  it('can generate a number variable action', function () {
     object.getVariables().insertNew('MyVariable', 0).setValue(0);
     const runtimeScene = generateAndRunActionsForLayout([
       {
         type: { value: 'SetNumberObjectVariable' },
-        parameters: ['MyObject', 'MyVariable', '=', '1'],
+        parameters: ['MyObject', 'MyVariable', '=', '123'],
       },
     ]);
     expect(
@@ -103,10 +103,10 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         .getVariables()
         .get('MyVariable')
         .getAsNumber()
-    ).toBe(1);
+    ).toBe(123);
   });
 
-  it('can generate a scene string variable action', function () {
+  it('can generate a string variable action', function () {
     object.getVariables().insertNew('MyVariable', 0).setString('');
     const runtimeScene = generateAndRunActionsForLayout([
       {
@@ -123,7 +123,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe('Hello');
   });
 
-  it('can generate a scene boolean variable action', function () {
+  it('can generate a boolean variable action', function () {
     object.getVariables().insertNew('MyVariable', 0).setBool(false);
     const runtimeScene = generateAndRunActionsForLayout([
       {
@@ -140,7 +140,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(true);
   });
 
-  it('can generate a scene boolean variable toggle', function () {
+  it('can generate a boolean variable toggle', function () {
     object.getVariables().insertNew('MyVariable', 0).setBool(false);
     const runtimeScene = generateAndRunActionsForLayout([
       {
@@ -157,7 +157,61 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(true);
   });
 
-  it('can generate a scene number variable condition that is true', function () {
+  it('can generate a push number variable action', function () {
+    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout([
+      {
+        type: { value: 'PushNumberToObjectVariable' },
+        parameters: ['MyObject', 'MyVariable', '123'],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getObjects('MyObject')[0]
+        .getVariables()
+        .get('MyVariable')
+        .getChild('0')
+        .getAsNumber()
+    ).toBe(123);
+  });
+
+  it('can generate a push string variable action', function () {
+    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout([
+      {
+        type: { value: 'PushStringToObjectVariable' },
+        parameters: ['MyObject', 'MyVariable', '"Hello"'],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getObjects('MyObject')[0]
+        .getVariables()
+        .get('MyVariable')
+        .getChild('0')
+        .getAsNumber()
+    ).toBe("Hello");
+  });
+
+  it('can generate a push boolean variable action', function () {
+    object.getVariables().insertNew('MyVariable', 0).castTo('Array');
+    const runtimeScene = generateAndRunActionsForLayout([
+      {
+        type: { value: 'PushBooleanToObjectVariable' },
+        parameters: ['MyObject', 'MyVariable', 'True'],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getObjects('MyObject')[0]
+        .getVariables()
+        .get('MyVariable')
+        .getChild('0')
+        .getAsNumber()
+    ).toBe(true);
+  });
+
+  it('can generate a number variable condition that is true', function () {
     object.getVariables().insertNew('MyVariable', 0).setValue(123);
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
@@ -170,7 +224,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a scene boolean variable condition that is true', function () {
+  it('can generate a boolean variable condition that is true', function () {
     object.getVariables().insertNew('MyVariable', 0).setBool(true);
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {
@@ -183,7 +237,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('can generate a scene string variable condition that is true', function () {
+  it('can generate a string variable condition that is true', function () {
     object.getVariables().insertNew('MyVariable', 0).setString('Same value');
     const runtimeScene = generateAndRunVariableAffectationWithConditions([
       {

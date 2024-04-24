@@ -65,7 +65,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetDefaultValue("true")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
-      .AddCodeOnlyParameter("boolean", _("Value"))
+      .AddCodeOnlyParameter("trueorfalse", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   extension
@@ -107,7 +107,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("operator", _("Value"), "boolean")
       // This parameter allows to keep the operand expression
       // when the editor switch between variable instructions.
-      .AddCodeOnlyParameter("boolean", _("Value"))
+      .AddCodeOnlyParameter("trueorfalse", _("Value"))
       .SetRelevantForLayoutEventsOnly();
 
   extension

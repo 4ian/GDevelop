@@ -336,7 +336,10 @@ class GD_CORE_API EventsCodeGenerator {
     return projectScopedContainers;
   }
 
-  // TODO Only keep the const one.
+  /**
+   * @brief The code generator push variable containers in the same instance
+   * to avoid to pass an instance by parameter.
+   */
   gd::ProjectScopedContainers& GetProjectScopedContainers() {
     return projectScopedContainers;
   }
@@ -539,7 +542,8 @@ class GD_CORE_API EventsCodeGenerator {
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
       const gd::String& objectName) {
-    // This is dead code. See the real implementation in GDJS.
+    // This code is only used as a mock.
+    // See the real implementation in GDJS.
     if (scope == LAYOUT_VARIABLE) {
       return "getLayoutVariable(" + variableName + ")";
 

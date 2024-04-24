@@ -185,7 +185,7 @@ ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithCont
 
 void ReadOnlyArbitraryEventsWorkerWithContext::VisitEvent(
     const gd::BaseEvent &event) {
-  // TOD SHould CanHaveVariables be used instead?
+  // TODO Should CanHaveVariables be used instead?
   // CanHaveVariables is less efficient but allows to add local variables to
   // empty containers.
   if (!event.HasVariables()) {

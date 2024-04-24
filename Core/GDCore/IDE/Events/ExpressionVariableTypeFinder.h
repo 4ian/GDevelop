@@ -10,28 +10,20 @@
 
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
-#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
-#include "GDCore/Extensions/Metadata/MetadataProvider.h"
-#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
-#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
-#include "GDCore/Tools/Localization.h"
 
 namespace gd {
-class Expression;
-class ObjectsContainer;
 class Platform;
-class ParameterMetadata;
-class ExpressionMetadata;
 }  // namespace gd
 
 namespace gd {
 
+// This class is very similar to ExpressionVariableParentFinder.
 /**
  * \brief Find the variable type of a node representing a variable.
  * 
- * It only works for expression from variable parameters.
+ * It only works for expressions from variable parameters.
  *
  * \see gd::ExpressionParser2
  */

@@ -98,7 +98,7 @@ class GD_CORE_API BaseEvent {
   virtual bool CanHaveVariables() const { return false; }
 
   /**
-   * Return the local variable, if applicable.
+   * Return the local variables, if applicable.
    */
   virtual const gd::VariablesContainer& GetVariables() const {
     return badLocalVariables;
@@ -112,7 +112,7 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
-   * \brief Return true if the events has local variable.
+   * \brief Return true if the events has local variables.
    * \warning This is only applicable when CanHaveVariables() return true.
    */
   bool HasVariables() const;

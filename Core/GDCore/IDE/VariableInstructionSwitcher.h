@@ -6,7 +6,6 @@
 #pragma once
 #include "GDCore/Project/Variable.h"
 #include "GDCore/String.h"
-#include <vector>
 
 namespace gd {
 class Instruction;
@@ -14,20 +13,25 @@ class Instruction;
 
 namespace gd {
 /**
- * Contains tools to use events functions.
+ * Events set and check variables with sets of 3 instructions for:
+ * - number
+ * - string
+ * - boolean
+ *
+ * Users only see 1 instruction. The editor automatically switches between the 3
+ * instructions according to the variable type.
  */
 class GD_CORE_API VariableInstructionSwitcher {
 public:
   /**
-   * \brief Return true if the instruction is a primitive variable getter or
-   * setter.
+   * \brief Return true if the instruction is a variable getter or setter.
    */
   static bool
   IsSwitchableVariableInstruction(const gd::String &instructionType);
 
   /**
-   * \brief Return the common identifier for primitive variable getter or
-   * setter or an empty string otherwise.
+   * \brief Return the common identifier for variable getter or setter or an
+   * empty string otherwise.
    *
    * The instruction type of the "number" one is actually used as the common
    * identifier.
@@ -36,8 +40,7 @@ public:
   GetSwitchableVariableInstructionIdentifier(const gd::String &instructionType);
 
   /**
-   * \brief Return the variable type for primitive variable getter or
-   * setter.
+   * \brief Return the variable type for variable getter or setter.
    */
   static const gd::Variable::Type
   GetSwitchableInstructionVariableType(const gd::String &instructionType);

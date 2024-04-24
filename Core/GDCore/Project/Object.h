@@ -55,9 +55,7 @@ class GD_CORE_API Object {
   /**
    * Copy constructor. Calls Init().
    */
-  Object(const gd::Object& object) {
-    Init(object);
-  };
+  Object(const gd::Object& object) { Init(object); };
 
   /**
    * Assignment operator. Calls Init().

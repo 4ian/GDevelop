@@ -1,8 +1,5 @@
 #include "ProjectScopedContainers.h"
 
-#include <functional>
-#include <vector>
-
 namespace gd {
 
 ProjectScopedContainers

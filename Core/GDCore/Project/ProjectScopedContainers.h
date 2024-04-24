@@ -160,7 +160,10 @@ class ProjectScopedContainers {
     return variablesContainersList;
   };
 
-  // TODO Only keep the const one.
+  /**
+   * @brief The code generator push variable containers in the same instance
+   * to avoid to pass an instance by parameter.
+   */
   gd::VariablesContainersList &GetVariablesContainersList() {
     return variablesContainersList;
   };

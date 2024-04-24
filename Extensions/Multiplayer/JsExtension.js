@@ -87,6 +87,35 @@ module.exports = {
       .setFunctionName('gdjs.multiplayer.endLobbyGame');
 
     extension
+      .addAction(
+        'SendMessage',
+        _('Send message to other players'),
+        _(
+          "Send a message to other players in the lobby, with an automatic retry system if it hasn't been received. Use with the condition 'HasMessageBeenReceived' to know when the message has been properly processed by the server."
+        ),
+        _('Send message _PARAM0_ to other players with content _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .setHelpPath('/all-features/multiplayer')
+      .addParameter('string', _('Message name'), '', false)
+      .addParameter('string', _('Message content'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.sendMessage');
+
+    extension
       .addCondition(
         'IsLobbiesWindowOpen',
         _('Lobbies window is open'),
@@ -182,6 +211,59 @@ module.exports = {
       .addIncludeFile('Extensions/Multiplayer/messageManager.js')
       .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
       .setFunctionName('gdjs.multiplayer.isConnectedToLobby');
+
+    extension
+      .addCondition(
+        'HasMessageBeenReceived',
+        _('Message has been received from another player'),
+        _(
+          'Check if a message has been received from another player. Will be true only for one frame.'
+        ),
+        _('Message _PARAM0_ has been received'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addParameter('string', _('Message name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.hasMessageBeenReceived');
+
+    extension
+      .addStrExpression(
+        'GetMessageData',
+        _('Get message data'),
+        _(
+          'Returns the data received when the specified message was received from another player.'
+        ),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addParameter('string', _('Message name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .addIncludeFile('Extensions/Multiplayer/multiplayercomponents.js')
+      .addIncludeFile('Extensions/Multiplayer/messageManager.js')
+      .addIncludeFile('Extensions/Multiplayer/multiplayertools.js')
+      .setFunctionName('gdjs.multiplayerMessageManager.getMessageData');
 
     extension
       .addExpression(

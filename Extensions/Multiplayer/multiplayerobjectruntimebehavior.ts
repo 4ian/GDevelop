@@ -134,10 +134,6 @@ namespace gdjs {
         updateMessageName,
         updateMessageData
       );
-      this.sendDataToPeersWithIncreasedClock(
-        updateMessageName,
-        updateMessageData
-      );
 
       this._lastSyncTimestamp = this._getTimeNow();
     }

@@ -29,6 +29,7 @@ namespace gdjs {
       (runtimeScene: gdjs.RuntimeScene) => {
         multiplayerMessageManager.handleChangeOwnerMessages(runtimeScene);
         multiplayerMessageManager.handleUpdateObjectMessages(runtimeScene);
+        multiplayerMessageManager.handleCustomMessages();
         multiplayerMessageManager.handleAcknowledgeMessages();
         multiplayerMessageManager.resendClearOrCancelAcknowledgedMessages(
           runtimeScene
@@ -598,9 +599,7 @@ namespace gdjs {
      * players in the lobby via the websocket.
      * It will then trigger an event from the websocket to all players in the lobby.
      */
-    const handleGameCountdownStartMessage = function (
-      runtimeScene: gdjs.RuntimeScene
-    ) {
+    const handleGameCountdownStartMessage = function () {
       if (!_websocket) {
         logger.error(
           'No connection to send the start countdown message. Are you connected to a lobby?'
@@ -717,7 +716,7 @@ namespace gdjs {
           break;
         }
         case 'startGameCountdown': {
-          handleGameCountdownStartMessage(runtimeScene);
+          handleGameCountdownStartMessage();
           break;
         }
         case 'startGame': {

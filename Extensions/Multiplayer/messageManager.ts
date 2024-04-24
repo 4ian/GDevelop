@@ -2,6 +2,37 @@ namespace gdjs {
   declare var cordova: any;
 
   const logger = new gdjs.Logger('Multiplayer');
+
+  class RecentlySeenCustomMessages {
+    maxSize: number;
+    cache: Set<string>;
+    keys: string[];
+
+    constructor(maxSize: number) {
+      this.maxSize = maxSize;
+      this.cache = new Set();
+      this.keys = [];
+    }
+
+    has(key: string) {
+      return this.cache.has(key);
+    }
+
+    add(key: string) {
+      // If we are at the maximum size, remove the first key.
+      if (this.cache.size >= this.maxSize) {
+        const keyToRemove = this.keys.shift();
+        if (keyToRemove) {
+          this.cache.delete(keyToRemove);
+        }
+      }
+
+      // Add the key to the end of the list.
+      this.cache.add(key);
+      this.keys.push(key);
+    }
+  }
+
   export namespace multiplayerMessageManager {
     // For testing purposes, you can simulate network latency and packet loss.
     // Adds x ms to all network messages, simulating a slow network.
@@ -18,6 +49,10 @@ namespace gdjs {
         : Date.now;
     const messageRetryTime = 200; // Time to wait before retrying a message that was not acknowledged, in ms.
     const maxRetries = 4; // Maximum number of retries before giving up on a message.
+
+    // Make the processed messages an LRU cache, so that we can limit the number of messages we keep in memory,
+    // as well as keep them in order.
+    const processedCustomMessagesCache = new RecentlySeenCustomMessages(500);
 
     let expectedMessageAcknowledgements: {
       [messageName: string]: {
@@ -257,7 +292,7 @@ namespace gdjs {
       };
     } => {
       return {
-        messageName: `#changeOwner#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${changeOwnerMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
         messageData: {
           previousOwner: objectOwner,
           newOwner: newObjectOwner,
@@ -266,7 +301,6 @@ namespace gdjs {
         },
       };
     };
-
     export const handleChangeOwnerMessages = (
       runtimeScene: gdjs.RuntimeScene
     ) => {
@@ -342,16 +376,16 @@ namespace gdjs {
             );
             behavior._playerNumber = newOwner;
 
-            const ownerChangedmessageName = messageName.replace(
-              '#changeOwner',
-              '#ownerChanged'
-            );
+            const ownerChangedMessageName =
+              createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+                messageName
+              );
 
             logger.info(
               `Sending acknowledgment of ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
             // Once the object ownership has changed, we need to acknowledge it to the player who sent this message.
-            sendDataTo(messageSender, ownerChangedmessageName, {});
+            sendDataTo(messageSender, ownerChangedMessageName, {});
 
             // If we are player number 1, we are the server,
             // so we need to relay the ownership change to others,
@@ -370,7 +404,7 @@ namespace gdjs {
               addExpectedMessageAcknowledgement({
                 originalMessageName: messageName,
                 originalData: data,
-                expectedMessageName: ownerChangedmessageName,
+                expectedMessageName: ownerChangedMessageName,
                 otherPeerIds,
                 // As we are the server, we do not cancel the message if it times out.
                 shouldCancelMessageIfTimesOut: false,
@@ -405,7 +439,7 @@ namespace gdjs {
       messageData: any;
     } => {
       return {
-        messageName: `#update#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${updateObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
         messageData: objectNetworkSyncData,
       };
     };
@@ -518,7 +552,10 @@ namespace gdjs {
     export const createObjectDestroyedMessageNameFromDestroyMessage = (
       messageName: string
     ): string => {
-      return messageName.replace('#destroy', '#destroyed');
+      return messageName.replace(
+        destroyObjectMessageNamePrefix,
+        objectDestroyedMessageNamePrefix
+      );
     };
     const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
     const objectOwnerChangedMessageNameRegex =
@@ -526,16 +563,47 @@ namespace gdjs {
     export const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
       messageName: string
     ): string => {
-      return messageName.replace('#changeOwner', '#ownerChanged');
+      return messageName.replace(
+        changeOwnerMessageNamePrefix,
+        objectOwnerChangedMessageNamePrefix
+      );
     };
+    const customMessageAcknowledgePrefix = '#ackCustomMessage';
+    const customMessageAcknowledgeRegex = /#ackCustomMessage#(.+)/;
+    const createAcknowledgeCustomMessageNameFromCustomMessage = (
+      messageName: string
+    ): string => {
+      return messageName.replace(
+        customMessageNamePrefix,
+        customMessageAcknowledgePrefix
+      );
+    };
+
+    const getRegexFromAckMessageName = (messageName: string) => {
+      if (messageName.startsWith(objectDestroyedMessageNamePrefix)) {
+        return objectDestroyedMessageNameRegex;
+      } else if (messageName.startsWith(objectOwnerChangedMessageNamePrefix)) {
+        return objectOwnerChangedMessageNameRegex;
+      } else if (messageName.startsWith(customMessageAcknowledgePrefix)) {
+        return customMessageAcknowledgeRegex;
+      }
+      return null;
+    };
+
+    const isMessageAcknowledgement = (messageName: string) => {
+      return (
+        messageName.startsWith(objectDestroyedMessageNamePrefix) ||
+        messageName.startsWith(objectOwnerChangedMessageNamePrefix) ||
+        messageName.startsWith(customMessageAcknowledgePrefix)
+      );
+    };
+
     export const handleAcknowledgeMessages = () => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
       const objectMessageNamesArray = Array.from(p2pMessagesMap.keys());
       // When we receive acknowledgement messages, save it in the extension, to avoid sending the message again.
       const acknowledgedMessageNames = objectMessageNamesArray.filter(
-        (messageName) =>
-          messageName.startsWith(objectDestroyedMessageNamePrefix) ||
-          messageName.startsWith(objectOwnerChangedMessageNamePrefix)
+        isMessageAcknowledgement
       );
       acknowledgedMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
@@ -544,37 +612,50 @@ namespace gdjs {
           let data;
           while ((data = message.getData())) {
             const messageSender = message.getSender();
-            // message name is like #destroyed#owner_abc#object_abc#instance_abc, extract owner, object and instance names.
-            const regex = messageName.startsWith(
-              objectDestroyedMessageNamePrefix
-            )
-              ? objectDestroyedMessageNameRegex
-              : objectOwnerChangedMessageNameRegex;
+            const regex = getRegexFromAckMessageName(messageName);
+            if (!regex) {
+              // This should not happen.
+              logger.error(`Invalid acknowledgment message ${messageName}.`);
+              message.popData();
+              return;
+            }
+
             const matches = regex.exec(messageName);
             if (!matches) {
               // This should not happen.
+              logger.error(`Invalid acknowledgment message ${messageName}.`);
               message.popData();
               return;
             }
             if (!expectedMessageAcknowledgements[messageName]) {
               // This should not happen, but if we receive an acknowledgment for a message we did not expect, let's not error
               // and just clear that message.
+              logger.error(
+                `Received acknowledgment for message ${messageName} that was not expected.`
+              );
               message.popData();
               return;
             }
             if (!expectedMessageAcknowledgements[messageName][messageSender]) {
               // This should not happen, but if we receive an acknowledgment from a sender we did not expect, let's not error
               // and just clear that message.
+              logger.error(
+                `Received acknowledgment for message ${messageName} from ${messageSender} that was not expected.`
+              );
               message.popData();
               return;
             }
-            const instanceId = matches[3];
 
+            // If a clock is provided in the message, ensure that we only process the message if the clock is newer than the last one received.
             const messageInstanceClock = data['_clock'];
-            const lastClock = _lastClockReceivedByInstance[instanceId] || 0;
-            if (messageInstanceClock <= lastClock) {
-              // Ignore old messages.
-              return;
+            if (messageInstanceClock !== undefined) {
+              const instanceId = matches[3];
+              const lastClock = _lastClockReceivedByInstance[instanceId] || 0;
+              if (messageInstanceClock <= lastClock) {
+                // Ignore old messages.
+                return;
+              }
+              _lastClockReceivedByInstance[instanceId] = messageInstanceClock;
             }
 
             logger.info(
@@ -584,7 +665,6 @@ namespace gdjs {
             expectedMessageAcknowledgements[messageName][
               messageSender
             ].acknowledged = true;
-            _lastClockReceivedByInstance[instanceId] = messageInstanceClock;
 
             // We've received this acknowledgement from this sender, remove it from the list
             // so that the next getSender() will return the next sender.
@@ -724,7 +804,7 @@ namespace gdjs {
       messageData: any;
     } => {
       return {
-        messageName: `#destroy#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
+        messageName: `${destroyObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
         messageData: {},
       };
     };
@@ -741,6 +821,7 @@ namespace gdjs {
           const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
           const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
           if (data && messageSender) {
+            logger.info(`Received message ${messageName} with data ${data}.`);
             const matches = destroyObjectMessageNameRegex.exec(messageName);
             if (!matches) {
               return;
@@ -820,6 +901,163 @@ namespace gdjs {
                 );
                 sendDataTo(peerId, messageName, data);
               }
+            }
+          }
+        }
+      });
+    };
+
+    const customMessageNamePrefix = '#customMessage';
+    const customMessageRegex = /#customMessage#(.+)/;
+    const getCustomMessageNameFromUserMessageName = (
+      userMessageName: string
+    ) => {
+      return `${customMessageNamePrefix}#${userMessageName}`;
+    };
+    const createCustomMessage = ({
+      userMessageName,
+      userMessageData,
+    }: {
+      userMessageName: string;
+      userMessageData: any;
+    }) => {
+      const messageId = gdjs.makeUuid();
+      return {
+        messageName: getCustomMessageNameFromUserMessageName(userMessageName),
+        messageData: {
+          data: userMessageData,
+          uniqueId: messageId,
+        },
+      };
+    };
+
+    export const sendMessage = (
+      userMessageName: string,
+      userMessageData: string
+    ) => {
+      const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+      const { messageName, messageData } = createCustomMessage({
+        userMessageName,
+        userMessageData,
+      });
+      const acknowledgmentMessageName =
+        createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
+      addExpectedMessageAcknowledgement({
+        originalMessageName: messageName,
+        originalData: messageData,
+        expectedMessageName: acknowledgmentMessageName,
+        otherPeerIds: connectedPeerIds, // Expect acknowledgment from all peers.
+      });
+      for (const peerId of connectedPeerIds) {
+        sendDataTo(peerId, messageName, messageData);
+      }
+
+      // If we are player number 1, we are the server so we can consider this messaged as received
+      // and add it to the list of custom messages to process on top of the messages received.
+      if (gdjs.multiplayer.playerPositionInLobby === 1) {
+        const message = gdjs.evtTools.p2p.getEvent(messageName);
+        message.pushData(
+          new gdjs.evtTools.p2p.EventData(
+            JSON.stringify(messageData),
+            gdjs.evtTools.p2p.getCurrentId()
+          )
+        );
+        // The message is now automatically added to the list of messages to process,
+        // and will be removed at the end of the frame.
+      }
+    };
+
+    export const hasMessageBeenReceived = (userMessageName: string) => {
+      const messageName =
+        getCustomMessageNameFromUserMessageName(userMessageName);
+      const messageHasBeenReceived = gdjs.evtTools.p2p.onEvent(
+        messageName,
+        false
+      );
+      if (messageHasBeenReceived) {
+        const messageData = gdjs.evtTools.p2p.getEventData(messageName);
+        const uniqueMessageId = JSON.parse(messageData).uniqueId;
+        const customMessageCacheKey = `${messageName}#${uniqueMessageId}`;
+        if (processedCustomMessagesCache.has(customMessageCacheKey)) {
+          // Message has already been processed recently. This can happen if the message is sent multiple times,
+          // after not being acknowledged properly.
+          return false;
+        }
+        processedCustomMessagesCache.add(customMessageCacheKey);
+        return true;
+      }
+
+      return false;
+    };
+
+    export const getMessageData = (messageName: string) => {
+      const data = gdjs.evtTools.p2p.getEventData(messageName);
+      return data;
+    };
+
+    export const handleCustomMessages = (): void => {
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const customMessageNamesArray = Array.from(p2pMessagesMap.keys());
+      const customMessageNames = customMessageNamesArray.filter((messageName) =>
+        messageName.startsWith(customMessageNamePrefix)
+      );
+      customMessageNames.forEach((messageName) => {
+        if (gdjs.evtTools.p2p.onEvent(messageName, false)) {
+          const event = gdjs.evtTools.p2p.getEvent(messageName);
+          const data = JSON.parse(event.getData());
+          const uniqueMessageId = data.uniqueId;
+          const messageSender = event.getSender();
+          logger.info(`Received message ${messageName} with data ${data}.`);
+          const matches = customMessageRegex.exec(messageName);
+          if (!matches) {
+            // This should not happen.
+            logger.error(`Invalid custom message ${messageName}.`);
+            return;
+          }
+
+          const customMessageCacheKey = `${messageName}#${uniqueMessageId}`;
+          if (processedCustomMessagesCache.has(customMessageCacheKey)) {
+            // Message has already been processed recently. This can happen if the message is sent multiple times,
+            // after not being acknowledged properly.
+            logger.info(
+              `Message ${messageName} has already been processed, skipping.`
+            );
+            return;
+          }
+
+          logger.info(
+            `Received custom message ${messageName} with data ${data}.`
+          );
+
+          const acknowledgmentMessageName =
+            createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
+          logger.info(
+            `Sending acknowledgment of custom message ${messageName} to ${messageSender}.`
+          );
+          sendDataTo(messageSender, acknowledgmentMessageName, {});
+
+          // If we are player number 1, we are the server,
+          // so we need to relay the message to others.
+          if (gdjs.multiplayer.playerPositionInLobby === 1) {
+            // In the case of custom messages, we relay the message to all players, including the sender.
+            // This allows the sender to process it the same way others would, when they receive the event.
+            const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+            if (!connectedPeerIds.length) {
+              // No one else to relay the message to.
+              return;
+            }
+
+            addExpectedMessageAcknowledgement({
+              originalMessageName: messageName,
+              originalData: data,
+              expectedMessageName: acknowledgmentMessageName,
+              otherPeerIds: connectedPeerIds,
+            });
+            for (const peerId of connectedPeerIds) {
+              logger.info(
+                `Relaying custom message ${messageName} to ${peerId}.`
+              );
+              sendDataTo(peerId, messageName, data);
             }
           }
         }

@@ -23,7 +23,7 @@ namespace gdjs {
       /**
        * The data bound to an event that got triggered.
        */
-      class EventData {
+      export class EventData {
         constructor(data: string, sender: string) {
           this.data = data;
           this.sender = sender;
@@ -43,7 +43,7 @@ namespace gdjs {
       /**
        * An event that can be listened to.
        */
-      class Event {
+      export class Event {
         private readonly data: EventData[] = [];
         public dataloss = false;
 

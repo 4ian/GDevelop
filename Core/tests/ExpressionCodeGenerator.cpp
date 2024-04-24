@@ -1023,80 +1023,83 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "fakeBadVariable");
     }
   }
-  SECTION("Valid variables (upcoming, new 'variable' type working for any variable)") {
-    // TODO When implemented, copy the test cases from the next section, like this:
+  SECTION("Valid variables (legacy, pre-scoped variables)") {
+    // Check that the scope is forwarded by the parser.
+    SECTION("simple variable") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "MySceneVariable", "")
+              == "getLayoutVariable(MySceneVariable)");
+    }
+    SECTION("simple (global) variable") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "globalvar", "MyGlobalNumberVariable", "")
+              == "getProjectVariable(MyGlobalNumberVariable)");
+    }
+  }
+  SECTION("Valid variables") {
+    // getAnyVariable is a mocked value. The function doesn't actually exist.
+    // The actual scope switching is done by GDJS and tested by GDevelop.js
+    // integration tests.
     SECTION("simple variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "variable", "MySceneVariable", "")
               == "getAnyVariable(MySceneVariable)");
     }
-    SECTION("simple (global) variable") {
-      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "variable", "MyGlobalNumberVariable", "")
-              == "getAnyVariable(MyGlobalNumberVariable)");
-    }
-  }
-  SECTION("Valid variables (legacy, pre-scoped variables)") {
-    SECTION("simple variable") {
-      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable", "")
-              == "getLayoutVariable(myVariable)");
-    }
     SECTION("child dot accessor") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable.myChild", "")
-              == "getLayoutVariable(myVariable).getChild(\"myChild\")");
+                  codeGenerator, context, "variable", "MySceneVariable.myChild", "")
+              == "getAnyVariable(MySceneVariable).getChild(\"myChild\")");
     }
     SECTION("2 children") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable.child1.child2", "")
-              == "getLayoutVariable(myVariable).getChild(\"child1\").getChild(\"child2\")");
+                  codeGenerator, context, "variable", "MySceneVariable.child1.child2", "")
+              == "getAnyVariable(MySceneVariable).getChild(\"child1\").getChild(\"child2\")");
     }
     SECTION("bracket access") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[ \"hello\" + "
+                  codeGenerator, context, "variable", "MySceneVariable[ \"hello\" + "
             "\"world\" ]", "")
-              == "getLayoutVariable(myVariable).getChild(\"hello\" + \"world\")");
+              == "getAnyVariable(MySceneVariable).getChild(\"hello\" + \"world\")");
     }
     SECTION("bracket access (using a string object variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySpriteObject.MyStringVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getVariableForObject(MySpriteObject, MyStringVariable).getAsString())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySpriteObject.MyStringVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getVariableForObject(MySpriteObject, MyStringVariable).getAsString())");
     }
     SECTION("bracket access (using a number object variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySpriteObject.MyNumberVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getVariableForObject(MySpriteObject, MyNumberVariable).getAsNumber())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySpriteObject.MyNumberVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getVariableForObject(MySpriteObject, MyNumberVariable).getAsNumber())");
     }
     SECTION("bracket access (using a string variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySceneStringVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneStringVariable).getAsString())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySceneStringVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MySceneStringVariable).getAsString())");
     }
     SECTION("bracket access (using a number variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySceneVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneVariable).getAsNumber())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySceneVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MySceneVariable).getAsNumber())");
     }
     SECTION("bracket access (using a string global variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MyGlobalStringVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MyGlobalStringVariable).getAsString())");
+                  codeGenerator, context, "variable", "MySceneVariable[MyGlobalStringVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MyGlobalStringVariable).getAsString())");
     }
     SECTION("bracket access (using a number global variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MyGlobalNumberVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MyGlobalNumberVariable).getAsNumber())");
+                  codeGenerator, context, "variable", "MySceneVariable[MyGlobalNumberVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MyGlobalNumberVariable).getAsNumber())");
     }
     SECTION("bracket access (using a boolean variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySceneBooleanVariable]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneBooleanVariable).getAsNumberOrString())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySceneBooleanVariable]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MySceneBooleanVariable).getAsNumberOrString())");
     }
     SECTION("bracket access (using a structure variable inside)") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                  codeGenerator, context, "scenevar", "myVariable[MySceneStructureVariable.MyChild.SubChild]", "")
-              == "getLayoutVariable(myVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"SubChild\").getAsNumberOrString())");
+                  codeGenerator, context, "variable", "MySceneVariable[MySceneStructureVariable.MyChild.SubChild]", "")
+              == "getAnyVariable(MySceneVariable).getChild(getAnyVariable(MySceneStructureVariable).getChild(\"MyChild\").getChild(\"SubChild\").getAsNumberOrString())");
     }
     SECTION("object variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(

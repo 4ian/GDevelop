@@ -51,6 +51,10 @@ class GD_CORE_API VariablesContainersList {
    */
   bool HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const;
 
+  // TODO: Rename GetTopMostVariablesContainer and GetBottomMostVariablesContainer
+  // to give a clearer access to segments of the container list.
+  // For instance, a project tree segment and an event tree segment.
+
   /**
    * Get the variables container at the top of the scope (so the most "global" one).
    * \brief Avoid using apart when a scope must be forced.
@@ -61,7 +65,8 @@ class GD_CORE_API VariablesContainersList {
   };
 
   /**
-   * Get the variables container at the bottom of the scope (so the most "local" one).
+   * Get the variables container at the bottom of the scope
+   * (so the most "local" one) excluding local variables.
    * \brief Avoid using apart when a scope must be forced.
    */
   const VariablesContainer* GetBottomMostVariablesContainer() const {
@@ -101,15 +106,15 @@ class GD_CORE_API VariablesContainersList {
    */
   void ForEachVariableMatchingSearch(const gd::String& search, std::function<void(const gd::String& name, const gd::Variable& variable)> fn) const;
 
-  // TODO Refactor the code generator to remove these 2 methods.
   /**
-   * Avoid to use this.
+   * \brief Push a new variables container to the context.
    */
   void Push(const gd::VariablesContainer& variablesContainer) {
     variablesContainers.push_back(&variablesContainer);
   };
+
   /**
-   * Avoid to use this.
+   * \brief Pop a variables container from the context.
    */
   void Pop() {
     variablesContainers.pop_back();

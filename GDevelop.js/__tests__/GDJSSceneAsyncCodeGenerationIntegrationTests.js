@@ -100,7 +100,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               parameters: ['1.5'],
             },
             {
-              type: { value: 'ModVarScene' },
+              type: { value: 'SetNumberVariable' },
               parameters: ['SuccessVariable', '+', '1'],
             },
             {
@@ -108,7 +108,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               parameters: ['1.5'],
             },
             {
-              type: { value: 'ModVarScene' },
+              type: { value: 'SetNumberVariable' },
               parameters: ['SuccessVariable', '+', '2'],
             },
           ],
@@ -141,12 +141,284 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     });
   });
 
+  it('generates a local variable expression after an async action', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 8 }],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Wait' },
+            parameters: ['1.5'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+          },
+          {
+            type: { value: 'Wait' },
+            parameters: ['1.5'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+          },
+        ],
+      },
+    ]);
+
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(0);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(8);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(16);
+  });
+
+  it('generates a local variable action after an async action', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 1 }],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Wait' },
+            parameters: ['1.5'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyLocalVariable', '+', '1'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MyLocalVariable', '+', '1'],
+          },
+          {
+            type: { value: 'Wait' },
+            parameters: ['1.5'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+          },
+        ],
+      },
+    ]);
+
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(0);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2 + 3);
+  });
+
+  it('generates async forks that share a local variable', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 1 }],
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Wait' },
+                parameters: ['2.5'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['MyLocalVariable', '+', '1'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+              },
+            ],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Wait' },
+                parameters: ['1.5'],
+              },
+              // The same action is used here because the mock doesn't handle
+              // the wait duration.
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['MyLocalVariable', '+', '1'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(0);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2 + 3);
+  });
+
+  it('generates an async fork that shares a local variable a synced sub-event', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        variables: [{ name: 'MyLocalVariable', type: 'number', value: 1 }],
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Wait' },
+                parameters: ['2.5'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['MyLocalVariable', '+', '3'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+              },
+            ],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              // There is no wait action this time
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['MyLocalVariable', '+', '1'],
+              },
+              {
+                type: { value: 'SetNumberVariable' },
+                parameters: ['SuccessVariable', '+', 'MyLocalVariable'],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2 + 5);
+  });
+
+  it('generates an async fork that shares a scene variable a synced sub-event', function () {
+    scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
+    scene.getVariables().insertNew('MySceneVariable', 0).setValue(1);
+    const runtimeScene = generateAndRunEventsForLayout([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'Wait' },
+            parameters: ['2.5'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MySceneVariable', '+', '3'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MySceneVariable'],
+          },
+        ],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          // There is no wait action this time
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['MySceneVariable', '+', '1'],
+          },
+          {
+            type: { value: 'SetNumberVariable' },
+            parameters: ['SuccessVariable', '+', 'MySceneVariable'],
+          },
+        ],
+      },
+    ]);
+
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2 + 5);
+  });
+
   test('generate an asynchronous action with objects', function () {
     const object = scene.insertNewObject(project, 'Sprite', 'MyObjectA', 0);
     object.getVariables().insertNew('TestVariable', 0).setValue(0);
-    const instance = scene
-      .getInitialInstances()
-      .insertNewInitialInstance();
+    const instance = scene.getInitialInstances().insertNewInitialInstance();
     instance.setObjectName('MyObjectA');
     const runtimeScene = generateAndRunEventsForLayout([
       {

@@ -41,6 +41,17 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
         .AddIncludeFile(
             "Extensions/PlatformBehavior/platformtools.js");
 
+    std::map<gd::String, gd::InstructionMetadata>& extConditions =
+        GetAllConditions();
+    extConditions["PlatformBehavior::IsObjectOnGivenFloor"].SetFunctionName(
+        "gdjs.evtTools.platform.isOnPlatform")
+    .AddIncludeFile(
+        "Extensions/PlatformBehavior/platformruntimebehavior.js")
+    .AddIncludeFile(
+        "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+    .AddIncludeFile(
+        "Extensions/PlatformBehavior/platformtools.js");
+
     {
       std::map<gd::String, gd::InstructionMetadata>& autActions =
           GetAllActionsForBehavior(
@@ -62,14 +73,6 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autConditions["PlatformBehavior::IsFalling"].SetFunctionName("isFalling");
       autConditions["PlatformBehavior::IsGrabbingPlatform"].SetFunctionName(
           "isGrabbingPlatform");
-      autConditions["PlatformBehavior::IsObjectOnGivenFloor"].SetFunctionName(
-          "gdjs.evtTools.platform.isOnPlatform")
-        .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformruntimebehavior.js")
-        .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
-        .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformtools.js");
 
       autConditions["PlatformBehavior::Gravity"].SetFunctionName("getGravity");
       autActions["PlatformBehavior::Gravity"]

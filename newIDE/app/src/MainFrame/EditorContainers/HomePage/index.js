@@ -454,6 +454,7 @@ export const HomePage = React.memo<Props>(
                       subscriptionPlansWithPricingSystems={
                         subscriptionPlansWithPricingSystems
                       }
+                      onOpenProfile={onOpenProfile}
                     />
                   )}
                   {activeTab === 'build' && (
@@ -493,6 +494,7 @@ export const HomePage = React.memo<Props>(
                       onOpenPrivateGameTemplateListingData={
                         onOpenPrivateGameTemplateListingData
                       }
+                      onOpenProfile={onOpenProfile}
                     />
                   )}
                   {activeTab === 'team-view' && (

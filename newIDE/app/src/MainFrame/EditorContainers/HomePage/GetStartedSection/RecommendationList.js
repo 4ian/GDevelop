@@ -34,6 +34,10 @@ import { SurveyCard } from './SurveyCard';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
 import PromotionsSlideshow from '../../../../Promotions/PromotionsSlideshow';
 import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
+import {
+  GithubStarCard,
+  shouldDisplayGithubStarCard,
+} from '../../../../Profile/GithubStarCard';
 
 const styles = {
   textTutorialContent: {
@@ -178,6 +182,7 @@ type Props = {|
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
   onStartSurvey: null | (() => void),
   hasFilledSurveyAlready: boolean,
+  onOpenProfile: () => void,
 |};
 
 const RecommendationList = ({
@@ -186,8 +191,15 @@ const RecommendationList = ({
   subscriptionPlansWithPricingSystems,
   onStartSurvey,
   hasFilledSurveyAlready,
+  onOpenProfile,
 }: Props) => {
-  const { recommendations, subscription, limits } = authenticatedUser;
+  const {
+    recommendations,
+    subscription,
+    limits,
+    badges,
+    achievements,
+  } = authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
@@ -323,6 +335,13 @@ const RecommendationList = ({
             </Text>
             <Spacer />
             <PromotionsSlideshow />
+            <Spacer />
+            {shouldDisplayGithubStarCard({ badges }) && (
+              <GithubStarCard
+                achievements={achievements}
+                onOpenProfile={onOpenProfile}
+              />
+            )}
           </SectionRow>
         );
 

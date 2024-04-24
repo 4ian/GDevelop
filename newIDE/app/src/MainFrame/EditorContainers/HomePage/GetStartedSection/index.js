@@ -90,6 +90,7 @@ type Props = {|
   onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  onOpenProfile: () => void,
 |};
 
 const GetStartedSection = ({
@@ -97,6 +98,7 @@ const GetStartedSection = ({
   onUserSurveyStarted,
   onUserSurveyHidden,
   subscriptionPlansWithPricingSystems,
+  onOpenProfile,
 }: Props) => {
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
@@ -639,6 +641,7 @@ const GetStartedSection = ({
             subscriptionPlansWithPricingSystems={
               subscriptionPlansWithPricingSystems
             }
+            onOpenProfile={onOpenProfile}
             onStartSurvey={
               profile
                 ? () => {

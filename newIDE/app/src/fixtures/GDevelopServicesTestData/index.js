@@ -2941,6 +2941,18 @@ export const fakeAuthenticatedUserWithBadges: AuthenticatedUser = {
   ],
 };
 
+export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  badges: [
+    {
+      seen: false,
+      unlockedAt: '123',
+      userId: indieUserProfile.id,
+      achievementId: 'github-star',
+    },
+  ],
+};
+
 export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser = {
   ...fakeSilverAuthenticatedUser,
   subscription: noSubscription,

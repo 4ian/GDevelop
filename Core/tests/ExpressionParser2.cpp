@@ -22,6 +22,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Project project;
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
+  project.GetVariables().InsertNew("MyProjectVariable");
+
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.GetVariables().InsertNew("MySceneVariable");
   layout1.GetVariables().InsertNew("MySceneVariable2");
@@ -2709,6 +2711,103 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetFatalErrors().size() == 1);
       REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
               "You entered a text, but this type was expected: variable");
+    }
+  }
+  
+  SECTION("Variable declaration") {
+    SECTION("Undeclared variable") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No variable with this name found.");
+    }
+
+    SECTION("Undeclared variable with children") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 1);
+      REQUIRE(validator.GetFatalErrors()[0]->GetMessage() ==
+              "No variable with this name found.");
+    }
+
+    SECTION("Declared scene variable") {
+      auto node = parser.ParseExpression("MySceneVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Declared scene variable with children") {
+      // Children themselves don't need to be declared.
+      auto node = parser.ParseExpression("MySceneVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Declared project variable") {
+      auto node = parser.ParseExpression("MyProjectVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Declared project variable with children") {
+      auto node = parser.ParseExpression("MyProjectVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "variable");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Undeclared legacy pre-scope scene variable") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Undeclared legacy pre-scope scene variable with children") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Undeclared legacy pre-scope project variable") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "globalvar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
+    }
+
+    SECTION("Undeclared legacy pre-scope project variable with children") {
+      auto node = parser.ParseExpression("MyUndeclaredVariable.MyChild.MyChild");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, projectScopedContainers, "globalvar");
+      node->Visit(validator);
+      REQUIRE(validator.GetFatalErrors().size() == 0);
     }
   }
 

@@ -141,7 +141,6 @@ class Variable {
   }
 
   setBoolean(value) {
-    console.log(value);
     this._value = value;
   }
 
@@ -409,6 +408,22 @@ class RuntimeObject {
 
   getVariableBoolean(variable) {
     return variable.getAsBoolean();
+  }
+
+  /**
+   * @param {Variable} array
+   * @param {string | float | boolean} value
+   */
+  static valuePush(array, value) {
+    array.pushValue(value);
+  }
+
+  /**
+   * @param {Variable} array
+   * @param {string | float | boolean} value
+   */
+  valuePush(array, value) {
+    array.pushValue(value);
   }
 
   /** @param {RuntimeScene} runtimeScene */

@@ -189,7 +189,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         .getVariables()
         .get('MyVariable')
         .getChild('0')
-        .getAsNumber()
+        .getAsString()
     ).toBe("Hello");
   });
 
@@ -207,7 +207,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         .getVariables()
         .get('MyVariable')
         .getChild('0')
-        .getAsNumber()
+        .getAsBoolean()
     ).toBe(true);
   });
 

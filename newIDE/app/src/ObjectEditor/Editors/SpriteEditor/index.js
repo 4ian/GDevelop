@@ -30,6 +30,8 @@ import {
 
 const gd: libGDevelop = global.gd;
 
+const styles = { scrollView: { display: 'flex', flexDirection: 'column' } };
+
 type SpriteEditorProps = {|
   ...EditorProps,
   isAnimationListLocked?: boolean,
@@ -118,27 +120,25 @@ export default function SpriteEditor({
     <I18n>
       {({ i18n }) => (
         <>
-          <ScrollView ref={scrollView}>
-            <>
-              {renderObjectNameField && renderObjectNameField()}
-              <SpacedDismissableTutorialMessage />
-              <AnimationList
-                ref={animationList}
-                animations={animations}
-                project={project}
-                layout={layout}
-                object={object}
-                objectName={objectName}
-                resourceManagementProps={resourceManagementProps}
-                onSizeUpdated={onSizeUpdated}
-                onObjectUpdated={onObjectUpdated}
-                isAnimationListLocked={isChildObject}
-                scrollView={scrollView}
-                onCreateMatchingSpriteCollisionMask={
-                  onCreateMatchingSpriteCollisionMask
-                }
-              />
-            </>
+          <ScrollView ref={scrollView} style={styles.scrollView}>
+            {renderObjectNameField && renderObjectNameField()}
+            <SpacedDismissableTutorialMessage />
+            <AnimationList
+              ref={animationList}
+              animations={animations}
+              project={project}
+              layout={layout}
+              object={object}
+              objectName={objectName}
+              resourceManagementProps={resourceManagementProps}
+              onSizeUpdated={onSizeUpdated}
+              onObjectUpdated={onObjectUpdated}
+              isAnimationListLocked={isChildObject}
+              scrollView={scrollView}
+              onCreateMatchingSpriteCollisionMask={
+                onCreateMatchingSpriteCollisionMask
+              }
+            />
           </ScrollView>
           <Column noMargin>
             <ResponsiveLineStackLayout

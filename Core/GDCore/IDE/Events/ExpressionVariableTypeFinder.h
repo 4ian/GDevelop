@@ -12,6 +12,7 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/Project/Variable.h"
+#include "GDCore/Project/VariablesContainer.h"
 
 namespace gd {
 class Platform;

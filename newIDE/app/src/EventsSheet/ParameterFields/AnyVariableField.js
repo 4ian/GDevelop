@@ -13,58 +13,7 @@ import {
   type FieldFocusFunction,
 } from './ParameterFieldCommons';
 import { enumerateVariablesOfContainersList } from './EnumerateVariables';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 import { mapFor } from '../../Utils/MapFor';
-
-const gd: libGDevelop = global.gd;
-
-const getVariableTypeFromParameters = (
-  platform: gdPlatform,
-  projectScopedContainers: gdProjectScopedContainers,
-  instruction: gdInstruction
-): Variable_Type | null => {
-  if (
-    instruction.getParametersCount() > 0 &&
-    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-      instruction.getType()
-    )
-  ) {
-    const variableType = gd.ExpressionVariableTypeFinder.getVariableType(
-      platform,
-      projectScopedContainers,
-      instruction.getParameter(0).getRootNode(),
-      ''
-    );
-    return variableType === gd.Variable.Array
-      ? // "Push" actions need the child type to be able to switch.
-        gd.ExpressionVariableTypeFinder.getArrayVariableType(
-          platform,
-          projectScopedContainers,
-          instruction.getParameter(0).getRootNode(),
-          ''
-        )
-      : variableType;
-  }
-  return null;
-};
-
-export const switchBetweenUnifiedInstructionIfNeeded = (
-  platform: gdPlatform,
-  projectScopedContainers: ProjectScopedContainers,
-  instruction: gdInstruction
-): void => {
-  const variableType = getVariableTypeFromParameters(
-    platform,
-    projectScopedContainers.get(),
-    instruction
-  );
-  if (variableType != null) {
-    gd.VariableInstructionSwitcher.switchVariableInstructionType(
-      instruction,
-      variableType
-    );
-  }
-};
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
@@ -142,7 +91,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ? `parameter-${props.parameterIndex}-scene-variable-field`
               : undefined
           }
-          getVariableTypeFromParameters={getVariableTypeFromParameters}
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
         {editorOpen && layout && project && (

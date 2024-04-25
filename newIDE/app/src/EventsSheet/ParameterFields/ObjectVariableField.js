@@ -17,7 +17,6 @@ import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import intersection from 'lodash/intersection';
 import { enumerateVariables } from './EnumerateVariables';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,56 +54,6 @@ export const getObjectOrGroupVariablesContainers = (
     }
   }
   return variablesContainers;
-};
-
-const getVariableTypeFromParameters = (
-  platform: gdPlatform,
-  projectScopedContainers: gdProjectScopedContainers,
-  instruction: gdInstruction
-): Variable_Type | null => {
-  if (
-    instruction.getParametersCount() > 1 &&
-    gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
-      instruction.getType()
-    )
-  ) {
-    const objectName = instruction.getParameter(0).getPlainString();
-
-    const variableType = gd.ExpressionVariableTypeFinder.getVariableType(
-      platform,
-      projectScopedContainers,
-      instruction.getParameter(1).getRootNode(),
-      objectName
-    );
-    return variableType === gd.Variable.Array
-      ? // "Push" actions need the child type to be able to switch.
-        gd.ExpressionVariableTypeFinder.getArrayVariableType(
-          platform,
-          projectScopedContainers,
-          instruction.getParameter(1).getRootNode(),
-          objectName
-        )
-      : variableType;
-  }
-  return null;
-};
-
-export const switchBetweenUnifiedObjectInstructionIfNeeded = (
-  platform: gdPlatform,
-  projectScopedContainers: ProjectScopedContainers,
-  instruction: gdInstruction
-): void => {
-  const variableType = getVariableTypeFromParameters(
-    platform,
-    projectScopedContainers.get(),
-    instruction
-  );
-  if (variableType != null) {
-    gd.VariableInstructionSwitcher.switchVariableInstructionType(
-      instruction,
-      variableType
-    );
-  }
 };
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
@@ -196,7 +145,6 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ? `parameter-${props.parameterIndex}-object-variable-field`
               : undefined
           }
-          getVariableTypeFromParameters={getVariableTypeFromParameters}
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
         {editorOpen && project && (

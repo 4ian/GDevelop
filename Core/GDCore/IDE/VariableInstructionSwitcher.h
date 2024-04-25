@@ -9,6 +9,8 @@
 
 namespace gd {
 class Instruction;
+class Platform;
+class ProjectScopedContainers;
 } // namespace gd
 
 namespace gd {
@@ -24,10 +26,18 @@ namespace gd {
 class GD_CORE_API VariableInstructionSwitcher {
 public:
   /**
-   * \brief Return true if the instruction is a variable getter or setter.
+   * \brief Return true if the instruction is a variable getter or setter
+   * (including object variable instructions).
    */
   static bool
   IsSwitchableVariableInstruction(const gd::String &instructionType);
+
+  /**
+   * \brief Return true if the instruction is an object variable getter or
+   * setter.
+   */
+  static bool
+  IsSwitchableObjectVariableInstruction(const gd::String &instructionType);
 
   /**
    * \brief Return the common identifier for variable getter or setter or an
@@ -51,6 +61,23 @@ public:
   static void
   SwitchVariableInstructionType(gd::Instruction &instruction,
                                 const gd::Variable::Type variableType);
+
+  /**
+   * \brief Return the variable type of the instruction parameter.
+   */
+  static const gd::Variable::Type GetVariableTypeFromParameters(
+      const gd::Platform &platform,
+      const gd::ProjectScopedContainers &projectScopedContainers,
+      const gd::Instruction &instruction);
+
+  /**
+   * \brief Modify the instruction type to match the variable type of the
+   * instruction parameter.
+   */
+  static void SwitchBetweenUnifiedInstructionIfNeeded(
+      const gd::Platform &platform,
+      const gd::ProjectScopedContainers &projectScopedContainers,
+      gd::Instruction &instruction);
 
 private:
   static const gd::String variableGetterIdentifier;

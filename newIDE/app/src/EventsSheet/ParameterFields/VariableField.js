@@ -48,11 +48,6 @@ type Props = {
   enumerateVariables: () => Array<EnumeratedVariable>,
   forceDeclaration?: boolean,
   onOpenDialog: ?() => void,
-  getVariableTypeFromParameters?: (
-    platform: gdPlatform,
-    projectScopedContainers: gdProjectScopedContainers,
-    instruction: gdInstruction
-  ) => Variable_Type | null,
 };
 
 type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3 | 4;
@@ -177,7 +172,6 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       onApply,
       id,
       onInstructionTypeChanged,
-      getVariableTypeFromParameters,
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
@@ -278,16 +272,24 @@ export default React.forwardRef<Props, VariableFieldInterface>(
         ? t`This variable is not declared. It's recommended to use the *variables editor* to add it.`
         : null;
 
+    const isSwitchableInstruction =
+      instruction &&
+      gd.VariableInstructionSwitcher.isSwitchableVariableInstruction(
+        instruction.getType()
+      );
     const variableType =
-      project && instruction && getVariableTypeFromParameters
-        ? getVariableTypeFromParameters(
+      project && instruction && isSwitchableInstruction
+        ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
             project.getCurrentPlatform(),
             projectScopedContainers.get(),
             instruction
           )
         : null;
     const needManualTypeSwitcher =
-      variableType === gd.Variable.Unknown && !errorText && value;
+      isSwitchableInstruction &&
+      variableType === gd.Variable.Unknown &&
+      !errorText &&
+      value;
 
     return (
       <I18n>

@@ -235,10 +235,19 @@ enum Variable_Type {
 
 interface VariableInstructionSwitcher {
     boolean STATIC_IsSwitchableVariableInstruction([Const] DOMString instructionType);
+    boolean STATIC_IsSwitchableObjectVariableInstruction([Const] DOMString instructionType);
     [Const, Ref] DOMString STATIC_GetSwitchableVariableInstructionIdentifier([Const] DOMString instructionType);
     [Const] Variable_Type STATIC_GetSwitchableInstructionVariableType([Const] DOMString instructionType);
     void STATIC_SwitchVariableInstructionType(
     [Ref] Instruction instruction, [Const] Variable_Type variableType);
+    [Const] Variable_Type STATIC_GetVariableTypeFromParameters(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Const, Ref] Instruction instruction);
+    void STATIC_SwitchBetweenUnifiedInstructionIfNeeded(
+        [Const, Ref] Platform platform,
+        [Const, Ref] ProjectScopedContainers projectScopedContainers,
+        [Ref] Instruction instruction);
 };
 
 interface ExpressionVariableTypeFinder {
@@ -2547,7 +2556,7 @@ enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Variable",
   "ExpressionCompletionDescription::TextWithPrefix",
   "ExpressionCompletionDescription::Property",
-  "ExpressionCompletionDescription::Parameter",
+  "ExpressionCompletionDescription::Parameter"
 };
 
 interface ExpressionCompletionDescription {

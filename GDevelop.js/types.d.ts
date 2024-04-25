@@ -251,9 +251,12 @@ export class PairStringVariable extends EmscriptenObject {
 
 export class VariableInstructionSwitcher extends EmscriptenObject {
   static isSwitchableVariableInstruction(instructionType: string): boolean;
+  static isSwitchableObjectVariableInstruction(instructionType: string): boolean;
   static getSwitchableVariableInstructionIdentifier(instructionType: string): string;
   static getSwitchableInstructionVariableType(instructionType: string): Variable_Type;
   static switchVariableInstructionType(instruction: Instruction, variableType: Variable_Type): void;
+  static getVariableTypeFromParameters(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction): Variable_Type;
+  static switchBetweenUnifiedInstructionIfNeeded(platform: Platform, projectScopedContainers: ProjectScopedContainers, instruction: Instruction): void;
 }
 
 export class ExpressionVariableTypeFinder extends EmscriptenObject {

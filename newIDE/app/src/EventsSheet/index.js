@@ -112,8 +112,6 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
-import { switchBetweenUnifiedInstructionIfNeeded } from '../EventsSheet/ParameterFields/AnyVariableField';
-import { switchBetweenUnifiedObjectInstructionIfNeeded } from '../EventsSheet/ParameterFields/ObjectVariableField';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
 import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -2045,14 +2043,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     }
                     instruction.setParameter(parameterIndex, value);
 
-                    switchBetweenUnifiedInstructionIfNeeded(
+                    gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      editedParameterProjectScopedContainers,
-                      instruction
-                    );
-                    switchBetweenUnifiedObjectInstructionIfNeeded(
-                      project.getCurrentPlatform(),
-                      editedParameterProjectScopedContainers,
+                      editedParameterProjectScopedContainers.get(),
                       instruction
                     );
 

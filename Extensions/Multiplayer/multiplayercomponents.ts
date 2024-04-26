@@ -367,10 +367,10 @@ namespace gdjs {
      * Create, display, and hide an error notification.
      */
     export const displayErrorNotification = function (
-      domContainer: HTMLDivElement
+      runtimeScene: gdjs.RuntimeScene
     ) {
       showNotification(
-        domContainer,
+        runtimeScene,
         'error-notification',
         'An error occurred while displaying the game lobbies, please try again.',
         'error'
@@ -378,21 +378,48 @@ namespace gdjs {
     };
 
     /**
+     * Create, display, and hide a notification when a player leaves the game.
+     */
+    export const displayPlayerLeftNotification = function (
+      runtimeScene: gdjs.RuntimeScene,
+      playerName: string
+    ) {
+      showNotification(
+        runtimeScene,
+        'player-left-notification',
+        `${playerName} has left the game.`,
+        'warning'
+      );
+    };
+
+    /**
      * Helper to show a notification to the user, that disappears automatically.
      */
     export const showNotification = function (
-      domContainer: HTMLDivElement,
+      runtimeScene: gdjs.RuntimeScene,
       id: string,
       content: string,
-      type: 'success' | 'error'
+      type: 'success' | 'warning' | 'error'
     ) {
+      const domContainer = runtimeScene
+        .getGame()
+        .getRenderer()
+        .getDomElementContainer();
+      if (!domContainer) {
+        logger.error('No DOM element container found.');
+        return;
+      }
       const divContainer = document.createElement('div');
 
       divContainer.id = id;
       divContainer.style.position = 'absolute';
       divContainer.style.pointerEvents = 'all';
       divContainer.style.backgroundColor =
-        type === 'success' ? '#0E062D' : 'red';
+        type === 'success'
+          ? '#0E062D'
+          : type === 'warning'
+          ? '#FFA500'
+          : '#FF0000';
       divContainer.style.top = '12px';
       divContainer.style.right = '16px';
       divContainer.style.padding = '6px 32px 6px 6px';

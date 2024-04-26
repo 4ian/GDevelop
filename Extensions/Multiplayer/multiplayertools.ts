@@ -15,6 +15,12 @@ namespace gdjs {
       status: string;
       players: { playerId: string; status: string }[];
     } | null = null;
+    let _lobbyOnGameStart: {
+      id: string;
+      name: string;
+      status: string;
+      players: { playerId: string; status: string }[];
+    } | null = null;
     let _playerPublicProfiles: { id: string; username?: string }[] = [];
 
     // Communication methods.
@@ -133,14 +139,14 @@ namespace gdjs {
      * The position is shifted by one, so that the first player has position 1.
      */
     export const getPlayerId = (position: number) => {
-      if (!_lobby) {
+      if (!_lobbyOnGameStart) {
         return '';
       }
       const index = position - 1;
-      if (index < 0 || index >= _lobby.players.length) {
+      if (index < 0 || index >= _lobbyOnGameStart.players.length) {
         return '';
       }
-      return _lobby.players[index].playerId;
+      return _lobbyOnGameStart.players[index].playerId;
     };
 
     /**
@@ -268,6 +274,7 @@ namespace gdjs {
         playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
+        _lobbyOnGameStart = null;
         _websocket = null;
       }
 
@@ -341,6 +348,7 @@ namespace gdjs {
               break;
             }
             case 'lobbyUpdated': {
+              console.log('Lobby updated:', messageContent.data);
               const messageData = messageContent.data;
               const lobby = messageData.lobby;
               const positionInLobby = messageData.positionInLobby;
@@ -412,6 +420,7 @@ namespace gdjs {
         playerPositionInLobby = null;
         _lobbyId = null;
         _lobby = null;
+        _lobbyOnGameStart = null;
         _websocket = null;
         if (_heartbeatInterval) {
           clearInterval(_heartbeatInterval);
@@ -477,28 +486,75 @@ namespace gdjs {
       playerPositionInLobby = null;
       _lobbyId = null;
       _lobby = null;
+      _lobbyOnGameStart = null;
       _websocket = null;
     };
 
     const handleLobbyUpdatedEvent = function (
       runtimeScene: gdjs.RuntimeScene,
-      lobby,
+      updatedLobby,
       positionInLobby: number
     ) {
+      const lobbyBeforeUpdate = _lobby;
       // Update the object representing the lobby in the extension.
-      _lobby = lobby;
+      _lobby = updatedLobby;
+
+      console.log('Lobby updated:', updatedLobby, positionInLobby);
+
+      // If the lobby is playing, do not update the player position or usernames as it's probably a player leaving,
+      // and we want to keep that info.
+      if (updatedLobby.status === 'playing') {
+        // But we do want to let the player know if another player has left the lobby.
+        if (
+          _lobbyOnGameStart &&
+          lobbyBeforeUpdate &&
+          lobbyBeforeUpdate.players.length > updatedLobby.players.length
+        ) {
+          // Find the missing player. Note: we can have multiple players with the same playerId, when testing.
+          // So, we loop through the players one by one until one is not the same (as they are in order).
+          let playerLeft: { playerId: string; status: string } | null = null;
+          for (let i = 0; i < lobbyBeforeUpdate.players.length; i++) {
+            // If the last player is missing, then it's the last one.
+            if (!updatedLobby.players[i]) {
+              playerLeft = lobbyBeforeUpdate.players[i];
+              break;
+            }
+
+            // If the player is not the same, then it's the missing one, we can break.
+            if (
+              updatedLobby.players[i] &&
+              updatedLobby.players[i].playerId !==
+                lobbyBeforeUpdate.players[i].playerId
+            ) {
+              playerLeft = lobbyBeforeUpdate.players[i];
+              break;
+            }
+          }
+
+          if (!playerLeft) {
+            return;
+          }
+
+          const playerLeftPublicProfile = _playerPublicProfiles.find(
+            (profile) => profile.id === playerLeft.playerId
+          );
+
+          if (playerLeftPublicProfile) {
+            multiplayerComponents.displayPlayerLeftNotification(
+              runtimeScene,
+              (playerLeftPublicProfile && playerLeftPublicProfile.username) ||
+                'Player'
+            );
+          }
+        }
+        return;
+      }
 
       // Update the profiles so we can use the usernames of the players.
       const isDev = runtimeScene
         .getGame()
         .isUsingGDevelopDevelopmentEnvironment();
       updatePlayerPublicProfiles(isDev);
-
-      // If the lobby is playing, do not update the player position as it's probably a player leaving,
-      // and we don't want to affect the game.
-      if (lobby.status === 'playing') {
-        return;
-      }
 
       playerPositionInLobby = positionInLobby;
 
@@ -556,6 +612,7 @@ namespace gdjs {
     const handleGameStartedEvent = function (runtimeScene: gdjs.RuntimeScene) {
       _hasGameJustStarted = true;
       isGameRunning = true;
+      _lobbyOnGameStart = _lobby;
       removeLobbiesContainer(runtimeScene);
       focusOnGame(runtimeScene);
     };

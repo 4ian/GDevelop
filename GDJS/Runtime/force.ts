@@ -152,18 +152,18 @@ namespace gdjs {
       return {
         x: this._x,
         y: this._y,
-        angle: this._angle,
-        length: this._length,
-        multiplier: this._multiplier,
+        a: this._angle,
+        l: this._length,
+        m: this._multiplier,
       };
     }
 
     updateFromNetworkSyncData(syncData: any) {
       this._x = syncData.x;
       this._y = syncData.y;
-      this._angle = syncData.angle;
-      this._length = syncData.length;
-      this._multiplier = syncData.multiplier;
+      this._angle = syncData.a;
+      this._length = syncData.l;
+      this._multiplier = syncData.m;
     }
   }
 }

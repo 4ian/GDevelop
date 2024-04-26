@@ -15,11 +15,11 @@ namespace gdjs {
   export type SpriteObjectData = ObjectData & SpriteObjectDataType;
 
   export type SpriteNetworkSyncDataType = {
-    isFlippedX: boolean;
-    isFlippedY: boolean;
-    scaleX: float;
-    scaleY: float;
-    animator: SpriteAnimatorNetworkSyncData;
+    anim: SpriteAnimatorNetworkSyncData;
+    ifx: boolean;
+    ify: boolean;
+    sx: float;
+    sy: float;
   };
 
   export type SpriteNetworkSyncData = ObjectNetworkSyncData &
@@ -108,23 +108,21 @@ namespace gdjs {
     getObjectNetworkSyncData(): SpriteNetworkSyncData {
       return {
         ...super.getObjectNetworkSyncData(),
-        animator: this._animator.getNetworkSyncData(),
-        isFlippedX: this.isFlippedX(),
-        isFlippedY: this.isFlippedY(),
-        scaleX: this._scaleX,
-        scaleY: this._scaleY,
+        anim: this._animator.getNetworkSyncData(),
+        ifx: this.isFlippedX(),
+        ify: this.isFlippedY(),
+        sx: this._scaleX,
+        sy: this._scaleY,
       };
     }
 
     updateFromObjectNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
       super.updateFromObjectNetworkSyncData(newNetworkSyncData);
-      this.flipX(newNetworkSyncData.isFlippedX);
-      this.flipY(newNetworkSyncData.isFlippedY);
-      this.setScaleX(Math.abs(newNetworkSyncData.scaleX));
-      this.setScaleY(Math.abs(newNetworkSyncData.scaleY));
-      this._animator.updateFromObjectNetworkSyncData(
-        newNetworkSyncData.animator
-      );
+      this.flipX(newNetworkSyncData.ifx);
+      this.flipY(newNetworkSyncData.ify);
+      this.setScaleX(Math.abs(newNetworkSyncData.sx));
+      this.setScaleY(Math.abs(newNetworkSyncData.sy));
+      this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
       this.invalidateHitboxes();
     }
 

@@ -163,78 +163,75 @@ namespace gdjs {
 
     getNetworkSyncData() {
       return {
-        currentSpeed: this._currentSpeed,
-        requestedDeltaX: this._requestedDeltaX,
-        requestedDeltaY: this._requestedDeltaY,
-        lastDeltaY: this._lastDeltaY,
-        currentFallSpeed: this._currentFallSpeed,
-        canJump: this._canJump,
-        lastDirectionIsLeft: this._lastDirectionIsLeft,
-        leftKey: this._wasLeftKeyPressed,
-        rightKey: this._wasRightKeyPressed,
-        ladderKey: this._wasLadderKeyPressed,
-        upKey: this._wasUpKeyPressed,
-        downKey: this._wasDownKeyPressed,
-        jumpKey: this._wasJumpKeyPressed,
-        releasePlatformKey: this._wasReleasePlatformKeyPressed,
-        releaseLadderKey: this._wasReleaseLadderKeyPressed,
-        stateName: this._state.toString(),
-        stateSyncData: this._state.getNetworkSyncData(),
+        cs: this._currentSpeed,
+        rdx: this._requestedDeltaX,
+        rdy: this._requestedDeltaY,
+        ldy: this._lastDeltaY,
+        cfs: this._currentFallSpeed,
+        cj: this._canJump,
+        ldl: this._lastDirectionIsLeft,
+        lek: this._wasLeftKeyPressed,
+        rik: this._wasRightKeyPressed,
+        lak: this._wasLadderKeyPressed,
+        upk: this._wasUpKeyPressed,
+        dok: this._wasDownKeyPressed,
+        juk: this._wasJumpKeyPressed,
+        rpk: this._wasReleasePlatformKeyPressed,
+        rlk: this._wasReleaseLadderKeyPressed,
+        sn: this._state.toString(),
+        ssd: this._state.getNetworkSyncData(),
       };
     }
 
     updateFromBehaviorNetworkSyncData(networkSyncData) {
-      // console.log('updateFromBehaviorNetworkSyncData', networkSyncData);
-      if (networkSyncData.currentSpeed !== this._currentSpeed) {
-        this._currentSpeed = networkSyncData.currentSpeed;
+      if (networkSyncData.cs !== this._currentSpeed) {
+        this._currentSpeed = networkSyncData.cs;
       }
-      if (networkSyncData.requestedDeltaX !== this._requestedDeltaX) {
-        this._requestedDeltaX = networkSyncData.requestedDeltaX;
+      if (networkSyncData.rdx !== this._requestedDeltaX) {
+        this._requestedDeltaX = networkSyncData.rdx;
       }
-      if (networkSyncData.requestedDeltaY !== this._requestedDeltaY) {
-        this._requestedDeltaY = networkSyncData.requestedDeltaY;
+      if (networkSyncData.rdy !== this._requestedDeltaY) {
+        this._requestedDeltaY = networkSyncData.rdy;
       }
-      if (networkSyncData.lastDeltaY !== this._lastDeltaY) {
-        this._lastDeltaY = networkSyncData.lastDeltaY;
+      if (networkSyncData.ldy !== this._lastDeltaY) {
+        this._lastDeltaY = networkSyncData.ldy;
       }
-      if (networkSyncData.currentFallSpeed !== this._currentFallSpeed) {
-        this._currentFallSpeed = networkSyncData.currentFallSpeed;
+      if (networkSyncData.cfs !== this._currentFallSpeed) {
+        this._currentFallSpeed = networkSyncData.cfs;
       }
-      if (networkSyncData.canJump !== this._canJump) {
-        this._canJump = networkSyncData.canJump;
+      if (networkSyncData.cj !== this._canJump) {
+        this._canJump = networkSyncData.cj;
       }
-      if (networkSyncData.lastDirectionIsLeft !== this._lastDirectionIsLeft) {
-        this._lastDirectionIsLeft = networkSyncData.lastDirectionIsLeft;
+      if (networkSyncData.ldl !== this._lastDirectionIsLeft) {
+        this._lastDirectionIsLeft = networkSyncData.ldl;
       }
-      if (networkSyncData.leftKey !== this._leftKey) {
-        this._leftKey = networkSyncData.leftKey;
+      if (networkSyncData.lek !== this._leftKey) {
+        this._leftKey = networkSyncData.lek;
       }
-      if (networkSyncData.rightKey !== this._rightKey) {
-        this._rightKey = networkSyncData.rightKey;
+      if (networkSyncData.rik !== this._rightKey) {
+        this._rightKey = networkSyncData.rik;
       }
-      if (networkSyncData.ladderKey !== this._ladderKey) {
-        this._ladderKey = networkSyncData.ladderKey;
+      if (networkSyncData.lak !== this._ladderKey) {
+        this._ladderKey = networkSyncData.lak;
       }
-      if (networkSyncData.upKey !== this._upKey) {
-        this._upKey = networkSyncData.upKey;
+      if (networkSyncData.upk !== this._upKey) {
+        this._upKey = networkSyncData.upk;
       }
-      if (networkSyncData.downKey !== this._downKey) {
-        this._downKey = networkSyncData.downKey;
+      if (networkSyncData.dok !== this._downKey) {
+        this._downKey = networkSyncData.dok;
       }
-      if (networkSyncData.jumpKey !== this._jumpKey) {
-        // console.log('setting jump key');
-        this._jumpKey = networkSyncData.jumpKey;
+      if (networkSyncData.juk !== this._jumpKey) {
+        this._jumpKey = networkSyncData.juk;
       }
-      if (networkSyncData.releasePlatformKey !== this._releasePlatformKey) {
-        this._releasePlatformKey = networkSyncData.releasePlatformKey;
+      if (networkSyncData.rpk !== this._releasePlatformKey) {
+        this._releasePlatformKey = networkSyncData.rpk;
       }
-      if (networkSyncData.releaseLadderKey !== this._releaseLadderKey) {
-        this._releaseLadderKey = networkSyncData.releaseLadderKey;
+      if (networkSyncData.rlk !== this._releaseLadderKey) {
+        this._releaseLadderKey = networkSyncData.rlk;
       }
 
-      if (networkSyncData.stateName !== this._state.toString()) {
-        // console.log('data', networkSyncData.stateSyncData);
-        switch (networkSyncData.stateName) {
+      if (networkSyncData.sn !== this._state.toString()) {
+        switch (networkSyncData.sn) {
           case 'Falling':
             this._setFalling();
             break;
@@ -251,15 +248,13 @@ namespace gdjs {
             this._setOnLadder();
             break;
           default:
-            console.error(
-              'Unknown state name: ' + networkSyncData.stateName + '.'
-            );
+            console.error('Unknown state name: ' + networkSyncData.sn + '.');
             break;
         }
       }
 
-      if (networkSyncData.stateName === this._state.toString()) {
-        this._state.updateFromNetworkSyncData(networkSyncData.stateSyncData);
+      if (networkSyncData.sn === this._state.toString()) {
+        this._state.updateFromNetworkSyncData(networkSyncData.ssd);
       }
 
       // When the object is synchronized from the network, the inputs must not be cleared.
@@ -2058,16 +2053,16 @@ namespace gdjs {
 
     getNetworkSyncData(): any {
       return {
-        floorLastX: this._floorLastX,
-        floorLastY: this._floorLastY,
-        oldHeight: this._oldHeight,
+        flx: this._floorLastX,
+        fly: this._floorLastY,
+        oh: this._oldHeight,
       };
     }
 
     updateFromNetworkSyncData(data: any) {
-      this._floorLastX = data.floorLastX;
-      this._floorLastY = data.floorLastY;
-      this._oldHeight = data.oldHeight;
+      this._floorLastX = data.flx;
+      this._floorLastY = data.fly;
+      this._oldHeight = data.oh;
     }
 
     toString(): String {
@@ -2250,18 +2245,18 @@ namespace gdjs {
 
     getNetworkSyncData(): any {
       return {
-        currentJumpSpeed: this._currentJumpSpeed,
-        timeSinceCurrentJumpStart: this._timeSinceCurrentJumpStart,
-        jumpKeyHeldSinceJumpStart: this._jumpKeyHeldSinceJumpStart,
-        jumpingFirstDelta: this._jumpingFirstDelta,
+        cjs: this._currentJumpSpeed,
+        tscjs: this._timeSinceCurrentJumpStart,
+        jkhsjs: this._jumpKeyHeldSinceJumpStart,
+        jfd: this._jumpingFirstDelta,
       };
     }
 
     updateFromNetworkSyncData(data: any) {
-      this._currentJumpSpeed = data.currentJumpSpeed;
-      this._timeSinceCurrentJumpStart = data.timeSinceCurrentJumpStart;
-      this._jumpKeyHeldSinceJumpStart = data.jumpKeyHeldSinceJumpStart;
-      this._jumpingFirstDelta = data.jumpingFirstDelta;
+      this._currentJumpSpeed = data.cjs;
+      this._timeSinceCurrentJumpStart = data.tscjs;
+      this._jumpKeyHeldSinceJumpStart = data.jkhsjs;
+      this._jumpingFirstDelta = data.jfd;
     }
 
     toString(): String {
@@ -2338,14 +2333,14 @@ namespace gdjs {
 
     getNetworkSyncData(): any {
       return {
-        grabbedPlatformLastX: this._grabbedPlatformLastX,
-        grabbedPlatformLastY: this._grabbedPlatformLastY,
+        gplx: this._grabbedPlatformLastX,
+        gply: this._grabbedPlatformLastY,
       };
     }
 
     updateFromNetworkSyncData(data: any) {
-      this._grabbedPlatformLastX = data.grabbedPlatformLastX;
-      this._grabbedPlatformLastY = data.grabbedPlatformLastY;
+      this._grabbedPlatformLastX = data.gplx;
+      this._grabbedPlatformLastY = data.gply;
     }
 
     toString(): String {

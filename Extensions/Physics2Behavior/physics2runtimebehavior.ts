@@ -479,22 +479,34 @@ namespace gdjs {
 
     getNetworkSyncData() {
       return {
-        objectOldX: this._objectOldX,
-        objectOldY: this._objectOldY,
-        objectOldAngle: this._objectOldAngle,
-        objectOldWidth: this._objectOldWidth,
-        objectOldHeight: this._objectOldHeight,
-        _verticesBuffer: this._verticesBuffer,
+        oox: this._objectOldX,
+        ooy: this._objectOldY,
+        ooa: this._objectOldAngle,
+        oow: this._objectOldWidth,
+        ooh: this._objectOldHeight,
+        vb: this._verticesBuffer,
       };
     }
 
     updateFromNetworkSyncData(syncData: any) {
-      this._objectOldX = syncData.objectOldX;
-      this._objectOldY = syncData.objectOldY;
-      this._objectOldAngle = syncData.objectOldAngle;
-      this._objectOldWidth = syncData.objectOldWidth;
-      this._objectOldHeight = syncData.objectOldHeight;
-      this._verticesBuffer = syncData._verticesBuffer;
+      if (syncData.oox !== undefined) {
+        this._objectOldX = syncData.oox;
+      }
+      if (syncData.ooy !== undefined) {
+        this._objectOldY = syncData.ooy;
+      }
+      if (syncData.ooa !== undefined) {
+        this._objectOldAngle = syncData.ooa;
+      }
+      if (syncData.oow !== undefined) {
+        this._objectOldWidth = syncData.oow;
+      }
+      if (syncData.ooh !== undefined) {
+        this._objectOldHeight = syncData.ooh;
+      }
+      if (syncData.vb !== undefined) {
+        this._verticesBuffer = syncData.vb;
+      }
     }
 
     onDeActivate() {

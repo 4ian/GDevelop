@@ -46,17 +46,17 @@ declare type ObjectNetworkSyncData = {
   /** The position of the object on the Y axis. */
   y: number;
   /** The position of the object on the Z axis. */
-  zOrder: number;
+  z: number;
   /** The angle of the object. */
-  angle: number;
+  a: number;
   /** All the instant forces */
-  instantForces: Array<ForceNetworkSyncData>;
+  if: Array<ForceNetworkSyncData>;
   /** Permanent force on X */
-  permanentForceX: number;
+  pfx: number;
   /** Permanent force on Y */
-  permanentForceY: number;
+  pfy: number;
   /** The behaviors of the object */
-  behaviors: {
+  beh: {
     [behaviorName: string]: any;
   };
 };
@@ -64,9 +64,9 @@ declare type ObjectNetworkSyncData = {
 declare type ForceNetworkSyncData = {
   x: float;
   y: float;
-  angle: float;
-  length: float;
-  multiplier: number;
+  a: float;
+  l: float;
+  m: number;
 };
 
 declare type VariableType =

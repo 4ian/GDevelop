@@ -268,18 +268,6 @@ namespace gdjs {
       // 0 means the server is the owner.
       this.setPlayerObjectOwnership(0);
     }
-
-    getNetworkSyncData() {
-      return {
-        playerNumber: this._playerNumber,
-      };
-    }
-
-    updateFromBehaviorNetworkSyncData(networkSyncData) {
-      if (networkSyncData.playerNumber !== undefined) {
-        this._playerNumber = networkSyncData.playerNumber;
-      }
-    }
   }
   gdjs.registerBehavior(
     'Multiplayer::MultiplayerObjectBehavior',

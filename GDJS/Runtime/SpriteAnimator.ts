@@ -67,12 +67,12 @@ namespace gdjs {
 
   /** Represents all the information needed to synchronize the animations of a SpriteRuntimeObject. */
   export type SpriteAnimatorNetworkSyncData = {
-    animation: integer;
-    direction: integer;
-    frame: integer;
-    elapsedTime: float;
-    speedScale: float;
-    paused: boolean;
+    an: integer;
+    di: integer;
+    fr: integer;
+    et: float;
+    ss: float;
+    pa: boolean;
   };
 
   /**
@@ -388,24 +388,24 @@ namespace gdjs {
 
     getNetworkSyncData(): SpriteAnimatorNetworkSyncData {
       return {
-        animation: this._currentAnimation,
-        direction: this._currentDirection,
-        frame: this._currentFrameIndex,
-        elapsedTime: this._animationElapsedTime,
-        speedScale: this._animationSpeedScale,
-        paused: this._animationPaused,
+        an: this._currentAnimation,
+        di: this._currentDirection,
+        fr: this._currentFrameIndex,
+        et: this._animationElapsedTime,
+        ss: this._animationSpeedScale,
+        pa: this._animationPaused,
       };
     }
 
     updateFromObjectNetworkSyncData(
       networkSyncData: SpriteAnimatorNetworkSyncData
     ) {
-      this._currentAnimation = networkSyncData.animation;
-      this._currentDirection = networkSyncData.direction;
-      this._currentFrameIndex = networkSyncData.frame;
-      this._animationElapsedTime = networkSyncData.elapsedTime;
-      this._animationSpeedScale = networkSyncData.speedScale;
-      this._animationPaused = networkSyncData.paused;
+      this._currentAnimation = networkSyncData.an;
+      this._currentDirection = networkSyncData.di;
+      this._currentFrameIndex = networkSyncData.fr;
+      this._animationElapsedTime = networkSyncData.et;
+      this._animationSpeedScale = networkSyncData.ss;
+      this._animationPaused = networkSyncData.pa;
       this.invalidateFrame();
     }
 

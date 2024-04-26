@@ -466,14 +466,12 @@ namespace gdjs {
       return {
         x: this.x,
         y: this.y,
-        zOrder: this.zOrder,
-        angle: this.angle,
-        instantForces: this._instantForces.map((force) =>
-          force.getNetworkSyncData()
-        ),
-        permanentForceX: this._permanentForceX,
-        permanentForceY: this._permanentForceY,
-        behaviors: behaviorNetworkSyncData,
+        z: this.zOrder,
+        a: this.angle,
+        if: this._instantForces.map((force) => force.getNetworkSyncData()),
+        pfx: this._permanentForceX,
+        pfy: this._permanentForceY,
+        beh: behaviorNetworkSyncData,
       };
     }
 
@@ -487,31 +485,27 @@ namespace gdjs {
      */
     updateFromObjectNetworkSyncData(newNetworkSyncData: ObjectNetworkSyncData) {
       this.setPosition(newNetworkSyncData.x, newNetworkSyncData.y);
-      this.setZOrder(newNetworkSyncData.zOrder);
-      this.setAngle(newNetworkSyncData.angle);
+      this.setZOrder(newNetworkSyncData.z);
+      this.setAngle(newNetworkSyncData.a);
 
       // Force clear all forces and reapply them, using the garbage collector to recycle forces.
       // Is that efficient?
       this.clearForces();
-      for (
-        let i = 0, len = newNetworkSyncData.instantForces.length;
-        i < len;
-        ++i
-      ) {
-        const forceData = newNetworkSyncData.instantForces[i];
+      for (let i = 0, len = newNetworkSyncData.if.length; i < len; ++i) {
+        const forceData = newNetworkSyncData.if[i];
         const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
         recycledOrNewForce.updateFromNetworkSyncData(forceData);
         this._instantForces.push(recycledOrNewForce);
       }
-      this._permanentForceX = newNetworkSyncData.permanentForceX;
-      this._permanentForceY = newNetworkSyncData.permanentForceY;
+      this._permanentForceX = newNetworkSyncData.pfx;
+      this._permanentForceY = newNetworkSyncData.pfy;
 
       // Loop through all behaviors and update them.
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         const behavior = this._behaviors[i];
-        if (newNetworkSyncData.behaviors[behavior.getName()]) {
+        if (newNetworkSyncData.beh[behavior.getName()]) {
           behavior.updateFromBehaviorNetworkSyncData(
-            newNetworkSyncData.behaviors[behavior.getName()]
+            newNetworkSyncData.beh[behavior.getName()]
           );
         }
       }

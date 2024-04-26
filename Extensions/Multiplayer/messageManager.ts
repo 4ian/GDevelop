@@ -47,8 +47,8 @@ namespace gdjs {
       window.performance && typeof window.performance.now === 'function'
         ? window.performance.now.bind(window.performance)
         : Date.now;
-    const messageRetryTime = 200; // Time to wait before retrying a message that was not acknowledged, in ms.
-    const maxRetries = 4; // Maximum number of retries before giving up on a message.
+    const defaultMessageRetryTime = 200; // Time to wait before retrying a message that was not acknowledged, in ms.
+    const defaultMaxRetries = 4; // Maximum number of retries before giving up on a message.
 
     // Make the processed messages an LRU cache, so that we can limit the number of messages we keep in memory,
     // as well as keep them in order.
@@ -61,7 +61,9 @@ namespace gdjs {
           lastMessageSentAt: number;
           originalMessageName: string;
           originalData: any;
-          numberOfRetries?: number;
+          numberOfRetries: number;
+          maxNumberOfRetries: number;
+          messageRetryTime: number;
           shouldCancelMessageIfTimesOut?: boolean;
         };
       };
@@ -74,12 +76,16 @@ namespace gdjs {
       expectedMessageName,
       otherPeerIds,
       shouldCancelMessageIfTimesOut,
+      maxNumberOfRetries,
+      messageRetryTime,
     }: {
       originalMessageName: string;
       originalData: any;
       expectedMessageName: string;
       otherPeerIds: string[];
       shouldCancelMessageIfTimesOut?: boolean;
+      maxNumberOfRetries?: number;
+      messageRetryTime?: number;
     }) => {
       if (!gdjs.multiplayer.isGameRunning) {
         // This can happen if objects are destroyed at the end of the scene.
@@ -104,6 +110,9 @@ namespace gdjs {
           originalMessageName,
           originalData,
           shouldCancelMessageIfTimesOut,
+          numberOfRetries: 0,
+          maxNumberOfRetries: maxNumberOfRetries || defaultMaxRetries,
+          messageRetryTime: messageRetryTime || defaultMessageRetryTime,
         };
       });
     };
@@ -300,6 +309,17 @@ namespace gdjs {
           instanceY,
         },
       };
+    };
+    const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
+    const objectOwnerChangedMessageNameRegex =
+      /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
+    export const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
+      messageName: string
+    ): string => {
+      return messageName.replace(
+        changeOwnerMessageNamePrefix,
+        objectOwnerChangedMessageNamePrefix
+      );
     };
     export const handleChangeOwnerMessages = (
       runtimeScene: gdjs.RuntimeScene
@@ -546,39 +566,6 @@ namespace gdjs {
       });
     };
 
-    const objectDestroyedMessageNamePrefix = '#destroyed';
-    const objectDestroyedMessageNameRegex =
-      /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createObjectDestroyedMessageNameFromDestroyMessage = (
-      messageName: string
-    ): string => {
-      return messageName.replace(
-        destroyObjectMessageNamePrefix,
-        objectDestroyedMessageNamePrefix
-      );
-    };
-    const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
-    const objectOwnerChangedMessageNameRegex =
-      /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
-    export const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
-      messageName: string
-    ): string => {
-      return messageName.replace(
-        changeOwnerMessageNamePrefix,
-        objectOwnerChangedMessageNamePrefix
-      );
-    };
-    const customMessageAcknowledgePrefix = '#ackCustomMessage';
-    const customMessageAcknowledgeRegex = /#ackCustomMessage#(.+)/;
-    const createAcknowledgeCustomMessageNameFromCustomMessage = (
-      messageName: string
-    ): string => {
-      return messageName.replace(
-        customMessageNamePrefix,
-        customMessageAcknowledgePrefix
-      );
-    };
-
     const getRegexFromAckMessageName = (messageName: string) => {
       if (messageName.startsWith(objectDestroyedMessageNamePrefix)) {
         return objectDestroyedMessageNameRegex;
@@ -695,15 +682,16 @@ namespace gdjs {
         } else {
           // Some peers have not acknowledged the message, let's resend it to them.
           for (const peerId of peerWhoHaventAcknowledged) {
-            const lastMessageSentAt =
-              acknowledgements[peerId].lastMessageSentAt;
-            const originalMessageName =
-              acknowledgements[peerId].originalMessageName;
-            const originalData = acknowledgements[peerId].originalData;
+            const {
+              lastMessageSentAt,
+              originalMessageName,
+              originalData,
+              numberOfRetries: currentNumberOfRetries,
+              maxNumberOfRetries,
+              messageRetryTime,
+            } = acknowledgements[peerId];
             if (getTimeNow() - lastMessageSentAt > messageRetryTime) {
-              const currentNumberOfRetries =
-                acknowledgements[peerId].numberOfRetries || 0;
-              if (currentNumberOfRetries >= maxRetries) {
+              if (currentNumberOfRetries >= maxNumberOfRetries) {
                 // We have retried too many times, let's give up.
                 logger.info(
                   `Giving up on message ${acknowledgemessageName} for ${peerId}.`
@@ -807,6 +795,17 @@ namespace gdjs {
         messageName: `${destroyObjectMessageNamePrefix}#owner_${objectOwner}#object_${objectName}#instance_${instanceNetworkId}`,
         messageData: {},
       };
+    };
+    const objectDestroyedMessageNamePrefix = '#destroyed';
+    const objectDestroyedMessageNameRegex =
+      /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
+    export const createObjectDestroyedMessageNameFromDestroyMessage = (
+      messageName: string
+    ): string => {
+      return messageName.replace(
+        destroyObjectMessageNamePrefix,
+        objectDestroyedMessageNamePrefix
+      );
     };
     export const handleDestroyObjectMessages = (
       runtimeScene: gdjs.RuntimeScene
@@ -929,6 +928,16 @@ namespace gdjs {
           uniqueId: messageId,
         },
       };
+    };
+    const customMessageAcknowledgePrefix = '#ackCustomMessage';
+    const customMessageAcknowledgeRegex = /#ackCustomMessage#(.+)/;
+    const createAcknowledgeCustomMessageNameFromCustomMessage = (
+      messageName: string
+    ): string => {
+      return messageName.replace(
+        customMessageNamePrefix,
+        customMessageAcknowledgePrefix
+      );
     };
 
     export const sendMessage = (

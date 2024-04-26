@@ -360,7 +360,9 @@ namespace gdjs {
       }
 
       closeContainer.style.display = 'none';
-      removeTouchAndClickEventListeners(closeContainer);
+      setTimeout(() => {
+        closeContainer.style.display = 'flex';
+      }, 5000);
     };
 
     /**
@@ -497,11 +499,6 @@ namespace gdjs {
       element.addEventListener('click', (event) => {
         action();
       });
-    };
-
-    const removeTouchAndClickEventListeners = function (element: HTMLElement) {
-      element.removeEventListener('touchstart', () => {});
-      element.removeEventListener('click', () => {});
     };
   }
 }

@@ -444,7 +444,14 @@ namespace gdjs {
       playerToken: string;
     }) {
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
-      gdjs.evtTools.p2p.useDefaultBrokerServer();
+      // gdjs.evtTools.p2p.useDefaultBrokerServer();
+      gdjs.evtTools.p2p.useCustomBrokerServer(
+        'gdevelop-services.uc.r.appspot.com',
+        80,
+        '/',
+        '',
+        false
+      );
 
       _connectionId = connectionId;
       playerPositionInLobby = positionInLobby;

@@ -163,75 +163,81 @@ namespace gdjs {
 
     getNetworkSyncData() {
       return {
-        cs: this._currentSpeed,
-        rdx: this._requestedDeltaX,
-        rdy: this._requestedDeltaY,
-        ldy: this._lastDeltaY,
-        cfs: this._currentFallSpeed,
-        cj: this._canJump,
-        ldl: this._lastDirectionIsLeft,
-        lek: this._wasLeftKeyPressed,
-        rik: this._wasRightKeyPressed,
-        lak: this._wasLadderKeyPressed,
-        upk: this._wasUpKeyPressed,
-        dok: this._wasDownKeyPressed,
-        juk: this._wasJumpKeyPressed,
-        rpk: this._wasReleasePlatformKeyPressed,
-        rlk: this._wasReleaseLadderKeyPressed,
-        sn: this._state.toString(),
-        ssd: this._state.getNetworkSyncData(),
+        ...super.getNetworkSyncData(),
+        props: {
+          cs: this._currentSpeed,
+          rdx: this._requestedDeltaX,
+          rdy: this._requestedDeltaY,
+          ldy: this._lastDeltaY,
+          cfs: this._currentFallSpeed,
+          cj: this._canJump,
+          ldl: this._lastDirectionIsLeft,
+          lek: this._wasLeftKeyPressed,
+          rik: this._wasRightKeyPressed,
+          lak: this._wasLadderKeyPressed,
+          upk: this._wasUpKeyPressed,
+          dok: this._wasDownKeyPressed,
+          juk: this._wasJumpKeyPressed,
+          rpk: this._wasReleasePlatformKeyPressed,
+          rlk: this._wasReleaseLadderKeyPressed,
+          sn: this._state.toString(),
+          ssd: this._state.getNetworkSyncData(),
+        },
       };
     }
 
-    updateFromBehaviorNetworkSyncData(networkSyncData) {
-      if (networkSyncData.cs !== this._currentSpeed) {
-        this._currentSpeed = networkSyncData.cs;
+    updateFromNetworkSyncData(networkSyncData) {
+      super.updateFromNetworkSyncData(networkSyncData);
+
+      const behaviorSpecificProps = networkSyncData.props;
+      if (behaviorSpecificProps.cs !== this._currentSpeed) {
+        this._currentSpeed = behaviorSpecificProps.cs;
       }
-      if (networkSyncData.rdx !== this._requestedDeltaX) {
-        this._requestedDeltaX = networkSyncData.rdx;
+      if (behaviorSpecificProps.rdx !== this._requestedDeltaX) {
+        this._requestedDeltaX = behaviorSpecificProps.rdx;
       }
-      if (networkSyncData.rdy !== this._requestedDeltaY) {
-        this._requestedDeltaY = networkSyncData.rdy;
+      if (behaviorSpecificProps.rdy !== this._requestedDeltaY) {
+        this._requestedDeltaY = behaviorSpecificProps.rdy;
       }
-      if (networkSyncData.ldy !== this._lastDeltaY) {
-        this._lastDeltaY = networkSyncData.ldy;
+      if (behaviorSpecificProps.ldy !== this._lastDeltaY) {
+        this._lastDeltaY = behaviorSpecificProps.ldy;
       }
-      if (networkSyncData.cfs !== this._currentFallSpeed) {
-        this._currentFallSpeed = networkSyncData.cfs;
+      if (behaviorSpecificProps.cfs !== this._currentFallSpeed) {
+        this._currentFallSpeed = behaviorSpecificProps.cfs;
       }
-      if (networkSyncData.cj !== this._canJump) {
-        this._canJump = networkSyncData.cj;
+      if (behaviorSpecificProps.cj !== this._canJump) {
+        this._canJump = behaviorSpecificProps.cj;
       }
-      if (networkSyncData.ldl !== this._lastDirectionIsLeft) {
-        this._lastDirectionIsLeft = networkSyncData.ldl;
+      if (behaviorSpecificProps.ldl !== this._lastDirectionIsLeft) {
+        this._lastDirectionIsLeft = behaviorSpecificProps.ldl;
       }
-      if (networkSyncData.lek !== this._leftKey) {
-        this._leftKey = networkSyncData.lek;
+      if (behaviorSpecificProps.lek !== this._leftKey) {
+        this._leftKey = behaviorSpecificProps.lek;
       }
-      if (networkSyncData.rik !== this._rightKey) {
-        this._rightKey = networkSyncData.rik;
+      if (behaviorSpecificProps.rik !== this._rightKey) {
+        this._rightKey = behaviorSpecificProps.rik;
       }
-      if (networkSyncData.lak !== this._ladderKey) {
-        this._ladderKey = networkSyncData.lak;
+      if (behaviorSpecificProps.lak !== this._ladderKey) {
+        this._ladderKey = behaviorSpecificProps.lak;
       }
-      if (networkSyncData.upk !== this._upKey) {
-        this._upKey = networkSyncData.upk;
+      if (behaviorSpecificProps.upk !== this._upKey) {
+        this._upKey = behaviorSpecificProps.upk;
       }
-      if (networkSyncData.dok !== this._downKey) {
-        this._downKey = networkSyncData.dok;
+      if (behaviorSpecificProps.dok !== this._downKey) {
+        this._downKey = behaviorSpecificProps.dok;
       }
-      if (networkSyncData.juk !== this._jumpKey) {
-        this._jumpKey = networkSyncData.juk;
+      if (behaviorSpecificProps.juk !== this._jumpKey) {
+        this._jumpKey = behaviorSpecificProps.juk;
       }
-      if (networkSyncData.rpk !== this._releasePlatformKey) {
-        this._releasePlatformKey = networkSyncData.rpk;
+      if (behaviorSpecificProps.rpk !== this._releasePlatformKey) {
+        this._releasePlatformKey = behaviorSpecificProps.rpk;
       }
-      if (networkSyncData.rlk !== this._releaseLadderKey) {
-        this._releaseLadderKey = networkSyncData.rlk;
+      if (behaviorSpecificProps.rlk !== this._releaseLadderKey) {
+        this._releaseLadderKey = behaviorSpecificProps.rlk;
       }
 
-      if (networkSyncData.sn !== this._state.toString()) {
-        switch (networkSyncData.sn) {
+      if (behaviorSpecificProps.sn !== this._state.toString()) {
+        switch (behaviorSpecificProps.sn) {
           case 'Falling':
             this._setFalling();
             break;
@@ -248,13 +254,15 @@ namespace gdjs {
             this._setOnLadder();
             break;
           default:
-            console.error('Unknown state name: ' + networkSyncData.sn + '.');
+            console.error(
+              'Unknown state name: ' + behaviorSpecificProps.sn + '.'
+            );
             break;
         }
       }
 
-      if (networkSyncData.sn === this._state.toString()) {
-        this._state.updateFromNetworkSyncData(networkSyncData.ssd);
+      if (behaviorSpecificProps.sn === this._state.toString()) {
+        this._state.updateFromNetworkSyncData(behaviorSpecificProps.ssd);
       }
 
       // When the object is synchronized from the network, the inputs must not be cleared.

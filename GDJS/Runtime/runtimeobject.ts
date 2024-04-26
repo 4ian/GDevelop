@@ -504,7 +504,7 @@ namespace gdjs {
       for (let i = 0, len = this._behaviors.length; i < len; ++i) {
         const behavior = this._behaviors[i];
         if (newNetworkSyncData.beh[behavior.getName()]) {
-          behavior.updateFromBehaviorNetworkSyncData(
+          behavior.updateFromNetworkSyncData(
             newNetworkSyncData.beh[behavior.getName()]
           );
         }

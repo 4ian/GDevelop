@@ -479,33 +479,39 @@ namespace gdjs {
 
     getNetworkSyncData() {
       return {
-        oox: this._objectOldX,
-        ooy: this._objectOldY,
-        ooa: this._objectOldAngle,
-        oow: this._objectOldWidth,
-        ooh: this._objectOldHeight,
-        vb: this._verticesBuffer,
+        ...super.getNetworkSyncData(),
+        props: {
+          oox: this._objectOldX,
+          ooy: this._objectOldY,
+          ooa: this._objectOldAngle,
+          oow: this._objectOldWidth,
+          ooh: this._objectOldHeight,
+          vb: this._verticesBuffer,
+        },
       };
     }
 
-    updateFromNetworkSyncData(syncData: any) {
-      if (syncData.oox !== undefined) {
-        this._objectOldX = syncData.oox;
+    updateFromNetworkSyncData(networkSyncData: any) {
+      super.updateFromNetworkSyncData(networkSyncData);
+
+      const behaviorSpecificProps = networkSyncData.props;
+      if (behaviorSpecificProps.oox !== undefined) {
+        this._objectOldX = behaviorSpecificProps.oox;
       }
-      if (syncData.ooy !== undefined) {
-        this._objectOldY = syncData.ooy;
+      if (behaviorSpecificProps.ooy !== undefined) {
+        this._objectOldY = behaviorSpecificProps.ooy;
       }
-      if (syncData.ooa !== undefined) {
-        this._objectOldAngle = syncData.ooa;
+      if (behaviorSpecificProps.ooa !== undefined) {
+        this._objectOldAngle = behaviorSpecificProps.ooa;
       }
-      if (syncData.oow !== undefined) {
-        this._objectOldWidth = syncData.oow;
+      if (behaviorSpecificProps.oow !== undefined) {
+        this._objectOldWidth = behaviorSpecificProps.oow;
       }
-      if (syncData.ooh !== undefined) {
-        this._objectOldHeight = syncData.ooh;
+      if (behaviorSpecificProps.ooh !== undefined) {
+        this._objectOldHeight = behaviorSpecificProps.ooh;
       }
-      if (syncData.vb !== undefined) {
-        this._verticesBuffer = syncData.vb;
+      if (behaviorSpecificProps.vb !== undefined) {
+        this._verticesBuffer = behaviorSpecificProps.vb;
       }
     }
 

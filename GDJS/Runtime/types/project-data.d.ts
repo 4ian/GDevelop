@@ -99,6 +99,11 @@ declare type BehaviorData = {
   type: string;
 };
 
+declare type BehaviorSyncData = {
+  act: boolean;
+  props: Object;
+};
+
 declare interface GdVersionData {
   build: number;
   major: number;

@@ -15,7 +15,7 @@ namespace gdjs {
 
     // Authentication display
     let _authenticationWindow: Window | null = null; // For Web.
-    let _authenticationInAppWindow: Window | null = null; // For Cordova.
+    let _authenticationInAppWindow: any | null = null; // For Cordova.
     let _authenticationRootContainer: HTMLDivElement | null = null;
     let _authenticationLoaderContainer: HTMLDivElement | null = null;
     let _authenticationIframeContainer: HTMLDivElement | null = null;
@@ -25,13 +25,15 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
-    let _cordovaAuthenticationMessageCallback:
-      | ((event: MessageEvent) => void)
-      | null = null;
+    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
+      null;
     let _websocket: WebSocket | null = null;
+
+    type PlayerAuthenticationCallbacks = {
+      onDismissed?: () => void;
+      onErrored?: () => void;
+      onLoggedIn?: () => void;
+    };
 
     // Ensure that the condition "just logged in" is valid only for one frame.
     gdjs.registerRuntimeScenePostEventsCallback(() => {
@@ -43,7 +45,7 @@ namespace gdjs {
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
-        if (getPlatform(runtimeScene) !== 'web') {
+        if (getPlayerAuthPlatform(runtimeScene) !== 'web') {
           // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
           return;
         }
@@ -98,17 +100,19 @@ namespace gdjs {
     };
 
     /**
-     * Helper returning the platform.
+     * Get the platform running the game, which changes how the authentication
+     * window is opened.
      */
-    const getPlatform = (
+    export const getPlayerAuthPlatform = (
       runtimeScene: RuntimeScene
-    ): 'electron' | 'cordova' | 'web' => {
+    ): 'electron' | 'cordova' | 'web-iframe' | 'web' => {
       const runtimeGame = runtimeScene.getGame();
       const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
         return 'electron';
       }
       if (typeof cordova !== 'undefined') return 'cordova';
+      if (shouldAuthenticationUseIframe(runtimeScene)) return 'web-iframe';
 
       return 'web';
     };
@@ -334,16 +338,17 @@ namespace gdjs {
       }
     };
 
-    /**
-     * When the game receives the authentication result, close all the
-     * authentication windows, display the notification and focus on the game.
-     */
-    const handleLoggedInEvent = function (
-      runtimeScene: gdjs.RuntimeScene,
-      userId: string,
-      username: string | null,
-      userToken: string
-    ) {
+    export const login = ({
+      runtimeScene,
+      userId,
+      username,
+      userToken,
+    }: {
+      runtimeScene: gdjs.RuntimeScene;
+      userId: string;
+      username: string | null;
+      userToken: string;
+    }) => {
       saveAuthKeyToStorage({ userId, username, userToken });
       cleanUpAuthWindowAndCallbacks(runtimeScene);
       removeAuthenticationBanner(runtimeScene);
@@ -363,7 +368,6 @@ namespace gdjs {
         domElementContainer,
         _username || 'Anonymous'
       );
-      focusOnGame(runtimeScene);
     };
 
     /**
@@ -373,7 +377,7 @@ namespace gdjs {
     const receiveAuthenticationMessage = function (
       runtimeScene: gdjs.RuntimeScene,
       event: MessageEvent,
-      { checkOrigin }: { checkOrigin: boolean }
+      { checkOrigin, callbacks }: { checkOrigin: boolean, callbacks?: PlayerAuthenticationCallbacks }
     ) {
       const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
 
@@ -394,12 +398,14 @@ namespace gdjs {
             throw new Error('Malformed message.');
           }
 
-          handleLoggedInEvent(
+          login({
             runtimeScene,
-            event.data.body.userId,
-            event.data.body.username,
-            event.data.body.token
-          );
+            userId: event.data.body.userId,
+            username: event.data.body.username,
+            userToken: event.data.body.token,
+          });
+          focusOnGame(runtimeScene);
+          if (callbacks && callbacks.onLoggedIn) callbacks.onLoggedIn();
           break;
         }
         case 'alreadyAuthenticated': {
@@ -452,7 +458,7 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       clearAuthenticationWindowTimeout();
-      const time = 12 * 60 * 1000; // 12 minutes, in case the user needs time to authenticate.
+      const time = 15 * 60 * 1000; // 15 minutes, in case the user needs time to authenticate.
       _authenticationTimeoutId = setTimeout(() => {
         logger.info(
           'Authentication window did not send message in time. Closing it.'
@@ -487,6 +493,7 @@ namespace gdjs {
       const onOpenAuthenticationWindow = () => {
         openAuthenticationWindow(runtimeScene);
       };
+      console.log({_userToken, _userId, _username});
       return _userToken
         ? authComponents.computeAuthenticatedBanner(
             onOpenAuthenticationWindow,
@@ -564,8 +571,10 @@ namespace gdjs {
      */
     const openAuthenticationWindowForElectron = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      callbacks?: PlayerAuthenticationCallbacks
     ) => {
+      let hasFinishedAlready = false;
       const wsPlayApi = runtimeScene
         .getGame()
         .isUsingGDevelopDevelopmentEnvironment()
@@ -579,10 +588,20 @@ namespace gdjs {
         }
       };
       _websocket.onerror = () => {
+        if (!hasFinishedAlready) {
+          hasFinishedAlready = true;
+          if (callbacks && callbacks.onErrored) callbacks.onErrored();
+        }
         handleAuthenticationError(
           runtimeScene,
           'Error while connecting to the authentication server.'
         );
+      };
+      _websocket.onclose = () => {
+        if (!hasFinishedAlready) {
+          hasFinishedAlready = true;
+          if (callbacks && callbacks.onDismissed) callbacks.onDismissed();
+        }
       };
       _websocket.onmessage = (event) => {
         if (event.data) {
@@ -590,12 +609,16 @@ namespace gdjs {
           switch (messageContent.type) {
             case 'authenticationResult': {
               const messageData = messageContent.data;
-              handleLoggedInEvent(
+
+              login({
                 runtimeScene,
-                messageData.userId,
-                messageData.username,
-                messageData.token
-              );
+                userId: messageData.userId,
+                username: messageData.username,
+                userToken: messageData.token,
+              });
+              focusOnGame(runtimeScene);
+              hasFinishedAlready = true;
+              if (callbacks && callbacks.onLoggedIn) callbacks.onLoggedIn();
               break;
             }
             case 'connectionId': {
@@ -641,7 +664,8 @@ namespace gdjs {
      */
     const openAuthenticationWindowForCordova = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      callbacks?: PlayerAuthenticationCallbacks
     ) => {
       const targetUrl = getAuthWindowUrl({
         runtimeGame: runtimeScene.getGame(),
@@ -656,14 +680,19 @@ namespace gdjs {
       // Listen to messages posted on the authentication window, so that we can
       // know when the user is authenticated.
       if (_authenticationInAppWindow) {
-        _cordovaAuthenticationMessageCallback = (event: MessageEvent) => {
-          receiveAuthenticationMessage(runtimeScene, event, {
-            checkOrigin: false, // For Cordova we don't check the origin, as the message is read from the InAppBrowser directly.
-          });
-        };
         _authenticationInAppWindow.addEventListener(
           'message',
-          _cordovaAuthenticationMessageCallback,
+          (event: MessageEvent) => {
+            receiveAuthenticationMessage(runtimeScene, event, {
+              checkOrigin: false, // For Cordova we don't check the origin, as the message is read from the InAppBrowser directly.
+              callbacks,
+            });
+          },
+          true
+        );
+        _authenticationInAppWindow.addEventListener(
+          'exit',
+          () => {}, // TODO: check if cordova window is closed, and run callbacks if it is.
           true
         );
       }
@@ -675,7 +704,8 @@ namespace gdjs {
      */
     const openAuthenticationWindowForWeb = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      callbacks?: PlayerAuthenticationCallbacks
     ) => {
       // If we're on a browser, open a new window.
       const targetUrl = getAuthWindowUrl({
@@ -688,6 +718,7 @@ namespace gdjs {
       _authenticationMessageCallback = (event: MessageEvent) => {
         receiveAuthenticationMessage(runtimeScene, event, {
           checkOrigin: true,
+          callbacks,
         });
       };
       window.addEventListener('message', _authenticationMessageCallback, true);
@@ -695,9 +726,11 @@ namespace gdjs {
       const left = screen.width / 2 - 500 / 2;
       const top = screen.height / 2 - 600 / 2;
       const windowFeatures = `left=${left},top=${top},width=500,height=600`;
-      const openWindow = () =>
-        window.open(targetUrl, 'authentication', windowFeatures);
-      _authenticationWindow = openWindow();
+      const openWindow = () => {
+        _authenticationWindow = window.open(targetUrl, 'authentication', windowFeatures);
+      }
+
+      openWindow();
 
       // Add the link to the window in case a popup blocker is preventing the window from opening.
       if (_authenticationTextContainer) {
@@ -714,7 +747,8 @@ namespace gdjs {
      */
     const openAuthenticationIframeForWeb = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      gameId: string,
+      callbacks?: PlayerAuthenticationCallbacks
     ) => {
       if (
         !_authenticationIframeContainer ||
@@ -737,6 +771,7 @@ namespace gdjs {
       _authenticationMessageCallback = (event: MessageEvent) => {
         receiveAuthenticationMessage(runtimeScene, event, {
           checkOrigin: true,
+          callbacks,
         });
       };
       window.addEventListener('message', _authenticationMessageCallback, true);
@@ -753,7 +788,8 @@ namespace gdjs {
      * Action to display the authentication window to the user.
      */
     export const openAuthenticationWindow = function (
-      runtimeScene: gdjs.RuntimeScene
+      runtimeScene: gdjs.RuntimeScene,
+      callbacks?: PlayerAuthenticationCallbacks
     ) {
       // Create the authentication container for the player to wait.
       const domElementContainer = runtimeScene
@@ -765,12 +801,14 @@ namespace gdjs {
           runtimeScene,
           "The div element covering the game couldn't be found, the authentication window cannot be displayed."
         );
+        if (callbacks && callbacks.onErrored) callbacks.onErrored();
         return;
       }
 
       const onAuthenticationContainerDismissed = () => {
         cleanUpAuthWindowAndCallbacks(runtimeScene);
         displayAuthenticationBanner(runtimeScene);
+        if (callbacks && callbacks.onDismissed) callbacks.onDismissed();
       };
 
       const _gameId = gdjs.projectData.properties.projectUuid;
@@ -779,20 +817,18 @@ namespace gdjs {
           runtimeScene,
           'The game ID is missing, the authentication window cannot be opened.'
         );
+        if (callbacks && callbacks.onErrored) callbacks.onErrored();
         return;
       }
 
       // If the banner is displayed, hide it, so that it can be shown again if the user closes the window.
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
-      const platform = getPlatform(runtimeScene);
-      const {
-        rootContainer,
-        loaderContainer,
-        iframeContainer,
-      } = authComponents.computeAuthenticationContainer(
-        onAuthenticationContainerDismissed
-      );
+      const playerAuthPlatform = getPlayerAuthPlatform(runtimeScene);
+      const { rootContainer, loaderContainer, iframeContainer } =
+        authComponents.computeAuthenticationContainer(
+          onAuthenticationContainerDismissed
+        );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
       _authenticationIframeContainer = iframeContainer;
@@ -814,32 +850,32 @@ namespace gdjs {
                   )
               : null; // Only show a link if we're on electron.
 
-            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
-              _authenticationLoaderContainer,
-              platform,
-              isGameRegistered,
-              wikiOpenAction
-            );
+            _authenticationTextContainer =
+              authComponents.addAuthenticationTextsToLoadingContainer(
+                _authenticationLoaderContainer,
+                playerAuthPlatform,
+                isGameRegistered,
+                wikiOpenAction
+              );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);
 
             // Based on which platform the game is running, we open the authentication window
             // with a different window, with or without a websocket.
-            switch (platform) {
+            switch (playerAuthPlatform) {
               case 'electron':
-                openAuthenticationWindowForElectron(runtimeScene, _gameId);
+                openAuthenticationWindowForElectron(runtimeScene, _gameId, callbacks);
                 break;
               case 'cordova':
-                openAuthenticationWindowForCordova(runtimeScene, _gameId);
+                openAuthenticationWindowForCordova(runtimeScene, _gameId, callbacks);
+                break;
+              case 'web-iframe':
+                openAuthenticationIframeForWeb(runtimeScene, _gameId, callbacks);
                 break;
               case 'web':
               default:
-                if (shouldAuthenticationUseIframe(runtimeScene)) {
-                  openAuthenticationIframeForWeb(runtimeScene, _gameId);
-                } else {
-                  openAuthenticationWindowForWeb(runtimeScene, _gameId);
-                }
+                openAuthenticationWindowForWeb(runtimeScene, _gameId, callbacks);
                 break;
             }
           }
@@ -850,6 +886,7 @@ namespace gdjs {
             'Error while checking if the game is registered.'
           );
           logger.error(error);
+          if (callbacks && callbacks.onErrored) callbacks.onErrored();
         });
     };
 
@@ -901,8 +938,6 @@ namespace gdjs {
           true
         );
         _authenticationMessageCallback = null;
-        // No need to detach the callback from the InAppBrowser, as it's destroyed when the window is closed.
-        _cordovaAuthenticationMessageCallback = null;
       }
     };
 

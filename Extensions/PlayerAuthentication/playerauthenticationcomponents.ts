@@ -5,7 +5,7 @@ namespace gdjs {
       platform,
       isGameRegistered,
     }: {
-      platform: 'cordova' | 'electron' | 'web';
+      platform: 'cordova' | 'electron' | 'web-iframe' | 'web';
       isGameRegistered: boolean;
     }) =>
       isGameRegistered
@@ -166,9 +166,9 @@ namespace gdjs {
      */
     export const addAuthenticationTextsToLoadingContainer = (
       loaderContainer: HTMLDivElement,
-      platform,
-      isGameRegistered,
-      wikiOpenAction
+      platform: 'cordova' | 'electron' | 'web-iframe' | 'web',
+      isGameRegistered: boolean,
+      wikiOpenAction: (() => void) | null
     ) => {
       const textContainer: HTMLDivElement = document.createElement('div');
       textContainer.id = 'authentication-container-texts';

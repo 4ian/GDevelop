@@ -40,7 +40,7 @@ export default class StandardEvent extends React.Component<
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick
           }
-          className={'actions-container'}
+          className={'local-variables-container'}
           disabled={this.props.disabled}
           screenType={this.props.screenType}
           windowSize={this.props.windowSize}

@@ -74,6 +74,16 @@ VariablesContainersList::GetVariablesContainerPositionFromVariableName(
   return gd::String::npos;
 }
 
+std::size_t VariablesContainersList::GetLocalVariablesContainerPosition(
+    const gd::VariablesContainer &localVariableContainer) const {
+  for (std::size_t i = firstLocalVariableContainerIndex;
+       i < variablesContainers.size(); ++i) {
+    if (variablesContainers[i] == &localVariableContainer)
+      return i - firstLocalVariableContainerIndex;
+  }
+  return gd::String::npos;
+}
+
 bool VariablesContainersList::HasVariablesContainer(const gd::VariablesContainer& variablesContainer) const {
   for (auto it = variablesContainers.rbegin(); it != variablesContainers.rend();
        ++it) {

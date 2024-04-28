@@ -87,6 +87,12 @@ class GD_CORE_API VariablesContainersList {
       const gd::String &variableName) const;
 
   /**
+   * \brief Get the index of the given local variables container.
+   */
+  std::size_t GetLocalVariablesContainerPosition(
+      const gd::VariablesContainer &localVariableContainer) const;
+
+  /**
    * \brief Get the variable container at the specified index in the list.
    *
    * \warning Trying to access to a not existing variable container will result

@@ -1311,12 +1311,9 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     if (HasProjectAndLayout()) {
       const auto variablesContainersList =
           GetProjectScopedContainers().GetVariablesContainersList();
-      const std::size_t variablesContainerIndex =
-          variablesContainersList.GetVariablesContainerPositionFromVariableName(
-              variableName);
       const auto variablesContainer =
-          variablesContainersList.GetVariablesContainer(
-              variablesContainerIndex);
+          variablesContainersList.GetVariablesContainerFromVariableName(
+              variableName);
       const auto sourceType = variablesContainer.GetSourceType();
       if (sourceType == gd::VariablesContainer::SourceType::Scene) {
         variables = &variablesContainer;
@@ -1326,10 +1323,9 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
         output = "runtimeScene.getGame().getVariables()";
       } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
         variables = &variablesContainer;
-        // It supposes that there is always 2 not local VariablesContainer:
-        // - 1 for the project
-        // - 1 for the scene
-        std::size_t localVariablesIndex = variablesContainerIndex - 2;
+        std::size_t localVariablesIndex =
+            variablesContainersList.GetLocalVariablesContainerPosition(
+                variablesContainer);
         output = GetCodeNamespace() + ".localVariables[" +
                  gd::String::From(localVariablesIndex) + "]";
       }

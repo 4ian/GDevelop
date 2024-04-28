@@ -135,10 +135,15 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::StandardEvent& event = dynamic_cast<gd::StandardEvent&>(event_);
 
         gd::String localVariablesInitializationCode = "";
-        if (event_.HasVariables() && codeGenerator.HasProjectAndLayout()) {
-          GenerateLocalVariablesInitializationCode(
-              event_.GetVariables(), codeGenerator,
-              localVariablesInitializationCode);
+        if (event_.HasVariables()) {
+          if (codeGenerator.HasProjectAndLayout()) {
+            GenerateLocalVariablesInitializationCode(
+                event_.GetVariables(), codeGenerator,
+                localVariablesInitializationCode);
+          } else {
+            localVariablesInitializationCode =
+                "// Unsupported local variables in functions.\n";
+          }
         }
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
@@ -173,8 +178,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += actionsCode;
         outputCode += "}\n";
 
-        if (event_.HasVariables() && codeGenerator.HasProjectAndLayout()) {
-            outputCode += codeGenerator.GetCodeNamespace() + ".localVariables.pop();\n";
+        if (event_.HasVariables()) {
+          if (codeGenerator.HasProjectAndLayout()) {
+            outputCode +=
+                codeGenerator.GetCodeNamespace() + ".localVariables.pop();\n";
+          } else {
+            outputCode += "// Unsupported local variables in functions.\n";
+          }
         }
 
         return outputCode;

@@ -16,7 +16,7 @@ import { enumerateVariablesOfContainersList } from './EnumerateVariables';
 import { mapFor } from '../../Utils/MapFor';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
-  function SceneVariableField(props: ParameterFieldProps, ref) {
+  function AnyVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
     const focus: FieldFocusFunction = options => {

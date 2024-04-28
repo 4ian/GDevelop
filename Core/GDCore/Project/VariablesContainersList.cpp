@@ -15,8 +15,8 @@ VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
     const gd::Project& project, const gd::Layout& layout) {
   VariablesContainersList variablesContainersList;
-  variablesContainersList.Add(project.GetVariables());
-  variablesContainersList.Add(layout.GetVariables());
+  variablesContainersList.Push(project.GetVariables());
+  variablesContainersList.Push(layout.GetVariables());
   variablesContainersList.firstLocalVariableContainerIndex = 2;
   return variablesContainersList;
 }
@@ -25,7 +25,7 @@ VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListPushing(
     const VariablesContainersList& variablesContainersList, const gd::VariablesContainer& variablesContainer) {
   VariablesContainersList newVariablesContainersList(variablesContainersList);
-  newVariablesContainersList.Add(variablesContainer);
+  newVariablesContainersList.Push(variablesContainer);
   return newVariablesContainersList;
 }
 

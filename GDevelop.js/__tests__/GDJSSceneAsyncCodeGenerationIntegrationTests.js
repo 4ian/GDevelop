@@ -306,7 +306,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     ).toBe(2 + 3);
   });
 
-  it('generates an async fork that shares a local variable a synced sub-event', function () {
+  it('generates an async fork that shares a local variable a non-async sub-event', function () {
     scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
     const runtimeScene = generateAndRunEventsForLayout([
       {
@@ -364,7 +364,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     ).toBe(2 + 5);
   });
 
-  it('generates an async fork that shares a scene variable a synced sub-event', function () {
+  it('generates an async fork that shares a scene variable a non-async sub-event', function () {
     scene.getVariables().insertNew('SuccessVariable', 0).setValue(0);
     scene.getVariables().insertNew('MySceneVariable', 0).setValue(1);
     const runtimeScene = generateAndRunEventsForLayout([

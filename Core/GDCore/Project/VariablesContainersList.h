@@ -125,10 +125,6 @@ class GD_CORE_API VariablesContainersList {
   VariablesContainersList(): firstLocalVariableContainerIndex(0) {};
  private:
 
-  void Add(const gd::VariablesContainer& variablesContainer) {
-    variablesContainers.push_back(&variablesContainer);
-  };
-
   std::vector<const gd::VariablesContainer*> variablesContainers;
   std::size_t firstLocalVariableContainerIndex;
   static Variable badVariable;

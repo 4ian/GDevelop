@@ -367,7 +367,8 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
         }
 
         if (gd::ParameterMetadata::IsExpression("variable", type)) {
-          const auto &variableName = instruction.GetParameter(parameterIndex).GetPlainString();
+          const auto& newParameterValue = instruction.GetParameter(parameterIndex);
+          const auto &variableName = newParameterValue.GetPlainString();
           auto itr = variableNewTypes.find(variableName);
           if (itr != variableNewTypes.end()) {
             const gd::Variable::Type variableType = itr->second;

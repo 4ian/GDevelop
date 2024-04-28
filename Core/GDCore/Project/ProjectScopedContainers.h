@@ -64,8 +64,6 @@ class ProjectScopedContainers {
     return projectScopedContainers;
   };
 
-  static std::vector<ProjectScopedContainers> test;
-
   static ProjectScopedContainers
   MakeNewProjectScopedContainersWithLocalVariables(
       const ProjectScopedContainers &projectScopedContainers,
@@ -161,8 +159,8 @@ class ProjectScopedContainers {
   };
 
   /**
-   * @brief The code generator push variable containers in the same instance
-   * to avoid to pass an instance by parameter.
+   * @brief Allow modification of the variables containers list. This is used
+   * by code generation which does push and pop of local variable containers.
    */
   gd::VariablesContainersList &GetVariablesContainersList() {
     return variablesContainersList;

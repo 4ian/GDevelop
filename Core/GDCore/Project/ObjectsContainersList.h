@@ -30,8 +30,6 @@ class GD_CORE_API ObjectsContainersList {
  public:
   virtual ~ObjectsContainersList(){};
 
-  static ObjectsContainersList MakeNewEmptyObjectsContainersList();
-
   static ObjectsContainersList MakeNewObjectsContainersListForProjectAndLayout(
       const gd::Project& project, const gd::Layout& layout);
 

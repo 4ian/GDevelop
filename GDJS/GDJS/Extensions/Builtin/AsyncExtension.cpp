@@ -55,6 +55,9 @@ AsyncExtension::AsyncExtension() {
               "asyncObjectsList.backupLocalVariablesContainers(" +
               codeGenerator.GetCodeNamespace() + ".localVariables);\n";
         }
+        else {
+          asyncContextBuilder += "// Unsupported local variables in functions.\n";
+        }
 
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {

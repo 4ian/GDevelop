@@ -164,9 +164,6 @@ void ReadOnlyArbitraryEventsWorker::StopAnyEventIteration() {
 ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
 
 bool ArbitraryEventsWorkerWithContext::VisitEvent(gd::BaseEvent &event) {
-  // TODO Should CanHaveVariables be used instead?
-  // CanHaveVariables is less efficient but allows to add local variables to
-  // empty containers.
   if (!event.HasVariables()) {
     return ArbitraryEventsWorker::VisitEvent(event);
   }
@@ -185,9 +182,6 @@ ReadOnlyArbitraryEventsWorkerWithContext::~ReadOnlyArbitraryEventsWorkerWithCont
 
 void ReadOnlyArbitraryEventsWorkerWithContext::VisitEvent(
     const gd::BaseEvent &event) {
-  // TODO Should CanHaveVariables be used instead?
-  // CanHaveVariables is less efficient but allows to add local variables to
-  // empty containers.
   if (!event.HasVariables()) {
     ReadOnlyArbitraryEventsWorker::VisitEvent(event);
     return;

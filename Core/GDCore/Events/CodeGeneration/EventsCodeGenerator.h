@@ -337,8 +337,10 @@ class GD_CORE_API EventsCodeGenerator {
   }
 
   /**
-   * @brief The code generator push variable containers in the same instance
-   * to avoid to pass an instance by parameter.
+   * @brief Give access to the project scoped containers as code generation might
+   * push and pop variable containers (for local variables).
+   * This could be passed as a parameter recursively in code generation, but this requires
+   * heavy refactoring. Instead, we use this single instance.
    */
   gd::ProjectScopedContainers& GetProjectScopedContainers() {
     return projectScopedContainers;

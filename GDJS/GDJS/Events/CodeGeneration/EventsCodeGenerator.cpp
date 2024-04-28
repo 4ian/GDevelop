@@ -1324,8 +1324,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       } else if (sourceType == gd::VariablesContainer::SourceType::Global) {
         variables = &variablesContainer;
         output = "runtimeScene.getGame().getVariables()";
-      } else if (sourceType == gd::VariablesContainer::SourceType::Local &&
-                 HasProjectAndLayout()) {
+      } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
         variables = &variablesContainer;
         // It supposes that there is always 2 not local VariablesContainer:
         // - 1 for the project
@@ -1336,7 +1335,8 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       }
     }
     else {
-      output = "runtimeScene.getScene().getVariables()";
+      output = "// Unsupported unified variables in functions.";
+      output += "runtimeScene.getScene().getVariables()";
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";

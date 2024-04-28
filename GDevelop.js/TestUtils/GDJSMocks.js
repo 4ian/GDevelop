@@ -269,6 +269,7 @@ class VariablesContainer {
   constructor(initialVariablesData) {
     this._variables = new Hashtable();
     this._indexedVariables = [];
+    this._isLocal = initialVariablesData === undefined;
 
     if (initialVariablesData !== undefined) {
       const setupVariableFromVariableData = (variable, variableData) => {
@@ -321,9 +322,16 @@ class VariablesContainer {
    */
   getFromIndex(index) {
     if (!this._indexedVariables[index]) {
-      throw new Error(
-        'Trying to access to an indexed variable that does not exist.'
-      );
+      if (this._isLocal) {
+        const variable = new Variable();
+        this._indexedVariables[index] = variable;
+        return variable;
+      }
+      else {
+        throw new Error(
+          'Trying to access to an indexed variable that does not exist: ' + index
+        );
+      }
     }
     return this._indexedVariables[index];
   }

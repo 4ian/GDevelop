@@ -1311,7 +1311,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     if (HasProjectAndLayout()) {
       const auto variablesContainersList =
           GetProjectScopedContainers().GetVariablesContainersList();
-      const auto variablesContainer =
+      const auto &variablesContainer =
           variablesContainersList.GetVariablesContainerFromVariableName(
               variableName);
       const auto sourceType = variablesContainer.GetSourceType();

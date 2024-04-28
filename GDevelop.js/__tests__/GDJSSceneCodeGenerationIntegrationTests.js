@@ -87,16 +87,24 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
       .getEvents()
       .unserializeFrom(project, serializedExternalEventsEvents);
 
+    const serializedProjectElement = new gd.SerializerElement();
+    project.serializeTo(serializedProjectElement);
+
+    const serializedSceneElement = new gd.SerializerElement();
+    layout.serializeTo(serializedSceneElement);
+
     const runCompiledEvents = generateCompiledEventsForLayout(
       gd,
       project,
       layout
     );
 
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+      gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+      sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+    });
     runCompiledEvents(gdjs, runtimeScene);
 
-    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
     expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(7);
 
     project.delete();
@@ -155,16 +163,24 @@ describe('libGD.js - GDJS Scene Code Generation integration tests', function () 
       .getEvents()
       .unserializeFrom(project, serializedExternalEvents2Events);
 
+    const serializedProjectElement = new gd.SerializerElement();
+    project.serializeTo(serializedProjectElement);
+
+    const serializedSceneElement = new gd.SerializerElement();
+    layout.serializeTo(serializedSceneElement);
+
     const runCompiledEvents = generateCompiledEventsForLayout(
       gd,
       project,
       layout
     );
 
-    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock({
+      gameData: JSON.parse(gd.Serializer.toJSON(serializedProjectElement)),
+      sceneData: JSON.parse(gd.Serializer.toJSON(serializedSceneElement)),
+    });
     runCompiledEvents(gdjs, runtimeScene);
 
-    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
     expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(2);
 
     project.delete();

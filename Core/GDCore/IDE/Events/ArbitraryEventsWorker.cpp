@@ -167,14 +167,17 @@ bool ArbitraryEventsWorkerWithContext::VisitEvent(gd::BaseEvent &event) {
   if (!event.HasVariables()) {
     return ArbitraryEventsWorker::VisitEvent(event);
   }
+  // Push local variables
   auto newProjectScopedContainers =
       ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
-          *projectScopedContainers, event);
+          *currentProjectScopedContainers, event);
+  auto *parentProjectScopedContainers = currentProjectScopedContainers;
+  currentProjectScopedContainers = &newProjectScopedContainers;
 
-  auto *parentProjectScopedContainers = projectScopedContainers;
-  projectScopedContainers = &newProjectScopedContainers;
   bool shouldDelete = ArbitraryEventsWorker::VisitEvent(event);
-  projectScopedContainers = parentProjectScopedContainers;
+
+  // Pop local variables
+  currentProjectScopedContainers = parentProjectScopedContainers;
   return shouldDelete;
 }
 
@@ -186,14 +189,17 @@ void ReadOnlyArbitraryEventsWorkerWithContext::VisitEvent(
     ReadOnlyArbitraryEventsWorker::VisitEvent(event);
     return;
   }
+  // Push local variables
   auto newProjectScopedContainers =
       ProjectScopedContainers::MakeNewProjectScopedContainersWithLocalVariables(
-          *projectScopedContainers, event);
+          *currentProjectScopedContainers, event);
+  auto *parentProjectScopedContainers = currentProjectScopedContainers;
+  currentProjectScopedContainers = &newProjectScopedContainers;
 
-  auto *parentProjectScopedContainers = projectScopedContainers;
-  projectScopedContainers = &newProjectScopedContainers;
   ReadOnlyArbitraryEventsWorker::VisitEvent(event);
-  projectScopedContainers = parentProjectScopedContainers;
+
+  // Pop local variables
+  currentProjectScopedContainers = parentProjectScopedContainers;
 }
 
 }  // namespace gd

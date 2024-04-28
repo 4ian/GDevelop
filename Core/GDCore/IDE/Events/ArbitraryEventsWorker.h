@@ -115,7 +115,7 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
     : public ArbitraryEventsWorker {
  public:
   ArbitraryEventsWorkerWithContext()
-      : projectScopedContainers(nullptr){};
+      : currentProjectScopedContainers(nullptr){};
   virtual ~ArbitraryEventsWorkerWithContext();
 
   /**
@@ -123,8 +123,8 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(gd::EventsList& events,
-              const gd::ProjectScopedContainers& projectScopedContainers_) {
-    projectScopedContainers = &projectScopedContainers_;
+              const gd::ProjectScopedContainers& projectScopedContainers) {
+    currentProjectScopedContainers = &projectScopedContainers;
     ArbitraryEventsWorker::Launch(events);
   };
 
@@ -134,18 +134,18 @@ class GD_CORE_API ArbitraryEventsWorkerWithContext
   const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *projectScopedContainers;
+    return *currentProjectScopedContainers;
   };
   const gd::ObjectsContainersList& GetObjectsContainersList() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return projectScopedContainers->GetObjectsContainersList();
+    return currentProjectScopedContainers->GetObjectsContainersList();
   };
 
  private:
   bool VisitEvent(gd::BaseEvent& event) override;
 
-  const gd::ProjectScopedContainers* projectScopedContainers;
+  const gd::ProjectScopedContainers* currentProjectScopedContainers;
 };
 
 /**
@@ -229,7 +229,7 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
     : public ReadOnlyArbitraryEventsWorker {
  public:
   ReadOnlyArbitraryEventsWorkerWithContext()
-      : projectScopedContainers(nullptr){};
+      : currentProjectScopedContainers(nullptr){};
   virtual ~ReadOnlyArbitraryEventsWorkerWithContext();
 
   /**
@@ -237,8 +237,8 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
    * giving the objects container on which the events are applying to.
    */
   void Launch(const gd::EventsList& events,
-              const gd::ProjectScopedContainers& projectScopedContainers_) {
-    projectScopedContainers = &projectScopedContainers_;
+              const gd::ProjectScopedContainers& projectScopedContainers) {
+    currentProjectScopedContainers = &projectScopedContainers;
     ReadOnlyArbitraryEventsWorker::Launch(events);
   };
 
@@ -248,13 +248,13 @@ class GD_CORE_API ReadOnlyArbitraryEventsWorkerWithContext
   const gd::ProjectScopedContainers& GetProjectScopedContainers() {
     // Pointers are guaranteed to be not nullptr after
     // Launch was called.
-    return *projectScopedContainers;
+    return *currentProjectScopedContainers;
   };
 
  private:
   void VisitEvent(const gd::BaseEvent& event) override;
 
-  const gd::ProjectScopedContainers* projectScopedContainers;
+  const gd::ProjectScopedContainers* currentProjectScopedContainers;
 };
 
 }  // namespace gd

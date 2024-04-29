@@ -35,7 +35,6 @@ export default class StandardEvent extends React.Component<
       >
         <VariableDeclarationsList
           variablesContainer={standardEvent.getVariables()}
-          selection={this.props.selection}
           onVariableDeclarationClick={this.props.onVariableDeclarationClick}
           onVariableDeclarationDoubleClick={
             this.props.onVariableDeclarationDoubleClick

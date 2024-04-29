@@ -2315,6 +2315,33 @@ export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSys
   },
 ];
 
+const prices = {
+  'cordova-build': {
+    priceInCredits: 50,
+  },
+  'cordova-ios-build': {
+    priceInCredits: 100,
+  },
+  'electron-build': {
+    priceInCredits: 50,
+  },
+  'ai-project-generation': {
+    priceInCredits: 0,
+  },
+  'web-build': {
+    priceInCredits: 0,
+  },
+  'featuring-basic': {
+    priceInCredits: 500,
+  },
+  'featuring-pro': {
+    priceInCredits: 900,
+  },
+  'featuring-premium': {
+    priceInCredits: 4000,
+  },
+};
+
 export const limitsForNoSubscriptionUser: Limits = {
   capabilities: {
     analytics: {
@@ -2352,7 +2379,7 @@ export const limitsForNoSubscriptionUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2395,7 +2422,7 @@ export const limitsForSilverUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2438,7 +2465,7 @@ export const limitsForGoldUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2489,7 +2516,7 @@ export const limitsForTeacherUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2537,7 +2564,7 @@ export const limitsForStudentUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2580,7 +2607,7 @@ export const limitsForStartupUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2623,7 +2650,7 @@ export const limitsForBusinessUser: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2666,7 +2693,7 @@ export const limitsReached: Limits = {
     userBalance: {
       amount: 0,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -2709,7 +2736,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
     userBalance: {
       amount: 1000,
     },
-    prices: {},
+    prices,
     purchasableQuantities: {},
   },
   message: undefined,
@@ -3599,6 +3626,8 @@ export const fakeGame: Game = {
   createdAt: 1606065498,
   publicWebBuildId: 'fake-public-web-build-id-sonic',
   displayAdsOnGamePage: true,
+  discoverable: true,
+  thumbnailUrl: 'https://example.com/sonic1995-thumbnail.png',
 };
 
 export const game1: Game = {

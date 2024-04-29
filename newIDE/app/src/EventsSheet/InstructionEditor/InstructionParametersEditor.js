@@ -34,7 +34,7 @@ import {
   type FieldFocusFunction,
 } from '../ParameterFields/ParameterFieldCommons';
 import Edit from '../../UI/CustomSvgIcons/Edit';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,7 +72,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   objectName?: ?string,
   instruction: gdInstruction,
   isCondition: boolean,
@@ -110,7 +110,7 @@ const InstructionParametersEditor = React.forwardRef<
       project,
       globalObjectsContainer,
       objectsContainer,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
       noHelpButton,
       objectName,
       isCondition,
@@ -217,7 +217,7 @@ const InstructionParametersEditor = React.forwardRef<
 
     gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
       project.getCurrentPlatform(),
-      projectScopedContainers.get(),
+      projectScopedContainersAccessor.get(),
       instruction
     );
 
@@ -358,7 +358,9 @@ const InstructionParametersEditor = React.forwardRef<
                         scope={scope}
                         globalObjectsContainer={globalObjectsContainer}
                         objectsContainer={objectsContainer}
-                        projectScopedContainers={projectScopedContainers}
+                        projectScopedContainersAccessor={
+                          projectScopedContainersAccessor
+                        }
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
                         resourceManagementProps={resourceManagementProps}

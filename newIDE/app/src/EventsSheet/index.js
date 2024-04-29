@@ -113,7 +113,7 @@ import {
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
 import { insertInVariablesContainer } from '../Utils/VariablesUtils';
-import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 
 const gd: libGDevelop = global.gd;
@@ -130,7 +130,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
@@ -1546,7 +1546,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _openEventsContextAnalyzer = () => {
-    const projectScopedContainers = this.props.projectScopedContainers.get();
+    const projectScopedContainers = this.props.projectScopedContainersAccessor.get();
 
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get()
@@ -1709,7 +1709,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       scope,
       globalObjectsContainer,
       objectsContainer,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
     } = this.props;
 
     // Choose the dialog to use
@@ -1727,11 +1727,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
-            projectScopedContainers={
+            projectScopedContainersAccessor={
               this.state.editedInstruction.eventContext
                 ? this.state.editedInstruction.eventContext
-                    .projectScopedContainers
-                : projectScopedContainers
+                    .projectScopedContainersAccessor
+                : projectScopedContainersAccessor
             }
             instruction={instruction}
             isCondition={this.state.editedInstruction.isCondition}
@@ -1831,7 +1831,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
       preferences,
       resourceManagementProps,
       onCreateEventsFunction,
@@ -1867,10 +1867,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             scope.eventsFunction
           )));
 
-    const editedParameterProjectScopedContainers = this.state.editedParameter
-      .eventContext
-      ? this.state.editedParameter.eventContext.projectScopedContainers
-      : projectScopedContainers;
+    const editedParameterProjectScopedContainersAccessor = this.state
+      .editedParameter.eventContext
+      ? this.state.editedParameter.eventContext.projectScopedContainersAccessor
+      : projectScopedContainersAccessor;
 
     return (
       <ResponsiveWindowMeasurer>
@@ -1925,7 +1925,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
-                  projectScopedContainers={projectScopedContainers}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   selection={this.state.selection}
                   onInstructionClick={this.selectInstruction}
                   onInstructionDoubleClick={this.openInstructionEditor}
@@ -2024,8 +2026,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
-                  projectScopedContainers={
-                    editedParameterProjectScopedContainers
+                  projectScopedContainersAccessor={
+                    editedParameterProjectScopedContainersAccessor
                   }
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
@@ -2045,7 +2047,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
                     gd.VariableInstructionSwitcher.switchBetweenUnifiedInstructionIfNeeded(
                       project.getCurrentPlatform(),
-                      editedParameterProjectScopedContainers.get(),
+                      editedParameterProjectScopedContainersAccessor.get(),
                       instruction
                     );
 

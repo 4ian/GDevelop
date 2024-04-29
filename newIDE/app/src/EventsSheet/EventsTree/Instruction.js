@@ -40,7 +40,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import {
   type EventsScope,
-  ProjectScopedContainers,
+  ProjectScopedContainersAccessor,
 } from '../../InstructionOrExpression/EventsScope.flow';
 import { enumerateParametersUsableInExpressions } from '../ParameterFields/EnumerateFunctionParameters';
 import { getFunctionNameFromType } from '../../EventsFunctionsExtensionsLoader';
@@ -108,7 +108,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   id: string,
 |};
@@ -221,7 +221,7 @@ const Instruction = (props: Props) => {
     resourcesManager,
     scope,
   } = props;
-  const projectScopedContainers = props.projectScopedContainers.get();
+  const projectScopedContainers = props.projectScopedContainersAccessor.get();
 
   const instrFormatter = React.useMemo(
     () => gd.InstructionSentenceFormatter.get(),
@@ -452,7 +452,8 @@ const Instruction = (props: Props) => {
                 InvalidParameterValue,
                 MissingParameterValue,
                 useAssignmentOperators,
-                projectScopedContainers: props.projectScopedContainers,
+                projectScopedContainersAccessor:
+                  props.projectScopedContainersAccessor,
               })}
             </span>
           );
@@ -668,7 +669,9 @@ const Instruction = (props: Props) => {
                     resourcesManager={props.resourcesManager}
                     globalObjectsContainer={props.globalObjectsContainer}
                     objectsContainer={props.objectsContainer}
-                    projectScopedContainers={props.projectScopedContainers}
+                    projectScopedContainersAccessor={
+                      props.projectScopedContainersAccessor
+                    }
                     idPrefix={props.id}
                   />
                 )}

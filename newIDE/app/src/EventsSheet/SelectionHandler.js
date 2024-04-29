@@ -1,7 +1,7 @@
 // @flow
 
 import values from 'lodash/values';
-import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 export type InstructionsListContext = {|
   isCondition: boolean,
@@ -33,7 +33,7 @@ export type EventContext = {|
   eventsList: gdEventsList,
   event: gdBaseEvent,
   indexInList: number,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 |};
 
 export type InstructionContextWithEventContext = {

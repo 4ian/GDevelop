@@ -73,7 +73,9 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
           resourcesManager={this.props.project.getResourcesManager()}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
-          projectScopedContainers={this.props.projectScopedContainers}
+          projectScopedContainersAccessor={
+            this.props.projectScopedContainersAccessor
+          }
           idPrefix={this.props.idPrefix}
         />
         <div
@@ -113,7 +115,9 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              projectScopedContainers={this.props.projectScopedContainers}
+              projectScopedContainersAccessor={
+                this.props.projectScopedContainersAccessor
+              }
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -148,7 +152,9 @@ export default class WhileEvent extends React.Component<EventRendererProps, *> {
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              projectScopedContainers={this.props.projectScopedContainers}
+              projectScopedContainersAccessor={
+                this.props.projectScopedContainersAccessor
+              }
               idPrefix={this.props.idPrefix}
             />
           )}

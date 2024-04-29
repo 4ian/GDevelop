@@ -1,5 +1,5 @@
 // @flow
-import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 /*::
 export type TestProject = {|
@@ -20,7 +20,7 @@ export type TestProject = {|
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
-  testSceneProjectScopedContainers: ProjectScopedContainers,
+  testSceneProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
@@ -31,7 +31,7 @@ export type TestProject = {|
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
   emptyLayout: gdLayout,
-  emptySceneProjectScopedContainers: ProjectScopedContainers,
+  emptySceneProjectScopedContainersAccessor: ProjectScopedContainersAccessor,
   emptyEventsList: gdEventsList,
   testEventsFunction: gdEventsFunction,
   testEventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -907,7 +907,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'whatever-this-is-not-recognised'
   );
 
-  const testSceneProjectScopedContainers = new ProjectScopedContainers(
+  const testSceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
     {
       project,
       layout: testLayout,
@@ -916,7 +916,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testLayout
   );
 
-  const emptySceneProjectScopedContainers = new ProjectScopedContainers(
+  const emptySceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
     {
       project,
       layout: emptyLayout,
@@ -943,7 +943,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,
-    testSceneProjectScopedContainers,
+    testSceneProjectScopedContainersAccessor,
     group1,
     group2,
     group4WithLongsNames,
@@ -954,7 +954,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
-    emptySceneProjectScopedContainers,
+    emptySceneProjectScopedContainersAccessor,
     emptyEventsList,
     testEventsFunction,
     testEventsFunctionsExtension,

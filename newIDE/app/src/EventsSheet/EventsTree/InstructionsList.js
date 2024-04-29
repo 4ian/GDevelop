@@ -19,7 +19,7 @@ import { type WindowSizeType } from '../../UI/Responsive/ResponsiveWindowMeasure
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import {
   type EventsScope,
-  ProjectScopedContainers,
+  ProjectScopedContainersAccessor,
 } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
@@ -64,7 +64,7 @@ type Props = {|
   resourcesManager: gdResourcesManager,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   idPrefix: string,
 |};
@@ -102,7 +102,7 @@ export default function InstructionsList({
   resourcesManager,
   globalObjectsContainer,
   objectsContainer,
-  projectScopedContainers,
+  projectScopedContainersAccessor,
   idPrefix,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
@@ -178,7 +178,7 @@ export default function InstructionsList({
         resourcesManager={resourcesManager}
         globalObjectsContainer={globalObjectsContainer}
         objectsContainer={objectsContainer}
-        projectScopedContainers={projectScopedContainers}
+        projectScopedContainersAccessor={projectScopedContainersAccessor}
         id={`${idPrefix}-${areConditions ? 'condition' : 'action'}-${i}`}
       />
     );

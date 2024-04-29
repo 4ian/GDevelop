@@ -21,7 +21,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../ResourcesWatcher';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   container: {
@@ -182,8 +182,8 @@ export class ExternalEventsEditorContainer extends React.Component<
             scope={scope}
             globalObjectsContainer={project}
             objectsContainer={layout}
-            projectScopedContainers={
-              new ProjectScopedContainers(scope, project, layout)
+            projectScopedContainersAccessor={
+              new ProjectScopedContainersAccessor(scope, project, layout)
             }
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}

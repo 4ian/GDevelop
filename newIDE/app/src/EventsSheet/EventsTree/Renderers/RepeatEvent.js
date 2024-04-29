@@ -162,7 +162,9 @@ export default class RepeatEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              projectScopedContainers={this.props.projectScopedContainers}
+              projectScopedContainersAccessor={
+                this.props.projectScopedContainersAccessor
+              }
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -197,7 +199,9 @@ export default class RepeatEvent extends React.Component<
               resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
-              projectScopedContainers={this.props.projectScopedContainers}
+              projectScopedContainersAccessor={
+                this.props.projectScopedContainersAccessor
+              }
               idPrefix={this.props.idPrefix}
             />
           )}
@@ -213,7 +217,9 @@ export default class RepeatEvent extends React.Component<
             scope={this.props.scope}
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
-            projectScopedContainers={this.props.projectScopedContainers}
+            projectScopedContainersAccessor={
+              this.props.projectScopedContainersAccessor
+            }
             value={expression}
             onChange={text => {
               repeatEvent.setRepeatExpression(text);

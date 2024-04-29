@@ -14,7 +14,7 @@ import {
   getAvoidSoftKeyboardStyle,
   useSoftKeyboardBottomOffset,
 } from '../UI/MobileSoftKeyboard';
-import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -23,7 +23,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
 
   open: boolean,
   onRequestClose: () => void,
@@ -44,7 +44,7 @@ const InlineParameterEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
-  projectScopedContainers,
+  projectScopedContainersAccessor,
   open,
   onRequestClose,
   onApply,
@@ -173,7 +173,7 @@ const InlineParameterEditor = ({
       scope={scope}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
-      projectScopedContainers={projectScopedContainers}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       key={instruction.ptr}
       ref={field}
       parameterRenderingService={ParameterRenderingService}

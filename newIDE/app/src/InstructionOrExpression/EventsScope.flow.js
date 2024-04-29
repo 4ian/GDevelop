@@ -15,7 +15,7 @@ export type EventsScope = {|
   eventsFunction?: ?gdEventsFunction,
 |};
 
-export class ProjectScopedContainers {
+export class ProjectScopedContainersAccessor {
   _scope: EventsScope;
   _globalObjectsContainer: gdObjectsContainer;
   _objectsContainer: gdObjectsContainer;
@@ -98,7 +98,7 @@ export class ProjectScopedContainers {
   }
 
   makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent) {
-    return new ProjectScopedContainers(
+    return new ProjectScopedContainersAccessor(
       this._scope,
       this._globalObjectsContainer,
       this._objectsContainer,

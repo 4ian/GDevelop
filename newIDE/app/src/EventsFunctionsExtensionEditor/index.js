@@ -38,7 +38,7 @@ import ExtensionEditIcon from '../UI/CustomSvgIcons/ExtensionEdit';
 import Tune from '../UI/CustomSvgIcons/Tune';
 import Mark from '../UI/CustomSvgIcons/Mark';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { ProjectScopedContainers } from '../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -1131,7 +1131,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsBasedObject: selectedEventsBasedObject,
       eventsFunction: selectedEventsFunction,
     };
-    const projectScopedContainers = new ProjectScopedContainers(
+    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
       scope,
       this._globalObjectsContainer,
       this._objectsContainer
@@ -1231,7 +1231,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 scope={scope}
                 globalObjectsContainer={this._globalObjectsContainer}
                 objectsContainer={this._objectsContainer}
-                projectScopedContainers={projectScopedContainers}
+                projectScopedContainersAccessor={
+                  projectScopedContainersAccessor
+                }
                 events={selectedEventsFunction.getEvents()}
                 onOpenExternalEvents={() => {}}
                 onOpenLayout={() => {}}

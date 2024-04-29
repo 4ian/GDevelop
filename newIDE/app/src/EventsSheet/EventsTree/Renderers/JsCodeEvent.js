@@ -292,7 +292,9 @@ export default class JsCodeEvent extends React.Component<
                 scope={this.props.scope}
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
-                projectScopedContainers={this.props.projectScopedContainers}
+                projectScopedContainersAccessor={
+                  this.props.projectScopedContainersAccessor
+                }
                 value={parameterObjects}
                 onChange={text => {
                   jsCodeEvent.setParameterObjects(text);

@@ -33,7 +33,7 @@ import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSe
 import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 import ErrorBoundary from '../../UI/ErrorBoundary';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const styles = {
   fullHeightSelector: {
@@ -53,7 +53,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   instruction: gdInstruction,
   isCondition: boolean,
   resourceManagementProps: ResourceManagementProps,
@@ -93,7 +93,7 @@ const InstructionEditorDialog = ({
   project,
   globalObjectsContainer,
   objectsContainer,
-  projectScopedContainers,
+  projectScopedContainersAccessor,
   onCancel,
   open,
   instruction,
@@ -265,7 +265,7 @@ const InstructionEditorDialog = ({
       scope={scope}
       globalObjectsContainer={globalObjectsContainer}
       objectsContainer={objectsContainer}
-      projectScopedContainers={projectScopedContainers}
+      projectScopedContainersAccessor={projectScopedContainersAccessor}
       objectName={chosenObjectName}
       isCondition={isCondition}
       instruction={instruction}

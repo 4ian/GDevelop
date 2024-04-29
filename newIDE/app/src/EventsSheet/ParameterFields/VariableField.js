@@ -38,7 +38,7 @@ import GlobalIcon from '../../UI/CustomSvgIcons/Publish';
 import SceneIcon from '../../UI/CustomSvgIcons/Scene';
 import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 import LocalIcon from '../../UI/CustomSvgIcons/ExternalEvents';
-import { ProjectScopedContainers } from '../../InstructionOrExpression/EventsScope.flow';
+import { ProjectScopedContainersAccessor } from '../../InstructionOrExpression/EventsScope.flow';
 
 const gd: libGDevelop = global.gd;
 
@@ -158,7 +158,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
   function VariableField(props: Props, ref) {
     const {
       project,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
       variablesContainers,
       enumerateVariables,
       instruction,
@@ -281,7 +281,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       project && instruction && isSwitchableInstruction
         ? gd.VariableInstructionSwitcher.getVariableTypeFromParameters(
             project.getCurrentPlatform(),
-            projectScopedContainers.get(),
+            projectScopedContainersAccessor.get(),
             instruction
           )
         : null;
@@ -379,11 +379,11 @@ export default React.forwardRef<Props, VariableFieldInterface>(
 );
 
 const getVariablesContainerSourceType = (
-  projectScopedContainers: ProjectScopedContainers,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   variableName: string
 ) => {
   const rootVariableName = getRootVariableName(variableName);
-  const variablesContainersList = projectScopedContainers
+  const variablesContainersList = projectScopedContainersAccessor
     .get()
     .getVariablesContainersList();
   return variablesContainersList.has(rootVariableName)
@@ -400,7 +400,7 @@ export const renderVariableWithIcon = (
     expressionIsValid,
     InvalidParameterValue,
     MissingParameterValue,
-    projectScopedContainers,
+    projectScopedContainersAccessor,
   }: ParameterInlineRendererProps,
   tooltip: string,
   ForcedVariableIcon?: SvgIconProps => React.Element<typeof SvgIcon>
@@ -411,7 +411,7 @@ export const renderVariableWithIcon = (
   const VariableIcon =
     ForcedVariableIcon ||
     getVariableSourceIcon(
-      getVariablesContainerSourceType(projectScopedContainers, value)
+      getVariablesContainerSourceType(projectScopedContainersAccessor, value)
     );
 
   const IconAndNameContainer = expressionIsValid

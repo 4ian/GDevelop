@@ -33,8 +33,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -56,8 +56,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -79,8 +79,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -102,8 +102,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -125,8 +125,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -148,8 +148,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -171,8 +171,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -194,8 +194,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -217,8 +217,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}
@@ -240,8 +240,8 @@ export const AllResourceFields = () => (
             }}
             globalObjectsContainer={testProject.project}
             objectsContainer={testProject.testLayout}
-            projectScopedContainers={
-              testProject.testSceneProjectScopedContainers
+            projectScopedContainersAccessor={
+              testProject.testSceneProjectScopedContainersAccessor
             }
             value={value}
             onChange={onChange}

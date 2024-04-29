@@ -25,7 +25,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       focus,
     }));
 
-    const { project, scope, projectScopedContainers } = props;
+    const { project, scope, projectScopedContainersAccessor } = props;
 
     const variablesContainers = React.useMemo(
       () => {
@@ -56,7 +56,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onOpenDialog={() => setEditorOpen(true)}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
-          projectScopedContainers={projectScopedContainers}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
         />
         {editorOpen && project && (

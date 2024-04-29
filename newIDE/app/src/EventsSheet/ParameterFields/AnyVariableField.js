@@ -31,21 +31,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       scope,
       instruction,
       onInstructionTypeChanged,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
     } = props;
     const { layout } = scope;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
         enumerateVariablesOfContainersList(
-          projectScopedContainers.get().getVariablesContainersList()
+          projectScopedContainersAccessor.get().getVariablesContainersList()
         ),
-      [projectScopedContainers]
+      [projectScopedContainersAccessor]
     );
 
     const variablesContainers = React.useMemo(
       () => {
-        const variablesContainersList = projectScopedContainers
+        const variablesContainersList = projectScopedContainersAccessor
           .get()
           .getVariablesContainersList();
         return mapFor(
@@ -56,7 +56,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
         );
       },
-      [projectScopedContainers]
+      [projectScopedContainersAccessor]
     );
 
     const isGlobal = !!(
@@ -84,7 +84,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           onOpenDialog={() => setEditorOpen(true)}
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
-          projectScopedContainers={projectScopedContainers}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           id={
             props.parameterIndex !== undefined

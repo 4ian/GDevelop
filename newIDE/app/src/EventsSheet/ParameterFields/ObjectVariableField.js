@@ -71,7 +71,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       project,
       globalObjectsContainer,
       objectsContainer,
-      projectScopedContainers,
+      projectScopedContainersAccessor,
       scope,
       instructionMetadata,
       instruction,
@@ -138,7 +138,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           globalObjectsContainer={props.globalObjectsContainer}
           objectsContainer={props.objectsContainer}
-          projectScopedContainers={projectScopedContainers}
+          projectScopedContainersAccessor={projectScopedContainersAccessor}
           scope={scope}
           id={
             props.parameterIndex !== undefined

@@ -65,8 +65,7 @@ namespace gdjs {
     }
 
     isOwnerOrServer() {
-      const currentPlayerNumber =
-        gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
 
       const isOwnerOfObject =
         currentPlayerNumber === this._playerNumber || // Player as owner.
@@ -115,21 +114,24 @@ namespace gdjs {
         return;
       }
 
-      this.logToConsole(
-        `Synchronizing object ${this.owner.getName()} (instance ${
-          this.owner.networkId
-        }) with player ${this._playerNumber}.`
-      );
+      // this.logToConsole(
+      //   `Synchronizing object ${this.owner.getName()} (instance ${
+      //     this.owner.networkId
+      //   }) with player ${this._playerNumber}`
+      // );
 
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
-      const { messageName: updateMessageName, messageData: updateMessageData } =
-        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-          objectOwner: this._playerNumber,
-          objectName,
-          instanceNetworkId,
-          objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
-        });
+      const {
+        messageName: updateMessageName,
+        messageData: updateMessageData,
+      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+        objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+      });
+      this.logToConsole(JSON.stringify(updateMessageData));
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
@@ -154,13 +156,15 @@ namespace gdjs {
       logger.info(
         `Sending a final update for object ${objectName} (instance ${instanceNetworkId}) before it is destroyed.`
       );
-      const { messageName: updateMessageName, messageData: updateMessageData } =
-        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-          objectOwner: this._playerNumber,
-          objectName,
-          instanceNetworkId,
-          objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
-        });
+      const {
+        messageName: updateMessageName,
+        messageData: updateMessageData,
+      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+        objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+      });
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
@@ -180,10 +184,9 @@ namespace gdjs {
         objectName,
         instanceNetworkId,
       });
-      const destroyedMessageName =
-        gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
-          destroyMessageName
-        );
+      const destroyedMessageName = gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
+        destroyMessageName
+      );
       gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
         originalMessageName: destroyMessageName,
         originalData: {
@@ -212,33 +215,33 @@ namespace gdjs {
         );
         return;
       }
-      const currentPlayerNumber =
-        gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
 
       // When changing the ownership, we send a message to the server to ensure it is aware of the change,
       // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
       // We expect an acknowledgment from the server, if not, we will retry and eventually revert the ownership.
       const objectName = this.owner.getName();
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
-      const { messageName, messageData } =
-        gdjs.multiplayerMessageManager.createChangeOwnerMessage({
-          objectOwner: this._playerNumber,
-          objectName,
-          instanceNetworkId,
-          newObjectOwner: playerNumber,
-          instanceX: this.owner.getX(),
-          instanceY: this.owner.getY(),
-        });
+      const {
+        messageName,
+        messageData,
+      } = gdjs.multiplayerMessageManager.createChangeOwnerMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+        newObjectOwner: playerNumber,
+        instanceX: this.owner.getX(),
+        instanceY: this.owner.getY(),
+      });
       // Before sending the changeOwner message, we set up the object representing the peers
       // that we need an acknowledgment from.
       // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
       // If we are another player, we are only connected to player 1, so we expect an acknowledgment from player 1.
       // In both cases, this represents the list of peers the current user is connected to.
       const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-      const changeOwnerAcknowledgedMessageName =
-        gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
-          messageName
-        );
+      const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+        messageName
+      );
       gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
         originalMessageName: messageName,
         originalData: {

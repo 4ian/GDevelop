@@ -275,8 +275,7 @@ namespace gdjs {
     };
 
     const changeOwnerMessageNamePrefix = '#changeOwner';
-    const changeOwnerMessageNameRegex =
-      /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const changeOwnerMessageNameRegex = /#changeOwner#owner_(\d+)#object_(.+)#instance_(.+)/;
     export const createChangeOwnerMessage = ({
       objectOwner,
       objectName,
@@ -311,8 +310,7 @@ namespace gdjs {
       };
     };
     const objectOwnerChangedMessageNamePrefix = '#ownerChanged';
-    const objectOwnerChangedMessageNameRegex =
-      /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const objectOwnerChangedMessageNameRegex = /#ownerChanged#owner_(\d+)#object_(.+)#instance_(.+)/;
     export const createObjectOwnerChangedMessageNameFromChangeOwnerMessage = (
       messageName: string
     ): string => {
@@ -375,8 +373,7 @@ namespace gdjs {
 
             const isPlayerTheServer =
               gdjs.multiplayer.playerPositionInLobby === 1;
-            const currentPlayerObjectOwnership =
-              behavior.getPlayerObjectOwnership();
+            const currentPlayerObjectOwnership = behavior.getPlayerObjectOwnership();
             if (
               isPlayerTheServer &&
               currentPlayerObjectOwnership !== previousOwner
@@ -396,10 +393,9 @@ namespace gdjs {
             );
             behavior._playerNumber = newOwner;
 
-            const ownerChangedMessageName =
-              createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
-                messageName
-              );
+            const ownerChangedMessageName = createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+              messageName
+            );
 
             logger.info(
               `Sending acknowledgment of ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
@@ -442,8 +438,7 @@ namespace gdjs {
     };
 
     const updateObjectMessageNamePrefix = '#update';
-    const updateObjectMessageNameRegex =
-      /#update#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const updateObjectMessageNameRegex = /#update#owner_(\d+)#object_(.+)#instance_(.+)/;
     export const createUpdateObjectMessage = ({
       objectOwner,
       objectName,
@@ -538,8 +533,9 @@ namespace gdjs {
             }
 
             instance.updateFromObjectNetworkSyncData(data);
-            _lastClockReceivedByInstance[instanceNetworkId] =
-              messageInstanceClock;
+            _lastClockReceivedByInstance[
+              instanceNetworkId
+            ] = messageInstanceClock;
 
             // If we are player number 1, we are the server,
             // so we need to relay the position to others except the player who sent the update message.
@@ -701,8 +697,9 @@ namespace gdjs {
                   if (
                     originalMessageName.startsWith(changeOwnerMessageNamePrefix)
                   ) {
-                    const matches =
-                      changeOwnerMessageNameRegex.exec(originalMessageName);
+                    const matches = changeOwnerMessageNameRegex.exec(
+                      originalMessageName
+                    );
                     if (!matches) {
                       // This should not happen, if it does, remove the acknowledgment and return.
                       delete expectedMessageAcknowledgements[
@@ -777,8 +774,7 @@ namespace gdjs {
     };
 
     const destroyObjectMessageNamePrefix = '#destroy';
-    const destroyObjectMessageNameRegex =
-      /#destroy#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const destroyObjectMessageNameRegex = /#destroy#owner_(\d+)#object_(.+)#instance_(.+)/;
     export const createDestroyObjectMessage = ({
       objectOwner,
       objectName,
@@ -797,8 +793,7 @@ namespace gdjs {
       };
     };
     const objectDestroyedMessageNamePrefix = '#destroyed';
-    const objectDestroyedMessageNameRegex =
-      /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
+    const objectDestroyedMessageNameRegex = /#destroyed#owner_(\d+)#object_(.+)#instance_(.+)/;
     export const createObjectDestroyedMessageNameFromDestroyMessage = (
       messageName: string
     ): string => {
@@ -849,8 +844,9 @@ namespace gdjs {
               instanceNetworkId,
             });
 
-            const destroyedMessageName =
-              createObjectDestroyedMessageNameFromDestroyMessage(messageName);
+            const destroyedMessageName = createObjectDestroyedMessageNameFromDestroyMessage(
+              messageName
+            );
 
             if (!instance) {
               logger.info(
@@ -866,8 +862,9 @@ namespace gdjs {
               `Destroying object ${objectName} with instance network ID ${instanceNetworkId}.`
             );
             instance.deleteFromScene(runtimeScene);
-            _lastClockReceivedByInstance[instanceNetworkId] =
-              messageInstanceClock;
+            _lastClockReceivedByInstance[
+              instanceNetworkId
+            ] = messageInstanceClock;
 
             logger.info(
               `Sending acknowledgment of destruction of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
@@ -949,8 +946,9 @@ namespace gdjs {
         userMessageName,
         userMessageData,
       });
-      const acknowledgmentMessageName =
-        createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
+      const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
+        messageName
+      );
       addExpectedMessageAcknowledgement({
         originalMessageName: messageName,
         originalData: messageData,
@@ -977,8 +975,9 @@ namespace gdjs {
     };
 
     export const hasMessageBeenReceived = (userMessageName: string) => {
-      const messageName =
-        getCustomMessageNameFromUserMessageName(userMessageName);
+      const messageName = getCustomMessageNameFromUserMessageName(
+        userMessageName
+      );
       const messageHasBeenReceived = gdjs.evtTools.p2p.onEvent(
         messageName,
         false
@@ -1038,8 +1037,9 @@ namespace gdjs {
             `Received custom message ${messageName} with data ${data}.`
           );
 
-          const acknowledgmentMessageName =
-            createAcknowledgeCustomMessageNameFromCustomMessage(messageName);
+          const acknowledgmentMessageName = createAcknowledgeCustomMessageNameFromCustomMessage(
+            messageName
+          );
           logger.info(
             `Sending acknowledgment of custom message ${messageName} to ${messageSender}.`
           );

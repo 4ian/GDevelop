@@ -392,8 +392,9 @@ namespace gdjs {
       _websocket.onclose = () => {
         logger.info('Disconnected from the lobby.');
 
-        const lobbiesIframe =
-          multiplayerComponents.getLobbiesIframe(runtimeScene);
+        const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+          runtimeScene
+        );
 
         if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
           logger.error(
@@ -459,8 +460,9 @@ namespace gdjs {
       _lobbyId = lobbyId;
 
       // Then we inform the lobbies window that the player has joined.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.error(
@@ -567,8 +569,9 @@ namespace gdjs {
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.info('The lobbies iframe is not opened, not sending message.');
@@ -593,8 +596,9 @@ namespace gdjs {
       }
 
       // Just pass along the message to the iframe so that it can display the countdown.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.info('The lobbies iframe is not opened, not sending message.');
@@ -927,8 +931,9 @@ namespace gdjs {
     export const isLobbiesWindowOpen = function (
       runtimeScene: gdjs.RuntimeScene
     ): boolean {
-      const lobbiesRootContainer =
-        multiplayerComponents.getLobbiesRootContainer(runtimeScene);
+      const lobbiesRootContainer = multiplayerComponents.getLobbiesRootContainer(
+        runtimeScene
+      );
       return !!lobbiesRootContainer;
     };
 

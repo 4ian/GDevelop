@@ -540,13 +540,15 @@ const VariablesList = (props: Props) => {
   );
   const setSelectedNodes = React.useCallback(
     (nodes: Array<string> | ((nodes: Array<string>) => Array<string>)) => {
-      nodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
-      doSetSelectedNodes(nodes);
-      if (onSelectedVariableChange) {
-        onSelectedVariableChange(nodes);
-      }
+      doSetSelectedNodes(selectedNodes => {
+        const newNodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
+        if (onSelectedVariableChange) {
+          onSelectedVariableChange(newNodes);
+        }        
+        return newNodes;
+      });
     },
-    [onSelectedVariableChange, selectedNodes]
+    [onSelectedVariableChange]
   );
 
   const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<

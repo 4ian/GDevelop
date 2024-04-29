@@ -93,7 +93,7 @@
   padding-left: 5px;
   padding-right: 5px;
   /* Prevent container to growing outside its parent. We don't have a way to prevent an infinitely
-     * small action column, but responsive design should avoid the problem on small screens. */
+     * small variables column, but responsive design should avoid the problem on small screens. */
   min-width: 0;
 }
 

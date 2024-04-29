@@ -1943,7 +1943,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   }
                   onParameterClick={this.openParameterEditor}
                   onVariableDeclarationClick={() => {
-                    //TODO
+                    // Nothing to do.
                   }}
                   onVariableDeclarationDoubleClick={this.openVariablesEditor}
                   onEventClick={this.selectEvent}

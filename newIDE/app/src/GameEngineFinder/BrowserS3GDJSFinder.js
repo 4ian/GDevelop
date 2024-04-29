@@ -49,7 +49,7 @@ export const findGDJS = (
   let gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
 
   // If you want to test your local changes to the game engine on the local web-app,
-  // run `npx serve --cors` (or another CORS enabled http server on port 5000)
+  // run `npx serve --cors -p 5001` (or another CORS enabled http server on port 5001)
   // in `newIDE/app/resources/GDJS` and uncomment this line:
   // gdjsRoot = `http://localhost:5000`;
 

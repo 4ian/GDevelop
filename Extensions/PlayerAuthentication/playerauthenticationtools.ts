@@ -25,8 +25,9 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
-      null;
+    let _authenticationMessageCallback:
+      | ((event: MessageEvent) => void)
+      | null = null;
     let _websocket: WebSocket | null = null;
 
     type PlayerAuthenticationCallbacks = {
@@ -377,7 +378,10 @@ namespace gdjs {
     const receiveAuthenticationMessage = function (
       runtimeScene: gdjs.RuntimeScene,
       event: MessageEvent,
-      { checkOrigin, callbacks }: { checkOrigin: boolean, callbacks?: PlayerAuthenticationCallbacks }
+      {
+        checkOrigin,
+        callbacks,
+      }: { checkOrigin: boolean; callbacks?: PlayerAuthenticationCallbacks }
     ) {
       const allowedOrigins = ['https://liluo.io', 'https://gd.games'];
 
@@ -493,7 +497,7 @@ namespace gdjs {
       const onOpenAuthenticationWindow = () => {
         openAuthenticationWindow(runtimeScene);
       };
-      console.log({_userToken, _userId, _username});
+
       return _userToken
         ? authComponents.computeAuthenticatedBanner(
             onOpenAuthenticationWindow,
@@ -727,8 +731,12 @@ namespace gdjs {
       const top = screen.height / 2 - 600 / 2;
       const windowFeatures = `left=${left},top=${top},width=500,height=600`;
       const openWindow = () => {
-        _authenticationWindow = window.open(targetUrl, 'authentication', windowFeatures);
-      }
+        _authenticationWindow = window.open(
+          targetUrl,
+          'authentication',
+          windowFeatures
+        );
+      };
 
       openWindow();
 
@@ -825,10 +833,13 @@ namespace gdjs {
       if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
       const playerAuthPlatform = getPlayerAuthPlatform(runtimeScene);
-      const { rootContainer, loaderContainer, iframeContainer } =
-        authComponents.computeAuthenticationContainer(
-          onAuthenticationContainerDismissed
-        );
+      const {
+        rootContainer,
+        loaderContainer,
+        iframeContainer,
+      } = authComponents.computeAuthenticationContainer(
+        onAuthenticationContainerDismissed
+      );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
       _authenticationIframeContainer = iframeContainer;
@@ -850,13 +861,12 @@ namespace gdjs {
                   )
               : null; // Only show a link if we're on electron.
 
-            _authenticationTextContainer =
-              authComponents.addAuthenticationTextsToLoadingContainer(
-                _authenticationLoaderContainer,
-                playerAuthPlatform,
-                isGameRegistered,
-                wikiOpenAction
-              );
+            _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
+              _authenticationLoaderContainer,
+              playerAuthPlatform,
+              isGameRegistered,
+              wikiOpenAction
+            );
           }
           if (isGameRegistered) {
             startAuthenticationWindowTimeout(runtimeScene);
@@ -865,17 +875,33 @@ namespace gdjs {
             // with a different window, with or without a websocket.
             switch (playerAuthPlatform) {
               case 'electron':
-                openAuthenticationWindowForElectron(runtimeScene, _gameId, callbacks);
+                openAuthenticationWindowForElectron(
+                  runtimeScene,
+                  _gameId,
+                  callbacks
+                );
                 break;
               case 'cordova':
-                openAuthenticationWindowForCordova(runtimeScene, _gameId, callbacks);
+                openAuthenticationWindowForCordova(
+                  runtimeScene,
+                  _gameId,
+                  callbacks
+                );
                 break;
               case 'web-iframe':
-                openAuthenticationIframeForWeb(runtimeScene, _gameId, callbacks);
+                openAuthenticationIframeForWeb(
+                  runtimeScene,
+                  _gameId,
+                  callbacks
+                );
                 break;
               case 'web':
               default:
-                openAuthenticationWindowForWeb(runtimeScene, _gameId, callbacks);
+                openAuthenticationWindowForWeb(
+                  runtimeScene,
+                  _gameId,
+                  callbacks
+                );
                 break;
             }
           }

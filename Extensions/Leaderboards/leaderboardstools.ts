@@ -6,6 +6,7 @@ namespace gdjs {
   export namespace evtTools {
     export namespace leaderboards {
       let _hasPlayerJustClosedLeaderboardView = false;
+      let _preferSendConnectedPlayerScore = true;
 
       gdjs.registerRuntimeScenePostEventsCallback(() => {
         // Set it back to false for the next frame.
@@ -23,6 +24,9 @@ namespace gdjs {
         shaObj.update(payload);
         return shaObj.getHash('B64');
       };
+
+      const leaderboardHostBaseUrl = 'https://gd.games';
+      // const leaderboardHostBaseUrl = 'http://localhost:4000';
 
       type PublicLeaderboardEntry = {
         id: string;
@@ -219,8 +223,9 @@ namespace gdjs {
       let _leaderboardViewIframeLoading: boolean = false;
       let _leaderboardViewIframeLoaded: boolean = false;
       let _errorTimeoutId: NodeJS.Timeout | null = null;
-      let _leaderboardMessageListener: ((event: MessageEvent) => void) | null =
-        null;
+      let _leaderboardMessageListener:
+        | ((event: MessageEvent) => void)
+        | null = null;
 
       const _loaderContainer: HTMLDivElement = document.createElement('div');
       _loaderContainer.style.backgroundColor = '#000000';
@@ -363,19 +368,25 @@ namespace gdjs {
         }
       };
 
+      export const setPreferSendConnectedPlayerScore = (enable: boolean) => {
+        _preferSendConnectedPlayerScore = enable;
+      };
+
       export const savePlayerScore = (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
         playerName: string
-      ) =>
-        new gdjs.PromiseTask(
-          (async () => {
-            // Get the connected player id and token, if any.
-            // TODO: make a setting for this??
-            const playerId = gdjs.playerAuthentication.getUserId();
-            const playerToken = gdjs.playerAuthentication.getUserToken();
+      ) => {
+        if (
+          _preferSendConnectedPlayerScore &&
+          gdjs.playerAuthentication.isAuthenticated()
+        ) {
+          return saveConnectedPlayerScore(runtimeScene, leaderboardId, score);
+        }
 
+        return new gdjs.PromiseTask(
+          (async () => {
             const scoreSavingState = (_scoreSavingStateByLeaderboard[
               leaderboardId
             ] =
@@ -383,17 +394,15 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
                   leaderboardId,
                   playerName,
-                  // TODO: make a setting for this??
-                  authenticatedPlayerData: playerToken
-                    ? { playerId, playerToken }
-                    : undefined,
                   score,
                   runtimeScene,
                 });
@@ -406,6 +415,7 @@ namespace gdjs {
             }
           })()
         );
+      };
 
       export const saveConnectedPlayerScore = (
         runtimeScene: gdjs.RuntimeScene,
@@ -430,8 +440,10 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -865,8 +877,9 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe =
-              computeLeaderboardDisplayingIframe(targetUrl);
+            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
+              targetUrl
+            );
             if (typeof window !== 'undefined') {
               _leaderboardMessageListener = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(

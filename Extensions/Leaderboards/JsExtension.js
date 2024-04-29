@@ -34,7 +34,9 @@ module.exports = {
       .addAction(
         'SavePlayerScore',
         _('Save player score'),
-        _("Save the player's score to the given leaderboard."),
+        _(
+          "Save the player's score to the given leaderboard. If the player is connected, the score will be attached to the connected player (unless disabled)."
+        ),
         _(
           'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_'
         ),
@@ -91,6 +93,28 @@ module.exports = {
       .setAsyncFunctionName(
         'gdjs.evtTools.leaderboards.saveConnectedPlayerScore'
       );
+
+    extension
+      .addAction(
+        'SetPreferSendConnectedPlayerScore',
+        _('Enable the score to the connected player'),
+        _(
+          'Set if the score sent to a leaderboard is always attached to the connected player - if any. This is on by default.'
+        ),
+        _('Always attach the score to the connected player: _PARAM0_'),
+        _('Setup'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Enable?'), '', false)
+      .setHelpPath('/all-features/leaderboards')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName(
+        'gdjs.evtTools.leaderboards.setPreferSendConnectedPlayerScore'
+      );
+    // TODO: add player authentication files.
 
     extension
       .addCondition(

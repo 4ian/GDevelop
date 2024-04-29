@@ -26,6 +26,15 @@ const GlobalVariablesDialog = ({
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
 }: Props) => {
+  const onComputeAllVariableNames = React.useCallback(
+    () =>
+      EventsRootVariablesFinder.findAllGlobalVariables(
+        project.getCurrentPlatform(),
+        project
+      ),
+    [project]
+  );
+
   const tabs = React.useMemo(
     () => [
       {
@@ -38,9 +47,10 @@ const GlobalVariablesDialog = ({
             These variables hold additional information on a project.
           </Trans>
         ),
+        onComputeAllVariableNames,
       },
     ],
-    [project]
+    [project, onComputeAllVariableNames]
   );
 
   return (
@@ -53,12 +63,6 @@ const GlobalVariablesDialog = ({
       tabs={tabs}
       helpPagePath={'/all-features/variables/global-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      onComputeAllVariableNames={() =>
-        EventsRootVariablesFinder.findAllGlobalVariables(
-          project.getCurrentPlatform(),
-          project
-        )
-      }
       preventRefactoringToDeleteInstructions={
         preventRefactoringToDeleteInstructions
       }

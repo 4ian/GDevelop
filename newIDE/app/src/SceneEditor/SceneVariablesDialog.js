@@ -28,6 +28,16 @@ const SceneVariablesDialog = ({
   hotReloadPreviewButtonProps,
   preventRefactoringToDeleteInstructions,
 }: Props) => {
+  const onComputeAllVariableNames = React.useCallback(
+    () =>
+      EventsRootVariablesFinder.findAllLayoutVariables(
+        project.getCurrentPlatform(),
+        project,
+        layout
+      ),
+    [layout, project]
+  );
+
   const tabs = React.useMemo(
     () => [
       {
@@ -38,10 +48,12 @@ const SceneVariablesDialog = ({
         emptyPlaceholderDescription: (
           <Trans>These variables hold additional information on a scene.</Trans>
         ),
+        onComputeAllVariableNames,
       },
     ],
-    [layout]
+    [layout, onComputeAllVariableNames]
   );
+
   return (
     <VariablesEditorDialog
       project={project}
@@ -52,13 +64,6 @@ const SceneVariablesDialog = ({
       tabs={tabs}
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      onComputeAllVariableNames={() =>
-        EventsRootVariablesFinder.findAllLayoutVariables(
-          project.getCurrentPlatform(),
-          project,
-          layout
-        )
-      }
       preventRefactoringToDeleteInstructions={
         preventRefactoringToDeleteInstructions
       }

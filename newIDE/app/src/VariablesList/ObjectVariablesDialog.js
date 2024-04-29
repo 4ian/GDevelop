@@ -36,24 +36,6 @@ const ObjectVariablesDialog = ({
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
 }: Props) => {
-  const tabs = React.useMemo(
-    () =>
-      [
-        {
-          id: 'object-variables',
-          label: <Trans>Object variables</Trans>,
-          variablesContainer: variablesContainer,
-          emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
-          emptyPlaceholderDescription: (
-            <Trans>
-              These variables hold additional information on an object.
-            </Trans>
-          ),
-        },
-      ].filter(Boolean),
-    [variablesContainer]
-  );
-
   const onComputeAllVariableNames = React.useCallback(
     () =>
       project && layout && objectName
@@ -67,6 +49,25 @@ const ObjectVariablesDialog = ({
     [layout, objectName, project]
   );
 
+  const tabs = React.useMemo(
+    () =>
+      [
+        {
+          id: 'object-variables',
+          label: <Trans>Object variables</Trans>,
+          variablesContainer: variablesContainer,
+          emptyPlaceholderTitle: <Trans>Add your first object variable</Trans>,
+          emptyPlaceholderDescription: (
+            <Trans>
+              These variables hold additional information on an object.
+            </Trans>
+          ),
+          onComputeAllVariableNames,
+        },
+      ].filter(Boolean),
+    [onComputeAllVariableNames, variablesContainer]
+  );
+
   return (
     <VariablesEditorDialog
       project={project}
@@ -78,7 +79,6 @@ const ObjectVariablesDialog = ({
       initiallySelectedVariableName={initiallySelectedVariableName}
       helpPagePath={'/all-features/variables/object-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      onComputeAllVariableNames={onComputeAllVariableNames}
       preventRefactoringToDeleteInstructions={
         preventRefactoringToDeleteInstructions
       }

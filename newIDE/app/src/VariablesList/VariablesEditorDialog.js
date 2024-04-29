@@ -37,6 +37,11 @@ type TabProps = {
   inheritedVariablesContainer?: gdVariablesContainer,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
+  /**
+   * Deprecated - will be removed once we don't want to display completions
+   * for variables not declared but still used in events.
+   */
+  onComputeAllVariableNames: () => Array<string>,
 };
 
 type Props = {|
@@ -52,11 +57,6 @@ type Props = {|
   project: gdProject,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
-  /**
-   * Deprecated - will be removed once we don't want to display completions
-   * for variables not declared but still used in events.
-   */
-  onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
   id?: string,
 
@@ -75,7 +75,6 @@ const VariablesEditorDialog = ({
   title,
   project,
   hotReloadPreviewButtonProps,
-  onComputeAllVariableNames,
   helpPagePath,
   preventRefactoringToDeleteInstructions,
   id,
@@ -244,6 +243,7 @@ const VariablesEditorDialog = ({
           inheritedVariablesContainer,
           emptyPlaceholderTitle,
           emptyPlaceholderDescription,
+          onComputeAllVariableNames,
         }) => {
           return (
             currentTab === id && (

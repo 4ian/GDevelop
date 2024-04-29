@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from './VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   open: boolean,
@@ -31,6 +32,25 @@ const GlobalAndSceneVariablesDialog = ({
   isGlobalTabInitiallyOpen,
   initiallySelectedVariableName,
 }: Props) => {
+  const onComputeAllSceneVariableNames = React.useCallback(
+    () =>
+      EventsRootVariablesFinder.findAllLayoutVariables(
+        project.getCurrentPlatform(),
+        project,
+        layout
+      ),
+    [layout, project]
+  );
+
+  const onComputeAllGlobalVariableNames = React.useCallback(
+    () =>
+      EventsRootVariablesFinder.findAllGlobalVariables(
+        project.getCurrentPlatform(),
+        project
+      ),
+    [project]
+  );
+
   const tabs = React.useMemo(
     () =>
       [
@@ -44,6 +64,7 @@ const GlobalAndSceneVariablesDialog = ({
               These variables hold additional information on a scene.
             </Trans>
           ),
+          onComputeAllVariableNames: onComputeAllSceneVariableNames,
         },
         {
           id: 'global-variables',
@@ -55,12 +76,16 @@ const GlobalAndSceneVariablesDialog = ({
               These variables hold additional information on a project.
             </Trans>
           ),
+          onComputeAllVariableNames: onComputeAllGlobalVariableNames,
         },
       ].filter(Boolean),
-    [layout, project]
+    [
+      layout,
+      onComputeAllGlobalVariableNames,
+      onComputeAllSceneVariableNames,
+      project,
+    ]
   );
-
-  const onComputeAllVariableNames = React.useCallback(() => [], []);
 
   return (
     <VariablesEditorDialog
@@ -76,7 +101,6 @@ const GlobalAndSceneVariablesDialog = ({
       initiallySelectedVariableName={initiallySelectedVariableName}
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-      onComputeAllVariableNames={onComputeAllVariableNames}
       preventRefactoringToDeleteInstructions={
         preventRefactoringToDeleteInstructions
       }

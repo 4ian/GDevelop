@@ -2122,10 +2122,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         label: '',
                         variablesContainer: this.state.editedVariable
                           .variablesContainer,
+                        onComputeAllVariableNames: () => [],
                       },
                     ]}
                     helpPagePath={'/all-features/variables/local-variables'}
-                    onComputeAllVariableNames={() => []}
                     preventRefactoringToDeleteInstructions
                     initiallySelectedVariableName={
                       this.state.editedVariable.variableName

@@ -1882,6 +1882,25 @@ export default class SceneEditor extends React.Component<Props, State> {
                             the variables of the object.
                           </Trans>
                         ),
+                        onComputeAllVariableNames: () => {
+                          const { variablesEditedInstance } = this.state;
+                          if (!variablesEditedInstance) {
+                            return [];
+                          }
+                          const variablesEditedObject = getObjectByName(
+                            project,
+                            layout,
+                            variablesEditedInstance.getObjectName()
+                          );
+                          return variablesEditedObject
+                            ? EventsRootVariablesFinder.findAllObjectVariables(
+                                project.getCurrentPlatform(),
+                                project,
+                                layout,
+                                variablesEditedObject.getName()
+                              )
+                            : [];
+                        },
                       },
                     ]}
                     helpPagePath={'/all-features/variables/instance-variables'}
@@ -1900,25 +1919,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                     hotReloadPreviewButtonProps={
                       this.props.hotReloadPreviewButtonProps
                     }
-                    onComputeAllVariableNames={() => {
-                      const { variablesEditedInstance } = this.state;
-                      if (!variablesEditedInstance) {
-                        return [];
-                      }
-                      const variablesEditedObject = getObjectByName(
-                        project,
-                        layout,
-                        variablesEditedInstance.getObjectName()
-                      );
-                      return variablesEditedObject
-                        ? EventsRootVariablesFinder.findAllObjectVariables(
-                            project.getCurrentPlatform(),
-                            project,
-                            layout,
-                            variablesEditedObject.getName()
-                          )
-                        : [];
-                    }}
                   />
                 )}
               {!!this.state.layerRemoved &&

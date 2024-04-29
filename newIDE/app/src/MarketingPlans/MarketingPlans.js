@@ -20,9 +20,9 @@ import {
 import Text from '../UI/Text';
 import Link from '../UI/Link';
 import Window from '../Utils/Window';
-import Basic from './Icons/Basic';
-import Pro from './Icons/Pro';
-import Premium from './Icons/Premium';
+import Speaker from './Icons/Speaker';
+import Speedometer from './Icons/Speedometer';
+import Stars from './Icons/Stars';
 import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -56,13 +56,13 @@ const styles = {
 };
 
 const getIconForMarketingPlan = (marketingPlan: MarketingPlan) => {
-  switch (marketingPlan.id) {
-    case 'featuring-basic':
-      return <Basic style={styles.iconStyle} />;
-    case 'featuring-pro':
-      return <Pro style={styles.iconStyle} />;
-    case 'featuring-premium':
-      return <Premium style={styles.iconStyle} />;
+  switch (marketingPlan.icon) {
+    case 'speaker':
+      return <Speaker style={styles.iconStyle} />;
+    case 'speedometer':
+      return <Speedometer style={styles.iconStyle} />;
+    case 'stars':
+      return <Stars style={styles.iconStyle} />;
     default:
       return null;
   }
@@ -93,55 +93,43 @@ const MarketingPlans = ({ game }: Props) => {
     null
   );
 
-  const {
-    activeBasicFeaturing,
-    activeProFeaturing,
-    activePremiumFeaturing,
-  }: {|
-    activeBasicFeaturing: ?GameFeaturing,
-    activeProFeaturing: ?GameFeaturing,
-    activePremiumFeaturing: ?GameFeaturing,
-  |} = React.useMemo(
+  const activeGameFeaturings: ?(GameFeaturing[]) = React.useMemo(
     () => {
-      if (!gameFeaturings)
-        return {
-          activeBasicFeaturing: null,
-          activeProFeaturing: null,
-          activePremiumFeaturing: null,
-        };
+      if (!gameFeaturings) return null;
 
-      const activeGameFeaturings = gameFeaturings.filter(
+      return gameFeaturings.filter(
         gameFeaturing => gameFeaturing.expiresAt > Date.now() / 1000
       );
-      return {
-        activeBasicFeaturing: activeGameFeaturings.filter(
-          gameFeaturing => gameFeaturing.featuring === 'games-platform-home'
-        )[0],
-        activeProFeaturing: activeGameFeaturings.filter(
-          gameFeaturing => gameFeaturing.featuring === 'socials-newsletter'
-        )[0],
-        activePremiumFeaturing: activeGameFeaturings.filter(
-          gameFeaturing => gameFeaturing.featuring === 'gdevelop-banner'
-        )[0],
-      };
     },
     [gameFeaturings]
   );
 
-  const getActiveFeaturing = React.useCallback(
+  const isMarketingPlanActive = React.useCallback(
     (marketingPlan: MarketingPlan) => {
-      switch (marketingPlan.id) {
-        case 'featuring-basic':
-          return activeBasicFeaturing;
-        case 'featuring-pro':
-          return activeProFeaturing;
-        case 'featuring-premium':
-          return activePremiumFeaturing;
-        default:
-          return null;
-      }
+      if (!activeGameFeaturings) return false;
+      const includedMarketingPlanFeaturings = marketingPlan.includedFeaturings;
+
+      // A marketing plan is considered active if it has all the inluded featurings active.
+      return includedMarketingPlanFeaturings.every(
+        includedMarketingPlanFeaturing =>
+          activeGameFeaturings.some(
+            activeGameFeaturing =>
+              activeGameFeaturing.featuring === includedMarketingPlanFeaturing
+          )
+      );
     },
-    [activeBasicFeaturing, activePremiumFeaturing, activeProFeaturing]
+    [activeGameFeaturings]
+  );
+
+  const getActiveFeaturingsOfMarketingPlan = React.useCallback(
+    (marketingPlan: MarketingPlan) => {
+      if (!activeGameFeaturings) return [];
+
+      return activeGameFeaturings.filter(activeGameFeaturing =>
+        marketingPlan.includedFeaturings.includes(activeGameFeaturing.featuring)
+      );
+    },
+    [activeGameFeaturings]
   );
 
   const getMarketingPlanPrice = React.useCallback(
@@ -199,24 +187,28 @@ const MarketingPlans = ({ game }: Props) => {
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
       if (!profile || !limits) return;
 
-      const { id, nameByLocale } = marketingPlan;
+      const {
+        id,
+        nameByLocale,
+        canExtend,
+        requiresManualContact,
+        additionalSuccessMessageByLocale,
+      } = marketingPlan;
       const planCreditsAmount = getMarketingPlanPrice(marketingPlan);
       if (!planCreditsAmount) return;
 
       const translatedName = selectMessageByLocale(i18n, nameByLocale);
 
-      const activeFeaturing = getActiveFeaturing(marketingPlan);
-      if (
-        activeFeaturing &&
-        (marketingPlan.id === 'featuring-pro' ||
-          marketingPlan.id === 'featuring-premium')
-      ) {
-        await showAlert({
-          title: t`Featuring already active`,
-          message: t`You already have an active ${translatedName} featuring for your game ${
-            game.gameName
-          }. Check your emails or discord, we will get in touch with you to get the campaign up!`,
-        });
+      const isPlanActive = isMarketingPlanActive(marketingPlan);
+      if (isPlanActive && !canExtend) {
+        if (requiresManualContact) {
+          await showAlert({
+            title: t`Featuring already active`,
+            message: t`You already have an active ${translatedName} featuring for your game ${
+              game.gameName
+            }. Check your emails or discord, we will get in touch with you to get the campaign up!`,
+          });
+        }
         return;
       }
 
@@ -229,12 +221,13 @@ const MarketingPlans = ({ game }: Props) => {
       }
 
       openCreditsUsageDialog({
-        title: activeFeaturing ? (
-          <Trans>Extend Featuring</Trans>
-        ) : (
-          <Trans>Get Featuring</Trans>
-        ),
-        message: activeFeaturing ? (
+        title:
+          isPlanActive && canExtend ? (
+            <Trans>Extend Featuring</Trans>
+          ) : (
+            <Trans>Get Featuring</Trans>
+          ),
+        message: canExtend ? (
           <Trans>
             You are about to use {planCreditsAmount} credits to extend the game
             featuring {translatedName} for your game {game.gameName} and push it
@@ -255,21 +248,15 @@ const MarketingPlans = ({ game }: Props) => {
           });
           await fetchGameFeaturings();
         },
-        successMessage:
-          marketingPlan.id === 'featuring-basic' ? (
+        successMessage: (
+          <span>
             <Trans>
               🎉 Congrats on getting the {translatedName} featuring for your
-              game {game.gameName}! Ensure that your game is public and you have
-              configured a thumbnail for gd.games. This can take a few minutes
-              for your game to be visible on the platform.
-            </Trans>
-          ) : (
-            <Trans>
-              🎉 Congrats on getting the {translatedName} featuring for your
-              game {game.gameName}. We will get in touch with you to get the
-              campaign up!
-            </Trans>
-          ),
+              game {game.gameName}!
+            </Trans>{' '}
+            {selectMessageByLocale(i18n, additionalSuccessMessageByLocale)}
+          </span>
+        ),
       });
     },
     [
@@ -278,7 +265,7 @@ const MarketingPlans = ({ game }: Props) => {
       limits,
       profile,
       showAlert,
-      getActiveFeaturing,
+      isMarketingPlanActive,
       fetchGameFeaturings,
       openCreditsPackageDialog,
       openCreditsUsageDialog,
@@ -288,18 +275,17 @@ const MarketingPlans = ({ game }: Props) => {
 
   const getRequirementsErrors = (marketingPlan: MarketingPlan) => {
     const requirementsErrors = [];
-    if (marketingPlan.id === 'featuring-basic') {
-      if (!game.thumbnailUrl) {
-        requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
-      }
-      if (!game.publicWebBuildId) {
-        requirementsErrors.push(
-          <Trans>Your game does not have a public build</Trans>
-        );
-      }
-      if (!game.discoverable) {
-        requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
-      }
+    const marketingPlanGameRequirements = marketingPlan.gameRequirements;
+    if (!!marketingPlanGameRequirements.hasThumbnail && !game.thumbnailUrl) {
+      requirementsErrors.push(<Trans>You don't have a thumbnail</Trans>);
+    }
+    if (!marketingPlanGameRequirements.isPublished && !game.publicWebBuildId) {
+      requirementsErrors.push(
+        <Trans>Your game does not have a public build</Trans>
+      );
+    }
+    if (!!marketingPlanGameRequirements.isDiscoverable && !game.discoverable) {
+      requirementsErrors.push(<Trans>Your game is not discoverable</Trans>);
     }
 
     return requirementsErrors;
@@ -307,12 +293,10 @@ const MarketingPlans = ({ game }: Props) => {
 
   const getActiveMessage = ({
     marketingPlan,
-    activeFeaturing,
     i18n,
     hasErrors,
   }: {|
     marketingPlan: MarketingPlan,
-    activeFeaturing: GameFeaturing,
     i18n: I18nType,
     hasErrors: boolean,
   |}) => {
@@ -320,10 +304,24 @@ const MarketingPlans = ({ game }: Props) => {
       return <Trans>Fix those issues to get the campaign up!</Trans>;
     }
 
-    return activeFeaturing.featuring === 'games-platform-home' ? (
+    const activeFeaturingsForPlan = getActiveFeaturingsOfMarketingPlan(
+      marketingPlan
+    );
+
+    if (activeFeaturingsForPlan.length === 0) {
+      // Should not happen.
+      return null;
+    }
+
+    // Assume they will all have the same expiration date, so pick the first one.
+    const activeFeaturing = activeFeaturingsForPlan[0];
+
+    return !marketingPlan.requiresManualContact ? (
       <Trans>Active until {i18n.date(activeFeaturing.expiresAt * 1000)}</Trans>
-    ) : (
+    ) : marketingPlan.requiresManualContact ? (
       <Trans>Active, we will get in touch to get the campaign up!</Trans>
+    ) : (
+      <Trans>Active</Trans>
     );
   };
 
@@ -370,6 +368,7 @@ const MarketingPlans = ({ game }: Props) => {
                 const {
                   id,
                   nameByLocale,
+                  canExtend,
                   descriptionByLocale,
                   bulletPointsByLocale,
                 } = marketingPlan;
@@ -380,8 +379,8 @@ const MarketingPlans = ({ game }: Props) => {
                   );
                   return null;
                 }
-                const activeFeaturing = getActiveFeaturing(marketingPlan);
-                const requirementsErrors = activeFeaturing
+                const isPlanActive = isMarketingPlanActive(marketingPlan);
+                const requirementsErrors = isPlanActive
                   ? getRequirementsErrors(marketingPlan)
                   : [];
                 const hasErrors = requirementsErrors.length > 0;
@@ -389,7 +388,7 @@ const MarketingPlans = ({ game }: Props) => {
                   <div
                     style={{
                       ...styles.campaign,
-                      border: activeFeaturing
+                      border: isPlanActive
                         ? `2px solid ${gdevelopTheme.message.valid}`
                         : `1px solid ${gdevelopTheme.palette.secondary}`,
                     }}
@@ -441,7 +440,7 @@ const MarketingPlans = ({ game }: Props) => {
                                     <CheckCircle
                                       style={{
                                         ...styles.bulletIcon,
-                                        ...(activeFeaturing
+                                        ...(isPlanActive
                                           ? {
                                               color:
                                                 gdevelopTheme.message.valid,
@@ -473,9 +472,8 @@ const MarketingPlans = ({ game }: Props) => {
                           color="secondary"
                           align="left"
                         >
-                          {activeFeaturing
+                          {isPlanActive
                             ? getActiveMessage({
-                                activeFeaturing,
                                 marketingPlan,
                                 i18n,
                                 hasErrors,
@@ -484,14 +482,13 @@ const MarketingPlans = ({ game }: Props) => {
                         </Text>
                       </Column>
                       <RaisedButton
-                        primary={!activeFeaturing}
+                        primary={!isPlanActive || canExtend}
                         onClick={() => onPurchase(i18n, marketingPlan)}
                         label={
                           !gameFeaturings ? (
                             <Trans>Loading...</Trans>
-                          ) : activeFeaturing ? (
-                            activeFeaturing.featuring ===
-                            'games-platform-home' ? (
+                          ) : isPlanActive ? (
+                            canExtend ? (
                               <Trans>Extend</Trans>
                             ) : (
                               <Trans>Activated</Trans>

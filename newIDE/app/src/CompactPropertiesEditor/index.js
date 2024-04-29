@@ -55,7 +55,7 @@ export type PrimitiveValueField =
         label: string,
         tooltipContent: React.Node,
       |},
-      getEndAdornmentIcon?: () => React.Node,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
@@ -69,7 +69,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      getEndAdornmentIcon?: () => React.Node,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
@@ -267,6 +267,28 @@ const getFieldValue = ({
   return value;
 };
 
+const getFieldEndAdornmentIcon = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): ?(className: string) => React.Node => {
+  if (!instances[0]) {
+    console.warn(
+      'getFieldEndAdornmentIcon was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return null;
+  }
+  if (!field.getEndAdornmentIcon) return null;
+
+  for (const instance of instances) {
+    const getEndAdornmentIcon = field.getEndAdornmentIcon(instance);
+    if (getEndAdornmentIcon) return getEndAdornmentIcon;
+  }
+  return null;
+};
+
 const getFieldLabel = ({
   instances,
   field,
@@ -386,7 +408,8 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
-          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+          renderEndAdornmentOnHover:
+            getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));
@@ -515,7 +538,8 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
-          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+          renderEndAdornmentOnHover:
+            getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));

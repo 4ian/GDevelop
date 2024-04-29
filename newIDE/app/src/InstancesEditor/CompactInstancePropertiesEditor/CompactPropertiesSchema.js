@@ -251,7 +251,12 @@ const getWidthField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <LetterW className={className} />,
-  getEndAdornmentIcon: className => <Restore className={className} />,
+  getEndAdornmentIcon: (instance: gdInitialInstance) => {
+    if (instance.hasCustomDepth() || instance.hasCustomSize()) {
+      return className => <Restore className={className} />;
+    }
+    return null;
+  },
   onClickEndAdornment: (instance: gdInitialInstance) => {
     instance.setHasCustomSize(false);
     instance.setHasCustomDepth(false);
@@ -307,7 +312,12 @@ const getHeightField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <LetterH className={className} />,
-  getEndAdornmentIcon: className => <Restore className={className} />,
+  getEndAdornmentIcon: (instance: gdInitialInstance) => {
+    if (instance.hasCustomDepth() || instance.hasCustomSize()) {
+      return className => <Restore className={className} />;
+    }
+    return null;
+  },
   onClickEndAdornment: (instance: gdInitialInstance) => {
     instance.setHasCustomSize(false);
     instance.setHasCustomDepth(false);
@@ -363,7 +373,12 @@ const getDepthField = ({
     forceUpdate();
   },
   renderLeftIcon: className => <LetterD className={className} />,
-  getEndAdornmentIcon: className => <Restore className={className} />,
+  getEndAdornmentIcon: (instance: gdInitialInstance) => {
+    if (instance.hasCustomDepth() || instance.hasCustomSize()) {
+      return className => <Restore className={className} />;
+    }
+    return null;
+  },
   onClickEndAdornment: (instance: gdInitialInstance) => {
     instance.setHasCustomSize(false);
     instance.setHasCustomDepth(false);

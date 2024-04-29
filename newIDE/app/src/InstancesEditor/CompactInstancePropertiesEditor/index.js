@@ -12,7 +12,7 @@ import propertiesMapToSchema from '../../CompactPropertiesEditor/PropertiesMapTo
 import { type Schema } from '../../CompactPropertiesEditor';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
-import { Line, Column, Spacer } from '../../UI/Grid';
+import { Line, Column, Spacer, marginsSize } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
@@ -149,6 +149,7 @@ const CompactInstancePropertiesEditor = ({
     >
       <ScrollView
         autoHideScrollbar
+        style={{ paddingTop: marginsSize }}
         key={instances
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}

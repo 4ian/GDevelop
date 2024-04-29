@@ -109,7 +109,7 @@ const MarketingPlans = ({ game }: Props) => {
       if (!activeGameFeaturings) return false;
       const includedMarketingPlanFeaturings = marketingPlan.includedFeaturings;
 
-      // A marketing plan is considered active if it has all the inluded featurings active.
+      // A marketing plan is considered active if it has all the included featurings active.
       return includedMarketingPlanFeaturings.every(
         includedMarketingPlanFeaturing =>
           activeGameFeaturings.some(

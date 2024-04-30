@@ -186,17 +186,21 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
           : instance.isLocked()
           ? 'locked'
           : 'free',
-      setValue: (instance: gdInitialInstance, newValue: boolean) => {
-        if (instance.isSealed()) {
-          instance.setSealed(false);
-          instance.setLocked(false);
-          return;
-        }
-        if (instance.isLocked()) {
-          instance.setSealed(true);
-          return;
-        }
-        instance.setLocked(true);
+      setValue: (
+        instance: gdInitialInstance,
+        newValue: 'sealed' | 'locked' | 'free'
+      ) => {
+        instance.setSealed(newValue === 'sealed' ? true : false);
+        instance.setLocked(
+          newValue === 'sealed' || newValue === 'locked' ? true : false
+        );
+      },
+      getNextValue: (
+        currentValue: 'sealed' | 'locked' | 'free'
+      ): 'sealed' | 'locked' | 'free' => {
+        if (currentValue === 'free') return 'locked';
+        if (currentValue === 'locked') return 'sealed';
+        return 'free';
       },
     },
   ],
@@ -407,6 +411,7 @@ const getKeepRatioField = ({
   getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
   setValue: (instance: gdInitialInstance, newValue: boolean) =>
     instance.setShouldKeepRatio(newValue),
+  getNextValue: (currentValue: boolean) => !currentValue,
 });
 
 export const makeSchema = ({

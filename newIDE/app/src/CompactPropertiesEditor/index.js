@@ -86,6 +86,7 @@ export type PrimitiveValueField =
       getValue: Instance => any,
       isHighlighted: (value: any) => boolean,
       setValue: (instance: Instance, newValue: any) => void,
+      getNextValue: (currentValue: any) => any,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -257,10 +258,12 @@ const getFieldValue = ({
   if (!getValue) return null;
 
   let value = getValue(instances[0]);
-  for (var i = 1; i < instances.length; ++i) {
-    if (value !== getValue(instances[i])) {
-      if (typeof defaultValue !== 'undefined') value = defaultValue;
-      break;
+  if (typeof defaultValue !== 'undefined') {
+    for (var i = 1; i < instances.length; ++i) {
+      if (value !== getValue(instances[i])) {
+        value = defaultValue;
+        break;
+      }
     }
   }
 
@@ -489,7 +492,9 @@ const CompactPropertiesEditor = ({
             tooltip={getFieldLabel({ instances, field })}
             selected={field.isHighlighted(value)}
             onClick={event => {
-              instances.forEach(i => field.setValue(i, !value));
+              instances.forEach(i =>
+                field.setValue(i, field.getNextValue(value))
+              );
               _onInstancesModified(instances);
             }}
           >

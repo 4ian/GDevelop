@@ -38,6 +38,7 @@ export const styles = {
   icon: {
     fontSize: 18,
   },
+  scrollView: { paddingTop: marginsSize },
 };
 
 const gd: libGDevelop = global.gd;
@@ -149,7 +150,7 @@ const CompactInstancePropertiesEditor = ({
     >
       <ScrollView
         autoHideScrollbar
-        style={{ paddingTop: marginsSize }}
+        style={styles.scrollView}
         key={instances
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}

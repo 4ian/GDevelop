@@ -12,7 +12,8 @@ namespace gdjs {
         parameterName: string,
         value: number
       ) {
-        const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
+        const adjustmentFilter =
+          filter as unknown as PIXI.filters.AdjustmentFilter;
         if (parameterName === 'gamma') {
           adjustmentFilter.gamma = value;
         } else if (parameterName === 'saturation') {
@@ -32,7 +33,8 @@ namespace gdjs {
         }
       }
       getDoubleParameter(filter: PIXI.Filter, parameterName: string): number {
-        const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
+        const adjustmentFilter =
+          filter as unknown as PIXI.filters.AdjustmentFilter;
         if (parameterName === 'gamma') {
           return adjustmentFilter.gamma;
         }
@@ -77,6 +79,32 @@ namespace gdjs {
         parameterName: string,
         value: boolean
       ) {}
+      getNetworkSyncData(filter: PIXI.Filter) {
+        const adjustmentFilter =
+          filter as unknown as PIXI.filters.AdjustmentFilter;
+        return {
+          ga: adjustmentFilter.gamma,
+          sa: adjustmentFilter.saturation,
+          co: adjustmentFilter.contrast,
+          br: adjustmentFilter.brightness,
+          r: adjustmentFilter.red,
+          g: adjustmentFilter.green,
+          b: adjustmentFilter.blue,
+          a: adjustmentFilter.alpha,
+        };
+      }
+      updateFromNetworkSyncData(filter: PIXI.Filter, data: any): void {
+        const adjustmentFilter =
+          filter as unknown as PIXI.filters.AdjustmentFilter;
+        adjustmentFilter.gamma = data.ga;
+        adjustmentFilter.saturation = data.sa;
+        adjustmentFilter.contrast = data.co;
+        adjustmentFilter.brightness = data.br;
+        adjustmentFilter.red = data.r;
+        adjustmentFilter.green = data.g;
+        adjustmentFilter.blue = data.b;
+        adjustmentFilter.alpha = data.a;
+      }
     })()
   );
 }

@@ -194,6 +194,68 @@ namespace gdjs {
     }
     static _deletedVars: Array<string | undefined> = [];
 
+    getNetworkSyncData(): VariableSyncData[] {
+      const networkSyncData: VariableSyncData[] = [];
+      const variableNames = [];
+      this._variables.keys(variableNames);
+      variableNames.forEach((variableName) => {
+        const variable = this._variables.get(variableName);
+        if (variable.isUndefinedInContainer()) {
+          return;
+        }
+
+        networkSyncData.push({
+          name: variableName,
+          value: variable.getAsNumberOrString(),
+          type: variable.getType(),
+          children: this.getStructureNetworkSyncData(variable),
+        });
+      });
+
+      return networkSyncData;
+    }
+
+    // Structure variables can contain other variables, so we need to recursively
+    // get the sync data for each child variable.
+    getStructureNetworkSyncData(
+      variable: gdjs.Variable
+    ): VariableSyncData[] | undefined {
+      const variableChildren =
+        variable.getType() === 'structure' ? variable.getAllChildren() : null;
+
+      const childrenSyncData = variableChildren
+        ? Object.entries(variableChildren).map(
+            ([childVariableName, childVariable]) => {
+              return {
+                name: childVariableName,
+                value: childVariable.getAsNumberOrString(),
+                type: childVariable.getType(),
+                children: this.getStructureNetworkSyncData(childVariable),
+              };
+            }
+          )
+        : undefined;
+
+      return childrenSyncData;
+    }
+
+    updateFromNetworkSyncData(networkSyncData: VariableSyncData[]) {
+      const that = this;
+      for (let j = 0; j < networkSyncData.length; ++j) {
+        const variableSyncData = networkSyncData[j];
+        const variableName = variableSyncData.name;
+        if (!variableName) continue;
+
+        const variable = that.get(variableName);
+        variable.reinitialize({
+          name: variableName,
+          value: variableSyncData.value,
+          type: variableSyncData.type,
+          children: variableSyncData.children,
+        });
+      }
+    }
+
     /**
      * "Bad" variable container, used by events when no other valid container can be found.
      * This container has no state and always returns the bad variable ( see VariablesContainer.badVariable ).
@@ -222,6 +284,15 @@ namespace gdjs {
       },
       initFrom: function () {
         return;
+      },
+      getNetworkSyncData: function () {
+        return [];
+      },
+      updateFromNetworkSyncData: function () {
+        return;
+      },
+      getStructureNetworkSyncData: function () {
+        return undefined;
       },
     };
 

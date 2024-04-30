@@ -20,6 +20,7 @@ namespace gdjs {
     ify: boolean;
     sx: float;
     sy: float;
+    op: float;
   };
 
   export type SpriteNetworkSyncData = ObjectNetworkSyncData &
@@ -113,6 +114,7 @@ namespace gdjs {
         ify: this.isFlippedY(),
         sx: this._scaleX,
         sy: this._scaleY,
+        op: this.opacity,
       };
     }
 
@@ -122,6 +124,7 @@ namespace gdjs {
       this.flipY(newNetworkSyncData.ify);
       this.setScaleX(Math.abs(newNetworkSyncData.sx));
       this.setScaleY(Math.abs(newNetworkSyncData.sy));
+      this.setOpacity(newNetworkSyncData.op);
       this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
       this.invalidateHitboxes();
     }

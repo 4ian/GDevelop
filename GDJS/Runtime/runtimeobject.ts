@@ -463,6 +463,15 @@ namespace gdjs {
         }
       }
 
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+
+      const effectsNetworkSyncData = {};
+      for (const effectName in this._rendererEffects) {
+        effectsNetworkSyncData[effectName] = this._rendererEffects[
+          effectName
+        ].getNetworkSyncData();
+      }
+
       return {
         x: this.x,
         y: this.y,
@@ -472,6 +481,8 @@ namespace gdjs {
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
         beh: behaviorNetworkSyncData,
+        var: variablesNetworkSyncData,
+        eff: effectsNetworkSyncData,
       };
     }
 
@@ -479,34 +490,49 @@ namespace gdjs {
      * Called when the object must be updated using the specified networkSyncData. This is the
      * case during an update of the object from the network.
      *
-     * @param oldNetworkSyncData The previous data for the object.
-     * @param newNetworkSyncData The new data for the object.
+     * @param networkSyncData The new data for the object.
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
-    updateFromObjectNetworkSyncData(newNetworkSyncData: ObjectNetworkSyncData) {
-      this.setPosition(newNetworkSyncData.x, newNetworkSyncData.y);
-      this.setZOrder(newNetworkSyncData.z);
-      this.setAngle(newNetworkSyncData.a);
+    updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+      this.setPosition(networkSyncData.x, networkSyncData.y);
+      this.setZOrder(networkSyncData.z);
+      this.setAngle(networkSyncData.a);
 
       // Force clear all forces and reapply them, using the garbage collector to recycle forces.
       // Is that efficient?
       this.clearForces();
-      for (let i = 0, len = newNetworkSyncData.if.length; i < len; ++i) {
-        const forceData = newNetworkSyncData.if[i];
+      for (let i = 0, len = networkSyncData.if.length; i < len; ++i) {
+        const forceData = networkSyncData.if[i];
         const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
         recycledOrNewForce.updateFromNetworkSyncData(forceData);
         this._instantForces.push(recycledOrNewForce);
       }
-      this._permanentForceX = newNetworkSyncData.pfx;
-      this._permanentForceY = newNetworkSyncData.pfy;
+      this._permanentForceX = networkSyncData.pfx;
+      this._permanentForceY = networkSyncData.pfy;
 
       // Loop through all behaviors and update them.
-      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
-        const behavior = this._behaviors[i];
-        if (newNetworkSyncData.beh[behavior.getName()]) {
-          behavior.updateFromNetworkSyncData(
-            newNetworkSyncData.beh[behavior.getName()]
-          );
+      for (const behaviorName in networkSyncData.beh) {
+        const behaviorNetworkSyncData = networkSyncData.beh[behaviorName];
+        const behavior = this.getBehavior(behaviorName);
+        if (behavior) {
+          behavior.updateFromNetworkSyncData(behaviorNetworkSyncData);
+        }
+      }
+
+      // If variables are synchronized, update them.
+      if (networkSyncData.var) {
+        this._variables.updateFromNetworkSyncData(networkSyncData.var);
+      }
+
+      // If effects are synchronized, update them.
+      if (networkSyncData.eff) {
+        // Loop through all effects and update them.
+        for (const effectName in networkSyncData.eff) {
+          const effectNetworkSyncData = networkSyncData.eff[effectName];
+          const effect = this._rendererEffects[effectName];
+          if (effect) {
+            effect.updateFromNetworkSyncData(effectNetworkSyncData);
+          }
         }
       }
     }

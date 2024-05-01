@@ -36,7 +36,6 @@
 #include <GDCore/IDE/Events/EventsRemover.h>
 #include <GDCore/IDE/Events/EventsTypesLister.h>
 #include <GDCore/IDE/Events/EventsVariablesFinder.h>
-#include <GDCore/IDE/Events/ExpressionVariableTypeFinder.h>
 #include <GDCore/IDE/Events/ExpressionCompletionFinder.h>
 #include <GDCore/IDE/Events/ExpressionNodeLocationFinder.h>
 #include <GDCore/IDE/Events/ExpressionTypeFinder.h>

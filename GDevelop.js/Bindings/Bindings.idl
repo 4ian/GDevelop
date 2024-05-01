@@ -250,19 +250,6 @@ interface VariableInstructionSwitcher {
         [Ref] Instruction instruction);
 };
 
-interface ExpressionVariableTypeFinder {
-    [Const] Variable_Type STATIC_GetVariableType(
-      [Const, Ref] Platform platform,
-      [Const, Ref] ProjectScopedContainers projectScopedContainers,
-      [Ref] ExpressionNode node,
-      [Const] DOMString objectName);
-    [Const] Variable_Type STATIC_GetArrayVariableType(
-      [Const, Ref] Platform platform,
-      [Const, Ref] ProjectScopedContainers projectScopedContainers,
-      [Ref] ExpressionNode node,
-      [Const] DOMString objectName);
-};
-
 interface Variable {
     void Variable();
 

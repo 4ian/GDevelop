@@ -11,7 +11,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
-#include "GDCore/IDE/Events/ExpressionVariableParentFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariablePathFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/ProjectScopedContainers.h"
@@ -206,7 +206,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -234,7 +234,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -788,7 +788,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -1527,7 +1527,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("MyNonExistingSceneVariable");
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -1559,7 +1559,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("MyNonExistingSceneVariable.MyNonExistingChild");
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -1643,7 +1643,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("MyNonExistingSpriteObject.MyVariable");
 
       // Also check that if we try to find the last parent of node, it is not defined.
-      auto lastParentOfNode = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfNode = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, *node);
       REQUIRE(lastParentOfNode.parentVariable == nullptr);
       REQUIRE(lastParentOfNode.parentVariablesContainer == nullptr);
@@ -3317,10 +3317,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable2ObjectName == "MySpriteObject2");
 
       // Also check the ability to find the last parent of the variables:
-      auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable1Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
       REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
-      auto lastParentOfVariable2Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable2Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable2Node);
       REQUIRE(lastParentOfVariable2Node.parentVariablesContainer == &mySpriteObject2.GetVariables());
 
@@ -3356,10 +3356,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable2ObjectName == "MySpriteObject");
 
       // Also check the ability to find the last parent of the variables:
-      auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable1Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
       REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
-      auto lastParentOfVariable2Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable2Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable2Node);
       REQUIRE(lastParentOfVariable2Node.parentVariablesContainer == &mySpriteObject.GetVariables());
 
@@ -3385,7 +3385,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable1ObjectName == "MySpriteObject");
 
       // Also check the ability to find the last parent of the variable:
-      auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable1Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
       REQUIRE(lastParentOfVariable1Node.parentVariablesContainer == &mySpriteObject.GetVariables());
 
@@ -3412,7 +3412,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(variable1ObjectName == "MySpriteObject");
 
       // Also check the ability to find the last parent of the variable:
-      auto lastParentOfVariable1Node = gd::ExpressionVariableParentFinder::GetLastParentOfNode(
+      auto lastParentOfVariable1Node = gd::ExpressionVariablePathFinder::GetLastParentOfNode(
           platform, projectScopedContainers, variable1Node);
       REQUIRE(lastParentOfVariable1Node.parentVariable == &mySpriteObject.GetVariables().Get("MyVariable"));
 

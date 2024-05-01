@@ -6,7 +6,7 @@
 #include "VariableInstructionSwitcher.h"
 
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/IDE/Events/ExpressionVariableTypeFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariablePathFinder.h"
 #include "GDCore/Project/Variable.h"
 
 namespace gd {
@@ -215,11 +215,11 @@ VariableInstructionSwitcher::GetVariableTypeFromParameters(
   auto &variableExpressionNode =
       *instruction.GetParameter(variableParameterIndex).GetRootNode();
 
-  auto variableType = gd::ExpressionVariableTypeFinder::GetVariableType(
+  auto variableType = gd::ExpressionVariablePathFinder::GetVariableType(
       platform, projectScopedContainers, variableExpressionNode, objectName);
   return variableType == gd::Variable::Type::Array
              ? // "Push" actions need the child type to be able to switch.
-             gd::ExpressionVariableTypeFinder::GetArrayVariableType(
+             gd::ExpressionVariablePathFinder::GetArrayVariableType(
                  platform, projectScopedContainers, variableExpressionNode,
                  objectName)
              : variableType;

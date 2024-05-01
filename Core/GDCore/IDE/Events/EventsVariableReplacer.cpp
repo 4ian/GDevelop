@@ -367,6 +367,9 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
         }
 
         if (gd::ParameterMetadata::IsExpression("variable", type)) {
+          // TODO Find the variable path
+          // If there is an empty element (a bracket) don't change the type.
+          // When there is a bracket the drop down menu is shown.
           const auto& newParameterValue = instruction.GetParameter(parameterIndex);
           const auto &variableName = newParameterValue.GetPlainString();
           auto itr = variableNewTypes.find(variableName);

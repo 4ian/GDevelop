@@ -223,9 +223,8 @@ namespace gdjs {
       let _leaderboardViewIframeLoading: boolean = false;
       let _leaderboardViewIframeLoaded: boolean = false;
       let _errorTimeoutId: NodeJS.Timeout | null = null;
-      let _leaderboardMessageListener:
-        | ((event: MessageEvent) => void)
-        | null = null;
+      let _leaderboardMessageListener: ((event: MessageEvent) => void) | null =
+        null;
 
       const _loaderContainer: HTMLDivElement = document.createElement('div');
       _loaderContainer.style.backgroundColor = '#000000';
@@ -394,10 +393,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerName, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -440,10 +437,8 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const {
-                closeSaving,
-                closeSavingWithError,
-              } = scoreSavingState.startSaving({ playerId, score });
+              const { closeSaving, closeSavingWithError } =
+                scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -584,61 +579,51 @@ namespace gdjs {
             });
             break;
           case 'openPlayerAuthentication':
-            gdjs.playerAuthentication.openAuthenticationWindow(runtimeScene, {
-              onDismissed: () => {
+            gdjs.playerAuthentication
+              .openAuthenticationWindow(runtimeScene)
+              .promise.then(({ status }) => {
                 if (
-                  _leaderboardViewIframe &&
-                  _leaderboardViewIframe.contentWindow
+                  !_leaderboardViewIframe ||
+                  !_leaderboardViewIframe.contentWindow
                 ) {
-                  _leaderboardViewIframe.contentWindow.postMessage(
-                    {
-                      id: 'onPlayerAuthenticationDismissed',
-                    },
-                    leaderboardHostBaseUrl
+                  logger.warn(
+                    'Unable to transmit the new login status to the leaderboard view.'
                   );
+                  return;
                 }
-              },
-              onErrored: () => {
-                if (
-                  _leaderboardViewIframe &&
-                  _leaderboardViewIframe.contentWindow
-                ) {
+
+                if (status === 'errored') {
                   _leaderboardViewIframe.contentWindow.postMessage(
                     {
                       id: 'onPlayerAuthenticationErrored',
                     },
                     leaderboardHostBaseUrl
                   );
+                  return;
                 }
-              },
-              onLoggedIn: () => {
-                if (
-                  _leaderboardViewIframe &&
-                  _leaderboardViewIframe.contentWindow
-                ) {
-                  const playerId = gdjs.playerAuthentication.getUserId();
-                  const playerToken = gdjs.playerAuthentication.getUserToken();
-                  if (!playerId || !playerToken) {
-                    return;
-                  }
 
-                  if (
-                    _leaderboardViewIframe &&
-                    _leaderboardViewIframe.contentWindow
-                  ) {
-                    _leaderboardViewIframe.contentWindow.postMessage(
-                      {
-                        id: 'onPlayerAuthenticated',
-                        playerId,
-                        playerUsername: gdjs.playerAuthentication.getUsername(),
-                        playerToken: playerToken,
-                      },
-                      leaderboardHostBaseUrl
-                    );
-                  }
+                const playerId = gdjs.playerAuthentication.getUserId();
+                const playerToken = gdjs.playerAuthentication.getUserToken();
+                if (status === 'dismissed' || !playerId || !playerToken) {
+                  _leaderboardViewIframe.contentWindow.postMessage(
+                    {
+                      id: 'onPlayerAuthenticationDismissed',
+                    },
+                    leaderboardHostBaseUrl
+                  );
+                  return;
                 }
-              },
-            });
+
+                _leaderboardViewIframe.contentWindow.postMessage(
+                  {
+                    id: 'onPlayerAuthenticated',
+                    playerId,
+                    playerUsername: gdjs.playerAuthentication.getUsername(),
+                    playerToken: playerToken,
+                  },
+                  leaderboardHostBaseUrl
+                );
+              });
             break;
           case 'closeLeaderboardView':
             _hasPlayerJustClosedLeaderboardView = true;
@@ -820,10 +805,6 @@ namespace gdjs {
             );
           }
         }
-        searchParams.set(
-          'playerAuthPlatform',
-          gdjs.playerAuthentication.getPlayerAuthPlatform(runtimeScene)
-        );
         const playerId = gdjs.playerAuthentication.getUserId();
         const playerToken = gdjs.playerAuthentication.getUserToken();
         if (playerId && playerToken) {
@@ -877,9 +858,8 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-              targetUrl
-            );
+            _leaderboardViewIframe =
+              computeLeaderboardDisplayingIframe(targetUrl);
             if (typeof window !== 'undefined') {
               _leaderboardMessageListener = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(

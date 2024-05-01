@@ -16,7 +16,9 @@ namespace gdjs {
                 ? "One moment, we're opening a window for you to log in."
                 : "One moment, we're opening a new page with your web browser for you to log in.",
             text2:
-              'If the window did not open, please check your pop-up blocker and click the button below to try again.',
+              platform === 'cordova'
+                ? ''
+                : 'If the window did not open, please check your pop-up blocker and click the button below to try again.',
           }
         : {
             title: 'Publish your game!',

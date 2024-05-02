@@ -130,6 +130,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
     const resourcesManager = project.getResourcesManager();
     const resourcePath = resources[0].getFile();
+    // TODO: For a cloud project, projectPath is `'.'`
     const projectPath = path.dirname(project.getProjectFile());
     let image: HTMLImageElement;
 
@@ -144,6 +145,8 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     // Important, we are responsible for deleting the resources that were given to us.
     // Otherwise we have a memory leak.
     resources.forEach(resource => resource.delete());
+
+    // TODO: use a temporary folder to store the generated images.
 
     const results = await Promise.all([
       ...desktopSizes.map(size =>
@@ -193,6 +196,8 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
       'android-windowSplashScreenAnimatedIcon.png',
       ...iosSizes.map(size => `ios-icon-${size}.png`),
     ];
+    // TODO: For a cloud project, upload all generated images and set the right
+    // file attribute to the image resources.
     allResourcesNames.forEach(resourceName => {
       if (!resourcesManager.hasResource(resourceName)) {
         const imageResource = new gd.ImageResource();

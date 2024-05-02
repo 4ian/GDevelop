@@ -92,7 +92,7 @@ namespace gdjs {
     }
 
     onObjectDeleted(): void {
-      //@ts-ignore - We are destoying the task to avoid leaking memory.
+      //@ts-ignore - We destroy the task to avoid leaking memory/allow tween memory to be reclaimed as soon as possible.
       this.tween = null;
     }
   }

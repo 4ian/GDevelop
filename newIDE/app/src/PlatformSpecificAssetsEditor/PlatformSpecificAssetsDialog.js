@@ -13,7 +13,7 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { resizeImage } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Text from '../UI/Text';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
@@ -278,13 +278,20 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
         onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
-          <Line justifyContent="center" noMargin>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            noMargin
+            noColumnMargin
+          >
+            <Text noMargin>
+              <Trans>Generate icons from a file:</Trans>
+            </Text>
             <input
               type="file"
               onChange={this._generateFromFile}
               ref={_inputRef => (this.inputRef = _inputRef)}
             />
-          </Line>
+          </ResponsiveLineStackLayout>
           <Text size="sub-title">
             <Trans>gd.games thumbnail</Trans>
           </Text>

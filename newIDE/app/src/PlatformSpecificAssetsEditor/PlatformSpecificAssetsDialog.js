@@ -191,6 +191,12 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
         errorId: 'icon-generation-error',
         doNotReport: true,
       });
+    } finally {
+      // Reset input value so that if the user selects the same file again,
+      // the onChange callback is called.
+      if (this.inputRef) {
+        this.inputRef.value = '';
+      }
     }
   };
 

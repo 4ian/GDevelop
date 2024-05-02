@@ -62,6 +62,12 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
       .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore')
       .setAsyncFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
@@ -89,6 +95,12 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
       .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore')
       .setAsyncFunctionName(
         'gdjs.evtTools.leaderboards.saveConnectedPlayerScore'
@@ -97,7 +109,7 @@ module.exports = {
     extension
       .addAction(
         'SetPreferSendConnectedPlayerScore',
-        _('Enable the score to the connected player'),
+        _('Always attach scores to the connected player'),
         _(
           'Set if the score sent to a leaderboard is always attached to the connected player - if any. This is on by default.'
         ),
@@ -114,7 +126,6 @@ module.exports = {
       .setFunctionName(
         'gdjs.evtTools.leaderboards.setPreferSendConnectedPlayerScore'
       );
-    // TODO: add player authentication files.
 
     extension
       .addCondition(
@@ -297,6 +308,12 @@ module.exports = {
       .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
       .setFunctionName('gdjs.evtTools.leaderboards.displayLeaderboard');
 
     extension

@@ -5,21 +5,18 @@ import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { getImageFromPath, getImageFromUrl, resizeImage } from './ImageResizer';
+import {  resizeImage } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import ErrorBoundary from '../UI/ErrorBoundary';
 
-const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -70,6 +67,8 @@ const iosSizes = [
 ];
 
 class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
+  inputRef: HTMLInputElement | null = null;
+
   constructor(props: Props) {
     super(props);
     this.state = this._loadFrom(props.project);
@@ -105,79 +104,50 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     }
   }
 
-  _generateFromFile = async () => {
-    const { project, resourceManagementProps } = this.props;
-
-    const resourceSource = resourceManagementProps.resourceSources
-      .filter(source => source.kind === 'image')
-      .filter(source => source.name.startsWith('local-file-opener'))[0];
-
-    if (!resourceSource) {
-      throw new Error(
-        'No supported resource source - only local files are supported.'
-      );
-    }
-
-    const resources = await resourceManagementProps.onChooseResource({
-      initialSourceName: resourceSource.name,
-      multiSelection: false,
-      resourceKind: 'image',
-    });
-
-    if (!resources.length || !path) {
+  _generateFromFile = async e => {
+    if (!this.inputRef || !this.inputRef.files || !this.inputRef.files[0]) {
+      console.error("Could't find selected file. Aborting icon generation.")
       return;
     }
+    const chosenFileAsBlobDataUrl = URL.createObjectURL(this.inputRef.files[0]);
+    const { project, resourceManagementProps } = this.props;
 
     const resourcesManager = project.getResourcesManager();
-    const resourcePath = resources[0].getFile();
-    // TODO: For a cloud project, projectPath is `'.'`
-    const projectPath = path.dirname(project.getProjectFile());
-    let image: HTMLImageElement;
-
-    if (resourcePath.startsWith('https://')) {
-      image = await getImageFromUrl(resourcePath);
-    } else {
-      const fullPath = path.resolve(projectPath, resourcePath);
-
-      image = await getImageFromPath(fullPath);
-    }
-
-    // Important, we are responsible for deleting the resources that were given to us.
-    // Otherwise we have a memory leak.
-    resources.forEach(resource => resource.delete());
-
-    // TODO: use a temporary folder to store the generated images.
 
     const results = await Promise.all([
-      ...desktopSizes.map(size =>
-        resizeImage(image, path.join(projectPath, `desktop-icon-${size}.png`), {
+      ...desktopSizes.map(async size => ({
+        resourceName: `desktop-icon-${size}.png`,
+        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
           width: size,
           height: size,
-        })
-      ),
-      ...androidSizes.map(size =>
-        resizeImage(image, path.join(projectPath, `android-icon-${size}.png`), {
+        }),
+      })),
+      ...androidSizes.map(async size => ({
+        resourceName: `android-icon-${size}.png`,
+        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
           width: size,
           height: size,
-        })
-      ),
-      resizeImage(
-        image,
-        path.join(projectPath, 'android-windowSplashScreenAnimatedIcon.png'),
-        {
+        }),
+      })),
+      (async () => ({
+        resourceName: 'android-windowSplashScreenAnimatedIcon.png',
+        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
           width: androidWindowSplashScreenAnimatedIconRecommendedSize,
           height: androidWindowSplashScreenAnimatedIconRecommendedSize,
           transparentBorderSize:
             androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
-        }
-      ),
-      ...iosSizes.map(size =>
-        resizeImage(image, path.join(projectPath, `ios-icon-${size}.png`), {
+        }),
+      }))(),
+      ...iosSizes.map(async size => ({
+        resourceName: `ios-icon-${size}.png`,
+        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
           width: size,
           height: size,
-        })
-      ),
+        }),
+      })),
     ]);
+
+    console.log(results)
 
     if (results.indexOf(false) !== -1) {
       showErrorBox({
@@ -189,19 +159,10 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
       return;
     }
 
-    // Add resources to the game
-    const allResourcesNames = [
-      ...desktopSizes.map(size => `desktop-icon-${size}.png`),
-      ...androidSizes.map(size => `android-icon-${size}.png`),
-      'android-windowSplashScreenAnimatedIcon.png',
-      ...iosSizes.map(size => `ios-icon-${size}.png`),
-    ];
-    // TODO: For a cloud project, upload all generated images and set the right
-    // file attribute to the image resources.
-    allResourcesNames.forEach(resourceName => {
+    results.forEach(({ resourceName, blobDataUrl }) => {
       if (!resourcesManager.hasResource(resourceName)) {
         const imageResource = new gd.ImageResource();
-        imageResource.setFile(resourceName);
+        imageResource.setFile(blobDataUrl);
         imageResource.setName(resourceName);
 
         resourcesManager.addResource(imageResource);
@@ -210,12 +171,17 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
         imageResource.delete();
       } else {
-        resourcesManager.getResource(resourceName).setFile(resourceName);
+        resourcesManager.getResource(resourceName).setFile(blobDataUrl);
       }
     });
 
+    await resourceManagementProps.onFetchNewlyAddedResources();
+
     // Make sure the resources are (re)loaded.
-    ResourcesLoader.burstUrlsCacheForResources(project, allResourcesNames);
+    ResourcesLoader.burstUrlsCacheForResources(
+      project,
+      results.map(({ resourceName }) => resourceName)
+    );
     setTimeout(() => {
       this.setState({
         desktopIconResourceNames: desktopSizes.map(
@@ -310,20 +276,11 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
       >
         <ColumnStackLayout noMargin>
           <Line justifyContent="center" noMargin>
-            {!!path ? (
-              <RaisedButton
-                primary
-                label={<Trans>Generate icons from a file</Trans>}
-                onClick={this._generateFromFile}
-              />
-            ) : (
-              <Text>
-                <Trans>
-                  Download GDevelop desktop version to generate the Android and
-                  iOS icons of your game.
-                </Trans>
-              </Text>
-            )}
+            <input
+              type="file"
+              onChange={this._generateFromFile}
+              ref={_inputRef => (this.inputRef = _inputRef)}
+            />
           </Line>
           <Text size="sub-title">
             <Trans>gd.games thumbnail</Trans>

@@ -149,10 +149,14 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
       ]);
 
       results.forEach(({ resourceName, blobDataUrl }) => {
+        const metadata = JSON.stringify({
+          extension: '.png',
+        });
         if (!resourcesManager.hasResource(resourceName)) {
           const imageResource = new gd.ImageResource();
           imageResource.setFile(blobDataUrl);
           imageResource.setName(resourceName);
+          imageResource.setMetadata(metadata);
 
           resourcesManager.addResource(imageResource);
 
@@ -161,6 +165,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
           imageResource.delete();
         } else {
           resourcesManager.getResource(resourceName).setFile(blobDataUrl);
+          resourcesManager.getResource(resourceName).setMetadata(metadata);
         }
       });
 

@@ -11,7 +11,7 @@ import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import { getImageFromPath, resizeImage } from './ImageResizer';
+import { getImageFromPath, getImageFromUrl, resizeImage } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import optionalRequire from '../Utils/OptionalRequire';
 import Text from '../UI/Text';
@@ -129,10 +129,17 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     }
 
     const resourcesManager = project.getResourcesManager();
+    const resourcePath = resources[0].getFile();
     const projectPath = path.dirname(project.getProjectFile());
-    const fullPath = path.resolve(projectPath, resources[0].getFile());
+    let image: HTMLImageElement;
 
-    const image = await getImageFromPath(fullPath);
+    if (resourcePath.startsWith('https://')) {
+      image = await getImageFromUrl(resourcePath);
+    } else {
+      const fullPath = path.resolve(projectPath, resourcePath);
+
+      image = await getImageFromPath(fullPath);
+    }
 
     // Important, we are responsible for deleting the resources that were given to us.
     // Otherwise we have a memory leak.

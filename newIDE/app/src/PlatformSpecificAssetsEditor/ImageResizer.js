@@ -19,6 +19,20 @@ export const getImageFromPath = (path: string): Promise<HTMLImageElement> => {
   });
 };
 
+export const getImageFromUrl = (url: string): Promise<HTMLImageElement> => {
+  const imageElement = document.createElement('img');
+
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    imageElement.addEventListener('error', (event: Event) => {
+      reject(event);
+    });
+    imageElement.addEventListener('load', () => {
+      resolve(imageElement);
+    });
+    imageElement.src = url;
+  });
+};
+
 export const resizeImage = (
   image: HTMLImageElement,
   outputFile: string,

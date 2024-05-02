@@ -10,20 +10,27 @@ import {
   type EditForm,
   type AuthError,
   type Profile,
+  type UpdateGitHubStarResponse,
 } from '../Utils/GDevelopServices/Authentication';
 import {
   communityLinksConfig,
   donateLinkConfig,
   discordUsernameConfig,
+  githubUsernameConfig,
   type UsernameAvailability,
   type CommunityLinkType,
 } from '../Utils/GDevelopServices/User';
+import { type Badge, type Achievement } from '../Utils/GDevelopServices/Badge';
 import {
   hasValidSubscriptionPlan,
   type Subscription,
 } from '../Utils/GDevelopServices/Usage';
 import LeftLoader from '../UI/LeftLoader';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
+import {
+  ColumnStackLayout,
+  LineStackLayout,
+  TextFieldWithButtonLayout,
+} from '../UI/Layout';
 import {
   isUsernameValid,
   UsernameField,
@@ -36,12 +43,20 @@ import Text from '../UI/Text';
 import TextButton from '../UI/TextButton';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import Form from '../UI/Form';
+import RaisedButton from '../UI/RaisedButton';
+import Coin from '../Credits/Icons/Coin';
+import { sendGitHubStarUpdated } from '../Utils/Analytics/EventSender';
 
-type Props = {|
+export type EditProfileDialogProps = {|
   profile: Profile,
+  achievements: ?Array<Achievement>,
+  badges: ?Array<Badge>,
   subscription: ?Subscription,
   onClose: () => void,
   onEdit: (form: EditForm) => Promise<void>,
+  onUpdateGitHubStar: (
+    githubUsername: string
+  ) => Promise<UpdateGitHubStarResponse>,
   onDelete: () => Promise<void>,
   actionInProgress: boolean,
   error: ?AuthError,
@@ -55,6 +70,118 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   if (error.code === 'auth/malformed-username')
     return usernameFormatErrorMessage;
   return undefined;
+};
+
+const GitHubUsernameField = ({
+  badges,
+  achievements,
+  githubUsername,
+  onSetGithubUsername,
+  onUpdateGitHubStar,
+  disabled,
+}: {
+  badges: ?Array<Badge>,
+  achievements: ?Array<Achievement>,
+  githubUsername: string,
+  onSetGithubUsername: (username: string) => void,
+  onUpdateGitHubStar: (
+    githubUsername: string
+  ) => Promise<UpdateGitHubStarResponse>,
+  disabled: boolean,
+}) => {
+  const { showAlert } = useAlertDialog();
+
+  const hasGithubStarBadge =
+    !!badges && badges.some(badge => badge.achievementId === 'github-star');
+  const githubStarAchievement =
+    (achievements &&
+      achievements.find(achievement => achievement.id === 'github-star')) ||
+    null;
+
+  const onClaim = React.useCallback(
+    async () => {
+      try {
+        const response = await onUpdateGitHubStar(githubUsername);
+        sendGitHubStarUpdated({ code: response.code });
+
+        if (
+          response.code === 'github-star/badge-given' ||
+          response.code === 'github-star/badge-already-given'
+        ) {
+          showAlert({
+            title: t`You're awesome!`,
+            message: t`Thanks for starring GDevelop repository. We added credits to your account as a thank you gift.`,
+          });
+        } else if (response.code === 'github-star/repository-not-starred') {
+          showAlert({
+            title: t`We could not find your GitHub star`,
+            message: t`Make sure you star the repository called 4ian/GDevelop with your GitHub user and try again.`,
+          });
+        } else if (response.code === 'github-star/user-not-found') {
+          showAlert({
+            title: t`We could not find your GitHub user and star`,
+            message: t`Make sure you create your GitHub account, star the repository called 4ian/GDevelop, enter your username here and try again.`,
+          });
+        } else {
+          throw new Error(
+            `Error while updating the GitHub star: ${response.code}.`
+          );
+        }
+      } catch (error) {
+        console.error('Error while updating GitHub star:', error);
+        showAlert({
+          title: t`Something went wrong`,
+          message: t`Make sure you have a proper internet connection or try again later.`,
+        });
+      }
+    },
+    [githubUsername, onUpdateGitHubStar, showAlert]
+  );
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <TextFieldWithButtonLayout
+          renderButton={style => (
+            <RaisedButton
+              onClick={onClaim}
+              icon={<Coin fontSize="small" />}
+              label={
+                hasGithubStarBadge ? (
+                  <Trans>Credits given</Trans>
+                ) : (
+                  <Trans>Claim</Trans>
+                )
+              }
+              disabled={hasGithubStarBadge || disabled}
+              primary
+              style={style}
+            />
+          )}
+          renderTextField={() => (
+            <TextField
+              value={githubUsername}
+              floatingLabelText={<Trans>GitHub username</Trans>}
+              fullWidth
+              translatableHintText={t`Your GitHub username`}
+              onChange={(e, value) => {
+                onSetGithubUsername(value);
+              }}
+              disabled={disabled}
+              maxLength={githubUsernameConfig.maxLength}
+              helperMarkdownText={i18n._(
+                !hasGithubStarBadge
+                  ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
+                      githubStarAchievement.rewardValueInCredits) ||
+                      '-'} free credits as a thank you!`
+                  : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`
+              )}
+            />
+          )}
+        />
+      )}
+    </I18n>
+  );
 };
 
 const CommunityLinkLine = ({
@@ -98,12 +225,15 @@ const CommunityLinkLine = ({
 const EditProfileDialog = ({
   profile,
   subscription,
+  achievements,
+  badges,
   onClose,
   onEdit,
+  onUpdateGitHubStar,
   onDelete,
   actionInProgress,
   error,
-}: Props) => {
+}: EditProfileDialogProps) => {
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
 
   const communityLinks = profile.communityLinks || {};
@@ -114,6 +244,9 @@ const EditProfileDialog = ({
   const [donateLink, setDonateLink] = React.useState(profile.donateLink || '');
   const [discordUsername, setDiscordUsername] = React.useState(
     profile.discordUsername || ''
+  );
+  const [githubUsername, setGithubUsername] = React.useState(
+    profile.githubUsername || ''
   );
   const [personalWebsiteLink, setPersonalWebsiteLink] = React.useState(
     communityLinks.personalWebsiteLink || ''
@@ -197,6 +330,7 @@ const EditProfileDialog = ({
       getNewsletterEmail,
       donateLink,
       discordUsername,
+      githubUsername,
       communityLinks: {
         personalWebsiteLink,
         personalWebsite2Link,
@@ -300,6 +434,10 @@ const EditProfileDialog = ({
                 isValidatingUsername={isValidatingUsername}
                 disabled={actionInProgress}
               />
+
+              <Text size="sub-title" noMargin>
+                <Trans>Creator profile</Trans>
+              </Text>
               <TextField
                 value={discordUsername}
                 floatingLabelText={<Trans>Discord username</Trans>}
@@ -313,6 +451,14 @@ const EditProfileDialog = ({
                 helperMarkdownText={i18n._(
                   t`Add your Discord username to get access to a dedicated channel if you have a Gold or Pro subscription! Join the [GDevelop Discord](https://discord.gg/gdevelop).`
                 )}
+              />
+              <GitHubUsernameField
+                achievements={achievements}
+                badges={badges}
+                githubUsername={githubUsername}
+                onSetGithubUsername={setGithubUsername}
+                onUpdateGitHubStar={onUpdateGitHubStar}
+                disabled={actionInProgress}
               />
               <TextField
                 value={description}
@@ -329,6 +475,9 @@ const EditProfileDialog = ({
                 floatingLabelFixed
                 maxLength={10000}
               />
+              <Text size="sub-title" noMargin>
+                <Trans>Socials</Trans>
+              </Text>
               <CommunityLinkLine
                 id="personalWebsiteLink"
                 value={personalWebsiteLink}
@@ -435,6 +584,9 @@ const EditProfileDialog = ({
                 errorText={donateLinkError}
                 maxLength={donateLinkConfig.maxLength}
               />
+              <Text size="sub-title" noMargin>
+                <Trans>Notifications</Trans>
+              </Text>
               <Checkbox
                 label={<Trans>I want to receive the GDevelop Newsletter</Trans>}
                 checked={getNewsletterEmail}

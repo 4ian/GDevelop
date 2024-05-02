@@ -12,7 +12,14 @@ class ProjectCache {
   databasePromise: Promise<IDBDatabase> | null;
 
   static isAvailable() {
-    return typeof window !== 'undefined' && 'indexedDB' in window;
+    return (
+      typeof window !== 'undefined' &&
+      'indexedDB' in window &&
+      // Firefox <= 125 does not support the `databases()` method that is necessary to
+      // fix the issue of corrupted databases (that do not contain the object store `objectStoreScope`).
+      'databases' in window.indexedDB &&
+      typeof window.indexedDB.databases === 'function'
+    );
   }
 
   static async burst() {

@@ -28,6 +28,7 @@ export type Achievement = {|
   category: string,
   name: string,
   description: string,
+  rewardValueInCredits?: number,
 |};
 
 export type AchievementWithBadgeData = {|

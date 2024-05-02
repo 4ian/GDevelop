@@ -61,6 +61,7 @@ type Props = {|
   onOpenPrivateGameTemplateListingData?: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
+  onOpenProfile?: () => void,
 |};
 
 export type AssetStoreInterface = {|
@@ -98,6 +99,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       hideGameTemplates,
       displayPromotions,
       onOpenPrivateGameTemplateListingData,
+      onOpenProfile,
     }: Props,
     ref
   ) => {
@@ -698,6 +700,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                 openedShopCategory={openedShopCategory}
                 hideGameTemplates={hideGameTemplates}
                 displayPromotions={displayPromotions}
+                onOpenProfile={onOpenProfile}
               />
             ) : (
               <PlaceholderLoader />

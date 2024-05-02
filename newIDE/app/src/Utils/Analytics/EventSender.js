@@ -454,6 +454,10 @@ export const sendEventsExtractedAsFunction = (metadata: {|
   recordEvent('events-extracted-as-function', metadata);
 };
 
+export const sendGitHubStarUpdated = (metadata: {| code: string |}) => {
+  recordEvent('github-star-updated', metadata);
+};
+
 const inAppTutorialProgressLastFiredEvents: {
   [string]: {
     lastStep: number,

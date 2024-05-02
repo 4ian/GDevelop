@@ -10,6 +10,7 @@ import {
   itemsWithJustImage,
   itemsWithOverlay,
   itemsWithTitleAndDescription,
+  itemsWithLocks,
 } from './data';
 
 export default {
@@ -79,6 +80,17 @@ export const WithTitleAndDescription = () => (
 export const WithOverlay = () => (
   <ImageTileRow
     items={itemsWithOverlay}
+    title="Recommended templates"
+    onShowAll={() => {}}
+    showAllIcon={<Add fontSize="small" />}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
+  />
+);
+
+export const WithLocks = () => (
+  <ImageTileRow
+    items={itemsWithLocks}
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}

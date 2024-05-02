@@ -44,7 +44,9 @@ const CompactSemiControlledTextField = ({
           if (!commitOnBlur) onChange(newValue);
         }}
         onBlur={event => {
-          onChange(event.currentTarget.value);
+          if (value !== event.currentTarget.value) {
+            onChange(event.currentTarget.value);
+          }
           setFocused(false);
           setText('');
         }}

@@ -67,8 +67,7 @@ export default function SubscriptionPendingDialog({
           {
             discordUsername,
           },
-          preferences,
-          { throwError: false }
+          preferences
         );
       } catch (error) {
         console.error('Error while editing profile:', error);

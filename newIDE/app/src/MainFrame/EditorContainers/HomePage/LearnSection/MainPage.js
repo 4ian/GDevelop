@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line, Column, Spacer } from '../../../../UI/Grid';
 import Text from '../../../../UI/Text';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
@@ -29,6 +29,10 @@ import ChevronArrowRight from '../../../../UI/CustomSvgIcons/ChevronArrowRight';
 import Upload from '../../../../UI/CustomSvgIcons/Upload';
 import WikiSearchBar from '../../../../UI/WikiSearchBar';
 import FlingGame from '../InAppTutorials/FlingGame';
+import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
+import { PrivateTutorialViewDialog } from '../../../../AssetStore/PrivateTutorials/PrivateTutorialViewDialog';
+import { EducationCard } from './EducationCard';
 
 const useStyles = makeStyles({
   tile: {
@@ -86,15 +90,19 @@ const styles = {
 };
 
 type TutorialsRowProps = {|
+  limits: ?Limits,
   tutorials: Tutorial[],
   category: TutorialCategory,
   onSelectCategory: TutorialCategory => void,
+  onSelectTutorial: (tutorial: Tutorial) => void,
 |};
 
 export const TutorialsRow = ({
+  limits,
   tutorials,
   category,
   onSelectCategory,
+  onSelectTutorial,
 }: TutorialsRowProps) => (
   <I18n>
     {({ i18n }) => (
@@ -103,7 +111,14 @@ export const TutorialsRow = ({
         description={TUTORIAL_CATEGORY_TEXTS[category].description}
         items={tutorials
           .filter(tutorial => tutorial.category === category)
-          .map(tutorial => formatTutorialToImageTileComponent(i18n, tutorial))}
+          .map(tutorial =>
+            formatTutorialToImageTileComponent({
+              i18n,
+              limits,
+              tutorial,
+              onSelectTutorial,
+            })
+          )}
         onShowAll={() => onSelectCategory(category)}
         showAllIcon={<ChevronArrowRight fontSize="small" />}
         getColumnsFromWindowSize={getTutorialsColumnsFromWidth}
@@ -128,6 +143,7 @@ const MainPage = ({
   tutorials,
   selectInAppTutorial,
 }: Props) => {
+  const { limits } = React.useContext(AuthenticatedUserContext);
   const classes = useStyles();
   const {
     windowSize,
@@ -158,6 +174,11 @@ const MainPage = ({
       action: () => onTabChange('community'),
     },
   ].filter(Boolean);
+
+  const [
+    selectedTutorial,
+    setSelectedTutorial,
+  ] = React.useState<Tutorial | null>(null);
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
@@ -219,25 +240,41 @@ const MainPage = ({
               <Trans>Learn everything about GDevelop from the ground up</Trans>
             </Text>
           </Line>
+          {limits &&
+          limits.capabilities.classrooms &&
+          limits.capabilities.classrooms.hideUpgradeNotice ? null : (
+            <>
+              <Spacer />
+              <EducationCard
+                onSeeResources={() => onSelectCategory('education-curriculum')}
+              />
+            </>
+          )}
         </SectionRow>
         <SectionRow>
           <TutorialsRow
+            limits={limits}
             category="official-beginner"
             onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
             tutorials={tutorials}
           />
         </SectionRow>
         <SectionRow>
           <TutorialsRow
+            limits={limits}
             category="official-intermediate"
             onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
             tutorials={tutorials}
           />
         </SectionRow>
         <SectionRow>
           <TutorialsRow
+            limits={limits}
             category="official-advanced"
             onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
             tutorials={tutorials}
           />
         </SectionRow>
@@ -313,18 +350,37 @@ const MainPage = ({
         </SectionRow>
         <SectionRow>
           <TutorialsRow
-            category="full-game"
+            limits={limits}
+            category="education-curriculum"
             onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
             tutorials={tutorials}
           />
         </SectionRow>
         <SectionRow>
           <TutorialsRow
-            category="game-mechanic"
+            limits={limits}
+            category="full-game"
             onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
             tutorials={tutorials}
           />
         </SectionRow>
+        <SectionRow>
+          <TutorialsRow
+            limits={limits}
+            category="game-mechanic"
+            onSelectCategory={onSelectCategory}
+            onSelectTutorial={setSelectedTutorial}
+            tutorials={tutorials}
+          />
+        </SectionRow>
+        {selectedTutorial && (
+          <PrivateTutorialViewDialog
+            tutorial={selectedTutorial}
+            onClose={() => setSelectedTutorial(null)}
+          />
+        )}
       </>
     </SectionContainer>
   );

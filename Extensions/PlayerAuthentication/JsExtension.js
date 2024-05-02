@@ -101,7 +101,9 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.openAuthenticationWindow')
-      .setAsyncFunctionName('gdjs.playerAuthentication.openAuthenticationWindow');
+      .setAsyncFunctionName(
+        'gdjs.playerAuthentication.openAuthenticationWindow'
+      );
 
     extension
       .addCondition(

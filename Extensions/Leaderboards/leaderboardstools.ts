@@ -223,8 +223,9 @@ namespace gdjs {
       let _leaderboardViewIframeLoading: boolean = false;
       let _leaderboardViewIframeLoaded: boolean = false;
       let _errorTimeoutId: NodeJS.Timeout | null = null;
-      let _leaderboardMessageListener: ((event: MessageEvent) => void) | null =
-        null;
+      let _leaderboardMessageListener:
+        | ((event: MessageEvent) => void)
+        | null = null;
 
       const _loaderContainer: HTMLDivElement = document.createElement('div');
       _loaderContainer.style.backgroundColor = '#000000';
@@ -393,8 +394,10 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerName, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerName, score });
 
               try {
                 const leaderboardEntry = await saveScore({
@@ -437,8 +440,10 @@ namespace gdjs {
               new ScoreSavingState());
 
             try {
-              const { closeSaving, closeSavingWithError } =
-                scoreSavingState.startSaving({ playerId, score });
+              const {
+                closeSaving,
+                closeSavingWithError,
+              } = scoreSavingState.startSaving({ playerId, score });
 
               try {
                 const leaderboardEntryId = await saveScore({
@@ -672,7 +677,7 @@ namespace gdjs {
               'Leaderboard page did not send message in time. Closing leaderboard view.'
             );
           }
-        }, 5000);
+        }, 15000);
       };
 
       const displayLoaderInLeaderboardView = function (
@@ -858,8 +863,9 @@ namespace gdjs {
 
             resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-            _leaderboardViewIframe =
-              computeLeaderboardDisplayingIframe(targetUrl);
+            _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
+              targetUrl
+            );
             if (typeof window !== 'undefined') {
               _leaderboardMessageListener = (event: MessageEvent) => {
                 receiveMessageFromLeaderboardView(

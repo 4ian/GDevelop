@@ -25,8 +25,9 @@ namespace gdjs {
     let _authenticationTimeoutId: NodeJS.Timeout | null = null;
 
     // Communication methods.
-    let _authenticationMessageCallback: ((event: MessageEvent) => void) | null =
-      null;
+    let _authenticationMessageCallback:
+      | ((event: MessageEvent) => void)
+      | null = null;
     let _websocket: WebSocket | null = null;
 
     type AuthenticationWindowStatus = 'logged' | 'errored' | 'dismissed';
@@ -103,15 +104,35 @@ namespace gdjs {
      */
     const getPlayerAuthPlatform = (
       runtimeScene: RuntimeScene
-    ): 'electron' | 'cordova' | 'web-iframe' | 'web' => {
+    ): 'electron' | 'cordova' | 'cordova-websocket' | 'web-iframe' | 'web' => {
       const runtimeGame = runtimeScene.getGame();
       const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
+        // This can be a:
+        // - Preview in GDevelop desktop app.
+        // - Desktop game running on Electron.
         return 'electron';
       }
-      if (typeof cordova !== 'undefined') return 'cordova';
+
+      // This can be a:
+      // - Preview in GDevelop mobile app (iOS only)
       if (shouldAuthenticationUseIframe(runtimeScene)) return 'web-iframe';
 
+      if (typeof cordova !== 'undefined') {
+        if (cordova.platformId === 'ios') {
+          // The game is an iOS app.
+          return 'cordova-websocket';
+        }
+
+        // The game is an Android app.
+        return 'cordova';
+      }
+
+      // This can be a:
+      // - Preview in GDevelop web-app
+      // - Preview in Gdevelop mobile app (Android only)
+      // - Web game (gd.games or any website/server) accessed via a desktop browser...
+      // - Or a web game accessed via a mobile browser (Android/iOS).
       return 'web';
     };
 
@@ -119,7 +140,8 @@ namespace gdjs {
      * Check if, in some exceptional cases, we allow authentication
      * to be done through a iframe.
      * This is usually discouraged as the user can't verify that the authentication
-     * window is a genuine one. It's only to be used in trusted contexts.
+     * window is a genuine one. It's only to be used in trusted contexts (e.g:
+     * preview in the GDevelop mobile app).
      */
     const shouldAuthenticationUseIframe = (runtimeScene: RuntimeScene) => {
       const runtimeGameOptions = runtimeScene.getGame().getAdditionalOptions();
@@ -281,7 +303,10 @@ namespace gdjs {
     const cleanUpAuthWindowAndCallbacks = (runtimeScene: RuntimeScene) => {
       removeAuthenticationContainer(runtimeScene);
       clearAuthenticationWindowTimeout();
+
+      // If there is a websocket communication (electron, cordova iOS), close it.
       if (_websocket) {
+        logger.info('Closing authentication websocket connection.');
         _websocket.close();
         _websocket = null;
       }
@@ -569,13 +594,12 @@ namespace gdjs {
       );
     };
 
-    /**
-     * Helper to handle authentication window on Electron.
-     * We open a new window, and create a websocket to know when the user is logged in.
-     */
-    const openAuthenticationWindowForElectron = (
+    const setupWebsocketForAuthenticationWindow = (
       runtimeScene: gdjs.RuntimeScene,
-      gameId: string
+      onOpenAuthenticationWindow: (options: {
+        connectionId: string;
+        resolve: (AuthenticationWindowStatus) => void;
+      }) => void
     ) =>
       new Promise<AuthenticationWindowStatus>((resolve) => {
         let hasFinishedAlready = false;
@@ -586,12 +610,14 @@ namespace gdjs {
           : 'wss://api-ws.gdevelop.io/play';
         _websocket = new WebSocket(wsPlayApi);
         _websocket.onopen = () => {
+          logger.info('Opened authentication websocket connection.');
           // When socket is open, ask for the connectionId, so that we can open the authentication window.
           if (_websocket) {
             _websocket.send(JSON.stringify({ action: 'getConnectionId' }));
           }
         };
         _websocket.onerror = () => {
+          logger.info('Error in authentication websocket connection.');
           if (!hasFinishedAlready) {
             hasFinishedAlready = true;
             resolve('errored');
@@ -602,6 +628,7 @@ namespace gdjs {
           );
         };
         _websocket.onclose = () => {
+          logger.info('Closing authentication websocket connection.');
           if (!hasFinishedAlready) {
             hasFinishedAlready = true;
             resolve('dismissed');
@@ -621,6 +648,7 @@ namespace gdjs {
                   userToken: messageData.token,
                 });
                 focusOnGame(runtimeScene);
+
                 hasFinishedAlready = true;
                 resolve('logged');
                 break;
@@ -629,38 +657,89 @@ namespace gdjs {
                 const messageData = messageContent.data;
                 const connectionId = messageData.connectionId;
                 if (!connectionId) {
-                  logger.error('No connectionId received');
+                  logger.error('No WebSocket connectionId received');
+                  hasFinishedAlready = true;
+                  resolve('errored');
                   return;
                 }
 
-                const targetUrl = getAuthWindowUrl({
-                  runtimeGame: runtimeScene.getGame(),
-                  gameId,
-                  connectionId,
-                });
-
-                const electron = runtimeScene
-                  .getGame()
-                  .getRenderer()
-                  .getElectron();
-                const openWindow = () => electron.shell.openExternal(targetUrl);
-
-                openWindow();
-
-                // Add the link to the window in case a popup blocker is preventing the window from opening.
-                if (_authenticationTextContainer) {
-                  authComponents.addAuthenticationUrlToTextsContainer(
-                    openWindow,
-                    _authenticationTextContainer
-                  );
-                }
-
+                logger.info('WebSocket connectionId received.');
+                onOpenAuthenticationWindow({ connectionId, resolve });
                 break;
               }
             }
           }
         };
       });
+
+    /**
+     * Helper to handle authentication window on Electron.
+     * We open a new window, and create a websocket to know when the user is logged in.
+     */
+    const openAuthenticationWindowForElectron = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) =>
+      setupWebsocketForAuthenticationWindow(
+        runtimeScene,
+        ({ connectionId }) => {
+          const targetUrl = getAuthWindowUrl({
+            runtimeGame: runtimeScene.getGame(),
+            gameId,
+            connectionId,
+          });
+
+          const electron = runtimeScene.getGame().getRenderer().getElectron();
+          const openWindow = () => electron.shell.openExternal(targetUrl);
+
+          openWindow();
+
+          // Add the link to the window in case a popup blocker is preventing the window from opening.
+          if (_authenticationTextContainer) {
+            authComponents.addAuthenticationUrlToTextsContainer(
+              openWindow,
+              _authenticationTextContainer
+            );
+          }
+        }
+      );
+
+    /**
+     * Helper to handle authentication window on Cordova on iOS.
+     * We open an InAppBrowser window, and listen to the websocket to know when the user is logged in.
+     */
+    const openAuthenticationWindowForCordovaWithWebSocket = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) =>
+      setupWebsocketForAuthenticationWindow(
+        runtimeScene,
+        ({ connectionId, resolve }) => {
+          const targetUrl = getAuthWindowUrl({
+            runtimeGame: runtimeScene.getGame(),
+            gameId,
+            connectionId,
+          });
+
+          _authenticationInAppWindow = cordova.InAppBrowser.open(
+            targetUrl,
+            'authentication',
+            'location=yes,toolbarcolor=#000000,hidenavigationbuttons=yes,closebuttoncolor=#FFFFFF' // location=yes is important to show the URL bar to the user.
+          );
+          if (!_authenticationInAppWindow) {
+            resolve('errored');
+            return;
+          }
+
+          _authenticationInAppWindow.addEventListener(
+            'exit',
+            () => {
+              resolve('dismissed');
+            },
+            true
+          );
+        }
+      );
 
     /**
      * Helper to handle authentication window on Cordova.
@@ -868,10 +947,13 @@ namespace gdjs {
           if (_authenticationBanner) _authenticationBanner.style.opacity = '0';
 
           const playerAuthPlatform = getPlayerAuthPlatform(runtimeScene);
-          const { rootContainer, loaderContainer, iframeContainer } =
-            authComponents.computeAuthenticationContainer(
-              onAuthenticationContainerDismissed
-            );
+          const {
+            rootContainer,
+            loaderContainer,
+            iframeContainer,
+          } = authComponents.computeAuthenticationContainer(
+            onAuthenticationContainerDismissed
+          );
           _authenticationRootContainer = rootContainer;
           _authenticationLoaderContainer = loaderContainer;
           _authenticationIframeContainer = iframeContainer;
@@ -900,13 +982,12 @@ namespace gdjs {
                     )
                 : null; // Only show a link if we're on electron.
 
-              _authenticationTextContainer =
-                authComponents.addAuthenticationTextsToLoadingContainer(
-                  _authenticationLoaderContainer,
-                  playerAuthPlatform,
-                  isGameRegistered,
-                  wikiOpenAction
-                );
+              _authenticationTextContainer = authComponents.addAuthenticationTextsToLoadingContainer(
+                _authenticationLoaderContainer,
+                playerAuthPlatform,
+                isGameRegistered,
+                wikiOpenAction
+              );
             }
             if (!isGameRegistered) return;
 
@@ -917,18 +998,31 @@ namespace gdjs {
             let status: AuthenticationWindowStatus;
             switch (playerAuthPlatform) {
               case 'electron':
+                // This can be a:
+                // - Preview in GDevelop desktop app.
+                // - Desktop game running on Electron.
                 status = await openAuthenticationWindowForElectron(
                   runtimeScene,
                   _gameId
                 );
                 break;
               case 'cordova':
+                // The game is an Android app.
                 status = await openAuthenticationWindowForCordova(
                   runtimeScene,
                   _gameId
                 );
                 break;
+              case 'cordova-websocket':
+                // The game is an iOS app.
+                status = await openAuthenticationWindowForCordovaWithWebSocket(
+                  runtimeScene,
+                  _gameId
+                );
+                break;
               case 'web-iframe':
+                // This can be a:
+                // - Preview in GDevelop mobile app (iOS only)
                 status = await openAuthenticationIframeForWeb(
                   runtimeScene,
                   _gameId
@@ -936,6 +1030,11 @@ namespace gdjs {
                 break;
               case 'web':
               default:
+                // This can be a:
+                // - Preview in GDevelop web-app
+                // - Preview in Gdevelop mobile app (Android only)
+                // - Web game (gd.games or any website/server) accessed via a desktop browser...
+                // - Or a web game accessed via a mobile browser (Android/iOS).
                 status = await openAuthenticationWindowForWeb(
                   runtimeScene,
                   _gameId
@@ -944,6 +1043,10 @@ namespace gdjs {
             }
 
             if (isDimissedAlready) return;
+            if (status === 'dismissed') {
+              onAuthenticationContainerDismissed();
+            }
+
             resolve({ status });
           })();
         })

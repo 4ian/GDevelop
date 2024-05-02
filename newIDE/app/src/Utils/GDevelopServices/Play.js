@@ -79,6 +79,7 @@ export type LeaderboardUpdatePayload = {|
   extremeAllowedScore?: number | null,
   ignoreCustomPlayerNames?: boolean,
   autoPlayerNamePrefix?: string,
+  disableLoginInLeaderboard?: boolean,
 |};
 
 export type LeaderboardEntry = {|

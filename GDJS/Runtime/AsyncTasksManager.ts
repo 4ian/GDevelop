@@ -107,6 +107,8 @@ If you are using JavaScript promises in an asynchronous action, make sure to add
 Otherwise, report this as a bug on the GDevelop forums!
 ${error ? 'The following error was thrown: ' + error : ''}`
           );
+
+          // @ts-ignore
           return undefined as ResultType;
         })
         .then((result) => {

@@ -380,7 +380,7 @@ module.exports = {
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.deleteFileAsync')
       .setAsyncFunctionName('gdjs.fileSystem.deleteFileAsyncTask');
-    
+
     extension
       .addAction(
         'ReadDirectory',

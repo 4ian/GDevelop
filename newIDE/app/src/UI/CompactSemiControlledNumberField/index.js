@@ -57,7 +57,7 @@ const CompactSemiControlledNumberField = ({
         onBlur={event => {
           const newValue = parseFloat(event.currentTarget.value);
           const isNewValueValid = !Number.isNaN(newValue);
-          if (isNewValueValid) {
+          if (isNewValueValid && newValue !== value) {
             onChange(newValue);
           }
           setFocused(false);

@@ -18,17 +18,24 @@ export const resizeImage = (
     ctx.imageSmoothingQuality = 'high';
     const image = new Image();
     image.addEventListener('load', () => {
-      ctx.drawImage(
-        image,
-        transparentBorderSize,
-        transparentBorderSize,
-        width - 2 * transparentBorderSize,
-        height - 2 * transparentBorderSize
-      );
+      try {
+        ctx.drawImage(
+          image,
+          transparentBorderSize,
+          transparentBorderSize,
+          width - 2 * transparentBorderSize,
+          height - 2 * transparentBorderSize
+        );
 
-      canvasElement.toBlob(blob => {
-        resolve(URL.createObjectURL(blob));
-      }, 'image/png');
+        canvasElement.toBlob(blob => {
+          resolve(URL.createObjectURL(blob));
+        }, 'image/png');
+      } catch (error) {
+        reject('An error occurred while generating an icon');
+      }
+    });
+    image.addEventListener('error', (e: Event) => {
+      reject('An error occurred while loading the input image');
     });
     image.src = imageAsBlobDataUrl;
   });

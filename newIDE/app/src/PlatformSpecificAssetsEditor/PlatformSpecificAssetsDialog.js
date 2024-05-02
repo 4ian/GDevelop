@@ -10,7 +10,7 @@ import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
-import {  resizeImage } from './ImageResizer';
+import { resizeImage } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Text from '../UI/Text';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -106,7 +106,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
   _generateFromFile = async e => {
     if (!this.inputRef || !this.inputRef.files || !this.inputRef.files[0]) {
-      console.error("Could't find selected file. Aborting icon generation.")
+      console.error("Could't find selected file. Aborting icon generation.");
       return;
     }
     const chosenFileAsBlobDataUrl = URL.createObjectURL(this.inputRef.files[0]);
@@ -114,87 +114,84 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
     const resourcesManager = project.getResourcesManager();
 
-    const results = await Promise.all([
-      ...desktopSizes.map(async size => ({
-        resourceName: `desktop-icon-${size}.png`,
-        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
-          width: size,
-          height: size,
-        }),
-      })),
-      ...androidSizes.map(async size => ({
-        resourceName: `android-icon-${size}.png`,
-        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
-          width: size,
-          height: size,
-        }),
-      })),
-      (async () => ({
-        resourceName: 'android-windowSplashScreenAnimatedIcon.png',
-        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
-          width: androidWindowSplashScreenAnimatedIconRecommendedSize,
-          height: androidWindowSplashScreenAnimatedIconRecommendedSize,
-          transparentBorderSize:
-            androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
-        }),
-      }))(),
-      ...iosSizes.map(async size => ({
-        resourceName: `ios-icon-${size}.png`,
-        blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
-          width: size,
-          height: size,
-        }),
-      })),
-    ]);
+    try {
+      const results = await Promise.all([
+        ...desktopSizes.map(async size => ({
+          resourceName: `desktop-icon-${size}.png`,
+          blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
+            width: size,
+            height: size,
+          }),
+        })),
+        ...androidSizes.map(async size => ({
+          resourceName: `android-icon-${size}.png`,
+          blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
+            width: size,
+            height: size,
+          }),
+        })),
+        (async () => ({
+          resourceName: 'android-windowSplashScreenAnimatedIcon.png',
+          blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
+            width: androidWindowSplashScreenAnimatedIconRecommendedSize,
+            height: androidWindowSplashScreenAnimatedIconRecommendedSize,
+            transparentBorderSize:
+              androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
+          }),
+        }))(),
+        ...iosSizes.map(async size => ({
+          resourceName: `ios-icon-${size}.png`,
+          blobDataUrl: await resizeImage(chosenFileAsBlobDataUrl, {
+            width: size,
+            height: size,
+          }),
+        })),
+      ]);
 
-    console.log(results)
+      results.forEach(({ resourceName, blobDataUrl }) => {
+        if (!resourcesManager.hasResource(resourceName)) {
+          const imageResource = new gd.ImageResource();
+          imageResource.setFile(blobDataUrl);
+          imageResource.setName(resourceName);
 
-    if (results.indexOf(false) !== -1) {
+          resourcesManager.addResource(imageResource);
+
+          // Important, we are responsible for deleting the resources that we created
+          // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
+          imageResource.delete();
+        } else {
+          resourcesManager.getResource(resourceName).setFile(blobDataUrl);
+        }
+      });
+
+      await resourceManagementProps.onFetchNewlyAddedResources();
+
+      // Make sure the resources are (re)loaded.
+      ResourcesLoader.burstUrlsCacheForResources(
+        project,
+        results.map(({ resourceName }) => resourceName)
+      );
+      setTimeout(() => {
+        this.setState({
+          desktopIconResourceNames: desktopSizes.map(
+            size => `desktop-icon-${size}.png`
+          ),
+          androidIconResourceNames: androidSizes.map(
+            size => `android-icon-${size}.png`
+          ),
+          androidWindowSplashScreenAnimatedIconResourceName:
+            'android-windowSplashScreenAnimatedIcon.png',
+          iosIconResourceNames: iosSizes.map(size => `ios-icon-${size}.png`),
+        });
+      }, 200 /* Let a bit of time so that image files can be found */);
+    } catch (e) {
       showErrorBox({
-        message: 'Some icons could not be generated!',
+        message: 'Some icons could not be generated.',
         rawError: undefined,
         errorId: 'icon-generation-error',
         doNotReport: true,
       });
-      return;
     }
-
-    results.forEach(({ resourceName, blobDataUrl }) => {
-      if (!resourcesManager.hasResource(resourceName)) {
-        const imageResource = new gd.ImageResource();
-        imageResource.setFile(blobDataUrl);
-        imageResource.setName(resourceName);
-
-        resourcesManager.addResource(imageResource);
-
-        // Important, we are responsible for deleting the resources that we created
-        // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        imageResource.delete();
-      } else {
-        resourcesManager.getResource(resourceName).setFile(blobDataUrl);
-      }
-    });
-
-    await resourceManagementProps.onFetchNewlyAddedResources();
-
-    // Make sure the resources are (re)loaded.
-    ResourcesLoader.burstUrlsCacheForResources(
-      project,
-      results.map(({ resourceName }) => resourceName)
-    );
-    setTimeout(() => {
-      this.setState({
-        desktopIconResourceNames: desktopSizes.map(
-          size => `desktop-icon-${size}.png`
-        ),
-        androidIconResourceNames: androidSizes.map(
-          size => `android-icon-${size}.png`
-        ),
-        androidWindowSplashScreenAnimatedIconResourceName:
-          'android-windowSplashScreenAnimatedIcon.png',
-        iosIconResourceNames: iosSizes.map(size => `ios-icon-${size}.png`),
-      });
-    }, 200 /* Let a bit of time so that image files can be found */);
   };
 
   onApply = () => {

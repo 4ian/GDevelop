@@ -19,8 +19,8 @@ class GD_CORE_API ExpressionVariableContextFinder
 
   virtual ~ExpressionVariableContextFinder(){};
 
-  gd::String* objectName;
-  const gd::VariablesContainer* legacyPrescopedVariablesContainer;
+  gd::String objectName;
+  gd::String parameterType;
   gd::ExpressionNode* variableNode;
 
   ExpressionVariableContextFinder(
@@ -29,8 +29,8 @@ class GD_CORE_API ExpressionVariableContextFinder
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         variableNode(nullptr),
-        objectName(nullptr),
-        legacyPrescopedVariablesContainer(nullptr) {};
+        objectName(""),
+        parameterType("") {};
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
@@ -91,39 +91,29 @@ class GD_CORE_API ExpressionVariableContextFinder
             platform, objectsContainersList, functionCall, parameterIndex);
     if (parameterMetadata == nullptr) return;  // Unexpected
 
-    // Support for legacy pre-scoped variables:
-    if (parameterMetadata->GetValueTypeMetadata().IsLegacyPreScopedVariable()) {
-      if (parameterMetadata->GetType() == "objectvar") {
-        // Legacy convention where a "objectvar"
-        // parameter represents a variable of the object represented by the
-        // previous "object" parameter. The object on which the function is
-        // called is returned if no previous parameters are objects.
-        objectName = &functionCall.objectName;
-        for (int previousIndex = parameterIndex - 1; previousIndex >= 0;
-             previousIndex--) {
-          const gd::ParameterMetadata* previousParameterMetadata =
-              MetadataProvider::GetFunctionCallParameterMetadata(
-                  platform, objectsContainersList, functionCall, previousIndex);
-          if (previousParameterMetadata != nullptr &&
-              gd::ParameterMetadata::IsObject(
-                  previousParameterMetadata->GetType())) {
-            auto previousParameterNode =
-                functionCall.parameters[previousIndex].get();
-            IdentifierNode* objectNode =
-                dynamic_cast<IdentifierNode*>(previousParameterNode);
-            objectName = &objectNode->identifierName;
-            break;
-          }
+    if (parameterMetadata->GetType() == "objectvar") {
+      // Legacy convention where a "objectvar"
+      // parameter represents a variable of the object represented by the
+      // previous "object" parameter. The object on which the function is
+      // called is returned if no previous parameters are objects.
+      objectName = functionCall.objectName;
+      for (int previousIndex = parameterIndex - 1; previousIndex >= 0;
+            previousIndex--) {
+        const gd::ParameterMetadata* previousParameterMetadata =
+            MetadataProvider::GetFunctionCallParameterMetadata(
+                platform, objectsContainersList, functionCall, previousIndex);
+        if (previousParameterMetadata != nullptr &&
+            gd::ParameterMetadata::IsObject(
+                previousParameterMetadata->GetType())) {
+          auto previousParameterNode =
+              functionCall.parameters[previousIndex].get();
+          IdentifierNode* objectNode =
+              dynamic_cast<IdentifierNode*>(previousParameterNode);
+          objectName = objectNode->identifierName;
+          break;
         }
-      } else if (parameterMetadata->GetType() == "scenevar") {
-        legacyPrescopedVariablesContainer =
-            projectScopedContainers.GetVariablesContainersList()
-                .GetBottomMostVariablesContainer();
-      } else if (parameterMetadata->GetType() == "globalvar") {
-        legacyPrescopedVariablesContainer =
-            projectScopedContainers.GetVariablesContainersList()
-                .GetTopMostVariablesContainer();
       }
+      parameterType = parameterMetadata->GetType();
     }
   }
 
@@ -138,18 +128,16 @@ VariableAndItsParent ExpressionVariablePathFinder::GetLastParentOfNode(
     const gd::ProjectScopedContainers &projectScopedContainers,
     gd::ExpressionNode &node) {
 
-  gd::ExpressionVariableContextFinder contextFinder(
-      platform, projectScopedContainers);
+  gd::ExpressionVariableContextFinder contextFinder(platform,
+                                                    projectScopedContainers);
   node.Visit(contextFinder);
   if (!contextFinder.variableNode) {
     return {};
   }
 
-  gd::String objectName =
-      contextFinder.objectName ? *contextFinder.objectName : "";
-  gd::ExpressionVariablePathFinder typeFinder(
-      platform, projectScopedContainers, objectName,
-      contextFinder.legacyPrescopedVariablesContainer, &node);
+  gd::ExpressionVariablePathFinder typeFinder(platform, projectScopedContainers,
+                                              contextFinder.parameterType,
+                                              contextFinder.objectName, &node);
   contextFinder.variableNode->Visit(typeFinder);
 
   if (!typeFinder.variableName || !typeFinder.variablesContainer) {

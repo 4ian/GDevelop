@@ -48,10 +48,11 @@ class GD_CORE_API ExpressionVariablePathFinder
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers,
       gd::ExpressionNode& node, const gd::String& objectName) {
-    // The context is not checked because this is called on "variable" parameters.
+    // The context is not checked because this is called on variable parameters.
+    gd::String parameterType = objectName.empty() ? "variable" : "objectvar";
     gd::String objName = objectName;
-    gd::ExpressionVariablePathFinder typeFinder(platform,
-                                                projectScopedContainers, objName);
+    gd::ExpressionVariablePathFinder typeFinder(
+        platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
     if (!typeFinder.variableName || !typeFinder.variablesContainer) {
@@ -67,10 +68,11 @@ class GD_CORE_API ExpressionVariablePathFinder
       const gd::Platform& platform,
       const gd::ProjectScopedContainers& projectScopedContainers,
       gd::ExpressionNode& node, const gd::String& objectName) {
-    // The context is not checked because this is called on "variable" parameters.
+    // The context is not checked because this is called on variable parameters.
+    gd::String parameterType = objectName.empty() ? "variable" : "objectvar";
     gd::String objName = objectName;
-    gd::ExpressionVariablePathFinder typeFinder(platform,
-                                                projectScopedContainers, objName);
+    gd::ExpressionVariablePathFinder typeFinder(
+        platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
     if (!typeFinder.variableName || !typeFinder.variablesContainer) {
@@ -90,13 +92,13 @@ class GD_CORE_API ExpressionVariablePathFinder
   ExpressionVariablePathFinder(
       const gd::Platform& platform_,
       const gd::ProjectScopedContainers& projectScopedContainers_,
+      const gd::String& parameterType_,
       gd::String& objectName_,
-      const gd::VariablesContainer* legacyPrescopedVariablesContainer_ = nullptr,
       const gd::ExpressionNode* lastNodeToCheck_ = nullptr)
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
+        parameterType(parameterType_),
         objectName(objectName_),
-        legacyPrescopedVariablesContainer(legacyPrescopedVariablesContainer_),
         lastNodeToCheck(lastNodeToCheck_),
         variablesContainer(nullptr),
         variableName(nullptr),
@@ -163,10 +165,21 @@ class GD_CORE_API ExpressionVariablePathFinder
         }
       }
     }
-    else if (legacyPrescopedVariablesContainer) {
+    else if (parameterType == "scenevar") {
       // The node represents a variable name, and the variables container
       // containing it was identified in the FunctionCallNode.
-      variablesContainer = legacyPrescopedVariablesContainer;
+      variablesContainer = projectScopedContainers.GetVariablesContainersList()
+                .GetBottomMostVariablesContainer();
+      variableName = &identifier;
+      if (childIdentifier) {
+        childVariableNames.push_back(*childIdentifier);
+      }
+    } 
+    else if (parameterType == "globalvar") {
+      // The node represents a variable name, and the variables container
+      // containing it was identified in the FunctionCallNode.
+      variablesContainer = projectScopedContainers.GetVariablesContainersList()
+                .GetTopMostVariablesContainer();
       variableName = &identifier;
       if (childIdentifier) {
         childVariableNames.push_back(*childIdentifier);
@@ -178,20 +191,23 @@ class GD_CORE_API ExpressionVariablePathFinder
       projectScopedContainers.MatchIdentifierWithName<void>(
           identifier,
           [&]() {
-            // An object is overlapping the variable.
-            // Even in "variable" parameters, this is not allowed to be
-            // consistent with expressions.
             objectName = identifier;
             if (childIdentifier) {
-              // TODO In case the expression is a variable parameter, it can't be an object variable.
-              const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
-              if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
-                                                                          *childIdentifier) !=
-                  gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-                variableName = childIdentifier;
-                variablesContainer =
-                    projectScopedContainers.GetObjectsContainersList()
-                        .GetObjectOrGroupVariablesContainer(objectName);
+              if (parameterType == "variable") {
+                // An object is overlapping the variable.
+                // Even in "variable" parameters, this is not allowed to be
+                // consistent with expressions.
+              } else {
+                // It's an object variable expression.
+                const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+                if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
+                                                                            *childIdentifier) !=
+                    gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
+                  variableName = childIdentifier;
+                  variablesContainer =
+                      projectScopedContainers.GetObjectsContainersList()
+                          .GetObjectOrGroupVariablesContainer(objectName);
+                }
               }
             }
           },
@@ -329,8 +345,8 @@ class GD_CORE_API ExpressionVariablePathFinder
 
   const gd::Platform& platform;
   const gd::ProjectScopedContainers& projectScopedContainers;
+  const gd::String& parameterType;
   gd::String& objectName;
-  const gd::VariablesContainer* legacyPrescopedVariablesContainer;
   const gd::ExpressionNode* lastNodeToCheck;
 
   const gd::VariablesContainer* variablesContainer;

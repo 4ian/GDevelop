@@ -732,4 +732,91 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
               gd::Serializer::ToJSON(originalSerializedLayout2));
     }
   }
+
+  SECTION("Can change the instruction type of variable occurrences (layout)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    scene.GetVariables().InsertNew("MySceneVariable", 0).SetValue(123);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MySceneVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedLayoutVariables;
+    scene.GetVariables().SerializeTo(originalSerializedLayoutVariables);
+
+    scene.GetVariables().Get("MySceneVariable").SetString("Hello");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project, originalSerializedLayoutVariables, scene.GetVariables());
+
+    REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
+            changeset.typeChangedVariableNames.end());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset);
+
+    // Check the the action has changed to follow the variable type.
+    REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
+  }
+
+  SECTION("Can change the instruction type of child-variable occurrences (layout)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    scene.GetVariables()
+        .InsertNew("MySceneVariable", 0)
+        .GetChild("MyChild")
+        .SetValue(123);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MySceneVariable.MyChild"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedLayoutVariables;
+    scene.GetVariables().SerializeTo(originalSerializedLayoutVariables);
+
+    scene.GetVariables().Get("MySceneVariable").GetChild("MyChild").SetString("Hello");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            project, originalSerializedLayoutVariables, scene.GetVariables());
+
+    REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
+            changeset.typeChangedVariableNames.end());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset);
+
+    // Check the the action has changed to follow the variable type.
+    REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
+  }
 }

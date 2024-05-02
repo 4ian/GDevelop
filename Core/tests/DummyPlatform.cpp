@@ -204,6 +204,58 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
     .SetHidden();
   platform.AddExtension(extension);
 }
+
+{
+  // Create an extension without namespace to match the switchable variable instructions.
+  std::shared_ptr<gd::PlatformExtension> extension =
+      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
+  extension->SetExtensionInformation(
+      "BuiltinVariables", "My testing extension for variables", "", "", "");
+
+  extension
+      ->AddAction("SetNumberVariable",
+                  "Do something with number variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("variable", "Variable")
+      .AddParameter("operator", "Operator", "number")
+      .AddParameter("number", "Value")
+      .SetFunctionName("setNumberVariable");
+
+  extension
+      ->AddAction("SetStringVariable",
+                  "Do something with string variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("variable", "Variable")
+      .AddParameter("operator", "Operator", "string")
+      .AddParameter("string", "Value")
+      .SetFunctionName("setStringVariable");
+
+  extension
+      ->AddAction("SetBooleanVariable",
+                  "Do something with boolean variables",
+                  "This does something with variables",
+                  "Do something with variables please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("variable", "Variable")
+      .AddParameter("operator", "Operator", "boolean")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("trueorfalse", "")
+      .SetFunctionName("setBooleanVariable");
+
+  platform.AddExtension(extension);
+}
+
   // Create an extension with various stuff inside.
   std::shared_ptr<gd::PlatformExtension> extension =
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);

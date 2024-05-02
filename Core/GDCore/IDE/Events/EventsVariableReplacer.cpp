@@ -20,6 +20,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/IDE/VariableInstructionSwitcher.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
@@ -366,17 +367,47 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
           }
         }
 
-        if (gd::ParameterMetadata::IsExpression("variable", type)) {
-          // TODO Find the variable path
-          // If there is an empty element (a bracket) don't change the type.
-          // When there is a bracket the drop down menu is shown.
-          const auto& newParameterValue = instruction.GetParameter(parameterIndex);
-          const auto &variableName = newParameterValue.GetPlainString();
-          auto itr = variableNewTypes.find(variableName);
-          if (itr != variableNewTypes.end()) {
-            const gd::Variable::Type variableType = itr->second;
-            gd::VariableInstructionSwitcher::SwitchVariableInstructionType(
-                instruction, variableType);
+        if (gd::ParameterMetadata::IsExpression("variable", type) &&
+            gd::VariableInstructionSwitcher::IsSwitchableVariableInstruction(
+                instruction.GetType())) {
+          const auto &newParameterValue =
+              instruction.GetParameter(parameterIndex);
+          const auto variableName =
+              gd::ExpressionVariableNameFinder::GetVariableName(
+                  *newParameterValue.GetRootNode());
+
+          const gd::VariablesContainer *variablesContainer = nullptr;
+          if (!variableName.empty()) {
+            if (GetProjectScopedContainers().GetVariablesContainersList().Has(
+                    variableName)) {
+              variablesContainer =
+                  &GetProjectScopedContainers()
+                       .GetVariablesContainersList()
+                       .GetVariablesContainerFromVariableName(variableName);
+            }
+          } else {
+            const auto &objectsContainersList =
+                GetProjectScopedContainers().GetObjectsContainersList();
+            if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
+                    objectName, variableName) !=
+                gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
+              variablesContainer =
+                  GetProjectScopedContainers()
+                      .GetObjectsContainersList()
+                      .GetObjectOrGroupVariablesContainer(objectName);
+            }
+          }
+
+          // Every occurrence of the variable or its children are checked.
+          // Ensuring that a child is actually the one with a type change would
+          // take more time.
+          if (variablesContainer == &targetVariablesContainer) {
+            if (typeChangedVariableNames.find(variableName) !=
+                typeChangedVariableNames.end()) {
+              gd::VariableInstructionSwitcher::
+                  SwitchBetweenUnifiedInstructionIfNeeded(
+                      platform, GetProjectScopedContainers(), instruction);
+            }
           }
         }
       });

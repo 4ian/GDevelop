@@ -55,11 +55,11 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (!typeFinder.variableName || !typeFinder.variablesContainer) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
-        typeFinder.variablesContainer->Get(*typeFinder.variableName),
+        typeFinder.variablesContainer->Get(typeFinder.variableName),
         typeFinder.childVariableNames);
     return variable ? variable->GetType() : gd::Variable::Unknown;
   }
@@ -75,11 +75,11 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (!typeFinder.variableName || !typeFinder.variablesContainer) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
-        typeFinder.variablesContainer->Get(*typeFinder.variableName),
+        typeFinder.variablesContainer->Get(typeFinder.variableName),
         typeFinder.childVariableNames);
     return variable && variable->GetChildrenCount() > 0
                ? variable->GetAtIndex(0).GetType()
@@ -101,7 +101,7 @@ class GD_CORE_API ExpressionVariablePathFinder
         objectName(objectName_),
         lastNodeToCheck(lastNodeToCheck_),
         variablesContainer(nullptr),
-        variableName(nullptr),
+        variableName(""),
         bailOutBecauseEmptyVariableName(false) {};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
@@ -121,18 +121,18 @@ class GD_CORE_API ExpressionVariablePathFinder
       // giving wrong autocompletions).
       bailOutBecauseEmptyVariableName = true;
     }
-    if (variableName) {
-      childVariableNames.push_back(node.name);
-    } else {
+    if (variableName.empty()) {
       const auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
                                                                   node.name) !=
           gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-        variableName = &node.name;
+        variableName = node.name;
         variablesContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
       }
+    } else {
+      childVariableNames.push_back(node.name);
     }
     if (node.child && &node != lastNodeToCheck) node.child->Visit(*this);
   }
@@ -156,7 +156,7 @@ class GD_CORE_API ExpressionVariablePathFinder
       if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
                                                                   identifier) !=
           gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-        variableName = &identifier;
+        variableName = identifier;
         variablesContainer =
             projectScopedContainers.GetObjectsContainersList()
                 .GetObjectOrGroupVariablesContainer(objectName);
@@ -170,7 +170,7 @@ class GD_CORE_API ExpressionVariablePathFinder
       // containing it was identified in the FunctionCallNode.
       variablesContainer = projectScopedContainers.GetVariablesContainersList()
                 .GetBottomMostVariablesContainer();
-      variableName = &identifier;
+      variableName = identifier;
       if (childIdentifier) {
         childVariableNames.push_back(*childIdentifier);
       }
@@ -180,7 +180,7 @@ class GD_CORE_API ExpressionVariablePathFinder
       // containing it was identified in the FunctionCallNode.
       variablesContainer = projectScopedContainers.GetVariablesContainersList()
                 .GetTopMostVariablesContainer();
-      variableName = &identifier;
+      variableName = identifier;
       if (childIdentifier) {
         childVariableNames.push_back(*childIdentifier);
       }
@@ -203,7 +203,7 @@ class GD_CORE_API ExpressionVariablePathFinder
                 if (objectsContainersList.HasObjectOrGroupWithVariableNamed(objectName,
                                                                             *childIdentifier) !=
                     gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-                  variableName = childIdentifier;
+                  variableName = *childIdentifier;
                   variablesContainer =
                       projectScopedContainers.GetObjectsContainersList()
                           .GetObjectOrGroupVariablesContainer(objectName);
@@ -217,7 +217,7 @@ class GD_CORE_API ExpressionVariablePathFinder
               variablesContainer =
                   &(projectScopedContainers.GetVariablesContainersList()
                         .GetVariablesContainerFromVariableName(identifier));
-              variableName = &identifier;
+              variableName = identifier;
               if (childIdentifier) {
                 childVariableNames.push_back(*childIdentifier);
               }
@@ -330,11 +330,11 @@ class GD_CORE_API ExpressionVariablePathFinder
       return {};  // Do not even attempt to find the parent if we had an issue
                   // when visiting nodes.
 
-    if (!variableName)
+    if (variableName.empty())
       return {};  // There is no "parent" to the variables container itself.
 
-    const gd::Variable* variable = variablesContainer.Has(*variableName)
-                                       ? &variablesContainer.Get(*variableName)
+    const gd::Variable* variable = variablesContainer.Has(variableName)
+                                       ? &variablesContainer.Get(variableName)
                                        : nullptr;
     if (childVariableNames.empty() || !variable)
       return {// No child: the parent is the variables container itself.
@@ -350,7 +350,7 @@ class GD_CORE_API ExpressionVariablePathFinder
   const gd::ExpressionNode* lastNodeToCheck;
 
   const gd::VariablesContainer* variablesContainer;
-  const gd::String* variableName;
+  gd::String variableName;
   std::vector<gd::String> childVariableNames;
   bool bailOutBecauseEmptyVariableName;
 };

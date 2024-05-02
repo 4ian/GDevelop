@@ -140,7 +140,7 @@ VariableAndItsParent ExpressionVariablePathFinder::GetLastParentOfNode(
                                               contextFinder.objectName, &node);
   contextFinder.variableNode->Visit(typeFinder);
 
-  if (!typeFinder.variableName || !typeFinder.variablesContainer) {
+  if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
     return {};
   }
   return typeFinder.WalkUntilLastParent(*typeFinder.variablesContainer,

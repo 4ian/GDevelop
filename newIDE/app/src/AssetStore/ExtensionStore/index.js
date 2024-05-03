@@ -25,7 +25,7 @@ import SelectOption from '../../UI/SelectOption';
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<boolean>,
+  onInstall: (ExtensionShortHeader) => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -39,10 +39,8 @@ export const ExtensionStore = ({
   showOnlyWithBehaviors,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
-  const [
-    selectedExtensionShortHeader,
-    setSelectedExtensionShortHeader,
-  ] = React.useState<?ExtensionShortHeader>(null);
+  const [selectedExtensionShortHeader, setSelectedExtensionShortHeader] =
+    React.useState<?ExtensionShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -56,12 +54,9 @@ export const ExtensionStore = ({
     setChosenCategory,
   } = React.useContext(ExtensionStoreContext);
 
-  React.useEffect(
-    () => {
-      fetchExtensionsAndFilters();
-    },
-    [fetchExtensionsAndFilters]
-  );
+  React.useEffect(() => {
+    fetchExtensionsAndFilters();
+  }, [fetchExtensionsAndFilters]);
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
@@ -85,7 +80,7 @@ export const ExtensionStore = ({
   ): SearchMatch[] => {
     if (!searchResults) return [];
     const extensionMatches = searchResults.find(
-      result => result.item.name === extensionShortHeader.name
+      (result) => result.item.name === extensionShortHeader.name
     );
     return extensionMatches ? extensionMatches.matches : [];
   };
@@ -106,7 +101,7 @@ export const ExtensionStore = ({
               }}
             >
               <SelectOption value="" label={t`All categories`} />
-              {allCategories.map(category => (
+              {allCategories.map((category) => (
                 <SelectOption
                   key={category}
                   value={category}

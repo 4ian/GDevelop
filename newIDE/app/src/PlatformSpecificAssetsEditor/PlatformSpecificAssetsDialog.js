@@ -151,7 +151,8 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
       results.forEach(({ resourceName, blobDataUrl }) => {
         const metadata = JSON.stringify({
           extension: '.png',
-          // TODO: Check it works on Windows
+          // Used in local app to define the path where to save the image on
+          // the file system.
           localFilePath: `./assets/${resourceName}`,
         });
         if (!resourcesManager.hasResource(resourceName)) {

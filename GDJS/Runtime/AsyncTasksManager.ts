@@ -58,13 +58,82 @@ namespace gdjs {
    */
   export abstract class AsyncTask {
     /**
-     * Called every frame where the scene is active.
+     * Called every frame where the scene is active and the task still unresolved.
      * @param runtimeScene - The scene the task runs on.
      * @return True if the task is finished, false if it needs to continue running.
      */
     abstract update(runtimeScene: RuntimeScene): boolean;
   }
 
+  /**
+   * A task that requires the usage of an object.
+   *
+   * If the object comes to be deleted, the task will automatically
+   * get rid of the object reference and resolve to avoid memory leaks.
+   */
+  export abstract class ObjectBoundTask extends AsyncTask {
+    public readonly objectInstance: RuntimeObject;
+
+    constructor(objectInstance: RuntimeObject) {
+      super();
+      this.objectInstance = objectInstance;
+      objectInstance.registerDestroyCallback(this.onObjectDestroyedCallback);
+    }
+
+    private _onObjectDestroyedCallback() {
+      this.onObjectDeleted();
+
+      // @ts-ignore At this point, the subclass code will not be called again,
+      //            so we may allow this type contract transgression to avoid
+      //            potentially leaking a reference to the object.
+      this.objectInstance = null;
+    }
+    private onObjectDestroyedCallback = this._onObjectDestroyedCallback.bind(
+      this
+    );
+
+    /** The update method is handled by `ObjectBoundTask` - override `shouldResolve` instead. */
+    update(runtimeScene: RuntimeScene) {
+      const shouldResolve =
+        // Force resolve if the object has been deleted from the scene
+        this.objectInstance === null ||
+        // Else, delegate the resolve check to the subclass
+        this.shouldResolve(runtimeScene);
+
+      if (shouldResolve) {
+        // Resolving imminent - cleaning up all references
+        this.objectInstance.unregisterDestroyCallback(
+          this.onObjectDestroyedCallback
+        );
+        // @ts-ignore At this point, the subclass code will not be called again,
+        //            so we may allow this type contract transgression to avoid
+        //            potentially leaking a reference to the object.
+        this.objectInstance = null;
+      }
+
+      return shouldResolve;
+    }
+
+    /**
+     * Called every frame where the scene is active and the task still unresolved.
+     * @param runtimeScene - The scene the task runs on.
+     * @return True if the task is finished, false if it needs to continue running.
+     */
+    abstract shouldResolve(runtimeScene: RuntimeScene): boolean;
+
+    /**
+     * Ran once when the bound object is deleted. Use this to clean up any
+     * object references to the object that should not be leaked!
+     *
+     * The object reference will be deleted and the task will automatically
+     * resolve after this method has been called.
+     */
+    abstract onObjectDeleted(): void;
+  }
+
+  /**
+   * A task that represents the execution of a collection of tasks.
+   */
   export class TaskGroup extends AsyncTask {
     private tasks = new Array<AsyncTask>();
 
@@ -82,6 +151,9 @@ namespace gdjs {
     }
   }
 
+  /**
+   * An instantly resolving task.
+   */
   export class ResolveTask extends AsyncTask {
     update() {
       return true;
@@ -91,7 +163,7 @@ namespace gdjs {
   const logger = new gdjs.Logger('Internal PromiseTask');
 
   /**
-   * A task that resolves with a promise.
+   * A task that resolves when a promise resolves.
    */
   export class PromiseTask extends AsyncTask {
     private isResolved: boolean = false;

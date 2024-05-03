@@ -126,6 +126,46 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object"), "")
       .SetFunctionName("getFromBaseExpression");
 
+  baseObject.AddAction("SetNumberObjectVariable",
+                  "Do something with number object variables",
+                  "This does something with variables",
+                  "Do something with variables",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", "Object")
+      .AddParameter("objectvar", "Variable")
+      .AddParameter("operator", "Operator", "number")
+      .AddParameter("number", "Value");
+
+  baseObject.AddAction("SetStringObjectVariable",
+                  "Do something with string object variables",
+                  "This does something with variables",
+                  "Do something with variables",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", "Object")
+      .AddParameter("objectvar", "Variable")
+      .AddParameter("operator", "Operator", "string")
+      .AddParameter("string", "Value")
+      .SetRelevantForLayoutEventsOnly();
+
+  baseObject.AddAction("SetBooleanObjectVariable",
+                  "Do something with boolean object variables",
+                  "This does something with object variables",
+                  "Do something with object variables",
+                  "",
+                  "",
+                  "")
+      .AddParameter("object", "Object")
+      .AddParameter("objectvar", "Variable")
+      .AddParameter("operator", "Value", "boolean")
+      // This parameter allows to keep the operand expression
+      // when the editor switch between variable instructions.
+      .AddCodeOnlyParameter("yesorno", "Value")
+      .SetRelevantForLayoutEventsOnly();
+
 // Declare default behaviors that are used by event-based objects to avoid
 // warnings.
 {
@@ -216,7 +256,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->AddAction("SetNumberVariable",
                   "Do something with number variables",
                   "This does something with variables",
-                  "Do something with variables please",
+                  "Do something with variables",
                   "",
                   "",
                   "")
@@ -229,7 +269,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->AddAction("SetStringVariable",
                   "Do something with string variables",
                   "This does something with variables",
-                  "Do something with variables please",
+                  "Do something with variables",
                   "",
                   "",
                   "")
@@ -242,7 +282,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       ->AddAction("SetBooleanVariable",
                   "Do something with boolean variables",
                   "This does something with variables",
-                  "Do something with variables please",
+                  "Do something with variables",
                   "",
                   "",
                   "")

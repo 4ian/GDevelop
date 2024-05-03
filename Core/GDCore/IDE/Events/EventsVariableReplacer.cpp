@@ -377,24 +377,24 @@ bool EventsVariableReplacer::DoVisitInstruction(gd::Instruction& instruction,
                   *newParameterValue.GetRootNode());
 
           const gd::VariablesContainer *variablesContainer = nullptr;
-          if (!variableName.empty()) {
+          if (type == "objectvar") {
+            const auto &objectsContainersList =
+                GetProjectScopedContainers().GetObjectsContainersList();
+            if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
+                    lastObjectName, variableName) !=
+                gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
+              variablesContainer =
+                  GetProjectScopedContainers()
+                      .GetObjectsContainersList()
+                      .GetObjectOrGroupVariablesContainer(lastObjectName);
+            }
+          } else {
             if (GetProjectScopedContainers().GetVariablesContainersList().Has(
                     variableName)) {
               variablesContainer =
                   &GetProjectScopedContainers()
                        .GetVariablesContainersList()
                        .GetVariablesContainerFromVariableName(variableName);
-            }
-          } else {
-            const auto &objectsContainersList =
-                GetProjectScopedContainers().GetObjectsContainersList();
-            if (objectsContainersList.HasObjectOrGroupWithVariableNamed(
-                    objectName, variableName) !=
-                gd::ObjectsContainersList::VariableExistence::DoesNotExist) {
-              variablesContainer =
-                  GetProjectScopedContainers()
-                      .GetObjectsContainersList()
-                      .GetObjectOrGroupVariablesContainer(objectName);
             }
           }
 

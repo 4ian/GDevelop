@@ -59,7 +59,6 @@ function InstalledExtensionDetails({
             onOpenEventsFunctionsExtension(extensionName);
             onClose();
           }}
-          i18n={i18n}
         />
       )}
     </I18n>

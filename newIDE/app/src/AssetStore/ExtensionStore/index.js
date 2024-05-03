@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { I18n } from '@lingui/react';
 import SearchBar from '../../UI/SearchBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
@@ -26,7 +25,7 @@ import SelectOption from '../../UI/SelectOption';
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<boolean>,
+  onInstall: (ExtensionShortHeader) => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -40,10 +39,8 @@ export const ExtensionStore = ({
   showOnlyWithBehaviors,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
-  const [
-    selectedExtensionShortHeader,
-    setSelectedExtensionShortHeader,
-  ] = React.useState<?ExtensionShortHeader>(null);
+  const [selectedExtensionShortHeader, setSelectedExtensionShortHeader] =
+    React.useState<?ExtensionShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -57,12 +54,9 @@ export const ExtensionStore = ({
     setChosenCategory,
   } = React.useContext(ExtensionStoreContext);
 
-  React.useEffect(
-    () => {
-      fetchExtensionsAndFilters();
-    },
-    [fetchExtensionsAndFilters]
-  );
+  React.useEffect(() => {
+    fetchExtensionsAndFilters();
+  }, [fetchExtensionsAndFilters]);
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
@@ -86,7 +80,7 @@ export const ExtensionStore = ({
   ): SearchMatch[] => {
     if (!searchResults) return [];
     const extensionMatches = searchResults.find(
-      result => result.item.name === extensionShortHeader.name
+      (result) => result.item.name === extensionShortHeader.name
     );
     return extensionMatches ? extensionMatches.matches : [];
   };
@@ -107,7 +101,7 @@ export const ExtensionStore = ({
               }}
             >
               <SelectOption value="" label={t`All categories`} />
-              {allCategories.map(category => (
+              {allCategories.map((category) => (
                 <SelectOption
                   key={category}
                   value={category}
@@ -169,25 +163,20 @@ export const ExtensionStore = ({
           )}
         />
       </ColumnStackLayout>
-      <I18n>
-        {({ i18n }) =>
-          !!selectedExtensionShortHeader && (
-            <ExtensionInstallDialog
-              project={project}
-              isInstalling={isInstalling}
-              extensionShortHeader={selectedExtensionShortHeader}
-              onInstall={async () => {
-                sendExtensionAddedToProject(selectedExtensionShortHeader.name);
-                const wasInstalled = await onInstall(selectedExtensionShortHeader);
-                // An errorBox is already displayed by `installExtension`.
-                if (wasInstalled) setSelectedExtensionShortHeader(null);
-              }}
-              onClose={() => setSelectedExtensionShortHeader(null)}
-              i18n={i18n}
-            />
-          )
-        }
-      </I18n>
+      {!!selectedExtensionShortHeader && (
+        <ExtensionInstallDialog
+          project={project}
+          isInstalling={isInstalling}
+          extensionShortHeader={selectedExtensionShortHeader}
+          onInstall={async () => {
+            sendExtensionAddedToProject(selectedExtensionShortHeader.name);
+            const wasInstalled = await onInstall(selectedExtensionShortHeader);
+            // An errorBox is already displayed by `installExtension`.
+            if (wasInstalled) setSelectedExtensionShortHeader(null);
+          }}
+          onClose={() => setSelectedExtensionShortHeader(null)}
+        />
+      )}
     </React.Fragment>
   );
 };

@@ -36,8 +36,8 @@ type Props = {|
   /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
 
-  onChoose?: string => void,
-  onChange: string => void,
+  onChoose?: (string) => void,
+  onChange: (string) => void,
   onRequestClose?: () => void,
   onApply?: () => void,
   value: string,
@@ -143,7 +143,7 @@ export const checkHasRequiredCapability = ({
   }
 
   return requiredBehaviorTypes.every(
-    behaviorType =>
+    (behaviorType) =>
       gd
         .getBehaviorNamesInObjectOrGroup(
           globalObjectsContainer,
@@ -162,7 +162,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
   (props, ref) => {
     const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (fieldRef.current) fieldRef.current.focus(options);
     };
     const shouldAutofocusInput = useShouldAutofocusInput();
@@ -201,7 +201,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
 
     const hasValidChoice =
       objectAndGroups.filter(
-        choice => choice.text !== undefined && value === choice.text
+        (choice) => choice.text !== undefined && value === choice.text
       ).length !== 0;
 
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
@@ -214,9 +214,7 @@ const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
       <Trans>This object exists, but can't be used here.</Trans>
     ) : !hasValidChoice ? (
       errorTextIfInvalid
-    ) : (
-      undefined
-    );
+    ) : undefined;
 
     return shouldAutofocusInput ? (
       <SemiControlledAutoComplete

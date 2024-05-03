@@ -31,14 +31,14 @@ export type SceneEditorsDisplayProps = {|
   ) => void,
   editInstanceVariables: (instance: ?gdInitialInstance) => void,
   editObjectByName: (objectName: string, initialTab?: ObjectEditorTab) => void,
-  onEditObject: gdObject => void,
+  onEditObject: (gdObject) => void,
   selectedObjectFolderOrObjectsWithContext: ObjectFolderOrObjectWithContext[],
   onSelectLayer: (layerName: string) => void,
   editLayerEffects: (layer: ?gdLayer) => void,
   editLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, done: (boolean) => void) => void,
   onLayerRenamed: () => void,
-  onObjectCreated: gdObject => void,
+  onObjectCreated: (gdObject) => void,
   onObjectFolderOrObjectWithContextSelected: (
     ?ObjectFolderOrObjectWithContext
   ) => void,
@@ -80,17 +80,17 @@ export type SceneEditorsDisplayProps = {|
   updateBehaviorsSharedData: () => void,
   onInstancesAdded: (Array<gdInitialInstance>) => void,
   onInstancesSelected: (Array<gdInitialInstance>) => void,
-  onInstanceDoubleClicked: gdInitialInstance => void,
+  onInstanceDoubleClicked: (gdInitialInstance) => void,
   onInstancesMoved: (Array<gdInitialInstance>) => void,
   onInstancesResized: (Array<gdInitialInstance>) => void,
   onInstancesRotated: (Array<gdInitialInstance>) => void,
-  isInstanceOf3DObject: gdInitialInstance => boolean,
-  onSelectAllInstancesOfObjectInLayout: string => void,
+  isInstanceOf3DObject: (gdInitialInstance) => boolean,
+  onSelectAllInstancesOfObjectInLayout: (string) => void,
 
   canInstallPrivateAsset: () => boolean,
 
   instancesEditorSettings: InstancesEditorSettings,
-  onInstancesEditorSettingsMutated: InstancesEditorSettings => void,
+  onInstancesEditorSettingsMutated: (InstancesEditorSettings) => void,
 
   historyHandler: HistoryHandler,
   unsavedChanges?: ?UnsavedChanges,
@@ -118,7 +118,7 @@ export type SceneEditorsDisplayInterface = {|
   openNewObjectDialog: () => void,
   toggleEditorView: (editorId: EditorId) => void,
   isEditorVisible: (editorId: EditorId) => boolean,
-  renameObjectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext => void,
+  renameObjectFolderOrObjectWithContext: (ObjectFolderOrObjectWithContext) => void,
   viewControls: {|
     zoomBy: (factor: number) => void,
     setZoomFactor: (factor: number) => void,

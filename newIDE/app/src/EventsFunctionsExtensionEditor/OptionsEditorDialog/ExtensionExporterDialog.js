@@ -16,16 +16,18 @@ const exportExtension = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+  const eventsFunctionsExtensionWriter =
+    eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter) {
     // This won't happen in practice because this view can't be reached from the web-app.
     throw new Error(
       "The extension can't be exported because it's not supported by the web-app."
     );
   }
-  const pathOrUrl = await eventsFunctionsExtensionWriter.chooseEventsFunctionExtensionFile(
-    eventsFunctionsExtension.getName()
-  );
+  const pathOrUrl =
+    await eventsFunctionsExtensionWriter.chooseEventsFunctionExtensionFile(
+      eventsFunctionsExtension.getName()
+    );
 
   if (!pathOrUrl) return;
 

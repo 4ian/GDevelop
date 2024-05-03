@@ -13,28 +13,21 @@ type Props = {|
 |};
 
 const ElementHighlighterProvider = (props: Props) => {
-  const [
-    shouldHighlightField,
-    setShouldHighlightField,
-  ] = React.useState<boolean>(false);
-  const [
-    elementToHighlightId,
-    setElementToHighlightId,
-  ] = React.useState<?string>(props.elements[0] ? props.elements[0].id : null);
+  const [shouldHighlightField, setShouldHighlightField] =
+    React.useState<boolean>(false);
+  const [elementToHighlightId, setElementToHighlightId] =
+    React.useState<?string>(props.elements[0] ? props.elements[0].id : null);
   const [elementToHighlight, setElementToHighlight] = React.useState<any>(null);
-  React.useEffect(
-    () => {
-      if (!shouldHighlightField) {
-        setElementToHighlight(null);
-        return;
-      }
-      const element = elementToHighlightId
-        ? document.getElementById(elementToHighlightId)
-        : null;
-      setElementToHighlight(element);
-    },
-    [elementToHighlightId, shouldHighlightField]
-  );
+  React.useEffect(() => {
+    if (!shouldHighlightField) {
+      setElementToHighlight(null);
+      return;
+    }
+    const element = elementToHighlightId
+      ? document.getElementById(elementToHighlightId)
+      : null;
+    setElementToHighlight(element);
+  }, [elementToHighlightId, shouldHighlightField]);
 
   return (
     <>
@@ -54,7 +47,7 @@ const ElementHighlighterProvider = (props: Props) => {
               value={elementToHighlightId || ''}
               onChange={setElementToHighlightId}
             >
-              {props.elements.map(element => (
+              {props.elements.map((element) => (
                 <option
                   label={element.label}
                   value={element.id}

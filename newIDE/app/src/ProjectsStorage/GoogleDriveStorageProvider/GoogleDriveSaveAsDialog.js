@@ -20,7 +20,7 @@ type Props = {|
     selectedFileOrFolder: GoogleDriveFileOrFolder,
     newFileName: string,
   |}) => Promise<void>,
-  onShowFilePicker: GoogleDriveFilePickerOptions => Promise<?GoogleDriveFileOrFolder>,
+  onShowFilePicker: (GoogleDriveFilePickerOptions) => Promise<?GoogleDriveFileOrFolder>,
 |};
 
 /**
@@ -53,7 +53,7 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
         selectedFileOrFolder,
         newFileName,
       })
-      .catch(error => {
+      .catch((error) => {
         setSaveError(error);
         setSaving(false);
       });
@@ -69,11 +69,11 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
     setPickerError(null);
     props
       .onShowFilePicker({ selectFolderEnabled: true, showUploadView: false })
-      .then(selectedFileOrFolder => {
+      .then((selectedFileOrFolder) => {
         setSelectedFileOrFolder(selectedFileOrFolder);
         hideDialog(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setPickerError(error);
         hideDialog(false);
       });

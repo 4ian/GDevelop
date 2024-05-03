@@ -18,9 +18,9 @@ import {
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
 
 export type ExternalEventsTreeViewItemCallbacks = {|
-  onDeleteExternalEvents: gdExternalEvents => void,
+  onDeleteExternalEvents: (gdExternalEvents) => void,
   onRenameExternalEvents: (string, string) => void,
-  onOpenExternalEvents: string => void,
+  onOpenExternalEvents: (string) => void,
 |};
 
 export type ExternalEventsTreeViewItemCommonProps = {|
@@ -187,7 +187,7 @@ export class ExternalEventsTreeViewItemContent implements TreeViewItemContent {
     if (!name || !copiedExternalEvents) return;
 
     const project = this.props.project;
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       project.hasExternalEventsNamed(name)
     );
 

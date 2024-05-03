@@ -103,7 +103,7 @@ const getInitialMosaicEditorNodes = () => ({
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
-  State
+  State,
 > {
   state = {
     selectedEventsFunction: null,
@@ -215,10 +215,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     if (behaviorName) {
       // Behavior function
-      const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+      const eventsBasedBehaviors =
+        eventsFunctionsExtension.getEventsBasedBehaviors();
       if (eventsBasedBehaviors.has(behaviorName)) {
         const eventsBasedBehavior = eventsBasedBehaviors.get(behaviorName);
-        const behaviorEventsFunctions = eventsBasedBehavior.getEventsFunctions();
+        const behaviorEventsFunctions =
+          eventsBasedBehavior.getEventsFunctions();
         if (behaviorEventsFunctions.hasEventsFunctionNamed(functionName)) {
           this._selectEventsFunction(
             behaviorEventsFunctions.getEventsFunction(functionName),
@@ -295,45 +297,47 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsFunction = (i18n: I18nType) => (
-    eventsBasedBehavior: ?gdEventsBasedBehavior,
-    eventsBasedObject: ?gdEventsBasedObject,
-    eventsFunction: gdEventsFunction,
-    newName: string,
-    done: boolean => void
-  ) => {
-    if (eventsBasedBehavior) {
-      this._renameBehaviorEventsFunction(
-        i18n,
-        eventsBasedBehavior,
-        eventsFunction,
-        newName,
-        done
-      );
-    } else if (eventsBasedObject) {
-      this._renameObjectEventsFunction(
-        i18n,
-        eventsBasedObject,
-        eventsFunction,
-        newName,
-        done
-      );
-    } else {
-      this._renameFreeEventsFunction(i18n, eventsFunction, newName, done);
-    }
-  };
+  _makeRenameEventsFunction =
+    (i18n: I18nType) =>
+    (
+      eventsBasedBehavior: ?gdEventsBasedBehavior,
+      eventsBasedObject: ?gdEventsBasedObject,
+      eventsFunction: gdEventsFunction,
+      newName: string,
+      done: (boolean) => void
+    ) => {
+      if (eventsBasedBehavior) {
+        this._renameBehaviorEventsFunction(
+          i18n,
+          eventsBasedBehavior,
+          eventsFunction,
+          newName,
+          done
+        );
+      } else if (eventsBasedObject) {
+        this._renameObjectEventsFunction(
+          i18n,
+          eventsBasedObject,
+          eventsFunction,
+          newName,
+          done
+        );
+      } else {
+        this._renameFreeEventsFunction(i18n, eventsFunction, newName, done);
+      }
+    };
 
   _renameFreeEventsFunction = (
     i18n: I18nType,
     eventsFunction: gdEventsFunction,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           gd.MetadataDeclarationHelper.isExtensionLifecycleEventsFunction(
             tentativeNewName
@@ -366,11 +370,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           gd.MetadataDeclarationHelper.isBehaviorLifecycleEventsFunction(
             tentativeNewName
@@ -407,11 +411,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedObject: gdEventsBasedObject,
     eventsFunction: gdEventsFunction,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           gd.MetadataDeclarationHelper.isObjectLifecycleEventsFunction(
             tentativeNewName
@@ -443,73 +447,79 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
-    eventsFunction: gdEventsFunction,
-    oldIndex: number,
-    newIndex: number,
-    done: boolean => void
-  ) => {
-    // Don't ask for user confirmation as this change is easy to revert.
+  _makeMoveFreeEventsParameter =
+    (i18n: I18nType) =>
+    (
+      eventsFunction: gdEventsFunction,
+      oldIndex: number,
+      newIndex: number,
+      done: (boolean) => void
+    ) => {
+      // Don't ask for user confirmation as this change is easy to revert.
 
-    const { project, eventsFunctionsExtension } = this.props;
-    gd.WholeProjectRefactorer.moveEventsFunctionParameter(
-      project,
-      eventsFunctionsExtension,
-      eventsFunction.getName(),
-      oldIndex + ParametersIndexOffsets.FreeFunction,
-      newIndex + ParametersIndexOffsets.FreeFunction
-    );
+      const { project, eventsFunctionsExtension } = this.props;
+      gd.WholeProjectRefactorer.moveEventsFunctionParameter(
+        project,
+        eventsFunctionsExtension,
+        eventsFunction.getName(),
+        oldIndex + ParametersIndexOffsets.FreeFunction,
+        newIndex + ParametersIndexOffsets.FreeFunction
+      );
 
-    done(true);
-  };
+      done(true);
+    };
 
-  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    eventsFunction: gdEventsFunction,
-    oldIndex: number,
-    newIndex: number,
-    done: boolean => void
-  ) => {
-    // Don't ask for user confirmation as this change is easy to revert.
+  _makeMoveBehaviorEventsParameter =
+    (i18n: I18nType) =>
+    (
+      eventsBasedBehavior: gdEventsBasedBehavior,
+      eventsFunction: gdEventsFunction,
+      oldIndex: number,
+      newIndex: number,
+      done: (boolean) => void
+    ) => {
+      // Don't ask for user confirmation as this change is easy to revert.
 
-    const { project, eventsFunctionsExtension } = this.props;
-    gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(
-      project,
-      eventsFunctionsExtension,
-      eventsBasedBehavior,
-      eventsFunction.getName(),
-      oldIndex,
-      newIndex
-    );
+      const { project, eventsFunctionsExtension } = this.props;
+      gd.WholeProjectRefactorer.moveBehaviorEventsFunctionParameter(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedBehavior,
+        eventsFunction.getName(),
+        oldIndex,
+        newIndex
+      );
 
-    done(true);
-  };
+      done(true);
+    };
 
-  _makeMoveObjectEventsParameter = (i18n: I18nType) => (
-    eventsBasedObject: gdEventsBasedObject,
-    eventsFunction: gdEventsFunction,
-    oldIndex: number,
-    newIndex: number,
-    done: boolean => void
-  ) => {
-    // Don't ask for user confirmation as this change is easy to revert.
+  _makeMoveObjectEventsParameter =
+    (i18n: I18nType) =>
+    (
+      eventsBasedObject: gdEventsBasedObject,
+      eventsFunction: gdEventsFunction,
+      oldIndex: number,
+      newIndex: number,
+      done: (boolean) => void
+    ) => {
+      // Don't ask for user confirmation as this change is easy to revert.
 
-    const { project, eventsFunctionsExtension } = this.props;
-    gd.WholeProjectRefactorer.moveObjectEventsFunctionParameter(
-      project,
-      eventsFunctionsExtension,
-      eventsBasedObject,
-      eventsFunction.getName(),
-      oldIndex,
-      newIndex
-    );
+      const { project, eventsFunctionsExtension } = this.props;
+      gd.WholeProjectRefactorer.moveObjectEventsFunctionParameter(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject,
+        eventsFunction.getName(),
+        oldIndex,
+        newIndex
+      );
 
-    done(true);
-  };
+      done(true);
+    };
 
   _onDeleteEventsFunction = (
     eventsFunction: gdEventsFunction,
-    cb: boolean => void
+    cb: (boolean) => void
   ) => {
     if (
       this.state.selectedEventsFunction &&
@@ -523,7 +533,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   selectEventsBasedBehaviorByName = (behaviorName: string) => {
     const { eventsFunctionsExtension } = this.props;
-    const eventsBasedBehaviorsList = eventsFunctionsExtension.getEventsBasedBehaviors();
+    const eventsBasedBehaviorsList =
+      eventsFunctionsExtension.getEventsBasedBehaviors();
     if (eventsBasedBehaviorsList.has(behaviorName)) {
       this._selectEventsBasedBehavior(
         eventsBasedBehaviorsList.get(behaviorName)
@@ -586,67 +597,73 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    newName: string,
-    done: boolean => void
-  ) => {
-    const { project, eventsFunctionsExtension } = this.props;
-    const safeAndUniqueNewName = newNameGenerator(
-      gd.Project.getSafeName(newName),
-      tentativeNewName => {
-        if (
-          eventsFunctionsExtension
-            .getEventsBasedBehaviors()
-            .has(tentativeNewName)
-        ) {
-          return true;
+  _makeRenameEventsBasedBehavior =
+    (i18n: I18nType) =>
+    (
+      eventsBasedBehavior: gdEventsBasedBehavior,
+      newName: string,
+      done: (boolean) => void
+    ) => {
+      const { project, eventsFunctionsExtension } = this.props;
+      const safeAndUniqueNewName = newNameGenerator(
+        gd.Project.getSafeName(newName),
+        (tentativeNewName) => {
+          if (
+            eventsFunctionsExtension
+              .getEventsBasedBehaviors()
+              .has(tentativeNewName)
+          ) {
+            return true;
+          }
+
+          return false;
         }
+      );
 
-        return false;
-      }
-    );
+      gd.WholeProjectRefactorer.renameEventsBasedBehavior(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedBehavior.getName(),
+        safeAndUniqueNewName
+      );
+      eventsBasedBehavior.setName(safeAndUniqueNewName);
 
-    gd.WholeProjectRefactorer.renameEventsBasedBehavior(
-      project,
-      eventsFunctionsExtension,
-      eventsBasedBehavior.getName(),
-      safeAndUniqueNewName
-    );
-    eventsBasedBehavior.setName(safeAndUniqueNewName);
+      done(true);
+    };
 
-    done(true);
-  };
+  _makeRenameEventsBasedObject =
+    (i18n: I18nType) =>
+    (
+      eventsBasedObject: gdEventsBasedObject,
+      newName: string,
+      done: (boolean) => void
+    ) => {
+      const { project, eventsFunctionsExtension } = this.props;
+      const safeAndUniqueNewName = newNameGenerator(
+        gd.Project.getSafeName(newName),
+        (tentativeNewName) => {
+          if (
+            eventsFunctionsExtension
+              .getEventsBasedObjects()
+              .has(tentativeNewName)
+          ) {
+            return true;
+          }
 
-  _makeRenameEventsBasedObject = (i18n: I18nType) => (
-    eventsBasedObject: gdEventsBasedObject,
-    newName: string,
-    done: boolean => void
-  ) => {
-    const { project, eventsFunctionsExtension } = this.props;
-    const safeAndUniqueNewName = newNameGenerator(
-      gd.Project.getSafeName(newName),
-      tentativeNewName => {
-        if (
-          eventsFunctionsExtension.getEventsBasedObjects().has(tentativeNewName)
-        ) {
-          return true;
+          return false;
         }
+      );
 
-        return false;
-      }
-    );
+      gd.WholeProjectRefactorer.renameEventsBasedObject(
+        project,
+        eventsFunctionsExtension,
+        eventsBasedObject.getName(),
+        safeAndUniqueNewName
+      );
+      eventsBasedObject.setName(safeAndUniqueNewName);
 
-    gd.WholeProjectRefactorer.renameEventsBasedObject(
-      project,
-      eventsFunctionsExtension,
-      eventsBasedObject.getName(),
-      safeAndUniqueNewName
-    );
-    eventsBasedObject.setName(safeAndUniqueNewName);
-
-    done(true);
-  };
+      done(true);
+    };
 
   _onEventsBasedBehaviorPasted = (
     eventsBasedBehavior: gdEventsBasedBehavior,
@@ -710,7 +727,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _onDeleteEventsBasedBehavior = (
     eventsBasedBehavior: gdEventsBasedBehavior,
-    cb: boolean => void
+    cb: (boolean) => void
   ) => {
     if (
       this.state.selectedEventsBasedBehavior &&
@@ -724,7 +741,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _onDeleteEventsBasedObject = (
     eventsBasedObject: gdEventsBasedObject,
-    cb: boolean => void
+    cb: (boolean) => void
   ) => {
     if (
       this.state.selectedEventsBasedObject &&
@@ -905,7 +922,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _editBehavior = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
     this.setState(
-      state => {
+      (state) => {
         // If we're closing the properties of a behavior, ensure parameters
         // are up-to-date in all event functions of the behavior (the object
         // type might have changed).
@@ -959,7 +976,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _editObject = (editedEventsBasedObject: ?gdEventsBasedObject) => {
     this.setState(
-      state => {
+      (state) => {
         // If we're closing the properties of an object, ensure parameters
         // are up-to-date in all event functions of the object.
         if (state.editedEventsBasedObject && !editedEventsBasedObject) {
@@ -1024,12 +1041,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // functions from the extension or different behaviors
     // won't use the same groups names.
     // An independent autocompletion is done for each of them.
-    const {
-      selectedEventsBasedBehavior,
-      selectedEventsBasedObject,
-    } = this.state;
+    const { selectedEventsBasedBehavior, selectedEventsBasedObject } =
+      this.state;
     if (selectedEventsBasedBehavior) {
-      const eventFunctionContainer = selectedEventsBasedBehavior.getEventsFunctions();
+      const eventFunctionContainer =
+        selectedEventsBasedBehavior.getEventsFunctions();
       for (
         let index = 0;
         index < eventFunctionContainer.getEventsFunctionsCount();
@@ -1043,7 +1059,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         }
       }
     } else if (selectedEventsBasedObject) {
-      const eventFunctionContainer = selectedEventsBasedObject.getEventsFunctions();
+      const eventFunctionContainer =
+        selectedEventsBasedObject.getEventsFunctions();
       for (
         let index = 0;
         index < eventFunctionContainer.getEventsFunctionsCount();
@@ -1151,8 +1168,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       selectedEventsBasedObject
                         ? '/behaviors/events-based-objects'
                         : selectedEventsBasedBehavior
-                        ? '/behaviors/events-based-behaviors'
-                        : '/events/functions'
+                          ? '/behaviors/events-based-behaviors'
+                          : '/events/functions'
                     }
                     onParametersOrGroupsUpdated={() => {
                       this._loadEventsFunctionFrom(
@@ -1198,8 +1215,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         title: selectedEventsBasedBehavior
           ? t`Behavior Configuration`
           : selectedEventsBasedObject
-          ? t`Object Configuration`
-          : null,
+            ? t`Object Configuration`
+            : null,
         toolbarControls: [],
         renderEditor: () =>
           selectedEventsFunction &&
@@ -1208,7 +1225,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             <Background>
               <EventsSheet
                 key={selectedEventsFunction.ptr}
-                ref={editor => (this.editor = editor)}
+                ref={(editor) => (this.editor = editor)}
                 project={project}
                 scope={{
                   project,
@@ -1303,7 +1320,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           <I18n>
             {({ i18n }) => (
               <EventsFunctionsListWithErrorBoundary
-                ref={eventsFunctionList =>
+                ref={(eventsFunctionList) =>
                   (this.eventsFunctionList = eventsFunctionList)
                 }
                 project={project}
@@ -1359,7 +1376,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           {({ isMobile }) =>
             isMobile ? (
               <EditorNavigator
-                ref={editorNavigator =>
+                ref={(editorNavigator) =>
                   (this._editorNavigator = editorNavigator)
                 }
                 editors={editors}
@@ -1392,9 +1409,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   setDefaultEditorMosaicNode,
                 }) => (
                   <EditorMosaic
-                    ref={editorMosaic => (this._editorMosaic = editorMosaic)}
+                    ref={(editorMosaic) => (this._editorMosaic = editorMosaic)}
                     editors={editors}
-                    onPersistNodes={node =>
+                    onPersistNodes={(node) =>
                       setDefaultEditorMosaicNode(
                         'events-functions-extension-editor',
                         node
@@ -1432,7 +1449,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           <ObjectMethodSelectorDialog
             eventsBasedObject={selectedEventsBasedObject}
             onCancel={() => this._onCloseObjectMethodSelectorDialog(null)}
-            onChoose={parameters =>
+            onChoose={(parameters) =>
               this._onCloseObjectMethodSelectorDialog(parameters)
             }
           />
@@ -1441,7 +1458,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           <BehaviorMethodSelectorDialog
             eventsBasedBehavior={selectedEventsBasedBehavior}
             onCancel={() => this._onCloseBehaviorMethodSelectorDialog(null)}
-            onChoose={parameters =>
+            onChoose={(parameters) =>
               this._onCloseBehaviorMethodSelectorDialog(parameters)
             }
           />
@@ -1450,7 +1467,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           <ExtensionFunctionSelectorDialog
             eventsFunctionsExtension={eventsFunctionsExtension}
             onCancel={() => this._onCloseExtensionFunctionSelectorDialog(null)}
-            onChoose={parameters =>
+            onChoose={(parameters) =>
               this._onCloseExtensionFunctionSelectorDialog(parameters)
             }
           />

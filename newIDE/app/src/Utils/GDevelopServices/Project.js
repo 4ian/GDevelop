@@ -237,7 +237,7 @@ export const getCredentialsForCloudProject = async (
         Authorization: authorizationHeader,
       },
       params: { userId },
-      validateStatus: status => true,
+      validateStatus: (status) => true,
     }
   );
 
@@ -386,9 +386,7 @@ export const uploadProjectResourceFiles = async (
             )
         );
 
-        const fullUrl = `${
-          GDevelopProjectResourcesStorage.baseUrl
-        }${presignedUrl}`;
+        const fullUrl = `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`;
         const urlWithoutSearchParams = fullUrl.substr(0, fullUrl.indexOf('?'));
         results[index] = {
           error: null,
@@ -570,7 +568,7 @@ const getPresignedUrlForResourcesUpload = async (
   const authorizationHeader = await getAuthorizationHeader();
 
   const requestedResources = await Promise.all(
-    resourceFiles.map(async resourceFile => ({
+    resourceFiles.map(async (resourceFile) => ({
       type: 'project-resource',
       filename: resourceFile.name,
       size: resourceFile.size,
@@ -613,15 +611,16 @@ export const getProjectFileAsZipBlob = async (
 
   const response = await projectResourcesClient.get(
     addGDevelopResourceJwtTokenToUrl(
-      `/${cloudProject.id}/versions/${versionId ||
-        cloudProject.currentVersion}.zip`
+      `/${cloudProject.id}/versions/${
+        versionId || cloudProject.currentVersion
+      }.zip`
     ),
     { responseType: 'blob' }
   );
   return response.data;
 };
 
-const escapeStringForRegExp = string => {
+const escapeStringForRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 };
 const resourceFilenameRegex = new RegExp(

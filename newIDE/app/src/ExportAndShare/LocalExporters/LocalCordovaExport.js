@@ -49,7 +49,7 @@ export const localCordovaExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   packageNameWarningType: 'mobile',
@@ -58,7 +58,7 @@ export const localCordovaExportPipeline: ExportPipeline<
     outputDir: project.getLastCompilationDirectory(),
   }),
 
-  canLaunchBuild: exportState => !!exportState.outputDir,
+  canLaunchBuild: (exportState) => !!exportState.outputDir,
 
   isNavigationDisabled: () => false,
 
@@ -75,7 +75,7 @@ export const localCordovaExportPipeline: ExportPipeline<
             type="export"
             value={exportState.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
-            onChange={outputDir => {
+            onChange={(outputDir) => {
               updateExportState(() => ({ outputDir }));
               project.setLastCompilationDirectory(outputDir);
             }}

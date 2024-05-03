@@ -71,11 +71,11 @@ export type TabName = 'objects' | 'free-instructions';
 const moveDeprecatedInstructionsDown = (
   results: Array<SearchResult<EnumeratedInstructionMetadata>>
 ) => {
-  const deprecatedResults = results.filter(result =>
+  const deprecatedResults = results.filter((result) =>
     result.item.fullGroupName.includes('deprecated')
   );
   const notDeprecatedResults = results.filter(
-    result => !result.item.fullGroupName.includes('deprecated')
+    (result) => !result.item.fullGroupName.includes('deprecated')
   );
   return [...notDeprecatedResults, ...deprecatedResults];
 };
@@ -91,7 +91,7 @@ type State = {|
         path: string,
         folder: gdObjectFolderOrObject,
         global: boolean,
-      |}>
+      |}>,
     >,
   },
 |};
@@ -102,7 +102,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   scope: EventsScope,
   currentTab: TabName,
-  onChangeTab: TabName => void,
+  onChangeTab: (TabName) => void,
   isCondition: boolean,
   focusOnMount?: boolean,
   chosenInstructionType: ?string,
@@ -124,7 +124,7 @@ const getGroupIconSrc = (key: string) => {
 
 export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
-  State
+  State,
 > {
   state = {
     searchText: '',
@@ -135,10 +135,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _selectedItem = React.createRef<ListItemRefType>();
 
   // Free instructions, to be displayed in a tab next to the objects.
-  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
+  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateFreeInstructions(this.props.isCondition, this.props.i18n),
+      this.props.scope
+    );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.freeInstructionsInfo
   );
@@ -153,20 +154,22 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   folderSearchApi = null;
 
   reEnumerateInstructions = (i18n: I18nType) => {
-    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructions(this.props.isCondition, i18n),
-      this.props.scope
-    );
+    this.freeInstructionsInfo =
+      filterEnumeratedInstructionOrExpressionMetadataByScope(
+        enumerateFreeInstructions(this.props.isCondition, i18n),
+        this.props.scope
+      );
     this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
     this.forceUpdate();
   };
 
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
-  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition, this.props.i18n),
-    this.props.scope
-  );
+  allInstructionsInfo: Array<EnumeratedInstructionMetadata> =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateAllInstructions(this.props.isCondition, this.props.i18n),
+      this.props.scope
+    );
 
   componentDidMount() {
     if (this._selectedItem.current && this._scrollView.current) {
@@ -179,10 +182,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
     const allFolders = [
       ...enumerateFoldersInContainer(this.props.globalObjectsContainer).map(
-        folderWithPath => ({ ...folderWithPath, global: true })
+        (folderWithPath) => ({ ...folderWithPath, global: true })
       ),
       ...enumerateFoldersInContainer(this.props.objectsContainer).map(
-        folderWithPath => ({ ...folderWithPath, global: false })
+        (folderWithPath) => ({ ...folderWithPath, global: false })
       ),
     ];
 
@@ -219,19 +222,19 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.setState({
       searchResults: {
         objects: this.objectSearchApi
-          ? this.objectSearchApi.search(extendedSearchText).map(result => ({
+          ? this.objectSearchApi.search(extendedSearchText).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         groups: this.groupSearchApi
-          ? this.groupSearchApi.search(extendedSearchText).map(result => ({
+          ? this.groupSearchApi.search(extendedSearchText).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         folders: this.folderSearchApi
-          ? this.folderSearchApi.search(extendedSearchText).map(result => ({
+          ? this.folderSearchApi.search(extendedSearchText).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
@@ -246,7 +249,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     'description',
                   ])
                 )
-                .map(result => ({
+                .map((result) => ({
                   item: result.item,
                   matches: tuneMatches(result, searchText),
                 }))
@@ -295,11 +298,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       filteredInstructionsList = searchResults.instructions;
       filteredFoldersList = searchResults.folders;
     } else {
-      filteredObjectsList = allObjectsList.map(object => ({
+      filteredObjectsList = allObjectsList.map((object) => ({
         item: object,
         matches: [],
       }));
-      displayedObjectGroupsList = allGroupsList.map(object => ({
+      displayedObjectGroupsList = allGroupsList.map((object) => ({
         item: object,
         matches: [],
       }));
@@ -353,7 +356,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
             <SearchBar
               id="search-bar"
               value={searchText}
-              onChange={searchText => {
+              onChange={(searchText) => {
                 const oldSearchText = this.state.searchText;
                 if (!!searchText) this._search(searchText);
                 this.setState({
@@ -464,7 +467,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             const objectsInGroup = group
                               .getAllObjectsNames()
                               .toJSArray()
-                              .map(objectName => {
+                              .map((objectName) => {
                                 // A global object group can contain scene objects so we cannot use
                                 // the group context to get directly get the object knowing the
                                 // appropriate container.
@@ -548,7 +551,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             );
                           } else {
                             results.push(
-                              ...objectsInFolder.map(object =>
+                              ...objectsInFolder.map((object) =>
                                 renderObjectListItem({
                                   project,
                                   selectedValue: chosenObjectName

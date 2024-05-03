@@ -110,15 +110,11 @@ export const AllWorking = () => {
       certificateKind: 'distribution',
     })
     .onPost(
-      `${
-        GDevelopBuildApi.baseUrl
-      }/signing-credential/action/create-certificate-p12`
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/create-certificate-p12`
     )
     .reply(200, 'Ok')
     .onPost(
-      `${
-        GDevelopBuildApi.baseUrl
-      }/signing-credential/action/upload-mobile-provision`
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/upload-mobile-provision`
     )
     .reply(200, {
       uuid: 'fake-mobile-provision-uuid',

@@ -103,10 +103,8 @@ const GetStartedSection = ({
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const [
-    isLoggingInUsingProvider,
-    setIsLoggingInUsingProvider,
-  ] = React.useState<boolean>(false);
+  const [isLoggingInUsingProvider, setIsLoggingInUsingProvider] =
+    React.useState<boolean>(false);
   const {
     profile,
     onResetPassword,
@@ -119,10 +117,8 @@ const GetStartedSection = ({
     authenticationError,
     loginState,
   } = authenticatedUser;
-  const {
-    values: preferences,
-    setShowGetStartedSectionByDefault,
-  } = React.useContext(PreferencesContext);
+  const { values: preferences, setShowGetStartedSectionByDefault } =
+    React.useContext(PreferencesContext);
   const recommendationsGettingDelayPromise = React.useRef<?Promise<void>>(null);
   const [error, setError] = React.useState<?AuthError>(null);
   const forceUpdate = useForceUpdate();
@@ -133,29 +129,21 @@ const GetStartedSection = ({
     | 'register'
     | 'survey'
     | 'surveyFinished'
-    | 'recommendations'
+    | 'recommendations',
   >(isFillingOutSurvey ? 'survey' : 'recommendations');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
-  const [errorSendingSurvey, setErrorSendingSurvey] = React.useState<boolean>(
-    false
-  );
-  const [
-    usernameAvailability,
-    setUsernameAvailability,
-  ] = React.useState<?UsernameAvailability>(null);
-  const [
-    isValidatingUsername,
-    setIsValidatingUsername,
-  ] = React.useState<boolean>(false);
-  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
-    false
-  );
-  const [
-    lastVisitedAuthenticationStep,
-    setLastVisitedAuthenticationStep,
-  ] = React.useState<'login' | 'register'>('login');
+  const [errorSendingSurvey, setErrorSendingSurvey] =
+    React.useState<boolean>(false);
+  const [usernameAvailability, setUsernameAvailability] =
+    React.useState<?UsernameAvailability>(null);
+  const [isValidatingUsername, setIsValidatingUsername] =
+    React.useState<boolean>(false);
+  const [getNewsletterEmail, setGetNewsletterEmail] =
+    React.useState<boolean>(false);
+  const [lastVisitedAuthenticationStep, setLastVisitedAuthenticationStep] =
+    React.useState<'login' | 'register'>('login');
 
   const doLogin = () => {
     if (creatingOrLoggingInAccount) return;
@@ -200,7 +188,7 @@ const GetStartedSection = ({
   };
 
   const loginWithProvider = React.useCallback(
-    async provider => {
+    async (provider) => {
       try {
         setIsLoggingInUsingProvider(true);
         await onLoginWithProvider(provider);
@@ -212,41 +200,29 @@ const GetStartedSection = ({
   );
 
   // Logic to store the last visited authentication step.
-  React.useEffect(
-    () => {
-      if (step === 'login') {
-        setLastVisitedAuthenticationStep('login');
-      } else if (step === 'register') {
-        setLastVisitedAuthenticationStep('register');
-      }
-    },
-    [step]
-  );
+  React.useEffect(() => {
+    if (step === 'login') {
+      setLastVisitedAuthenticationStep('login');
+    } else if (step === 'register') {
+      setLastVisitedAuthenticationStep('register');
+    }
+  }, [step]);
 
-  React.useEffect(
-    () => {
-      if (!authenticatedUser.authenticated) clearUserSurveyPersistedState();
-    },
-    [authenticatedUser.authenticated]
-  );
+  React.useEffect(() => {
+    if (!authenticatedUser.authenticated) clearUserSurveyPersistedState();
+  }, [authenticatedUser.authenticated]);
 
   // Set the error when the authentication error changes.
-  React.useEffect(
-    () => {
-      setError(authenticationError);
-    },
-    [authenticationError]
-  );
+  React.useEffect(() => {
+    setError(authenticationError);
+  }, [authenticationError]);
 
   // Reset form when user changes authentication step.
-  React.useEffect(
-    () => {
-      setError(null);
-      setEmail('');
-      setPassword('');
-    },
-    [lastVisitedAuthenticationStep]
-  );
+  React.useEffect(() => {
+    setError(null);
+    setEmail('');
+    setPassword('');
+  }, [lastVisitedAuthenticationStep]);
 
   if (
     (creatingOrLoggingInAccount || loginState === 'loggingIn') &&

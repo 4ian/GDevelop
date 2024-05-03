@@ -47,7 +47,7 @@ export const isAnAncestryOf = (
   variable: gdVariable,
   lineage: VariableLineage
 ): boolean => {
-  const lineageVariables = lineage.map(context => context.variable);
+  const lineageVariables = lineage.map((context) => context.variable);
   return lineageVariables.includes(variable);
 };
 
@@ -117,7 +117,7 @@ export const updateListOfNodesFollowingChangeName = (
   });
   const originalNodeIdBits = oldNodeId.split(separator);
   const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach(index => {
+  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach((index) => {
     if (index === null || index < 0) return;
     const nodeIdToChange = newList[index];
     const bitsToChange = nodeIdToChange.split(separator);
@@ -238,10 +238,7 @@ export const generateListOfNodesMatchingSearchInVariable = ({
     case gd.Variable.Number:
       if (
         normalizeString(variableName).includes(searchText) ||
-        variable
-          .getValue()
-          .toString()
-          .includes(searchText)
+        variable.getValue().toString().includes(searchText)
       ) {
         return [nodeId];
       }
@@ -251,7 +248,7 @@ export const generateListOfNodesMatchingSearchInVariable = ({
       if (normalizeString(variableName).includes(searchText)) {
         newAcc.push(nodeId);
       }
-      childrenNodes = mapFor(0, variable.getChildrenCount(), index => {
+      childrenNodes = mapFor(0, variable.getChildrenCount(), (index) => {
         const childVariable = variable.getAtIndex(index);
         return generateListOfNodesMatchingSearchInVariable({
           variable: childVariable,
@@ -270,7 +267,7 @@ export const generateListOfNodesMatchingSearchInVariable = ({
       childrenNodes = variable
         .getAllChildrenNames()
         .toJSArray()
-        .map(childName => {
+        .map((childName) => {
           const childVariable = variable.getChild(childName);
 
           return Array.from(
@@ -298,7 +295,7 @@ export const generateListOfNodesMatchingSearchInVariablesContainer = (
   searchText: string,
   prefix?: string
 ): Array<string> => {
-  return mapFor(0, variablesContainer.count(), index => {
+  return mapFor(0, variablesContainer.count(), (index) => {
     const variable = variablesContainer.getAt(index);
     const name = variablesContainer.getNameAt(index);
     return generateListOfNodesMatchingSearchInVariable({

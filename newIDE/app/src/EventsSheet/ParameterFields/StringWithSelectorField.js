@@ -19,20 +19,13 @@ import { getParameterChoiceValues } from './ParameterMetadataTools';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function StringWithSelectorField(props: ParameterFieldProps, ref) {
-    const {
-      value,
-      onChange,
-      parameterIndex,
-      parameterMetadata,
-      isInline,
-    } = props;
+    const { value, onChange, parameterIndex, parameterMetadata, isInline } =
+      props;
 
-    const field = React.useRef<?(
-      | GenericExpressionField
-      | SelectFieldInterface
-    )>(null);
+    const field =
+      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -44,7 +37,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const choices = getParameterChoiceValues(parameterMetadata);
 
     const isCurrentValueInList = choices.some(
-      choice => `"${choice}"` === value
+      (choice) => `"${choice}"` === value
     );
 
     // If the current value is not in the list, display an expression field.
@@ -52,14 +45,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       !!value && !isCurrentValueInList
     );
 
-    React.useEffect(
-      () => {
-        if (!isExpressionField && !value && choices.length > 0) {
-          onChange(`"${choices[0]}"`);
-        }
-      },
-      [choices, isExpressionField, onChange, value]
-    );
+    React.useEffect(() => {
+      if (!isExpressionField && !value && choices.length > 0) {
+        onChange(`"${choices[0]}"`);
+      }
+    }, [choices, isExpressionField, onChange, value]);
 
     const switchFieldType = () => {
       setIsExpressionField(!isExpressionField);
@@ -73,7 +63,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = choices.map(choice => {
+    const selectOptions = choices.map((choice) => {
       return (
         <SelectOption
           key={choice}
@@ -122,7 +112,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={style =>
+        renderButton={(style) =>
           isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

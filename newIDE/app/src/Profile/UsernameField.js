@@ -40,7 +40,7 @@ type Props = {|
   value: string,
   onChange: (event: {| target: {| value: string |} |}, value: string) => void,
   isValidatingUsername: boolean,
-  onAvailabilityCheckLoading: boolean => void,
+  onAvailabilityCheckLoading: (boolean) => void,
   onAvailabilityChecked: (?UsernameAvailability) => void,
   errorText?: ?React.Node,
   allowEmpty?: boolean,
@@ -64,10 +64,8 @@ export const UsernameField = ({
     ? undefined
     : usernameFormatErrorMessage;
 
-  const [
-    usernameAvailabilityError,
-    setUsernameAvailabilityError,
-  ] = React.useState<?React.Node>(null);
+  const [usernameAvailabilityError, setUsernameAvailabilityError] =
+    React.useState<?React.Node>(null);
 
   const updateUsernameAvailability = ({
     usernameAvailability,
@@ -129,12 +127,9 @@ export const UsernameField = ({
     }
   }, 500);
 
-  React.useEffect(
-    () => {
-      checkUsernameAvailability(value);
-    },
-    [value, checkUsernameAvailability]
-  );
+  React.useEffect(() => {
+    checkUsernameAvailability(value);
+  }, [value, checkUsernameAvailability]);
 
   return (
     <TextField

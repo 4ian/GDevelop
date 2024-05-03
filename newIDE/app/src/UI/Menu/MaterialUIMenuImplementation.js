@@ -61,7 +61,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
   // When null, the submenu stays closed.
   const [anchorElement, setAnchorElement] = React.useState(null);
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     // $FlowFixMe - even if not defined, not a problem.
     if (item.enabled === false) {
       return;
@@ -191,7 +191,8 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
  *  - submenu
  */
 export default class MaterialUIMenuImplementation
-  implements ContextMenuImplementation {
+  implements ContextMenuImplementation
+{
   _onClose: () => void;
   constructor({ onClose }: {| onClose: () => void |}) {
     this._onClose = onClose;
@@ -224,7 +225,7 @@ export default class MaterialUIMenuImplementation
                 // $FlowFixMe - existence should be inferred by Flow.
                 item.enabled === false
               }
-              onClick={async e => {
+              onClick={async (e) => {
                 e.stopPropagation();
                 if (item.enabled === false) {
                   return;
@@ -259,7 +260,7 @@ export default class MaterialUIMenuImplementation
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
-              buildFromTemplate={template =>
+              buildFromTemplate={(template) =>
                 this.buildFromTemplate(template, forceUpdate)
               }
             />
@@ -270,7 +271,7 @@ export default class MaterialUIMenuImplementation
               dense
               key={'item' + item.label}
               disabled={item.enabled === false}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 if (item.enabled === false) {
                   return;

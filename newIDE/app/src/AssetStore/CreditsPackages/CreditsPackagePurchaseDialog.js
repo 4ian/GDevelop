@@ -48,10 +48,8 @@ const CreditsPackagePurchaseDialog = ({
   const [initialCreditsAmount, setInitialCreditsAmount] = React.useState(null);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
-  const [
-    displayPasswordPrompt,
-    setDisplayPasswordPrompt,
-  ] = React.useState<boolean>(false);
+  const [displayPasswordPrompt, setDisplayPasswordPrompt] =
+    React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
 
@@ -87,9 +85,8 @@ const CreditsPackagePurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (
         extractedStatusAndCode &&
         extractedStatusAndCode.status === 403 &&
@@ -136,30 +133,24 @@ const CreditsPackagePurchaseDialog = ({
 
   // Listen to the limits being loaded the first time (either when the dialog is opened, or when the user logs in)
   // In this case, save the user balance before the purchase.
-  React.useEffect(
-    () => {
-      (async () => {
-        if (limits && initialCreditsAmount === null) {
-          setInitialCreditsAmount(limits.credits.userBalance.amount);
-        }
-      })();
-    },
-    [limits, initialCreditsAmount]
-  );
+  React.useEffect(() => {
+    (async () => {
+      if (limits && initialCreditsAmount === null) {
+        setInitialCreditsAmount(limits.credits.userBalance.amount);
+      }
+    })();
+  }, [limits, initialCreditsAmount]);
 
   // If the limits change, check the user balance and close the dialog if the purchase was successful.
-  React.useEffect(
-    () => {
-      if (initialCreditsAmount !== null && limits && isPurchasing) {
-        const newCreditsAmount = limits.credits.userBalance.amount;
-        if (newCreditsAmount > initialCreditsAmount) {
-          setIsPurchasing(false);
-          setPurchaseSuccessful(true);
-        }
+  React.useEffect(() => {
+    if (initialCreditsAmount !== null && limits && isPurchasing) {
+      const newCreditsAmount = limits.credits.userBalance.amount;
+      if (newCreditsAmount > initialCreditsAmount) {
+        setIsPurchasing(false);
+        setPurchaseSuccessful(true);
       }
-    },
-    [initialCreditsAmount, isPurchasing, purchaseSuccessful, limits]
-  );
+    }
+  }, [initialCreditsAmount, isPurchasing, purchaseSuccessful, limits]);
 
   const dialogContents = !profile
     ? {
@@ -179,81 +170,81 @@ const CreditsPackagePurchaseDialog = ({
         ),
       }
     : purchaseSuccessful
-    ? {
-        subtitle: <Trans>Your purchase has been processed!</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>You can now use them across the app!</Trans>
-            </Text>
-          </Line>
-        ),
-      }
-    : isPurchasing
-    ? {
-        subtitle: shouldUseOrSimulateAppStoreProduct ? (
-          <Trans>Complete your purchase with the app store.</Trans>
-        ) : (
-          <Trans>Complete your payment on the web browser</Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? (
-          <>
-            <ColumnStackLayout justifyContent="center" alignItems="center">
-              <CircularProgress size={40} />
-              <Text>
-                <Trans>
-                  The purchase will be linked to your account once done.
-                </Trans>
-              </Text>
-            </ColumnStackLayout>
-          </>
-        ) : (
-          <>
+      ? {
+          subtitle: <Trans>Your purchase has been processed!</Trans>,
+          content: (
             <Line justifyContent="center" alignItems="center">
-              <CircularProgress size={20} />
-              <Spacer />
               <Text>
-                <Trans>Waiting for the purchase confirmation...</Trans>
+                <Trans>You can now use them across the app!</Trans>
               </Text>
             </Line>
-            <Spacer />
-            <Line justifyContent="center">
-              <BackgroundText>
+          ),
+        }
+      : isPurchasing
+        ? {
+            subtitle: shouldUseOrSimulateAppStoreProduct ? (
+              <Trans>Complete your purchase with the app store.</Trans>
+            ) : (
+              <Trans>Complete your payment on the web browser</Trans>
+            ),
+            content: shouldUseOrSimulateAppStoreProduct ? (
+              <>
+                <ColumnStackLayout justifyContent="center" alignItems="center">
+                  <CircularProgress size={40} />
+                  <Text>
+                    <Trans>
+                      The purchase will be linked to your account once done.
+                    </Trans>
+                  </Text>
+                </ColumnStackLayout>
+              </>
+            ) : (
+              <>
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                  <Spacer />
+                  <Text>
+                    <Trans>Waiting for the purchase confirmation...</Trans>
+                  </Text>
+                </Line>
+                <Spacer />
+                <Line justifyContent="center">
+                  <BackgroundText>
+                    <Trans>
+                      Once you're done, come back to GDevelop and the credits
+                      will be added to your account automatically.
+                    </Trans>
+                  </BackgroundText>
+                </Line>
+              </>
+            ),
+          }
+        : !limits
+          ? {
+              subtitle: <Trans>Loading your profile...</Trans>,
+              content: (
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                </Line>
+              ),
+            }
+          : {
+              subtitle: (
                 <Trans>
-                  Once you're done, come back to GDevelop and the credits will
-                  be added to your account automatically.
+                  {creditsPackageListingData.name} will be added to your account
+                  {profile.email}.
                 </Trans>
-              </BackgroundText>
-            </Line>
-          </>
-        ),
-      }
-    : !limits
-    ? {
-        subtitle: <Trans>Loading your profile...</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <CircularProgress size={20} />
-          </Line>
-        ),
-      }
-    : {
-        subtitle: (
-          <Trans>
-            {creditsPackageListingData.name} will be added to your account
-            {profile.email}.
-          </Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? null : (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                A new secure window will open to complete the purchase.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      };
+              ),
+              content: shouldUseOrSimulateAppStoreProduct ? null : (
+                <Line justifyContent="center" alignItems="center">
+                  <Text>
+                    <Trans>
+                      A new secure window will open to complete the purchase.
+                    </Trans>
+                  </Text>
+                </Line>
+              ),
+            };
 
   const allowPurchase =
     profile && !isPurchasing && !purchaseSuccessful && !!limits;

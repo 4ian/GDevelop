@@ -46,15 +46,11 @@ const PrivateGameTemplatePurchaseDialog = ({
     gameTemplatePurchases,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
-  const [
-    isCheckingPurchasesAfterLogin,
-    setIsCheckingPurchasesAfterLogin,
-  ] = React.useState(!receivedGameTemplates);
+  const [isCheckingPurchasesAfterLogin, setIsCheckingPurchasesAfterLogin] =
+    React.useState(!receivedGameTemplates);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
-  const [
-    displayPasswordPrompt,
-    setDisplayPasswordPrompt,
-  ] = React.useState<boolean>(false);
+  const [displayPasswordPrompt, setDisplayPasswordPrompt] =
+    React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
 
@@ -79,7 +75,7 @@ const PrivateGameTemplatePurchaseDialog = ({
     }
 
     const price = privateGameTemplateListingData.prices.find(
-      price => price.usageType === usageType
+      (price) => price.usageType === usageType
     );
     if (!price) {
       console.error('Unable to find the price for the usage type', usageType);
@@ -102,9 +98,8 @@ const PrivateGameTemplatePurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (
         extractedStatusAndCode &&
         extractedStatusAndCode.status === 403 &&
@@ -144,32 +139,29 @@ const PrivateGameTemplatePurchaseDialog = ({
 
   // This effect will be triggered when the game template purchases change,
   // to check if the user has just bought the product.
-  React.useEffect(
-    () => {
-      const checkIfPurchaseIsDone = async () => {
-        if (
-          isPurchasing &&
-          gameTemplatePurchases &&
-          gameTemplatePurchases.find(
-            userPurchase =>
-              userPurchase.productId === privateGameTemplateListingData.id
-          )
-        ) {
-          // We found the purchase, the user has bought the game template.
-          // We do not close the dialog yet, as we need to trigger a refresh of the products received.
-          await onPurchaseSuccessful();
-        }
-      };
-      checkIfPurchaseIsDone();
-    },
-    [
-      isPurchasing,
-      gameTemplatePurchases,
-      privateGameTemplateListingData,
-      onPurchaseSuccessful,
-      onRefreshGameTemplatePurchases,
-    ]
-  );
+  React.useEffect(() => {
+    const checkIfPurchaseIsDone = async () => {
+      if (
+        isPurchasing &&
+        gameTemplatePurchases &&
+        gameTemplatePurchases.find(
+          (userPurchase) =>
+            userPurchase.productId === privateGameTemplateListingData.id
+        )
+      ) {
+        // We found the purchase, the user has bought the game template.
+        // We do not close the dialog yet, as we need to trigger a refresh of the products received.
+        await onPurchaseSuccessful();
+      }
+    };
+    checkIfPurchaseIsDone();
+  }, [
+    isPurchasing,
+    gameTemplatePurchases,
+    privateGameTemplateListingData,
+    onPurchaseSuccessful,
+    onRefreshGameTemplatePurchases,
+  ]);
 
   useInterval(
     () => {
@@ -180,52 +172,46 @@ const PrivateGameTemplatePurchaseDialog = ({
 
   // Listen to the received game template, to know when a user has just logged in and the received game templates have been loaded.
   // In this case, start a timeout to remove the loader and give some time for the store to refresh.
-  React.useEffect(
-    () => {
-      let timeoutId;
-      (async () => {
-        if (receivedGameTemplates) {
-          timeoutId = setTimeout(
-            () => setIsCheckingPurchasesAfterLogin(false),
-            3000
-          );
-        }
-      })();
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    },
-    [receivedGameTemplates]
-  );
+  React.useEffect(() => {
+    let timeoutId;
+    (async () => {
+      if (receivedGameTemplates) {
+        timeoutId = setTimeout(
+          () => setIsCheckingPurchasesAfterLogin(false),
+          3000
+        );
+      }
+    })();
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [receivedGameTemplates]);
 
   // If the user has received this particular template, either:
   // - they just logged in, and already have it, so we close the dialog.
   // - they just bought it, we display the success message.
-  React.useEffect(
-    () => {
-      if (receivedGameTemplates) {
-        const receivedGameTemplate = receivedGameTemplates.find(
-          gameTemplate => gameTemplate.id === privateGameTemplateListingData.id
-        );
-        if (receivedGameTemplate) {
-          if (isPurchasing) {
-            setIsPurchasing(false);
-            setPurchaseSuccessful(true);
-          } else if (!purchaseSuccessful) {
-            onClose();
-          }
+  React.useEffect(() => {
+    if (receivedGameTemplates) {
+      const receivedGameTemplate = receivedGameTemplates.find(
+        (gameTemplate) => gameTemplate.id === privateGameTemplateListingData.id
+      );
+      if (receivedGameTemplate) {
+        if (isPurchasing) {
+          setIsPurchasing(false);
+          setPurchaseSuccessful(true);
+        } else if (!purchaseSuccessful) {
+          onClose();
         }
       }
-    },
-    [
-      receivedGameTemplates,
-      privateGameTemplateListingData,
-      isPurchasing,
-      onClose,
-      isCheckingPurchasesAfterLogin,
-      purchaseSuccessful,
-    ]
-  );
+    }
+  }, [
+    receivedGameTemplates,
+    privateGameTemplateListingData,
+    isPurchasing,
+    onClose,
+    isCheckingPurchasesAfterLogin,
+    purchaseSuccessful,
+  ]);
 
   const dialogContents = !profile
     ? {
@@ -246,83 +232,84 @@ const PrivateGameTemplatePurchaseDialog = ({
         ),
       }
     : purchaseSuccessful
-    ? {
-        subtitle: <Trans>Your purchase has been processed!</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                You can now go back to the store to use your new game template.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      }
-    : isPurchasing
-    ? {
-        subtitle: shouldUseOrSimulateAppStoreProduct ? (
-          <Trans>Complete your purchase with the app store.</Trans>
-        ) : (
-          <Trans>Complete your payment on the web browser</Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? (
-          <>
-            <ColumnStackLayout justifyContent="center" alignItems="center">
-              <CircularProgress size={40} />
-              <Text>
-                <Trans>
-                  The purchase will be linked to your account once done.
-                </Trans>
-              </Text>
-            </ColumnStackLayout>
-          </>
-        ) : (
-          <>
+      ? {
+          subtitle: <Trans>Your purchase has been processed!</Trans>,
+          content: (
             <Line justifyContent="center" alignItems="center">
-              <CircularProgress size={20} />
-              <Spacer />
               <Text>
-                <Trans>Waiting for the purchase confirmation...</Trans>
+                <Trans>
+                  You can now go back to the store to use your new game
+                  template.
+                </Trans>
               </Text>
             </Line>
-            <Spacer />
-            <Line justifyContent="center">
-              <BackgroundText>
+          ),
+        }
+      : isPurchasing
+        ? {
+            subtitle: shouldUseOrSimulateAppStoreProduct ? (
+              <Trans>Complete your purchase with the app store.</Trans>
+            ) : (
+              <Trans>Complete your payment on the web browser</Trans>
+            ),
+            content: shouldUseOrSimulateAppStoreProduct ? (
+              <>
+                <ColumnStackLayout justifyContent="center" alignItems="center">
+                  <CircularProgress size={40} />
+                  <Text>
+                    <Trans>
+                      The purchase will be linked to your account once done.
+                    </Trans>
+                  </Text>
+                </ColumnStackLayout>
+              </>
+            ) : (
+              <>
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                  <Spacer />
+                  <Text>
+                    <Trans>Waiting for the purchase confirmation...</Trans>
+                  </Text>
+                </Line>
+                <Spacer />
+                <Line justifyContent="center">
+                  <BackgroundText>
+                    <Trans>
+                      Once you're done, come back to GDevelop and the game
+                      template will be added to your account automatically.
+                    </Trans>
+                  </BackgroundText>
+                </Line>
+              </>
+            ),
+          }
+        : isCheckingPurchasesAfterLogin
+          ? {
+              subtitle: <Trans>Loading your profile...</Trans>,
+              content: (
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                </Line>
+              ),
+            }
+          : {
+              subtitle: (
                 <Trans>
-                  Once you're done, come back to GDevelop and the game template
-                  will be added to your account automatically.
+                  The game template {privateGameTemplateListingData.name} will
+                  be linked to your account {profile.email}.
                 </Trans>
-              </BackgroundText>
-            </Line>
-          </>
-        ),
-      }
-    : isCheckingPurchasesAfterLogin
-    ? {
-        subtitle: <Trans>Loading your profile...</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <CircularProgress size={20} />
-          </Line>
-        ),
-      }
-    : {
-        subtitle: (
-          <Trans>
-            The game template {privateGameTemplateListingData.name} will be
-            linked to your account {profile.email}.
-          </Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? null : (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                A new secure window will open to complete the purchase.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      };
+              ),
+              content: shouldUseOrSimulateAppStoreProduct ? null : (
+                <Line justifyContent="center" alignItems="center">
+                  <Text>
+                    <Trans>
+                      A new secure window will open to complete the purchase.
+                    </Trans>
+                  </Text>
+                </Line>
+              ),
+            };
 
   const allowPurchase =
     profile &&

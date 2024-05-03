@@ -41,7 +41,7 @@ const defaultOperators: { [string]: string } = {
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function RelationalOperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -79,7 +79,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         ref={field}
         translatableHintText={t`Choose an operator`}
       >
-        {operators.map(operator => (
+        {operators.map((operator) => (
           <SelectOption
             key={operator}
             value={operator}

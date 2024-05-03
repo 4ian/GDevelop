@@ -22,25 +22,21 @@ const QuitInAppTutorialDialog = ({
   onClose,
   isSavingProject,
 }: Props) => {
-  const [hasUserInteracted, setHasUserInteracted] = React.useState<boolean>(
-    false
-  );
+  const [hasUserInteracted, setHasUserInteracted] =
+    React.useState<boolean>(false);
   const [title, setTitle] = React.useState<React.Node>(
     <Trans>Leave the tutorial</Trans>
   );
 
-  React.useEffect(
-    () => {
-      if (hasUserInteracted) {
-        if (isSavingProject) {
-          setTitle(<Trans>Saving project</Trans>);
-        } else if (canEndTutorial) {
-          setTitle(<Trans>Project saved</Trans>);
-        }
+  React.useEffect(() => {
+    if (hasUserInteracted) {
+      if (isSavingProject) {
+        setTitle(<Trans>Saving project</Trans>);
+      } else if (canEndTutorial) {
+        setTitle(<Trans>Project saved</Trans>);
       }
-    },
-    [isSavingProject, canEndTutorial, hasUserInteracted]
-  );
+    }
+  }, [isSavingProject, canEndTutorial, hasUserInteracted]);
 
   const quitTutorial = () => {
     endTutorial();

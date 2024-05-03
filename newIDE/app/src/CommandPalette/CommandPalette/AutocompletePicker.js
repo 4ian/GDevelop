@@ -30,7 +30,7 @@ import {
 import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 import { useShouldAutofocusInput } from '../../UI/Responsive/ScreenTypeMeasurer';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   listItemContainer: {
     width: '100%',
   },
@@ -71,7 +71,7 @@ const HitPrimaryText = (
   return (
     <>
       <span className={classes.wikiPrimaryTextHierarchy}>
-        {hierarchyArray.map(item => `${item} > `)}
+        {hierarchyArray.map((item) => `${item} > `)}
       </span>{' '}
       <span>{lastElement}</span>
     </>
@@ -226,7 +226,7 @@ const AutocompletePicker = (
       openOnFocus
       autoHighlight
       filterOptions={filterOptions}
-      renderInput={params => (
+      renderInput={(params) => (
         <TextField
           {...params}
           placeholder={props.i18n._(props.placeholder)}

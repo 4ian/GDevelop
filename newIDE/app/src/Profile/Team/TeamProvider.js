@@ -22,108 +22,82 @@ import { listOtherUserCloudProjects } from '../../Utils/GDevelopServices/Project
 type Props = {| children: React.Node |};
 
 const TeamProvider = ({ children }: Props) => {
-  const {
-    limits,
-    profile,
-    getAuthorizationHeader,
-    authenticated,
-  } = React.useContext(AuthenticatedUserContext);
+  const { limits, profile, getAuthorizationHeader, authenticated } =
+    React.useContext(AuthenticatedUserContext);
   const [groups, setGroups] = React.useState<?(TeamGroup[])>(null);
   const [team, setTeam] = React.useState<?Team>(null);
   const [members, setMembers] = React.useState<?(User[])>(null);
-  const [memberships, setMemberships] = React.useState<?(TeamMembership[])>(
-    null
-  );
+  const [memberships, setMemberships] =
+    React.useState<?(TeamMembership[])>(null);
 
-  React.useEffect(
-    () => {
-      if (!authenticated) {
-        setTeam(null);
-        setGroups(null);
-        setMembers(null);
-        setMemberships(null);
-      }
-    },
-    [authenticated]
-  );
+  React.useEffect(() => {
+    if (!authenticated) {
+      setTeam(null);
+      setGroups(null);
+      setMembers(null);
+      setMemberships(null);
+    }
+  }, [authenticated]);
 
-  React.useEffect(
-    () => {
-      const fetchTeam = async () => {
-        if (
-          !profile ||
-          !limits ||
-          !limits.capabilities.classrooms ||
-          !limits.capabilities.classrooms.showClassroomTab
-        )
-          return;
-        const teams = await listUserTeams(getAuthorizationHeader, profile.id);
-        // Being admin of multiple teams is not supported at the moment.
-        setTeam(teams[0]);
-      };
-      fetchTeam();
-    },
-    [getAuthorizationHeader, profile, limits]
-  );
+  React.useEffect(() => {
+    const fetchTeam = async () => {
+      if (
+        !profile ||
+        !limits ||
+        !limits.capabilities.classrooms ||
+        !limits.capabilities.classrooms.showClassroomTab
+      )
+        return;
+      const teams = await listUserTeams(getAuthorizationHeader, profile.id);
+      // Being admin of multiple teams is not supported at the moment.
+      setTeam(teams[0]);
+    };
+    fetchTeam();
+  }, [getAuthorizationHeader, profile, limits]);
 
-  React.useEffect(
-    () => {
-      const fetchGroups = async () => {
-        if (!team || !profile) return;
-
-        const teamGroups = await listTeamGroups(
-          getAuthorizationHeader,
-          profile.id,
-          team.id
-        );
-        setGroups(teamGroups);
-      };
-      fetchGroups();
-    },
-    [team, getAuthorizationHeader, profile]
-  );
-
-  const fetchMembers = React.useCallback(
-    async () => {
+  React.useEffect(() => {
+    const fetchGroups = async () => {
       if (!team || !profile) return;
 
-      const teamMembers = await listTeamMembers(
+      const teamGroups = await listTeamGroups(
         getAuthorizationHeader,
         profile.id,
         team.id
       );
-      setMembers(teamMembers);
-    },
-    [team, getAuthorizationHeader, profile]
-  );
+      setGroups(teamGroups);
+    };
+    fetchGroups();
+  }, [team, getAuthorizationHeader, profile]);
 
-  React.useEffect(
-    () => {
-      fetchMembers();
-    },
-    [fetchMembers]
-  );
+  const fetchMembers = React.useCallback(async () => {
+    if (!team || !profile) return;
 
-  const fetchMemberships = React.useCallback(
-    async () => {
-      if (!team || !profile) return;
+    const teamMembers = await listTeamMembers(
+      getAuthorizationHeader,
+      profile.id,
+      team.id
+    );
+    setMembers(teamMembers);
+  }, [team, getAuthorizationHeader, profile]);
 
-      const teamMemberships = await listTeamMemberships(
-        getAuthorizationHeader,
-        profile.id,
-        team.id
-      );
-      setMemberships(teamMemberships);
-    },
-    [team, getAuthorizationHeader, profile]
-  );
+  React.useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
-  React.useEffect(
-    () => {
-      fetchMemberships();
-    },
-    [fetchMemberships]
-  );
+  const fetchMemberships = React.useCallback(async () => {
+    if (!team || !profile) return;
+
+    const teamMemberships = await listTeamMemberships(
+      getAuthorizationHeader,
+      profile.id,
+      team.id
+    );
+    setMemberships(teamMemberships);
+  }, [team, getAuthorizationHeader, profile]);
+
+  React.useEffect(() => {
+    fetchMemberships();
+  }, [fetchMemberships]);
 
   const onChangeGroupName = React.useCallback(
     async (group: TeamGroup, newName: string) => {
@@ -136,7 +110,7 @@ const TeamProvider = ({ children }: Props) => {
         { name: newName }
       );
       const updatedGroupIndex = groups.findIndex(
-        group_ => group_.id === group.id
+        (group_) => group_.id === group.id
       );
       if (updatedGroupIndex !== -1) {
         const newGroups = [...groups];
@@ -152,7 +126,7 @@ const TeamProvider = ({ children }: Props) => {
       if (!team || !profile || !memberships) return;
       try {
         const membershipIndex = memberships.findIndex(
-          membership => membership.userId === user.id
+          (membership) => membership.userId === user.id
         );
         if (
           memberships[membershipIndex].groups &&
@@ -198,8 +172,8 @@ const TeamProvider = ({ children }: Props) => {
     async (group: TeamGroup) => {
       if (!profile || !team) return;
       await deleteGroup(getAuthorizationHeader, profile.id, team.id, group.id);
-      setGroups(groups =>
-        groups ? groups.filter(group_ => group_.id !== group.id) : null
+      setGroups((groups) =>
+        groups ? groups.filter((group_) => group_.id !== group.id) : null
       );
     },
     [team, getAuthorizationHeader, profile]
@@ -219,12 +193,9 @@ const TeamProvider = ({ children }: Props) => {
     [team, getAuthorizationHeader, profile, groups]
   );
 
-  const onRefreshMembers = React.useCallback(
-    async () => {
-      await Promise.all([fetchMembers(), fetchMemberships()]);
-    },
-    [fetchMembers, fetchMemberships]
-  );
+  const onRefreshMembers = React.useCallback(async () => {
+    await Promise.all([fetchMembers(), fetchMemberships()]);
+  }, [fetchMembers, fetchMemberships]);
 
   return (
     <TeamContext.Provider

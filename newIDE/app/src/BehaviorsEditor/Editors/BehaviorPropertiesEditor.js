@@ -26,7 +26,7 @@ const areAdvancedPropertiesModified = (behavior: gdBehavior) => {
   const propertiesValues = behavior.getProperties();
   const propertyNames = propertiesMetadata.keys();
   let hasFoundModifiedAdvancedProperty = false;
-  mapFor(0, propertyNames.size(), i => {
+  mapFor(0, propertyNames.size(), (i) => {
     const name = propertyNames.at(i);
     const property = propertiesMetadata.get(name);
     const defaultValue = property.getValue();
@@ -51,16 +51,14 @@ const BehaviorPropertiesEditor = ({
   onBehaviorUpdated,
   resourceManagementProps,
 }: Props) => {
-  const [
-    shouldShowDeprecatedProperties,
-    setShouldShowDeprecatedProperties,
-  ] = React.useState<boolean>(false);
+  const [shouldShowDeprecatedProperties, setShouldShowDeprecatedProperties] =
+    React.useState<boolean>(false);
 
   const basicPropertiesSchema = React.useMemo(
     () =>
       propertiesMapToSchema(
         behavior.getProperties(),
-        behavior => behavior.getProperties(),
+        (behavior) => behavior.getProperties(),
         (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
@@ -79,7 +77,7 @@ const BehaviorPropertiesEditor = ({
     () =>
       propertiesMapToSchema(
         behavior.getProperties(),
-        behavior => behavior.getProperties(),
+        (behavior) => behavior.getProperties(),
         (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },
@@ -93,7 +91,7 @@ const BehaviorPropertiesEditor = ({
     () =>
       propertiesMapToSchema(
         behavior.getProperties(),
-        behavior => behavior.getProperties(),
+        (behavior) => behavior.getProperties(),
         (behavior, name, value) => {
           behavior.updateProperty(name, value);
         },

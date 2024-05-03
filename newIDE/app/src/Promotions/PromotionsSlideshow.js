@@ -25,11 +25,11 @@ const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
 
   const filteredPromotions =
     promotions && type
-      ? promotions.filter(promotion => promotion.type === type)
+      ? promotions.filter((promotion) => promotion.type === type)
       : promotions;
 
   const slideShowItems = filteredPromotions
-    ? filteredPromotions.map(promotion => ({
+    ? filteredPromotions.map((promotion) => ({
         id: promotion.id,
         imageUrl: promotion.imageUrl,
         mobileImageUrl: promotion.mobileImageUrl,
@@ -51,8 +51,8 @@ const PromotionsSlideshow = ({ type }: PromotionsSlideshowProps) => {
         isMobile
           ? 0
           : isMediumScreen
-          ? homepageMediumMenuBarWidth + 2 * SECTION_PADDING
-          : homepageDesktopMenuBarWidth + 2 * SECTION_PADDING
+            ? homepageMediumMenuBarWidth + 2 * SECTION_PADDING
+            : homepageDesktopMenuBarWidth + 2 * SECTION_PADDING
       }
     />
   );

@@ -100,7 +100,7 @@ const ONE_MINUTE = 6 * TEN_SECONDS;
 
 export default class AuthenticatedUserProvider extends React.Component<
   Props,
-  State
+  State,
 > {
   state = {
     authenticatedUser: initialAuthenticatedUser,
@@ -133,7 +133,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   //   their cloud projects;
   // - Second one comes from the homepage fetching the cloud projects regularly.
   _cloudProjectListingDeduplicator = new RequestDeduplicator<
-    Array<CloudProjectWithUserAccessInfo>
+    Array<CloudProjectWithUserAccessInfo>,
   >(listUserCloudProjects);
 
   async componentDidMount() {
@@ -257,14 +257,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._hasNotifiedUserAboutEmailVerification = false;
 
     listDefaultRecommendations().then(
-      recommendations =>
+      (recommendations) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             recommendations,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading default recommendations:', error);
       }
     );
@@ -349,14 +349,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     // the user profile itself, to not block in case one of these calls
     // fails.
     getUserUsages(authentication.getAuthorizationHeader, firebaseUser.uid).then(
-      usages =>
+      (usages) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             usages,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user usages:', error);
       }
     );
@@ -364,26 +364,26 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader,
       firebaseUser.uid
     ).then(
-      subscription =>
+      (subscription) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             subscription,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user subscriptions:', error);
       }
     );
     getUserLimits(authentication.getAuthorizationHeader, firebaseUser.uid).then(
-      limits =>
+      (limits) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             limits,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user limits:', error);
       }
     );
@@ -393,14 +393,14 @@ export default class AuthenticatedUserProvider extends React.Component<
         firebaseUser.uid,
       ])
       .then(
-        cloudProjects =>
+        (cloudProjects) =>
           this.setState(({ authenticatedUser }) => ({
             authenticatedUser: {
               ...authenticatedUser,
               cloudProjects,
             },
           })),
-        error => {
+        (error) => {
           console.error('Error while loading user cloud projects:', error);
           this.setState(({ authenticatedUser }) => ({
             authenticatedUser: {
@@ -418,28 +418,28 @@ export default class AuthenticatedUserProvider extends React.Component<
     listReceivedAssetPacks(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
-      receivedAssetPacks =>
+      (receivedAssetPacks) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             receivedAssetPacks,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading received asset packs:', error);
       }
     );
     listReceivedAssetShortHeaders(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
-      receivedAssetShortHeaders =>
+      (receivedAssetShortHeaders) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             receivedAssetShortHeaders,
           },
         })),
-      error => {
+      (error) => {
         console.error(
           'Error while loading received asset short headers:',
           error
@@ -449,17 +449,16 @@ export default class AuthenticatedUserProvider extends React.Component<
     listRecommendations(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
-      recommendations =>
+      (recommendations) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             recommendations,
           },
         })),
-      error => {
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
+      (error) => {
+        const extractedStatusAndCode =
+          extractGDevelopApiErrorStatusAndCode(error);
         if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           console.warn(
             'List recommendations endpoint returned 404, user might not have completed survey.'
@@ -472,14 +471,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     listReceivedGameTemplates(authentication.getAuthorizationHeader, {
       userId: firebaseUser.uid,
     }).then(
-      receivedGameTemplates =>
+      (receivedGameTemplates) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             receivedGameTemplates,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading received game templates:', error);
       }
     );
@@ -488,14 +487,14 @@ export default class AuthenticatedUserProvider extends React.Component<
       productType: 'game-template',
       role: 'receiver',
     }).then(
-      gameTemplatePurchases =>
+      (gameTemplatePurchases) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             gameTemplatePurchases,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading game template purchases:', error);
       }
     );
@@ -504,14 +503,14 @@ export default class AuthenticatedUserProvider extends React.Component<
       productType: 'asset-pack',
       role: 'receiver',
     }).then(
-      assetPackPurchases =>
+      (assetPackPurchases) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             assetPackPurchases,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading asset pack purchases:', error);
       }
     );
@@ -806,14 +805,14 @@ export default class AuthenticatedUserProvider extends React.Component<
         firebaseUser.uid,
       ])
       .then(
-        cloudProjects =>
+        (cloudProjects) =>
           this.setState(({ authenticatedUser }) => ({
             authenticatedUser: {
               ...authenticatedUser,
               cloudProjects,
             },
           })),
-        error => {
+        (error) => {
           console.error('Error while loading user cloud projects:', error);
           this.setState(({ authenticatedUser }) => ({
             authenticatedUser: {
@@ -1332,7 +1331,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                   badges={this.state.authenticatedUser.badges}
                   subscription={this.state.authenticatedUser.subscription}
                   onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={async form => {
+                  onEdit={async (form) => {
                     try {
                       await this._doEdit(form, preferences);
                       this.openEditProfileDialog(false);
@@ -1340,7 +1339,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                       // Ignore errors, we will let the user retry in their profile.
                     }
                   }}
-                  onUpdateGitHubStar={githubUsername =>
+                  onUpdateGitHubStar={(githubUsername) =>
                     this._onUpdateGithubStar(githubUsername, preferences)
                   }
                   onDelete={this._doDeleteAccount}
@@ -1364,7 +1363,7 @@ export default class AuthenticatedUserProvider extends React.Component<
               <CreateAccountDialog
                 onClose={() => this.openCreateAccountDialog(false)}
                 onGoToLogin={() => this.openLoginDialog(true)}
-                onCreateAccount={form =>
+                onCreateAccount={(form) =>
                   this._doCreateAccount(form, preferences)
                 }
                 onLoginWithProvider={this._doLoginWithProvider}

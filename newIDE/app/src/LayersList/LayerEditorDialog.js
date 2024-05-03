@@ -51,42 +51,31 @@ const LayerEditorDialog = (props: Props) => {
     hotReloadPreviewButtonProps,
   } = props;
   const forceUpdate = useForceUpdate();
-  const {
-    onCancelChanges,
-    notifyOfChange,
-  } = useSerializableObjectCancelableEditor({
-    serializableObject: layer,
-    onCancel: onClose,
-  });
-  const [
-    camera3DFieldOfViewError,
-    setCamera3DFieldOfViewError,
-  ] = React.useState<?React.Node>(null);
-  const [
-    camera3DFarPlaneDistanceError,
-    setCamera3DFarPlaneDistanceError,
-  ] = React.useState<?React.Node>(null);
-  const [
-    camera3DNearPlaneDistanceError,
-    setCamera3DNearPlaneDistanceError,
-  ] = React.useState<?React.Node>(null);
+  const { onCancelChanges, notifyOfChange } =
+    useSerializableObjectCancelableEditor({
+      serializableObject: layer,
+      onCancel: onClose,
+    });
+  const [camera3DFieldOfViewError, setCamera3DFieldOfViewError] =
+    React.useState<?React.Node>(null);
+  const [camera3DFarPlaneDistanceError, setCamera3DFarPlaneDistanceError] =
+    React.useState<?React.Node>(null);
+  const [camera3DNearPlaneDistanceError, setCamera3DNearPlaneDistanceError] =
+    React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
-  const { instancesCount, highestZOrder } = React.useMemo(
-    () => {
-      const zOrderFinder = new gd.HighestZOrderFinder();
-      zOrderFinder.restrictSearchToLayer(layer.getName());
+  const { instancesCount, highestZOrder } = React.useMemo(() => {
+    const zOrderFinder = new gd.HighestZOrderFinder();
+    zOrderFinder.restrictSearchToLayer(layer.getName());
 
-      initialInstances.iterateOverInstances(zOrderFinder);
-      const instancesCount = zOrderFinder.getInstancesCount();
-      const highestZOrder = zOrderFinder.getHighestZOrder();
-      zOrderFinder.delete();
-      return { instancesCount, highestZOrder };
-    },
-    [layer, initialInstances]
-  );
+    initialInstances.iterateOverInstances(zOrderFinder);
+    const instancesCount = zOrderFinder.getInstancesCount();
+    const highestZOrder = zOrderFinder.getHighestZOrder();
+    zOrderFinder.delete();
+    return { instancesCount, highestZOrder };
+  }, [layer, initialInstances]);
 
   const onChangeCamera3DFieldOfView = React.useCallback(
-    value => {
+    (value) => {
       setCamera3DFieldOfViewError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= 0 || newValue > 180) {
@@ -106,7 +95,7 @@ const LayerEditorDialog = (props: Props) => {
   );
 
   const checkNearPlaneDistanceError = React.useCallback(
-    value => {
+    (value) => {
       setCamera3DNearPlaneDistanceError(null);
       const hasError =
         (value <= 0 && layer.getCameraType() !== 'orthographic') ||
@@ -125,7 +114,7 @@ const LayerEditorDialog = (props: Props) => {
   );
 
   const onChangeCamera3DNearPlaneDistance = React.useCallback(
-    value => {
+    (value) => {
       const newValue = parseFloat(value) || 0;
       const hasError = checkNearPlaneDistanceError(newValue);
       if (hasError) {
@@ -140,7 +129,7 @@ const LayerEditorDialog = (props: Props) => {
   );
 
   const onChangeCamera3DFarPlaneDistance = React.useCallback(
-    value => {
+    (value) => {
       setCamera3DFarPlaneDistanceError(null);
       const newValue = parseFloat(value) || 0;
       if (newValue <= layer.getCamera3DNearPlaneDistance()) {
@@ -378,7 +367,7 @@ const LayerEditorDialog = (props: Props) => {
                   g: layer.getAmbientLightColorGreen(),
                   b: layer.getAmbientLightColorBlue(),
                 })}
-                onChange={newColor => {
+                onChange={(newColor) => {
                   const currentRgbColor = {
                     r: layer.getAmbientLightColorRed(),
                     g: layer.getAmbientLightColorGreen(),

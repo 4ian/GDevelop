@@ -50,7 +50,7 @@ export type ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {|
   name: string,
   onlineBuildType?: BuildType,

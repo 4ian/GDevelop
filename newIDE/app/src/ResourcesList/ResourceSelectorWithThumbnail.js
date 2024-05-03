@@ -20,7 +20,7 @@ type Props = {|
   resourceKind: ResourceKind,
   resourceName: string,
   defaultNewResourceName?: string,
-  onChange: string => void,
+  onChange: (string) => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
   helperMarkdownText?: ?string,

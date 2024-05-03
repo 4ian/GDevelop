@@ -59,10 +59,10 @@ export const renderProductPrice = ({
     const creditPrices = productListingData.creditPrices;
     if (!creditPrices) return '';
     const creditPrice = usageType
-      ? creditPrices.find(price => price.usageType === usageType)
+      ? creditPrices.find((price) => price.usageType === usageType)
       : creditPrices.length > 0
-      ? creditPrices[0]
-      : null;
+        ? creditPrices[0]
+        : null;
 
     if (!creditPrice) return '';
     return plainText ? (
@@ -79,11 +79,11 @@ export const renderProductPrice = ({
 
   const productPrices = productListingData.prices;
   const price = usageType
-    ? productPrices.find(price => price.usageType === usageType)
+    ? productPrices.find((price) => price.usageType === usageType)
     : // If no usage type is specified, use the first price.
-    productPrices.length > 0
-    ? productPrices[0]
-    : null;
+      productPrices.length > 0
+      ? productPrices[0]
+      : null;
   if (!price) return '';
 
   const currencyCode = price.currency === 'USD' ? '$' : '€';

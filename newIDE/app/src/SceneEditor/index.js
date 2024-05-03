@@ -205,9 +205,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
-      this.onResourceExternallyChanged.bind(this)
-    );
+    this.resourceExternallyChangedCallbackId =
+      registerOnResourceExternallyChangedCallback(
+        this.onResourceExternallyChanged.bind(this)
+      );
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -248,10 +249,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         gd.ProjectBrowserHelper.exposeProjectObjects(project, objectsCollector);
         const objectNames = objectsCollector.getObjectNames().toJSArray();
         objectsCollector.delete();
-        ObjectsRenderingService.renderersCacheClearingMethods.forEach(clear =>
+        ObjectsRenderingService.renderersCacheClearingMethods.forEach((clear) =>
           clear(project)
         );
-        objectNames.forEach(objectName => {
+        objectNames.forEach((objectName) => {
           editorDisplay.instancesHandlers.resetInstanceRenderersFor(objectName);
         });
       } finally {
@@ -357,11 +358,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.props.initialInstances
       );
       this.setState(({ selectedObjectFolderOrObjectsWithContext }) => ({
-        selectedObjectFolderOrObjectsWithContext: cleanNonExistingObjectFolderOrObjectWithContexts(
-          this.props.project,
-          this.props.layout,
-          selectedObjectFolderOrObjectsWithContext
-        ),
+        selectedObjectFolderOrObjectsWithContext:
+          cleanNonExistingObjectFolderOrObjectWithContexts(
+            this.props.project,
+            this.props.layout,
+            selectedObjectFolderOrObjectsWithContext
+          ),
       }));
     }
   }
@@ -575,7 +577,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Remember where to create the instance, when the object will be created
     this.setState({
-      newObjectInstanceSceneCoordinates: this.editorDisplay.viewControls.getLastCursorSceneCoordinates(),
+      newObjectInstanceSceneCoordinates:
+        this.editorDisplay.viewControls.getLastCursorSceneCoordinates(),
     });
 
     if (this.editorDisplay) this.editorDisplay.openNewObjectDialog();
@@ -616,7 +619,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
     let invisibleLayerOnWhichInstancesHaveJustBeenAdded = null;
-    instances.forEach(instance => {
+    instances.forEach((instance) => {
       if (invisibleLayerOnWhichInstancesHaveJustBeenAdded === null) {
         const layer = this.props.layout.getLayer(instance.getLayer());
         if (!layer.getVisibility()) {
@@ -805,7 +808,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._addInstanceForNewObject(object.getName());
   };
 
-  _onRemoveLayer = (layerName: string, done: boolean => void) => {
+  _onRemoveLayer = (layerName: string, done: (boolean) => void) => {
     const getNewState = (doRemove: boolean) => {
       const newState: {| layerRemoved: null, selectedLayer?: string |} = {
         layerRemoved: null,
@@ -859,8 +862,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _startRenamingSelectedObject = () => {
-    const firstSelectedObjectFolderOrObject = this.state
-      .selectedObjectFolderOrObjectsWithContext[0];
+    const firstSelectedObjectFolderOrObject =
+      this.state.selectedObjectFolderOrObjectsWithContext[0];
     if (!firstSelectedObjectFolderOrObject) return;
 
     if (this.editorDisplay)
@@ -877,7 +880,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onDeleteObjects = (
     i18n: I18nType,
     objectsWithContext: ObjectWithContext[],
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const message =
       objectsWithContext.length === 1
@@ -890,7 +893,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const shouldRemoveReferences = answer === 'yes';
     const { project, layout } = this.props;
 
-    objectsWithContext.forEach(objectWithContext => {
+    objectsWithContext.forEach((objectWithContext) => {
       const { object, global } = objectWithContext;
 
       // Unselect instances of the deleted object because these instances
@@ -932,7 +935,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           layout.hasObjectNamed(tentativeNewName) ||
           project.hasObjectNamed(tentativeNewName) ||
@@ -948,7 +951,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
             0,
             project.getLayoutsCount(),
-            i => {
+            (i) => {
               const otherLayout = project.getLayoutAt(i);
               const otherLayoutName = otherLayout.getName();
               if (layoutName !== otherLayoutName) {
@@ -1020,13 +1023,12 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onRenameObjectFolderOrObjectWithContextFinish = (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
 
-    const unifiedName = getObjectFolderOrObjectUnifiedName(
-      objectFolderOrObject
-    );
+    const unifiedName =
+      getObjectFolderOrObjectUnifiedName(objectFolderOrObject);
     // Avoid triggering renaming refactoring if name has not really changed
     if (unifiedName === newName) {
       this._onObjectFolderOrObjectWithContextSelected(
@@ -1066,7 +1068,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const highestZOrderFinder = new gd.HighestZOrderFinder();
 
     const extremeZOrderByLayerName = {};
-    layerNames.forEach(layerName => {
+    layerNames.forEach((layerName) => {
       highestZOrderFinder.reset();
       highestZOrderFinder.restrictSearchToLayer(layerName);
       this.props.initialInstances.iterateOverInstances(highestZOrderFinder);
@@ -1077,7 +1079,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
     highestZOrderFinder.delete();
 
-    selectedInstances.forEach(instance => {
+    selectedInstances.forEach((instance) => {
       if (!instance.isLocked()) {
         const extremeZOrder = extremeZOrderByLayerName[instance.getLayer()];
         // If instance is already at the extreme z order, do nothing.
@@ -1092,7 +1094,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onDeleteGroup = (
     groupWithContext: GroupWithContext,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
@@ -1124,7 +1126,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onRenameGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
@@ -1163,7 +1165,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const layoutsWithObjectOrGroupWithSameName: Array<string> = mapFor(
       0,
       project.getLayoutsCount(),
-      i => {
+      (i) => {
         const otherLayout = project.getLayoutAt(i);
         const otherLayoutName = otherLayout.getName();
         if (layoutName !== otherLayoutName) {
@@ -1182,9 +1184,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (layoutsWithObjectOrGroupWithSameName.length > 0) {
       return Window.showConfirmDialog(
         i18n._(
-          t`Making "${objectOrGroupName}" global would conflict with the following scenes that have a group or an object with the same name:${'\n\n - ' +
+          t`Making "${objectOrGroupName}" global would conflict with the following scenes that have a group or an object with the same name:${
+            '\n\n - ' +
             layoutsWithObjectOrGroupWithSameName.join('\n\n - ') +
-            '\n\n'}Continue only if you know what you're doing.`
+            '\n\n'
+          }Continue only if you know what you're doing.`
         ),
         'warning'
       );
@@ -1194,7 +1198,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.forEach(instance => {
+    selectedInstances.forEach((instance) => {
       if (instance.isLocked()) return;
       this.props.initialInstances.removeInstance(instance);
     });
@@ -1357,7 +1361,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     if (this.contextMenu)
       this.contextMenu.open(x, y, {
-        ignoreSelectedObjectsForContextMenu: !!ignoreSelectedObjectsForContextMenu,
+        ignoreSelectedObjectsForContextMenu:
+          !!ignoreSelectedObjectsForContextMenu,
       });
   };
 
@@ -1400,7 +1405,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const instances = this.instancesSelection.getSelectedInstances();
     if (
       instances.length === 1 ||
-      uniq(instances.map(instance => instance.getObjectName())).length === 1
+      uniq(instances.map((instance) => instance.getObjectName())).length === 1
     ) {
       const { project, layout } = this.props;
       const objectName = instances[0].getObjectName();
@@ -1454,12 +1459,13 @@ export default class SceneEditor extends React.Component<Props, State> {
   }: CopyCutPasteOptions = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
-      .map(instance => serializeToJSObject(instance));
+      .map((instance) => serializeToJSObject(instance));
 
     let x = 0;
     let y = 0;
     if (this.editorDisplay) {
-      const selectionAABB = this.editorDisplay.instancesHandlers.getSelectionAABB();
+      const selectionAABB =
+        this.editorDisplay.instancesHandlers.getSelectionAABB();
       x = selectionAABB.centerX();
       y = selectionAABB.centerY();
     }
@@ -1486,7 +1492,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!editorDisplay) return;
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
-      .map(instance => serializeToJSObject(instance));
+      .map((instance) => serializeToJSObject(instance));
 
     const newInstances = editorDisplay.instancesHandlers.addSerializedInstances(
       {
@@ -1667,7 +1673,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 project={project}
                 layout={layout}
                 onEditObject={this.props.onEditObject || this.editObject}
-                onEditObjectVariables={object => {
+                onEditObjectVariables={(object) => {
                   this.editObject(object, 'variables');
                 }}
                 onOpenSceneProperties={this.openSceneProperties}
@@ -1677,7 +1683,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onEditLayer={this.editLayer}
               />
               <EditorsDisplay
-                ref={ref => (this.editorDisplay = ref)}
+                ref={(ref) => (this.editorDisplay = ref)}
                 project={project}
                 layout={layout}
                 initialInstances={initialInstances}
@@ -1798,14 +1804,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                           }
                           this.editObject(null);
                         }}
-                        getValidatedObjectOrGroupName={newName =>
+                        getValidatedObjectOrGroupName={(newName) =>
                           this._getValidatedObjectOrGroupName(
                             newName,
                             editedObjectWithContext.global,
                             i18n
                           )
                         }
-                        onRename={newName => {
+                        onRename={(newName) => {
                           this._onRenameEditedObject(newName);
                         }}
                         onApply={() => {
@@ -1979,7 +1985,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       )}
                     />
                     <ContextMenu
-                      ref={contextMenu => (this.contextMenu = contextMenu)}
+                      ref={(contextMenu) => (this.contextMenu = contextMenu)}
                       buildMenuTemplate={(i18n, buildOptions) =>
                         this.buildContextMenu(i18n, layout, buildOptions)
                       }

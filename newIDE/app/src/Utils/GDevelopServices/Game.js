@@ -213,7 +213,7 @@ export const getPublicGameUrl = (publicGame: ?PublicGame) => {
 export const getAclsFromUserIds = (
   ownersIds: Array<string>
 ): Array<{| userId: string, level: string |}> =>
-  ownersIds.map(ownerId => ({
+  ownersIds.map((ownerId) => ({
     userId: ownerId,
     level: 'owner',
   }));
@@ -228,15 +228,15 @@ export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
   const responsesData = await Promise.all([
     axios
       .get(gamesShowcaseUrl)
-      .then(response => response.data)
-      .catch(e => e),
+      .then((response) => response.data)
+      .catch((e) => e),
     axios
       .get(filtersUrl)
-      .then(response => response.data)
-      .catch(e => e),
+      .then((response) => response.data)
+      .catch((e) => e),
   ]);
 
-  if (responsesData.some(data => !data || data instanceof Error)) {
+  if (responsesData.some((data) => !data || data instanceof Error)) {
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
@@ -523,7 +523,7 @@ export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
 };
 
 export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
-  Array<GameLeaderboard>
+  Array<GameLeaderboard>,
 > => {
   const response = await client.get(
     '/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global'

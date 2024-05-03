@@ -58,7 +58,7 @@ export const Default = () => {
         <CompactSelectField
           value={value3}
           onChange={setValue3}
-          renderLeftIcon={className => <Layers className={className} />}
+          renderLeftIcon={(className) => <Layers className={className} />}
           leftIconTooltip={'Layer'}
           id="with-icon"
         >
@@ -68,7 +68,7 @@ export const Default = () => {
           value={value4}
           onChange={setValue4}
           errored
-          renderLeftIcon={className => <Layers className={className} />}
+          renderLeftIcon={(className) => <Layers className={className} />}
           leftIconTooltip={'Layer'}
         >
           {options}
@@ -76,7 +76,7 @@ export const Default = () => {
         <CompactSelectField
           value={value5}
           onChange={setValue5}
-          renderLeftIcon={className => <Layers className={className} />}
+          renderLeftIcon={(className) => <Layers className={className} />}
           leftIconTooltip={'Layer'}
         >
           {[
@@ -88,7 +88,7 @@ export const Default = () => {
           disabled
           value={'disabled field'}
           onChange={() => {}}
-          renderLeftIcon={className => <Layers className={className} />}
+          renderLeftIcon={(className) => <Layers className={className} />}
           leftIconTooltip={'Layer'}
         >
           {options}

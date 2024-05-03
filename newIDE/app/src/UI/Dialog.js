@@ -129,7 +129,7 @@ const styles = {
 };
 
 const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
-  makeStyles(theme => {
+  makeStyles((theme) => {
     if (!dangerLevel) return {};
     const color =
       dangerLevel === 'warning' ? theme.palette.warning : theme.palette.error;
@@ -138,9 +138,7 @@ const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
         '&:before': {
           content: '""',
           height: 60,
-          background: `repeating-linear-gradient(110deg, ${color.dark}, ${
-            color.dark
-          } 25px, ${color.main} 25px, ${color.main} 40px)`,
+          background: `repeating-linear-gradient(110deg, ${color.dark}, ${color.dark} 25px, ${color.main} 25px, ${color.main} 40px)`,
         },
       },
     };
@@ -281,8 +279,8 @@ const Dialog = ({
   const flexStyle = flexColumnBody
     ? styles.flexColumnBody
     : flexBody
-    ? styles.flexBody
-    : {};
+      ? styles.flexBody
+      : {};
   const additionalPaddingStyle = {
     paddingTop: title ? 0 : dialogTitlePadding, // Ensure the padding is here if there is no title.
     paddingBottom: hasActions ? 0 : dialogActionPadding, // Ensure the padding is here if there are no actions.
@@ -352,7 +350,8 @@ const Dialog = ({
       fullScreen={isFullScreen}
       className={classNames({
         'safe-area-aware-container': isFullScreen,
-        [classNameToStillAllowRenderingInstancesEditor]: exceptionallyStillAllowRenderingInstancesEditors,
+        [classNameToStillAllowRenderingInstancesEditor]:
+          exceptionallyStillAllowRenderingInstancesEditors,
       })}
       PaperProps={{
         id,
@@ -361,10 +360,10 @@ const Dialog = ({
           minHeight: fullHeight
             ? styles.minHeightForFullHeightModal
             : minHeight === 'lg'
-            ? styles.minHeightForLargeHeightModal
-            : minHeight === 'sm'
-            ? styles.minHeightForSmallHeightModal
-            : undefined,
+              ? styles.minHeightForLargeHeightModal
+              : minHeight === 'sm'
+                ? styles.minHeightForSmallHeightModal
+                : undefined,
           ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
         },
       }}

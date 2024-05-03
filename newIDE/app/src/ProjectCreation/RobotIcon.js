@@ -3,8 +3,8 @@ import * as React from 'react';
 import RobotFace from '../UI/CustomSvgIcons/RobotFace';
 import { makeStyles } from '@material-ui/core';
 
-const useClasses = rotating =>
-  makeStyles(theme => ({
+const useClasses = (rotating) =>
+  makeStyles((theme) => ({
     container: {
       position: 'relative',
       overflow: 'hidden',

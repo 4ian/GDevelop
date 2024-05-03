@@ -47,10 +47,10 @@ type Props = {|
   project: gdProject,
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
-  onEditObjectByName: string => void,
+  onEditObjectByName: (string) => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
-  onGetInstanceSize: gdInitialInstance => [number, number, number],
-  editInstanceVariables: gdInitialInstance => void,
+  onGetInstanceSize: (gdInitialInstance) => [number, number, number],
+  editInstanceVariables: (gdInitialInstance) => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
@@ -106,40 +106,38 @@ const CompactInstancePropertiesEditor = ({
   const { object, instanceSchema } = React.useMemo<{|
     object?: gdObject,
     instanceSchema?: Schema,
-  |}>(
-    () => {
-      if (!instance) return { object: undefined, instanceSchema: undefined };
+  |}>(() => {
+    if (!instance) return { object: undefined, instanceSchema: undefined };
 
-      const associatedObjectName = instance.getObjectName();
-      const object = getObjectByName(project, layout, associatedObjectName);
-      const properties = instance.getCustomProperties(project, layout);
-      if (!object) return { object: undefined, instanceSchema: undefined };
+    const associatedObjectName = instance.getObjectName();
+    const object = getObjectByName(project, layout, associatedObjectName);
+    const properties = instance.getCustomProperties(project, layout);
+    if (!object) return { object: undefined, instanceSchema: undefined };
 
-      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
-        project.getCurrentPlatform(),
-        object.getType()
-      ).isRenderedIn3D();
-      const instanceSchemaForCustomProperties = propertiesMapToSchema(
-        properties,
-        (instance: gdInitialInstance) =>
-          instance.getCustomProperties(project, layout),
-        (instance: gdInitialInstance, name, value) =>
-          instance.updateCustomProperty(name, value, project, layout)
-      );
+    const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+      project.getCurrentPlatform(),
+      object.getType()
+    ).isRenderedIn3D();
+    const instanceSchemaForCustomProperties = propertiesMapToSchema(
+      properties,
+      (instance: gdInitialInstance) =>
+        instance.getCustomProperties(project, layout),
+      (instance: gdInitialInstance, name, value) =>
+        instance.updateCustomProperty(name, value, project, layout)
+    );
 
-      const reorderedInstanceSchemaForCustomProperties = reorderInstanceSchemaForCustomProperties(
+    const reorderedInstanceSchemaForCustomProperties =
+      reorderInstanceSchemaForCustomProperties(
         instanceSchemaForCustomProperties,
         i18n
       );
-      return {
-        object,
-        instanceSchema: is3DInstance
-          ? schemaFor3D.concat(reorderedInstanceSchemaForCustomProperties)
-          : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
-      };
-    },
-    [project, layout, instance, schemaFor2D, schemaFor3D, i18n]
-  );
+    return {
+      object,
+      instanceSchema: is3DInstance
+        ? schemaFor3D.concat(reorderedInstanceSchemaForCustomProperties)
+        : schemaFor2D.concat(reorderedInstanceSchemaForCustomProperties),
+    };
+  }, [project, layout, instance, schemaFor2D, schemaFor3D, i18n]);
 
   if (!object || !instance || !instanceSchema) return null;
 
@@ -207,7 +205,7 @@ const CompactInstancePropertiesEditor = ({
 
 const CompactInstancePropertiesEditorContainer = React.forwardRef<
   Props,
-  CompactInstancePropertiesEditorInterface
+  CompactInstancePropertiesEditorInterface,
 >((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({

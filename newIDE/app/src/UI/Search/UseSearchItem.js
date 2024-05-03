@@ -26,7 +26,8 @@ export interface SearchFilter<SearchItem> {
 }
 
 export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
-  implements SearchFilter<SearchItem> {
+  implements SearchFilter<SearchItem>
+{
   tags: Set<string>;
 
   constructor(tags: Set<string> = new Set()) {
@@ -35,7 +36,7 @@ export class TagSearchFilter<SearchItem: AssetShortHeader | Resource>
 
   getPertinence(searchItem: SearchItem): number {
     return this.tags.size === 0 ||
-      searchItem.tags.some(tag => this.tags.has(tag))
+      searchItem.tags.some((tag) => this.tags.has(tag))
       ? 1
       : 0;
   }
@@ -129,7 +130,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
   const startTime = performance.now();
   // TODO do only one call to filter for efficiency.
   const filteredSearchItems = searchItems
-    .filter(searchItem => {
+    .filter((searchItem) => {
       if (!chosenCategory) return true;
       if (chosenCategory && !searchItem.tags) {
         // TODO: If the item has no tags, it's a Public or Private pack.
@@ -143,7 +144,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
         (searchItem.tags &&
-          searchItem.tags.some(tag => tag === chosenCategory.node.name));
+          searchItem.tags.some((tag) => tag === chosenCategory.node.name));
       if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {
@@ -154,20 +155,20 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
 
         const hasParentCategoryTag =
           searchItem.tags &&
-          searchItem.tags.some(tag => tag === parentNode.name);
+          searchItem.tags.some((tag) => tag === parentNode.name);
         if (!hasParentCategoryTag) return false; // Item is not in the parent(s) of the selected category
       }
 
       return true;
     })
-    .filter(searchItem => {
+    .filter((searchItem) => {
       return (
         !chosenFilters ||
         chosenFilters.size === 0 ||
         (searchItem.tags &&
-          searchItem.tags.some(tag => chosenFilters.has(tag))) ||
+          searchItem.tags.some((tag) => chosenFilters.has(tag))) ||
         (searchItem.categories &&
-          searchItem.categories.some(category => chosenFilters.has(category)))
+          searchItem.categories.some((category) => chosenFilters.has(category)))
       );
     });
 
@@ -176,7 +177,7 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
     let pertinenceMin = 1;
     let pertinenceMax = 0;
     const weightedSearchItems = filteredSearchItems
-      .map(searchItem => {
+      .map((searchItem) => {
         let pertinence = 1;
         for (const searchFilter of searchFilters) {
           pertinence *= searchFilter.getPertinence(searchItem);
@@ -191,12 +192,12 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
       .filter(Boolean);
     partialQuickSort(
       weightedSearchItems,
-      weightedSearchItem => weightedSearchItem.pertinence,
+      (weightedSearchItem) => weightedSearchItem.pertinence,
       pertinenceMin,
       pertinenceMax
     );
     sortedSearchItems = weightedSearchItems.map(
-      weightedSearchItem => weightedSearchItem.searchItem
+      (weightedSearchItem) => weightedSearchItem.searchItem
     );
   }
 
@@ -219,146 +220,133 @@ export const filterSearchItems = <SearchItem: SearchableItem>(
  */
 export const useSearchItem = <SearchItem: SearchableItem>(
   searchItemsById: ?{ [string]: SearchItem },
-  getItemDescription: SearchItem => string,
+  getItemDescription: (SearchItem) => string,
   searchText: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: ?Set<string>,
   searchFilters?: Array<SearchFilter<SearchItem>>
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);
-  const [searchResults, setSearchResults] = React.useState<?Array<SearchItem>>(
-    null
-  );
+  const [searchResults, setSearchResults] =
+    React.useState<?Array<SearchItem>>(null);
 
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
-  const shuffledSearchItems: ?Array<SearchItem> = React.useMemo(
-    () => {
-      if (!searchItemsById) return null;
+  const shuffledSearchItems: ?Array<SearchItem> = React.useMemo(() => {
+    if (!searchItemsById) return null;
 
-      return shuffle(
-        Object.keys(searchItemsById).map(id => searchItemsById[id])
-      );
-    },
-    [searchItemsById]
-  );
-  const sortedSearchItems: ?Array<SearchItem> = React.useMemo(
-    () => {
-      if (!searchItemsById) return null;
+    return shuffle(
+      Object.keys(searchItemsById).map((id) => searchItemsById[id])
+    );
+  }, [searchItemsById]);
+  const sortedSearchItems: ?Array<SearchItem> = React.useMemo(() => {
+    if (!searchItemsById) return null;
 
-      return Object.keys(searchItemsById).map(id => searchItemsById[id]);
-    },
-    [searchItemsById]
-  );
+    return Object.keys(searchItemsById).map((id) => searchItemsById[id]);
+  }, [searchItemsById]);
 
   // Index items that have been loaded.
-  React.useEffect(
-    () => {
-      if (!searchItemsById) {
-        // Nothing to index - yet.
-        return;
-      }
+  React.useEffect(() => {
+    if (!searchItemsById) {
+      // Nothing to index - yet.
+      return;
+    }
 
-      const startTime = performance.now();
-      if (searchApiRef.current) {
-        searchApiRef.current.terminate();
-        searchApiRef.current = null;
-      }
+    const startTime = performance.now();
+    if (searchApiRef.current) {
+      searchApiRef.current.terminate();
+      searchApiRef.current = null;
+    }
 
-      try {
-        const newSearchApi = new SearchApi();
-        const allIds = Object.keys(searchItemsById);
+    try {
+      const newSearchApi = new SearchApi();
+      const allIds = Object.keys(searchItemsById);
 
-        allIds.forEach(id => {
-          const searchItem = searchItemsById[id];
-          newSearchApi.indexDocument(id, getItemDescription(searchItem));
-        });
+      allIds.forEach((id) => {
+        const searchItem = searchItemsById[id];
+        newSearchApi.indexDocument(id, getItemDescription(searchItem));
+      });
 
-        const totalTime = performance.now() - startTime;
-        console.info(
-          `Indexed ${allIds.length} items in ${totalTime.toFixed(3)}ms.`
-        );
-        searchApiRef.current = newSearchApi;
-      } catch (error) {
-        console.error('Error while indexing items: ', error);
-      }
-    },
-    [searchItemsById, getItemDescription]
-  );
+      const totalTime = performance.now() - startTime;
+      console.info(
+        `Indexed ${allIds.length} items in ${totalTime.toFixed(3)}ms.`
+      );
+      searchApiRef.current = newSearchApi;
+    } catch (error) {
+      console.error('Error while indexing items: ', error);
+    }
+  }, [searchItemsById, getItemDescription]);
 
   // Update the search results according to the items, search term
   // chosen category and chosen filters.
   const searchApi = searchApiRef.current;
-  React.useEffect(
-    () => {
-      let discardSearch = false;
-      if (!searchText) {
-        setSearchResults(
-          filterSearchItems(
-            chosenCategory ? sortedSearchItems : shuffledSearchItems,
-            chosenCategory,
-            chosenFilters,
-            searchFilters
-          )
+  React.useEffect(() => {
+    let discardSearch = false;
+    if (!searchText) {
+      setSearchResults(
+        filterSearchItems(
+          chosenCategory ? sortedSearchItems : shuffledSearchItems,
+          chosenCategory,
+          chosenFilters,
+          searchFilters
+        )
+      );
+    } else {
+      if (!searchItemsById || !searchApi) {
+        console.info(
+          'Search for items skipped because items are not ready - will be retried when ready'
         );
-      } else {
-        if (!searchItemsById || !searchApi) {
-          console.info(
-            'Search for items skipped because items are not ready - will be retried when ready'
-          );
-          return;
-        }
-
-        const startTime = performance.now();
-        searchApi
-          .search(searchText)
-          .then((partialSearchResultIds: Array<string>) => {
-            if (discardSearch) {
-              console.info(
-                'Discarding search results as a new search was launched.'
-              );
-              return;
-            }
-
-            const partialSearchResults = partialSearchResultIds
-              .map(id => searchItemsById[id])
-              .filter(Boolean);
-
-            const totalTime = performance.now() - startTime;
-            console.info(
-              `Found ${
-                partialSearchResults.length
-              } items in ${totalTime.toFixed(3)}ms.`
-            );
-
-            setSearchResults(
-              filterSearchItems(
-                partialSearchResults,
-                chosenCategory,
-                chosenFilters,
-                searchFilters
-              )
-            );
-          });
+        return;
       }
 
-      return () => {
-        // Effect is being destroyed - meaning that a new search was launched.
-        // Cancel this one.
-        discardSearch = true;
-      };
-    },
-    [
-      shuffledSearchItems,
-      sortedSearchItems,
-      searchItemsById,
-      searchText,
-      chosenCategory,
-      chosenFilters,
-      searchFilters,
-      searchApi,
-    ]
-  );
+      const startTime = performance.now();
+      searchApi
+        .search(searchText)
+        .then((partialSearchResultIds: Array<string>) => {
+          if (discardSearch) {
+            console.info(
+              'Discarding search results as a new search was launched.'
+            );
+            return;
+          }
+
+          const partialSearchResults = partialSearchResultIds
+            .map((id) => searchItemsById[id])
+            .filter(Boolean);
+
+          const totalTime = performance.now() - startTime;
+          console.info(
+            `Found ${
+              partialSearchResults.length
+            } items in ${totalTime.toFixed(3)}ms.`
+          );
+
+          setSearchResults(
+            filterSearchItems(
+              partialSearchResults,
+              chosenCategory,
+              chosenFilters,
+              searchFilters
+            )
+          );
+        });
+    }
+
+    return () => {
+      // Effect is being destroyed - meaning that a new search was launched.
+      // Cancel this one.
+      discardSearch = true;
+    };
+  }, [
+    shuffledSearchItems,
+    sortedSearchItems,
+    searchItemsById,
+    searchText,
+    chosenCategory,
+    chosenFilters,
+    searchFilters,
+    searchApi,
+  ]);
 
   return searchResults;
 };

@@ -34,7 +34,7 @@ const styles = {
 
 export default class RepeatEvent extends React.Component<
   EventRendererProps,
-  *
+  *,
 > {
   _field: ?ParameterFieldInterface = null;
   state = {
@@ -116,7 +116,7 @@ export default class RepeatEvent extends React.Component<
               [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
-            onKeyPress={event => {
+            onKeyPress={(event) => {
               if (shouldActivate(event)) {
                 this.edit(event);
               }
@@ -212,13 +212,13 @@ export default class RepeatEvent extends React.Component<
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={expression}
-            onChange={text => {
+            onChange={(text) => {
               repeatEvent.setRepeatExpression(text);
               this.props.onUpdate();
             }}
             parameterRenderingService={ParameterRenderingService}
             isInline
-            ref={field => (this._field = field)}
+            ref={(field) => (this._field = field)}
           />
         </InlinePopover>
       </div>

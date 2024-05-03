@@ -48,7 +48,7 @@ const CREATE_NEW_EXTENSION_PLACEHOLDER = '<create a new extension>';
 
 export default class EventsFunctionExtractorDialog extends React.Component<
   Props,
-  State
+  State,
 > {
   state = {
     eventsFunction: null,
@@ -80,9 +80,8 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     });
 
     // Prepopulate the form
-    const eventsFunctionsExtensions = enumerateEventsFunctionsExtensions(
-      project
-    );
+    const eventsFunctionsExtensions =
+      enumerateEventsFunctionsExtensions(project);
     if (eventsFunctionsExtensions.length === 0) {
       this.setState({
         createNewExtension: true,
@@ -102,9 +101,8 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     }
     const groupNames = new Set<string>();
     const { project } = this.props;
-    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-      extensionName
-    );
+    const eventsFunctionsExtension =
+      project.getEventsFunctionsExtension(extensionName);
     for (
       let index = 0;
       index < eventsFunctionsExtension.getEventsFunctionsCount();
@@ -125,9 +123,8 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     const { eventsFunction, extensionName, createNewExtension } = this.state;
     if (!eventsFunction) return null;
 
-    const eventsFunctionsExtensions = enumerateEventsFunctionsExtensions(
-      project
-    );
+    const eventsFunctionsExtensions =
+      enumerateEventsFunctionsExtensions(project);
     const hasLotsOfParameters = functionHasLotsOfParameters(eventsFunction);
 
     const onApply = () => {
@@ -204,7 +201,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                 }}
                 fullWidth
               >
-                {eventsFunctionsExtensions.map(eventsFunctionsExtension => (
+                {eventsFunctionsExtensions.map((eventsFunctionsExtension) => (
                   <SelectOption
                     key={eventsFunctionsExtension.getName()}
                     value={eventsFunctionsExtension.getName()}
@@ -238,9 +235,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                         This name is not valid. Only use alphanumeric characters
                         (0-9, a-z) and underscores.
                       </Trans>
-                    ) : (
-                      undefined
-                    )
+                    ) : undefined
                   }
                 />
               ) : null}
@@ -270,9 +265,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
                       This name is not valid. Only use alphanumeric characters
                       (0-9, a-z) and underscores.
                     </Trans>
-                  ) : (
-                    undefined
-                  )
+                  ) : undefined
                 }
               />
             </Line>

@@ -54,24 +54,24 @@ export const findGDJS = (
   // gdjsRoot = `http://localhost:5000`;
 
   return Promise.all(
-    filesToDownload[fileSet].map(relativeFilePath => {
+    filesToDownload[fileSet].map((relativeFilePath) => {
       const url = gdjsRoot + relativeFilePath;
 
       // Don't do any caching, rely on the browser cache only.
-      return fetch(url).then(response => {
+      return fetch(url).then((response) => {
         if (!response.ok) {
           console.error(`Error while downloading "${url}"`, response);
           throw new Error(
             `Error while downloading "${url}" (status: ${response.status})`
           );
         }
-        return response.text().then(text => ({
+        return response.text().then((text) => ({
           filePath: url,
           text,
         }));
       });
     })
-  ).then(filesContent => {
+  ).then((filesContent) => {
     return {
       gdjsRoot,
       filesContent,

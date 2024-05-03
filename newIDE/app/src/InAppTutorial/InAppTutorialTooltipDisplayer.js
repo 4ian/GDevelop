@@ -328,12 +328,9 @@ const InAppTutorialTooltipDisplayer = ({
   ).replace(/\(.+\)/g, ''); // Remove content between parenthesis as they should contain dynamic content (to prevent unfolding the tooltip for nothing).
 
   // If tooltip changes, we unfold the tooltip.
-  React.useEffect(
-    () => {
-      setFolded(false);
-    },
-    [tooltipConcatenated]
-  );
+  React.useEffect(() => {
+    setFolded(false);
+  }, [tooltipConcatenated]);
 
   useIsElementVisibleInScroll(anchorElement, updateVisibility);
 

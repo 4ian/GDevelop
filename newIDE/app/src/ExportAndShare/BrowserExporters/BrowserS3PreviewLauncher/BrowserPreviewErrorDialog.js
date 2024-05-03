@@ -34,17 +34,20 @@ export default class BrowserPreviewErrorDialog extends Component<Props> {
             <Line>
               <Column noMargin>
                 <Text>
-                  {// $FlowFixMe - AWS returned errors can have extra fields
-                  error.code === 'NetworkingError' ? (
-                    <Trans>
-                      The preview could not be launched because you're offline.
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      The preview could not be launched because an error
-                      happened: {error.message}.
-                    </Trans>
-                  )}
+                  {
+                    // $FlowFixMe - AWS returned errors can have extra fields
+                    error.code === 'NetworkingError' ? (
+                      <Trans>
+                        The preview could not be launched because you're
+                        offline.
+                      </Trans>
+                    ) : (
+                      <Trans>
+                        The preview could not be launched because an error
+                        happened: {error.message}.
+                      </Trans>
+                    )
+                  }
                 </Text>
               </Column>
             </Line>

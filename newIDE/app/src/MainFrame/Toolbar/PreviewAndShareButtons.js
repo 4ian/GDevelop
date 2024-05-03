@@ -68,14 +68,10 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
                 type: 'checkbox',
                 label: previewState.overridenPreviewExternalLayoutName
                   ? i18n._(
-                      t`Start all previews from external layout ${
-                        previewState.overridenPreviewExternalLayoutName
-                      }`
+                      t`Start all previews from external layout ${previewState.overridenPreviewExternalLayoutName}`
                     )
                   : i18n._(
-                      t`Start all previews from scene ${
-                        previewState.overridenPreviewLayoutName
-                      }`
+                      t`Start all previews from scene ${previewState.overridenPreviewLayoutName}`
                     ),
                 checked: previewState.isPreviewOverriden,
                 click: () =>
@@ -124,12 +120,9 @@ const PreviewAndShareButtons = React.memo<PreviewAndShareButtonsProps>(
 
     // Create a separate function to avoid the button passing its event as
     // the first argument.
-    const onShareClick = React.useCallback(
-      () => {
-        openShareDialog();
-      },
-      [openShareDialog]
-    );
+    const onShareClick = React.useCallback(() => {
+      openShareDialog();
+    }, [openShareDialog]);
 
     return (
       <LineStackLayout noMargin>

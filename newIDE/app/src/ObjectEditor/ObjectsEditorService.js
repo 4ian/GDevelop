@@ -38,7 +38,7 @@ const ObjectsEditorService = {
       helpPagePath: '',
     });
   },
-  registerEditorConfiguration: function(
+  registerEditorConfiguration: function (
     objectType: string,
     editorConfiguration: any
   ) {
@@ -78,10 +78,7 @@ const ObjectsEditorService = {
       createNewObject: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectConfiguration =>
-        gd
-          .asObjectJsImplementation(objectConfiguration)
-          .clone()
-          .release(),
+        gd.asObjectJsImplementation(objectConfiguration).clone().release(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
@@ -96,10 +93,7 @@ const ObjectsEditorService = {
         objectConfiguration: gdObjectConfiguration
       ): gdCustomObjectConfiguration =>
         gd.asCustomObjectConfiguration(
-          gd
-            .asCustomObjectConfiguration(objectConfiguration)
-            .clone()
-            .release()
+          gd.asCustomObjectConfiguration(objectConfiguration).clone().release()
         ),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
@@ -122,10 +116,7 @@ const ObjectsEditorService = {
       createNewObject: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectConfiguration =>
-        gd
-          .asObjectJsImplementation(objectConfiguration)
-          .clone()
-          .release(),
+        gd.asObjectJsImplementation(objectConfiguration).clone().release(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
@@ -137,10 +128,7 @@ const ObjectsEditorService = {
       createNewObject: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectConfiguration =>
-        gd
-          .asObjectJsImplementation(objectConfiguration)
-          .clone()
-          .release(),
+        gd.asObjectJsImplementation(objectConfiguration).clone().release(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>
@@ -152,10 +140,7 @@ const ObjectsEditorService = {
       createNewObject: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectConfiguration =>
-        gd
-          .asObjectJsImplementation(objectConfiguration)
-          .clone()
-          .release(),
+        gd.asObjectJsImplementation(objectConfiguration).clone().release(),
       castToObjectType: (
         objectConfiguration: gdObjectConfiguration
       ): gdObjectJsImplementation =>

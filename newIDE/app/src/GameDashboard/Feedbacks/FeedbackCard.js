@@ -85,10 +85,8 @@ const FeedbackCard = ({
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const [
-    openPlayerPublicProfileDialog,
-    setOpenPlayerPublicProfileDialog,
-  ] = React.useState<boolean>(false);
+  const [openPlayerPublicProfileDialog, setOpenPlayerPublicProfileDialog] =
+    React.useState<boolean>(false);
 
   const processComment = async (newProcessed: boolean, i18n: I18nType) => {
     if (!profile) return;
@@ -277,7 +275,7 @@ const FeedbackCard = ({
               <Spacer />
               {ratings && (
                 <ResponsiveLineStackLayout noColumnMargin expand>
-                  {ratings.map(rating => (
+                  {ratings.map((rating) => (
                     <Line expand noMargin key={rating.key}>
                       <Rating label={rating.label} value={rating.value} />
                       <Spacer />

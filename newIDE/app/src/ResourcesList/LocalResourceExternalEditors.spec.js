@@ -55,7 +55,7 @@ describe('LocalResourceExternalEditors', () => {
       // Mock the successful download of a resource.
       mockFn(downloadUrlsToBlobs).mockImplementation(
         async ({ urlContainers }) => {
-          return urlContainers.map(urlContainer => ({
+          return urlContainers.map((urlContainer) => ({
             error: null,
             blob: { content: 'fake-blob' },
             item: urlContainer,

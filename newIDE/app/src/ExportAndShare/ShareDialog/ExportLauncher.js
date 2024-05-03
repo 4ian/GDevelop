@@ -214,8 +214,8 @@ export default class ExportLauncher extends Component<Props, State> {
 
   registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
-    const getAuthorizationHeader = this.props.authenticatedUser
-      .getAuthorizationHeader;
+    const getAuthorizationHeader =
+      this.props.authenticatedUser.getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
     if (profile) {
       const userId = profile.id;
@@ -223,9 +223,8 @@ export default class ExportLauncher extends Component<Props, State> {
         // Try to fetch the game to see if it's registered but do not do anything with it.
         await getGame(getAuthorizationHeader, userId, gameId);
       } catch (error) {
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
+        const extractedStatusAndCode =
+          extractGDevelopApiErrorStatusAndCode(error);
         if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
           // If the game is not registered, register it before launching the export.
           const authorName =
@@ -321,9 +320,8 @@ export default class ExportLauncher extends Component<Props, State> {
     } catch (registerError) {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game.');
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        registerError
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(registerError);
       if (
         extractedStatusAndCode &&
         extractedStatusAndCode.code === 'game-creation/too-many-games'
@@ -387,10 +385,11 @@ export default class ExportLauncher extends Component<Props, State> {
       setStep('resources-download');
       // TODO: use a GenericRetryableProcessWithProgressDialog to show errors
       // and allow to try again?
-      const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
-        exportPipelineContext,
-        exportOutput
-      );
+      const resourcesDownloadOutput =
+        await exportPipeline.launchResourcesDownload(
+          exportPipelineContext,
+          exportOutput
+        );
       setStep('compress');
       const compressionOutput = await exportPipeline.launchCompression(
         exportPipelineContext,
@@ -439,8 +438,8 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  _updateExportState = (updater: any => any) => {
-    this.setState(prevState => ({
+  _updateExportState = (updater: (any) => any) => {
+    this.setState((prevState) => ({
       ...prevState,
       exportState: updater(prevState.exportState),
     }));
@@ -484,7 +483,7 @@ export default class ExportLauncher extends Component<Props, State> {
       // We check pending builds that are not more than 10 minutes old,
       // to avoid counting builds that may be stuck.
       return !!builds.filter(
-        build =>
+        (build) =>
           build.status === 'pending' &&
           build.type === exportPipeline.onlineBuildType &&
           build.createdAt &&

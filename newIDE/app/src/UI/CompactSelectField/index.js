@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import classes from './CompactSelectField.module.css';
 import { tooltipEnterDelay } from '../Tooltip';
 type Props = {|
-  onChange: string => void,
+  onChange: (string) => void,
   value: string,
   id?: string,
   disabled?: boolean,
@@ -68,7 +68,7 @@ const CompactSelectField = ({
           id={id}
           disabled={disabled}
           value={value}
-          onChange={e => onChange(e.currentTarget.value)}
+          onChange={(e) => onChange(e.currentTarget.value)}
         >
           {children}
         </select>

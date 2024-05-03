@@ -2,7 +2,7 @@
 
 export default class BrowserEventsFunctionsExtensionOpener {
   static chooseEventsFunctionExtensionFile = (): Promise<?any> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (window.showOpenFilePicker) {
         window
           .showOpenFilePicker({
@@ -29,7 +29,7 @@ export default class BrowserEventsFunctionsExtensionOpener {
         adhocInput.type = 'file';
         adhocInput.multiple = false;
         adhocInput.accept = 'application/json,.json';
-        adhocInput.onchange = e => {
+        adhocInput.onchange = (e) => {
           const file = e.target.files[0];
           return resolve(file);
         };

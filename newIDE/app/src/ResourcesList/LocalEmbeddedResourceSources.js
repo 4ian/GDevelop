@@ -66,7 +66,7 @@ export async function copyAllEmbeddedResourcesToProjectFolder(
 
       const newFileNameWithoutExtension = newNameGenerator(
         fileNameWithoutExtension,
-        tentativeFileName => {
+        (tentativeFileName) => {
           const tentativePath =
             path.join(projectPath, tentativeFileName) + fileExtension;
           return fs.existsSync(tentativePath);
@@ -234,7 +234,7 @@ export async function listSpineEmbeddedResources(
   if (!fs || !path) return null;
 
   const atlasPath = filePath.replace('.json', '.atlas');
-  const hasAtlasWithSameBasename = await new Promise<boolean>(resolve => {
+  const hasAtlasWithSameBasename = await new Promise<boolean>((resolve) => {
     fs.promises
       .access(atlasPath, fs.constants.F_OK)
       .then(() => resolve(true))

@@ -36,51 +36,40 @@ export const PrivateTutorialViewDialog = ({ tutorial, onClose }: Props) => {
     AuthenticatedUserContext
   );
   const [error, setError] = React.useState<Error | null>(null);
-  const [
-    pdfTutorial,
-    setPdfTutorial,
-  ] = React.useState<PrivatePdfTutorial | null>(null);
+  const [pdfTutorial, setPdfTutorial] =
+    React.useState<PrivatePdfTutorial | null>(null);
   const isLocked = !canAccessTutorial(
     tutorial,
     limits ? limits.capabilities : null
   );
 
-  const fetchTutorial = React.useCallback(
-    async () => {
-      if (!profile) return;
-      if (!tutorial.isPrivateTutorial || tutorial.type !== 'pdf-tutorial') {
-        console.error(
-          'PrivateTutorialViewDialog is used for an unsupported tutorial type.'
-        );
-      }
+  const fetchTutorial = React.useCallback(async () => {
+    if (!profile) return;
+    if (!tutorial.isPrivateTutorial || tutorial.type !== 'pdf-tutorial') {
+      console.error(
+        'PrivateTutorialViewDialog is used for an unsupported tutorial type.'
+      );
+    }
 
-      setError(null);
-      try {
-        const pdfTutorial = await getPrivatePdfTutorial(
-          getAuthorizationHeader,
-          {
-            userId: profile.id,
-            tutorialId: tutorial.id,
-          }
-        );
-        setPdfTutorial(pdfTutorial);
-      } catch (error) {
-        console.error(
-          'An error occurred while fetching the PDF tutorial:',
-          error
-        );
-        setError(error);
-      }
-    },
-    [getAuthorizationHeader, profile, tutorial]
-  );
+    setError(null);
+    try {
+      const pdfTutorial = await getPrivatePdfTutorial(getAuthorizationHeader, {
+        userId: profile.id,
+        tutorialId: tutorial.id,
+      });
+      setPdfTutorial(pdfTutorial);
+    } catch (error) {
+      console.error(
+        'An error occurred while fetching the PDF tutorial:',
+        error
+      );
+      setError(error);
+    }
+  }, [getAuthorizationHeader, profile, tutorial]);
 
-  React.useEffect(
-    () => {
-      fetchTutorial();
-    },
-    [fetchTutorial]
-  );
+  React.useEffect(() => {
+    fetchTutorial();
+  }, [fetchTutorial]);
 
   return (
     <I18n>

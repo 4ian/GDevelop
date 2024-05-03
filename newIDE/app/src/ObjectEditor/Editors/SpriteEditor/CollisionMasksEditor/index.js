@@ -74,16 +74,13 @@ const CollisionMasksEditor = ({
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-  const [
-    highlightedVerticePtr,
-    setHighlightedVerticePtr,
-  ] = React.useState<?number>(null);
-  const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
-    null
-  );
+  const [highlightedVerticePtr, setHighlightedVerticePtr] =
+    React.useState<?number>(null);
+  const [selectedVerticePtr, setSelectedVerticePtr] =
+    React.useState<?number>(null);
 
   const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
-    [number, number]
+    [number, number],
   >([0, 0]);
   const forceUpdate = useForceUpdate();
 
@@ -97,28 +94,26 @@ const CollisionMasksEditor = ({
   );
 
   // Note: sprite should always be defined so this value will be correctly initialised.
-  const [
-    sameCollisionMasksForAnimations,
-    setSameCollisionMasksForAnimations,
-  ] = React.useState(
-    sprite ? allObjectSpritesHaveSameCollisionMaskAs(sprite, animations) : false
-  );
+  const [sameCollisionMasksForAnimations, setSameCollisionMasksForAnimations] =
+    React.useState(
+      sprite
+        ? allObjectSpritesHaveSameCollisionMaskAs(sprite, animations)
+        : false
+    );
 
   // Note: sprite & animation should always be defined so this value will be correctly initialised.
-  const [
-    sameCollisionMasksForSprites,
-    setSameCollisionMasksForSprites,
-  ] = React.useState(
-    sprite && animation
-      ? allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
-      : false
-  );
+  const [sameCollisionMasksForSprites, setSameCollisionMasksForSprites] =
+    React.useState(
+      sprite && animation
+        ? allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
+        : false
+    );
 
   const updateCollisionMasks = React.useCallback(
     (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, animations.getAnimationsCount(), i => {
+          mapFor(0, animations.getAnimationsCount(), (i) => {
             const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
@@ -133,18 +128,18 @@ const CollisionMasksEditor = ({
     [animation, sprite, animations, forceUpdate, onMasksUpdated]
   );
 
-  const chooseAnimation = index => {
+  const chooseAnimation = (index) => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  const chooseDirection = index => {
+  const chooseDirection = (index) => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  const chooseSprite = index => {
+  const chooseSprite = (index) => {
     setSpriteIndex(index);
   };
 
@@ -152,16 +147,13 @@ const CollisionMasksEditor = ({
   // to enable the toggle.
   // Note: we do not recompute if all animations have the same collision masks, as we consider
   // that if the user has enabled/disabled this, they want to keep it that way.
-  React.useEffect(
-    () => {
-      if (!animation || !sprite) return;
+  React.useEffect(() => {
+    if (!animation || !sprite) return;
 
-      setSameCollisionMasksForSprites(
-        allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
-      );
-    },
-    [animation, sprite]
-  );
+    setSameCollisionMasksForSprites(
+      allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
+    );
+  }, [animation, sprite]);
 
   const onSetFullImageCollisionMask = React.useCallback(
     async (fullImage: boolean = true) => {
@@ -243,7 +235,7 @@ const CollisionMasksEditor = ({
   );
 
   const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
-    async value => {
+    async (value) => {
       // If enabling automatic while custom was selected, then ask for confirmation.
       if (value && sprite && !sprite.isFullImageCollisionMask()) {
         const answer = await showConfirmation({
@@ -275,30 +267,24 @@ const CollisionMasksEditor = ({
     ]
   );
 
-  const onUseCustomCollisionMask = React.useCallback(
-    () => {
-      onSetFullImageCollisionMask(false);
-      onSetAutomaticallyAdaptCollisionMasks(false);
-    },
-    [onSetFullImageCollisionMask, onSetAutomaticallyAdaptCollisionMasks]
-  );
+  const onUseCustomCollisionMask = React.useCallback(() => {
+    onSetFullImageCollisionMask(false);
+    onSetAutomaticallyAdaptCollisionMasks(false);
+  }, [onSetFullImageCollisionMask, onSetAutomaticallyAdaptCollisionMasks]);
 
-  const onPolygonsUpdated = React.useCallback(
-    () => {
-      // Revert to non-automatic collision mask.
-      animations.setAdaptCollisionMaskAutomatically(false);
-      updateCollisionMasks(
-        sameCollisionMasksForAnimations,
-        sameCollisionMasksForSprites
-      );
-    },
-    [
-      animations,
-      updateCollisionMasks,
+  const onPolygonsUpdated = React.useCallback(() => {
+    // Revert to non-automatic collision mask.
+    animations.setAdaptCollisionMaskAutomatically(false);
+    updateCollisionMasks(
       sameCollisionMasksForAnimations,
-      sameCollisionMasksForSprites,
-    ]
-  );
+      sameCollisionMasksForSprites
+    );
+  }, [
+    animations,
+    updateCollisionMasks,
+    sameCollisionMasksForAnimations,
+    sameCollisionMasksForSprites,
+  ]);
 
   // Keep panes vertical for small screens, side-by-side for large screens
   const { isMobile } = useResponsiveWindowSize();
@@ -327,7 +313,7 @@ const CollisionMasksEditor = ({
                 resourceName
               )}
               onImageSize={setCurrentSpriteSize}
-              renderOverlay={overlayProps =>
+              renderOverlay={(overlayProps) =>
                 sprite && (
                   <CollisionMasksPreview
                     {...overlayProps}

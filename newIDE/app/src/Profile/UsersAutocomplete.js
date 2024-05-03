@@ -48,14 +48,11 @@ export const UsersAutocomplete = ({
         },
       ]
     : [];
-  const [
-    completionUserPublicProfiles,
-    setCompletionUserPublicProfiles,
-  ] = React.useState<Array<UserPublicProfile>>([]);
+  const [completionUserPublicProfiles, setCompletionUserPublicProfiles] =
+    React.useState<Array<UserPublicProfile>>([]);
   const [error, setError] = React.useState(null);
-  const autocompleteRef = React.useRef<?SemiControlledMultiAutoCompleteInterface>(
-    null
-  );
+  const autocompleteRef =
+    React.useRef<?SemiControlledMultiAutoCompleteInterface>(null);
 
   // Recalculate if the userInput has changed.
   const searchUserPublicProfiles = useDebounce(async () => {
@@ -66,9 +63,8 @@ export const UsersAutocomplete = ({
     }
     try {
       setLoading(true);
-      const userPublicProfiles = await searchCreatorPublicProfilesByUsername(
-        userInput
-      );
+      const userPublicProfiles =
+        await searchCreatorPublicProfilesByUsername(userInput);
       const filteredPublicProfiles = profile
         ? userPublicProfiles.filter(({ id }) => id !== profile.id)
         : userPublicProfiles;
@@ -83,67 +79,56 @@ export const UsersAutocomplete = ({
   }, 500);
 
   // Call every time the userInput changes.
-  React.useEffect(
-    () => {
-      searchUserPublicProfiles();
-    },
-    [searchUserPublicProfiles, userInput]
-  );
+  React.useEffect(() => {
+    searchUserPublicProfiles();
+  }, [searchUserPublicProfiles, userInput]);
 
   // Do only once, the first time it is loaded.
-  const getUserPublicProfilesForAutocomplete = React.useCallback(
-    async () => {
-      setError(null);
-      if (!userIds.length) {
-        setUsers([]);
-        return;
-      }
-      try {
-        setLoading(true);
-        const userPublicProfilesByIds = await getUserPublicProfilesByIds(
-          userIds
-        );
-        setUsers(
-          userIds
-            .map(userId => {
-              const userPublicProfile: UserPublicProfile =
-                userPublicProfilesByIds[userId];
-              return userPublicProfile
-                ? {
-                    text:
-                      userPublicProfile.username ||
-                      `${
-                        !!profile && userPublicProfile.id === profile.id
-                          ? `Yourself`
-                          : `Unknown`
-                      } (no username)`,
-                    value: userPublicProfile.id,
-                  }
-                : null;
-            })
-            .filter(Boolean)
-        );
-      } catch (err) {
-        setError(err);
-        console.error('Could not load the users: ', err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [userIds, profile]
-  );
+  const getUserPublicProfilesForAutocomplete = React.useCallback(async () => {
+    setError(null);
+    if (!userIds.length) {
+      setUsers([]);
+      return;
+    }
+    try {
+      setLoading(true);
+      const userPublicProfilesByIds = await getUserPublicProfilesByIds(userIds);
+      setUsers(
+        userIds
+          .map((userId) => {
+            const userPublicProfile: UserPublicProfile =
+              userPublicProfilesByIds[userId];
+            return userPublicProfile
+              ? {
+                  text:
+                    userPublicProfile.username ||
+                    `${
+                      !!profile && userPublicProfile.id === profile.id
+                        ? `Yourself`
+                        : `Unknown`
+                    } (no username)`,
+                  value: userPublicProfile.id,
+                }
+              : null;
+          })
+          .filter(Boolean)
+      );
+    } catch (err) {
+      setError(err);
+      console.error('Could not load the users: ', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userIds, profile]);
 
   const focusInput = React.useCallback(() => {
     if (autocompleteRef.current) autocompleteRef.current.focusInput();
   }, []);
 
   // Do only once.
-  React.useEffect(
-    () => {
-      getUserPublicProfilesForAutocomplete();
-    },
-    [getUserPublicProfilesForAutocomplete]
-  );
+  React.useEffect(() => {
+    getUserPublicProfilesForAutocomplete();
+  }, [getUserPublicProfilesForAutocomplete]);
 
   return (
     <SemiControlledMultiAutoComplete
@@ -157,7 +142,7 @@ export const UsersAutocomplete = ({
         setUsers(values);
         // call top onChange on user ids
         onChange(
-          values.map(option => ({
+          values.map((option) => ({
             username: option.text,
             userId: option.value,
           }))

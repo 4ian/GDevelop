@@ -1,7 +1,7 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.memo(props => (
+export default React.memo((props) => (
   <SvgIcon {...props} width="25" height="24" viewBox="0 0 25 24" fill="none">
     <path
       d="M2.66699 12C2.66699 6.47716 7.14415 2 12.667 2C18.1899 2 22.667 6.47716 22.667 12C22.667 17.5229 18.1899 22 12.667 22C7.14415 22 2.66699 17.5229 2.66699 12Z"

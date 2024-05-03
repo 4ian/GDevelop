@@ -54,8 +54,8 @@ export const getSentenceErrorText = (
   const parametersIndexOffset = eventsBasedBehavior
     ? ParametersIndexOffsets.BehaviorFunction
     : eventsBasedObject
-    ? ParametersIndexOffsets.ObjectFunction
-    : ParametersIndexOffsets.FreeFunction;
+      ? ParametersIndexOffsets.ObjectFunction
+      : ParametersIndexOffsets.FreeFunction;
 
   const type = eventsFunction.getFunctionType();
   const param0isImplicit =
@@ -241,7 +241,7 @@ export const EventsFunctionPropertiesEditor = ({
           {renderConfigurationHeader ? renderConfigurationHeader() : null}
           <Measure
             bounds
-            onResize={contentRect => {
+            onResize={(contentRect) => {
               setContainerWidth(contentRect.bounds.width);
             }}
           >
@@ -261,7 +261,8 @@ export const EventsFunctionPropertiesEditor = ({
                         disabled={!!freezeEventsFunctionType}
                         onChange={(e, i, valueString: string) => {
                           // $FlowFixMe
-                          const value: EventsFunction_FunctionType = valueString;
+                          const value: EventsFunction_FunctionType =
+                            valueString;
                           eventsFunction.setFunctionType(value);
                           if (onConfigurationUpdated)
                             onConfigurationUpdated('type');
@@ -311,10 +312,11 @@ export const EventsFunctionPropertiesEditor = ({
                             ? mapFor(
                                 0,
                                 eventsFunctionsContainer.getEventsFunctionsCount(),
-                                i => {
-                                  const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
-                                    i
-                                  );
+                                (i) => {
+                                  const eventsFunction =
+                                    eventsFunctionsContainer.getEventsFunctionAt(
+                                      i
+                                    );
 
                                   return (
                                     eventsFunction.getFunctionType() ===
@@ -345,7 +347,7 @@ export const EventsFunctionPropertiesEditor = ({
                             eventsFunction.getExpressionType()
                           )}
                           value={eventsFunction.getFullName()}
-                          onChange={text => {
+                          onChange={(text) => {
                             eventsFunction.setFullName(text);
                             if (onConfigurationUpdated)
                               onConfigurationUpdated();
@@ -364,7 +366,7 @@ export const EventsFunctionPropertiesEditor = ({
                           value={
                             getterFunction ? getterFunction.getGroup() : ''
                           }
-                          onChange={text => {}}
+                          onChange={(text) => {}}
                         />
                       ) : (
                         <SemiControlledAutoComplete
@@ -372,7 +374,7 @@ export const EventsFunctionPropertiesEditor = ({
                           hintText={t`Leave it empty to use the default group for this extension.`}
                           fullWidth
                           value={eventsFunction.getGroup()}
-                          onChange={text => {
+                          onChange={(text) => {
                             eventsFunction.setGroup(text);
                             if (onConfigurationUpdated)
                               onConfigurationUpdated();
@@ -380,7 +382,7 @@ export const EventsFunctionPropertiesEditor = ({
                           }}
                           dataSource={
                             getFunctionGroupNames
-                              ? getFunctionGroupNames().map(name => ({
+                              ? getFunctionGroupNames().map((name) => ({
                                   text: name,
                                   value: name,
                                 }))
@@ -406,7 +408,7 @@ export const EventsFunctionPropertiesEditor = ({
                             ? 'Change ' + getterFunction.getDescription()
                             : ''
                         }
-                        onChange={text => {}}
+                        onChange={(text) => {}}
                       />
                     ) : (
                       <SemiControlledTextField
@@ -428,7 +430,7 @@ export const EventsFunctionPropertiesEditor = ({
                         fullWidth
                         multiline
                         value={eventsFunction.getDescription()}
-                        onChange={text => {
+                        onChange={(text) => {
                           eventsFunction.setDescription(text);
                           if (onConfigurationUpdated) onConfigurationUpdated();
                           forceUpdate();
@@ -455,7 +457,7 @@ export const EventsFunctionPropertiesEditor = ({
                               ': [...]'
                             : ''
                         }
-                        onChange={text => {}}
+                        onChange={(text) => {}}
                       />
                     </Line>
                   ) : (
@@ -480,7 +482,7 @@ export const EventsFunctionPropertiesEditor = ({
                           translatableHintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                           fullWidth
                           value={eventsFunction.getSentence()}
-                          onChange={text => {
+                          onChange={(text) => {
                             eventsFunction.setSentence(text);
                             if (onConfigurationUpdated)
                               onConfigurationUpdated();

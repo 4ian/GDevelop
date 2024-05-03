@@ -59,7 +59,7 @@ const getAcceptedExtensions = (
     null;
   if (!resourceKindMetadata) return [];
   return withLeadingDot
-    ? resourceKindMetadata.fileExtensions.map(extension => '.' + extension)
+    ? resourceKindMetadata.fileExtensions.map((extension) => '.' + extension)
     : resourceKindMetadata.fileExtensions;
 };
 
@@ -98,17 +98,17 @@ export const FileToCloudProjectResourceUploader = ({
   ]);
   const cloudProjectId = fileMetadata ? fileMetadata.fileIdentifier : null;
   const [uploadProgress, setUploadProgress] = React.useState(0);
-  const onUpload = React.useCallback(
-    async () => {
-      const input = inputRef.current;
-      if (!input) return;
-      if (!cloudProjectId) return;
+  const onUpload = React.useCallback(async () => {
+    const input = inputRef.current;
+    if (!input) return;
+    if (!cloudProjectId) return;
 
-      try {
-        setIsUploading(true);
-        setError(null);
-        setUploadProgress(0);
-        const results: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
+    try {
+      setIsUploading(true);
+      setError(null);
+      setUploadProgress(0);
+      const results: UploadedProjectResourceFiles =
+        await uploadProjectResourceFiles(
           authenticatedUser,
           cloudProjectId,
           selectedFiles,
@@ -116,39 +116,37 @@ export const FileToCloudProjectResourceUploader = ({
             setUploadProgress((current / total) * 100);
           }
         );
-        const erroredResults = results.filter(({ error }) => !!error);
-        const okResults = results.filter(({ url }) => !!url);
-        if (erroredResults.length) {
-          throw erroredResults[0];
-        } else if (okResults.length) {
-          onChooseResources(
-            okResults.map(({ url, resourceFile }) => {
-              const newResource = createNewResource();
-              newResource.setFile(url || '');
-              newResource.setName(resourceFile.name);
-              newResource.setOrigin('cloud-project-resource', url || '');
+      const erroredResults = results.filter(({ error }) => !!error);
+      const okResults = results.filter(({ url }) => !!url);
+      if (erroredResults.length) {
+        throw erroredResults[0];
+      } else if (okResults.length) {
+        onChooseResources(
+          okResults.map(({ url, resourceFile }) => {
+            const newResource = createNewResource();
+            newResource.setFile(url || '');
+            newResource.setName(resourceFile.name);
+            newResource.setOrigin('cloud-project-resource', url || '');
 
-              return newResource;
-            })
-          );
-        }
-      } catch (error) {
-        setError(error);
-      } finally {
-        setIsUploading(false);
+            return newResource;
+          })
+        );
       }
-    },
-    [
-      selectedFiles,
-      authenticatedUser,
-      onChooseResources,
-      createNewResource,
-      cloudProjectId,
-    ]
-  );
+    } catch (error) {
+      setError(error);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [
+    selectedFiles,
+    authenticatedUser,
+    onChooseResources,
+    createNewResource,
+    cloudProjectId,
+  ]);
 
   const invalidFiles = selectedFiles
-    .map(file => {
+    .map((file) => {
       if (file.size > PROJECT_RESOURCE_MAX_SIZE_IN_BYTES) {
         return {
           filename: file.name,
@@ -166,15 +164,12 @@ export const FileToCloudProjectResourceUploader = ({
     !isUploading && isConnected && canUploadWithThisStorageProvider;
 
   // Automatically open the input once, at the first render, if asked.
-  React.useLayoutEffect(
-    () => {
-      if (automaticallyOpenInput && !hasAutomaticallyOpenedInput.current) {
-        hasAutomaticallyOpenedInput.current = true;
-        if (inputRef.current) inputRef.current.click();
-      }
-    },
-    [automaticallyOpenInput]
-  );
+  React.useLayoutEffect(() => {
+    if (automaticallyOpenInput && !hasAutomaticallyOpenedInput.current) {
+      hasAutomaticallyOpenedInput.current = true;
+      if (inputRef.current) inputRef.current.click();
+    }
+  }, [automaticallyOpenInput]);
 
   // Start uploading after choosing some files (if there are no errors and
   // if no error happened during the last upload attempt).
@@ -183,25 +178,19 @@ export const FileToCloudProjectResourceUploader = ({
     canChooseFiles &&
     hasSelectedFiles &&
     invalidFiles.length === 0;
-  React.useEffect(
-    () => {
-      if (canUploadFiles && !error) {
-        onUpload();
-      }
-    },
-    [canUploadFiles, onUpload, error]
-  );
+  React.useEffect(() => {
+    if (canUploadFiles && !error) {
+      onUpload();
+    }
+  }, [canUploadFiles, onUpload, error]);
 
-  const shouldValidateFilePostPicking = React.useMemo(
-    () => {
-      const acceptedMimeTypes = getAcceptedMimeTypes(options.resourceKind);
-      // Safari does not use file extensions to filter files pre-picking and
-      // Safari also does not recognize all mime types. So if the only accepted
-      // mime type is 'file', the file validation should happen post-picking.
-      return acceptedMimeTypes.length === 1 && acceptedMimeTypes[0] === 'file';
-    },
-    [options.resourceKind]
-  );
+  const shouldValidateFilePostPicking = React.useMemo(() => {
+    const acceptedMimeTypes = getAcceptedMimeTypes(options.resourceKind);
+    // Safari does not use file extensions to filter files pre-picking and
+    // Safari also does not recognize all mime types. So if the only accepted
+    // mime type is 'file', the file validation should happen post-picking.
+    return acceptedMimeTypes.length === 1 && acceptedMimeTypes[0] === 'file';
+  }, [options.resourceKind]);
 
   const validateFilePostPicking = React.useCallback(
     (file: File) => {
@@ -245,7 +234,7 @@ export const FileToCloudProjectResourceUploader = ({
               type="file"
               ref={inputRef}
               disabled={!canChooseFiles}
-              onChange={event => {
+              onChange={(event) => {
                 const files = [];
                 const newFilteredOutFiles = [];
                 for (let i = 0; i < event.currentTarget.files.length; i++) {
@@ -270,14 +259,14 @@ export const FileToCloudProjectResourceUploader = ({
               <AlertMessage kind="warning">
                 <Trans>
                   The following file(s) cannot be used for this kind of object:{' '}
-                  {filteredOutFiles.map(file => file.name).join(', ')}
+                  {filteredOutFiles.map((file) => file.name).join(', ')}
                 </Trans>
               </AlertMessage>
             )}
           </Column>
         </Line>
       </Paper>
-      {invalidFiles.map(erroredFile => {
+      {invalidFiles.map((erroredFile) => {
         if (erroredFile.error === 'too-large')
           return (
             <AlertMessage kind="error">

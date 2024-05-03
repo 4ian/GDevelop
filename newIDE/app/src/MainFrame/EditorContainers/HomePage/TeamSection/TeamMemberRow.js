@@ -118,7 +118,7 @@ const TeamMemberRow = ({
                     size="small"
                     edge="end"
                     aria-label="menu"
-                    onClick={event => {
+                    onClick={(event) => {
                       // prevent triggering the click on the list item.
                       event.stopPropagation();
                       onOpenContextMenu(event, member);

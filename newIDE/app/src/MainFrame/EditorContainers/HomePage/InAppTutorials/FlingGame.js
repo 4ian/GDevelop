@@ -123,7 +123,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 0,
       }),
-      renderImage: props => <Unboxing {...props} />,
+      renderImage: (props) => <Unboxing {...props} />,
     },
     {
       key: 'publish',
@@ -152,7 +152,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 1,
       }),
-      renderImage: props => <Building {...props} />,
+      renderImage: (props) => <Building {...props} />,
     },
     {
       key: 'leaderboards',
@@ -181,7 +181,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
         tutorialId: FLING_GAME_IN_APP_TUTORIAL_ID,
         part: 2,
       }),
-      renderImage: props => <Podium {...props} />,
+      renderImage: (props) => <Podium {...props} />,
     },
   ];
 
@@ -230,7 +230,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
                   size="banner"
                   locked={false}
                   disabled={false}
-                  renderImage={props => (
+                  renderImage={(props) => (
                     <Line justifyContent="space-around" expand>
                       <Unboxing {...props} />
                       <Building {...props} />
@@ -243,7 +243,7 @@ const FlingGame = ({ selectInAppTutorial }: Props) => {
                 />
               </GridListTile>
             ) : (
-              flingInAppTutorialCards.map(item => (
+              flingInAppTutorialCards.map((item) => (
                 <GridListTile key={item.key}>
                   <InAppTutorialPhaseCard
                     {...item}

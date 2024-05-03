@@ -30,27 +30,25 @@ export type GroupWithContext = {|
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
-export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext) => (
-  other: ?GroupWithContext
-) => {
-  return (
-    groupWithContext &&
-    other &&
-    groupWithContext.global === other.global &&
-    groupWithContext.group === other.group
-  );
-};
+export const isSameGroupWithContext =
+  (groupWithContext: ?GroupWithContext) => (other: ?GroupWithContext) => {
+    return (
+      groupWithContext &&
+      other &&
+      groupWithContext.global === other.global &&
+      groupWithContext.group === other.group
+    );
+  };
 
-export const isSameObjectWithContext = (
-  objectWithContext: ?ObjectWithContext
-) => (other: ?ObjectWithContext) => {
-  return (
-    objectWithContext &&
-    other &&
-    objectWithContext.global === other.global &&
-    objectWithContext.object === other.object
-  );
-};
+export const isSameObjectWithContext =
+  (objectWithContext: ?ObjectWithContext) => (other: ?ObjectWithContext) => {
+    return (
+      objectWithContext &&
+      other &&
+      objectWithContext.global === other.global &&
+      objectWithContext.object === other.object
+    );
+  };
 
 export const enumerateObjects = (
   project: gdObjectsContainer,
@@ -81,7 +79,7 @@ export const enumerateObjects = (
   let containerObjectsList: ObjectWithContextList = mapFor(
     0,
     objectsContainer.getObjectsCount(),
-    i => {
+    (i) => {
       const object = objectsContainer.getObjectAt(i);
       if (filterObjectByType && !filterObjectByType(object)) {
         return null;
@@ -98,7 +96,7 @@ export const enumerateObjects = (
   const projectObjectsList: ObjectWithContextList =
     project === objectsContainer
       ? []
-      : mapFor(0, project.getObjectsCount(), i => {
+      : mapFor(0, project.getObjectsCount(), (i) => {
           const object = project.getObjectAt(i);
           if (filterObjectByType && !filterObjectByType(object)) {
             return null;
@@ -109,16 +107,13 @@ export const enumerateObjects = (
           return object;
         })
           .filter(Boolean)
-          .map(
-            (object: gdObject): ObjectWithContext => ({
-              object,
-              global: true,
-            })
-          );
+          .map((object: gdObject): ObjectWithContext => ({
+            object,
+            global: true,
+          }));
 
-  const allObjectsList: ObjectWithContextList = containerObjectsList.concat(
-    projectObjectsList
-  );
+  const allObjectsList: ObjectWithContextList =
+    containerObjectsList.concat(projectObjectsList);
 
   return {
     containerObjectsList,
@@ -134,15 +129,15 @@ export const enumerateObjectTypes = (
   const extensionsList = platform.getAllPlatformExtensions();
 
   return flatten(
-    mapFor(0, extensionsList.size(), i => {
+    mapFor(0, extensionsList.size(), (i) => {
       const extension = extensionsList.at(i);
 
       return extension
         .getExtensionObjectsTypes()
         .toJSArray()
-        .map(objectType => extension.getObjectMetadata(objectType))
-        .filter(objectMetadata => !objectMetadata.isHidden())
-        .map(objectMetadata => ({
+        .map((objectType) => extension.getObjectMetadata(objectType))
+        .filter((objectMetadata) => !objectMetadata.isHidden())
+        .map((objectMetadata) => ({
           extension,
           objectMetadata,
           name: objectMetadata.getName(),
@@ -198,7 +193,7 @@ export const filterGroupsList = (
 export const enumerateGroups = (
   objectGroups: gdObjectGroupsContainer
 ): Array<gdObjectGroup> => {
-  return mapFor(0, objectGroups.count(), i => {
+  return mapFor(0, objectGroups.count(), (i) => {
     return objectGroups.getAt(i);
   });
 };
@@ -219,7 +214,7 @@ export const enumerateObjectsAndGroups = (
           false
         ) === objectType) &&
       requiredBehaviorTypes.every(
-        requiredBehaviorType =>
+        (requiredBehaviorType) =>
           gd
             .getBehaviorNamesInObjectOrGroup(
               globalObjectsContainer,
@@ -242,7 +237,7 @@ export const enumerateObjectsAndGroups = (
           true
         ) === objectType) &&
       requiredBehaviorTypes.every(
-        behaviorType =>
+        (behaviorType) =>
           gd
             .getBehaviorNamesInObjectOrGroup(
               globalObjectsContainer,
@@ -259,26 +254,26 @@ export const enumerateObjectsAndGroups = (
   const containerObjectsList: ObjectWithContextList = mapFor(
     0,
     objectsContainer.getObjectsCount(),
-    i => objectsContainer.getObjectAt(i)
+    (i) => objectsContainer.getObjectAt(i)
   )
     .filter(filterObject)
-    .map(object => ({ object, global: false }));
+    .map((object) => ({ object, global: false }));
 
   const containerGroups = objectsContainer.getObjectGroups();
   const containerGroupsList: GroupWithContextList = enumerateGroups(
     containerGroups
   )
     .filter(filterGroup)
-    .map(group => ({ group, global: false }));
+    .map((group) => ({ group, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
     globalObjectsContainer === objectsContainer
       ? []
-      : mapFor(0, globalObjectsContainer.getObjectsCount(), i =>
+      : mapFor(0, globalObjectsContainer.getObjectsCount(), (i) =>
           globalObjectsContainer.getObjectAt(i)
         )
           .filter(filterObject)
-          .map(object => ({ object, global: true }));
+          .map((object) => ({ object, global: true }));
 
   const projectGroups = globalObjectsContainer.getObjectGroups();
   const projectGroupsList: GroupWithContextList =
@@ -286,14 +281,12 @@ export const enumerateObjectsAndGroups = (
       ? []
       : enumerateGroups(projectGroups)
           .filter(filterGroup)
-          .map(group => ({ group, global: true }));
+          .map((group) => ({ group, global: true }));
 
-  const allObjectsList: ObjectWithContextList = containerObjectsList.concat(
-    projectObjectsList
-  );
-  const allGroupsList: GroupWithContextList = containerGroupsList.concat(
-    projectGroupsList
-  );
+  const allObjectsList: ObjectWithContextList =
+    containerObjectsList.concat(projectObjectsList);
+  const allGroupsList: GroupWithContextList =
+    containerGroupsList.concat(projectGroupsList);
 
   return {
     allObjectsList,

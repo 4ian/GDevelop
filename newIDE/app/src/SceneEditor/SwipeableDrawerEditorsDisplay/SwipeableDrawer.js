@@ -103,18 +103,15 @@ type Props = {|
   children: React.Node,
   title: React.Node,
   openingState: DrawerOpeningState,
-  setOpeningState: DrawerOpeningState => void,
+  setOpeningState: (DrawerOpeningState) => void,
   topBarControls?: ?React.Node,
 |};
 
 function useAnimationOpeningState(openingState: DrawerOpeningState) {
   const lastOpeningState = React.useRef<DrawerOpeningState>(openingState);
-  React.useEffect(
-    () => {
-      lastOpeningState.current = openingState;
-    },
-    [openingState]
-  );
+  React.useEffect(() => {
+    lastOpeningState.current = openingState;
+  }, [openingState]);
 
   // Animate the half opening of the drawer, to give a hint that it can be opened
   // even more.
@@ -132,8 +129,8 @@ const SwipeableDrawer = (props: Props) => {
     openingState === 'closed'
       ? 0
       : openingState === 'halfOpen'
-      ? props.maxHeight * 0.42 // Empirical value that leaves space in both editor and canvas.
-      : props.maxHeight - topMargin;
+        ? props.maxHeight * 0.42 // Empirical value that leaves space in both editor and canvas.
+        : props.maxHeight - topMargin;
   const display = openingState === 'closed' ? 'none' : 'flex';
   const animationOpeningState = useAnimationOpeningState(openingState);
 

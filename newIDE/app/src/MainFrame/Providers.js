@@ -45,12 +45,10 @@ import { CommunityLeaderboardsStateProvider } from '../CommunityLeaderboards/Com
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
-  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: (EventsFunctionCodeWriterCallbacks) => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
-  children: ({|
-    i18n: I18nType,
-  |}) => React.Node,
+  children: ({| i18n: I18nType |}) => React.Node,
 |};
 
 /**

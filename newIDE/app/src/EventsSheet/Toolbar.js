@@ -145,7 +145,7 @@ const Toolbar = React.memo<Props>(function Toolbar({
             </IconButton>
           }
           buildMenuTemplate={() =>
-            allEventsMetadata.map(metadata => {
+            allEventsMetadata.map((metadata) => {
               return {
                 label: metadata.fullName,
                 click: () => {

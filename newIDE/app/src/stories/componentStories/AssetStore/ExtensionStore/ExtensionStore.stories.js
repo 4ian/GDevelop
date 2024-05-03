@@ -57,9 +57,8 @@ export const Default = () => (
 Default.parameters = apiDataFakeExtensions;
 
 export const WithCommunityExtensions = () => {
-  const [showCommunityExtensions, setShowCommunityExtensions] = React.useState(
-    true
-  );
+  const [showCommunityExtensions, setShowCommunityExtensions] =
+    React.useState(true);
   const preferences: Preferences = {
     ...initialPreferences,
     values: { ...initialPreferences.values, showCommunityExtensions },

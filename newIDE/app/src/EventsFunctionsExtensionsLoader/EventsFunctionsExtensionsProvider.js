@@ -25,7 +25,7 @@ import xxhashjs from 'xxhashjs';
 type Props = {|
   children: React.Node,
   i18n: I18nType,
-  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: (EventsFunctionCodeWriterCallbacks) => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
@@ -40,32 +40,26 @@ type State = EventsFunctionsExtensionsState;
  */
 export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
-  State
+  State,
 > {
-  _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter = this.props.makeEventsFunctionCodeWriter(
-    {
+  _eventsFunctionCodeWriter: ?EventsFunctionCodeWriter =
+    this.props.makeEventsFunctionCodeWriter({
       onWriteFile: this._onWriteFile.bind(this),
-    }
-  );
+    });
   _includeFileHashs: { [string]: number } = {};
   _lastLoadPromise: ?Promise<void> = null;
   state = {
     eventsFunctionsExtensionsError: null,
-    loadProjectEventsFunctionsExtensions: this._loadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    unloadProjectEventsFunctionsExtensions: this._unloadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    unloadProjectEventsFunctionsExtension: this._unloadProjectEventsFunctionsExtension.bind(
-      this
-    ),
-    reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
-      this
-    ),
-    reloadProjectEventsFunctionsExtensionMetadata: this._reloadProjectEventsFunctionsExtensionMetadata.bind(
-      this
-    ),
+    loadProjectEventsFunctionsExtensions:
+      this._loadProjectEventsFunctionsExtensions.bind(this),
+    unloadProjectEventsFunctionsExtensions:
+      this._unloadProjectEventsFunctionsExtensions.bind(this),
+    unloadProjectEventsFunctionsExtension:
+      this._unloadProjectEventsFunctionsExtension.bind(this),
+    reloadProjectEventsFunctionsExtensions:
+      this._reloadProjectEventsFunctionsExtensions.bind(this),
+    reloadProjectEventsFunctionsExtensionMetadata:
+      this._reloadProjectEventsFunctionsExtensionMetadata.bind(this),
     ensureLoadFinished: this._ensureLoadFinished.bind(this),
     getEventsFunctionsExtensionWriter: () =>
       this.props.eventsFunctionsExtensionWriter,

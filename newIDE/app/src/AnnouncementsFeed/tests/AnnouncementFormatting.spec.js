@@ -5,7 +5,7 @@ import { type Announcement } from '../../Utils/GDevelopServices/Announcement';
 
 // $FlowExpectedError
 const makeFakeI18n = (): I18nType => ({
-  _: message => message.id,
+  _: (message) => message.id,
   language: 'en',
 });
 

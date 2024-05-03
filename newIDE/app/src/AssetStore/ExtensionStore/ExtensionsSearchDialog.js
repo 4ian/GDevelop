@@ -24,7 +24,7 @@ import ErrorBoundary from '../../UI/ErrorBoundary';
 type Props = {|
   project: gdProject,
   onClose: () => void,
-  onInstallExtension: ExtensionShortHeader => void,
+  onInstallExtension: (ExtensionShortHeader) => void,
   onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
   onCreateNew?: () => void,
 |};
@@ -41,9 +41,8 @@ const ExtensionsSearchDialog = ({
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
-    false
-  );
+  const [extensionWasInstalled, setExtensionWasInstalled] =
+    React.useState(false);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -90,7 +89,8 @@ const ExtensionsSearchDialog = ({
     }
   };
 
-  const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
+  const eventsFunctionsExtensionOpener =
+    eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
   return (
     <I18n>
@@ -150,7 +150,7 @@ const ExtensionsSearchDialog = ({
         >
           <ExtensionStore
             isInstalling={isInstalling}
-            onInstall={async extensionShortHeader =>
+            onInstall={async (extensionShortHeader) =>
               installOrImportExtension(i18n, extensionShortHeader)
             }
             project={project}

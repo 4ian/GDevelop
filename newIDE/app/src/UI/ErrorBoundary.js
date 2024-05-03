@@ -241,7 +241,7 @@ const ErrorBoundary = (props: Props) => {
   const uniqueErrorIdRef = React.useRef(generateUUID());
   return (
     <ReactErrorBoundary
-      FallbackComponent={fallbackComponentProps => (
+      FallbackComponent={(fallbackComponentProps) => (
         <ErrorFallbackComponent
           {...fallbackComponentProps}
           componentTitle={props.componentTitle}

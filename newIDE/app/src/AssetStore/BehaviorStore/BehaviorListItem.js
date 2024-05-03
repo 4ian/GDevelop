@@ -36,7 +36,7 @@ type Props = {|
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
   onShowDetails: () => void,
-  onHeightComputed: number => void,
+  onHeightComputed: (number) => void,
   platform: gdPlatform,
 |};
 
@@ -56,16 +56,18 @@ export const BehaviorListItem = ({
   const isObjectCompatible =
     (!behaviorShortHeader.objectType ||
       objectType === behaviorShortHeader.objectType) &&
-    behaviorShortHeader.allRequiredBehaviorTypes.every(requiredBehaviorType => {
-      const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
-        platform,
-        requiredBehaviorType
-      );
-      return (
-        !behaviorMetadata.isHidden() ||
-        objectBehaviorsTypes.includes(requiredBehaviorType)
-      );
-    });
+    behaviorShortHeader.allRequiredBehaviorTypes.every(
+      (requiredBehaviorType) => {
+        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          platform,
+          requiredBehaviorType
+        );
+        return (
+          !behaviorMetadata.isHidden() ||
+          objectBehaviorsTypes.includes(requiredBehaviorType)
+        );
+      }
+    );
 
   // Report the height of the item once it's known.
   const containerRef = React.useRef<?HTMLDivElement>(null);
@@ -78,7 +80,7 @@ export const BehaviorListItem = ({
     const originalField = behaviorShortHeader[field];
 
     if (!matches) return originalField;
-    const nameMatches = matches.filter(match => match.key === field);
+    const nameMatches = matches.filter((match) => match.key === field);
     if (nameMatches.length === 0) return originalField;
 
     return (
@@ -91,20 +93,18 @@ export const BehaviorListItem = ({
 
   const isEnabled = !alreadyAdded && isObjectCompatible;
 
-  const chooseBehavior = React.useCallback(
-    () => {
-      if (isEnabled) {
-        onChoose();
-      }
-    },
-    [isEnabled, onChoose]
-  );
+  const chooseBehavior = React.useCallback(() => {
+    if (isEnabled) {
+      onChoose();
+    }
+  }, [isEnabled, onChoose]);
 
   const hasChip =
     alreadyAdded ||
     !isObjectCompatible ||
     behaviorShortHeader.tier === 'community' ||
-    (behaviorShortHeader.isDeprecated || false);
+    behaviorShortHeader.isDeprecated ||
+    false;
   const hasInfoButton = behaviorShortHeader.authors || false;
   const iconStyle = {
     paddingTop: hasInfoButton ? 10 : hasChip ? 6 : 4,
@@ -176,7 +176,7 @@ export const BehaviorListItem = ({
                     behaviorShortHeader.authors.length > 0 ? (
                       <Line>
                         <div style={{ flexWrap: 'wrap' }}>
-                          {behaviorShortHeader.authors.map(author => (
+                          {behaviorShortHeader.authors.map((author) => (
                             <UserPublicProfileChip
                               user={author}
                               key={author.id}
@@ -192,7 +192,7 @@ export const BehaviorListItem = ({
                 >
                   <IconButton
                     size="small"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       onShowDetails();
                     }}

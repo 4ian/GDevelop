@@ -92,7 +92,8 @@ const loadPropertiesFromProject = (project: gdProject): ProjectProperties => {
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
-    useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
+    useDeprecatedZeroAsDefaultZOrder:
+      project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
 };
 
@@ -129,10 +130,10 @@ function applyPropertiesToProject(
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
-  authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  authorIds.forEach((authorId) => projectAuthorIds.push_back(authorId));
   const projectAuthorUsernames = project.getAuthorUsernames();
   projectAuthorUsernames.clear();
-  authorUsernames.forEach(authorUsername =>
+  authorUsernames.forEach((authorUsername) =>
     projectAuthorUsernames.push_back(authorUsername)
   );
   project.setAuthor(author);
@@ -176,10 +177,8 @@ const ProjectPropertiesDialog = (props: Props) => {
   let [gameResolutionHeight, setGameResolutionHeight] = React.useState(
     initialProperties.gameResolutionHeight
   );
-  let [
-    adaptGameResolutionAtRuntime,
-    setAdaptGameResolutionAtRuntime,
-  ] = React.useState(initialProperties.adaptGameResolutionAtRuntime);
+  let [adaptGameResolutionAtRuntime, setAdaptGameResolutionAtRuntime] =
+    React.useState(initialProperties.adaptGameResolutionAtRuntime);
   let [author, setAuthor] = React.useState(initialProperties.author);
   let [version, setVersion] = React.useState(initialProperties.version);
   let [packageName, setPackageName] = React.useState(
@@ -198,19 +197,15 @@ const ProjectPropertiesDialog = (props: Props) => {
   let [antialiasingMode, setAntialiasingMode] = React.useState(
     initialProperties.antialiasingMode
   );
-  let [
-    isAntialisingEnabledOnMobile,
-    setAntialisingEnabledOnMobile,
-  ] = React.useState(initialProperties.isAntialisingEnabledOnMobile);
+  let [isAntialisingEnabledOnMobile, setAntialisingEnabledOnMobile] =
+    React.useState(initialProperties.isAntialisingEnabledOnMobile);
   let [minFPS, setMinFPS] = React.useState(initialProperties.minFPS);
   let [maxFPS, setMaxFPS] = React.useState(initialProperties.maxFPS);
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
   );
-  let [
-    useDeprecatedZeroAsDefaultZOrder,
-    setUseDeprecatedZeroAsDefaultZOrder,
-  ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
+  let [useDeprecatedZeroAsDefaultZOrder, setUseDeprecatedZeroAsDefaultZOrder] =
+    React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
 
   const { isMobile } = useResponsiveWindowSize();
 
@@ -218,7 +213,7 @@ const ProjectPropertiesDialog = (props: Props) => {
   const defaultVersion = '1.0.0';
 
   const [currentTab, setCurrentTab] = React.useState<
-    'properties' | 'loading-screen'
+    'properties' | 'loading-screen',
   >(props.initialTab);
 
   const {
@@ -228,13 +223,11 @@ const ProjectPropertiesDialog = (props: Props) => {
     serializableObject: project.getLoadingScreen(),
     onCancel: props.onClose,
   });
-  const {
-    onCancelChanges,
-    notifyOfChange,
-  } = useSerializableObjectCancelableEditor({
-    serializableObject: project.getExtensionProperties(),
-    onCancel: onCancelLoadingScreenChanges,
-  });
+  const { onCancelChanges, notifyOfChange } =
+    useSerializableObjectCancelableEditor({
+      serializableObject: project.getExtensionProperties(),
+      onCancel: onCancelLoadingScreenChanges,
+    });
 
   const onApply = async () => {
     const specialPropertiesChanged =
@@ -344,7 +337,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                 </Text>
                 <PublicGameProperties
                   name={name}
-                  setName={newName => {
+                  setName={(newName) => {
                     if (newName.trim() === name) {
                       return;
                     }
@@ -352,7 +345,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                   description={description}
-                  setDescription={newDescription => {
+                  setDescription={(newDescription) => {
                     if (newDescription === description) {
                       return;
                     }
@@ -361,16 +354,16 @@ const ProjectPropertiesDialog = (props: Props) => {
                   }}
                   project={project}
                   authorIds={authorIds}
-                  setAuthorIds={newAuthorIds => {
+                  setAuthorIds={(newAuthorIds) => {
                     setAuthorIds(newAuthorIds);
                     notifyOfChange();
                   }}
-                  setAuthorUsernames={newAuthorUsernames => {
+                  setAuthorUsernames={(newAuthorUsernames) => {
                     setAuthorUsernames(newAuthorUsernames);
                     notifyOfChange();
                   }}
                   orientation={orientation}
-                  setOrientation={newOrientation => {
+                  setOrientation={(newOrientation) => {
                     if (newOrientation === orientation) {
                       return;
                     }
@@ -389,7 +382,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                   hintText={defaultPackageName}
                   type="text"
                   value={packageName}
-                  onChange={newPackageName => {
+                  onChange={(newPackageName) => {
                     if (newPackageName === packageName) {
                       return;
                     }
@@ -397,9 +390,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     notifyOfChange();
                   }}
                   errorText={
-                    validatePackageName(packageName) ? (
-                      undefined
-                    ) : (
+                    validatePackageName(packageName) ? undefined : (
                       <Trans>
                         The package name is containing invalid characters or not
                         following the convention "xxx.yyy.zzz" (numbers allowed
@@ -414,7 +405,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                   hintText={defaultVersion}
                   type="text"
                   value={version}
-                  onChange={newVersion => {
+                  onChange={(newVersion) => {
                     if (newVersion === version) {
                       return;
                     }
@@ -431,7 +422,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                   )}
                   type="text"
                   value={author}
-                  onChange={newAuthor => {
+                  onChange={(newAuthor) => {
                     if (newAuthor === author) {
                       return;
                     }
@@ -488,7 +479,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     fullWidth
                     type="number"
                     value={'' + gameResolutionWidth}
-                    onChange={value => {
+                    onChange={(value) => {
                       const newResolutionWidth = Math.max(
                         1,
                         parseInt(value, 10)
@@ -506,7 +497,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     fullWidth
                     type="number"
                     value={'' + gameResolutionHeight}
-                    onChange={value => {
+                    onChange={(value) => {
                       const newResolutionHeight = Math.max(
                         1,
                         parseInt(value, 10)
@@ -569,7 +560,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     fullWidth
                     type="number"
                     value={'' + minFPS}
-                    onChange={value => {
+                    onChange={(value) => {
                       const newMinFPS = Math.max(0, parseInt(value, 10));
                       if (newMinFPS === minFPS) {
                         return;
@@ -585,7 +576,7 @@ const ProjectPropertiesDialog = (props: Props) => {
                     fullWidth
                     type="number"
                     value={'' + maxFPS}
-                    onChange={value => {
+                    onChange={(value) => {
                       const newMaxFPS = Math.max(0, parseInt(value, 10));
                       if (newMaxFPS === maxFPS) {
                         return;
@@ -692,8 +683,8 @@ const ProjectPropertiesDialog = (props: Props) => {
                     antialiasingMode === 'none'
                       ? 'never'
                       : isAntialisingEnabledOnMobile
-                      ? 'always'
-                      : 'notOnMobile'
+                        ? 'always'
+                        : 'notOnMobile'
                   }
                   onChange={(e, i, newScaleMode: string) => {
                     if (newScaleMode === scaleMode) {

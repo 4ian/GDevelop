@@ -43,24 +43,19 @@ export const applyPublicPropertiesToProject = (
   i18n: I18nType,
   newProperties: PublicProjectProperties
 ) => {
-  const {
-    name,
-    authorIds,
-    authorUsernames,
-    description,
-    categories,
-  } = newProperties;
+  const { name, authorIds, authorUsernames, description, categories } =
+    newProperties;
   project.setName(name);
   const projectCategories = project.getCategories();
   projectCategories.clear();
-  categories.forEach(category => projectCategories.push_back(category));
+  categories.forEach((category) => projectCategories.push_back(category));
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
-  authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  authorIds.forEach((authorId) => projectAuthorIds.push_back(authorId));
   const projectAuthorUsernames = project.getAuthorUsernames();
   projectAuthorUsernames.clear();
-  authorUsernames.forEach(authorUsername =>
+  authorUsernames.forEach((authorUsername) =>
     projectAuthorUsernames.push_back(authorUsername)
   );
   project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
@@ -93,17 +88,16 @@ export const PublicGamePropertiesDialog = ({
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
-  const publicGameAuthorIds = publicGame.authors.map(author => author.id);
+  const publicGameAuthorIds = publicGame.authors.map((author) => author.id);
   const publicGameAuthorUsernames = publicGame.authors
-    .map(author => author.username)
+    .map((author) => author.username)
     .filter(Boolean);
-  const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
+  const publicGameOwnerIds = publicGame.owners.map((owner) => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
   const [categories, setCategories] = React.useState(publicGame.categories);
   const [description, setDescription] = React.useState(publicGame.description);
-  const [authorIds, setAuthorIds] = React.useState<string[]>(
-    publicGameAuthorIds
-  );
+  const [authorIds, setAuthorIds] =
+    React.useState<string[]>(publicGameAuthorIds);
   const [authorUsernames, setAuthorUsernames] = React.useState<string[]>(
     publicGameAuthorUsernames
   );

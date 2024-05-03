@@ -35,13 +35,13 @@ export const SelectColumns = ({
         const paddingLeft = isFirst
           ? 0
           : columnRatio > 1
-          ? columnsPadding * (columnRatio + 1)
-          : columnsPadding;
+            ? columnsPadding * (columnRatio + 1)
+            : columnsPadding;
         const paddingRight = isLast
           ? 0
           : columnRatio > 1
-          ? columnsPadding * (columnRatio + 1)
-          : columnsPadding;
+            ? columnsPadding * (columnRatio + 1)
+            : columnsPadding;
         return (
           <div
             style={{

@@ -16,7 +16,7 @@ import { useDebounce } from '../../Utils/UseDebounce';
 
 type Props = {|
   editorTabs: EditorTabsState,
-  setEditorTabs: EditorTabsState => void,
+  setEditorTabs: (EditorTabsState) => void,
   currentProjectId: string | null,
   getEditorOpeningOptions: ({|
     kind: EditorKind,
@@ -57,30 +57,23 @@ const useEditorTabsStateSaving = ({
   getEditorOpeningOptions,
   setEditorTabs,
 }: Props) => {
-  const {
-    setEditorStateForProject,
-    getEditorStateForProject,
-  } = React.useContext(PreferencesContext);
-  const saveEditorState = React.useCallback(
-    () => {
-      // Do not save the state if the user is on the start page
-      if (!currentProjectId || editorTabs.currentTab === 0) return;
-      const editorState = {
-        currentTab: editorTabs.currentTab,
-        editors: editorTabs.editors
-          .filter(editor => editor.key !== 'start page')
-          .map(getEditorTabMetadata),
-      };
+  const { setEditorStateForProject, getEditorStateForProject } =
+    React.useContext(PreferencesContext);
+  const saveEditorState = React.useCallback(() => {
+    // Do not save the state if the user is on the start page
+    if (!currentProjectId || editorTabs.currentTab === 0) return;
+    const editorState = {
+      currentTab: editorTabs.currentTab,
+      editors: editorTabs.editors
+        .filter((editor) => editor.key !== 'start page')
+        .map(getEditorTabMetadata),
+    };
 
-      setEditorStateForProject(
-        currentProjectId,
-        editorState.editors.length === 0
-          ? undefined
-          : { editorTabs: editorState }
-      );
-    },
-    [currentProjectId, editorTabs, setEditorStateForProject]
-  );
+    setEditorStateForProject(
+      currentProjectId,
+      editorState.editors.length === 0 ? undefined : { editorTabs: editorState }
+    );
+  }, [currentProjectId, editorTabs, setEditorStateForProject]);
 
   const saveEditorStateDebounced = useDebounce(
     saveEditorState,
@@ -91,17 +84,14 @@ const useEditorTabsStateSaving = ({
     !!currentProjectId ? 1000 : 0
   );
 
-  React.useEffect(
-    () => {
-      saveEditorStateDebounced();
-    },
-    [
-      saveEditorStateDebounced,
-      currentProjectId,
-      editorTabs,
-      setEditorStateForProject,
-    ]
-  );
+  React.useEffect(() => {
+    saveEditorStateDebounced();
+  }, [
+    saveEditorStateDebounced,
+    currentProjectId,
+    editorTabs,
+    setEditorStateForProject,
+  ]);
 
   const hasAPreviousSaveForEditorTabsState = React.useCallback(
     (project: gdProject) => {
@@ -119,7 +109,7 @@ const useEditorTabsStateSaving = ({
       let shouldOpenSavedCurrentTab = true;
 
       const editorsOpeningOptions = editorState.editorTabs.editors
-        .map(editorMetadata => {
+        .map((editorMetadata) => {
           if (
             projectHasItem({
               project,
@@ -163,8 +153,8 @@ const useEditorTabsStateSaving = ({
         shouldOpenSavedCurrentTab
           ? editorState.editorTabs.currentTab
           : newEditorTabs.editors.length >= 1
-          ? 1
-          : 0
+            ? 1
+            : 0
       );
       setEditorTabs(newEditorTabs);
       return editorsOpeningOptions.length;

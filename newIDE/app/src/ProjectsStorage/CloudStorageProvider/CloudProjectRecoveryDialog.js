@@ -33,85 +33,75 @@ const CloudProjectRecoveryDialog = ({
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile } = authenticatedUser;
-  const [
-    lastSaneVersion,
-    setLastSaneVersion,
-  ] = React.useState<?ExpandedCloudProjectVersion>(null);
+  const [lastSaneVersion, setLastSaneVersion] =
+    React.useState<?ExpandedCloudProjectVersion>(null);
   const [isErrored, setIsErrored] = React.useState<boolean>(false);
-  const [
-    saneVersionHasNotBeenFound,
-    setSaneVersionHasNotBeenFound,
-  ] = React.useState<boolean>(false);
+  const [saneVersionHasNotBeenFound, setSaneVersionHasNotBeenFound] =
+    React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
-  React.useEffect(
-    () => {
-      if (cloudProjectId && profile && profile.id) {
-        sendCloudProjectCouldNotBeOpened({
-          cloudProjectId,
-          userId: profile.id,
-        });
+  React.useEffect(() => {
+    if (cloudProjectId && profile && profile.id) {
+      sendCloudProjectCouldNotBeOpened({
+        cloudProjectId,
+        userId: profile.id,
+      });
+    }
+  }, [cloudProjectId, profile]);
+
+  React.useEffect(() => {
+    const getVersions = async () => {
+      const lastVersions = await getLastVersionsOfProject(
+        authenticatedUser,
+        cloudProjectId
+      );
+      if (!lastVersions) {
+        throw new Error("We couldn't get the project last versions.");
       }
-    },
-    [cloudProjectId, profile]
-  );
-
-  React.useEffect(
-    () => {
-      const getVersions = async () => {
-        const lastVersions = await getLastVersionsOfProject(
+      for (
+        let versionIndex = 1; // The first version is the current one
+        versionIndex < lastVersions.length;
+        versionIndex++
+      ) {
+        const version = lastVersions[versionIndex];
+        const isSane = await isCloudProjectVersionSane(
           authenticatedUser,
-          cloudProjectId
+          cloudProjectId,
+          version.id
         );
-        if (!lastVersions) {
-          throw new Error("We couldn't get the project last versions.");
-        }
-        for (
-          let versionIndex = 1; // The first version is the current one
-          versionIndex < lastVersions.length;
-          versionIndex++
-        ) {
-          const version = lastVersions[versionIndex];
-          const isSane = await isCloudProjectVersionSane(
-            authenticatedUser,
-            cloudProjectId,
-            version.id
-          );
-          if (isSane) {
-            setLastSaneVersion(version);
-            return;
-          }
-        }
-        setSaneVersionHasNotBeenFound(true);
-      };
-
-      let timeoutId;
-      const setDelay = (delayInMs: number) =>
-        new Promise(resolve => {
-          timeoutId = setTimeout(() => {
-            resolve();
-          }, delayInMs);
+        if (isSane) {
+          setLastSaneVersion(version);
           return;
-        });
-
-      const getVersionsAndWait = async () => {
-        try {
-          // Give time to user to read the content of the dialog.
-          await Promise.all([
-            getVersions(),
-            setDelay(DELAY_TO_READ_DIALOG_IN_MS),
-          ]);
-        } catch (error) {
-          setIsErrored(true);
-        } finally {
-          setIsLoading(false);
         }
-      };
-      getVersionsAndWait();
-      return () => clearTimeout(timeoutId);
-    },
-    [cloudProjectId, authenticatedUser]
-  );
+      }
+      setSaneVersionHasNotBeenFound(true);
+    };
+
+    let timeoutId;
+    const setDelay = (delayInMs: number) =>
+      new Promise((resolve) => {
+        timeoutId = setTimeout(() => {
+          resolve();
+        }, delayInMs);
+        return;
+      });
+
+    const getVersionsAndWait = async () => {
+      try {
+        // Give time to user to read the content of the dialog.
+        await Promise.all([
+          getVersions(),
+          setDelay(DELAY_TO_READ_DIALOG_IN_MS),
+        ]);
+      } catch (error) {
+        setIsErrored(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getVersionsAndWait();
+    return () => clearTimeout(timeoutId);
+  }, [cloudProjectId, authenticatedUser]);
 
   const actions =
     isErrored || saneVersionHasNotBeenFound
@@ -123,35 +113,35 @@ const CloudProjectRecoveryDialog = ({
           />,
         ]
       : isLoading
-      ? []
-      : lastSaneVersion
-      ? [
-          <FlatButton
-            key="cancel"
-            label={<Trans>Cancel</Trans>}
-            onClick={onClose}
-          />,
-          <DialogPrimaryButton
-            primary
-            key="restore"
-            label={<Trans>Accept</Trans>}
-            onClick={() => onOpenPreviousVersion(lastSaneVersion.id)}
-          />,
-        ]
-      : [];
+        ? []
+        : lastSaneVersion
+          ? [
+              <FlatButton
+                key="cancel"
+                label={<Trans>Cancel</Trans>}
+                onClick={onClose}
+              />,
+              <DialogPrimaryButton
+                primary
+                key="restore"
+                label={<Trans>Accept</Trans>}
+                onClick={() => onOpenPreviousVersion(lastSaneVersion.id)}
+              />,
+            ]
+          : [];
 
   const onApply =
     isErrored || saneVersionHasNotBeenFound
       ? onClose
       : isLoading
-      ? undefined
-      : lastSaneVersion
-      ? () => onOpenPreviousVersion(lastSaneVersion.id)
-      : undefined;
+        ? undefined
+        : lastSaneVersion
+          ? () => onOpenPreviousVersion(lastSaneVersion.id)
+          : undefined;
 
   const cloudProject = authenticatedUser.cloudProjects
     ? authenticatedUser.cloudProjects.find(
-        project => project.id === cloudProjectId
+        (project) => project.id === cloudProjectId
       )
     : null;
   const cloudProjectName = cloudProject ? cloudProject.name : null;

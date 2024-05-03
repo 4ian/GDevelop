@@ -45,7 +45,7 @@ import { setupResourcesWatcher } from './LocalFileResourcesWatcher';
 export default ({
   internalName: 'LocalFile',
   name: t`Your computer`,
-  renderIcon: props => <Computer fontSize={props.size} />,
+  renderIcon: (props) => <Computer fontSize={props.size} />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
@@ -109,59 +109,61 @@ export default ({
       return true;
     },
   }),
-  createResourceOperations: () => ({
-    project,
-    resource,
-    i18n,
-    updateInterface,
-    cleanUserSelectionOfResources,
-    informUser,
-  }) => [
-    {
-      label: i18n._(t`Locate file`),
-      click: () => locateResourceFile({ project, resource }),
-    },
-    {
-      label: i18n._(t`Open file`),
-      click: () => openResourceFile({ project, resource }),
-    },
-    {
-      label: i18n._(t`Copy file path`),
-      click: () => {
-        copyResourceFilePath({ project, resource });
-        informUser({
-          message: <Trans>Resource file path copied to clipboard</Trans>,
-        });
+  createResourceOperations:
+    () =>
+    ({
+      project,
+      resource,
+      i18n,
+      updateInterface,
+      cleanUserSelectionOfResources,
+      informUser,
+    }) => [
+      {
+        label: i18n._(t`Locate file`),
+        click: () => locateResourceFile({ project, resource }),
       },
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Scan in the project folder for...`),
-      submenu: allResourceKindsAndMetadata.map(
-        ({ displayName, fileExtensions, createNewResource }) => ({
-          label: i18n._(displayName),
-          click: async () => {
-            await scanForNewResources({
-              project,
-              extensions: fileExtensions,
-              createResource: createNewResource,
-            });
-            updateInterface();
-          },
-        })
-      ),
-    },
-    {
-      label: i18n._(t`Remove resources with invalid path`),
-      click: () => {
-        removeAllResourcesWithInvalidPath({ project });
-        // Remove user selection in case the user selected a resource
-        // that was just removed.
-        cleanUserSelectionOfResources();
-        // Force update of the resources list as otherwise it could render
-        // resources that were just deleted.
-        updateInterface();
+      {
+        label: i18n._(t`Open file`),
+        click: () => openResourceFile({ project, resource }),
       },
-    },
-  ],
+      {
+        label: i18n._(t`Copy file path`),
+        click: () => {
+          copyResourceFilePath({ project, resource });
+          informUser({
+            message: <Trans>Resource file path copied to clipboard</Trans>,
+          });
+        },
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Scan in the project folder for...`),
+        submenu: allResourceKindsAndMetadata.map(
+          ({ displayName, fileExtensions, createNewResource }) => ({
+            label: i18n._(displayName),
+            click: async () => {
+              await scanForNewResources({
+                project,
+                extensions: fileExtensions,
+                createResource: createNewResource,
+              });
+              updateInterface();
+            },
+          })
+        ),
+      },
+      {
+        label: i18n._(t`Remove resources with invalid path`),
+        click: () => {
+          removeAllResourcesWithInvalidPath({ project });
+          // Remove user selection in case the user selected a resource
+          // that was just removed.
+          cleanUserSelectionOfResources();
+          // Force update of the resources list as otherwise it could render
+          // resources that were just deleted.
+          updateInterface();
+        },
+      },
+    ],
 }: StorageProvider);

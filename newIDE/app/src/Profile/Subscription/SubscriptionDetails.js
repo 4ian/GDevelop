@@ -119,84 +119,78 @@ const SubscriptionDetails = ({
     setUserSubscriptionPlanWithPricingSystems,
   ] = React.useState<?SubscriptionPlanWithPricingSystems>(null);
   const [error, setError] = React.useState<?React.Node>(null);
-  const [isLoadingUserPrice, setIsLoadingUserPrice] = React.useState<boolean>(
-    false
-  );
+  const [isLoadingUserPrice, setIsLoadingUserPrice] =
+    React.useState<boolean>(false);
 
-  React.useEffect(
-    () => {
-      (async () => {
-        setError(null);
-        setIsLoadingUserPrice(true);
-        try {
-          if (!subscription) {
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
+  React.useEffect(() => {
+    (async () => {
+      setError(null);
+      setIsLoadingUserPrice(true);
+      try {
+        if (!subscription) {
+          setUserSubscriptionPlanWithPricingSystems(null);
+          return;
+        }
 
-          const { planId, pricingSystemId } = subscription;
-          if (!planId || !pricingSystemId) {
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
+        const { planId, pricingSystemId } = subscription;
+        if (!planId || !pricingSystemId) {
+          setUserSubscriptionPlanWithPricingSystems(null);
+          return;
+        }
 
-          const matchingSubscriptionPlanWithPrices = subscriptionPlansWithPricingSystems.find(
-            plan => subscription.planId === plan.id
+        const matchingSubscriptionPlanWithPrices =
+          subscriptionPlansWithPricingSystems.find(
+            (plan) => subscription.planId === plan.id
           );
-          if (!matchingSubscriptionPlanWithPrices) {
-            setError(
-              <Trans>
-                Couldn't find a subscription matching your account. Please get
-                in touch with us to fix this issue.
-              </Trans>
-            );
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
-
-          const {
-            pricingSystems,
-            ...subscriptionPlan
-          } = matchingSubscriptionPlanWithPrices;
-
-          if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
-            setUserSubscriptionPlanWithPricingSystems({
-              ...subscriptionPlan,
-              pricingSystems: [],
-            });
-            return;
-          }
-
-          let pricingSystem = pricingSystems.find(
-            price => price.id === subscription.pricingSystemId
+        if (!matchingSubscriptionPlanWithPrices) {
+          setError(
+            <Trans>
+              Couldn't find a subscription matching your account. Please get in
+              touch with us to fix this issue.
+            </Trans>
           );
-          if (!pricingSystem) {
-            pricingSystem = await getSubscriptionPlanPricingSystem(
-              pricingSystemId
-            );
-          }
-          if (!pricingSystem) {
-            setError(
-              <Trans>
-                Couldn't find a subscription price matching your account. Please
-                get in touch with us to fix this issue.
-              </Trans>
-            );
-            setUserSubscriptionPlanWithPricingSystems(null);
-            return;
-          }
+          setUserSubscriptionPlanWithPricingSystems(null);
+          return;
+        }
 
+        const { pricingSystems, ...subscriptionPlan } =
+          matchingSubscriptionPlanWithPrices;
+
+        if (!canPriceBeFoundInGDevelopPrices(pricingSystemId)) {
           setUserSubscriptionPlanWithPricingSystems({
             ...subscriptionPlan,
-            pricingSystems: [pricingSystem],
+            pricingSystems: [],
           });
-        } finally {
-          setIsLoadingUserPrice(false);
+          return;
         }
-      })();
-    },
-    [subscription, subscriptionPlansWithPricingSystems]
-  );
+
+        let pricingSystem = pricingSystems.find(
+          (price) => price.id === subscription.pricingSystemId
+        );
+        if (!pricingSystem) {
+          pricingSystem =
+            await getSubscriptionPlanPricingSystem(pricingSystemId);
+        }
+        if (!pricingSystem) {
+          setError(
+            <Trans>
+              Couldn't find a subscription price matching your account. Please
+              get in touch with us to fix this issue.
+            </Trans>
+          );
+          setUserSubscriptionPlanWithPricingSystems(null);
+          return;
+        }
+
+        setUserSubscriptionPlanWithPricingSystems({
+          ...subscriptionPlan,
+          pricingSystems: [pricingSystem],
+        });
+      } finally {
+        setIsLoadingUserPrice(false);
+      }
+    })();
+  }, [subscription, subscriptionPlansWithPricingSystems]);
 
   const redemptionCodeExpirationDate =
     subscription && subscription.redemptionCodeValidUntil;
@@ -391,7 +385,7 @@ const SubscriptionDetails = ({
           </Paper>
         ) : (
           <ResponsiveLineStackLayout noColumnMargin>
-            {Object.keys(subscriptionOptions).map(key => {
+            {Object.keys(subscriptionOptions).map((key) => {
               const { title, description, icon } = subscriptionOptions[key];
               return (
                 <div

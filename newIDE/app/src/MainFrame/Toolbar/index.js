@@ -105,16 +105,13 @@ export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
       setEditorToolbar,
     }));
 
-    const borderBottomColor = React.useMemo(
-      () => {
-        if (!props.checkedOutVersionStatus) return null;
-        return getStatusColor(
-          gdevelopTheme,
-          props.checkedOutVersionStatus.status
-        );
-      },
-      [props.checkedOutVersionStatus, gdevelopTheme]
-    );
+    const borderBottomColor = React.useMemo(() => {
+      if (!props.checkedOutVersionStatus) return null;
+      return getStatusColor(
+        gdevelopTheme,
+        props.checkedOutVersionStatus.status
+      );
+    }, [props.checkedOutVersionStatus, gdevelopTheme]);
 
     return (
       <Toolbar borderBottomColor={borderBottomColor}>

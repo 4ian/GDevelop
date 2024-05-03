@@ -54,7 +54,7 @@ const useChipStyles = makeStyles({
 
 type Props = {|
   value: Array<AutocompleteOption>,
-  onChange: AutocompleteOption => void,
+  onChange: (AutocompleteOption) => void,
   dataSource: DataSource,
   inputValue: ?string,
   onInputChange: (event: Object, value: string, reason: string) => void,
@@ -76,7 +76,7 @@ export type SemiControlledMultiAutoCompleteInterface = {|
 
 const SemiControlledMultiAutoComplete = React.forwardRef<
   Props,
-  SemiControlledMultiAutoCompleteInterface
+  SemiControlledMultiAutoCompleteInterface,
 >((props, ref) => {
   const chipStyles = useChipStyles();
   const inputRef = React.useRef<?TextField>(null);
@@ -105,7 +105,7 @@ const SemiControlledMultiAutoComplete = React.forwardRef<
           getOptionDisabled={(option: AutocompleteOption) =>
             option.disabled ||
             !!props.value.find(
-              element => element && element.value === option.value
+              (element) => element && element.value === option.value
             ) ||
             (props.optionsLimit && props.value.length >= props.optionsLimit)
           }
@@ -118,7 +118,7 @@ const SemiControlledMultiAutoComplete = React.forwardRef<
               ...styles.listbox,
             },
           }}
-          renderInput={params => (
+          renderInput={(params) => (
             <TextField
               {...params}
               color="secondary"

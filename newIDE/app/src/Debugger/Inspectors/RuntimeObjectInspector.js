@@ -31,7 +31,7 @@ type RuntimeObjectData = {|
   'Is hidden?': boolean,
 |};
 
-const transform = runtimeObject => {
+const transform = (runtimeObject) => {
   if (!runtimeObject) return null;
   const runtimeObjectData: RuntimeObjectData = {
     'X position': runtimeObject.x,
@@ -93,7 +93,7 @@ const RuntimeObjectInspector = (props: Props) => (
       enableClipboard={false}
       displayDataTypes={false}
       displayObjectSize={false}
-      onEdit={edit => handleEdit(edit, props)}
+      onEdit={(edit) => handleEdit(edit, props)}
       groupArraysAfterLength={50}
       theme="monokai"
     />

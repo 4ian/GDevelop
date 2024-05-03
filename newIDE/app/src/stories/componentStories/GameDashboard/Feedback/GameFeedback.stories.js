@@ -34,7 +34,7 @@ export const DefaultGameFeedback = () => {
     .onGet(`${GDevelopBuildApi.baseUrl}/build`)
     .reply(200, [completeWebBuild])
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -59,7 +59,7 @@ export const GameFeedbackOneSolvedComment = () => {
     .onGet(`${GDevelopBuildApi.baseUrl}/build`)
     .reply(200, [completeWebBuild])
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -84,7 +84,7 @@ export const GameFeedbackWithError = () => {
     .onGet(`${GDevelopBuildApi.baseUrl}/build`)
     .reply(200, [completeWebBuild])
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -109,7 +109,7 @@ export const GameFeedbackEmpty = () => {
     .onGet(`${GDevelopBuildApi.baseUrl}/build`)
     .reply(200, [completeWebBuild])
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

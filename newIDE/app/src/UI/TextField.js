@@ -187,11 +187,10 @@ export type TextFieldInterface = {|
 const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
-  const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
-    false
-  );
+  const [isPasswordVisible, setIsPasswordVisible] =
+    React.useState<boolean>(false);
 
-  const focus: FieldFocusFunction = options => {
+  const focus: FieldFocusFunction = (options) => {
     const { current: input } = inputRef;
     if (input) {
       input.focus();
@@ -259,8 +258,8 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const shouldAutoFocusTextField = !props.autoFocus
     ? false
     : props.autoFocus === 'desktopAndMobileDevices'
-    ? true
-    : shouldAutofocusInput;
+      ? true
+      : shouldAutofocusInput;
 
   return (
     <I18n>
@@ -283,11 +282,13 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
             props.defaultValue !== undefined ? props.defaultValue : undefined
           }
           onChange={
-            onChange ? event => onChange(event, event.target.value) : undefined
+            onChange
+              ? (event) => onChange(event, event.target.value)
+              : undefined
           }
           onContextMenu={
             props.stopContextMenuPropagation
-              ? e => e.stopPropagation()
+              ? (e) => e.stopPropagation()
               : undefined
           }
           // Error handling:
@@ -304,8 +305,8 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
             props.hintText
               ? props.hintText
               : props.translatableHintText
-              ? i18n._(props.translatableHintText)
-              : undefined
+                ? i18n._(props.translatableHintText)
+                : undefined
           }
           id={props.id}
           // Keyboard focus:
@@ -359,16 +360,12 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
                 >
                   {props.endAdornment}
                 </InputAdornment>
-              ) : (
-                undefined
-              ),
+              ) : undefined,
             startAdornment: props.startAdornment ? (
               <InputAdornment position="start">
                 {props.startAdornment}
               </InputAdornment>
-            ) : (
-              undefined
-            ),
+            ) : undefined,
           }}
           style={
             props.style

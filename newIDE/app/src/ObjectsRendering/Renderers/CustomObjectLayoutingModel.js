@@ -95,17 +95,16 @@ const layoutFields = [
 export const getProportionalPositionX = (
   positionName: string
 ): number | null => {
-  const horizontalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[1]
-    : positionName
+  const horizontalPositionName = (
+    positionName.includes('-') ? positionName.split('-')[1] : positionName
   ).toLowerCase();
   return horizontalPositionName === 'left'
     ? 0
     : horizontalPositionName === 'right'
-    ? 1
-    : horizontalPositionName === 'center'
-    ? 0.5
-    : null;
+      ? 1
+      : horizontalPositionName === 'center'
+        ? 0.5
+        : null;
 };
 
 /**
@@ -116,17 +115,16 @@ export const getProportionalPositionX = (
 export const getProportionalPositionY = (
   positionName: string
 ): number | null => {
-  const verticalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[0]
-    : positionName
+  const verticalPositionName = (
+    positionName.includes('-') ? positionName.split('-')[0] : positionName
   ).toLowerCase();
   return verticalPositionName === 'top'
     ? 0
     : verticalPositionName === 'bottom'
-    ? 1
-    : verticalPositionName === 'center'
-    ? 0.5
-    : null;
+      ? 1
+      : verticalPositionName === 'center'
+        ? 0.5
+        : null;
 };
 
 /**
@@ -137,17 +135,16 @@ export const getProportionalPositionY = (
 export const getProportionalPositionZ = (
   positionName: string
 ): number | null => {
-  const verticalPositionName = (positionName.includes('-')
-    ? positionName.split('-')[2] || ''
-    : positionName
+  const verticalPositionName = (
+    positionName.includes('-') ? positionName.split('-')[2] || '' : positionName
   ).toLowerCase();
   return verticalPositionName === 'Zmin'
     ? 0
     : verticalPositionName === 'Zmax'
-    ? 1
-    : verticalPositionName === 'center'
-    ? 0.5
-    : null;
+      ? 1
+      : verticalPositionName === 'center'
+        ? 0.5
+        : null;
 };
 
 const getHorizontalAnchorValue = (
@@ -158,9 +155,9 @@ const getHorizontalAnchorValue = (
   return proportionalX !== null
     ? proportionalX
     : // Reference to another property to allow to expose a Choice property.
-    properties && properties.has(anchorName)
-    ? getProportionalPositionX(properties.get(anchorName).getValue())
-    : null;
+      properties && properties.has(anchorName)
+      ? getProportionalPositionX(properties.get(anchorName).getValue())
+      : null;
 };
 
 const getVerticalAnchorValue = (
@@ -171,9 +168,9 @@ const getVerticalAnchorValue = (
   return proportionalY !== null
     ? proportionalY
     : // Reference to another property to allow to expose a Choice property.
-    properties && properties.has(anchorName)
-    ? getProportionalPositionY(properties.get(anchorName).getValue())
-    : null;
+      properties && properties.has(anchorName)
+      ? getProportionalPositionY(properties.get(anchorName).getValue())
+      : null;
 };
 
 /**
@@ -185,15 +182,14 @@ const getHorizontalOriginAnchorValue = (
   properties: gdMapStringPropertyDescriptor,
   targetAnchorValue: number | null
 ): number | null => {
-  const horizontalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[1]
-    : anchorName
+  const horizontalAnchorName = (
+    anchorName.includes('-') ? anchorName.split('-')[1] : anchorName
   ).toLowerCase();
   return horizontalAnchorName === 'same'
     ? targetAnchorValue
     : horizontalAnchorName === 'opposite' && targetAnchorValue !== null
-    ? 1 - targetAnchorValue
-    : getHorizontalAnchorValue(horizontalAnchorName, properties);
+      ? 1 - targetAnchorValue
+      : getHorizontalAnchorValue(horizontalAnchorName, properties);
 };
 
 /**
@@ -205,15 +201,14 @@ const getVerticalOriginAnchorValue = (
   properties: gdMapStringPropertyDescriptor,
   targetAnchorValue: number | null
 ): number | null => {
-  const verticalAnchorName = (anchorName.includes('-')
-    ? anchorName.split('-')[0]
-    : anchorName
+  const verticalAnchorName = (
+    anchorName.includes('-') ? anchorName.split('-')[0] : anchorName
   ).toLowerCase();
   return verticalAnchorName === 'same'
     ? targetAnchorValue
     : verticalAnchorName === 'opposite' && targetAnchorValue !== null
-    ? 1 - targetAnchorValue
-    : getVerticalAnchorValue(verticalAnchorName, properties);
+      ? 1 - targetAnchorValue
+      : getVerticalAnchorValue(verticalAnchorName, properties);
 };
 
 export interface PropertiesContainer {
@@ -252,7 +247,7 @@ export const getLayouts = (
     const propertyValueString = instanceProperties.get(name).getValue();
     const propertyValueBoolean = propertyValueString === 'true';
     const propertyValueNumber = Number.parseFloat(propertyValueString) || 0;
-    const layoutField = layoutFields.find(field => name.includes(field));
+    const layoutField = layoutFields.find((field) => name.includes(field));
 
     // AnchorTarget extraInfo is not the list of child-object where the layout is applied
     // but the child that is the target of the anchor.
@@ -562,7 +557,7 @@ export interface ChildRenderedInstance {
 }
 
 export interface LayoutedParent<
-  CovariantChildRenderedInstance: ChildRenderedInstance
+  CovariantChildRenderedInstance: ChildRenderedInstance,
 > {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];

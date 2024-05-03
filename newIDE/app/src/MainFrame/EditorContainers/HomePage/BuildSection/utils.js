@@ -42,7 +42,7 @@ export const getLastModifiedInfoByProjectId = async ({
   profile: Profile,
 |}): Promise<LastModifiedInfoByProjectId> => {
   const cloudProjectsLastModifiedBySomeoneElse = cloudProjects.filter(
-    cloudProject =>
+    (cloudProject) =>
       !!cloudProject.committedAt &&
       !!cloudProject.lastCommittedBy &&
       cloudProject.lastCommittedBy !== profile.id
@@ -50,7 +50,7 @@ export const getLastModifiedInfoByProjectId = async ({
 
   const allOtherContributorIds = new Set(
     cloudProjectsLastModifiedBySomeoneElse
-      .map(cloudProject => cloudProject.lastCommittedBy)
+      .map((cloudProject) => cloudProject.lastCommittedBy)
       .filter(Boolean)
   );
 
@@ -61,7 +61,7 @@ export const getLastModifiedInfoByProjectId = async ({
       Array.from(allOtherContributorIds)
     );
     const lastModifiedInfoByProjectId: LastModifiedInfoByProjectId = {};
-    cloudProjects.forEach(project => {
+    cloudProjects.forEach((project) => {
       if (!project.lastCommittedBy || !project.committedAt) return;
       const contributorPublicProfile =
         userPublicProfileByIds[project.lastCommittedBy];
@@ -91,7 +91,7 @@ export const transformCloudProjectsIntoFileMetadataWithStorageProviderName = (
   ownerId?: string
 ): Array<FileMetadataAndStorageProviderName> => {
   return cloudProjects
-    .map(cloudProject => {
+    .map((cloudProject) => {
       if (cloudProject.deletedAt) return null;
       const file: FileMetadataAndStorageProviderName = {
         storageProviderName: 'Cloud',
@@ -118,14 +118,14 @@ const formatGameTemplateListingDataForCarousel = ({
   receivedGameTemplates,
 }: {|
   gameTemplateListingData: PrivateGameTemplateListingData,
-  onSelectGameTemplate: PrivateGameTemplateListingData => void,
+  onSelectGameTemplate: (PrivateGameTemplateListingData) => void,
   i18n: I18nType,
   receivedGameTemplates: ?Array<PrivateGameTemplate>,
 |}): CarouselThumbnail => {
   const isTemplateOwned =
     !!receivedGameTemplates &&
     !!receivedGameTemplates.find(
-      receivedGameTemplate =>
+      (receivedGameTemplate) =>
         receivedGameTemplate.id === gameTemplateListingData.id
     );
   return {
@@ -154,7 +154,7 @@ const formatExampleShortHeaderForCarousel = ({
   onSelectExample,
 }: {|
   exampleShortHeader: ExampleShortHeader,
-  onSelectExample: ExampleShortHeader => void,
+  onSelectExample: (ExampleShortHeader) => void,
 |}) => {
   return {
     id: exampleShortHeader.id,
@@ -203,7 +203,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
     return { carouselItems: [], gridItems: [] };
   }
   const exampleShortHeadersWithThumbnails = exampleShortHeaders.filter(
-    exampleShortHeader =>
+    (exampleShortHeader) =>
       !!exampleShortHeader.previewImageUrls &&
       !!exampleShortHeader.previewImageUrls[0]
   );
@@ -253,7 +253,7 @@ export const getExampleAndTemplateItemsForBuildSection = ({
           const isTemplateOwned =
             !!receivedGameTemplates &&
             !!receivedGameTemplates.find(
-              receivedGameTemplate =>
+              (receivedGameTemplate) =>
                 receivedGameTemplate.id === privateGameTemplateListingData.id
             );
           gridItems.push(
@@ -312,7 +312,7 @@ export const getAllGameTemplatesAndExamplesFlaggedAsGameCount = ({
         : 0) +
         (exampleShortHeaders
           ? exampleShortHeaders.filter(
-              exampleShortHeader =>
+              (exampleShortHeader) =>
                 exampleShortHeader.tags.includes('game') ||
                 exampleShortHeader.tags.includes('Starter')
             ).length

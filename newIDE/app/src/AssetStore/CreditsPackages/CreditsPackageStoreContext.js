@@ -27,19 +27,18 @@ type CreditsPackageStoreState = {|
   error: ?Error,
   openCreditsPackageDialog: (?CreditsPackageDialogOpeningOptions) => void,
   closeCreditsPackageDialog: () => void,
-  openCreditsUsageDialog: CreditsUsageDialogOptions => void,
+  openCreditsUsageDialog: (CreditsUsageDialogOptions) => void,
 |};
 
-export const CreditsPackageStoreContext = React.createContext<CreditsPackageStoreState>(
-  {
+export const CreditsPackageStoreContext =
+  React.createContext<CreditsPackageStoreState>({
     fetchCreditsPackages: () => {},
     creditsPackageListingDatas: null,
     error: null,
     openCreditsPackageDialog: () => {},
     closeCreditsPackageDialog: () => {},
     openCreditsUsageDialog: () => {},
-  }
-);
+  });
 
 // Ids are in the form "amount_credits" (e.g: "500_credits").
 export const getCreditsAmountFromId = (id: string) => {
@@ -54,71 +53,60 @@ export const CreditsPackageStoreStateProvider = ({
   children,
 }: CreditsPackageStoreStateProviderProps) => {
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    creditsPackageListingDatas,
-    setCreditsPackageListingDatas,
-  ] = React.useState<?Array<CreditsPackageListingData>>(null);
-  const [
-    isCreditsPackageDialogOpen,
-    setIsCreditsPackageDialogOpen,
-  ] = React.useState<boolean>(false);
+  const [creditsPackageListingDatas, setCreditsPackageListingDatas] =
+    React.useState<?Array<CreditsPackageListingData>>(null);
+  const [isCreditsPackageDialogOpen, setIsCreditsPackageDialogOpen] =
+    React.useState<boolean>(false);
   const [missingCredits, setMissingCredits] = React.useState<?number>(null);
   const [showCalloutTip, setShowCalloutTip] = React.useState<boolean>(false);
 
-  const [
-    creditsUsageDialogConfig,
-    setCreditsUsageDialogConfig,
-  ] = React.useState<?CreditsUsageDialogOptions>(null);
+  const [creditsUsageDialogConfig, setCreditsUsageDialogConfig] =
+    React.useState<?CreditsUsageDialogOptions>(null);
 
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchCreditsPackages = React.useCallback(
-    () => {
-      // If the credit packages are already loaded, don't load them again.
-      if (isLoading.current || creditsPackageListingDatas) return;
+  const fetchCreditsPackages = React.useCallback(() => {
+    // If the credit packages are already loaded, don't load them again.
+    if (isLoading.current || creditsPackageListingDatas) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const fetchedCreditsPackageListingDatas = await listListedCreditsPackages();
+      try {
+        const fetchedCreditsPackageListingDatas =
+          await listListedCreditsPackages();
 
-          console.info(
-            `Loaded ${
-              fetchedCreditsPackageListingDatas
-                ? fetchedCreditsPackageListingDatas.length
-                : 0
-            } credit packages from the store.`
-          );
+        console.info(
+          `Loaded ${
+            fetchedCreditsPackageListingDatas
+              ? fetchedCreditsPackageListingDatas.length
+              : 0
+          } credit packages from the store.`
+        );
 
-          setCreditsPackageListingDatas(fetchedCreditsPackageListingDatas);
-        } catch (error) {
-          console.error(
-            `Unable to load the credit packages from the store:`,
-            error
-          );
-          setError(error);
-        }
+        setCreditsPackageListingDatas(fetchedCreditsPackageListingDatas);
+      } catch (error) {
+        console.error(
+          `Unable to load the credit packages from the store:`,
+          error
+        );
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [creditsPackageListingDatas]
-  );
+      isLoading.current = false;
+    })();
+  }, [creditsPackageListingDatas]);
 
-  React.useEffect(
-    () => {
-      if (isLoading.current) return;
+  React.useEffect(() => {
+    if (isLoading.current) return;
 
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching credit packages from the store...');
-        fetchCreditsPackages();
-      }, CREDITS_PACKAGES_FETCH_TIMEOUT);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchCreditsPackages]
-  );
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching credit packages from the store...');
+      fetchCreditsPackages();
+    }, CREDITS_PACKAGES_FETCH_TIMEOUT);
+    return () => clearTimeout(timeoutId);
+  }, [fetchCreditsPackages]);
 
   const openCreditsPackageDialog = React.useCallback(
     (options: ?CreditsPackageDialogOpeningOptions) => {
@@ -135,43 +123,41 @@ export const CreditsPackageStoreStateProvider = ({
     [creditsPackageListingDatas]
   );
 
-  const suggestedPackage: ?CreditsPackageListingData = React.useMemo(
-    () => {
-      if (!missingCredits || !creditsPackageListingDatas) return null;
-      let creditsPackageListingDataWithShorterPositiveDifferenceInCredits = null;
-      creditsPackageListingDatas.forEach(creditsPackageListingData => {
-        const packageCreditsAmount = getCreditsAmountFromId(
-          creditsPackageListingData.id
-        );
-        const shortlistedPackageCreditsAmount = creditsPackageListingDataWithShorterPositiveDifferenceInCredits
+  const suggestedPackage: ?CreditsPackageListingData = React.useMemo(() => {
+    if (!missingCredits || !creditsPackageListingDatas) return null;
+    let creditsPackageListingDataWithShorterPositiveDifferenceInCredits = null;
+    creditsPackageListingDatas.forEach((creditsPackageListingData) => {
+      const packageCreditsAmount = getCreditsAmountFromId(
+        creditsPackageListingData.id
+      );
+      const shortlistedPackageCreditsAmount =
+        creditsPackageListingDataWithShorterPositiveDifferenceInCredits
           ? getCreditsAmountFromId(
               creditsPackageListingDataWithShorterPositiveDifferenceInCredits.id
             )
           : null;
-        if (
-          packageCreditsAmount >= missingCredits &&
-          (!shortlistedPackageCreditsAmount ||
-            packageCreditsAmount < shortlistedPackageCreditsAmount)
-        ) {
-          creditsPackageListingDataWithShorterPositiveDifferenceInCredits = creditsPackageListingData;
-        }
-      });
-
-      // If no package with more credits than missingCredits is found, return the package with the most credits.
-      if (!creditsPackageListingDataWithShorterPositiveDifferenceInCredits) {
-        creditsPackageListingDataWithShorterPositiveDifferenceInCredits = creditsPackageListingDatas.reduce(
-          (a, b) => {
-            return getCreditsAmountFromId(a.id) > getCreditsAmountFromId(b.id)
-              ? a
-              : b;
-          }
-        );
+      if (
+        packageCreditsAmount >= missingCredits &&
+        (!shortlistedPackageCreditsAmount ||
+          packageCreditsAmount < shortlistedPackageCreditsAmount)
+      ) {
+        creditsPackageListingDataWithShorterPositiveDifferenceInCredits =
+          creditsPackageListingData;
       }
+    });
 
-      return creditsPackageListingDataWithShorterPositiveDifferenceInCredits;
-    },
-    [creditsPackageListingDatas, missingCredits]
-  );
+    // If no package with more credits than missingCredits is found, return the package with the most credits.
+    if (!creditsPackageListingDataWithShorterPositiveDifferenceInCredits) {
+      creditsPackageListingDataWithShorterPositiveDifferenceInCredits =
+        creditsPackageListingDatas.reduce((a, b) => {
+          return getCreditsAmountFromId(a.id) > getCreditsAmountFromId(b.id)
+            ? a
+            : b;
+        });
+    }
+
+    return creditsPackageListingDataWithShorterPositiveDifferenceInCredits;
+  }, [creditsPackageListingDatas, missingCredits]);
 
   const closeCreditsPackageDialog = React.useCallback(() => {
     setIsCreditsPackageDialogOpen(false);

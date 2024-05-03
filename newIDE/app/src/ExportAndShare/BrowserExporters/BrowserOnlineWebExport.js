@@ -54,7 +54,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   onlineBuildType: 'web-build',
@@ -129,7 +129,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -152,7 +152,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadBlobFile(
         blobFile,
         uploadOptions,

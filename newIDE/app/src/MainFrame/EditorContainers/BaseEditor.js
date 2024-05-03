@@ -46,8 +46,8 @@ export type RenderEditorContainerProps = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 
   // Opening other editors:
-  onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
+  onOpenExternalEvents: (string) => void,
+  onOpenLayout: (string) => void,
   onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -77,8 +77,8 @@ export type RenderEditorContainerProps = {|
 
   // Other dialogs opening:
   onOpenExampleStore: () => void,
-  onSelectExampleShortHeader: ExampleShortHeader => void,
-  onPreviewPrivateGameTemplateListingData: PrivateGameTemplateListingData => void,
+  onSelectExampleShortHeader: (ExampleShortHeader) => void,
+  onPreviewPrivateGameTemplateListingData: (PrivateGameTemplateListingData) => void,
   onOpenPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -109,6 +109,6 @@ export type RenderEditorContainerProps = {|
 |};
 
 export type RenderEditorContainerPropsWithRef = {|
-  ref: any => any, // TODO - improve the typing of this ref.
+  ref: (any) => any, // TODO - improve the typing of this ref.
   ...RenderEditorContainerProps,
 |};

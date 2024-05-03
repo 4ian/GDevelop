@@ -14,17 +14,14 @@ export default {
 export const Default = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  React.useEffect(
-    () => {
-      if (isLoading) {
-        const timeoutId = setTimeout(() => {
-          setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timeoutId);
-      }
-    },
-    [isLoading]
-  );
+  React.useEffect(() => {
+    if (isLoading) {
+      const timeoutId = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isLoading]);
   return (
     <CloudProjectSaveChoiceDialog
       isLoading={isLoading}

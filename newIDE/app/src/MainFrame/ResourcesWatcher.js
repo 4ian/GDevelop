@@ -45,40 +45,37 @@ const useResourcesWatcher = ({
   const informEditorsResourceExternallyChanged = React.useCallback(
     (resourceInfo: {| identifier: string |}) => {
       ResourcesLoader.burstAllUrlsCache();
-      Object.keys(callbacks).forEach(callbackId =>
+      Object.keys(callbacks).forEach((callbackId) =>
         callbacks[callbackId](resourceInfo)
       );
     },
     []
   );
 
-  React.useEffect(
-    () => {
-      const storageProvider = getStorageProvider();
-      if (
-        storageProvider.internalName === 'LocalFile' &&
-        !watchProjectFolderFilesForLocalProjects
-      ) {
-        return;
-      }
-      if (fileIdentifier && storageProvider.setupResourcesWatcher) {
-        const unsubscribe = storageProvider.setupResourcesWatcher({
-          fileIdentifier,
-          callback: informEditorsResourceExternallyChanged,
-          options: {
-            isProjectSplitInMultipleFiles,
-          },
-        });
-        return unsubscribe;
-      }
-    },
-    [
-      fileIdentifier,
-      informEditorsResourceExternallyChanged,
-      getStorageProvider,
-      watchProjectFolderFilesForLocalProjects,
-      isProjectSplitInMultipleFiles,
-    ]
-  );
+  React.useEffect(() => {
+    const storageProvider = getStorageProvider();
+    if (
+      storageProvider.internalName === 'LocalFile' &&
+      !watchProjectFolderFilesForLocalProjects
+    ) {
+      return;
+    }
+    if (fileIdentifier && storageProvider.setupResourcesWatcher) {
+      const unsubscribe = storageProvider.setupResourcesWatcher({
+        fileIdentifier,
+        callback: informEditorsResourceExternallyChanged,
+        options: {
+          isProjectSplitInMultipleFiles,
+        },
+      });
+      return unsubscribe;
+    }
+  }, [
+    fileIdentifier,
+    informEditorsResourceExternallyChanged,
+    getStorageProvider,
+    watchProjectFolderFilesForLocalProjects,
+    isProjectSplitInMultipleFiles,
+  ]);
 };
 export default useResourcesWatcher;

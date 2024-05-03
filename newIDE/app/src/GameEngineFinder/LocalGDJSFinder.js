@@ -10,16 +10,16 @@ const process = optionalRequire('process');
 var isDarwin = process && /^darwin/.test(process.platform);
 
 const tryPath = (
-  path /*: string*/,
-  onExists /*: string => void*/,
-  onNoAccess /*: Function*/
+  path: string,
+  onExists: (string) => void,
+  onNoAccess: Function
 ) =>
-  fs.access(path, fs.constants.R_OK, err => {
+  fs.access(path, fs.constants.R_OK, (err) => {
     if (!err) onExists(path);
     else onNoAccess();
   });
 
-const findGDJS = () /*: Promise<{|gdjsRoot: string|}> */ => {
+const findGDJS = (): Promise<{| gdjsRoot: string |}> => {
   if (!path || !process || !fs) return Promise.reject(new Error('Unsupported'));
 
   const appPath = app ? app.getAppPath() : process.cwd();
@@ -30,7 +30,7 @@ const findGDJS = () /*: Promise<{|gdjsRoot: string|}> */ => {
   const rootPath = path.join(appPath, pathToRoot);
 
   return new Promise((resolve, reject) => {
-    const onFound = gdjsRoot => resolve({ gdjsRoot });
+    const onFound = (gdjsRoot) => resolve({ gdjsRoot });
     const onNotFound = () => reject(new Error('Could not find GDJS'));
 
     // First try to find GDJS in the parent folder (when newIDE is inside IDE)

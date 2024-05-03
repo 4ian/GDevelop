@@ -62,7 +62,7 @@ type State = {|
 
 export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
-  State
+  State,
 > {
   state = {
     currentTab: 'config',
@@ -73,7 +73,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           objectsContainer.hasObjectNamed(tentativeNewName) ||
           globalObjectsContainer.hasObjectNamed(tentativeNewName) ||
@@ -92,7 +92,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
   _onDeleteGroup = (
     groupWithContext: GroupWithContext,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group } = groupWithContext;
     const {
@@ -121,7 +121,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   _onRenameGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group } = groupWithContext;
     const {

@@ -58,7 +58,7 @@ export const getHierarchyAsArray = (
     }, [])
     .sort((a, b) => a[0] - b[0])
     // $FlowFixMe[incompatible-return] - Object.entries does not keep values types.
-    .map(item => item[1]);
+    .map((item) => item[1]);
 
 export const getHitLastHierarchyLevel = (hit: AlgoliaSearchHit) => {
   const hierarchyArray = getHierarchyAsArray(hit.hierarchy);

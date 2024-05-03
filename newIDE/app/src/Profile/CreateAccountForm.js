@@ -35,17 +35,17 @@ type Props = {|
   onCreateAccount: () => Promise<void>,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   email: string,
-  onChangeEmail: string => void,
+  onChangeEmail: (string) => void,
   password: string,
-  onChangePassword: string => void,
+  onChangePassword: (string) => void,
   username: string,
-  onChangeUsername: string => void,
+  onChangeUsername: (string) => void,
   optInNewsletterEmail: boolean,
-  onChangeOptInNewsletterEmail: boolean => void,
+  onChangeOptInNewsletterEmail: (boolean) => void,
   usernameAvailability: ?UsernameAvailability,
   onChangeUsernameAvailability: (?UsernameAvailability) => void,
   isValidatingUsername: boolean,
-  onChangeIsValidatingUsername: boolean => void,
+  onChangeIsValidatingUsername: (boolean) => void,
   createAccountInProgress: boolean,
   error: ?AuthError,
 |};
@@ -102,7 +102,7 @@ const CreateAccountForm = ({
             onChange={(e, value) => {
               onChangeEmail(value);
             }}
-            onBlur={event => {
+            onBlur={(event) => {
               onChangeEmail(event.currentTarget.value.trim());
             }}
             disabled={createAccountInProgress}

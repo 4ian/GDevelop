@@ -345,24 +345,21 @@ export function AutoScroll({
   // This drop target overlaps with sibling drag source and cancels drag immediately.
   // See: https://github.com/react-dnd/react-dnd/issues/766#issuecomment-388943403
   // Delaying the render of the drop target seems to solve the issue.
-  React.useEffect(
-    () => {
-      if (activateTargets) {
-        delayActivationTimer.current = setTimeout(() => {
-          setShow(true);
-        }, 100);
-      } else {
-        setShow(false);
+  React.useEffect(() => {
+    if (activateTargets) {
+      delayActivationTimer.current = setTimeout(() => {
+        setShow(true);
+      }, 100);
+    } else {
+      setShow(false);
+      clearTimeout(delayActivationTimer.current);
+      delayActivationTimer.current = null;
+    }
+    return () => {
+      delayActivationTimer.current &&
         clearTimeout(delayActivationTimer.current);
-        delayActivationTimer.current = null;
-      }
-      return () => {
-        delayActivationTimer.current &&
-          clearTimeout(delayActivationTimer.current);
-      };
-    },
-    [activateTargets]
-  );
+    };
+  }, [activateTargets]);
 
   return (
     <DnDComponent

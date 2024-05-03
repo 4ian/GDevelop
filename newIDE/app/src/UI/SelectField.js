@@ -10,9 +10,9 @@ import { MarkdownText } from './MarkdownText';
 import { makeStyles } from '@material-ui/core';
 
 const INVALID_VALUE = '';
-const stopPropagation = event => event.stopPropagation();
+const stopPropagation = (event) => event.stopPropagation();
 
-const useSelectStyles = textAlign =>
+const useSelectStyles = (textAlign) =>
   makeStyles({
     root: {
       textAlign: textAlign || 'left',
@@ -70,7 +70,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
   (props, ref) => {
     const inputRef = React.useRef<?HTMLInputElement>(null);
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (inputRef.current) inputRef.current.focus();
     };
 
@@ -83,7 +83,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
 
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
-    const childrenValues = React.Children.map(props.children, child => {
+    const childrenValues = React.Children.map(props.children, (child) => {
       if (child === null || !child.props) return null;
 
       return child.props.value;
@@ -94,7 +94,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
       );
     } else {
       hasValidValue =
-        childrenValues.filter(childValue => childValue === props.value)
+        childrenValues.filter((childValue) => childValue === props.value)
           .length !== 0;
     }
     const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
@@ -122,7 +122,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={
               onChange
-                ? event => {
+                ? (event) => {
                     onChange(event, -1, event.target.value);
                   }
                 : undefined

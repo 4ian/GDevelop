@@ -20,7 +20,7 @@ export const Default = () => (
       <ExtensionFunctionSelectorDialog
         eventsFunctionsExtension={testProject.testEventsFunctionsExtension}
         onCancel={() => action('Cancel')}
-        onChoose={parameters => action('Choose function type', parameters)}
+        onChoose={(parameters) => action('Choose function type', parameters)}
       />
     )}
   </I18n>

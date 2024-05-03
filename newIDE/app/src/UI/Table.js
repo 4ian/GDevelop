@@ -68,7 +68,7 @@ type TableHeaderColumnProps = {|
  */
 export class TableHeaderColumn extends React.Component<
   TableHeaderColumnProps,
-  {||}
+  {||},
 > {
   render() {
     return <MUITableCell {...this.props} />;

@@ -19,16 +19,16 @@ const getList = (
 
   const externalEvents = enumerateExternalEvents(project)
     .filter(
-      externalEvents => externalEvents.getName() !== currentExternalEventName
+      (externalEvents) => externalEvents.getName() !== currentExternalEventName
     )
-    .map(externalEvents => ({
+    .map((externalEvents) => ({
       text: externalEvents.getName(),
       value: externalEvents.getName(),
     }));
 
   const layouts = enumerateLayouts(project)
-    .filter(layout => layout.getName() !== currentSceneName)
-    .map(layout => ({
+    .filter((layout) => layout.getName() !== currentSceneName)
+    .map((layout) => ({
       text: layout.getName(),
       value: layout.getName(),
     }));
@@ -37,7 +37,7 @@ const getList = (
 };
 
 type Props = {|
-  onChange: string => void,
+  onChange: (string) => void,
   value: string,
   project?: gdProject,
   isInline?: boolean,
@@ -49,7 +49,7 @@ type Props = {|
 
 export default class ExternalEventsAutoComplete extends React.Component<
   Props,
-  {||}
+  {||},
 > {
   _field: ?any;
 
@@ -80,7 +80,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
         onApply={onApply}
         dataSource={getList(sceneName, externalEventsName, project)}
         openOnFocus={!isInline}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
       />
     );
   }

@@ -100,7 +100,7 @@ export const hexNumberToRGBString = (hex: number) => {
  * Convert a RGB string ("rrr;ggg;bbb") or a Hex string (#rrggbb) to a RGB string.
  * @param value The color as a RGB string or Hex string
  */
-export const rgbOrHexToRGBString = function(value: string): string {
+export const rgbOrHexToRGBString = function (value: string): string {
   const splitValue = value.split(';');
   // If a RGB string is provided, just return it.
   if (splitValue.length === 3) {

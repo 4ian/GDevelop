@@ -13,7 +13,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function DefaultField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledTextFieldInterface>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({

@@ -41,9 +41,9 @@ type Props = {|
   onLogin: () => void,
   onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   email: string,
-  onChangeEmail: string => void,
+  onChangeEmail: (string) => void,
   password: string,
-  onChangePassword: string => void,
+  onChangePassword: (string) => void,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
@@ -60,10 +60,8 @@ const LoginForm = ({
   loginInProgress,
   error,
 }: Props) => {
-  const [
-    isForgotPasswordDialogOpen,
-    setIsForgotPasswordDialogOpen,
-  ] = React.useState(false);
+  const [isForgotPasswordDialogOpen, setIsForgotPasswordDialogOpen] =
+    React.useState(false);
 
   const accountsExistsWithOtherCredentials = error
     ? error.code === 'auth/account-exists-with-different-credential'
@@ -92,7 +90,7 @@ const LoginForm = ({
               onChange={(e, value) => {
                 onChangeEmail(value);
               }}
-              onBlur={event => {
+              onBlur={(event) => {
                 onChangeEmail(event.currentTarget.value.trim());
               }}
               fullWidth

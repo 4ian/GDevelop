@@ -27,7 +27,7 @@ export type LeaderboardState = {|
     }
   ) => Promise<void>,
   selectLeaderboard: (id: string) => void,
-  setDisplayOnlyBestEntry: boolean => void,
+  setDisplayOnlyBestEntry: (boolean) => void,
   updateLeaderboard: (payload: LeaderboardUpdatePayload) => Promise<void>,
   resetLeaderboard: () => Promise<void>,
   deleteLeaderboard: () => Promise<void>,
@@ -52,7 +52,7 @@ export const initialLeaderboardState = {
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboard: async () => {},
-  deleteLeaderboardEntry: async entryId => {},
+  deleteLeaderboardEntry: async (entryId) => {},
   fetchLeaderboardEntries: async () => {},
 };
 

@@ -28,33 +28,30 @@ export const TutorialStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchTutorials = React.useCallback(
-    () => {
-      // Don't attempt to load again tutorials if they
-      // were loaded already.
-      if (tutorials || isLoading.current) return;
+  const fetchTutorials = React.useCallback(() => {
+    // Don't attempt to load again tutorials if they
+    // were loaded already.
+    if (tutorials || isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const allTutorials: Array<Tutorial> = await listAllTutorials();
+      try {
+        const allTutorials: Array<Tutorial> = await listAllTutorials();
 
-          console.info(
-            `Loaded ${allTutorials ? allTutorials.length : 0} tutorials.`
-          );
-          setTutorials(allTutorials);
-        } catch (error) {
-          console.error(`Unable to load the tutorials:`, error);
-          setError(error);
-        }
+        console.info(
+          `Loaded ${allTutorials ? allTutorials.length : 0} tutorials.`
+        );
+        setTutorials(allTutorials);
+      } catch (error) {
+        console.error(`Unable to load the tutorials:`, error);
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [tutorials, isLoading]
-  );
+      isLoading.current = false;
+    })();
+  }, [tutorials, isLoading]);
 
   const tutorialState = React.useMemo(
     () => ({

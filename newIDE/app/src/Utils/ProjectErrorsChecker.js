@@ -104,7 +104,7 @@ export const displayProjectErrorsBox = (
       ) +
       '\n\n' +
       values(errors)
-        .map(errors =>
+        .map((errors) =>
           errors.map((error: ProjectError) => `- ${error.message}`).join('\n')
         )
         .join('\n'),
@@ -125,16 +125,16 @@ export const displayProjectErrorsBox = (
  * See https://trello.com/c/IiLgNR16/462-add-a-diagnostic-report-to-warn-about-potential-issues-in-the-game-and-show-them-in-the-events-sheet
  */
 export const findAndLogProjectPreviewErrors = (project: gdProject) => {
-  const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
-    project
-  );
+  const problems =
+    gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(project);
   for (let index = 0; index < problems.size(); index++) {
     const problem = problems.at(index);
 
-    const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
-      problem.getSourceObject(),
-      problem.getExpectedBehaviorTypeName()
-    ).toJSArray();
+    const suggestedBehaviorNames =
+      gd.WholeProjectRefactorer.getBehaviorsWithType(
+        problem.getSourceObject(),
+        problem.getExpectedBehaviorTypeName()
+      ).toJSArray();
 
     console.error(
       `Invalid value for required behavior property "${problem.getSourcePropertyName()}" in object ${problem
@@ -144,9 +144,9 @@ export const findAndLogProjectPreviewErrors = (project: gdProject) => {
         .getName()}.`
     );
     console.info(
-      `Expected behavior of type ${problem.getExpectedBehaviorTypeName()}. Possibles values are: ${suggestedBehaviorNames.join(
-        ', '
-      ) || '(none)'}.`
+      `Expected behavior of type ${problem.getExpectedBehaviorTypeName()}. Possibles values are: ${
+        suggestedBehaviorNames.join(', ') || '(none)'
+      }.`
     );
   }
 };

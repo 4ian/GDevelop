@@ -37,7 +37,7 @@ type State = {|
 
 export class ExternalEventsEditorContainer extends React.Component<
   RenderEditorContainerProps,
-  State
+  State,
 > {
   editor: ?EventsSheetInterface;
   resourceExternallyChangedCallbackId: ?string;
@@ -54,9 +54,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   }
 
   componentDidMount() {
-    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
-      this.onResourceExternallyChanged.bind(this)
-    );
+    this.resourceExternallyChangedCallbackId =
+      registerOnResourceExternallyChangedCallback(
+        this.onResourceExternallyChanged.bind(this)
+      );
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -163,7 +164,7 @@ export class ExternalEventsEditorContainer extends React.Component<
       <div style={styles.container}>
         {layout && (
           <EventsSheet
-            ref={editor => (this.editor = editor)}
+            ref={(editor) => (this.editor = editor)}
             setToolbar={this.props.setToolbar}
             onOpenLayout={this.props.onOpenLayout}
             resourceManagementProps={this.props.resourceManagementProps}

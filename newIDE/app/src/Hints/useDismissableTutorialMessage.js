@@ -14,19 +14,15 @@ import TutorialMessage from './TutorialMessage';
  */
 const useDismissableTutorialMessage = (tutorialId: string) => {
   const preferences = React.useContext(PreferencesContext);
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
+  const { currentlyRunningInAppTutorial } =
+    React.useContext(InAppTutorialContext);
   const { tutorials } = React.useContext(TutorialContext);
   const tutorial = getTutorial(preferences, tutorials, tutorialId);
 
-  const DismissableTutorialMessage = React.useMemo(
-    () => {
-      if (!tutorial || currentlyRunningInAppTutorial) return null;
-      return <TutorialMessage tutorial={tutorial} />;
-    },
-    [tutorial, currentlyRunningInAppTutorial]
-  );
+  const DismissableTutorialMessage = React.useMemo(() => {
+    if (!tutorial || currentlyRunningInAppTutorial) return null;
+    return <TutorialMessage tutorial={tutorial} />;
+  }, [tutorial, currentlyRunningInAppTutorial]);
 
   return {
     DismissableTutorialMessage,

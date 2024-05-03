@@ -21,7 +21,8 @@ const isDev = Window.isDev();
 const authenticationPortalUrl = 'https://auth.gdevelop.io';
 
 class BrowserLoginProvider
-  implements LoginProvider, FirebaseBasedLoginProvider {
+  implements LoginProvider, FirebaseBasedLoginProvider
+{
   auth: Auth;
   constructor(auth: Auth) {
     this.auth = auth;
@@ -77,7 +78,7 @@ class BrowserLoginProvider
         `<style>body { margin: 0; }</style><div style="height: 100vh; display: flex; justify-content: center; align-items: center; color: #F5F5F7; background-color: #25252E; font-family: 'Verdana', 'Fira Sans', 'Open Sans', 'Lucida Sans'; font-size: 20px">Loading</div>`
       );
       setupAuthenticationWebSocket({
-        onConnectionEstablished: connectionId => {
+        onConnectionEstablished: (connectionId) => {
           if (signal && signal.aborted) return;
           const url = new URL(authenticationPortalUrl);
           url.searchParams.set('connection-id', connectionId);
@@ -100,13 +101,13 @@ class BrowserLoginProvider
               provider === 'google'
                 ? GoogleAuthProvider.credential(data.credential)
                 : provider === 'github'
-                ? GithubAuthProvider.credential(data.accessToken)
-                : new OAuthProvider('apple.com').credential({
-                    idToken: data.id_token,
-                    // Typescript types declaration indicates the parameter `rawNonce` should be
-                    // set but it only works with `nonce`.
-                    nonce: data.raw_nonce,
-                  });
+                  ? GithubAuthProvider.credential(data.accessToken)
+                  : new OAuthProvider('apple.com').credential({
+                      idToken: data.id_token,
+                      // Typescript types declaration indicates the parameter `rawNonce` should be
+                      // set but it only works with `nonce`.
+                      nonce: data.raw_nonce,
+                    });
             await signInWithCredential(this.auth, credential);
             if (authWindow) {
               authWindow.close();
@@ -121,7 +122,7 @@ class BrowserLoginProvider
             reject(error);
           }
         },
-        onError: error => {
+        onError: (error) => {
           if (signal && signal.aborted) return;
           terminateWebSocket();
           console.error(

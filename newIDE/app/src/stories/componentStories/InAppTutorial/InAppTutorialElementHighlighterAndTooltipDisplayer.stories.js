@@ -65,19 +65,16 @@ const elementIdToShowQuitButton = {
 export const Default = () => {
   const [listItemRef, setListItemRef] = React.useState<any>(null);
   const [elementToHighlight, setElementToHighlight] = React.useState<any>(null);
-  const [textFieldValue, setTextFieldValue] = React.useState<string>(
-    'Object.Variable'
-  );
+  const [textFieldValue, setTextFieldValue] =
+    React.useState<string>('Object.Variable');
   const [searchValue, setSearchValue] = React.useState<string>('Search me');
   const [multilineInputValue, setMultilineInputValue] = React.useState<string>(
     "First layout\nThis is what we're gonna do"
   );
-  const [
-    elementToHighlightId,
-    setElementToHighlightId,
-  ] = React.useState<string>('#add-parameter-button');
+  const [elementToHighlightId, setElementToHighlightId] =
+    React.useState<string>('#add-parameter-button');
 
-  const handleSelect = event => {
+  const handleSelect = (event) => {
     const {
       target: { value },
     } = event;
@@ -87,16 +84,13 @@ export const Default = () => {
     }
   };
 
-  React.useEffect(
-    () => {
-      if (elementToHighlightId.startsWith('#')) {
-        setElementToHighlight(
-          queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
-        );
-      }
-    },
-    [elementToHighlightId]
-  );
+  React.useEffect(() => {
+    if (elementToHighlightId.startsWith('#')) {
+      setElementToHighlight(
+        queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+      );
+    }
+  }, [elementToHighlightId]);
 
   return (
     <>
@@ -171,7 +165,7 @@ export const Default = () => {
                   <ListItem primaryText="Choice paradox hits" />
                   <ListItem
                     primaryText="I want this one"
-                    ref={ref => setListItemRef(ref)}
+                    ref={(ref) => setListItemRef(ref)}
                   />
                   <ListItem primaryText="Why not me?" />
                   <ListItem primaryText="There's a choice to do?" />

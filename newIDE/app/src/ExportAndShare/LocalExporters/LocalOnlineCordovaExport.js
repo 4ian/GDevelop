@@ -52,7 +52,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   onlineBuildType: 'cordova-build',
@@ -76,7 +76,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: props => <SetupExportHeader {...props} />,
+  renderHeader: (props) => <SetupExportHeader {...props} />,
 
   shouldSuggestBumpingVersionNumber: () => true,
 
@@ -167,7 +167,7 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     outputFile: CompressionOutput
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadLocalFile(
         outputFile,
         uploadOptions,

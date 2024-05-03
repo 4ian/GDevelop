@@ -27,11 +27,11 @@ const toPascalCase = (str: string) => {
   return str
     .replace(/^[^A-Za-z0-9]*|[^A-Za-z0-9]*$/g, '$')
     .replace(/[^A-Za-z0-9]+/g, '$')
-    .replace(/([a-z])([A-Z])/g, function(m, a, b) {
+    .replace(/([a-z])([A-Z])/g, function (m, a, b) {
       return a + '$' + b;
     })
     .toLowerCase()
-    .replace(/(\$)(\w?)/g, function(m, a, b) {
+    .replace(/(\$)(\w?)/g, function (m, a, b) {
       return b.toUpperCase();
     });
 };
@@ -95,9 +95,8 @@ export const installResource = (
           resourceOriginIdentifier
         )
       : '';
-  const existingResourceNameWithSameFile = resourcesManager.getResourceNameWithFile(
-    resourceFileUrl
-  );
+  const existingResourceNameWithSameFile =
+    resourcesManager.getResourceNameWithFile(resourceFileUrl);
 
   if (existingResourceNameFromSameOrigin) {
     // There is a resource with the same origin, use it.
@@ -142,7 +141,7 @@ export const installResource = (
     );
   }
 
-  const newName = newNameGenerator(originalResourceName, name =>
+  const newName = newNameGenerator(originalResourceName, (name) =>
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
@@ -173,13 +172,13 @@ export const addAssetToProject = async ({
   const createdObjects: Array<gdObject> = [];
 
   // Create objects (and their behaviors)
-  asset.objectAssets.forEach(objectAsset => {
+  asset.objectAssets.forEach((objectAsset) => {
     const type: ?string = objectAsset.object.type;
     if (!type) throw new Error('An object has no type specified');
 
     // Insert the object
     const originalName = sanitizeObjectName(objectAsset.object.name);
-    const newName = newNameGenerator(originalName, name =>
+    const newName = newNameGenerator(originalName, (name) =>
       objectsContainer.hasObjectNamed(name)
     );
     const object = objectsContainer.insertNewObject(
@@ -202,7 +201,7 @@ export const addAssetToProject = async ({
     object.setName(newName);
 
     // Add resources used by the object
-    objectAsset.resources.forEach(serializedResource => {
+    objectAsset.resources.forEach((serializedResource) => {
       installResource(project, asset, serializedResource, resourceNewNames);
     });
 
@@ -240,7 +239,7 @@ export const getRequiredExtensionsFromAsset = (
   return uniqBy(
     flatten(
       asset.objectAssets.map(
-        objectAsset => objectAsset.requiredExtensions || []
+        (objectAsset) => objectAsset.requiredExtensions || []
       )
     ),
     ({ extensionName }) => extensionName
@@ -253,12 +252,12 @@ const filterMissingExtensions = (
 ): Array<ExtensionShortHeader> => {
   const loadedExtensionNames = mapVector(
     gd.asPlatform(gd.JsPlatform.get()).getAllPlatformExtensions(),
-    extension => {
+    (extension) => {
       return extension.getName();
     }
   );
 
-  return requiredExtensions.filter(extension => {
+  return requiredExtensions.filter((extension) => {
     return !loadedExtensionNames.includes(extension.name);
   });
 };
@@ -300,7 +299,7 @@ export const installRequiredExtensions = async ({
     : missingExtensionShortHeaders;
 
   const serializedExtensions = await Promise.all(
-    uniq(neededExtensions).map(extensionShortHeader =>
+    uniq(neededExtensions).map((extensionShortHeader) =>
       getExtension(extensionShortHeader)
     )
   );
@@ -318,7 +317,9 @@ export const installRequiredExtensions = async ({
   if (stillMissingExtensions.length) {
     throw new Error(
       'These extensions could not be installed: ' +
-        missingExtensionShortHeaders.map(extension => extension.name).join(', ')
+        missingExtensionShortHeaders
+          .map((extension) => extension.name)
+          .join(', ')
     );
   }
 };
@@ -333,16 +334,15 @@ export const addSerializedExtensionsToProject = (
   serializedExtensions: Array<SerializedExtension>,
   fromExtensionStore: boolean = true
 ): Promise<void> => {
-  serializedExtensions.forEach(serializedExtension => {
+  serializedExtensions.forEach((serializedExtension) => {
     const { name } = serializedExtension;
     if (!name)
       return Promise.reject(new Error('Malformed extension (missing name).'));
 
-    const newEventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
-      name
-    )
-      ? project.getEventsFunctionsExtension(name)
-      : project.insertNewEventsFunctionsExtension(name, 0);
+    const newEventsFunctionsExtension =
+      project.hasEventsFunctionsExtensionNamed(name)
+        ? project.getEventsFunctionsExtension(name)
+        : project.insertNewEventsFunctionsExtension(name, 0);
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,
@@ -381,9 +381,9 @@ export const checkRequiredExtensionsUpdate = async ({
   const extensionsRegistry = await getExtensionsRegistry();
 
   const requiredExtensionShortHeaders = requiredExtensions.map(
-    requiredExtension => {
+    (requiredExtension) => {
       const extensionShortHeader = extensionsRegistry.headers.find(
-        extensionShortHeader => {
+        (extensionShortHeader) => {
           return extensionShortHeader.name === requiredExtension.extensionName;
         }
       );
@@ -400,7 +400,7 @@ export const checkRequiredExtensionsUpdate = async ({
   );
 
   const outOfDateExtensionShortHeaders = requiredExtensionShortHeaders.filter(
-    requiredExtensionShortHeader =>
+    (requiredExtensionShortHeader) =>
       project.hasEventsFunctionsExtensionNamed(
         requiredExtensionShortHeader.name
       ) &&
@@ -431,18 +431,20 @@ export const checkRequiredExtensionsUpdateForAssets = async ({
   project,
 }: CheckRequiredExtensionsForAssetsArgs): Promise<RequiredExtensionInstallation> => {
   const requiredExtensions: Array<RequiredExtension> = [];
-  assets.forEach(asset => {
-    getRequiredExtensionsFromAsset(asset).forEach(requiredExtensionForAsset => {
-      if (
-        !requiredExtensions.some(
-          requiredExtension =>
-            requiredExtension.extensionName ===
-            requiredExtensionForAsset.extensionName
-        )
-      ) {
-        requiredExtensions.push(requiredExtensionForAsset);
+  assets.forEach((asset) => {
+    getRequiredExtensionsFromAsset(asset).forEach(
+      (requiredExtensionForAsset) => {
+        if (
+          !requiredExtensions.some(
+            (requiredExtension) =>
+              requiredExtension.extensionName ===
+              requiredExtensionForAsset.extensionName
+          )
+        ) {
+          requiredExtensions.push(requiredExtensionForAsset);
+        }
       }
-    });
+    );
   });
 
   return checkRequiredExtensionsUpdate({ requiredExtensions, project });

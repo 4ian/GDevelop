@@ -38,7 +38,7 @@ const StringArrayEditor = ({
               disabled={disabled}
               commitOnBlur
               value={item}
-              onChange={text => {
+              onChange={(text) => {
                 extraInfo[index] = text;
                 updateExtraInfo();
               }}

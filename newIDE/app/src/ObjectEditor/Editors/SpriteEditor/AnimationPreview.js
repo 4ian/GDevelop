@@ -45,7 +45,7 @@ type Props = {|
   getImageResourceSource: (resourceName: string) => string,
   isImageResourceSmooth: (resourceName: string) => boolean,
   timeBetweenFrames: number,
-  onChangeTimeBetweenFrames?: number => void,
+  onChangeTimeBetweenFrames?: (number) => void,
   isLooping: boolean,
   hideCheckeredBackground?: boolean,
   deactivateControls?: boolean,
@@ -92,23 +92,19 @@ const AnimationPreview = ({
   );
   const loaderTimeout = React.useRef<?TimeoutID>(null);
 
-  const [isStillLoadingResources, setIsStillLoadingResources] = React.useState(
-    true
-  );
+  const [isStillLoadingResources, setIsStillLoadingResources] =
+    React.useState(true);
 
   // When outside variables change, we need to update the animation callback.
-  React.useEffect(
-    () => {
-      if (isLooping !== isLoopingRef.current) {
-        isLoopingRef.current = isLooping;
-      }
-      if (animationName !== animationNameRef.current) {
-        animationNameRef.current = animationName;
-        imagesLoadedArray.current = new Array(resourceNames.length).fill(false);
-      }
-    },
-    [timeBetweenFrames, isLooping, animationName, resourceNames]
-  );
+  React.useEffect(() => {
+    if (isLooping !== isLoopingRef.current) {
+      isLoopingRef.current = isLooping;
+    }
+    if (animationName !== animationNameRef.current) {
+      animationNameRef.current = animationName;
+      imagesLoadedArray.current = new Array(resourceNames.length).fill(false);
+    }
+  }, [timeBetweenFrames, isLooping, animationName, resourceNames]);
 
   const replay = () => {
     currentFrameIndexRef.current = 0;
@@ -192,36 +188,30 @@ const AnimationPreview = ({
     [forceUpdate, resourceNames]
   );
 
-  React.useEffect(
-    () => {
-      requestRef.current = requestAnimationFrame(updateAnimation);
-      return () => {
-        if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      };
-    },
-    [updateAnimation]
-  );
+  React.useEffect(() => {
+    requestRef.current = requestAnimationFrame(updateAnimation);
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    };
+  }, [updateAnimation]);
 
-  const onImageLoaded = React.useCallback(
-    () => {
-      imagesLoadedArray.current[currentFrameIndexRef.current] = true;
-      // When the array of loaders changes, decide if we display the loader or not.
-      // If all images are loaded, then hide loader for instant display.
-      const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
-        hasImageLoaded => !hasImageLoaded
-      );
-      if (hasFinishedLoadingAllResources) {
-        setIsStillLoadingResources(false);
-      }
-      // Image has loaded, so cancel the timeout if it was set.
-      if (loaderTimeout.current) {
-        clearTimeout(loaderTimeout.current);
-        loaderTimeout.current = null;
-      }
-      forceUpdate();
-    },
-    [forceUpdate]
-  );
+  const onImageLoaded = React.useCallback(() => {
+    imagesLoadedArray.current[currentFrameIndexRef.current] = true;
+    // When the array of loaders changes, decide if we display the loader or not.
+    // If all images are loaded, then hide loader for instant display.
+    const hasFinishedLoadingAllResources = !imagesLoadedArray.current.some(
+      (hasImageLoaded) => !hasImageLoaded
+    );
+    if (hasFinishedLoadingAllResources) {
+      setIsStillLoadingResources(false);
+    }
+    // Image has loaded, so cancel the timeout if it was set.
+    if (loaderTimeout.current) {
+      clearTimeout(loaderTimeout.current);
+      loaderTimeout.current = null;
+    }
+    forceUpdate();
+  }, [forceUpdate]);
 
   // When changing animation, the index can be out of bounds, so reset the animation.
   if (currentFrameIndexRef.current >= resourceNames.length) {
@@ -268,7 +258,7 @@ const AnimationPreview = ({
                 commitOnBlur
                 margin="none"
                 value={fps.toString()}
-                onChange={text => {
+                onChange={(text) => {
                   if (!text) return;
                   const newFps = Number.parseFloat(text);
                   if (newFps > 0) {
@@ -294,7 +284,7 @@ const AnimationPreview = ({
                   timeBetweenFramesRef.current,
                   6
                 )}
-                onChange={text => {
+                onChange={(text) => {
                   if (!text) return;
                   const time = Number.parseFloat(text);
                   if (time > 0) {

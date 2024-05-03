@@ -38,9 +38,8 @@ type Props = {|
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
   const [currentTab, setCurrentTab] = React.useState('preferences');
-  const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
-    false
-  );
+  const [languageDidChange, setLanguageDidChange] =
+    React.useState<boolean>(false);
   const {
     values,
     setThemeName,
@@ -125,7 +124,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               onChange={(e, i, value: string) => setThemeName(value)}
               fullWidth
             >
-              {Object.keys(themes).map(themeName => (
+              {Object.keys(themes).map((themeName) => (
                 <SelectOption
                   value={themeName}
                   label={themeName}
@@ -139,7 +138,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               onChange={(e, i, value: string) => setCodeEditorThemeName(value)}
               fullWidth
             >
-              {getAllThemes().map(codeEditorTheme => (
+              {getAllThemes().map((codeEditorTheme) => (
                 <SelectOption
                   value={codeEditorTheme.themeName}
                   label={codeEditorTheme.name}

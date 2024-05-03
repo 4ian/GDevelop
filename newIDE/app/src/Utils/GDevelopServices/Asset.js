@@ -197,19 +197,19 @@ export const listAllPublicAssets = async ({
   const responsesData = await Promise.all([
     client
       .get(assetShortHeadersUrl)
-      .then(response => response.data)
-      .catch(e => e),
+      .then((response) => response.data)
+      .catch((e) => e),
     client
       .get(filtersUrl)
-      .then(response => response.data)
-      .catch(e => e),
+      .then((response) => response.data)
+      .catch((e) => e),
     client
       .get(assetPacksUrl)
-      .then(response => response.data)
-      .catch(e => e),
+      .then((response) => response.data)
+      .catch((e) => e),
   ]);
 
-  if (responsesData.some(data => !data || data instanceof Error)) {
+  if (responsesData.some((data) => !data || data instanceof Error)) {
     throw new Error('Unexpected response from the assets endpoints.');
   }
 
@@ -256,9 +256,7 @@ export const getPrivateAsset = async (
   if (!privateAssetPackId) {
     throw new Error('The asset does not have a private asset pack id.');
   }
-  const assetUrl = `${
-    GDevelopPrivateAssetsStorage.baseUrl
-  }/${privateAssetPackId}/${assetShortHeader.id}.json`;
+  const assetUrl = `${GDevelopPrivateAssetsStorage.baseUrl}/${privateAssetPackId}/${assetShortHeader.id}.json`;
   const authorizedUrl = createProductAuthorizedUrl(
     assetUrl,
     authorizationToken
@@ -271,9 +269,7 @@ export const getPrivateAssetPackAudioFilesArchiveUrl = (
   privateAssetPackId: string,
   authorizationToken: string
 ): string => {
-  const assetUrl = `${
-    GDevelopPrivateAssetsStorage.baseUrl
-  }/${privateAssetPackId}/resources/audio.zip`;
+  const assetUrl = `${GDevelopPrivateAssetsStorage.baseUrl}/${privateAssetPackId}/resources/audio.zip`;
   const authorizedUrl = createProductAuthorizedUrl(
     assetUrl,
     authorizationToken
@@ -292,14 +288,14 @@ export const listAllResources = ({
         environment,
       },
     })
-    .then(response => response.data)
+    .then((response) => response.data)
     .then(({ resourcesUrl, filtersUrl }) => {
       if (!resourcesUrl || !filtersUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
       return Promise.all([
-        client.get(resourcesUrl).then(response => response.data),
-        client.get(filtersUrl).then(response => response.data),
+        client.get(resourcesUrl).then((response) => response.data),
+        client.get(filtersUrl).then((response) => response.data),
       ]).then(([resources, filters]) => {
         if (!resources || !filters) {
           throw new Error('Unexpected response from the resources endpoints.');
@@ -323,13 +319,13 @@ export const listAllAuthors = ({
         environment,
       },
     })
-    .then(response => response.data)
+    .then((response) => response.data)
     .then(({ authorsUrl }) => {
       if (!authorsUrl)
         throw new Error('Unexpected response from author endpoint.');
       return client.get(authorsUrl);
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const listAllLicenses = ({
@@ -343,13 +339,13 @@ export const listAllLicenses = ({
         environment,
       },
     })
-    .then(response => response.data)
+    .then((response) => response.data)
     .then(({ licensesUrl }) => {
       if (!licensesUrl)
         throw new Error('Unexpected response from license endpoint.');
       return client.get(licensesUrl);
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getPrivateAssetPack = async (
@@ -392,9 +388,7 @@ export const createPrivateGameTemplateUrl = async (
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   authorizationToken: string
 ): Promise<string> => {
-  const gameTemplateUrl = `${GDevelopPrivateGameTemplatesStorage.baseUrl}/${
-    privateGameTemplateListingData.id
-  }/game.json`;
+  const gameTemplateUrl = `${GDevelopPrivateGameTemplatesStorage.baseUrl}/${privateGameTemplateListingData.id}/game.json`;
   const authorizedUrl = createProductAuthorizedUrl(
     gameTemplateUrl,
     authorizationToken
@@ -405,7 +399,7 @@ export const createPrivateGameTemplateUrl = async (
 export const isPixelArt = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
-  return assetOrAssetShortHeader.tags.some(tag => {
+  return assetOrAssetShortHeader.tags.some((tag) => {
     return tag.toLowerCase() === 'pixel art';
   });
 };
@@ -468,7 +462,7 @@ export const listReceivedGameTemplates = async (
 export const isPublicAssetResourceUrl = (url: string) =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
-const escapeStringForRegExp = string =>
+const escapeStringForRegExp = (string) =>
   string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 const resourceFilenameRegex = new RegExp(
   `(${escapeStringForRegExp(

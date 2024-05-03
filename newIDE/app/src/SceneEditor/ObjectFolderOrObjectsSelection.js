@@ -11,19 +11,19 @@ export const cleanNonExistingObjectFolderOrObjectWithContexts = (
   const allObjectFolderOrObjectPtrs = new Set<number>();
   mapVector(
     objectsContainer.getAllObjectFolderOrObjects(),
-    objectFolderOrObject => {
+    (objectFolderOrObject) => {
       allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
     }
   );
   mapVector(
     globalObjectsContainer.getAllObjectFolderOrObjects(),
-    objectFolderOrObject => {
+    (objectFolderOrObject) => {
       allObjectFolderOrObjectPtrs.add(gd.getPointer(objectFolderOrObject));
     }
   );
 
   return objectFolderOrObjectWithContexts.filter(
-    objectFolderOrObjectWithContext =>
+    (objectFolderOrObjectWithContext) =>
       allObjectFolderOrObjectPtrs.has(
         gd.getPointer(objectFolderOrObjectWithContext.objectFolderOrObject)
       )

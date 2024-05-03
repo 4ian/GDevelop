@@ -53,11 +53,11 @@ export default class ElementWithMenu extends React.Component<Props, State> {
           onContextMenu: this.open,
           // $FlowFixMe - Flow complaining about using too much spread operators
           ...(openMenuWithSecondaryClick ? {} : { onClick: this.open }),
-          ref: wrappedElement => (this._wrappedElement = wrappedElement),
+          ref: (wrappedElement) => (this._wrappedElement = wrappedElement),
           ...(passExtraProps ? otherProps : {}),
         })}
         <ContextMenu
-          ref={contextMenu => (this._contextMenu = contextMenu)}
+          ref={(contextMenu) => (this._contextMenu = contextMenu)}
           buildMenuTemplate={buildMenuTemplate}
         />
       </React.Fragment>

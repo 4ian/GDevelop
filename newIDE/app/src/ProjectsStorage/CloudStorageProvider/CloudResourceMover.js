@@ -59,15 +59,14 @@ export const moveUrlResourcesToCloudProject = async ({
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const resourceToFetchAndUpload: Array<ResourceToFetchAndUpload> = [];
 
-    const tokenForPrivateGameTemplateAuthorization = await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded(
-      {
+    const tokenForPrivateGameTemplateAuthorization =
+      await fetchTokenForPrivateGameTemplateAuthorizationIfNeeded({
         authenticatedUser,
-        allResourcePaths: allResourceNames.map(resourceName => {
+        allResourcePaths: allResourceNames.map((resourceName) => {
           const resource = resourcesManager.getResource(resourceName);
           return resource.getFile();
         }),
-      }
-    );
+      });
 
     await PromisePool.withConcurrency(50)
       .for(allResourceNames)
@@ -91,9 +90,8 @@ export const moveUrlResourcesToCloudProject = async ({
             resourceToFetchAndUpload.push({
               resource,
               url: resourceFile,
-              filename: extractDecodedFilenameFromProjectResourceUrl(
-                resourceFile
-              ),
+              filename:
+                extractDecodedFilenameFromProjectResourceUrl(resourceFile),
             });
           } else if (
             isPrivateGameTemplateResourceAuthorizedUrl(resourceFile) &&
@@ -110,9 +108,10 @@ export const moveUrlResourcesToCloudProject = async ({
             resourceToFetchAndUpload.push({
               resource,
               url: encodedResourceUrl,
-              filename: extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
-                resourceFile
-              ),
+              filename:
+                extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
+                  resourceFile
+                ),
             });
           } else if (isBlobURL(resourceFile)) {
             result.erroredResources.push({
@@ -148,7 +147,7 @@ export const moveUrlResourcesToCloudProject = async ({
 
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
-    ItemResult<ResourceToFetchAndUpload>
+    ItemResult<ResourceToFetchAndUpload>,
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -172,14 +171,15 @@ export const moveUrlResourcesToCloudProject = async ({
 
   // Upload the files just downloaded, for the new project.
   await getCredentialsForCloudProject(authenticatedUser, newCloudProjectId);
-  const uploadedProjectResourceFiles: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
-    authenticatedUser,
-    newCloudProjectId,
-    downloadedFilesAndResourcesToUpload.map(({ file }) => file),
-    (count, total) => {
-      onProgress(total + count, total * 2);
-    }
-  );
+  const uploadedProjectResourceFiles: UploadedProjectResourceFiles =
+    await uploadProjectResourceFiles(
+      authenticatedUser,
+      newCloudProjectId,
+      downloadedFilesAndResourcesToUpload.map(({ file }) => file),
+      (count, total) => {
+        onProgress(total + count, total * 2);
+      }
+    );
 
   // Update resources with the newly created URLs.
   uploadedProjectResourceFiles.forEach(({ url, error }, index) => {

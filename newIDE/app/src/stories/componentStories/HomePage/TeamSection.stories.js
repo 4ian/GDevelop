@@ -143,7 +143,7 @@ const MockTeamProvider = ({
   const [members, setMembers] = React.useState<?(User[])>(initialMembers);
   const [memberships, setMemberships] = React.useState<Array<TeamMembership>>(
     noGroups
-      ? initialMemberships.map(membership => ({
+      ? initialMemberships.map((membership) => ({
           userId: membership.userId,
           teamId: membership.teamId,
           createdAt: membership.createdAt,
@@ -191,7 +191,9 @@ const MockTeamProvider = ({
       throw new Error('Group name change error');
     }
     const newGroups = [...groups];
-    const foundGroupIndex = groups.findIndex(_group => _group.id === group.id);
+    const foundGroupIndex = groups.findIndex(
+      (_group) => _group.id === group.id
+    );
     if (foundGroupIndex === -1) return;
     await delay(1000);
     newGroups[foundGroupIndex].name = newName;
@@ -205,7 +207,7 @@ const MockTeamProvider = ({
       throw new Error('User group change error');
     }
     const membershipToChangeIndex = memberships.findIndex(
-      membership => membership.userId === user.id
+      (membership) => membership.userId === user.id
     );
     if (
       membershipToChangeIndex === -1 ||
@@ -222,7 +224,7 @@ const MockTeamProvider = ({
 
   const deleteGroup = async (group: TeamGroup) => {
     await delay(1000);
-    setGroups(groups => groups.filter(group_ => group_.id !== group.id));
+    setGroups((groups) => groups.filter((group_) => group_.id !== group.id));
   };
 
   const createGroup = async (attributes: {| name: string |}) => {
@@ -233,7 +235,7 @@ const MockTeamProvider = ({
 
   const refreshMembers = async () => {
     await delay(800);
-    setMembers(members => {
+    setMembers((members) => {
       if (!members) return members;
       const chosenMemberIndex = Math.floor(Math.random() * members.length);
       const newMembers = [...members];

@@ -46,7 +46,7 @@ export type MainMenuCallbacks = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
-  setElectronUpdateStatus: ElectronUpdateStatus => void,
+  setElectronUpdateStatus: (ElectronUpdateStatus) => void,
 |};
 
 export type MainMenuExtraCallbacks = {|
@@ -140,7 +140,7 @@ export const buildMainMenuDeclarativeTemplate = ({
         label: i18n._(t`Open Recent`),
         submenu:
           recentProjectFiles.length > 0
-            ? recentProjectFiles.map(item => ({
+            ? recentProjectFiles.map((item) => ({
                 label: item.fileMetadata.fileIdentifier,
                 onClickSendEvent: 'main-menu-open-recent',
                 eventArgs: item,
@@ -449,7 +449,7 @@ export const adaptFromDeclarativeTemplate = (
       return {
         ...menuItemTemplateRest,
         click: hasOnClick
-          ? function() {
+          ? function () {
               if (menuItemTemplate.onClickSendEvent) {
                 const mainMenuEvent = menuItemTemplate.onClickSendEvent;
                 const callback = getMainMenuEventCallback(

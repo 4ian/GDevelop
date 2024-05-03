@@ -57,7 +57,7 @@ export default class LocalEventsFunctionsExtensionWriter {
     filepath: string
   ): Promise<void> => {
     const serializedObject = serializeToJSObject(extension);
-    return writeJSONFile(serializedObject, filepath).catch(err => {
+    return writeJSONFile(serializedObject, filepath).catch((err) => {
       console.error('Unable to write the events function extension:', err);
       throw err;
     });

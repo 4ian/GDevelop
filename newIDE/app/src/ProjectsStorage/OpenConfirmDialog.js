@@ -65,9 +65,8 @@ export const OpenConfirmDialog = ({
 
 export const useOpenConfirmDialog = () => {
   const interactionMade = React.useRef(false);
-  const pendingConfirmationPromiseResolve = React.useRef<?(boolean) => void>(
-    null
-  );
+  const pendingConfirmationPromiseResolve =
+    React.useRef<?(boolean) => void>(null);
   const [openConfirmDialogOpen, openOpenConfirmDialog] = React.useState(false);
 
   return {
@@ -80,7 +79,7 @@ export const useOpenConfirmDialog = () => {
     ensureInteractionHappened: (
       storageProviderOperations: StorageProviderOperations
     ): Promise<boolean> => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (
           interactionMade.current ||
           !storageProviderOperations.doesInitialOpenRequireUserInteraction

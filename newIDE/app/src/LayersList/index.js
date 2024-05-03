@@ -28,7 +28,7 @@ type LayersListBodyProps = {|
   project: gdProject,
   layersContainer: gdLayout,
   selectedLayer: string,
-  onSelectLayer: string => void,
+  onSelectLayer: (string) => void,
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
   onLayerRenamed: () => void,
@@ -42,8 +42,8 @@ const getEffectsCount = (platform: gdPlatform, layer: gdLayer) => {
   return layer.getRenderingType() === '2d'
     ? getEffects2DCount(platform, effectsContainer)
     : layer.getRenderingType() === '3d'
-    ? getEffects3DCount(platform, effectsContainer)
-    : effectsContainer.getEffectsCount();
+      ? getEffects3DCount(platform, effectsContainer)
+      : effectsContainer.getEffectsCount();
 };
 
 const LayersListBody = (props: LayersListBodyProps) => {
@@ -65,13 +65,10 @@ const LayersListBody = (props: LayersListBodyProps) => {
     unsavedChanges,
   } = props;
 
-  const onLayerModified = React.useCallback(
-    () => {
-      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-      forceUpdate();
-    },
-    [forceUpdate, unsavedChanges]
-  );
+  const onLayerModified = React.useCallback(() => {
+    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+    forceUpdate();
+  }, [forceUpdate, unsavedChanges]);
 
   const onDropLayer = React.useCallback(
     (targetIndex: number) => {
@@ -91,7 +88,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
   );
 
   const layersCount = layersContainer.getLayersCount();
-  const containerLayersList = mapReverseFor(0, layersCount, i => {
+  const containerLayersList = mapReverseFor(0, layersCount, (i) => {
     const layer = layersContainer.getLayerAt(i);
     const layerName = layer.getName();
 
@@ -110,8 +107,8 @@ const LayersListBody = (props: LayersListBodyProps) => {
           draggedLayerIndexRef.current = i;
         }}
         onDrop={() => onDropLayer(i)}
-        onBlur={newName => {
-          setNameErrors(currentValue => ({
+        onBlur={(newName) => {
+          setNameErrors((currentValue) => ({
             ...currentValue,
             [layerName]: null,
           }));
@@ -120,7 +117,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
           const isNameAlreadyTaken = layersContainer.hasLayerNamed(newName);
           if (isNameAlreadyTaken) {
-            setNameErrors(currentValue => ({
+            setNameErrors((currentValue) => ({
               ...currentValue,
               [layerName]: <Trans>The name {newName} is already taken</Trans>,
             }));
@@ -137,7 +134,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
           }
         }}
         onRemove={() => {
-          onRemoveLayer(layerName, doRemove => {
+          onRemoveLayer(layerName, (doRemove) => {
             if (!doRemove) return;
 
             layersContainer.removeLayer(layerName);
@@ -145,12 +142,12 @@ const LayersListBody = (props: LayersListBodyProps) => {
           });
         }}
         isVisible={layer.getVisibility()}
-        onChangeVisibility={visible => {
+        onChangeVisibility={(visible) => {
           layer.setVisibility(visible);
           onLayerModified();
         }}
         isLocked={layer.isLocked()}
-        onChangeLockState={isLocked => {
+        onChangeLockState={(isLocked) => {
           layer.setLocked(isLocked);
           onLayerModified();
         }}
@@ -194,7 +191,7 @@ const LayersListBody = (props: LayersListBodyProps) => {
 type Props = {|
   project: gdProject,
   selectedLayer: string,
-  onSelectLayer: string => void,
+  onSelectLayer: (string) => void,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
@@ -214,7 +211,7 @@ export type LayersListInterface = {|
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
   return (
-    mapReverseFor(0, layersCount, i =>
+    mapReverseFor(0, layersCount, (i) =>
       layout.getLayerAt(i).isLightingLayer()
     ).filter(Boolean).length > 0
   );
@@ -230,7 +227,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
 
     const addLayer = () => {
       const { layersContainer } = props;
-      const name = newNameGenerator('Layer', name =>
+      const name = newNameGenerator('Layer', (name) =>
         layersContainer.hasLayerNamed(name)
       );
       layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
@@ -243,7 +240,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
 
     const addLightingLayer = () => {
       const { layersContainer } = props;
-      const name = newNameGenerator('Lighting', name =>
+      const name = newNameGenerator('Lighting', (name) =>
         layersContainer.hasLayerNamed(name)
       );
       layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
@@ -296,7 +293,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
                 primary
                 onClick={addLayer}
                 icon={<Add />}
-                buildMenuTemplate={i18n => [
+                buildMenuTemplate={(i18n) => [
                   {
                     label: i18n._(t`Add lighting layer`),
                     enabled: !isLightingLayerPresent,
@@ -314,7 +311,7 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
 
 const LayersListWithErrorBoundary = React.forwardRef<
   Props,
-  LayersListInterface
+  LayersListInterface,
 >((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Layers list</Trans>}

@@ -135,26 +135,18 @@ const LearnSection = ({
     error: tutorialLoadingError,
   } = React.useContext(TutorialContext);
 
-  React.useEffect(
-    () => {
-      fetchTutorials();
-    },
-    [fetchTutorials]
-  );
+  React.useEffect(() => {
+    fetchTutorials();
+  }, [fetchTutorials]);
 
-  const [
-    selectedCategory,
-    setSelectedCategory,
-  ] = React.useState<?TutorialCategory>(initialCategory || null);
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<?TutorialCategory>(initialCategory || null);
 
-  React.useEffect(
-    () => {
-      if (initialCategory) {
-        setSelectedCategory(initialCategory);
-      }
-    },
-    [initialCategory]
-  );
+  React.useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [initialCategory]);
 
   if (tutorialLoadingError)
     return (

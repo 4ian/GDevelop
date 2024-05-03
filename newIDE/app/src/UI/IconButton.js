@@ -65,13 +65,13 @@ type Props = {|
 |};
 
 const useStyles = makeStyles({
-  root: props =>
+  root: (props) =>
     props.color
       ? {
           color: props.color,
         }
       : undefined,
-  label: props =>
+  label: (props) =>
     props.backgroundColor
       ? {
           backgroundColor: props.backgroundColor,
@@ -86,14 +86,8 @@ const useStyles = makeStyles({
  */
 
 const IconButton = React.forwardRef<Props, {||}>((props: Props, ref) => {
-  const {
-    selected,
-    tooltip,
-    acceleratorString,
-    color,
-    style,
-    ...otherProps
-  } = props;
+  const { selected, tooltip, acceleratorString, color, style, ...otherProps } =
+    props;
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const classes = useStyles({

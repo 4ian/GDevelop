@@ -18,7 +18,7 @@ const enumerateExpressionMetadataMap = (
   expressions: gdMapStringExpressionMetadata,
   scope: InstructionOrExpressionScope
 ): Array<EnumeratedExpressionMetadata> => {
-  return mapVector(expressions.keys(), expressionType => {
+  return mapVector(expressions.keys(), (expressionType) => {
     const exprMetadata = expressions.get(expressionType);
     if (!exprMetadata.isShown()) {
       return null; // Skip hidden expressions
@@ -47,8 +47,10 @@ const enumerateExpressionMetadataMap = (
       isPrivate: exprMetadata.isPrivate(),
       isRelevantForLayoutEvents: exprMetadata.isRelevantForLayoutEvents(),
       isRelevantForFunctionEvents: exprMetadata.isRelevantForFunctionEvents(),
-      isRelevantForAsynchronousFunctionEvents: exprMetadata.isRelevantForAsynchronousFunctionEvents(),
-      isRelevantForCustomObjectEvents: exprMetadata.isRelevantForCustomObjectEvents(),
+      isRelevantForAsynchronousFunctionEvents:
+        exprMetadata.isRelevantForAsynchronousFunctionEvents(),
+      isRelevantForCustomObjectEvents:
+        exprMetadata.isRelevantForCustomObjectEvents(),
     };
   }).filter(Boolean);
 };
@@ -63,7 +65,7 @@ export const enumerateFreeExpressions = (
     .getAllPlatformExtensions();
 
   return flatten(
-    mapVector(allExtensions, extension => {
+    mapVector(allExtensions, (extension) => {
       const prefix = getExtensionPrefix(extension, i18n);
       const scope = {
         extension,
@@ -94,10 +96,11 @@ export const enumerateObjectExpressions = (
   type: string,
   objectType: string
 ): Array<EnumeratedExpressionMetadata> => {
-  const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
-    gd.JsPlatform.get(),
-    objectType
-  );
+  const extensionAndObjectMetadata =
+    gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      objectType
+    );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
   const scope = { extension, objectMetadata };
@@ -119,10 +122,11 @@ export const enumerateObjectExpressions = (
 
   const baseObjectType = ''; /* An empty string means the base object */
   if (objectType !== baseObjectType) {
-    const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
-      gd.JsPlatform.get(),
-      baseObjectType
-    );
+    const extensionAndObjectMetadata =
+      gd.MetadataProvider.getExtensionAndObjectMetadata(
+        gd.JsPlatform.get(),
+        baseObjectType
+      );
     const extension = extensionAndObjectMetadata.getExtension();
 
     objectsExpressions = [
@@ -150,10 +154,11 @@ export const enumerateBehaviorExpressions = (
   type: string,
   behaviorType: string
 ): Array<EnumeratedExpressionMetadata> => {
-  const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
-    gd.JsPlatform.get(),
-    behaviorType
-  );
+  const extensionAndBehaviorMetadata =
+    gd.MetadataProvider.getExtensionAndBehaviorMetadata(
+      gd.JsPlatform.get(),
+      behaviorType
+    );
   const extension = extensionAndBehaviorMetadata.getExtension();
   const behaviorMetadata = extensionAndBehaviorMetadata.getMetadata();
   const scope = { extension, behaviorMetadata };
@@ -186,11 +191,11 @@ export const enumerateAllExpressions = (
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
-  mapVector(allExtensions, extension => {
+  mapVector(allExtensions, (extension) => {
     const prefix = getExtensionPrefix(extension, i18n);
 
     //Objects expressions:
-    mapVector(extension.getExtensionObjectsTypes(), objectType => {
+    mapVector(extension.getExtensionObjectsTypes(), (objectType) => {
       const objectMetadata = extension.getObjectMetadata(objectType);
       const scope = { extension, objectMetadata };
 
@@ -214,7 +219,7 @@ export const enumerateAllExpressions = (
     });
 
     //Behaviors expressions:
-    mapVector(extension.getBehaviorsTypes(), behaviorType => {
+    mapVector(extension.getBehaviorsTypes(), (behaviorType) => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 

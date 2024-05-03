@@ -65,7 +65,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       const shouldDefineCurrentLeaderboardIfNoneSelected =
         !state.currentLeaderboard && leaderboards && leaderboards.length > 0;
       const primaryLeaderboard = leaderboards.find(
-        leaderboard => leaderboard.primary
+        (leaderboard) => leaderboard.primary
       );
       const currentLeaderboardUpdated = state.currentLeaderboard
         ? leaderboardsByIds[state.currentLeaderboard.id]
@@ -337,78 +337,60 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   // --- Navigation ---
 
-  const navigateToNextPage = React.useCallback(
-    async () => {
-      const nextPageUri = mapPageIndexToUri[pageIndex + 1];
-      if (!nextPageUri) return;
-      dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
-      await fetchEntries({ uri: nextPageUri });
-    },
-    [fetchEntries, mapPageIndexToUri, pageIndex]
-  );
+  const navigateToNextPage = React.useCallback(async () => {
+    const nextPageUri = mapPageIndexToUri[pageIndex + 1];
+    if (!nextPageUri) return;
+    dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
+    await fetchEntries({ uri: nextPageUri });
+  }, [fetchEntries, mapPageIndexToUri, pageIndex]);
 
-  const navigateToPreviousPage = React.useCallback(
-    async () => {
-      if (pageIndex === 1) {
-        dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
-        await fetchEntries();
-      } else {
-        const previousPageUri = mapPageIndexToUri[pageIndex - 1];
-        if (!previousPageUri) return;
-        dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
-        await fetchEntries({ uri: previousPageUri });
-      }
-    },
-    [fetchEntries, mapPageIndexToUri, pageIndex]
-  );
-
-  const navigateToFirstPage = React.useCallback(
-    async () => {
+  const navigateToPreviousPage = React.useCallback(async () => {
+    if (pageIndex === 1) {
       dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
       await fetchEntries();
-    },
-    [fetchEntries]
-  );
+    } else {
+      const previousPageUri = mapPageIndexToUri[pageIndex - 1];
+      if (!previousPageUri) return;
+      dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
+      await fetchEntries({ uri: previousPageUri });
+    }
+  }, [fetchEntries, mapPageIndexToUri, pageIndex]);
+
+  const navigateToFirstPage = React.useCallback(async () => {
+    dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
+    await fetchEntries();
+  }, [fetchEntries]);
 
   // --- Effects ---
 
-  React.useEffect(
-    () => {
-      dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-      dispatch({ type: 'PURGE_NAVIGATION' });
-    },
-    [gameId]
-  );
+  React.useEffect(() => {
+    dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+    dispatch({ type: 'PURGE_NAVIGATION' });
+  }, [gameId]);
 
-  React.useEffect(
-    () => {
-      if (!currentLeaderboardId || !gameId) return;
-      dispatch({ type: 'PURGE_NAVIGATION' });
-      fetchEntries();
-    },
-    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries, gameId]
-  );
+  React.useEffect(() => {
+    if (!currentLeaderboardId || !gameId) return;
+    dispatch({ type: 'PURGE_NAVIGATION' });
+    fetchEntries();
+  }, [currentLeaderboardId, displayOnlyBestEntry, fetchEntries, gameId]);
 
   const previousCurrentLeaderboardId = React.useRef<?string>(null);
   const previousCurrentLeaderboardResetLaunchedAt = React.useRef<?string>(null);
 
-  React.useEffect(
-    () => {
-      if (
-        previousCurrentLeaderboardId.current === currentLeaderboardId &&
-        !!previousCurrentLeaderboardResetLaunchedAt.current &&
-        !!currentLeaderboard &&
-        !currentLeaderboard.resetLaunchedAt
-      ) {
-        fetchEntries();
-      }
-      previousCurrentLeaderboardId.current = currentLeaderboardId;
-      previousCurrentLeaderboardResetLaunchedAt.current = currentLeaderboard
-        ? currentLeaderboard.resetLaunchedAt
-        : null;
-    },
-    [currentLeaderboard, currentLeaderboardId, fetchEntries]
-  );
+  React.useEffect(() => {
+    if (
+      previousCurrentLeaderboardId.current === currentLeaderboardId &&
+      !!previousCurrentLeaderboardResetLaunchedAt.current &&
+      !!currentLeaderboard &&
+      !currentLeaderboard.resetLaunchedAt
+    ) {
+      fetchEntries();
+    }
+    previousCurrentLeaderboardId.current = currentLeaderboardId;
+    previousCurrentLeaderboardResetLaunchedAt.current = currentLeaderboard
+      ? currentLeaderboard.resetLaunchedAt
+      : null;
+  }, [currentLeaderboard, currentLeaderboardId, fetchEntries]);
 
   useInterval(
     () => {

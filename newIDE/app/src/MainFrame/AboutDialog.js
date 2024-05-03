@@ -387,7 +387,7 @@ const AboutDialog = ({ onClose, updateStatus }: Props) => {
             </Text>
           </Column>
           <List>
-            {contributors.map(contributor => (
+            {contributors.map((contributor) => (
               <ListItem
                 key={contributor.name}
                 primaryText={contributor.name}

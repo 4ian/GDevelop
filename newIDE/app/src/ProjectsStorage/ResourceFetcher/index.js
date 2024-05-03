@@ -60,44 +60,42 @@ export const useResourceFetcher = ({
 }: {|
   resourceFetcher: ResourceFetcher,
 |}): UseResourceFetcherOutput => {
-  const {
-    ensureProcessIsDone,
-    renderProcessDialog,
-  } = useGenericRetryableProcessWithProgress<
-    () => EnsureResourcesAreFetchedOptions
-  >({
-    onDoProcess: React.useCallback(
-      (getOptions, onProgress) => {
-        // Get the latest options. Calling `getOptions` ensure we always
-        // get the latest up-to-date `project` and `fileMetadata`.
-        const {
-          project,
-          fileMetadata,
-          storageProvider,
-          storageProviderOperations,
-          authenticatedUser,
-        } = getOptions();
+  const { ensureProcessIsDone, renderProcessDialog } =
+    useGenericRetryableProcessWithProgress<
+      () => EnsureResourcesAreFetchedOptions,
+    >({
+      onDoProcess: React.useCallback(
+        (getOptions, onProgress) => {
+          // Get the latest options. Calling `getOptions` ensure we always
+          // get the latest up-to-date `project` and `fileMetadata`.
+          const {
+            project,
+            fileMetadata,
+            storageProvider,
+            storageProviderOperations,
+            authenticatedUser,
+          } = getOptions();
 
-        if (!project || !fileMetadata) {
-          // The project or fileMetadata are not valid anymore (the project
-          // was closed for example), abort the process.
-          return Promise.resolve({
-            erroredResources: [],
+          if (!project || !fileMetadata) {
+            // The project or fileMetadata are not valid anymore (the project
+            // was closed for example), abort the process.
+            return Promise.resolve({
+              erroredResources: [],
+            });
+          }
+
+          return resourceFetcher.fetchAllProjectResources({
+            project,
+            fileMetadata,
+            storageProvider,
+            storageProviderOperations,
+            authenticatedUser,
+            onProgress,
           });
-        }
-
-        return resourceFetcher.fetchAllProjectResources({
-          project,
-          fileMetadata,
-          storageProvider,
-          storageProviderOperations,
-          authenticatedUser,
-          onProgress,
-        });
-      },
-      [resourceFetcher]
-    ),
-  });
+        },
+        [resourceFetcher]
+      ),
+    });
 
   return React.useMemo(
     () => ({

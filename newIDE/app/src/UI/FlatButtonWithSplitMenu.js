@@ -48,15 +48,8 @@ const styles = {
  * when the dropdown arrow is clicked.
  */
 const FlatButtonWithSplitMenu = (props: Props) => {
-  const {
-    id,
-    buildMenuTemplate,
-    onClick,
-    label,
-    primary,
-    icon,
-    disabled,
-  } = props;
+  const { id, buildMenuTemplate, onClick, label, primary, icon, disabled } =
+    props;
 
   // In theory, focus ripple is only shown after a keyboard interaction
   // (see https://github.com/mui-org/material-ui/issues/12067). However, as

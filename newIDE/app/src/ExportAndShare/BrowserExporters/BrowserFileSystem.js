@@ -64,7 +64,7 @@ export default class BrowserFileSystem {
    * Create a new in-memory file system.
    */
   constructor({ textFiles }: ConstructorArgs) {
-    textFiles.forEach(textFileDescriptor => {
+    textFiles.forEach((textFileDescriptor) => {
       this._textFiles[textFileDescriptor.filePath] = textFileDescriptor.text;
     });
   }
@@ -74,8 +74,8 @@ export default class BrowserFileSystem {
    */
   getAllTextFilesIn = (pathPrefix: string): Array<TextFileDescriptor> => {
     return Object.keys(this._textFiles)
-      .filter(filePath => filePath.indexOf(pathPrefix) === 0)
-      .map(filePath => ({
+      .filter((filePath) => filePath.indexOf(pathPrefix) === 0)
+      .map((filePath) => ({
         filePath,
         text: this._textFiles[filePath],
       }));
@@ -86,8 +86,8 @@ export default class BrowserFileSystem {
    */
   getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
     return Object.keys(this._filesToDownload)
-      .filter(filePath => filePath.indexOf(pathPrefix) === 0)
-      .map(filePath => ({
+      .filter((filePath) => filePath.indexOf(pathPrefix) === 0)
+      .map((filePath) => ({
         filePath,
         url: this._filesToDownload[filePath],
       }));
@@ -105,7 +105,7 @@ export default class BrowserFileSystem {
   clearDir = (path: string) => {
     // Clear the files to be written in the specified directory.
     const filePaths = Object.keys(this._textFiles);
-    filePaths.forEach(filePath => {
+    filePaths.forEach((filePath) => {
       if (filePath.indexOf(path) === 0) {
         delete this._textFiles[filePath];
       }
@@ -205,7 +205,7 @@ export default class BrowserFileSystem {
 
     // Simulate ReadDir by returning all external URLs
     // with the filename matching the extension.
-    Object.keys(this._filesToDownload).forEach(filePath => {
+    Object.keys(this._filesToDownload).forEach((filePath) => {
       const upperCaseFilePath = filePath.toUpperCase();
       if (
         upperCaseFilePath.indexOf(ext) ===

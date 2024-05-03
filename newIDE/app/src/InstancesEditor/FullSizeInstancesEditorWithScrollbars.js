@@ -73,19 +73,16 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     });
   }
 
-  const hideScrollbarsAfterDelay = React.useCallback(
-    () => {
-      if (timeoutHidingScrollbarsId.current) {
-        clearTimeout(timeoutHidingScrollbarsId.current);
-      }
-      timeoutHidingScrollbarsId.current = setTimeout(() => {
-        if (!isMounted.current) return;
-        showScrollbars.current = false;
-        forceUpdate();
-      }, 1500);
-    },
-    [forceUpdate, isMounted]
-  );
+  const hideScrollbarsAfterDelay = React.useCallback(() => {
+    if (timeoutHidingScrollbarsId.current) {
+      clearTimeout(timeoutHidingScrollbarsId.current);
+    }
+    timeoutHidingScrollbarsId.current = setTimeout(() => {
+      if (!isMounted.current) return;
+      showScrollbars.current = false;
+      forceUpdate();
+    }, 1500);
+  }, [forceUpdate, isMounted]);
 
   const hideScrollbarsAfterDelayDebounced = useDebounce(() => {
     hideScrollbarsAfterDelay();
@@ -200,7 +197,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
 
   // When the user releases the thumb, we need to stop listening to mouse move and up events.
   const makeMouseUpXThumbHandler = React.useCallback(
-    mouseMoveHandler =>
+    (mouseMoveHandler) =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (
@@ -215,7 +212,7 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
     [hideScrollbarsAfterDelay]
   );
   const makeMouseUpYThumbHandler = React.useCallback(
-    mouseMoveHandler =>
+    (mouseMoveHandler) =>
       function mouseUpHandler(e: MouseEvent) {
         isDragging.current = false;
         if (
@@ -268,33 +265,30 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   );
 
   // Add the mouse down events once on mount.
-  React.useEffect(
-    () => {
-      const xScrollbarThumbElement = xScrollbarThumb.current;
-      const yScrollbarThumbElement = yScrollbarThumb.current;
-      if (!xScrollbarThumbElement || !yScrollbarThumbElement) return;
+  React.useEffect(() => {
+    const xScrollbarThumbElement = xScrollbarThumb.current;
+    const yScrollbarThumbElement = yScrollbarThumb.current;
+    if (!xScrollbarThumbElement || !yScrollbarThumbElement) return;
 
-      xScrollbarThumbElement.addEventListener(
+    xScrollbarThumbElement.addEventListener(
+      'mousedown',
+      mouseDownXThumbHandler
+    );
+    yScrollbarThumbElement.addEventListener(
+      'mousedown',
+      mouseDownYThumbHandler
+    );
+    return () => {
+      xScrollbarThumbElement.removeEventListener(
         'mousedown',
         mouseDownXThumbHandler
       );
-      yScrollbarThumbElement.addEventListener(
+      yScrollbarThumbElement.removeEventListener(
         'mousedown',
         mouseDownYThumbHandler
       );
-      return () => {
-        xScrollbarThumbElement.removeEventListener(
-          'mousedown',
-          mouseDownXThumbHandler
-        );
-        yScrollbarThumbElement.removeEventListener(
-          'mousedown',
-          mouseDownYThumbHandler
-        );
-      };
-    },
-    [mouseDownXThumbHandler, mouseDownYThumbHandler]
-  );
+    };
+  }, [mouseDownXThumbHandler, mouseDownYThumbHandler]);
 
   const setAndAdjust = React.useCallback(
     ({
@@ -356,21 +350,19 @@ const FullSizeInstancesEditorWithScrollbars = (props: Props) => {
   // Ensure the X Scrollbar doesn't go out of bounds.
   const minXScrollbarLeftPosition = '0%';
   const maxXScrollbarLeftPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_THUMB_WIDTH}px)`;
-  const expectedXScrollbarLeftPosition = `calc(${((xValue.current -
-    xMin.current) /
-    (xMax.current - xMin.current)) *
-    100 +
-    '%'} - ${SCROLLBAR_SIZE}px / 2)`;
+  const expectedXScrollbarLeftPosition = `calc(${
+    ((xValue.current - xMin.current) / (xMax.current - xMin.current)) * 100 +
+    '%'
+  } - ${SCROLLBAR_SIZE}px / 2)`;
   const xScrollbarLeftPosition = `max(min(${expectedXScrollbarLeftPosition}, ${maxXScrollbarLeftPosition}), ${minXScrollbarLeftPosition})`;
 
   // Ensure the Y Scrollbar doesn't go out of bounds.
   const minYScrollbarTopPosition = '0%';
   const maxYScrollbarTopPosition = `calc(100% - ${SCROLLBAR_SIZE}px - ${SCROLLBAR_THUMB_WIDTH}px)`;
-  const expectedYScrollbarTopPosition = `calc(${((yValue.current -
-    yMin.current) /
-    (yMax.current - yMin.current)) *
-    100 +
-    '%'} - ${SCROLLBAR_SIZE}px / 2)`;
+  const expectedYScrollbarTopPosition = `calc(${
+    ((yValue.current - yMin.current) / (yMax.current - yMin.current)) * 100 +
+    '%'
+  } - ${SCROLLBAR_SIZE}px / 2)`;
   const yScrollbarTopPosition = `max(min(${expectedYScrollbarTopPosition}, ${maxYScrollbarTopPosition}), ${minYScrollbarTopPosition})`;
 
   const screenType = useScreenType();

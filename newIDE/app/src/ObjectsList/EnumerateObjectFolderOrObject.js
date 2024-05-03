@@ -19,7 +19,7 @@ const recursivelyEnumerateFoldersInFolder = (
   prefix: string,
   result: {| path: string, folder: gdObjectFolderOrObject |}[]
 ) => {
-  mapFor(0, folder.getChildrenCount(), i => {
+  mapFor(0, folder.getChildrenCount(), (i) => {
     const child = folder.getChildAt(i);
     if (child.isFolder()) {
       const newPrefix = prefix
@@ -38,7 +38,7 @@ const recursivelyEnumerateObjectsInFolder = (
   folder: gdObjectFolderOrObject,
   result: gdObject[]
 ) => {
-  mapFor(0, folder.getChildrenCount(), i => {
+  mapFor(0, folder.getChildrenCount(), (i) => {
     const child = folder.getChildAt(i);
     if (!child.isFolder()) {
       result.push(child.getObject());
@@ -79,7 +79,7 @@ export const getObjectsInFolder = (
   objectFolderOrObject: gdObjectFolderOrObject
 ): gdObject[] => {
   if (!objectFolderOrObject.isFolder()) return [];
-  return mapFor(0, objectFolderOrObject.getChildrenCount(), i => {
+  return mapFor(0, objectFolderOrObject.getChildrenCount(), (i) => {
     const child = objectFolderOrObject.getChildAt(i);
     if (child.isFolder()) {
       return null;

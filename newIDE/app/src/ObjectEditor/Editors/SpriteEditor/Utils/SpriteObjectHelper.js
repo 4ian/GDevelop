@@ -126,7 +126,7 @@ export const copySpritePoints = (
   );
 
   destinationSprite.getAllNonDefaultPoints().clear();
-  mapVector(originalSprite.getAllNonDefaultPoints(), originalPoint => {
+  mapVector(originalSprite.getAllNonDefaultPoints(), (originalPoint) => {
     destinationSprite.addPoint(originalPoint);
   });
 };
@@ -135,10 +135,10 @@ export const copyAnimationsSpritePoints = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       copySpritePoints(originalSprite, sprite);
     });
@@ -166,7 +166,7 @@ export const haveSamePoints = (sprite1: gdSprite, sprite2: gdSprite) => {
     return false;
 
   return every(
-    mapVector(sprite1.getAllNonDefaultPoints(), sprite1Point => {
+    mapVector(sprite1.getAllNonDefaultPoints(), (sprite1Point) => {
       if (!sprite2.hasPoint(sprite1Point.getName())) return false;
 
       return isSamePoint(
@@ -182,7 +182,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
   direction: gdDirection
 ) => {
   return every(
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       return haveSamePoints(sprite, originalSprite);
     })
@@ -194,7 +194,7 @@ export const allAnimationSpritesHaveSamePointsAs = (
   animation: gdAnimation
 ) => {
   return every(
-    mapFor(0, animation.getDirectionsCount(), i => {
+    mapFor(0, animation.getDirectionsCount(), (i) => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSamePointsAs(originalSprite, direction);
     })
@@ -206,7 +206,7 @@ export const allObjectSpritesHaveSamePointsAs = (
   animations: gdSpriteAnimationList
 ) => {
   return every(
-    mapFor(0, animations.getAnimationsCount(), i => {
+    mapFor(0, animations.getAnimationsCount(), (i) => {
       const animation = animations.getAnimation(i);
       return allAnimationSpritesHaveSamePointsAs(originalSprite, animation);
     })
@@ -224,7 +224,7 @@ export const copySpritePolygons = (
   );
 
   destinationSprite.getCustomCollisionMask().clear();
-  mapVector(originalSprite.getCustomCollisionMask(), originalPolygon => {
+  mapVector(originalSprite.getCustomCollisionMask(), (originalPolygon) => {
     destinationSprite.getCustomCollisionMask().push_back(originalPolygon);
   });
 };
@@ -233,10 +233,10 @@ export const copyAnimationsSpriteCollisionMasks = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       copySpritePolygons(originalSprite, sprite);
     });
@@ -286,7 +286,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
   direction: gdDirection
 ) => {
   return every(
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       return haveSameCollisionMasks(sprite, originalSprite);
     })
@@ -298,7 +298,7 @@ export const allAnimationSpritesHaveSameCollisionMasksAs = (
   animation: gdAnimation
 ) => {
   return every(
-    mapFor(0, animation.getDirectionsCount(), i => {
+    mapFor(0, animation.getDirectionsCount(), (i) => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSameCollisionMasksAs(
         originalSprite,
@@ -313,7 +313,7 @@ export const allObjectSpritesHaveSameCollisionMaskAs = (
   animations: gdSpriteAnimationList
 ) => {
   return every(
-    mapFor(0, animations.getAnimationsCount(), i => {
+    mapFor(0, animations.getAnimationsCount(), (i) => {
       const animation = animations.getAnimation(i);
       return allAnimationSpritesHaveSameCollisionMasksAs(
         originalSprite,
@@ -336,10 +336,10 @@ export const deleteSpritesFromAnimation = (
     [number]: boolean,
   }
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    const spritesToDelete = mapFor(0, direction.getSpritesCount(), j => {
+    const spritesToDelete = mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
 
       return !!spritePtrs[sprite.ptr];
@@ -362,10 +362,10 @@ export const duplicateSpritesInAnimation = (
     [number]: boolean,
   }
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), j => {
+    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
 
       return !!spritePtrs[sprite.ptr];

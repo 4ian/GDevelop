@@ -106,16 +106,17 @@ export const WithGithubUsernameButErrorWhenGivingGithubStarBadge = () => (
   />
 );
 
-export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge = () => (
-  <EditProfileDialog
-    {...defaultProps}
-    subscription={null}
-    badges={[]}
-    onUpdateGitHubStar={async () => ({
-      code: 'github-star/user-not-found',
-    })}
-  />
-);
+export const WithGithubUsernameButUserNotFoundWhenGivingGithubStarBadge =
+  () => (
+    <EditProfileDialog
+      {...defaultProps}
+      subscription={null}
+      badges={[]}
+      onUpdateGitHubStar={async () => ({
+        code: 'github-star/user-not-found',
+      })}
+    />
+  );
 
 export const ErrorFromBackend = () => (
   <EditProfileDialog {...defaultProps} error={{ code: 'auth/username-used' }} />

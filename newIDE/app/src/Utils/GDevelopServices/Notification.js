@@ -113,7 +113,7 @@ export const markNotificationsAsSeen = async (
   let payload;
   if (notificationIds) {
     payload = {
-      notifications: notificationIds.map(notificationId => ({
+      notifications: notificationIds.map((notificationId) => ({
         notificationId,
         seen: true,
       })),

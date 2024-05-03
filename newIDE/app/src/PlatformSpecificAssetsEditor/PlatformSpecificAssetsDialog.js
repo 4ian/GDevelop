@@ -48,25 +48,8 @@ const androidSizes = [192, 144, 96, 72, 48, 36];
  */
 const androidWindowSplashScreenAnimatedIconRecommendedSize = 864;
 const iosSizes = [
-  1024,
-  180,
-  167,
-  152,
-  144,
-  120,
-  114,
-  100,
-  87,
-  80,
-  76,
-  72,
-  60,
-  58,
-  57,
-  50,
-  40,
-  29,
-  20,
+  1024, 180, 167, 152, 144, 120, 114, 100, 87, 80, 76, 72, 60, 58, 57, 50, 40,
+  29, 20,
 ];
 
 class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
@@ -79,16 +62,16 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     const platformSpecificAssets = project.getPlatformSpecificAssets();
     return {
       thumbnailResourceName: platformSpecificAssets.get('liluo', 'thumbnail'),
-      desktopIconResourceNames: desktopSizes.map(size =>
+      desktopIconResourceNames: desktopSizes.map((size) =>
         platformSpecificAssets.get('desktop', `icon-${size}`)
       ),
-      androidIconResourceNames: androidSizes.map(size =>
+      androidIconResourceNames: androidSizes.map((size) =>
         platformSpecificAssets.get('android', `icon-${size}`)
       ),
       androidWindowSplashScreenAnimatedIconResourceName: project
         .getPlatformSpecificAssets()
         .get('android', `windowSplashScreenAnimatedIcon`),
-      iosIconResourceNames: iosSizes.map(size =>
+      iosIconResourceNames: iosSizes.map((size) =>
         platformSpecificAssets.get('ios', `icon-${size}`)
       ),
       displayGamesPlatformThumbnailWarning: false,
@@ -109,8 +92,8 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     const { project, resourceManagementProps } = this.props;
 
     const resourceSource = resourceManagementProps.resourceSources
-      .filter(source => source.kind === 'image')
-      .filter(source => source.name.startsWith('local-file-opener'))[0];
+      .filter((source) => source.kind === 'image')
+      .filter((source) => source.name.startsWith('local-file-opener'))[0];
 
     if (!resourceSource) {
       throw new Error(
@@ -136,16 +119,16 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
     // Important, we are responsible for deleting the resources that were given to us.
     // Otherwise we have a memory leak.
-    resources.forEach(resource => resource.delete());
+    resources.forEach((resource) => resource.delete());
 
     const results = await Promise.all([
-      ...desktopSizes.map(size =>
+      ...desktopSizes.map((size) =>
         resizeImage(image, path.join(projectPath, `desktop-icon-${size}.png`), {
           width: size,
           height: size,
         })
       ),
-      ...androidSizes.map(size =>
+      ...androidSizes.map((size) =>
         resizeImage(image, path.join(projectPath, `android-icon-${size}.png`), {
           width: size,
           height: size,
@@ -161,7 +144,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             androidWindowSplashScreenAnimatedIconRecommendedSize / 6,
         }
       ),
-      ...iosSizes.map(size =>
+      ...iosSizes.map((size) =>
         resizeImage(image, path.join(projectPath, `ios-icon-${size}.png`), {
           width: size,
           height: size,
@@ -181,12 +164,12 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
 
     // Add resources to the game
     const allResourcesNames = [
-      ...desktopSizes.map(size => `desktop-icon-${size}.png`),
-      ...androidSizes.map(size => `android-icon-${size}.png`),
+      ...desktopSizes.map((size) => `desktop-icon-${size}.png`),
+      ...androidSizes.map((size) => `android-icon-${size}.png`),
       'android-windowSplashScreenAnimatedIcon.png',
-      ...iosSizes.map(size => `ios-icon-${size}.png`),
+      ...iosSizes.map((size) => `ios-icon-${size}.png`),
     ];
-    allResourcesNames.forEach(resourceName => {
+    allResourcesNames.forEach((resourceName) => {
       if (!resourcesManager.hasResource(resourceName)) {
         const imageResource = new gd.ImageResource();
         imageResource.setFile(resourceName);
@@ -207,14 +190,14 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
     setTimeout(() => {
       this.setState({
         desktopIconResourceNames: desktopSizes.map(
-          size => `desktop-icon-${size}.png`
+          (size) => `desktop-icon-${size}.png`
         ),
         androidIconResourceNames: androidSizes.map(
-          size => `android-icon-${size}.png`
+          (size) => `android-icon-${size}.png`
         ),
         androidWindowSplashScreenAnimatedIconResourceName:
           'android-windowSplashScreenAnimatedIcon.png',
-        iosIconResourceNames: iosSizes.map(size => `ios-icon-${size}.png`),
+        iosIconResourceNames: iosSizes.map((size) => `ios-icon-${size}.png`),
       });
     }, 200 /* Let a bit of time so that image files can be found */);
   };
@@ -323,7 +306,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
             resourceKind="image"
             resourceName={thumbnailResourceName}
             defaultNewResourceName={'Thumbnail'}
-            onChange={resourceName => {
+            onChange={(resourceName) => {
               this.setState({
                 thumbnailResourceName: resourceName,
                 displayGamesPlatformThumbnailWarning:
@@ -355,7 +338,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceKind="image"
               resourceName={desktopIconResourceNames[index]}
               defaultNewResourceName={'DesktopIcon' + size}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...desktopIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({
@@ -376,9 +359,10 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
                 resourceKind="image"
                 resourceName={androidWindowSplashScreenAnimatedIconResourceName}
                 defaultNewResourceName={'AndroidSplashscreenIcon'}
-                onChange={resourceName => {
+                onChange={(resourceName) => {
                   this.setState({
-                    androidWindowSplashScreenAnimatedIconResourceName: resourceName,
+                    androidWindowSplashScreenAnimatedIconResourceName:
+                      resourceName,
                   });
                 }}
                 helperMarkdownText={i18n._(
@@ -396,7 +380,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceKind="image"
               resourceName={androidIconResourceNames[index]}
               defaultNewResourceName={'AndroidIcon' + size}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...androidIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({
@@ -417,7 +401,7 @@ class PlatformSpecificAssetsDialog extends React.Component<Props, State> {
               resourceKind="image"
               resourceName={iosIconResourceNames[index]}
               defaultNewResourceName={'IosIcon' + size}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...iosIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({

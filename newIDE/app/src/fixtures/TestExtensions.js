@@ -76,7 +76,8 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .addIncludeFile(
         'Extensions/Effects/fake-effect-with-various-parameters.js'
       );
-    const variousParametersEffectProperties = variousParametersEffect.getProperties();
+    const variousParametersEffectProperties =
+      variousParametersEffect.getProperties();
     variousParametersEffectProperties
       .getOrCreate('intensity')
       .setValue('1')
@@ -163,7 +164,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.updateProperty = function(
+    fakeBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
@@ -180,7 +181,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.getProperties = function(behaviorContent) {
+    fakeBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties
@@ -196,7 +197,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return behaviorProperties;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.initializeContent = function(behaviorContent) {
+    fakeBehavior.initializeContent = function (behaviorContent) {
       behaviorContent.setStringAttribute('property1', 'Initial value 1');
       behaviorContent.setBoolAttribute('property2', true);
     };
@@ -245,7 +246,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
     const fakeBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.updateProperty = function(
+    fakeBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
@@ -253,12 +254,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.getProperties = function(behaviorContent) {
+    fakeBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
       return behaviorProperties;
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
-    fakeBehavior.initializeContent = function(behaviorContent) {};
+    fakeBehavior.initializeContent = function (behaviorContent) {};
 
     extension
       .addBehavior(
@@ -289,7 +290,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     const fakeObject = new gd.ObjectJsImplementation();
 
     // $FlowExpectedError
-    fakeObject.updateProperty = function(
+    fakeObject.updateProperty = function (
       objectContent,
       propertyName,
       newValue
@@ -297,7 +298,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError
-    fakeObject.getProperties = function(objectContent) {
+    fakeObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties
@@ -315,7 +316,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     );
 
     // $FlowExpectedError
-    fakeObject.updateInitialInstanceProperty = function(
+    fakeObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,
@@ -326,7 +327,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return false;
     };
     // $FlowExpectedError
-    fakeObject.getInitialInstanceProperties = function(
+    fakeObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -367,12 +368,12 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setIcon('res/conditions/3d_box.svg');
     const Cube3DObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    Cube3DObject.getProperties = function(objectContent) {
+    Cube3DObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
     // $FlowExpectedError
-    Cube3DObject.getInitialInstanceProperties = function(
+    Cube3DObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -412,13 +413,13 @@ export const makeTestExtensions = (gd: libGDevelop) => {
 
     const textInputObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
-    textInputObject.getProperties = function(objectContent) {
+    textInputObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
       return objectProperties;
     };
 
     // $FlowExpectedError
-    textInputObject.getInitialInstanceProperties = function(
+    textInputObject.getInitialInstanceProperties = function (
       content,
       instance,
       project,
@@ -442,7 +443,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
     };
 
     // $FlowExpectedError
-    textInputObject.updateInitialInstanceProperty = function(
+    textInputObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
       propertyName,

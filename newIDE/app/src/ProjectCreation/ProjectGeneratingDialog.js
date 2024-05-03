@@ -59,59 +59,53 @@ const ProjectGeneratingDialog = ({
   const [loadingMessageIndex, setLoadingMessageIndex] = React.useState(0);
   const [overallLoadingTime, setOverallLoadingTime] = React.useState(0);
 
-  const updateLoadingMessage = React.useCallback(
-    () => {
-      setOverallLoadingTime(overallLoadingTime + loadingMessagesInterval);
-      if (loadingMessageIndex >= loadingMessages.length - 1) return;
-      setLoadingMessageIndex(loadingMessageIndex + 1);
-    },
-    [loadingMessageIndex, setLoadingMessageIndex, overallLoadingTime]
-  );
+  const updateLoadingMessage = React.useCallback(() => {
+    setOverallLoadingTime(overallLoadingTime + loadingMessagesInterval);
+    if (loadingMessageIndex >= loadingMessages.length - 1) return;
+    setLoadingMessageIndex(loadingMessageIndex + 1);
+  }, [loadingMessageIndex, setLoadingMessageIndex, overallLoadingTime]);
 
   useInterval(updateLoadingMessage, loadingMessagesInterval * 1000);
 
   const hasProbablyTimedOut = overallLoadingTime > timeBeforeShowingError;
 
-  const updateGeneratingProject = React.useCallback(
-    async () => {
-      if (!generatingProjectId || !profile) return;
+  const updateGeneratingProject = React.useCallback(async () => {
+    if (!generatingProjectId || !profile) return;
 
-      try {
-        const generatedProject = await getGeneratedProject(
-          getAuthorizationHeader,
-          {
-            generatedProjectId: generatingProjectId,
-            userId: profile.id,
-          }
-        );
-        if (generatedProject.status === 'ready') {
-          setIsReady(true);
-          if (!generatedProject.fileUrl) {
-            throw new Error('Generated project has no fileUrl');
-          }
-          await onCreate(generatedProject, {
-            // We only update the project name, the rest is handled by the template.
-            projectName: generatedProject.projectName,
-            storageProvider,
-            saveAsLocation,
-          });
-        } else if (generatedProject.status === 'error') {
-          throw new Error('Generated project has an error');
+    try {
+      const generatedProject = await getGeneratedProject(
+        getAuthorizationHeader,
+        {
+          generatedProjectId: generatingProjectId,
+          userId: profile.id,
         }
-      } catch (err) {
-        console.error(err);
-        setIsErrored(true);
+      );
+      if (generatedProject.status === 'ready') {
+        setIsReady(true);
+        if (!generatedProject.fileUrl) {
+          throw new Error('Generated project has no fileUrl');
+        }
+        await onCreate(generatedProject, {
+          // We only update the project name, the rest is handled by the template.
+          projectName: generatedProject.projectName,
+          storageProvider,
+          saveAsLocation,
+        });
+      } else if (generatedProject.status === 'error') {
+        throw new Error('Generated project has an error');
       }
-    },
-    [
-      generatingProjectId,
-      getAuthorizationHeader,
-      profile,
-      onCreate,
-      saveAsLocation,
-      storageProvider,
-    ]
-  );
+    } catch (err) {
+      console.error(err);
+      setIsErrored(true);
+    }
+  }, [
+    generatingProjectId,
+    getAuthorizationHeader,
+    profile,
+    onCreate,
+    saveAsLocation,
+    storageProvider,
+  ]);
 
   const shouldUpdateProject = !isReady && !isErrored && generatingProjectId;
 

@@ -21,11 +21,10 @@ type ContextMenuProps = {|
 
 const MaterialUIContextMenu = React.forwardRef<
   ContextMenuProps,
-  ContextMenuInterface
+  ContextMenuInterface,
 >((props, ref) => {
   const [anchorPosition, setAnchorPosition] = React.useState<Array<number>>([
-    0,
-    0,
+    0, 0,
   ]);
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
@@ -89,7 +88,7 @@ type ElectronContextMenuProps = {|
 
 const ElectronContextMenu = React.forwardRef<
   ElectronContextMenuProps,
-  ContextMenuInterface
+  ContextMenuInterface,
 >((props, ref) => {
   const menuImplementation = new ElectronMenuImplementation();
 
@@ -114,7 +113,7 @@ const ElectronContextMenu = React.forwardRef<
 
 const ElectronContextMenuWrapper = React.forwardRef<
   ContextMenuProps,
-  ContextMenuInterface
+  ContextMenuInterface,
 >((props, ref) => {
   const electronContextMenu = React.useRef<?ContextMenuInterface>(null);
   React.useImperativeHandle(ref, () => ({
@@ -133,4 +132,4 @@ const ElectronContextMenuWrapper = React.forwardRef<
   );
 });
 
-export default (electron ? ElectronContextMenuWrapper : MaterialUIContextMenu);
+export default electron ? ElectronContextMenuWrapper : MaterialUIContextMenu;

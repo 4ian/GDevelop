@@ -14,7 +14,7 @@ import SelectOption from '../../UI/SelectOption';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function MouseField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({

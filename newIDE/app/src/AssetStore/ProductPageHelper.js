@@ -29,7 +29,7 @@ import { Column } from '../UI/Grid';
 
 export const getOtherProductsFromSameAuthorTiles = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
-  U: PrivateAssetPack | PrivateGameTemplate
+  U: PrivateAssetPack | PrivateGameTemplate,
 >({
   otherProductListingDatasFromSameCreator,
   currentProductListingData,
@@ -53,13 +53,13 @@ export const getOtherProductsFromSameAuthorTiles = <
   return otherProductListingDatasFromSameCreator
     .filter(
       // Filter out the current product.
-      product => product.id !== currentProductListingData.id
+      (product) => product.id !== currentProductListingData.id
     )
-    .map(productListingDataFromSameCreator => {
+    .map((productListingDataFromSameCreator) => {
       const isProductOwned =
         !!receivedProducts &&
         !!receivedProducts.find(
-          product => product.id === productListingDataFromSameCreator.id
+          (product) => product.id === productListingDataFromSameCreator.id
         );
 
       if (productListingDataFromSameCreator.productType === 'GAME_TEMPLATE') {
@@ -94,7 +94,7 @@ export const getOtherProductsFromSameAuthorTiles = <
 
 export const getBundlesContainingProductTiles = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
-  U: PrivateAssetPack | PrivateGameTemplate
+  U: PrivateAssetPack | PrivateGameTemplate,
 >({
   product,
   productListingDatas,
@@ -109,7 +109,7 @@ export const getBundlesContainingProductTiles = <
   if (!product || !productListingDatas) return null;
 
   const bundlesContainingProduct = productListingDatas.filter(
-    productListingData =>
+    (productListingData) =>
       productListingData.includedListableProductIds &&
       productListingData.includedListableProductIds.includes(product.id)
   );
@@ -117,22 +117,22 @@ export const getBundlesContainingProductTiles = <
   if (!bundlesContainingProduct.length) return null;
 
   const ownedBundlesContainingProduct = bundlesContainingProduct.filter(
-    bundleContainingProduct =>
+    (bundleContainingProduct) =>
       !!receivedProducts &&
       !!receivedProducts.find(
-        Product => Product.id === bundleContainingProduct.id
+        (Product) => Product.id === bundleContainingProduct.id
       )
   );
   const notOwnedBundlesContainingProduct = bundlesContainingProduct.filter(
-    bundleContainingProduct =>
+    (bundleContainingProduct) =>
       !ownedBundlesContainingProduct.find(
-        ownedBundleContainingProduct =>
+        (ownedBundleContainingProduct) =>
           ownedBundleContainingProduct.id === bundleContainingProduct.id
       )
   );
 
   const allTiles = ownedBundlesContainingProduct
-    .map(bundleContainingProduct => {
+    .map((bundleContainingProduct) => {
       return (
         <PromoBundleCard
           productListingData={bundleContainingProduct}
@@ -143,7 +143,7 @@ export const getBundlesContainingProductTiles = <
       );
     })
     .concat(
-      notOwnedBundlesContainingProduct.map(bundleContainingProduct => {
+      notOwnedBundlesContainingProduct.map((bundleContainingProduct) => {
         return (
           <PromoBundleCard
             productListingData={bundleContainingProduct}
@@ -160,7 +160,7 @@ export const getBundlesContainingProductTiles = <
 
 export const getProductsIncludedInBundleTiles = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
-  U: PrivateAssetPack | PrivateGameTemplate
+  U: PrivateAssetPack | PrivateGameTemplate,
 >({
   product,
   productListingDatas,
@@ -180,9 +180,9 @@ export const getProductsIncludedInBundleTiles = <
   if (!includedProductIds) return null;
 
   return includedProductIds
-    .map(includedProductId => {
+    .map((includedProductId) => {
       const includedProductListingData = productListingDatas.find(
-        privateProductListingData =>
+        (privateProductListingData) =>
           privateProductListingData.id === includedProductId
       );
       if (!includedProductListingData) {
@@ -193,7 +193,7 @@ export const getProductsIncludedInBundleTiles = <
       const isProductOwned =
         !!receivedProducts &&
         !!receivedProducts.find(
-          product => product.id === includedProductListingData.id
+          (product) => product.id === includedProductListingData.id
         );
 
       if (includedProductListingData.productType === 'GAME_TEMPLATE') {
@@ -234,7 +234,7 @@ export const getProductsIncludedInBundleTiles = <
 // most important one.
 export const getUserProductPurchaseUsageType = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
-  U: PrivateAssetPack | PrivateGameTemplate
+  U: PrivateAssetPack | PrivateGameTemplate,
 >({
   productId,
   receivedProducts,
@@ -251,24 +251,24 @@ export const getUserProductPurchaseUsageType = <
     return null;
 
   const currentReceivedProduct = receivedProducts.find(
-    receivedProduct => receivedProduct.id === productId
+    (receivedProduct) => receivedProduct.id === productId
   );
   // User does not own the product.
   if (!currentReceivedProduct) return null;
 
   const productPurchase = productPurchases.find(
-    productPurchase => productPurchase.productId === currentReceivedProduct.id
+    (productPurchase) => productPurchase.productId === currentReceivedProduct.id
   );
   if (!productPurchase) {
     // It is possible the user has the product as part of a bundle.
     const productBundleListingData = allProductListingDatas.find(
-      productListingData =>
+      (productListingData) =>
         productListingData.includedListableProductIds &&
         productListingData.includedListableProductIds.includes(productId)
     );
     if (productBundleListingData) {
       const receivedProductBundlePurchase = productPurchases.find(
-        productPurchase =>
+        (productPurchase) =>
           productPurchase.productId === productBundleListingData.id
       );
       if (receivedProductBundlePurchase) {
@@ -283,7 +283,7 @@ export const getUserProductPurchaseUsageType = <
 };
 
 export const PurchaseProductButtons = <
-  T: PrivateAssetPackListingData | PrivateGameTemplateListingData
+  T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
 >({
   productListingData,
   selectedUsageType,
@@ -309,20 +309,18 @@ export const PurchaseProductButtons = <
   const productType = productListingData.productType.toLowerCase();
 
   let creditPrice = productListingData.creditPrices.find(
-    price => price.usageType === selectedUsageType
+    (price) => price.usageType === selectedUsageType
   );
   if (!creditPrice) {
     // We're probably switching from one product to another, and the usage type is not available.
     // Let's reset it.
     onUsageTypeChange(productListingData.prices[0].usageType);
     creditPrice = productListingData.creditPrices.find(
-      price => price.usageType === productListingData.prices[0].usageType
+      (price) => price.usageType === productListingData.prices[0].usageType
     );
     if (!creditPrice) {
       console.error(
-        `Unable to find a credit price for product ${
-          productListingData.id
-        }, usage type ${productListingData.prices[0].usageType}`
+        `Unable to find a credit price for product ${productListingData.id}, usage type ${productListingData.prices[0].usageType}`
       );
       return null;
     }
@@ -372,7 +370,7 @@ export const PurchaseProductButtons = <
 };
 
 export const OpenProductButton = <
-  T: PrivateAssetPackListingData | PrivateGameTemplateListingData
+  T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
 >({
   productListingData,
   onClick,
@@ -405,7 +403,7 @@ export const OpenProductButton = <
 
 export const getProductMediaItems = <
   T: PrivateAssetPackListingData | PrivateGameTemplateListingData,
-  U: PrivateAssetPack | PrivateGameTemplate
+  U: PrivateAssetPack | PrivateGameTemplate,
 >({
   productListingData,
   product,
@@ -429,7 +427,7 @@ export const getProductMediaItems = <
           productListingData.appStoreThumbnailUrls[0]) ||
         productListingData.thumbnailUrls[0],
     },
-    ...product.previewImageUrls.map(url => ({
+    ...product.previewImageUrls.map((url) => ({
       kind: 'image',
       url,
     })),
@@ -437,7 +435,7 @@ export const getProductMediaItems = <
 
   if (product.previewSoundUrls) {
     mediaItems.push(
-      ...product.previewSoundUrls.map(url => ({
+      ...product.previewSoundUrls.map((url) => ({
         kind: 'audio',
         url,
       }))

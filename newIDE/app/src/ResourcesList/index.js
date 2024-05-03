@@ -52,7 +52,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   fileMetadata: ?FileMetadata,
-  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveUnusedResources: (ResourceKind) => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
   getResourceActionsSpecificToStorageProvider?: ?ResourcesActionsMenuBuilder,
 |};
@@ -148,7 +148,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    this.props.onRenameResource(resource, newName, doRename => {
+    this.props.onRenameResource(resource, newName, (doRename) => {
       if (!doRename) return;
       resource.setName(newName);
       this.forceUpdate();
@@ -172,71 +172,70 @@ export default class ResourcesList extends React.Component<Props, State> {
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderResourceMenuTemplate = (i18n: I18nType) => (
-    resource: gdResource,
-    _index: number
-  ): Array<MenuItemTemplate> => {
-    const {
-      getResourceActionsSpecificToStorageProvider,
-      fileMetadata,
-    } = this.props;
-    let menu = [
-      {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(resource),
-      },
-      {
-        label: i18n._(t`Delete`),
-        click: () => this._deleteResource(resource),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Remove unused...`),
-        submenu: allResourceKindsAndMetadata
-          .map(({ displayName, kind }) => ({
-            label: i18n._(displayName),
-            click: () => {
-              this.props.onRemoveUnusedResources(kind);
-            },
-          }))
-          .concat([
-            {
-              label: i18n._(t`Resources (any kind)`),
+  _renderResourceMenuTemplate =
+    (i18n: I18nType) =>
+    (resource: gdResource, _index: number): Array<MenuItemTemplate> => {
+      const { getResourceActionsSpecificToStorageProvider, fileMetadata } =
+        this.props;
+      let menu = [
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._editName(resource),
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () => this._deleteResource(resource),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Remove unused...`),
+          submenu: allResourceKindsAndMetadata
+            .map(({ displayName, kind }) => ({
+              label: i18n._(displayName),
               click: () => {
-                allResourceKindsAndMetadata.forEach(resourceKindAndMetadata => {
-                  this.props.onRemoveUnusedResources(
-                    resourceKindAndMetadata.kind
-                  );
-                });
+                this.props.onRemoveUnusedResources(kind);
               },
-            },
-          ]),
-      },
-    ];
-    if (getResourceActionsSpecificToStorageProvider && fileMetadata) {
-      menu.push({ type: 'separator' });
-      menu = menu.concat(
-        getResourceActionsSpecificToStorageProvider({
-          project: this.props.project,
-          fileMetadata,
-          resource,
-          i18n,
-          informUser: this.openInfoBar,
-          updateInterface: () => this.forceUpdateList(),
-          cleanUserSelectionOfResources: () =>
-            this.props.onSelectResource(null),
-        })
-      );
-    }
-    return menu;
-  };
+            }))
+            .concat([
+              {
+                label: i18n._(t`Resources (any kind)`),
+                click: () => {
+                  allResourceKindsAndMetadata.forEach(
+                    (resourceKindAndMetadata) => {
+                      this.props.onRemoveUnusedResources(
+                        resourceKindAndMetadata.kind
+                      );
+                    }
+                  );
+                },
+              },
+            ]),
+        },
+      ];
+      if (getResourceActionsSpecificToStorageProvider && fileMetadata) {
+        menu.push({ type: 'separator' });
+        menu = menu.concat(
+          getResourceActionsSpecificToStorageProvider({
+            project: this.props.project,
+            fileMetadata,
+            resource,
+            i18n,
+            informUser: this.openInfoBar,
+            updateInterface: () => this.forceUpdateList(),
+            cleanUserSelectionOfResources: () =>
+              this.props.onSelectResource(null),
+          })
+        );
+      }
+      return menu;
+    };
 
   checkMissingPaths = () => {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const resourcesWithErrors = {};
-    resourceNames.forEach(resourceName => {
+    resourceNames.forEach((resourceName) => {
       resourcesWithErrors[resourceName] = getResourceFilePathStatus(
         project,
         resourceName
@@ -268,7 +267,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     const allResourcesList = resourcesManager
       .getAllResourceNames()
       .toJSArray()
-      .map(resourceName => resourcesManager.getResource(resourceName));
+      .map((resourceName) => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project
@@ -283,7 +282,7 @@ export default class ResourcesList extends React.Component<Props, State> {
             <SearchBar
               value={searchText}
               onRequestSearch={() => {}}
-              onChange={text =>
+              onChange={(text) =>
                 this.setState({
                   searchText: text,
                 })
@@ -299,7 +298,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={filteredList}
                     width={width}
                     height={height}

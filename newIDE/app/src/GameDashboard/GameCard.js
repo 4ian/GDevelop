@@ -94,10 +94,8 @@ export const GameCard = ({
     Window.openExternalURL(url);
   };
   const [showShareGameDialog, setShowShareGameDialog] = React.useState(false);
-  const [
-    editedProperty,
-    setEditedProperty,
-  ] = React.useState<?TogglableProperties>(null);
+  const [editedProperty, setEditedProperty] =
+    React.useState<?TogglableProperties>(null);
   const [isDeletingGame, setIsDeletingGame] = React.useState(false);
 
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -154,9 +152,8 @@ export const GameCard = ({
       await onUpdateGame();
     } catch (error) {
       console.error('Unable to delete the game:', error);
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (
         extractedStatusAndCode &&
         extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'

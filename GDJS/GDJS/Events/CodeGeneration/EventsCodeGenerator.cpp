@@ -1332,7 +1332,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     }
     else {
       output = "// Unsupported unified variables in functions.";
-      output += "runtimeScene.getScene().getVariables()";
+      output += "gdjs.VariablesContainer.badVariablesContainer";
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";

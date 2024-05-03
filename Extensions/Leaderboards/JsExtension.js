@@ -113,7 +113,7 @@ module.exports = {
         _(
           'Set if the score sent to a leaderboard is always attached to the connected player - if any. This is on by default.'
         ),
-        _('Always attach the score to the connected player: _PARAM0_'),
+        _('Always attach the score to the connected player: _PARAM1_'),
         _('Setup'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'

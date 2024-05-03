@@ -368,7 +368,10 @@ namespace gdjs {
         }
       };
 
-      export const setPreferSendConnectedPlayerScore = (enable: boolean) => {
+      export const setPreferSendConnectedPlayerScore = (
+        runtimeScene: gdjs.RuntimeScene,
+        enable: boolean
+      ) => {
         _preferSendConnectedPlayerScore = enable;
       };
 

@@ -38,12 +38,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
  public:
   ExpressionValidator(const gd::Platform &platform_,
                       const gd::ProjectScopedContainers & projectScopedContainers_,
-                      const gd::String &rootType_)
+                      const gd::String &rootType_,
+                      const gd::String &extraInfo_ = "")
       : platform(platform_),
         projectScopedContainers(projectScopedContainers_),
         parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
         childType(Type::Unknown),
-        forbidsUsageOfBracketsBecauseParentIsObject(false) {};
+        forbidsUsageOfBracketsBecauseParentIsObject(false),
+        currentParameterExtraInfo(&extraInfo_) {};
   virtual ~ExpressionValidator(){};
 
   /**
@@ -201,9 +203,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     if (parentType == Type::Variable) {
       childType = parentType;
 
-      const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
-      if (!variablesContainersList.Has(node.name)) {
-        RaiseTypeError(_("No variable with this name found."), node.location);
+      if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+        const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+        if (!variablesContainersList.Has(node.name)) {
+          RaiseTypeError(_("No variable with this name found."), node.location);
+        }
       }
 
       if (node.child) {
@@ -290,7 +294,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     Type currentParentType = parentType;
     parentType = Type::NumberOrString;
+    auto parentParameterExtraInfo = currentParameterExtraInfo;
+    currentParameterExtraInfo = nullptr;
     node.expression->Visit(*this);
+    currentParameterExtraInfo = parentParameterExtraInfo;
     parentType = currentParentType;
 
     if (node.child) {
@@ -325,9 +332,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
     }
     else if (parentType == Type::Variable) {
-      const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
-      if (!variablesContainersList.Has(node.identifierName)) {
-        RaiseTypeError(_("No variable with this name found."), node.location);
+      if (!currentParameterExtraInfo || *currentParameterExtraInfo != "AllowUndeclaredVariable") {
+        const auto& variablesContainersList = projectScopedContainers.GetVariablesContainersList();
+        if (!variablesContainersList.Has(node.identifierName)) {
+          RaiseTypeError(_("No variable with this name found."), node.location);
+        }
       }
     }
     else if (parentType != Type::Object && parentType != Type::LegacyVariable) {
@@ -439,6 +448,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   Type childType; ///< The type "discovered" down the tree and passed up.
   Type parentType; ///< The type "required" by the top of the tree.
   bool forbidsUsageOfBracketsBecauseParentIsObject;
+  const gd::String *currentParameterExtraInfo;
   const gd::Platform &platform;
   const gd::ProjectScopedContainers &projectScopedContainers;
 };

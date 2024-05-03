@@ -111,16 +111,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetRelevantForLayoutEventsOnly();
 
   extension
-      .AddExpression("VariableChildCount2",
-                     _("Number of children"),
-                     _("Number of children in an array or "
-                       "structure variable"),
-                     _("Arrays and structures"),
-                     "res/actions/var.png")
-      .AddParameter("variable", _("Array or structure variable"))
-      .SetRelevantForLayoutEventsOnly();
-
-  extension
       .AddCondition(
           "VariableChildCount",
           _("Number of children"),
@@ -866,8 +856,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                        "structure variable"),
                      _("Scene variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("scenevar", _("Array or structure variable"))
-      .SetRelevantForFunctionEventsOnly();
+      .AddParameter("variable", _("Array or structure variable"), "AllowUndeclaredVariable");
 
   extension
       .AddExpression("Variable",

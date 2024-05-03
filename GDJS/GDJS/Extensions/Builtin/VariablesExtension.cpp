@@ -11,6 +11,7 @@
 #include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
+#include "GDCore/IDE/Events/ExpressionVariableNameFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
@@ -38,8 +39,29 @@ VariablesExtension::VariablesExtension() {
   GetAllExpressions()["VariableLastNumber"].SetFunctionName(
       "gdjs.evtTools.variable.getLastVariableNumber");
 
-  GetAllExpressions()["VariableChildCount2"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableChildCount");
+  GetAllExpressions()["VariableChildCount"].SetCustomCodeGenerator(
+      [](const std::vector<gd::Expression> &parameters, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        auto &variableExpression = parameters[0];
+        const auto variableName =
+            gd::ExpressionVariableNameFinder::GetVariableName(
+                *variableExpression.GetRootNode());
+
+        // This expression used to be declared with a scenevar parameter.
+        gd::String variableParameterType =
+            codeGenerator.GetProjectScopedContainers()
+                    .GetVariablesContainersList()
+                    .Has(variableName)
+                ? "variable"
+                : "scenevar";
+
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, variableParameterType,
+                variableExpression.GetPlainString(), "", "AllowUndeclaredVariable");
+
+        return "gdjs.evtTools.variable.getVariableChildCount(" + varGetter + ")";
+      });
   GetAllConditions()["VariableChildCount"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableChildCount");
   GetAllConditions()["VariableChildExists2"].SetFunctionName(
@@ -155,8 +177,6 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["GlobalVariableAsBoolean"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableBoolean");
 
-  GetAllExpressions()["VariableChildCount"].SetFunctionName(
-      "gdjs.evtTools.variable.getVariableChildCount");
   GetAllExpressions()["GlobalVariableChildCount"].SetFunctionName(
       "gdjs.evtTools.variable.getVariableChildCount");
 

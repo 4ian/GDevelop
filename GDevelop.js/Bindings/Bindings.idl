@@ -2528,7 +2528,8 @@ interface ExpressionValidator {
     void ExpressionValidator(
         [Const, Ref] Platform platform,
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
-        [Const] DOMString rootType);
+        [Const] DOMString rootType,
+        [Const] DOMString extraInfo);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetAllErrors();
     [Const, Ref] VectorExpressionParserDiagnostic GetFatalErrors();

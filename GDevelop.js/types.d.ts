@@ -1929,7 +1929,7 @@ export class VectorExpressionParserDiagnostic extends EmscriptenObject {
 export class ExpressionParser2NodeWorker extends EmscriptenObject {}
 
 export class ExpressionValidator extends EmscriptenObject {
-  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string);
+  constructor(platform: Platform, projectScopedContainers: ProjectScopedContainers, rootType: string, extraInfo: string);
   getAllErrors(): VectorExpressionParserDiagnostic;
   getFatalErrors(): VectorExpressionParserDiagnostic;
 }

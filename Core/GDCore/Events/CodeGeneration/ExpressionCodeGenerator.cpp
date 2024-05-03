@@ -39,7 +39,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerationContext& context,
     const gd::String& rootType,
     const gd::Expression& expression,
-    const gd::String& rootObjectName) {
+    const gd::String& rootObjectName,
+    const gd::String& extraInfo) {
   ExpressionCodeGenerator generator(rootType, rootObjectName, codeGenerator, context);
 
   auto node = expression.GetRootNode();
@@ -52,7 +53,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
 
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetProjectScopedContainers(),
-                                    rootType);
+                                    rootType,
+                                    extraInfo);
   node->Visit(validator);
   if (!validator.GetFatalErrors().empty()) {
     std::cout << "Error: \"" << validator.GetFatalErrors()[0]->GetMessage()

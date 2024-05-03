@@ -688,13 +688,13 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
   if (ParameterMetadata::IsExpression("number", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "number", parameter, lastObjectName);
+        *this, context, "number", parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("string", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "string", parameter, lastObjectName);
+        *this, context, "string", parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsExpression("variable", metadata.GetType())) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, metadata.GetType(), parameter, lastObjectName);
+        *this, context, metadata.GetType(), parameter, lastObjectName, metadata.GetExtraInfo());
   } else if (ParameterMetadata::IsObject(metadata.GetType())) {
     // It would be possible to run a gd::ExpressionCodeGenerator if later
     // objects can have nested objects, or function returning objects.

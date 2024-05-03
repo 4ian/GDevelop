@@ -375,7 +375,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(
         dynamic_cast<EmptyNode*>(parameter.get()) == nullptr) {
       auto currentParentType = parentType;
       parentType = StringToType(parameterMetadata.GetType());
+      auto parentParameterExtraInfo = currentParameterExtraInfo;
+      currentParameterExtraInfo = &parameterMetadata.GetExtraInfo();
       parameter->Visit(*this);
+      currentParameterExtraInfo = parentParameterExtraInfo;
       parentType = currentParentType;
 
       const gd::String& expectedParameterType = parameterMetadata.GetType();

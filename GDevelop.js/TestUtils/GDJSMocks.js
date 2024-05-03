@@ -179,6 +179,10 @@ class Variable {
     return Object.values(this._children);
   }
 
+  getChildrenCount() {
+    return Object.keys(this._children).length;
+  }
+
   castTo() {}
 
   isPrimitive() {
@@ -884,6 +888,7 @@ function makeMinimalGDJSMock(options) {
           variablePushCopy: (array, variable) =>
             array.pushVariableCopy(variable),
           valuePush: (array, value) => array.pushValue(value),
+          getVariableChildCount: (variable) => variable.getChildrenCount(),
         },
         object: {
           createObjectOnScene,

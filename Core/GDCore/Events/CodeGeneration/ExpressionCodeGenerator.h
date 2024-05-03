@@ -59,7 +59,8 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
                                            EventsCodeGenerationContext& context,
                                            const gd::String& type,
                                            const gd::Expression& expression,
-                                           const gd::String& objectName = "");
+                                           const gd::String& objectName = "",
+                                           const gd::String& extraInfo = "");
 
   const gd::String& GetOutput() { return output; };
 

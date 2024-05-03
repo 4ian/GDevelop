@@ -77,22 +77,41 @@ namespace gdjs {
     constructor(objectInstance: RuntimeObject) {
       super();
       this.objectInstance = objectInstance;
-      objectInstance.registerDestroyCallback(() => {
-        this.onObjectDeleted();
+      objectInstance.registerDestroyCallback(this.onObjectDestroyedCallback);
+    }
 
+    private _onObjectDestroyedCallback() {
+      this.onObjectDeleted();
+
+      // @ts-ignore At this point, the subclass code will not be called again,
+      //            so we may allow this type contract transgression to avoid
+      //            potentially leaking a reference to the object.
+      this.objectInstance = null;
+    }
+    private onObjectDestroyedCallback = this._onObjectDestroyedCallback.bind(
+      this
+    );
+
+    /** The update method is handled by `ObjectBoundTask` - override `shouldResolve` instead. */
+    update(runtimeScene: RuntimeScene) {
+      const shouldResolve =
+        // Force resolve if the object has been deleted from the scene
+        this.objectInstance === null ||
+        // Else, delegate the resolve check to the subclass
+        this.shouldResolve(runtimeScene);
+
+      if (shouldResolve) {
+        // Resolving imminent - cleaning up all references
+        this.objectInstance.unregisterDestroyCallback(
+          this.onObjectDestroyedCallback
+        );
         // @ts-ignore At this point, the subclass code will not be called again,
         //            so we may allow this type contract transgression to avoid
         //            potentially leaking a reference to the object.
         this.objectInstance = null;
-      });
-    }
+      }
 
-    /** The update method is handled by `ObjectBoundTask` - override `shouldResolve` instead. */
-    update(runtimeScene: RuntimeScene) {
-      // Force resolve if the object has been deleted from the scene
-      if (this.objectInstance === null) return true;
-      // Else, delegate the resolve check to the subclass
-      return this.shouldResolve(runtimeScene);
+      return shouldResolve;
     }
 
     /**

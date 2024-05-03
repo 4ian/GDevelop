@@ -59,7 +59,7 @@ namespace gdjs {
   const exponentialInterpolation =
     gdjs.evtTools.common.exponentialInterpolation;
 
-  class TweenAwaiterTask extends gdjs.ObjectBoundTask {
+  class ObjectTweenAwaiterTask extends gdjs.ObjectBoundTask {
     manager: gdjs.evtTools.tween.TweenManager;
     identifier: string;
 
@@ -1880,7 +1880,7 @@ namespace gdjs {
      */
     awaitTween(identifier: string): gdjs.AsyncTask {
       return this._tweens.exists(identifier)
-        ? new TweenAwaiterTask(this.owner, this._tweens, identifier)
+        ? new ObjectTweenAwaiterTask(this.owner, this._tweens, identifier)
         : new gdjs.ResolveTask();
     }
 

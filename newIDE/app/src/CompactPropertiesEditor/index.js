@@ -55,7 +55,7 @@ export type PrimitiveValueField =
         label: string,
         tooltipContent: React.Node,
       |},
-      getEndAdornmentIcon?: () => React.Node,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
@@ -69,7 +69,7 @@ export type PrimitiveValueField =
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      getEndAdornmentIcon?: () => React.Node,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
       onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
@@ -86,6 +86,7 @@ export type PrimitiveValueField =
       getValue: Instance => any,
       isHighlighted: (value: any) => boolean,
       setValue: (instance: Instance, newValue: any) => void,
+      getNextValue: (currentValue: any) => any,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -257,14 +258,38 @@ const getFieldValue = ({
   if (!getValue) return null;
 
   let value = getValue(instances[0]);
-  for (var i = 1; i < instances.length; ++i) {
-    if (value !== getValue(instances[i])) {
-      if (typeof defaultValue !== 'undefined') value = defaultValue;
-      break;
+  if (typeof defaultValue !== 'undefined') {
+    for (var i = 1; i < instances.length; ++i) {
+      if (value !== getValue(instances[i])) {
+        value = defaultValue;
+        break;
+      }
     }
   }
 
   return value;
+};
+
+const getFieldEndAdornmentIcon = ({
+  instances,
+  field,
+}: {|
+  instances: Instances,
+  field: ValueField,
+|}): ?(className: string) => React.Node => {
+  if (!instances[0]) {
+    console.warn(
+      'getFieldEndAdornmentIcon was called with an empty list of instances (or containing undefined). This is a bug that should be fixed.'
+    );
+    return null;
+  }
+  if (!field.getEndAdornmentIcon) return null;
+
+  for (const instance of instances) {
+    const getEndAdornmentIcon = field.getEndAdornmentIcon(instance);
+    if (getEndAdornmentIcon) return getEndAdornmentIcon;
+  }
+  return null;
 };
 
 const getFieldLabel = ({
@@ -386,7 +411,8 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
-          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+          renderEndAdornmentOnHover:
+            getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));
@@ -466,7 +492,9 @@ const CompactPropertiesEditor = ({
             tooltip={getFieldLabel({ instances, field })}
             selected={field.isHighlighted(value)}
             onClick={event => {
-              instances.forEach(i => field.setValue(i, !value));
+              instances.forEach(i =>
+                field.setValue(i, field.getNextValue(value))
+              );
               _onInstancesModified(instances);
             }}
           >
@@ -515,7 +543,8 @@ const CompactPropertiesEditor = ({
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
-          renderEndAdornmentOnHover: field.getEndAdornmentIcon || undefined,
+          renderEndAdornmentOnHover:
+            getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
             instances.forEach(i => onClickEndAdornment(i));

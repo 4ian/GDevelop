@@ -283,6 +283,7 @@ export const Default = () => (
         currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
+        onOpenTeachingResources={action('onOpenTeachingResources')}
       />
     </FixedHeightFlexContainer>
   </MockTeamProvider>
@@ -296,6 +297,7 @@ export const WithNoGroupsYet = () => (
         currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
+        onOpenTeachingResources={action('onOpenTeachingResources')}
       />
     </FixedHeightFlexContainer>
   </MockTeamProvider>
@@ -309,6 +311,7 @@ export const Loading = () => (
         currentFileMetadata={null}
         onOpenRecentFile={action('onOpenRecentFile')}
         storageProviders={[CloudStorageProvider]}
+        onOpenTeachingResources={action('onOpenTeachingResources')}
       />
     </FixedHeightFlexContainer>
   </MockTeamProvider>

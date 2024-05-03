@@ -4,7 +4,7 @@ import { Trans, t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import List from '@material-ui/core/List';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line, Column, Spacer } from '../../../../UI/Grid';
 
 import {
   type FileMetadataAndStorageProviderName,
@@ -42,6 +42,7 @@ import ContextMenu, {
 } from '../../../../UI/Menu/ContextMenu';
 import type { ClientCoordinates } from '../../../../Utils/UseLongTouch';
 import { type MenuItemTemplate } from '../../../../UI/Menu/Menu.flow';
+import { EducationCard } from '../LearnSection/EducationCard';
 
 const PADDING = 16;
 
@@ -63,6 +64,7 @@ type Props = {|
   currentFileMetadata: ?FileMetadata,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   storageProviders: Array<StorageProvider>,
+  onOpenTeachingResources: () => void,
 |};
 
 export type TeamSectionInterface = {|
@@ -71,7 +73,13 @@ export type TeamSectionInterface = {|
 
 const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
   (
-    { project, onOpenRecentFile, storageProviders, currentFileMetadata },
+    {
+      project,
+      onOpenRecentFile,
+      storageProviders,
+      currentFileMetadata,
+      onOpenTeachingResources,
+    },
     ref
   ) => {
     const {
@@ -272,6 +280,8 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         }
       >
         <SectionRow>
+          <EducationCard onSeeResources={onOpenTeachingResources} />
+          <Spacer />
           {membersNotInAGroupToDisplay && (
             <Paper background="medium" style={styles.lobbyContainer}>
               <Line noMargin>

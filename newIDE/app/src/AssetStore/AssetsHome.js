@@ -28,6 +28,10 @@ import {
 import { useDebounce } from '../Utils/UseDebounce';
 import PromotionsSlideshow from '../Promotions/PromotionsSlideshow';
 import { ColumnStackLayout } from '../UI/Layout';
+import {
+  GithubStarCard,
+  shouldDisplayGithubStarCard,
+} from '../Profile/GithubStarCard';
 
 const cellSpacing = 2;
 
@@ -160,6 +164,7 @@ type Props = {|
   openedShopCategory: string | null,
   hideGameTemplates?: boolean,
   displayPromotions?: boolean,
+  onOpenProfile?: () => void,
 |};
 
 export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
@@ -175,13 +180,17 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
       openedShopCategory,
       hideGameTemplates,
       displayPromotions,
+      onOpenProfile,
     }: Props,
     ref
   ) => {
     const { windowSize, isLandscape } = useResponsiveWindowSize();
-    const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
-      AuthenticatedUserContext
-    );
+    const {
+      receivedAssetPacks,
+      receivedGameTemplates,
+      badges,
+      achievements,
+    } = React.useContext(AuthenticatedUserContext);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -394,6 +403,12 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
             </Text>
 
             <PromotionsSlideshow />
+            {onOpenProfile && shouldDisplayGithubStarCard({ badges }) && (
+              <GithubStarCard
+                achievements={achievements}
+                onOpenProfile={onOpenProfile}
+              />
+            )}
           </ColumnStackLayout>
         ) : null}
         {allBundleTiles.length ? (

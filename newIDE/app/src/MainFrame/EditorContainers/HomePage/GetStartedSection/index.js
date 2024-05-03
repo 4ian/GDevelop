@@ -90,6 +90,7 @@ type Props = {|
   onUserSurveyHidden: () => void,
   selectInAppTutorial: (tutorialId: string) => void,
   subscriptionPlansWithPricingSystems: ?(SubscriptionPlanWithPricingSystems[]),
+  onOpenProfile: () => void,
 |};
 
 const GetStartedSection = ({
@@ -97,6 +98,7 @@ const GetStartedSection = ({
   onUserSurveyStarted,
   onUserSurveyHidden,
   subscriptionPlansWithPricingSystems,
+  onOpenProfile,
 }: Props) => {
   const isFillingOutSurvey = hasStartedUserSurvey();
   const isOnline = useOnlineStatus();
@@ -182,7 +184,7 @@ const GetStartedSection = ({
       // Artificial delay to build up expectations.
       recommendationsGettingDelayPromise.current = delay(2500);
       await Promise.all([
-        onEditProfile({ survey }, preferences, { throwError: true }),
+        onEditProfile({ survey }, preferences),
         recommendationsGettingDelayPromise.current,
       ]);
       sendUserSurveyCompleted();
@@ -639,6 +641,7 @@ const GetStartedSection = ({
             subscriptionPlansWithPricingSystems={
               subscriptionPlansWithPricingSystems
             }
+            onOpenProfile={onOpenProfile}
             onStartSurvey={
               profile
                 ? () => {

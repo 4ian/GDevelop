@@ -214,6 +214,7 @@ const ProfileDialog = ({ open, onClose }: Props) => {
             {isConnected && (
               <div ref={userAchievementsContainerRef}>
                 <UserAchievements
+                  achievements={authenticatedUser.achievements}
                   badges={authenticatedUser.badges}
                   displayUnclaimedAchievements
                   displayNotifications

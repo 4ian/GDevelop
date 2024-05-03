@@ -1,24 +1,18 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import Link from '../../UI/Link';
-
-import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { type SubscriptionDialogDisplayReason } from '../../Utils/Analytics/EventSender';
 import { SubscriptionSuggestionContext } from './SubscriptionSuggestionContext';
 import RaisedButton from '../../UI/RaisedButton';
 import FlatButton from '../../UI/FlatButton';
 import Coin from '../../Credits/Icons/Coin';
+import { CalloutCard } from '../../UI/CalloutCard';
 
 const styles = {
-  subscriptionContainer: {
-    display: 'flex',
-    borderRadius: 10,
-  },
   diamondIcon: {
     width: 50,
     height: 50,
@@ -54,67 +48,58 @@ const GetSubscriptionCard = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
-  const subscriptionContainerStyle = {
-    ...styles.subscriptionContainer,
-    border: `1px solid ${gdevelopTheme.palette.secondary}`,
-  };
 
   return (
-    <div style={subscriptionContainerStyle}>
-      <Line alignItems="center" expand>
+    <CalloutCard
+      renderImage={style => (
         <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
-        <Column expand>
-          <ResponsiveLineStackLayout
-            alignItems="center"
-            noColumnMargin
-            noMargin
-          >
-            <Column noMargin expand>
-              {children}
-            </Column>
-            {payWithCreditsOptions && (
-              <FlatButton
-                leftIcon={<Coin style={styles.coinIcon} />}
-                label={payWithCreditsOptions.label}
+      )}
+    >
+      <Column expand justifyContent="center">
+        <ResponsiveLineStackLayout alignItems="center" noColumnMargin noMargin>
+          <Column noMargin expand>
+            {children}
+          </Column>
+          {payWithCreditsOptions && (
+            <FlatButton
+              leftIcon={<Coin style={styles.coinIcon} />}
+              label={payWithCreditsOptions.label}
+              primary
+              onClick={payWithCreditsOptions.onPayWithCredits}
+            />
+          )}
+          {!hideButton &&
+            (!makeButtonRaised ? (
+              <Link
+                href="#"
+                onClick={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: subscriptionDialogOpeningReason,
+                    },
+                  });
+                }}
+              >
+                <Text noMargin color="inherit">
+                  {label || <Trans>Upgrade</Trans>}
+                </Text>
+              </Link>
+            ) : (
+              <RaisedButton
+                label={label || <Trans>Upgrade</Trans>}
                 primary
-                onClick={payWithCreditsOptions.onPayWithCredits}
+                onClick={() => {
+                  openSubscriptionDialog({
+                    analyticsMetadata: {
+                      reason: subscriptionDialogOpeningReason,
+                    },
+                  });
+                }}
               />
-            )}
-            {!hideButton &&
-              (!makeButtonRaised ? (
-                <Link
-                  href="#"
-                  onClick={() => {
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: subscriptionDialogOpeningReason,
-                      },
-                    });
-                  }}
-                >
-                  <Text noMargin color="inherit">
-                    {label || <Trans>Upgrade</Trans>}
-                  </Text>
-                </Link>
-              ) : (
-                <RaisedButton
-                  label={label || <Trans>Upgrade</Trans>}
-                  primary
-                  onClick={() => {
-                    openSubscriptionDialog({
-                      analyticsMetadata: {
-                        reason: subscriptionDialogOpeningReason,
-                      },
-                    });
-                  }}
-                />
-              ))}
-          </ResponsiveLineStackLayout>
-        </Column>
-      </Line>
-    </div>
+            ))}
+        </ResponsiveLineStackLayout>
+      </Column>
+    </CalloutCard>
   );
 };
 

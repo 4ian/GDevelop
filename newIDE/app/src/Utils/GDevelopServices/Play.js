@@ -350,6 +350,12 @@ export const listComments = async (
     .then(response => response.data);
 };
 
+export const canCommentBeRatedByOwner = (comment: Comment): boolean => {
+  if (!comment.text) return false;
+
+  return true;
+};
+
 export const updateComment = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,

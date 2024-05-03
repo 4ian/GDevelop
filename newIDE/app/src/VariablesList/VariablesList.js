@@ -544,7 +544,7 @@ const VariablesList = (props: Props) => {
         const newNodes = Array.isArray(nodes) ? nodes : nodes(selectedNodes);
         if (onSelectedVariableChange) {
           onSelectedVariableChange(newNodes);
-        }        
+        }
         return newNodes;
       });
     },

@@ -876,8 +876,11 @@ void CommonInstructionsExtension::GenerateLocalVariablesInitializationCode(
   for (std::size_t i = 0; i < variablesContainer.Count(); i++) {
     auto &variable = variablesContainer.Get(i);
     code += "{\n";
-    code += "const variable = variables.getFromIndex(" + gd::String::From(i) + ");\n";
     GenerateLocalVariableInitializationCode(variable, code);
+    code += "variables._declare(" +
+            EventsCodeGenerator::ConvertToStringExplicit(
+                variablesContainer.GetNameAt(i)) +
+            ", variable);\n";
     code += "}\n";
   }
   code +=
@@ -889,9 +892,7 @@ void CommonInstructionsExtension::GenerateLocalVariableInitializationCode(
     gd::Variable &variable, gd::String &code, std::size_t depth) {
   const gd::String variableCodeName =
       "variable" + (depth == 0 ? "" : gd::String::From(depth));
-  if (depth > 0) {
-    code += "const " + variableCodeName + " = new gdjs.Variable();\n";
-  }
+  code += "const " + variableCodeName + " = new gdjs.Variable();\n";
   if (variable.GetType() == gd::Variable::Number) {
     code += variableCodeName + ".setNumber(" +
             gd::String::From(variable.GetValue()) + ");\n";

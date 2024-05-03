@@ -307,6 +307,11 @@ class VariablesContainer {
     }
   }
 
+  _declare(name, newVariable) {
+    this._variables.put(name, newVariable);
+    this._indexedVariables.push(newVariable);
+  }
+
   /**
    * @param {string} name
    * @returns {Variable}

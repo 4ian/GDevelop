@@ -19,7 +19,8 @@ const dialogContent = {
     { messageByLocale: { en: 'you made it until the end of the tutorial!' } },
     {
       messageByLocale: {
-        en: 'You can be proud. You just discovered all the **concepts** of GDevelop',
+        en:
+          'You can be proud. You just discovered all the **concepts** of GDevelop',
       },
     },
     {

@@ -53,19 +53,20 @@ export default class BrowserS3FileSystem {
     this.bucketBaseUrl = bucketBaseUrl;
 
     this._indexedFilesContent = {};
-    filesContent.forEach((textFileDescriptor) => {
-      this._indexedFilesContent[textFileDescriptor.filePath] =
-        textFileDescriptor;
+    filesContent.forEach(textFileDescriptor => {
+      this._indexedFilesContent[
+        textFileDescriptor.filePath
+      ] = textFileDescriptor;
     });
   }
 
   uploadPendingObjects = () => {
     return Promise.all(this._pendingUploadObjects.map(uploadObject)).then(
-      (result) => {
+      result => {
         console.log('Uploaded all objects:', result);
         this._pendingUploadObjects = [];
       },
-      (error) => {
+      error => {
         console.error("Can't upload all objects:", error);
         throw error;
       }
@@ -159,7 +160,7 @@ export default class BrowserS3FileSystem {
 
     // Simulate ReadDir by returning all external URLs
     // with the filename matching the extension.
-    this._allCopiedExternalUrls.forEach((url) => {
+    this._allCopiedExternalUrls.forEach(url => {
       const upperCaseUrl = url.toUpperCase();
       if (upperCaseUrl.indexOf(ext) === upperCaseUrl.length - ext.length) {
         output.push_back(url);

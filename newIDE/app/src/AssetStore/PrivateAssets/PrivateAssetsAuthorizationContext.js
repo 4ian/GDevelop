@@ -29,11 +29,12 @@ const initialPrivateAssetsState = {
   authorizationToken: null,
   updateAuthorizationToken: async () => {},
   fetchPrivateAsset: async (assetShortHeader, options) => null,
-  installPrivateAsset: async (options) => null,
-  getPrivateAssetPackAudioArchiveUrl: async (id) => null,
+  installPrivateAsset: async options => null,
+  getPrivateAssetPackAudioArchiveUrl: async id => null,
 };
 
-const PrivateAssetsAuthorizationContext =
-  React.createContext<PrivateAssetsState>(initialPrivateAssetsState);
+const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(
+  initialPrivateAssetsState
+);
 
 export default PrivateAssetsAuthorizationContext;

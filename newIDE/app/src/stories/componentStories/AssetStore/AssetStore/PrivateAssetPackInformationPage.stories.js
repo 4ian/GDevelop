@@ -242,11 +242,11 @@ const PrivateAssetPackInformationPageStory = ({
       errorCode
         ? errorMessage || null
         : privateAssetPacks.find(
-            (assetPack) => assetPack.id === privateAssetPackListingData.id
+            assetPack => assetPack.id === privateAssetPackListingData.id
           )
     )
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -257,12 +257,12 @@ const PrivateAssetPackInformationPageStory = ({
     .onGet('/product-license')
     .reply(200, fakeAssetPackLicenses)
     .onPost(`/product/${privateAssetPackListingData.id}/action/redeem`)
-    .reply((config) => {
+    .reply(config => {
       action('Claim asset pack')();
       return [200, 'OK'];
     })
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -278,7 +278,7 @@ const PrivateAssetPackInformationPageStory = ({
         value={{
           ...authenticatedUser,
           receivedAssetPacks,
-          assetPackPurchases: receivedAssetPacks.map((privateAssetPack) => ({
+          assetPackPurchases: receivedAssetPacks.map(privateAssetPack => ({
             id: 'purchase-id',
             productType: 'ASSET_PACK',
             usageType: 'commercial',
@@ -300,7 +300,7 @@ const PrivateAssetPackInformationPageStory = ({
               onAssetPackOpen={() => action('open asset pack')()}
               onGameTemplateOpen={() => action('open game template')()}
               privateAssetPackListingDatasFromSameCreator={allPrivateAssetPackListingData.filter(
-                (assetPackListingData) =>
+                assetPackListingData =>
                   assetPackListingData.id !== privateAssetPackListingData.id
               )}
             />

@@ -65,7 +65,7 @@ export default class InstancesSelection {
   |}) {
     if (!multiSelect) this.clearSelection();
 
-    instances.forEach((instance) => {
+    instances.forEach(instance => {
       this.selectInstance({
         instance,
         multiSelect: true,

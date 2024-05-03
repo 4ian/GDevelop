@@ -53,7 +53,7 @@ export const enumerateVariables = (
     if (type === gd.Variable.Structure) {
       return [
         enumeratedVariable,
-        ...flatMap(variable.getAllChildrenNames().toJSArray(), (childName) =>
+        ...flatMap(variable.getAllChildrenNames().toJSArray(), childName =>
           enumerateVariableAndChildrenNames(
             isValidIdentifier(childName)
               ? `${fullName}.${childName}`
@@ -85,7 +85,7 @@ export const enumerateVariables = (
   };
 
   return flatten(
-    mapFor(0, variablesContainer.count(), (i) => {
+    mapFor(0, variablesContainer.count(), i => {
       return enumerateVariableAndChildrenNames(
         variablesContainer.getNameAt(i),
         variablesContainer.getAt(i),

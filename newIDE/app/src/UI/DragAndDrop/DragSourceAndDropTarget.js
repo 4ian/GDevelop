@@ -124,11 +124,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     sourceSpec,
     sourceCollect
   )(
-    DropTarget(
-      reactDndType,
-      targetSpec,
-      targetCollect
-    )(
+    DropTarget(reactDndType, targetSpec, targetCollect)(
       ({
         children,
         connectDragSource,

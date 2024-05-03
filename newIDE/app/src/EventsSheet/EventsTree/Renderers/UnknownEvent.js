@@ -6,7 +6,7 @@ import { type EventRendererProps } from './EventRenderer';
 
 export default class UnknownEvent extends React.Component<
   EventRendererProps,
-  *,
+  *
 > {
   render() {
     return (

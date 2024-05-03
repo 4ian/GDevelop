@@ -11,7 +11,7 @@ type Props = {|
   withOverlay?: boolean,
 |};
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(theme => {
   /**
    * Customize component with overlay:
    * - for dark themes (light font color on dark background), theme values are used.
@@ -23,17 +23,17 @@ const useStyles = makeStyles((theme) => {
     container: {
       borderRadius: 4,
       padding: '2px 4px',
-      backdropFilter: (props) =>
+      backdropFilter: props =>
         props.withOverlay && theme.palette.type === 'light'
           ? 'brightness(40%)'
           : undefined,
-      backgroundColor: (props) =>
+      backgroundColor: props =>
         props.withOverlay && theme.palette.type === 'light'
           ? undefined
           : theme.palette.background.alternate.startsWith('#')
-            ? theme.palette.background.alternate + 'BB' // manually add opacity to the background hex color
-            : theme.palette.background.alternate,
-      color: (props) =>
+          ? theme.palette.background.alternate + 'BB' // manually add opacity to the background hex color
+          : theme.palette.background.alternate,
+      color: props =>
         props.withOverlay && theme.palette.type === 'light'
           ? '#FAFAFA'
           : undefined,

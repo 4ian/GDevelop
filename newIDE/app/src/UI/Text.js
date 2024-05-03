@@ -139,8 +139,8 @@ const Text = React.forwardRef<Props, Interface>(
         display: displayInlineAsSpan
           ? 'inline-block'
           : displayAsListItem
-            ? 'list-item'
-            : undefined,
+          ? 'list-item'
+          : undefined,
         flexShrink: noShrink ? 0 : undefined,
         marginTop: noMargin ? 0 : 6,
         marginBottom: noMargin ? 0 : 6,

@@ -117,7 +117,7 @@ const getNotificationClickCallback = ({
   onMarkNotificationAsSeen,
 }: {
   notification: Notification,
-  addRouteArguments: (RouteArguments) => void,
+  addRouteArguments: RouteArguments => void,
   onCloseNotificationList: () => void,
   onMarkNotificationAsSeen: () => void,
 }): (() => void) | null => {

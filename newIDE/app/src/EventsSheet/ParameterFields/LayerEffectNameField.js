@@ -22,9 +22,11 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerEffectNameField(props: ParameterFieldProps, ref) {
-    const field =
-      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const field = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -55,7 +57,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const effectNames = getEffectNames();
 
     const isCurrentValueInEffectNamesList = !!effectNames.find(
-      (effectName) => `"${effectName}"` === props.value
+      effectName => `"${effectName}"` === props.value
     );
 
     // If the current value is not in the list, display an expression field.
@@ -80,7 +82,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = effectNames.map((effectName) => {
+    const selectOptions = effectNames.map(effectName => {
       return (
         <SelectOption
           key={effectName}
@@ -130,7 +132,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={(style) =>
+        renderButton={style =>
           props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

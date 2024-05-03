@@ -23,9 +23,11 @@ const gd: libGDevelop = global.gd;
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerEffectParameterNameField(props: ParameterFieldProps, ref) {
-    const field =
-      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const field = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -76,10 +78,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const effectParameterNames = getEffectParameterNames();
 
-    const isCurrentValueInEffectParameterNamesList =
-      !!effectParameterNames.find(
-        (effectParameterName) => `"${effectParameterName}"` === props.value
-      );
+    const isCurrentValueInEffectParameterNamesList = !!effectParameterNames.find(
+      effectParameterName => `"${effectParameterName}"` === props.value
+    );
 
     // If the current value is not in the list, display an expression field.
     const [isExpressionField, setIsExpressionField] = React.useState(
@@ -103,7 +104,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = effectParameterNames.map((effectParameterName) => {
+    const selectOptions = effectParameterNames.map(effectParameterName => {
       return (
         <SelectOption
           key={effectParameterName}
@@ -122,7 +123,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ref={field}
               id={
                 props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-layer-effect-parameter-name-field`
+                  ? `parameter-${
+                      props.parameterIndex
+                    }-layer-effect-parameter-name-field`
                   : undefined
               }
               value={props.value}
@@ -144,7 +147,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               ref={field}
               id={
                 props.parameterIndex !== undefined
-                  ? `parameter-${props.parameterIndex}-layer-effect-parameter-name-field`
+                  ? `parameter-${
+                      props.parameterIndex
+                    }-layer-effect-parameter-name-field`
                   : undefined
               }
               expressionType="string"
@@ -153,7 +158,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={(style) =>
+        renderButton={style =>
           props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

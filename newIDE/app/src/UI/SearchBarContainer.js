@@ -112,8 +112,8 @@ const getStyles = ({
       color: disabled
         ? theme.searchBar.textColor.disabled
         : nonEmpty && focused
-          ? theme.searchBar.textColor.focused
-          : theme.searchBar.textColor.default,
+        ? theme.searchBar.textColor.focused
+        : theme.searchBar.textColor.default,
       ...textEllipsisStyle,
     },
     searchContainer: {

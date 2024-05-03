@@ -9,7 +9,7 @@ const gd: libGDevelop = global.gd;
 // $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
-  _: (message) => message.id,
+  _: message => message.id,
 });
 
 describe('setupInstructionParameters', () => {
@@ -25,7 +25,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const playMusicInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) => enumeratedInstruction.type === 'PlayMusic'
+      enumeratedInstruction => enumeratedInstruction.type === 'PlayMusic'
     );
 
     if (!playMusicInstruction) {
@@ -65,7 +65,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) =>
+      enumeratedInstruction =>
         enumeratedInstruction.type ===
         'AnimatableCapability::AnimatableBehavior::SetName'
     );
@@ -113,7 +113,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) =>
+      enumeratedInstruction =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -165,7 +165,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) =>
+      enumeratedInstruction =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -215,7 +215,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) =>
+      enumeratedInstruction =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -268,7 +268,7 @@ describe('setupInstructionParameters', () => {
       makeFakeI18n()
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      (enumeratedInstruction) =>
+      enumeratedInstruction =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 

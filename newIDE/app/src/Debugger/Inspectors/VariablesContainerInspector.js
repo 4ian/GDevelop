@@ -170,7 +170,7 @@ const VariablesContainerInspector = (props: Props) => (
     enableClipboard={false}
     displayDataTypes={false}
     displayObjectSize={false}
-    onEdit={(edit) => handleEdit(edit, props)}
+    onEdit={edit => handleEdit(edit, props)}
     groupArraysAfterLength={50}
     theme="monokai"
     validationMessage="Invalid value"

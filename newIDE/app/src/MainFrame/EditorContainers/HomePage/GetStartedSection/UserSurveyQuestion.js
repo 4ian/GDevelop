@@ -48,15 +48,15 @@ const getColumnsFromWindowSize = (
 };
 
 const useStylesForAnswer = (isSelected?: boolean) =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: {
         '&:hover': {
           filter: isSelected
             ? undefined
             : theme.palette.type === 'dark'
-              ? 'brightness(120%)'
-              : 'brightness(85%)',
+            ? 'brightness(120%)'
+            : 'brightness(85%)',
         },
       },
     })
@@ -141,13 +141,13 @@ const styles = {
 
 type FreeAnswerProps = {|
   answerData: AnswerData,
-  onSelect: (string) => void,
+  onSelect: string => void,
   selected: boolean,
   i18n: I18nType,
   showCheckbox: boolean,
-  onClickSend?: (string) => void,
+  onClickSend?: string => void,
   value: string,
-  onChange: (string) => void,
+  onChange: string => void,
 |};
 
 const FreeAnswer = ({
@@ -188,7 +188,7 @@ const FreeAnswer = ({
         borderColor,
       }}
       classes={classes}
-      onClick={(e) => {
+      onClick={e => {
         if (e.nativeEvent && e.nativeEvent.x === 0 && e.nativeEvent.y === 0) {
           // Material UI buttons are clicked when focused and space key is pressed.
           // Here, it's an issue since the input is inside the button and each key press
@@ -237,7 +237,7 @@ const FreeAnswer = ({
                       value={value}
                       onChange={(_, newValue) => onChange(newValue)}
                       autoFocus="desktop"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     />
                   </div>
                   {clickSend && (
@@ -284,7 +284,7 @@ const FreeAnswer = ({
 
 type AnswerProps = {|
   answerData: AnswerData,
-  onSelect: (string) => void,
+  onSelect: string => void,
   selected: boolean,
   i18n: I18nType,
   showCheckbox: boolean,
@@ -345,14 +345,14 @@ const Answer = ({
 
 type Props = {|
   questionData: QuestionData,
-  onSelectAnswer: (string) => void,
+  onSelectAnswer: string => void,
   selectedAnswers: string[],
   showNextButton?: boolean,
   onClickNext: () => void,
   showQuestionText: boolean,
-  onClickSend?: (string) => void,
+  onClickSend?: string => void,
   userInputValue?: string,
-  onChangeUserInputValue?: (string) => void,
+  onChangeUserInputValue?: string => void,
 |};
 
 const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
@@ -395,54 +395,52 @@ const UserSurveyQuestion = React.forwardRef<Props, HTMLDivElement>(
               spacing={15}
               cellHeight="auto"
             >
-              {
-                // Case where only one free answer is possible.
-                onlyOneFreeAnswerPossible &&
-                userInputValue !== undefined &&
-                onChangeUserInputValue ? (
-                  <GridListTile>
-                    <FreeAnswer
-                      answerData={answers[0]}
-                      i18n={i18n}
-                      key={answers[0].id}
-                      // Do not leave possibility to unselect answer.
-                      onSelect={() => {}}
-                      selected={selectedAnswers.includes(answers[0].id)}
-                      showCheckbox={false}
-                      onClickSend={onClickSend}
-                      value={userInputValue}
-                      onChange={onChangeUserInputValue}
-                    />
+              {// Case where only one free answer is possible.
+              onlyOneFreeAnswerPossible &&
+              userInputValue !== undefined &&
+              onChangeUserInputValue ? (
+                <GridListTile>
+                  <FreeAnswer
+                    answerData={answers[0]}
+                    i18n={i18n}
+                    key={answers[0].id}
+                    // Do not leave possibility to unselect answer.
+                    onSelect={() => {}}
+                    selected={selectedAnswers.includes(answers[0].id)}
+                    showCheckbox={false}
+                    onClickSend={onClickSend}
+                    value={userInputValue}
+                    onChange={onChangeUserInputValue}
+                  />
+                </GridListTile>
+              ) : (
+                answers.map(answerData => (
+                  <GridListTile key={answerData.id}>
+                    {answerData.id === 'input' &&
+                    userInputValue !== undefined &&
+                    onChangeUserInputValue ? (
+                      <FreeAnswer
+                        answerData={answerData}
+                        i18n={i18n}
+                        onSelect={onSelectAnswer}
+                        selected={selectedAnswers.includes(answerData.id)}
+                        showCheckbox={!!multi}
+                        onClickSend={onClickSend}
+                        value={userInputValue}
+                        onChange={onChangeUserInputValue}
+                      />
+                    ) : (
+                      <Answer
+                        answerData={answerData}
+                        i18n={i18n}
+                        onSelect={onSelectAnswer}
+                        selected={selectedAnswers.includes(answerData.id)}
+                        showCheckbox={!!multi}
+                      />
+                    )}
                   </GridListTile>
-                ) : (
-                  answers.map((answerData) => (
-                    <GridListTile key={answerData.id}>
-                      {answerData.id === 'input' &&
-                      userInputValue !== undefined &&
-                      onChangeUserInputValue ? (
-                        <FreeAnswer
-                          answerData={answerData}
-                          i18n={i18n}
-                          onSelect={onSelectAnswer}
-                          selected={selectedAnswers.includes(answerData.id)}
-                          showCheckbox={!!multi}
-                          onClickSend={onClickSend}
-                          value={userInputValue}
-                          onChange={onChangeUserInputValue}
-                        />
-                      ) : (
-                        <Answer
-                          answerData={answerData}
-                          i18n={i18n}
-                          onSelect={onSelectAnswer}
-                          selected={selectedAnswers.includes(answerData.id)}
-                          showCheckbox={!!multi}
-                        />
-                      )}
-                    </GridListTile>
-                  ))
-                )
-              }
+                ))
+              )}
             </GridList>
             {showNextButton && (
               <Line justifyContent="flex-end">

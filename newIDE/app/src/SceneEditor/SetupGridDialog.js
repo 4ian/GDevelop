@@ -18,7 +18,7 @@ import {
 
 type Props = {|
   instancesEditorSettings: InstancesEditorSettings,
-  onChangeInstancesEditorSettings: (InstancesEditorSettings) => void,
+  onChangeInstancesEditorSettings: InstancesEditorSettings => void,
   onApply: () => void,
   onCancel: () => void,
 |};

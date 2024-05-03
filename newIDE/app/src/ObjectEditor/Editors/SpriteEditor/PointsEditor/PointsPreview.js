@@ -17,8 +17,8 @@ const getPointName = (kind: PointKind, point: gdPoint): string =>
   kind === pointKindIdentifiers.ORIGIN
     ? 'Origin'
     : kind === pointKindIdentifiers.CENTER
-      ? 'Center'
-      : point.getName();
+    ? 'Center'
+    : point.getName();
 
 const roundPointToHalfPixel = (point: gdPoint) => {
   point.setX(Math.round(point.getX() * 2) / 2);
@@ -35,7 +35,7 @@ type Props = {|
   onPointsUpdated: () => void,
   highlightedPointName: ?string,
   selectedPointName: ?string,
-  onClickPoint: (string) => void,
+  onClickPoint: string => void,
   forcedCursor: string | null,
   deactivateControls?: boolean,
 |};
@@ -81,22 +81,21 @@ const PointsPreview = (props: Props) => {
   /**
    * @returns The cursor position in the frame basis.
    */
-  const getCursorOnFrame = React.useCallback(
-    (event: any): [number, number] | null => {
-      if (!svgRef.current) return null;
+  const getCursorOnFrame = React.useCallback((event: any):
+    | [number, number]
+    | null => {
+    if (!svgRef.current) return null;
 
-      // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
-      const pointOnScreen = svgRef.current.createSVGPoint();
-      pointOnScreen.x = event.clientX;
-      pointOnScreen.y = event.clientY;
-      // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
-      const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
-      const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const pointOnScreen = svgRef.current.createSVGPoint();
+    pointOnScreen.x = event.clientX;
+    pointOnScreen.y = event.clientY;
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
+    const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
-      return [pointOnSvg.x, pointOnSvg.y];
-    },
-    []
-  );
+    return [pointOnSvg.x, pointOnSvg.y];
+  }, []);
 
   const onStartDragPoint = React.useCallback(
     (draggedPoint: gdPoint, draggedPointKind: PointKind) => {
@@ -109,25 +108,25 @@ const PointsPreview = (props: Props) => {
     [state.draggedPoint]
   );
 
-  const onEndDragPoint = React.useCallback(() => {
-    if (state.draggedPoint) {
-      roundPointToHalfPixel(state.draggedPoint);
-      onPointsUpdated();
-      // Select point at the end of the drag
-      if (state.draggedPointKind && state.draggedPoint) {
-        onClickPoint(getPointName(state.draggedPointKind, state.draggedPoint));
+  const onEndDragPoint = React.useCallback(
+    () => {
+      if (state.draggedPoint) {
+        roundPointToHalfPixel(state.draggedPoint);
+        onPointsUpdated();
+        // Select point at the end of the drag
+        if (state.draggedPointKind && state.draggedPoint) {
+          onClickPoint(
+            getPointName(state.draggedPointKind, state.draggedPoint)
+          );
+        }
       }
-    }
-    setState({
-      draggedPoint: null,
-      draggedPointKind: null,
-    });
-  }, [
-    state.draggedPoint,
-    state.draggedPointKind,
-    onPointsUpdated,
-    onClickPoint,
-  ]);
+      setState({
+        draggedPoint: null,
+        draggedPointKind: null,
+      });
+    },
+    [state.draggedPoint, state.draggedPointKind, onPointsUpdated, onClickPoint]
+  );
 
   /**
    * Move a point with the mouse. A similar dragging implementation is done in
@@ -212,8 +211,8 @@ const PointsPreview = (props: Props) => {
               pointName === highlightedPointName
                 ? 'rgba(0,0,0,0.75)'
                 : pointName === selectedPointName
-                  ? 'rgba(107,175,255,0.6)'
-                  : 'rgba(255,133,105,0.6)'
+                ? 'rgba(107,175,255,0.6)'
+                : 'rgba(255,133,105,0.6)'
             }
             stroke={pointName === highlightedPointName ? 'white' : undefined}
             strokeWidth={2}
@@ -300,9 +299,7 @@ const PointsPreview = (props: Props) => {
     ...mapVector(nonDefaultPoints, (point, i) => point.getName()),
     'Origin',
     'Center',
-  ].filter(
-    (name) => name !== selectedPointName && name !== highlightedPointName
-  );
+  ].filter(name => name !== selectedPointName && name !== highlightedPointName);
 
   return (
     <div
@@ -313,7 +310,7 @@ const PointsPreview = (props: Props) => {
       <svg style={svgStyle} ref={svgRef}>
         {/* Z index does not apply in SVG. To display selected and highlighted points
         above the other points, they must be rendered after the other ones. */}
-        {backgroundPointNames.map((pointName) =>
+        {backgroundPointNames.map(pointName =>
           renderPointOrCenterOrOrigin(pointName)
         )}
         {highlightedPointName &&
@@ -321,8 +318,8 @@ const PointsPreview = (props: Props) => {
         selectedPointName === highlightedPointName
           ? null // Do no render selected point if it's highlighted.
           : selectedPointName
-            ? renderPointOrCenterOrOrigin(selectedPointName)
-            : null}
+          ? renderPointOrCenterOrOrigin(selectedPointName)
+          : null}
         {highlightedPointName &&
           renderPointOrCenterOrOrigin(highlightedPointName)}
       </svg>

@@ -87,10 +87,12 @@ const globalVariablesItemId = getProjectManagerItemId('global-variables');
 const gameResourcesItemId = getProjectManagerItemId('game-resources');
 export const scenesRootFolderId = getProjectManagerItemId('scenes');
 export const extensionsRootFolderId = getProjectManagerItemId('extensions');
-export const externalEventsRootFolderId =
-  getProjectManagerItemId('external-events');
-export const externalLayoutsRootFolderId =
-  getProjectManagerItemId('external-layout');
+export const externalEventsRootFolderId = getProjectManagerItemId(
+  'external-events'
+);
+export const externalLayoutsRootFolderId = getProjectManagerItemId(
+  'external-layout'
+);
 
 const scenesEmptyPlaceholderId = 'scenes-placeholder';
 const extensionsEmptyPlaceholderId = 'extensions-placeholder';
@@ -369,12 +371,13 @@ const getTreeViewItemThumbnail = (item: TreeViewItem) =>
   item.content.getThumbnail();
 const getTreeViewItemDataSet = (item: TreeViewItem) =>
   item.content.getDataSet();
-const buildMenuTemplate =
-  (i18n: I18nType) => (item: TreeViewItem, index: number) =>
-    item.content.buildMenuTemplate(i18n, index);
-const renderTreeViewItemRightComponent =
-  (i18n: I18nType) => (item: TreeViewItem) =>
-    item.content.renderRightComponent(i18n);
+const buildMenuTemplate = (i18n: I18nType) => (
+  item: TreeViewItem,
+  index: number
+) => item.content.buildMenuTemplate(i18n, index);
+const renderTreeViewItemRightComponent = (i18n: I18nType) => (
+  item: TreeViewItem
+) => item.content.renderRightComponent(i18n);
 const renameItem = (item: TreeViewItem, newName: string) => {
   item.content.rename(newName);
 };
@@ -397,7 +400,7 @@ export type ProjectManagerInterface = {|
 
 type Props = {|
   project: gdProject,
-  onChangeProjectName: (string) => Promise<void>,
+  onChangeProjectName: string => Promise<void>,
   onSaveProjectProperties: (options: { newName?: string }) => Promise<boolean>,
   ...SceneTreeViewItemCallbacks,
   ...ExtensionTreeViewItemCallbacks,
@@ -410,7 +413,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: (ExtensionShortHeader) => void,
+  onInstallExtension: ExtensionShortHeader => void,
   onShareProject: () => void,
 
   // For resources:
@@ -449,22 +452,26 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
     ref
   ) => {
     const [selectedItems, setSelectedItems] = React.useState<
-      Array<TreeViewItem>,
+      Array<TreeViewItem>
     >([]);
 
     const preferences = React.useContext(PreferencesContext);
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const { currentlyRunningInAppTutorial } =
-      React.useContext(InAppTutorialContext);
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
     const { isMobile } = useResponsiveWindowSize();
     const { showDeleteConfirmation } = useAlertDialog();
 
-    const forceUpdateList = React.useCallback(() => {
-      forceUpdate();
-      if (treeViewRef.current) treeViewRef.current.forceUpdateList();
-    }, [forceUpdate]);
+    const forceUpdateList = React.useCallback(
+      () => {
+        forceUpdate();
+        if (treeViewRef.current) treeViewRef.current.forceUpdateList();
+      },
+      [forceUpdate]
+    );
 
     const [searchText, setSearchText] = React.useState('');
 
@@ -474,8 +481,10 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       }
     }, []);
 
-    const [projectPropertiesDialogOpen, setProjectPropertiesDialogOpen] =
-      React.useState(false);
+    const [
+      projectPropertiesDialogOpen,
+      setProjectPropertiesDialogOpen,
+    ] = React.useState(false);
     const [
       projectPropertiesDialogInitialTab,
       setProjectPropertiesDialogInitialTab,
@@ -502,33 +511,41 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       [unsavedChanges, onChangeProjectName]
     );
 
-    const [openGameDetails, setOpenGameDetails] =
-      React.useState<boolean>(false);
+    const [openGameDetails, setOpenGameDetails] = React.useState<boolean>(
+      false
+    );
     const projectUuid = project.getProjectUuid();
     const { games, fetchGames } = useGamesList();
     const { profile } = React.useContext(AuthenticatedUserContext);
     const userId = profile ? profile.id : null;
-    React.useEffect(() => {
-      fetchGames();
-    }, [fetchGames, userId]);
+    React.useEffect(
+      () => {
+        fetchGames();
+      },
+      [fetchGames, userId]
+    );
     const gameMatchingProjectUuid = games
-      ? games.find((game) => game.id === projectUuid)
+      ? games.find(game => game.id === projectUuid)
       : null;
     const onOpenGamesDashboardDialog = React.useCallback(
       () => setOpenGameDetails(true),
       []
     );
 
-    const [projectVariablesEditorOpen, setProjectVariablesEditorOpen] =
-      React.useState(false);
+    const [
+      projectVariablesEditorOpen,
+      setProjectVariablesEditorOpen,
+    ] = React.useState(false);
     const openProjectVariables = React.useCallback(() => {
       setProjectVariablesEditorOpen(true);
     }, []);
 
-    const [editedPropertiesLayout, setEditedPropertiesLayout] =
-      React.useState(null);
-    const [editedVariablesLayout, setEditedVariablesLayout] =
-      React.useState(null);
+    const [editedPropertiesLayout, setEditedPropertiesLayout] = React.useState(
+      null
+    );
+    const [editedVariablesLayout, setEditedVariablesLayout] = React.useState(
+      null
+    );
     const onOpenLayoutProperties = React.useCallback((layout: ?gdLayout) => {
       setEditedPropertiesLayout(layout);
     }, []);
@@ -536,13 +553,17 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       setEditedVariablesLayout(layout);
     }, []);
 
-    const [extensionsSearchDialogOpen, setExtensionsSearchDialogOpen] =
-      React.useState(false);
+    const [
+      extensionsSearchDialogOpen,
+      setExtensionsSearchDialogOpen,
+    ] = React.useState(false);
     const openSearchExtensionDialog = React.useCallback(() => {
       setExtensionsSearchDialogOpen(true);
     }, []);
-    const [openedExtensionShortHeader, setOpenedExtensionShortHeader] =
-      React.useState(null);
+    const [
+      openedExtensionShortHeader,
+      setOpenedExtensionShortHeader,
+    ] = React.useState(null);
     const [openedExtensionName, setOpenedExtensionName] = React.useState(null);
 
     const searchBarRef = React.useRef<?SearchBarInterface>(null);
@@ -557,10 +578,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       },
     }));
 
-    const onProjectItemModified = React.useCallback(() => {
-      forceUpdate();
-      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-    }, [forceUpdate, unsavedChanges]);
+    const onProjectItemModified = React.useCallback(
+      () => {
+        forceUpdate();
+        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      },
+      [forceUpdate, unsavedChanges]
+    );
 
     const editName = React.useCallback(
       (itemId: string) => {
@@ -579,7 +603,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const addNewScene = React.useCallback(
       (index: number, i18n: I18nType) => {
-        const newName = newNameGenerator(i18n._(t`Untitled scene`), (name) =>
+        const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
           project.hasLayoutNamed(name)
         );
         const newScene = project.insertNewLayout(newName, index + 1);
@@ -609,14 +633,13 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const onCreateNewExtension = React.useCallback(
       (project: gdProject, i18n: I18nType) => {
-        const newName = newNameGenerator(i18n._(t`UntitledExtension`), (name) =>
+        const newName = newNameGenerator(i18n._(t`UntitledExtension`), name =>
           isExtensionNameTaken(name, project)
         );
-        const eventsFunctionsExtension =
-          project.insertNewEventsFunctionsExtension(
-            newName,
-            project.getEventsFunctionsExtensionsCount()
-          );
+        const eventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+          newName,
+          project.getEventsFunctionsExtensionsCount()
+        );
         setExtensionsSearchDialogOpen(false);
         onProjectItemModified();
 
@@ -677,7 +700,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (index: number, i18n: I18nType) => {
         const newName = newNameGenerator(
           i18n._(t`Untitled external events`),
-          (name) => project.hasExternalEventsNamed(name)
+          name => project.hasExternalEventsNamed(name)
         );
         const newExternalEvents = project.insertNewExternalEvents(
           newName,
@@ -685,8 +708,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         onProjectItemModified();
 
-        const externalEventsItemId =
-          getExternalEventsTreeViewItemId(newExternalEvents);
+        const externalEventsItemId = getExternalEventsTreeViewItemId(
+          newExternalEvents
+        );
         if (treeViewRef.current) {
           treeViewRef.current.openItems([
             externalEventsItemId,
@@ -711,7 +735,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       (index: number, i18n: I18nType) => {
         const newName = newNameGenerator(
           i18n._(t`Untitled external layout`),
-          (name) => project.hasExternalLayoutNamed(name)
+          name => project.hasExternalLayoutNamed(name)
         );
         const newExternalLayout = project.insertNewExternalLayout(
           newName,
@@ -719,8 +743,9 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         );
         onProjectItemModified();
 
-        const externalLayoutItemId =
-          getExternalLayoutTreeViewItemId(newExternalLayout);
+        const externalLayoutItemId = getExternalLayoutTreeViewItemId(
+          newExternalLayout
+        );
         if (treeViewRef.current) {
           treeViewRef.current.openItems([
             externalLayoutItemId,
@@ -760,35 +785,38 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
         shortcutCallbacks: {},
       })
     );
-    React.useEffect(() => {
-      if (keyboardShortcutsRef.current) {
-        keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
-          if (selectedItems.length > 0) {
-            deleteItem(selectedItems[0]);
-          }
-        });
-        keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
-          if (selectedItems.length > 0) {
-            editName(selectedItems[0].content.getId());
-          }
-        });
-        keyboardShortcutsRef.current.setShortcutCallback('onCopy', () => {
-          if (selectedItems.length > 0) {
-            selectedItems[0].content.copy();
-          }
-        });
-        keyboardShortcutsRef.current.setShortcutCallback('onPaste', () => {
-          if (selectedItems.length > 0) {
-            selectedItems[0].content.paste();
-          }
-        });
-        keyboardShortcutsRef.current.setShortcutCallback('onCut', () => {
-          if (selectedItems.length > 0) {
-            selectedItems[0].content.cut();
-          }
-        });
-      }
-    }, [editName, selectedItems]);
+    React.useEffect(
+      () => {
+        if (keyboardShortcutsRef.current) {
+          keyboardShortcutsRef.current.setShortcutCallback('onDelete', () => {
+            if (selectedItems.length > 0) {
+              deleteItem(selectedItems[0]);
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onRename', () => {
+            if (selectedItems.length > 0) {
+              editName(selectedItems[0].content.getId());
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onCopy', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.copy();
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onPaste', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.paste();
+            }
+          });
+          keyboardShortcutsRef.current.setShortcutCallback('onCut', () => {
+            if (selectedItems.length > 0) {
+              selectedItems[0].content.cut();
+            }
+          });
+        }
+      },
+      [editName, selectedItems]
+    );
 
     const sceneTreeViewItemProps = React.useMemo<SceneTreeViewItemProps>(
       () => ({
@@ -825,105 +853,102 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
       ]
     );
 
-    const extensionTreeViewItemProps =
-      React.useMemo<ExtensionTreeViewItemProps>(
-        () => ({
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteEventsFunctionsExtension,
-          onRenameEventsFunctionsExtension,
-          onOpenEventsFunctionsExtension,
-          onReloadEventsFunctionsExtensions,
-          onEditEventsFunctionExtensionOrSeeDetails,
-        }),
-        [
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteEventsFunctionsExtension,
-          onRenameEventsFunctionsExtension,
-          onOpenEventsFunctionsExtension,
-          onReloadEventsFunctionsExtensions,
-          onEditEventsFunctionExtensionOrSeeDetails,
-        ]
-      );
+    const extensionTreeViewItemProps = React.useMemo<ExtensionTreeViewItemProps>(
+      () => ({
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteEventsFunctionsExtension,
+        onRenameEventsFunctionsExtension,
+        onOpenEventsFunctionsExtension,
+        onReloadEventsFunctionsExtensions,
+        onEditEventsFunctionExtensionOrSeeDetails,
+      }),
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteEventsFunctionsExtension,
+        onRenameEventsFunctionsExtension,
+        onOpenEventsFunctionsExtension,
+        onReloadEventsFunctionsExtensions,
+        onEditEventsFunctionExtensionOrSeeDetails,
+      ]
+    );
 
-    const externalEventsTreeViewItemProps =
-      React.useMemo<ExternalEventsTreeViewItemProps>(
-        () => ({
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteExternalEvents,
-          onRenameExternalEvents,
-          onOpenExternalEvents,
-        }),
-        [
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteExternalEvents,
-          onRenameExternalEvents,
-          onOpenExternalEvents,
-        ]
-      );
+    const externalEventsTreeViewItemProps = React.useMemo<ExternalEventsTreeViewItemProps>(
+      () => ({
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteExternalEvents,
+        onRenameExternalEvents,
+        onOpenExternalEvents,
+      }),
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteExternalEvents,
+        onRenameExternalEvents,
+        onOpenExternalEvents,
+      ]
+    );
 
-    const externalLayoutTreeViewItemProps =
-      React.useMemo<ExternalLayoutTreeViewItemProps>(
-        () => ({
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteExternalLayout,
-          onRenameExternalLayout,
-          onOpenExternalLayout,
-        }),
-        [
-          project,
-          unsavedChanges,
-          preferences,
-          gdevelopTheme,
-          forceUpdate,
-          forceUpdateList,
-          showDeleteConfirmation,
-          editName,
-          scrollToItem,
-          onDeleteExternalLayout,
-          onRenameExternalLayout,
-          onOpenExternalLayout,
-        ]
-      );
+    const externalLayoutTreeViewItemProps = React.useMemo<ExternalLayoutTreeViewItemProps>(
+      () => ({
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteExternalLayout,
+        onRenameExternalLayout,
+        onOpenExternalLayout,
+      }),
+      [
+        project,
+        unsavedChanges,
+        preferences,
+        gdevelopTheme,
+        forceUpdate,
+        forceUpdateList,
+        showDeleteConfirmation,
+        editName,
+        scrollToItem,
+        onDeleteExternalLayout,
+        onRenameExternalLayout,
+        onOpenExternalLayout,
+      ]
+    );
 
     const getTreeViewData = React.useCallback(
       (i18n: I18nType): Array<TreeViewItem> => {
@@ -1018,7 +1043,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               return mapFor(
                 0,
                 project.getLayoutsCount(),
-                (i) =>
+                i =>
                   new LeafTreeViewItem(
                     new SceneTreeViewItemContent(
                       project.getLayoutAt(i),
@@ -1052,7 +1077,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               return mapFor(
                 0,
                 project.getEventsFunctionsExtensionsCount(),
-                (i) =>
+                i =>
                   new LeafTreeViewItem(
                     new ExtensionTreeViewItemContent(
                       project.getEventsFunctionsExtensionAt(i),
@@ -1090,7 +1115,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               return mapFor(
                 0,
                 project.getExternalEventsCount(),
-                (i) =>
+                i =>
                   new LeafTreeViewItem(
                     new ExternalEventsTreeViewItemContent(
                       project.getExternalEventsAt(i),
@@ -1128,7 +1153,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
               return mapFor(
                 0,
                 project.getExternalLayoutsCount(),
-                (i) =>
+                i =>
                   new LeafTreeViewItem(
                     new ExternalLayoutTreeViewItemContent(
                       project.getExternalLayoutAt(i),
@@ -1160,7 +1185,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
 
     const canMoveSelectionTo = React.useCallback(
       (destinationItem: TreeViewItem, where: 'before' | 'inside' | 'after') =>
-        selectedItems.every((item) => {
+        selectedItems.every(item => {
           return (
             // Project and game settings children `getRootId` return an empty string.
             item.content.getRootId().length > 0 &&
@@ -1270,7 +1295,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         onEditItem={editItem}
                         onCollapseItem={onCollapseItem}
                         selectedItems={selectedItems}
-                        onSelectItems={(items) => {
+                        onSelectItems={items => {
                           const itemToSelect = items[0];
                           if (!itemToSelect) return;
                           if (itemToSelect.isRoot) return;
@@ -1290,7 +1315,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                         reactDndType={extensionItemReactDndType}
                         initiallyOpenedNodeIds={initiallyOpenedNodeIds}
                         forceDefaultDraggingPreview
-                        shouldHideMenuIcon={(item) => !item.content.getRootId()}
+                        shouldHideMenuIcon={item => !item.content.getRootId()}
                       />
                     )}
                   </AutoSizer>
@@ -1435,23 +1460,26 @@ const MemoizedProjectManager = React.memo<Props, ProjectManagerInterface>(
 
 const ProjectManagerWithErrorBoundary = React.forwardRef<
   Props,
-  ProjectManagerInterface,
+  ProjectManagerInterface
 >((props, outerRef) => {
   const projectManagerRef = React.useRef<?ProjectManagerInterface>(null);
   const shouldAutofocusInput = useShouldAutofocusInput();
 
-  React.useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (
-        !props.freezeUpdate &&
-        shouldAutofocusInput &&
-        projectManagerRef.current
-      ) {
-        projectManagerRef.current.focusSearchBar();
-      }
-    }, 100);
-    return () => clearTimeout(timeoutId);
-  }, [props.freezeUpdate, shouldAutofocusInput]);
+  React.useEffect(
+    () => {
+      const timeoutId = setTimeout(() => {
+        if (
+          !props.freezeUpdate &&
+          shouldAutofocusInput &&
+          projectManagerRef.current
+        ) {
+          projectManagerRef.current.focusSearchBar();
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    },
+    [props.freezeUpdate, shouldAutofocusInput]
+  );
 
   return (
     <ErrorBoundary
@@ -1459,7 +1487,7 @@ const ProjectManagerWithErrorBoundary = React.forwardRef<
       scope="project-manager"
     >
       <MemoizedProjectManager
-        ref={(ref) => {
+        ref={ref => {
           projectManagerRef.current = ref;
           if (typeof outerRef === 'function') outerRef(ref);
           else if (outerRef !== null) outerRef.current = ref;

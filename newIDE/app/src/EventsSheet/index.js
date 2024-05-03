@@ -131,8 +131,8 @@ type Props = {|
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
   settingsIcon?: React.Node,
-  onOpenExternalEvents: (string) => void,
-  onOpenLayout: (string) => void,
+  onOpenExternalEvents: string => void,
+  onOpenLayout: string => void,
   resourceManagementProps: ResourceManagementProps,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
@@ -215,7 +215,7 @@ const styles = {
 
 export class EventsSheetComponentWithoutHandle extends React.Component<
   ComponentProps,
-  State,
+  State
 > {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
@@ -302,10 +302,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
-    this.resourceExternallyChangedCallbackId =
-      registerOnResourceExternallyChangedCallback(
-        this.onResourceExternallyChanged.bind(this)
-      );
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -331,7 +330,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     }
   }
 
-  onResourceExternallyChanged = (resourceInfo) => {
+  onResourceExternallyChanged = resourceInfo => {
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
   };
 
@@ -382,7 +381,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _toggleSearchPanel = () => {
     this.setState(
-      (state) => {
+      state => {
         if (
           state.showSearchPanel &&
           this._searchPanel &&
@@ -451,7 +450,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _selectionCanToggleDisabled = () => {
-    return getSelectedEvents(this.state.selection).some((event) => {
+    return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
   };
@@ -703,10 +702,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         ? destinationContext.instrsList.size()
         : indexInList;
 
-    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions =
-      !!selectedInstructions.filter((instruction) =>
+    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
+      instruction =>
         containsSubInstructions(instruction, destinationContext.instrsList)
-      ).length;
+    ).length;
 
     if (isTryingToDragAnInstructionIntoItsOwnNestedInstructions) return;
 
@@ -826,11 +825,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         },
         ...this.state.allEventsMetadata
           .filter(
-            (metadata) =>
+            metadata =>
               metadata.type !== 'BuiltinCommonInstructions::Standard' &&
               metadata.type !== 'BuiltinCommonInstructions::Comment'
           )
-          .map((metadata) => ({
+          .map(metadata => ({
             label: i18n._(t`Add ${metadata.fullName}`),
             click: () => {
               this.addNewEvent(metadata.type);
@@ -889,7 +888,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               click: () => this.expandToLevel(-1),
             },
             { type: 'separator' },
-            ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => {
+            ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
               return {
                 label: i18n._(t`Level ${index + 1}`),
                 click: () => this.expandToLevel(index),
@@ -974,8 +973,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   closeParameterEditor = (shouldCancel: boolean) => {
-    const { instruction, parameterIndex, eventContext } =
-      this.state.editedParameter;
+    const {
+      instruction,
+      parameterIndex,
+      eventContext,
+    } = this.state.editedParameter;
     if (instruction) {
       // If the user canceled, revert the value to the positionsBeforeAction value, if not null.
       if (
@@ -1037,7 +1039,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   toggleDisabled = () => {
     let shouldBeSaved = false;
     const selectedEvents = getSelectedEvents(this.state.selection);
-    selectedEvents.forEach((event) => {
+    selectedEvents.forEach(event => {
       if (event.isExecutable()) {
         event.setDisabled(!event.isDisabled());
         shouldBeSaved = true;
@@ -1072,11 +1074,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     let eventsWithDeletion: Array<gdBaseEvent> = [];
     if (deleteEvents) {
       const selectedEvents = getSelectedEvents(this.state.selection);
-      selectedEvents.forEach((event) => eventsRemover.addEventToRemove(event));
+      selectedEvents.forEach(event => eventsRemover.addEventToRemove(event));
       eventsWithDeletion = eventsWithDeletion.concat(selectedEvents);
     }
     if (deleteInstructions) {
-      getSelectedInstructions(this.state.selection).forEach((instruction) =>
+      getSelectedInstructions(this.state.selection).forEach(instruction =>
         eventsRemover.addInstructionToRemove(instruction)
       );
       eventsWithDeletion = eventsWithDeletion.concat(
@@ -1207,7 +1209,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _invertSelectedConditions = () => {
     getSelectedInstructionsContexts(this.state.selection).forEach(
-      (instructionContext) => {
+      instructionContext => {
         if (instructionContext.isCondition) {
           instructionContext.instruction.setInverted(
             !instructionContext.instruction.isInverted()
@@ -1234,7 +1236,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _hasSelectedOptionallyAsyncActions = (): boolean => {
     return getSelectedInstructionsContexts(this.state.selection).some(
-      (instructionContext) => {
+      instructionContext => {
         if (!instructionContext.isCondition) {
           const instructionMetadata = getInstructionMetadata({
             instructionType: instructionContext.instruction.getType(),
@@ -1253,7 +1255,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _toggleAwaitingActions = () => {
     getSelectedInstructionsContexts(this.state.selection).forEach(
-      (instructionContext) => {
+      instructionContext => {
         if (!instructionContext.isCondition) {
           const instructionMetadata = getInstructionMetadata({
             instructionType: instructionContext.instruction.getType(),
@@ -1297,7 +1299,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _getChangedEventRows = (events: Array<gdBaseEvent>) => {
     const currentTree = this._eventsTree;
     if (currentTree) {
-      return events.map((event) => currentTree.getEventRow(event));
+      return events.map(event => currentTree.getEventRow(event));
     }
     return [];
   };
@@ -1345,10 +1347,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       const {
         changeContext: { positions },
         type,
-      } =
-        newEventsHistory.futureActions[
-          newEventsHistory.futureActions.length - 1
-        ];
+      } = newEventsHistory.futureActions[
+        newEventsHistory.futureActions.length - 1
+      ];
 
       let newSelection: SelectionState = getInitialSelection();
       // If it is a DELETE or EDIT, then the element will be present, so we can select them.
@@ -1401,10 +1402,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       const {
         changeContext: { positions },
         type,
-      } =
-        newEventsHistory.previousActions[
-          newEventsHistory.previousActions.length - 1
-        ];
+      } = newEventsHistory.previousActions[
+        newEventsHistory.previousActions.length - 1
+      ];
 
       // If it is a ADD or EDIT, then the element will be present, so we can select them.
       // If it is a DELETE, then they will not be present, so we can't select them.
@@ -1482,7 +1482,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
 
     const eventsList = new gd.EventsList();
-    getSelectedEvents(this.state.selection).forEach((event) =>
+    getSelectedEvents(this.state.selection).forEach(event =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
@@ -1633,8 +1633,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _renderInstructionEditorDialog = () => {
-    const { project, scope, globalObjectsContainer, objectsContainer } =
-      this.props;
+    const {
+      project,
+      scope,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
 
     // Choose the dialog to use
     const Dialog = this.state.inlineInstructionEditorAnchorEl
@@ -1660,8 +1664,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
             open={true}
             onCancel={() => this.closeInstructionEditor()}
             onSubmit={() => {
-              const { instrsList, instruction, indexInList } =
-                this.state.editedInstruction;
+              const {
+                instrsList,
+                instruction,
+                indexInList,
+              } = this.state.editedInstruction;
               if (!instrsList || !instruction) return;
 
               if (indexInList !== undefined && indexInList !== null) {
@@ -1687,8 +1694,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 : hasClipboardActions()
             }
             onPasteInstructions={() => {
-              const { instrsList, isCondition, eventContext } =
-                this.state.editedInstruction;
+              const {
+                instrsList,
+                isCondition,
+                eventContext,
+              } = this.state.editedInstruction;
               if (!instrsList) return;
 
               eventContext &&
@@ -1700,7 +1710,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           />
         )}
       </I18n>
-    ) : undefined;
+    ) : (
+      undefined
+    );
   };
 
   /**
@@ -1781,7 +1793,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         {({ windowSize }) => (
           <EventsSearcher
             key={events.ptr}
-            ref={(eventSearcher) => (this._eventSearcher = eventSearcher)}
+            ref={eventSearcher => (this._eventSearcher = eventSearcher)}
             events={events}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
@@ -1821,7 +1833,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   </Line>
                 )}
                 <EventsTree
-                  ref={(eventsTree) => (this._eventsTree = eventsTree)}
+                  ref={eventsTree => (this._eventsTree = eventsTree)}
                   key={events.ptr}
                   onScroll={this._ensureFocused}
                   events={events}
@@ -1881,11 +1893,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     onClose={() => this._closeSearchPanel()}
                   >
                     <SearchPanel
-                      ref={(searchPanel) => (this._searchPanel = searchPanel)}
-                      onSearchInEvents={(inputs) =>
+                      ref={searchPanel => (this._searchPanel = searchPanel)}
+                      onSearchInEvents={inputs =>
                         this._searchInEvents(searchInEvents, inputs)
                       }
-                      onReplaceInEvents={(inputs) => {
+                      onReplaceInEvents={inputs => {
                         this._replaceInEvents(replaceInEvents, inputs);
                       }}
                       resultsCount={
@@ -1926,9 +1938,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
                   parameterIndex={this.state.editedParameter.parameterIndex}
-                  onChange={(value) => {
-                    const { instruction, parameterIndex } =
-                      this.state.editedParameter;
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
                     if (!instruction || !this.state.inlineEditing) {
                       // Unlikely to ever happen, but maybe a component could
                       // fire the "onChange" while the inline editor was just
@@ -1946,13 +1960,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   resourceManagementProps={resourceManagementProps}
                 />
                 <ContextMenu
-                  ref={(eventContextMenu) =>
+                  ref={eventContextMenu =>
                     (this.eventContextMenu = eventContextMenu)
                   }
                   buildMenuTemplate={this._buildEventContextMenu}
                 />
                 <ContextMenu
-                  ref={(instructionContextMenu) =>
+                  ref={instructionContextMenu =>
                     (this.instructionContextMenu = instructionContextMenu)
                   }
                   buildMenuTemplate={this._buildInstructionContextMenu}
@@ -2023,7 +2037,7 @@ const EventsSheet = (props, ref) => {
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
   };
-  const onResourceExternallyChanged = (resourceInfo) => {
+  const onResourceExternallyChanged = resourceInfo => {
     if (component.current)
       component.current.onResourceExternallyChanged(resourceInfo);
   };

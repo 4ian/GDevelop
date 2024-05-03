@@ -61,10 +61,12 @@ const OnlineGameLink = ({
   onGameUpdated,
   automaticallyOpenGameProperties,
 }: OnlineGameLinkProps) => {
-  const [showCopiedInfoBar, setShowCopiedInfoBar] =
-    React.useState<boolean>(false);
-  const [isShareDialogOpen, setIsShareDialogOpen] =
-    React.useState<boolean>(false);
+  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
+    false
+  );
+  const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
+    false
+  );
   const { isMobile } = useResponsiveWindowSize();
   const [
     isOnlineGamePropertiesDialogOpen,
@@ -74,8 +76,10 @@ const OnlineGameLink = ({
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [timeBeforeExportFinished, setTimeBeforeExportFinished] =
-    React.useState<number>(timeForExport);
+  const [
+    timeBeforeExportFinished,
+    setTimeBeforeExportFinished,
+  ] = React.useState<number>(timeForExport);
   const { showAlert } = useAlertDialog();
 
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
@@ -86,22 +90,25 @@ const OnlineGameLink = ({
     exportPending || !isBuildComplete
       ? null
       : isBuildPublished
-        ? gameUrl
-        : getBuildArtifactUrl(build, 's3Key');
+      ? gameUrl
+      : getBuildArtifactUrl(build, 's3Key');
 
   // When export is started, start a timer to give information
   // about the build being ready after a few seconds.
-  React.useEffect(() => {
-    if (exportPending) {
-      const timeout = setTimeout(() => {
-        const newTimeBeforeExportFinished = timeBeforeExportFinished
-          ? timeBeforeExportFinished - 1
-          : 0;
-        setTimeBeforeExportFinished(newTimeBeforeExportFinished);
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [exportPending, timeBeforeExportFinished]);
+  React.useEffect(
+    () => {
+      if (exportPending) {
+        const timeout = setTimeout(() => {
+          const newTimeBeforeExportFinished = timeBeforeExportFinished
+            ? timeBeforeExportFinished - 1
+            : 0;
+          setTimeBeforeExportFinished(newTimeBeforeExportFinished);
+        }, 1000);
+        return () => clearTimeout(timeout);
+      }
+    },
+    [exportPending, timeBeforeExportFinished]
+  );
 
   const tryUpdateAuthors = React.useCallback(
     async (i18n: I18nType) => {
@@ -166,18 +173,24 @@ const OnlineGameLink = ({
     [build, game, getAuthorizationHeader, profile, showAlert]
   );
 
-  React.useEffect(() => {
-    if (exportStep === 'done') {
-      setTimeBeforeExportFinished(timeForExport); // reset.
-      setIsShareDialogOpen(true);
-    }
-  }, [exportStep, automaticallyOpenGameProperties]);
+  React.useEffect(
+    () => {
+      if (exportStep === 'done') {
+        setTimeBeforeExportFinished(timeForExport); // reset.
+        setIsShareDialogOpen(true);
+      }
+    },
+    [exportStep, automaticallyOpenGameProperties]
+  );
 
-  React.useEffect(() => {
-    if (isBuildComplete && automaticallyOpenGameProperties) {
-      setIsOnlineGamePropertiesDialogOpen(true);
-    }
-  }, [isBuildComplete, automaticallyOpenGameProperties]);
+  React.useEffect(
+    () => {
+      if (isBuildComplete && automaticallyOpenGameProperties) {
+        setIsOnlineGamePropertiesDialogOpen(true);
+      }
+    },
+    [isBuildComplete, automaticallyOpenGameProperties]
+  );
 
   const onGameUpdate = React.useCallback(
     async (
@@ -383,7 +396,7 @@ const OnlineGameLink = ({
                   setIsShareDialogOpen(false);
                 }
               }}
-              onApply={async (partialGameChange) => {
+              onApply={async partialGameChange => {
                 const isGameUpdated = await onGameUpdate(
                   partialGameChange,
                   i18n

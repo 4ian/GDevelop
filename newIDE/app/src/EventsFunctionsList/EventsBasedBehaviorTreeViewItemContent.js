@@ -69,8 +69,7 @@ export type EventsBasedBehaviorProps = {|
 |};
 
 export class EventsBasedBehaviorTreeViewItemContent
-  implements TreeViewItemContent
-{
+  implements TreeViewItemContent {
   eventsBasedBehavior: gdEventsBasedBehavior;
   props: EventsBasedBehaviorProps;
 
@@ -132,7 +131,7 @@ export class EventsBasedBehaviorTreeViewItemContent
     this.props.onRenameEventsBasedBehavior(
       this.eventsBasedBehavior,
       newName,
-      (doRename) => {
+      doRename => {
         if (!doRename) return;
 
         this._onEventsBasedBehaviorModified();
@@ -233,7 +232,7 @@ export class EventsBasedBehaviorTreeViewItemContent
 
     this.props.onDeleteEventsBasedBehavior(
       this.eventsBasedBehavior,
-      (doRemove) => {
+      doRemove => {
         if (!doRemove) return;
 
         eventsBasedBehaviorsList.remove(this.eventsBasedBehavior.getName());
@@ -292,7 +291,7 @@ export class EventsBasedBehaviorTreeViewItemContent
 
     const { project, eventsBasedBehaviorsList } = this.props;
 
-    const newName = newNameGenerator(name, (name) =>
+    const newName = newNameGenerator(name, name =>
       eventsBasedBehaviorsList.has(name)
     );
 
@@ -330,7 +329,7 @@ export class EventsBasedBehaviorTreeViewItemContent
   _addNewEventsBasedBehavior(): void {
     const { eventsBasedBehaviorsList } = this.props;
 
-    const name = newNameGenerator('MyBehavior', (name) =>
+    const name = newNameGenerator('MyBehavior', name =>
       eventsBasedBehaviorsList.has(name)
     );
     const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
@@ -371,8 +370,7 @@ export class EventsBasedBehaviorTreeViewItemContent
 
   addFunctionAtSelection(): void {
     const { selectedEventsFunction, selectedEventsBasedBehavior } = this.props;
-    const eventsFunctionsContainer =
-      this.eventsBasedBehavior.getEventsFunctions();
+    const eventsFunctionsContainer = this.eventsBasedBehavior.getEventsFunctions();
     // When the selected item is inside the behavior, the new function is
     // added below it.
     const index =

@@ -44,11 +44,9 @@ export default class GDI18nProvider extends React.Component<Props, State> {
       return Promise.resolve(this.state.catalogs);
     }
 
-    return import(
-      /* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
-      `../../locales/${language.replace('-', '_')}/messages`
-    ).then(
-      (catalog) => {
+    return import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
+    `../../locales/${language.replace('-', '_')}/messages`).then(
+      catalog => {
         return { ...this.state.catalogs, [language]: catalog };
       },
       (error: Error) => {
@@ -59,7 +57,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
   };
 
   _loadLanguage(language: string) {
-    this._loadCatalog(language).then((catalogs) => {
+    this._loadCatalog(language).then(catalogs => {
       this.setState(
         {
           language,

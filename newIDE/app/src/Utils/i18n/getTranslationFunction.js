@@ -1,8 +1,8 @@
 // @flow
 import { type I18n } from '@lingui/core';
 
-type TranslationFunction = ((string) => string) | null;
-type NotNullTranslationFunction = (string) => string;
+type TranslationFunction = (string => string) | null;
+type NotNullTranslationFunction = string => string;
 
 /**
  * Given the i18n object, return the function that can be used

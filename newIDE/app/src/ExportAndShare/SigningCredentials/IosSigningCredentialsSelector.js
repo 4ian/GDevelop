@@ -37,7 +37,7 @@ const filterSigningCredentialsForTarget = (
 ) => {
   if (!signingCredentials) return null;
 
-  return signingCredentials.filter((signingCredential) => {
+  return signingCredentials.filter(signingCredential => {
     if (signingCredential.type === 'apple-certificate') {
       if (
         !targets.includes('iosAppStore') &&
@@ -79,8 +79,9 @@ const formatBuildSigningOptionsForMobileProvision = (
   signingCredentials: Array<SigningCredential> | null,
   value: string
 ): BuildSigningOptions | null => {
-  const appleCertificateSigningCredentials =
-    filterAppleCertificateSigningCredentials(signingCredentials);
+  const appleCertificateSigningCredentials = filterAppleCertificateSigningCredentials(
+    signingCredentials
+  );
   if (!appleCertificateSigningCredentials) return buildSigningOptions;
 
   for (const signingCredential of appleCertificateSigningCredentials) {
@@ -121,8 +122,10 @@ const formatBuildSigningOptionsForAuthKey = (
     // Not signing for the app store, so no deployment of App Store Connect (no Auth Key).
     (!targets.includes('iosAppStore') && buildSigningOptions.authKeyApiKey)
   ) {
-    const { authKeyApiKey, ...buildSigningOptionsWithoutApiKey } =
-      buildSigningOptions;
+    const {
+      authKeyApiKey,
+      ...buildSigningOptionsWithoutApiKey
+    } = buildSigningOptions;
     return buildSigningOptionsWithoutApiKey;
   }
 
@@ -178,10 +181,12 @@ const getDefaultOrValidBuildSigningOptionsFor = (
   signingCredentials: Array<SigningCredential> | null,
   targets: Array<TargetName>
 ): BuildSigningOptions | null => {
-  const appleCertificateSigningCredentials =
-    filterAppleCertificateSigningCredentials(signingCredentials);
-  const appleAuthKeySigningCredentials =
-    filterAppleAuthKeySigningCredentials(signingCredentials);
+  const appleCertificateSigningCredentials = filterAppleCertificateSigningCredentials(
+    signingCredentials
+  );
+  const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
+    signingCredentials
+  );
   if (!appleCertificateSigningCredentials) {
     // No signing credentials yet (which means they can be loading),
     // don't touch the current build signing options.
@@ -250,41 +255,50 @@ export const IosSigningCredentialsSelector = ({
   onSelectBuildSigningOptions,
   disabled,
 }: Props) => {
-  const { signingCredentials, error, onRefreshSigningCredentials } =
-    useGetUserSigningCredentials(authenticatedUser);
+  const {
+    signingCredentials,
+    error,
+    onRefreshSigningCredentials,
+  } = useGetUserSigningCredentials(authenticatedUser);
   const allSigningCredentialsForTarget = filterSigningCredentialsForTarget(
     signingCredentials,
     targets
   );
-  const appleCertificateSigningCredentials =
-    filterAppleCertificateSigningCredentials(allSigningCredentialsForTarget);
+  const appleCertificateSigningCredentials = filterAppleCertificateSigningCredentials(
+    allSigningCredentialsForTarget
+  );
   const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
     allSigningCredentialsForTarget
   );
-  const [isSigningCredentialsDialogOpen, setIsSigningCredentialsDialogOpen] =
-    React.useState(false);
+  const [
+    isSigningCredentialsDialogOpen,
+    setIsSigningCredentialsDialogOpen,
+  ] = React.useState(false);
 
-  React.useEffect(() => {
-    // Override the selection if it's not valid or if none was made.
-    const newBuildSigningOptions = getDefaultOrValidBuildSigningOptionsFor(
+  React.useEffect(
+    () => {
+      // Override the selection if it's not valid or if none was made.
+      const newBuildSigningOptions = getDefaultOrValidBuildSigningOptionsFor(
+        buildSigningOptions,
+        allSigningCredentialsForTarget,
+        targets
+      );
+      if (
+        !isEquivalentBuildSigningOptions(
+          newBuildSigningOptions,
+          buildSigningOptions
+        )
+      ) {
+        onSelectBuildSigningOptions(newBuildSigningOptions);
+      }
+    },
+    [
       buildSigningOptions,
+      onSelectBuildSigningOptions,
       allSigningCredentialsForTarget,
-      targets
-    );
-    if (
-      !isEquivalentBuildSigningOptions(
-        newBuildSigningOptions,
-        buildSigningOptions
-      )
-    ) {
-      onSelectBuildSigningOptions(newBuildSigningOptions);
-    }
-  }, [
-    buildSigningOptions,
-    onSelectBuildSigningOptions,
-    allSigningCredentialsForTarget,
-    targets,
-  ]);
+      targets,
+    ]
+  );
 
   return (
     <ColumnStackLayout noMargin>
@@ -300,12 +314,11 @@ export const IosSigningCredentialsSelector = ({
               : ''
           }
           onChange={(e, i, value: string) => {
-            const newBuildSigningOptions =
-              formatBuildSigningOptionsForMobileProvision(
-                buildSigningOptions,
-                allSigningCredentialsForTarget,
-                value
-              );
+            const newBuildSigningOptions = formatBuildSigningOptionsForMobileProvision(
+              buildSigningOptions,
+              allSigningCredentialsForTarget,
+              value
+            );
             if (newBuildSigningOptions)
               onSelectBuildSigningOptions(newBuildSigningOptions);
           }}
@@ -319,14 +332,16 @@ export const IosSigningCredentialsSelector = ({
           disabled={disabled}
         >
           {appleCertificateSigningCredentials ? (
-            appleCertificateSigningCredentials.flatMap((signingCredential) => {
+            appleCertificateSigningCredentials.flatMap(signingCredential => {
               return signingCredential.provisioningProfiles.map(
-                (provisioningProfile) => {
+                provisioningProfile => {
                   return (
                     <SelectOption
                       key={provisioningProfile.uuid}
                       disabled={!signingCredential.hasCertificateReady}
-                      label={`${provisioningProfile.name} (${signingCredential.name})`}
+                      label={`${provisioningProfile.name} (${
+                        signingCredential.name
+                      })`}
                       value={provisioningProfile.uuid}
                     />
                   );
@@ -382,12 +397,11 @@ export const IosSigningCredentialsSelector = ({
               buildSigningOptions ? buildSigningOptions.authKeyApiKey || '' : ''
             }
             onChange={(e, i, value: string) => {
-              const newBuildSigningOptions =
-                formatBuildSigningOptionsForAuthKey(
-                  buildSigningOptions,
-                  targets,
-                  value
-                );
+              const newBuildSigningOptions = formatBuildSigningOptionsForAuthKey(
+                buildSigningOptions,
+                targets,
+                value
+              );
               if (newBuildSigningOptions)
                 onSelectBuildSigningOptions(newBuildSigningOptions);
             }}
@@ -401,12 +415,14 @@ export const IosSigningCredentialsSelector = ({
             disabled={disabled}
           >
             {appleAuthKeySigningCredentials ? (
-              appleAuthKeySigningCredentials.flatMap((signingCredential) => {
+              appleAuthKeySigningCredentials.flatMap(signingCredential => {
                 return (
                   <SelectOption
                     key={signingCredential.apiKey}
                     disabled={!signingCredential.hasAuthKeyReady}
-                    label={`${signingCredential.name} (${signingCredential.apiKey})`}
+                    label={`${signingCredential.name} (${
+                      signingCredential.apiKey
+                    })`}
                     value={signingCredential.apiKey}
                   />
                 );

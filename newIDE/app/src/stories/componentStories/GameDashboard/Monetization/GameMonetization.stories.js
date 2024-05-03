@@ -30,7 +30,7 @@ export const AdsEnabled = () => {
     .onPatch(`${GDevelopGameApi.baseUrl}/game/${game.id}`)
     .reply(200)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -49,7 +49,7 @@ export const AdsDisabled = () => {
     .onPatch(`${GDevelopGameApi.baseUrl}/game/${game.id}`)
     .reply(200)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -68,7 +68,7 @@ export const ErrorWhenUpdatingGame = () => {
     .onPatch(`${GDevelopGameApi.baseUrl}/game/${game.id}`)
     .reply(500)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

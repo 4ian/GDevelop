@@ -103,17 +103,17 @@ const PlanRecommendationRow = ({
     recommendationPlanId === 'silver'
       ? 'gdevelop_silver'
       : recommendationPlanId === 'gold'
-        ? 'gdevelop_gold'
-        : recommendationPlanId === 'education'
-          ? 'gdevelop_education'
-          : recommendationPlanId === 'startup' ||
-              recommendationPlanId === 'business'
-            ? 'gdevelop_startup'
-            : null;
+      ? 'gdevelop_gold'
+      : recommendationPlanId === 'education'
+      ? 'gdevelop_education'
+      : recommendationPlanId === 'startup' ||
+        recommendationPlanId === 'business'
+      ? 'gdevelop_startup'
+      : null;
   if (!planToUse) return null;
 
   const plan = subscriptionPlansWithPricingSystems.find(
-    (plan) => plan.id === planToUse
+    plan => plan.id === planToUse
   );
   if (!plan) return null;
 

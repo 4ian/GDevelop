@@ -32,8 +32,7 @@ export default function OptionsEditorDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
-  const eventsFunctionsExtensionWriter =
-    eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
   return (
     <Dialog

@@ -132,13 +132,13 @@ export default class SelectedInstances {
       this.resizeButtons[resizeGrabbingLocation] = resizeButton;
       this._makeButton({
         objectButton: resizeButton,
-        onMove: (event) => {
+        onMove: event => {
           this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
         },
         onEnd: () => {
           this.onResizeEnd();
         },
-        onPanMove: (event) => {
+        onPanMove: event => {
           this.onPanMove(
             event.deltaX,
             event.deltaY,
@@ -154,13 +154,13 @@ export default class SelectedInstances {
     }
     this._makeButton({
       objectButton: this.rotateButton,
-      onMove: (event) => {
+      onMove: event => {
         this.onRotate(event.deltaX, event.deltaY);
       },
       onEnd: () => {
         this.onRotateEnd();
       },
-      onPanMove: (event) => {
+      onPanMove: event => {
         this.onPanMove(
           event.deltaX,
           event.deltaY,
@@ -200,7 +200,7 @@ export default class SelectedInstances {
     panable(objectButton);
 
     // change cursor style if space is pressed
-    objectButton.addEventListener('mousemove', (event) => {
+    objectButton.addEventListener('mousemove', event => {
       if (this.keyboardShortcuts.shouldMoveView()) {
         objectButton.cursor = 'grab';
       } else {
@@ -208,7 +208,7 @@ export default class SelectedInstances {
       }
     });
 
-    objectButton.addEventListener('panmove', (event) => {
+    objectButton.addEventListener('panmove', event => {
       if (this.keyboardShortcuts.shouldMoveView()) {
         if (this._currentPanMovingGoal === 'buttonInteraction') {
           onEnd();
@@ -221,7 +221,7 @@ export default class SelectedInstances {
       }
     });
 
-    objectButton.addEventListener('panend', (event) => {
+    objectButton.addEventListener('panend', event => {
       if (this.keyboardShortcuts.shouldMoveView()) {
         onPanEnd();
       } else {
@@ -293,8 +293,12 @@ export default class SelectedInstances {
   };
 
   render() {
-    const { bigButtonSize, smallButtonSize, buttonPadding, hitAreaPadding } =
-      getButtonSizes(this._screenType);
+    const {
+      bigButtonSize,
+      smallButtonSize,
+      buttonPadding,
+      hitAreaPadding,
+    } = getButtonSizes(this._screenType);
     const selection = this.instancesSelection.getSelectedInstances();
     let x1 = 0;
     let y1 = 0;
@@ -360,7 +364,7 @@ export default class SelectedInstances {
 
     // If there are no unlocked instances, hide the resize buttons.
     const show =
-      selection.filter((instance) => !instance.isLocked()).length !== 0;
+      selection.filter(instance => !instance.isLocked()).length !== 0;
 
     // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {

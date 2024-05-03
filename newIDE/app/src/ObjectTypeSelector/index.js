@@ -14,7 +14,7 @@ type Props = {|
   project: gdProject,
   floatingLabelText?: React.Node,
   value: string,
-  onChange: (string) => void,
+  onChange: string => void,
   disabled?: boolean,
   allowedObjectTypes?: ?Array<string>,
 |};
@@ -28,8 +28,13 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
   };
 
   render() {
-    const { disabled, value, onChange, floatingLabelText, allowedObjectTypes } =
-      this.props;
+    const {
+      disabled,
+      value,
+      onChange,
+      floatingLabelText,
+      allowedObjectTypes,
+    } = this.props;
     const { objectMetadata } = this.state;
 
     const isDisabled = (type: string) => {

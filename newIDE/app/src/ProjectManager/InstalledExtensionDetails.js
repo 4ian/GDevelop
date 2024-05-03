@@ -14,8 +14,8 @@ type Props = {|
   onClose: () => void,
   extensionShortHeader: ExtensionShortHeader,
   extensionName: string,
-  onInstallExtension: (ExtensionShortHeader) => void,
-  onOpenEventsFunctionsExtension: (string) => void,
+  onInstallExtension: ExtensionShortHeader => void,
+  onOpenEventsFunctionsExtension: string => void,
 |};
 
 function InstalledExtensionDetails({

@@ -32,8 +32,8 @@ function e(e, r, i) {
   }
   switch (e) {
     case 'HEX':
-      return function (n, t, e) {
-        return (function (n, t, e, r) {
+      return function(n, t, e) {
+        return (function(n, t, e, r) {
           let i, s, o, w;
           if (0 != n.length % 2)
             throw new Error('String of HEX type must be in byte increments');
@@ -50,8 +50,8 @@ function e(e, r, i) {
         })(n, t, e, i);
       };
     case 'TEXT':
-      return function (n, t, e) {
-        return (function (n, t, e, r, i) {
+      return function(n, t, e) {
+        return (function(n, t, e, r, i) {
           let s,
             o,
             w,
@@ -71,23 +71,23 @@ function e(e, r, i) {
                   128 > s
                     ? o.push(s)
                     : 2048 > s
-                      ? (o.push(192 | (s >>> 6)), o.push(128 | (63 & s)))
-                      : 55296 > s || 57344 <= s
-                        ? o.push(
-                            224 | (s >>> 12),
-                            128 | ((s >>> 6) & 63),
-                            128 | (63 & s)
-                          )
-                        : ((w += 1),
-                          (s =
-                            65536 +
-                            (((1023 & s) << 10) | (1023 & n.charCodeAt(w)))),
-                          o.push(
-                            240 | (s >>> 18),
-                            128 | ((s >>> 12) & 63),
-                            128 | ((s >>> 6) & 63),
-                            128 | (63 & s)
-                          )),
+                    ? (o.push(192 | (s >>> 6)), o.push(128 | (63 & s)))
+                    : 55296 > s || 57344 <= s
+                    ? o.push(
+                        224 | (s >>> 12),
+                        128 | ((s >>> 6) & 63),
+                        128 | (63 & s)
+                      )
+                    : ((w += 1),
+                      (s =
+                        65536 +
+                        (((1023 & s) << 10) | (1023 & n.charCodeAt(w)))),
+                      o.push(
+                        240 | (s >>> 18),
+                        128 | ((s >>> 12) & 63),
+                        128 | ((s >>> 6) & 63),
+                        128 | (63 & s)
+                      )),
                   h = 0;
                 h < o.length;
                 h += 1
@@ -119,8 +119,8 @@ function e(e, r, i) {
         })(n, r, t, e, i);
       };
     case 'B64':
-      return function (t, e, r) {
-        return (function (t, e, r, i) {
+      return function(t, e, r) {
+        return (function(t, e, r, i) {
           let s,
             o,
             w,
@@ -150,8 +150,8 @@ function e(e, r, i) {
         })(t, e, r, i);
       };
     case 'BYTES':
-      return function (n, t, e) {
-        return (function (n, t, e, r) {
+      return function(n, t, e) {
+        return (function(n, t, e, r) {
           let i, s, o, w;
           const h = t || [0],
             u = (e = e || 0) >>> 3,
@@ -171,8 +171,8 @@ function e(e, r, i) {
       } catch (n) {
         throw new Error('ARRAYBUFFER not supported by this environment');
       }
-      return function (n, e, r) {
-        return (function (n, e, r, i) {
+      return function(n, e, r) {
+        return (function(n, e, r, i) {
           return t(new Uint8Array(n), e, r, i);
         })(n, e, r, i);
       };
@@ -182,7 +182,7 @@ function e(e, r, i) {
       } catch (n) {
         throw new Error('UINT8ARRAY not supported by this environment');
       }
-      return function (n, e, r) {
+      return function(n, e, r) {
         return t(n, e, r, i);
       };
     default:
@@ -194,8 +194,8 @@ function e(e, r, i) {
 function r(t, e, r, i) {
   switch (t) {
     case 'HEX':
-      return function (n) {
-        return (function (n, t, e, r) {
+      return function(n) {
+        return (function(n, t, e, r) {
           const i = '0123456789abcdef';
           let s,
             o,
@@ -209,8 +209,8 @@ function r(t, e, r, i) {
         })(n, e, r, i);
       };
     case 'B64':
-      return function (t) {
-        return (function (t, e, r, i) {
+      return function(t) {
+        return (function(t, e, r, i) {
           let s,
             o,
             w,
@@ -239,8 +239,8 @@ function r(t, e, r, i) {
         })(t, e, r, i);
       };
     case 'BYTES':
-      return function (n) {
-        return (function (n, t, e) {
+      return function(n) {
+        return (function(n, t, e) {
           let r,
             i,
             s = '';
@@ -258,8 +258,8 @@ function r(t, e, r, i) {
       } catch (n) {
         throw new Error('ARRAYBUFFER not supported by this environment');
       }
-      return function (n) {
-        return (function (n, t, e) {
+      return function(n) {
+        return (function(n, t, e) {
           let r;
           const i = t / 8,
             s = new ArrayBuffer(i),
@@ -276,8 +276,8 @@ function r(t, e, r, i) {
       } catch (n) {
         throw new Error('UINT8ARRAY not supported by this environment');
       }
-      return function (n) {
-        return (function (n, t, e) {
+      return function(n) {
+        return (function(n, t, e) {
           let r;
           const i = t / 8,
             s = -1 === e ? 3 : 0,
@@ -294,25 +294,90 @@ function r(t, e, r, i) {
   }
 }
 const i = [
-    1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993,
-    2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987,
-    1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774,
-    264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986,
-    2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711,
-    113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291,
-    1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411,
-    3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344,
-    430227734, 506948616, 659060556, 883997877, 958139571, 1322822218,
-    1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424,
-    2428436474, 2756734187, 3204031479, 3329325298,
+    1116352408,
+    1899447441,
+    3049323471,
+    3921009573,
+    961987163,
+    1508970993,
+    2453635748,
+    2870763221,
+    3624381080,
+    310598401,
+    607225278,
+    1426881987,
+    1925078388,
+    2162078206,
+    2614888103,
+    3248222580,
+    3835390401,
+    4022224774,
+    264347078,
+    604807628,
+    770255983,
+    1249150122,
+    1555081692,
+    1996064986,
+    2554220882,
+    2821834349,
+    2952996808,
+    3210313671,
+    3336571891,
+    3584528711,
+    113926993,
+    338241895,
+    666307205,
+    773529912,
+    1294757372,
+    1396182291,
+    1695183700,
+    1986661051,
+    2177026350,
+    2456956037,
+    2730485921,
+    2820302411,
+    3259730800,
+    3345764771,
+    3516065817,
+    3600352804,
+    4094571909,
+    275423344,
+    430227734,
+    506948616,
+    659060556,
+    883997877,
+    958139571,
+    1322822218,
+    1537002063,
+    1747873779,
+    1955562222,
+    2024104815,
+    2227730452,
+    2361852424,
+    2428436474,
+    2756734187,
+    3204031479,
+    3329325298,
   ],
   s = [
-    3238371032, 914150663, 812702999, 4144912697, 4290775857, 1750603025,
-    1694076839, 3204075428,
+    3238371032,
+    914150663,
+    812702999,
+    4144912697,
+    4290775857,
+    1750603025,
+    1694076839,
+    3204075428,
   ],
   o = [
-    1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924,
-    528734635, 1541459225,
+    1779033703,
+    3144134277,
+    1013904242,
+    2773480762,
+    1359893119,
+    2600822924,
+    528734635,
+    1541459225,
   ];
 function w(n) {
   const t = { outputUpper: !1, b64Pad: '=', outputLen: -1 },
@@ -700,12 +765,12 @@ class F extends class {
       (this.C = -1),
       (this.g = e(this.o, this.h, this.C)),
       (this.H = T),
-      (this.L = function (n) {
+      (this.L = function(n) {
         return n.slice();
       }),
       (this.M = y),
-      (this.I = function (t, e, r, i) {
-        return (function (n, t, e, r, i) {
+      (this.I = function(t, e, r, i) {
+        return (function(n, t, e, r, i) {
           let s, o;
           const w = 31 + (((t + 129) >>> 10) << 5),
             h = t + e;
@@ -764,7 +829,7 @@ class F extends class {
       (this.Y = !1),
       i.hmacKey &&
         this.X(
-          (function (n, t, r, i) {
+          (function(n, t, r, i) {
             const s = n + ' must include a value and format';
             if (!t) {
               if (!i) throw new Error(s);

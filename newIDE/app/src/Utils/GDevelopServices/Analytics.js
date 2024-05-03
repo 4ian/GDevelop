@@ -64,7 +64,7 @@ export const getGameMetrics = async (
       headers: {
         Authorization: authorizationHeader,
       },
-      validateStatus: (status) =>
+      validateStatus: status =>
         (status >= 200 && status < 300) || status === 404,
     }
   );
@@ -92,7 +92,7 @@ export const getGameMetricsFrom = async (
       headers: {
         Authorization: authorizationHeader,
       },
-      validateStatus: (status) =>
+      validateStatus: status =>
         (status >= 200 && status < 300) || status === 404,
     }
   );

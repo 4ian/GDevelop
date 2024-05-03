@@ -18,9 +18,9 @@ import {
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 
 export type ExternalLayoutTreeViewItemCallbacks = {|
-  onDeleteExternalLayout: (gdExternalLayout) => void,
+  onDeleteExternalLayout: gdExternalLayout => void,
   onRenameExternalLayout: (string, string) => void,
-  onOpenExternalLayout: (string) => void,
+  onOpenExternalLayout: string => void,
 |};
 
 export type ExternalLayoutTreeViewItemCommonProps = {|
@@ -187,7 +187,7 @@ export class ExternalLayoutTreeViewItemContent implements TreeViewItemContent {
     if (!name || !copiedExternalLayout) return;
 
     const project = this.props.project;
-    const newName = newNameGenerator(name, (name) =>
+    const newName = newNameGenerator(name, name =>
       project.hasExternalLayoutNamed(name)
     );
 

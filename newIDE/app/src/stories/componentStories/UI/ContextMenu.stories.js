@@ -38,7 +38,7 @@ export const Default = () => {
           </FixedHeightFlexContainer>
           <ContextMenu
             ref={contextMenu}
-            buildMenuTemplate={(i18n) => [
+            buildMenuTemplate={i18n => [
               {
                 label: 'Option 1',
                 click: action('Option 1'),

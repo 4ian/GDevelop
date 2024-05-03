@@ -66,7 +66,7 @@ const AssetPackInstallDialog = ({
   resourceManagementProps,
 }: Props) => {
   const missingAssetShortHeaders = assetShortHeaders.filter(
-    (assetShortHeader) => !addedAssetIds.has(assetShortHeader.id)
+    assetShortHeader => !addedAssetIds.has(assetShortHeader.id)
   );
   const allAssetsInstalled = missingAssetShortHeaders.length === 0;
   const noAssetsInstalled =
@@ -75,11 +75,13 @@ const AssetPackInstallDialog = ({
   const isInstallingTooManyAssets =
     assetShortHeaders.length > MAX_ASSETS_TO_INSTALL;
 
-  const [areAssetsBeingInstalled, setAreAssetsBeingInstalled] =
-    React.useState<boolean>(false);
+  const [
+    areAssetsBeingInstalled,
+    setAreAssetsBeingInstalled,
+  ] = React.useState<boolean>(false);
   const hasPrivateAssets = React.useMemo(
     () =>
-      assetShortHeaders.some((assetShortHeader) =>
+      assetShortHeaders.some(assetShortHeader =>
         isPrivateAsset(assetShortHeader)
       ),
     [assetShortHeaders]
@@ -99,9 +101,10 @@ const AssetPackInstallDialog = ({
   const fetchAssets = useFetchAssets();
   const showExtensionUpdateConfirmation = useExtensionUpdateAlertDialog();
 
-  const [selectedLayoutName, setSelectedLayoutName] =
-    React.useState<string>('');
-  const layoutNames = mapFor(0, project.getLayoutsCount(), (i) => {
+  const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
+    ''
+  );
+  const layoutNames = mapFor(0, project.getLayoutsCount(), i => {
     return project.getLayoutAt(i).getName();
   });
   const sceneChooser = objectsContainer ? null : ( // The objects container where to add assets objects is already given.
@@ -114,7 +117,7 @@ const AssetPackInstallDialog = ({
         aria-label="Associated scene"
         name="associated-layout"
         value={selectedLayoutName}
-        onChange={(event) => setSelectedLayoutName(event.target.value)}
+        onChange={event => setSelectedLayoutName(event.target.value)}
       >
         <FormControlLabel
           value={''}
@@ -122,7 +125,7 @@ const AssetPackInstallDialog = ({
           label={<Trans>Global objects in the project</Trans>}
           disabled={areAssetsBeingInstalled}
         />
-        {layoutNames.map((name) => (
+        {layoutNames.map(name => (
           <FormControlLabel
             key={name}
             value={name}
@@ -148,11 +151,12 @@ const AssetPackInstallDialog = ({
       setAreAssetsBeingInstalled(true);
       try {
         const assets = await fetchAssets(assetShortHeaders);
-        const requiredExtensionInstallation =
-          await checkRequiredExtensionsUpdateForAssets({
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
+          {
             assets,
             project,
-          });
+          }
+        );
         const shouldUpdateExtension =
           requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
             0 &&
@@ -169,7 +173,7 @@ const AssetPackInstallDialog = ({
         // Use a pool to avoid installing an unbounded amount of assets at the same time.
         const { results, errors } = await PromisePool.withConcurrency(6)
           .for(assets)
-          .process<InstallAssetOutput>(async (asset) => {
+          .process<InstallAssetOutput>(async asset => {
             const installOutput = isPrivateAsset(asset)
               ? await installPrivateAsset({
                   asset,
@@ -197,7 +201,7 @@ const AssetPackInstallDialog = ({
         }
 
         onObjectsAddedFromAssets(
-          results.map((installOutput) => installOutput.createdObjects).flat()
+          results.map(installOutput => installOutput.createdObjects).flat()
         );
 
         await resourceManagementProps.onFetchNewlyAddedResources();
@@ -251,128 +255,127 @@ const AssetPackInstallDialog = ({
           ),
         }
       : isInstallingTooManyAssets
-        ? {
-            actionButton: (
-              <RaisedButton
-                key="continue"
-                label={<Trans>Add the assets</Trans>}
-                primary
-                disabled
-                onClick={() => {}}
-              />
-            ),
-            onApply: () => {},
-            content: (
-              <AlertMessage kind="warning">
-                <Trans>
-                  You can only install up to {MAX_ASSETS_TO_INSTALL} assets at
-                  once. Try filtering the assets you would like to install, or
-                  install them one by one.
-                </Trans>
-              </AlertMessage>
-            ),
-          }
-        : areAssetsBeingInstalled
-          ? {
-              actionButton: (
-                <TextButton
-                  key="loading"
-                  label={<Trans>Please wait...</Trans>}
-                  disabled
-                  onClick={() => {}}
-                />
-              ),
-              onApply: () => {},
-              content: (
-                <>
-                  <Text>
-                    <Trans>Installing assets...</Trans>
-                  </Text>
-                  <Line expand>
-                    <LinearProgress />
-                  </Line>
-                </>
-              ),
-            }
-          : allAssetsInstalled
-            ? {
-                actionButton: (
-                  <RaisedButton
-                    key="install-again"
-                    label={<Trans>Install again</Trans>}
-                    primary={false}
-                    onClick={() => onInstallAssets(assetShortHeaders)}
-                  />
-                ),
-                onApply: () => onInstallAssets(assetShortHeaders),
-                content: (
-                  <Text>
-                    <Trans>
-                      You already have these {assetShortHeaders.length} assets
-                      installed, do you want to add them again?
-                    </Trans>
-                  </Text>
-                ),
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="continue"
+              label={<Trans>Add the assets</Trans>}
+              primary
+              disabled
+              onClick={() => {}}
+            />
+          ),
+          onApply: () => {},
+          content: (
+            <AlertMessage kind="warning">
+              <Trans>
+                You can only install up to {MAX_ASSETS_TO_INSTALL} assets at
+                once. Try filtering the assets you would like to install, or
+                install them one by one.
+              </Trans>
+            </AlertMessage>
+          ),
+        }
+      : areAssetsBeingInstalled
+      ? {
+          actionButton: (
+            <TextButton
+              key="loading"
+              label={<Trans>Please wait...</Trans>}
+              disabled
+              onClick={() => {}}
+            />
+          ),
+          onApply: () => {},
+          content: (
+            <>
+              <Text>
+                <Trans>Installing assets...</Trans>
+              </Text>
+              <Line expand>
+                <LinearProgress />
+              </Line>
+            </>
+          ),
+        }
+      : allAssetsInstalled
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="install-again"
+              label={<Trans>Install again</Trans>}
+              primary={false}
+              onClick={() => onInstallAssets(assetShortHeaders)}
+            />
+          ),
+          onApply: () => onInstallAssets(assetShortHeaders),
+          content: (
+            <Text>
+              <Trans>
+                You already have these {assetShortHeaders.length} assets
+                installed, do you want to add them again?
+              </Trans>
+            </Text>
+          ),
+        }
+      : noAssetsInstalled
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="continue"
+              label={
+                assetShortHeaders.length > 1 ? (
+                  <Trans>Add the assets</Trans>
+                ) : (
+                  <Trans>Add asset</Trans>
+                )
               }
-            : noAssetsInstalled
-              ? {
-                  actionButton: (
-                    <RaisedButton
-                      key="continue"
-                      label={
-                        assetShortHeaders.length > 1 ? (
-                          <Trans>Add the assets</Trans>
-                        ) : (
-                          <Trans>Add asset</Trans>
-                        )
-                      }
-                      primary
-                      onClick={() => onInstallAssets(assetShortHeaders)}
-                    />
-                  ),
-                  onApply: () => onInstallAssets(assetShortHeaders),
-                  content: (
-                    <Text>
-                      {assetShortHeaders.length > 1 ? (
-                        <Trans>
-                          You're about to add {assetShortHeaders.length} assets.
-                        </Trans>
-                      ) : (
-                        <Trans>You're about to add 1 asset.</Trans>
-                      )}
-                    </Text>
-                  ),
-                }
-              : {
-                  actionButton: (
-                    <RaisedButtonWithSplitMenu
-                      label={<Trans>Install the missing assets</Trans>}
-                      key="install-missing"
-                      primary
-                      onClick={() => {
-                        onInstallAssets(missingAssetShortHeaders);
-                      }}
-                      buildMenuTemplate={(i18n) => [
-                        {
-                          label: i18n._(t`Install all the assets`),
-                          click: () => onInstallAssets(assetShortHeaders),
-                        },
-                      ]}
-                    />
-                  ),
-                  onApply: () => onInstallAssets(missingAssetShortHeaders),
-                  content: (
-                    <Text>
-                      <Trans>
-                        You already have{' '}
-                        {assetShortHeaders.length -
-                          missingAssetShortHeaders.length}{' '}
-                        asset(s) in your scene. Do you want to add the remaining{' '}
-                        {missingAssetShortHeaders.length} one(s)?
-                      </Trans>
-                    </Text>
-                  ),
-                };
+              primary
+              onClick={() => onInstallAssets(assetShortHeaders)}
+            />
+          ),
+          onApply: () => onInstallAssets(assetShortHeaders),
+          content: (
+            <Text>
+              {assetShortHeaders.length > 1 ? (
+                <Trans>
+                  You're about to add {assetShortHeaders.length} assets.
+                </Trans>
+              ) : (
+                <Trans>You're about to add 1 asset.</Trans>
+              )}
+            </Text>
+          ),
+        }
+      : {
+          actionButton: (
+            <RaisedButtonWithSplitMenu
+              label={<Trans>Install the missing assets</Trans>}
+              key="install-missing"
+              primary
+              onClick={() => {
+                onInstallAssets(missingAssetShortHeaders);
+              }}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Install all the assets`),
+                  click: () => onInstallAssets(assetShortHeaders),
+                },
+              ]}
+            />
+          ),
+          onApply: () => onInstallAssets(missingAssetShortHeaders),
+          content: (
+            <Text>
+              <Trans>
+                You already have{' '}
+                {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
+                asset(s) in your scene. Do you want to add the remaining{' '}
+                {missingAssetShortHeaders.length} one(s)?
+              </Trans>
+            </Text>
+          ),
+        };
 
   return (
     <Dialog

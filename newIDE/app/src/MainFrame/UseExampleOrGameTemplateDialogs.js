@@ -18,23 +18,29 @@ const useExampleOrGameTemplateDialogs = ({
   isProjectOpening,
   onOpenNewProjectSetupDialog,
 }: Props) => {
-  const [exampleStoreDialogOpen, setExampleStoreDialogOpen] =
-    React.useState<boolean>(false);
-  const [selectedExampleShortHeader, setSelectedExampleShortHeader] =
-    React.useState<?ExampleShortHeader>(null);
-  const [selectedPrivateGameTemplate, setSelectedPrivateGameTemplate] =
-    React.useState<?{|
-      privateGameTemplateListingData: PrivateGameTemplateListingData,
-      /**
-       * At the moment, only MainFrame uses this hook and handles the selected private
-       * game template in both build and store sections in this single variable.
-       * But the store section handles the preview of the game template content (unlike
-       * the build section that needs this hook to open the information dialog) so we
-       * let the possibility to select a game template without opening the dialog
-       * (This selected game template is then used by the NewProjectSetupDialog to use).
-       */
-      openDialog: boolean,
-    |}>(null);
+  const [
+    exampleStoreDialogOpen,
+    setExampleStoreDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    selectedExampleShortHeader,
+    setSelectedExampleShortHeader,
+  ] = React.useState<?ExampleShortHeader>(null);
+  const [
+    selectedPrivateGameTemplate,
+    setSelectedPrivateGameTemplate,
+  ] = React.useState<?{|
+    privateGameTemplateListingData: PrivateGameTemplateListingData,
+    /**
+     * At the moment, only MainFrame uses this hook and handles the selected private
+     * game template in both build and store sections in this single variable.
+     * But the store section handles the preview of the game template content (unlike
+     * the build section that needs this hook to open the information dialog) so we
+     * let the possibility to select a game template without opening the dialog
+     * (This selected game template is then used by the NewProjectSetupDialog to use).
+     */
+    openDialog: boolean,
+  |}>(null);
 
   const { receivedGameTemplates } = React.useContext(AuthenticatedUserContext);
   const { privateGameTemplateListingDatas } = React.useContext(
@@ -55,12 +61,15 @@ const useExampleOrGameTemplateDialogs = ({
     },
     [setExampleStoreDialogOpen]
   );
-  const openExampleStoreDialog = React.useCallback(() => {
-    setExampleStoreDialogOpen(true);
-  }, [setExampleStoreDialogOpen]);
+  const openExampleStoreDialog = React.useCallback(
+    () => {
+      setExampleStoreDialogOpen(true);
+    },
+    [setExampleStoreDialogOpen]
+  );
 
-  const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> =
-    React.useMemo(() => {
+  const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+    () => {
       if (
         !selectedPrivateGameTemplate ||
         !privateGameTemplateListingDatas ||
@@ -69,12 +78,12 @@ const useExampleOrGameTemplateDialogs = ({
         return null;
 
       const receivedGameTemplateIds = receivedGameTemplates.map(
-        (template) => template.id
+        template => template.id
       );
 
       return privateGameTemplateListingDatas
         .filter(
-          (template) =>
+          template =>
             template.sellerId ===
               selectedPrivateGameTemplate.privateGameTemplateListingData
                 .sellerId &&
@@ -83,11 +92,13 @@ const useExampleOrGameTemplateDialogs = ({
         .sort((template1, template2) =>
           template1.name.localeCompare(template2.name)
         );
-    }, [
+    },
+    [
       selectedPrivateGameTemplate,
       privateGameTemplateListingDatas,
       receivedGameTemplates,
-    ]);
+    ]
+  );
 
   const renderExampleOrGameTemplateDialogs = () => {
     return (
@@ -106,9 +117,7 @@ const useExampleOrGameTemplateDialogs = ({
                 : null
             }
             onSelectExampleShortHeader={setSelectedExampleShortHeader}
-            onSelectPrivateGameTemplateListingData={(
-              privateGameTemplateListingData
-            ) =>
+            onSelectPrivateGameTemplateListingData={privateGameTemplateListingData =>
               privateGameTemplateListingData
                 ? setSelectedPrivateGameTemplate({
                     privateGameTemplateListingData,
@@ -134,7 +143,7 @@ const useExampleOrGameTemplateDialogs = ({
                 selectedPrivateGameTemplate.privateGameTemplateListingData
               }
               onCreateWithGameTemplate={onOpenNewProjectSetupDialog}
-              onGameTemplateOpen={(privateGameTemplateListingData) =>
+              onGameTemplateOpen={privateGameTemplateListingData =>
                 setSelectedPrivateGameTemplate({
                   privateGameTemplateListingData,
                   openDialog: true,

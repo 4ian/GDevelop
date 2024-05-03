@@ -19,7 +19,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -41,9 +41,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [project, layout]
     );
 
-    const variablesContainers = React.useMemo(() => {
-      return layout ? [layout.getVariables()] : [];
-    }, [layout]);
+    const variablesContainers = React.useMemo(
+      () => {
+        return layout ? [layout.getVariables()] : [];
+      },
+      [layout]
+    );
 
     return (
       <React.Fragment>

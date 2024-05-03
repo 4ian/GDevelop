@@ -9,7 +9,7 @@ import Rectangle from '../../Utils/Rectangle';
 export type InstanceMeasurer = {|
   getInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
   getUnrotatedInstanceAABB: (gdInitialInstance, Rectangle) => Rectangle,
-  getUnrotatedInstanceSize: (gdInitialInstance) => [number, number, number],
+  getUnrotatedInstanceSize: gdInitialInstance => [number, number, number],
 |};
 
 export default class InstancesRenderer {
@@ -17,7 +17,7 @@ export default class InstancesRenderer {
   instances: gdInitialInstancesContainer;
   layout: gdLayout;
   viewPosition: ViewPosition;
-  onInstanceClicked: (gdInitialInstance) => void;
+  onInstanceClicked: gdInitialInstance => void;
   onInstanceRightClicked: ({|
     offsetX: number,
     offsetY: number,
@@ -25,11 +25,11 @@ export default class InstancesRenderer {
     y: number,
   |}) => void;
   _showObjectInstancesIn3D: boolean;
-  onInstanceDoubleClicked: (gdInitialInstance) => void;
-  onOverInstance: (gdInitialInstance) => void;
-  onOutInstance: (gdInitialInstance) => void;
+  onInstanceDoubleClicked: gdInitialInstance => void;
+  onOverInstance: gdInitialInstance => void;
+  onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
-  onMoveInstanceEnd: (void) => void;
+  onMoveInstanceEnd: void => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
   onUpInstance: (gdInitialInstance, number, number) => void;
 
@@ -66,18 +66,18 @@ export default class InstancesRenderer {
     instances: gdInitialInstancesContainer,
     layout: gdLayout,
     viewPosition: ViewPosition,
-    onInstanceClicked: (gdInitialInstance) => void,
+    onInstanceClicked: gdInitialInstance => void,
     onInstanceRightClicked: ({|
       offsetX: number,
       offsetY: number,
       x: number,
       y: number,
     |}) => void,
-    onInstanceDoubleClicked: (gdInitialInstance) => void,
-    onOverInstance: (gdInitialInstance) => void,
-    onOutInstance: (gdInitialInstance) => void,
+    onInstanceDoubleClicked: gdInitialInstance => void,
+    onOverInstance: gdInitialInstance => void,
+    onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
-    onMoveInstanceEnd: (void) => void,
+    onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
     onUpInstance: (gdInitialInstance, number, number) => void,
     showObjectInstancesIn3D: boolean,
@@ -144,7 +144,7 @@ export default class InstancesRenderer {
 
         return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
-      getUnrotatedInstanceSize: (instance) => {
+      getUnrotatedInstanceSize: instance => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) {

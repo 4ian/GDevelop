@@ -51,40 +51,46 @@ export const GdGamesFrame = ({
   url.searchParams.set('supportedMessageIds', supportedMessageIds.join(','));
   url.searchParams.set('theme', paletteType);
 
-  React.useEffect(() => {
-    const callback = (event: MessageEvent) => {
-      if (
-        event.origin === gdGamesHost &&
-        event.data &&
-        typeof event.data === 'object'
-      ) {
-        if (event.data.id === 'pageLoaded') {
-          loadState.current = 'loaded';
-          forceUpdate();
-        } else {
-          // $FlowFixMe - Trust gd.games to send the right data shapes.
-          onMessageReceived(event.data);
+  React.useEffect(
+    () => {
+      const callback = (event: MessageEvent) => {
+        if (
+          event.origin === gdGamesHost &&
+          event.data &&
+          typeof event.data === 'object'
+        ) {
+          if (event.data.id === 'pageLoaded') {
+            loadState.current = 'loaded';
+            forceUpdate();
+          } else {
+            // $FlowFixMe - Trust gd.games to send the right data shapes.
+            onMessageReceived(event.data);
+          }
         }
-      }
-    };
+      };
 
-    window.addEventListener('message', callback);
+      window.addEventListener('message', callback);
 
-    return () => window.removeEventListener('message', callback);
-  }, [forceUpdate, onMessageReceived]);
+      return () => window.removeEventListener('message', callback);
+    },
+    [forceUpdate, onMessageReceived]
+  );
 
-  React.useEffect(() => {
-    (async () => {
-      await delay(6000);
-      if (!isMounted.current) return;
+  React.useEffect(
+    () => {
+      (async () => {
+        await delay(6000);
+        if (!isMounted.current) return;
 
-      // Consider the loading of the iframe as a failure if not completed/errored
-      // after 6s.
-      if (loadState.current === 'loaded') return;
-      loadState.current = 'errored';
-      forceUpdate();
-    })();
-  }, [forceUpdate, isMounted]);
+        // Consider the loading of the iframe as a failure if not completed/errored
+        // after 6s.
+        if (loadState.current === 'loaded') return;
+        loadState.current = 'errored';
+        forceUpdate();
+      })();
+    },
+    [forceUpdate, isMounted]
+  );
 
   return (
     <>

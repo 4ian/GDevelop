@@ -156,38 +156,41 @@ export const useShortcutMap = (): ShortcutMap => {
  * Listens for keyboard shortcuts and launches
  * callback with corresponding command
  */
-export const useKeyboardShortcuts = (onRunCommand: (CommandName) => void) => {
+export const useKeyboardShortcuts = (onRunCommand: CommandName => void) => {
   const shortcutMap = useShortcutMap();
 
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      // Extract shortcut from event object and check if it's valid
-      const shortcutData = getShortcutMetadataFromEvent(e);
-      if (!shortcutData.isValid) return;
+  React.useEffect(
+    () => {
+      const handler = (e: KeyboardEvent) => {
+        // Extract shortcut from event object and check if it's valid
+        const shortcutData = getShortcutMetadataFromEvent(e);
+        if (!shortcutData.isValid) return;
 
-      // Get corresponding command, if it exists
-      const commandName = Object.keys(shortcutMap).find(
-        (name) => shortcutMap[name] === shortcutData.shortcutString
-      );
-      if (!commandName) return;
+        // Get corresponding command, if it exists
+        const commandName = Object.keys(shortcutMap).find(
+          name => shortcutMap[name] === shortcutData.shortcutString
+        );
+        if (!commandName) return;
 
-      // On desktop app, ignore shortcuts that are handled by Electron
-      if (electron && commandsList[commandName].handledByElectron) return;
+        // On desktop app, ignore shortcuts that are handled by Electron
+        if (electron && commandsList[commandName].handledByElectron) return;
 
-      // e.preventDefault tends to block user from typing,
-      // so do it only if user is not typing.
-      if (isUserTyping()) return;
-      e.preventDefault();
+        // e.preventDefault tends to block user from typing,
+        // so do it only if user is not typing.
+        if (isUserTyping()) return;
+        e.preventDefault();
 
-      // Discard shortcut presses if a dialog is open
-      if (isDialogOpen()) return;
+        // Discard shortcut presses if a dialog is open
+        if (isDialogOpen()) return;
 
-      onRunCommand(commandName);
-    };
+        onRunCommand(commandName);
+      };
 
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [onRunCommand, shortcutMap]);
+      document.addEventListener('keydown', handler);
+      return () => document.removeEventListener('keydown', handler);
+    },
+    [onRunCommand, shortcutMap]
+  );
 };
 
 /**
@@ -213,7 +216,7 @@ export const getShortcutDisplayName = (shortcutString: ?string) => {
 
   return shortcutString
     .split('+')
-    .map<string>((keyCode) => {
+    .map<string>(keyCode => {
       if (keyCode === 'CmdOrCtrl') return isMacLike() ? 'Cmd' : 'Ctrl';
       if (keyCode === 'Shift' || keyCode === 'Alt') return keyCode;
       return getKeyDisplayName(keyCode);
@@ -241,7 +244,7 @@ const getElectronKeyString = (code: string) => {
 export const getElectronAccelerator = (shortcutString: string) => {
   return shortcutString
     .split('+')
-    .map<string>((keyCode) => {
+    .map<string>(keyCode => {
       if (keyCode === 'CmdOrCtrl' || keyCode === 'Shift' || keyCode === 'Alt')
         return keyCode;
       return getElectronKeyString(keyCode);

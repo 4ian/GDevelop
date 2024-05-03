@@ -18,8 +18,10 @@ const PrivateAssetPackAudioFilesDownloadButton = ({
   const { getPrivateAssetPackAudioArchiveUrl } = React.useContext(
     PrivateAssetsAuthorizationContext
   );
-  const [isAudioArchiveUrlLoading, setIsAudioArchiveUrlLoading] =
-    React.useState(false);
+  const [
+    isAudioArchiveUrlLoading,
+    setIsAudioArchiveUrlLoading,
+  ] = React.useState(false);
 
   return (
     <Column expand alignItems="center" justifyContent="center">
@@ -42,7 +44,9 @@ const PrivateAssetPackAudioFilesDownloadButton = ({
           setIsAudioArchiveUrlLoading(false);
           if (!url) {
             console.error(
-              `Could not generate url for premium asset pack with name ${assetPack.name}`
+              `Could not generate url for premium asset pack with name ${
+                assetPack.name
+              }`
             );
             return;
           }

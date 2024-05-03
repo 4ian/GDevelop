@@ -27,13 +27,13 @@ export const enumerateEffectsMetadata = (
   const extensionsList = platform.getAllPlatformExtensions();
 
   return flatten(
-    mapFor(0, extensionsList.size(), (i) => {
+    mapFor(0, extensionsList.size(), i => {
       const extension = extensionsList.at(i);
 
       return extension
         .getExtensionEffectTypes()
         .toJSArray()
-        .map((type) => extension.getEffectMetadata(type))
+        .map(type => extension.getEffectMetadata(type))
         .map((effectMetadata: gdEffectMetadata) => {
           const effectType = effectMetadata.getType();
 
@@ -107,7 +107,7 @@ export const enumerateEffectsMetadata = (
                 const choices = property
                   .getExtraInfo()
                   .toJSArray()
-                  .map((value) => ({ value, label: value }));
+                  .map(value => ({ value, label: value }));
                 return {
                   name: parameterName,
                   valueType: 'string',
@@ -135,12 +135,9 @@ export const enumerateEffectsMetadata = (
             effectMetadata,
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
-            isMarkedAsNotWorkingForObjects:
-              effectMetadata.isMarkedAsNotWorkingForObjects(),
-            isMarkedAsOnlyWorkingFor2D:
-              effectMetadata.isMarkedAsOnlyWorkingFor2D(),
-            isMarkedAsOnlyWorkingFor3D:
-              effectMetadata.isMarkedAsOnlyWorkingFor3D(),
+            isMarkedAsNotWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
+            isMarkedAsOnlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
+            isMarkedAsOnlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
             parametersSchema,
           };
         });

@@ -47,9 +47,9 @@ export const SetupExportHeader = ({
         <ColumnStackLayout noMargin>
           <RadioGroup
             value={exportState.targets[0] || 'iosAppStore'}
-            onChange={(event) => {
+            onChange={event => {
               const targetName = event.target.value;
-              updateExportState((prevExportState) => ({
+              updateExportState(prevExportState => ({
                 ...prevExportState,
                 targets: [targetName],
               }));
@@ -73,8 +73,8 @@ export const SetupExportHeader = ({
           <IosSigningCredentialsSelector
             targets={exportState.targets}
             buildSigningOptions={exportState.signing}
-            onSelectBuildSigningOptions={(signing) => {
-              updateExportState((prevExportState) => ({
+            onSelectBuildSigningOptions={signing => {
+              updateExportState(prevExportState => ({
                 ...prevExportState,
                 signing,
               }));

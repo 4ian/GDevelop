@@ -40,12 +40,13 @@ const ObjectPropertiesEditor = (props: Props) => {
 
   const propertiesSchema = propertiesMapToSchema(
     properties,
-    (object) => object.getProperties(),
+    object => object.getProperties(),
     (object, name, value) => object.updateProperty(name, value)
   );
 
-  const extraInformation =
-    getExtraObjectsInformation()[objectConfigurationAsGd.getType()];
+  const extraInformation = getExtraObjectsInformation()[
+    objectConfigurationAsGd.getType()
+  ];
 
   const tutorialIds = getObjectTutorialIds(objectConfigurationAsGd.getType());
 
@@ -54,7 +55,7 @@ const ObjectPropertiesEditor = (props: Props) => {
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
           {renderObjectNameField && renderObjectNameField()}
-          {tutorialIds.map((tutorialId) => (
+          {tutorialIds.map(tutorialId => (
             <DismissableTutorialMessage
               key={tutorialId}
               tutorialId={tutorialId}

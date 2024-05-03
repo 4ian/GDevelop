@@ -27,15 +27,15 @@ class ProjectCache {
     const databases = await window.indexedDB.databases();
     if (
       !databases.find(
-        (database) => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+        database => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
       )
     ) {
       // The database does not exist so there is nothing to clear.
       return;
     }
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         const db = event.target.result;
         if (!db.objectStoreNames.contains(objectStoreScope)) {
           // The database does not contain the object store so there is nothing to clear.
@@ -64,7 +64,7 @@ class ProjectCache {
     const databases = await window.indexedDB.databases();
     if (
       !databases.find(
-        (database) => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
+        database => database.name === CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
       )
     ) {
       // The database does not exist so it cannot be corrupt.
@@ -75,7 +75,7 @@ class ProjectCache {
     // needs to be removed and recreated.
     await new Promise((resolve, reject) => {
       const request = window.indexedDB.open(CLOUD_PROJECT_AUTOSAVE_CACHE_KEY);
-      request.onsuccess = (event) => {
+      request.onsuccess = event => {
         const db = event.target.result;
         if (db.objectStoreNames.contains(objectStoreScope)) {
           // The object store exists, there is nothing else to do.
@@ -89,15 +89,15 @@ class ProjectCache {
             CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
           );
 
-          req.onsuccess = function () {
+          req.onsuccess = function() {
             console.warn('Deleted indexedDB successfully!');
             resolve();
           };
-          req.onerror = function (event) {
+          req.onerror = function(event) {
             console.error("Couldn't delete indexedDB: ", event);
             reject();
           };
-          req.onblocked = function () {
+          req.onblocked = function() {
             console.error(
               "Couldn't delete indexedDB due to the operation being blocked."
             );
@@ -116,7 +116,7 @@ class ProjectCache {
             const request = window.indexedDB.open(
               CLOUD_PROJECT_AUTOSAVE_CACHE_KEY
             );
-            request.onsuccess = (event) => {
+            request.onsuccess = event => {
               const db = event.target.result;
               if (!db.objectStoreNames.contains(objectStoreScope)) {
                 // The onUpgradeNeeded is called before the success event so the object
@@ -127,11 +127,11 @@ class ProjectCache {
               }
               resolve(db);
             };
-            request.onerror = (event) => {
+            request.onerror = event => {
               console.error('IndexedDB could not be opened:', event);
               reject(event);
             };
-            request.onupgradeneeded = (event) => {
+            request.onupgradeneeded = event => {
               const db = event.target.result;
 
               if (!db.objectStoreNames.contains(objectStoreScope)) {
@@ -139,7 +139,7 @@ class ProjectCache {
               }
             };
           },
-          (error) => {
+          error => {
             console.error(
               'An error occurred while clearing a corrupt database.',
               error
@@ -158,10 +158,10 @@ class ProjectCache {
         const transaction = database.transaction(objectStoreScope, 'readonly');
         const key = ProjectCache._stringifyCacheKey(cacheKey);
         const request = transaction.objectStore(objectStoreScope).get(key);
-        request.onsuccess = (event) => {
+        request.onsuccess = event => {
           resolve(event.target.result);
         };
-        request.onerror = (event) => {
+        request.onerror = event => {
           console.error(
             'An error occurred while reading from indexedDB:',
             event
@@ -198,10 +198,10 @@ class ProjectCache {
       try {
         const transaction = database.transaction(objectStoreScope, 'readwrite');
         const key = ProjectCache._stringifyCacheKey(cacheKey);
-        transaction.oncomplete = (event) => {
+        transaction.oncomplete = event => {
           resolve();
         };
-        transaction.onerror = (event) => {
+        transaction.onerror = event => {
           console.error('An error occurred while writing to indexedDB:', event);
           reject(event);
         };

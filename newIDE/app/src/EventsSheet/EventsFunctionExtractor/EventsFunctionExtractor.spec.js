@@ -54,17 +54,31 @@ describe('EventsFunctionExtractor', () => {
 
     expect(eventsFunction.getParameters().size()).toBe(4);
     // The "GroupOfSpriteObjectsWithBehaviors" group (not expanded) and its behavior:
-    expect(eventsFunction.getParameters().at(0).getName()).toBe(
-      'GroupOfSpriteObjectsWithBehaviors'
-    );
-    expect(eventsFunction.getParameters().at(1).getName()).toBe(
-      'PlatformerObject'
-    );
+    expect(
+      eventsFunction
+        .getParameters()
+        .at(0)
+        .getName()
+    ).toBe('GroupOfSpriteObjectsWithBehaviors');
+    expect(
+      eventsFunction
+        .getParameters()
+        .at(1)
+        .getName()
+    ).toBe('PlatformerObject');
     // The "GroupOfObjects" group, expanded into MySpriteObject and MyTextObject
     // as both "GroupOfObjects" and "MySpriteObject" are used in events.
-    expect(eventsFunction.getParameters().at(2).getName()).toBe(
-      'MySpriteObject'
-    );
-    expect(eventsFunction.getParameters().at(3).getName()).toBe('MyTextObject');
+    expect(
+      eventsFunction
+        .getParameters()
+        .at(2)
+        .getName()
+    ).toBe('MySpriteObject');
+    expect(
+      eventsFunction
+        .getParameters()
+        .at(3)
+        .getName()
+    ).toBe('MyTextObject');
   });
 });

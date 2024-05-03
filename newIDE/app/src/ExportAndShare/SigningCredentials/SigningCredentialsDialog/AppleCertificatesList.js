@@ -51,8 +51,9 @@ export const AppleCertificatesList = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showConfirmation } = useAlertDialog();
 
-  const appleCertificateSigningCredentials =
-    filterAppleCertificateSigningCredentials(signingCredentials);
+  const appleCertificateSigningCredentials = filterAppleCertificateSigningCredentials(
+    signingCredentials
+  );
 
   return (
     <ColumnStackLayout noMargin>
@@ -76,7 +77,7 @@ export const AppleCertificatesList = ({
           }
         />
       ) : (
-        appleCertificateSigningCredentials.map((signingCredential) => {
+        appleCertificateSigningCredentials.map(signingCredential => {
           return (
             <Card
               background="medium"
@@ -197,7 +198,7 @@ export const AppleCertificatesList = ({
                 ) : (
                   <List>
                     {signingCredential.provisioningProfiles.map(
-                      (provisioningProfile) => (
+                      provisioningProfile => (
                         <ListItem
                           primaryText={provisioningProfile.name}
                           secondaryText={provisioningProfile.uuid}

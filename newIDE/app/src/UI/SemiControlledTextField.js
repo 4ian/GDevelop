@@ -5,7 +5,7 @@ import TextField, { type TextFieldInterface } from './TextField';
 import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 
 type Props = {|
-  onChange: (string) => void,
+  onChange: string => void,
   value: string,
   commitOnBlur?: boolean,
   onFocus?: ({
@@ -68,7 +68,7 @@ export type SemiControlledTextFieldInterface = {|
  */
 const SemiControlledTextField = React.forwardRef<
   Props,
-  SemiControlledTextFieldInterface,
+  SemiControlledTextFieldInterface
 >((props, ref) => {
   const [focused, setFocused] = React.useState<boolean>(false);
   const [text, setText] = React.useState<?string>(null);
@@ -86,7 +86,7 @@ const SemiControlledTextField = React.forwardRef<
     }
   };
 
-  const focus: FieldFocusFunction = (options) => {
+  const focus: FieldFocusFunction = options => {
     if (textFieldRef.current) textFieldRef.current.focus(options);
   };
 
@@ -128,7 +128,7 @@ const SemiControlledTextField = React.forwardRef<
       type={type || 'text'}
       ref={textFieldRef}
       value={focused ? text : value}
-      onFocus={(event) => {
+      onFocus={event => {
         setFocused(true);
         setText(value);
 
@@ -138,7 +138,7 @@ const SemiControlledTextField = React.forwardRef<
         setText(newValue);
         if (!commitOnBlur) onChange(newValue);
       }}
-      onBlur={(event) => {
+      onBlur={event => {
         onChange(event.currentTarget.value);
         setFocused(false);
         setText(null);

@@ -19,21 +19,20 @@ const EventsRenderingService = {
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
-    'BuiltinCommonInstructions::ForEachChildVariable':
-      ForEachChildVariableEvent,
+    'BuiltinCommonInstructions::ForEachChildVariable': ForEachChildVariableEvent,
     'BuiltinCommonInstructions::Repeat': RepeatEvent,
     'BuiltinCommonInstructions::While': WhileEvent,
     'BuiltinCommonInstructions::Link': LinkEvent,
     'BuiltinCommonInstructions::JsCode': JsCodeEvent,
   },
-  getEventComponent: function (
+  getEventComponent: function(
     event: gdBaseEvent
   ): ComponentType<EventRendererProps> {
     if (this.components.hasOwnProperty(event.getType()))
       return this.components[event.getType()];
     else return this.components.unknownEvent;
   },
-  registerEvent: function (
+  registerEvent: function(
     eventType: string,
     renderFunction: ComponentType<EventRendererProps>
   ) {

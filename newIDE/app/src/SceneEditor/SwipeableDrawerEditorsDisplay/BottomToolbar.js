@@ -40,7 +40,7 @@ const styles = {
 
 type Props = {|
   selectedEditorId: ?EditorId,
-  onSelectEditor: (EditorId) => void,
+  onSelectEditor: EditorId => void,
 |};
 
 const editors = {
@@ -71,7 +71,7 @@ const BottomToolbar = React.memo<Props>((props: Props) => {
     <Paper background="medium" square style={styles.container}>
       <Toolbar height={toolbarHeight}>
         <ToolbarGroup>
-          {Object.keys(editors).map((editorId) => {
+          {Object.keys(editors).map(editorId => {
             const { icon, buttonId } = editors[editorId];
             const isSelected = props.selectedEditorId === editorId;
             return (

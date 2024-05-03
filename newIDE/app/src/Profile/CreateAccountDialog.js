@@ -121,12 +121,17 @@ const CreateAccountDialog = ({
   const [email, setEmail] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [username, setUsername] = React.useState<string>('');
-  const [getNewsletterEmail, setGetNewsletterEmail] =
-    React.useState<boolean>(false);
-  const [usernameAvailability, setUsernameAvailability] =
-    React.useState<?UsernameAvailability>(null);
-  const [isValidatingUsername, setIsValidatingUsername] =
-    React.useState<boolean>(false);
+  const [getNewsletterEmail, setGetNewsletterEmail] = React.useState<boolean>(
+    false
+  );
+  const [
+    usernameAvailability,
+    setUsernameAvailability,
+  ] = React.useState<?UsernameAvailability>(null);
+  const [
+    isValidatingUsername,
+    setIsValidatingUsername,
+  ] = React.useState<boolean>(false);
 
   const canCreateAccount =
     !createAccountInProgress &&

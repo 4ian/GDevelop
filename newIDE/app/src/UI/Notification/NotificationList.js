@@ -17,7 +17,7 @@ type Props = {|
   notifications: Notification[],
   onMarkAllAsRead: () => Promise<void>,
   canMarkAllAsRead: boolean,
-  onMarkNotificationAsSeen: (Notification) => Promise<void>,
+  onMarkNotificationAsSeen: Notification => Promise<void>,
   onCloseNotificationList: () => void,
 |};
 
@@ -33,19 +33,22 @@ const NotificationList = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showAll, setShowAll] = React.useState<boolean>(false);
 
-  const markAllAsRead = React.useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await onMarkAllAsRead();
-    } catch (error) {
-      console.error(
-        'An error occurred while marking all notifications as seen:',
-        error
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, [onMarkAllAsRead]);
+  const markAllAsRead = React.useCallback(
+    async () => {
+      setIsLoading(true);
+      try {
+        await onMarkAllAsRead();
+      } catch (error) {
+        console.error(
+          'An error occurred while marking all notifications as seen:',
+          error
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onMarkAllAsRead]
+  );
 
   const markNotificationAsSeen = React.useCallback(
     async (notification: Notification) => {
@@ -88,7 +91,7 @@ const NotificationList = ({
             <Column>
               <List>
                 {notificationsToDisplay.length > 0 ? (
-                  notificationsToDisplay.map((notification) => (
+                  notificationsToDisplay.map(notification => (
                     <NotificationListItem
                       key={notification.id}
                       notification={notification}

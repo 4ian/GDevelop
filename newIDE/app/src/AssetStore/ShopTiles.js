@@ -98,7 +98,7 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = makeStyles((theme) =>
+const useStylesForGridListItem = makeStyles(theme =>
   createStyles({
     root: {
       '&:focus': {
@@ -483,7 +483,9 @@ export const PrivateGameTemplateTile = ({
           key={privateGameTemplateListingData.name}
           style={styles.previewImage}
           src={privateGameTemplateListingData.thumbnailUrls[0]}
-          alt={`Preview image of game template ${privateGameTemplateListingData.name}`}
+          alt={`Preview image of game template ${
+            privateGameTemplateListingData.name
+          }`}
         />
         <div style={styles.priceTagContainer}>
           <ProductPriceTag

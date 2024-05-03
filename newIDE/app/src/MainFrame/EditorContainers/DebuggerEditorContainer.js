@@ -17,7 +17,7 @@ type State = {|
 
 export class DebuggerEditorContainer extends React.Component<
   RenderEditorContainerProps,
-  State,
+  State
 > {
   editor: ?Debugger;
   _subscriptionChecker: ?SubscriptionCheckerInterface;
@@ -80,10 +80,10 @@ export class DebuggerEditorContainer extends React.Component<
           project={project}
           setToolbar={this.props.setToolbar}
           previewDebuggerServer={previewDebuggerServer}
-          ref={(editor) => (this.editor = editor)}
+          ref={editor => (this.editor = editor)}
         />
         <SubscriptionChecker
-          ref={(subscriptionChecker) =>
+          ref={subscriptionChecker =>
             (this._subscriptionChecker = subscriptionChecker)
           }
           id="Debugger"

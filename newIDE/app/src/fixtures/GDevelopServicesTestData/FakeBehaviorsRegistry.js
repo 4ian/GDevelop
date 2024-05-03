@@ -318,10 +318,12 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       fullName: 'Platformer multitouch controller mapper',
       name: 'PlatformerMultitouchMapper',
       version: '1.2.2',
-      url: 'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick-header.json',
-      tags: 'multitouch,joystick,thumbstick,controller,touchscreen,twin stick,shooter,virtual',
+      tags:
+        'multitouch,joystick,thumbstick,controller,touchscreen,twin stick,shooter,virtual',
       category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg',
@@ -362,10 +364,12 @@ export const fakeBehaviorsRegistry: BehaviorsRegistry & {
       fullName: 'Top-down multitouch controller mapper',
       name: 'TopDownMultitouchMapper',
       version: '1.2.2',
-      url: 'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/SpriteMultitouchJoystick-header.json',
-      tags: 'multitouch,joystick,thumbstick,controller,touchscreen,twin stick,shooter,virtual',
+      tags:
+        'multitouch,joystick,thumbstick,controller,touchscreen,twin stick,shooter,virtual',
       category: 'Input',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Videogames/Videogames_controller_joystick_arrows_direction.svg',

@@ -17,8 +17,9 @@ type Props = {|
 const LanguageDialog = ({ open, onClose }: Props) => {
   const { values } = React.useContext(PreferencesContext);
 
-  const [languageDidChange, setLanguageDidChange] =
-    React.useState<boolean>(false);
+  const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
+    false
+  );
 
   if (!open) return null;
 

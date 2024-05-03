@@ -40,7 +40,7 @@ const ResourceStoreChooser = ({
 }: ResourceStoreChooserProps) => {
   return (
     <ResourceStore
-      onChoose={(resource) => {
+      onChoose={resource => {
         const chosenResourceUrl = resource.url;
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
@@ -91,7 +91,7 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath(project, kind, lastUsedPath);
 
         let hasFilesOutsideProjectFolder = filePaths.some(
-          (path) => !isPathInProjectFolder(project, path)
+          path => !isPathInProjectFolder(project, path)
         );
 
         // Some resources, like tilemaps, can have references to other files.
@@ -181,7 +181,7 @@ const localResourceSources: Array<ResourceSource> = [
           filesWithEmbeddedResources
         );
 
-        return filePaths.map((filePath) => {
+        return filePaths.map(filePath => {
           const newResource = createNewResource();
           newResource.setFile(path.relative(projectPath, filePath));
           newResource.setName(path.relative(projectPath, filePath));
@@ -190,8 +190,9 @@ const localResourceSources: Array<ResourceSource> = [
             ? newToOldFilePaths.get(filePath)
             : filePath;
           if (filePathWithMapping) {
-            const mappedResources =
-              filesWithMappedResources.get(filePathWithMapping);
+            const mappedResources = filesWithMappedResources.get(
+              filePathWithMapping
+            );
 
             if (mappedResources && mappedResources.mapping) {
               newResource.setMetadata(

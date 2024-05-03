@@ -19,7 +19,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function GlobalVariableField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?VariableFieldInterface>(null);
     const [editorOpen, setEditorOpen] = React.useState(false);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -36,9 +36,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
-    const variablesContainers = React.useMemo(() => {
-      return project ? [project.getVariables()] : [];
-    }, [project]);
+    const variablesContainers = React.useMemo(
+      () => {
+        return project ? [project.getVariables()] : [];
+      },
+      [project]
+    );
 
     return (
       <React.Fragment>

@@ -7,7 +7,7 @@ const readLocalFileToArrayBuffer = async (
   filePath: string
 ): Promise<ArrayBuffer> => {
   const buffer: Buffer = await new Promise((resolve, reject) => {
-    fs.readFile(filePath, function (err, buffer) {
+    fs.readFile(filePath, function(err, buffer) {
       if (err) {
         reject(err);
         return;

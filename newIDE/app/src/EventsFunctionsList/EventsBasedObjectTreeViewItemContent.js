@@ -54,8 +54,7 @@ export const getObjectTreeViewItemId = (
 };
 
 export class EventsBasedObjectTreeViewItemContent
-  implements TreeViewItemContent
-{
+  implements TreeViewItemContent {
   eventsBasedObject: gdEventsBasedObject;
   props: EventsBasedObjectProps;
 
@@ -117,7 +116,7 @@ export class EventsBasedObjectTreeViewItemContent
     this.props.onRenameEventsBasedObject(
       this.eventsBasedObject,
       newName,
-      (doRename) => {
+      doRename => {
         if (!doRename) return;
 
         this._onEventsBasedObjectModified();
@@ -196,7 +195,7 @@ export class EventsBasedObjectTreeViewItemContent
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedObject(this.eventsBasedObject, (doRemove) => {
+    this.props.onDeleteEventsBasedObject(this.eventsBasedObject, doRemove => {
       if (!doRemove) return;
 
       eventsBasedObjectsList.remove(this.eventsBasedObject.getName());
@@ -246,7 +245,7 @@ export class EventsBasedObjectTreeViewItemContent
 
     const { project, eventsBasedObjectsList } = this.props;
 
-    const newName = newNameGenerator(name, (name) =>
+    const newName = newNameGenerator(name, name =>
       eventsBasedObjectsList.has(name)
     );
 
@@ -271,7 +270,7 @@ export class EventsBasedObjectTreeViewItemContent
   _addNewEventsBasedObject(): void {
     const { eventsBasedObjectsList } = this.props;
 
-    const name = newNameGenerator('MyObject', (name) =>
+    const name = newNameGenerator('MyObject', name =>
       eventsBasedObjectsList.has(name)
     );
     const newEventsBasedObject = eventsBasedObjectsList.insertNew(
@@ -280,8 +279,9 @@ export class EventsBasedObjectTreeViewItemContent
     );
     this._onEventsBasedObjectModified();
 
-    const newEventsBasedObjectId =
-      getObjectTreeViewItemId(newEventsBasedObject);
+    const newEventsBasedObjectId = getObjectTreeViewItemId(
+      newEventsBasedObject
+    );
     // Scroll to the new function.
     // Ideally, we'd wait for the list to be updated to scroll, but
     // to simplify the code, we just wait a few ms for a new render
@@ -311,8 +311,7 @@ export class EventsBasedObjectTreeViewItemContent
 
   addFunctionAtSelection(): void {
     const { selectedEventsFunction, selectedEventsBasedObject } = this.props;
-    const eventsFunctionsContainer =
-      this.eventsBasedObject.getEventsFunctions();
+    const eventsFunctionsContainer = this.eventsBasedObject.getEventsFunctions();
     // When the selected item is inside the object, the new function is
     // added below it.
     const index =

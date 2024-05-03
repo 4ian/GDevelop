@@ -47,7 +47,7 @@ type Props = {|
   isOpening: boolean,
   onChoose: () => void,
   onOpen: () => void,
-  onHeightComputed: (number) => void,
+  onHeightComputed: number => void,
 |};
 
 const ExampleListItem = ({
@@ -90,7 +90,7 @@ const ExampleListItem = ({
     const originalField = exampleShortHeader[field];
 
     if (!matches) return originalField;
-    const nameMatches = matches.filter((match) => match.key === field);
+    const nameMatches = matches.filter(match => match.key === field);
     if (nameMatches.length === 0) return originalField;
 
     return (
@@ -128,7 +128,7 @@ const ExampleListItem = ({
                     />
                   )}
                   {exampleShortHeader.authors &&
-                    exampleShortHeader.authors.map((author) => (
+                    exampleShortHeader.authors.map(author => (
                       <UserPublicProfileChip user={author} key={author.id} />
                     ))}
                 </div>
@@ -149,7 +149,7 @@ const ExampleListItem = ({
               label={<Trans>Open</Trans>}
               disabled={isOpening || !isCompatible}
               onClick={onOpen}
-              buildMenuTemplate={(i18n) => [
+              buildMenuTemplate={i18n => [
                 {
                   label: i18n._(t`Open details`),
                   click: onChoose,

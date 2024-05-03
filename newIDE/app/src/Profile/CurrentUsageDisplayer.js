@@ -56,43 +56,46 @@ const CurrentUsageDisplayer = ({
   const { profile, limits } = React.useContext(AuthenticatedUserContext);
   const usageCreditPrice = usagePrice ? usagePrice.priceInCredits : 0;
 
-  const onPurchaseBuildWithCredits = React.useCallback(() => {
-    if (!profile || !limits || !usageCreditPrice) {
-      return;
-    }
+  const onPurchaseBuildWithCredits = React.useCallback(
+    () => {
+      if (!profile || !limits || !usageCreditPrice) {
+        return;
+      }
 
-    const currentCreditsAmount = limits.credits.userBalance.amount;
-    if (currentCreditsAmount < usageCreditPrice) {
-      openCreditsPackageDialog({
-        missingCredits: usageCreditPrice - currentCreditsAmount,
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      if (currentCreditsAmount < usageCreditPrice) {
+        openCreditsPackageDialog({
+          missingCredits: usageCreditPrice - currentCreditsAmount,
+        });
+        return;
+      }
+
+      openCreditsUsageDialog({
+        title: <Trans>Start build with credits</Trans>,
+        message: (
+          <Trans>
+            You are about to use {usageCreditPrice} credits to start this build.
+            Continue?
+          </Trans>
+        ),
+        onConfirm: async () => {
+          // We do not await for the build to start, we assume
+          // that the ExportLauncher will handle the error if the build fails.
+          onStartBuildWithCredits();
+        },
+        successMessage: <Trans>Build started!</Trans>,
+        closeAutomaticallyAfterSuccess: true,
       });
-      return;
-    }
-
-    openCreditsUsageDialog({
-      title: <Trans>Start build with credits</Trans>,
-      message: (
-        <Trans>
-          You are about to use {usageCreditPrice} credits to start this build.
-          Continue?
-        </Trans>
-      ),
-      onConfirm: async () => {
-        // We do not await for the build to start, we assume
-        // that the ExportLauncher will handle the error if the build fails.
-        onStartBuildWithCredits();
-      },
-      successMessage: <Trans>Build started!</Trans>,
-      closeAutomaticallyAfterSuccess: true,
-    });
-  }, [
-    profile,
-    limits,
-    usageCreditPrice,
-    openCreditsUsageDialog,
-    onStartBuildWithCredits,
-    openCreditsPackageDialog,
-  ]);
+    },
+    [
+      profile,
+      limits,
+      usageCreditPrice,
+      openCreditsUsageDialog,
+      onStartBuildWithCredits,
+      openCreditsPackageDialog,
+    ]
+  );
 
   if (!quota || !subscription || !usagePrice) return <PlaceholderLoader />;
 

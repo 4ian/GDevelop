@@ -28,7 +28,7 @@ type TabOptions = {| data?: HTMLDataset |};
 
 export type EditorTab = {|
   /** The function to render the tab editor. */
-  renderEditorContainer: (RenderEditorContainerPropsWithRef) => React.Node,
+  renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
   /** A reference to the editor. */
   editorRef: ?EditorRef,
   /** The label shown on the tab. */
@@ -96,19 +96,18 @@ export const getEditorTabMetadata = (
       editorTab.editorRef instanceof SceneEditorContainer
         ? 'layout'
         : editorTab.editorRef instanceof ExternalEventsEditorContainer
-          ? 'external events'
-          : editorTab.editorRef instanceof ExternalLayoutEditorContainer
-            ? 'external layout'
-            : editorTab.editorRef instanceof ResourcesEditorContainer
-              ? 'resources'
-              : editorTab.editorRef instanceof EventsEditorContainer
-                ? 'layout events'
-                : editorTab.editorRef instanceof
-                    EventsFunctionsExtensionEditorContainer
-                  ? 'events functions extension'
-                  : editorTab.editorRef instanceof DebuggerEditorContainer
-                    ? 'debugger'
-                    : 'start page',
+        ? 'external events'
+        : editorTab.editorRef instanceof ExternalLayoutEditorContainer
+        ? 'external layout'
+        : editorTab.editorRef instanceof ResourcesEditorContainer
+        ? 'resources'
+        : editorTab.editorRef instanceof EventsEditorContainer
+        ? 'layout events'
+        : editorTab.editorRef instanceof EventsFunctionsExtensionEditorContainer
+        ? 'events functions extension'
+        : editorTab.editorRef instanceof DebuggerEditorContainer
+        ? 'debugger'
+        : 'start page',
   };
 };
 
@@ -135,7 +134,7 @@ export const openEditorTab = (
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
-    (editor) => editor.key === key
+    editor => editor.key === key
   );
   if (existingEditorId !== -1) {
     return {
@@ -178,7 +177,7 @@ export const changeCurrentTab = (
 };
 
 export const isStartPageTabPresent = (state: EditorTabsState): boolean => {
-  return state.editors.some((editor) => editor.key === 'start page');
+  return state.editors.some(editor => editor.key === 'start page');
 };
 
 export const closeTabsExceptIf = (
@@ -199,14 +198,14 @@ export const closeTabsExceptIf = (
 };
 
 export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
-  return closeTabsExceptIf(state, (editorTab) => !editorTab.closable);
+  return closeTabsExceptIf(state, editorTab => !editorTab.closable);
 };
 
 export const closeEditorTab = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
-  return closeTabsExceptIf(state, (editorTab) => editorTab !== chosenEditorTab);
+  return closeTabsExceptIf(state, editorTab => editorTab !== chosenEditorTab);
 };
 
 export const closeOtherEditorTabs = (
@@ -215,7 +214,7 @@ export const closeOtherEditorTabs = (
 ): EditorTabsState => {
   return closeTabsExceptIf(
     state,
-    (editorTab) => !editorTab.closable || editorTab === chosenEditorTab
+    editorTab => !editorTab.closable || editorTab === chosenEditorTab
   );
 };
 
@@ -235,7 +234,7 @@ export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
 ) => {
-  return closeTabsExceptIf(state, (editorTab) => {
+  return closeTabsExceptIf(state, editorTab => {
     const editorProject =
       editorTab.editorRef && editorTab.editorRef.getProject();
     return !editorProject || editorProject !== project;
@@ -247,7 +246,7 @@ export const closeProjectTabs = (
  * to the project.
  */
 export const saveUiSettings = (state: EditorTabsState) => {
-  state.editors.forEach((editorTab) => {
+  state.editors.forEach(editorTab => {
     if (
       editorTab.editorRef &&
       (editorTab.editorRef instanceof SceneEditorContainer ||
@@ -263,7 +262,7 @@ export const saveUiSettings = (state: EditorTabsState) => {
  * to editors with changes to commit them (like modified extensions).
  */
 export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
-  state.editors.forEach((editorTab) => {
+  state.editors.forEach(editorTab => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
@@ -273,7 +272,7 @@ export const notifyPreviewOrExportWillStart = (state: EditorTabsState) => {
 };
 
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
-  return closeTabsExceptIf(state, (editorTab) => {
+  return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
     if (
@@ -294,7 +293,7 @@ export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
 ) => {
-  return closeTabsExceptIf(state, (editorTab) => {
+  return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof ExternalLayoutEditorContainer) {
@@ -312,7 +311,7 @@ export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
 ) => {
-  return closeTabsExceptIf(state, (editorTab) => {
+  return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof ExternalEventsEditorContainer) {
       return (
@@ -329,7 +328,7 @@ export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtensionName: string
 ) => {
-  return closeTabsExceptIf(state, (editorTab) => {
+  return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
       return (

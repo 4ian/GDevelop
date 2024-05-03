@@ -154,7 +154,7 @@ export const PropertyResourceSelector = ({
       floatingLabelText={label}
       resourceManagementProps={resourceManagementProps}
       initialResourceName={value}
-      onChange={(newValue) => {
+      onChange={newValue => {
         if (newValue !== value) onChangeProperty(propertyName, newValue);
       }}
       resourcesLoader={resourcesLoader}

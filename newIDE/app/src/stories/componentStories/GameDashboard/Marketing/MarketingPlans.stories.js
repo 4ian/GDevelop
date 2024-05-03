@@ -99,7 +99,8 @@ const marketingPlans = [
       },
     ],
     additionalSuccessMessageByLocale: {
-      en: 'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
+      en:
+        'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
       'fr-FR':
         'Assurez-vous que votre jeu est public et que vous avez configuré une miniature pour gd.games. Il peut falloir quelques minutes pour que votre jeu soit visible sur la plateforme.',
       'ar-SA':
@@ -219,7 +220,8 @@ const marketingPlans = [
       },
     ],
     additionalSuccessMessageByLocale: {
-      en: 'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
+      en:
+        'Ensure that your game is public and you have configured a thumbnail for gd.games. This can take a few minutes for your game to be visible on the platform.',
       'fr-FR':
         'Assurez-vous que votre jeu est public et que vous avez configuré une miniature pour gd.games. Il peut falloir quelques minutes pour que votre jeu soit visible sur la plateforme.',
       'ar-SA':
@@ -265,7 +267,8 @@ const marketingPlans = [
     ],
     gameRequirements: {},
     descriptionByLocale: {
-      en: 'Perfect for people with a finished game who want to promote it to the widest audience possible',
+      en:
+        'Perfect for people with a finished game who want to promote it to the widest audience possible',
       'fr-FR':
         'Parfait pour les personnes ayant un jeu terminé qui souhaitent le promouvoir auprès du plus large public possible',
       'ar-SA':
@@ -350,7 +353,8 @@ const marketingPlans = [
       },
     ],
     additionalSuccessMessageByLocale: {
-      en: 'We will get in touch in the next few days to get the campaign up, check your emails!',
+      en:
+        'We will get in touch in the next few days to get the campaign up, check your emails!',
       'fr-FR':
         'Nous vous contacterons dans les prochains jours pour lancer la campagne, vérifiez vos e-mails !',
       'ar-SA':
@@ -403,7 +407,7 @@ const MarketingPlansStory = ({
     .onGet('/marketing-plan')
     .reply(200, marketingPlans)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

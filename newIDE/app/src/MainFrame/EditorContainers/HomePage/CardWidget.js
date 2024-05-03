@@ -22,7 +22,7 @@ const styles = {
 
 // Styles to give the impression of pressing an element.
 const useStylesForWidget = (useDefaultDisabledStyle?: boolean) =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: {
         border: `1px solid ${theme.palette.text.primary}`,
@@ -70,10 +70,10 @@ export const CardWidget = ({
     size === 'banner'
       ? undefined
       : isMobile
-        ? undefined
-        : size === 'small'
-          ? SMALL_WIDGET_SIZE
-          : LARGE_WIDGET_SIZE;
+      ? undefined
+      : size === 'small'
+      ? SMALL_WIDGET_SIZE
+      : LARGE_WIDGET_SIZE;
 
   return (
     <ButtonBase

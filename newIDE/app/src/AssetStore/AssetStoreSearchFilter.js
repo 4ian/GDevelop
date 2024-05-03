@@ -19,8 +19,7 @@ export class TagAssetStoreSearchFilter extends TagSearchFilter<AssetShortHeader>
 }
 
 export class ObjectTypeAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   objectTypes: Set<string>;
 
   constructor(objectTypes: Set<string> = new Set()) {
@@ -40,8 +39,7 @@ export class ObjectTypeAssetStoreSearchFilter
 }
 
 export class LicenseAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   attributionFreeOnly: boolean;
 
   static noAttributionLicenses = [
@@ -70,8 +68,7 @@ export class LicenseAssetStoreSearchFilter
 }
 
 export class AssetPackTypeStoreSearchFilter
-  implements SearchFilter<PublicAssetPack | PrivateAssetPackListingData>
-{
+  implements SearchFilter<PublicAssetPack | PrivateAssetPackListingData> {
   isFree: boolean;
   isPremium: boolean;
   isOwned: boolean;
@@ -103,7 +100,7 @@ export class AssetPackTypeStoreSearchFilter
       this.isOwned &&
       searchItem.prices &&
       this.receivedAssetPacks
-        .map((assetPack) => assetPack.id)
+        .map(assetPack => assetPack.id)
         .includes(searchItem.id)
     )
       return 1;
@@ -118,8 +115,7 @@ export class AssetPackTypeStoreSearchFilter
 }
 
 export class AnimatedAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   mustBeAnimated: boolean;
   mustHaveSeveralState: boolean;
 
@@ -146,8 +142,7 @@ export class AnimatedAssetStoreSearchFilter
 }
 
 export class DimensionAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   dimensionMin: number;
   dimensionMax: number;
 
@@ -193,7 +188,7 @@ export class DimensionAssetStoreSearchFilter
  * @param y Divisor value.
  * @returns Return the remainder using Euclidean division.
  */
-const mod = function (x: number, y: number): number {
+const mod = function(x: number, y: number): number {
   return ((x % y) + y) % y;
 };
 
@@ -203,7 +198,7 @@ const mod = function (x: number, y: number): number {
  * @returns Return the similitude between the 2 colors
  * (1 when they are the same).
  */
-const getColorSimilitude = function (
+const getColorSimilitude = function(
   colorA: RGBColor,
   colorB: RGBColor
 ): number {
@@ -239,8 +234,7 @@ const getColorSimilitude = function (
 };
 
 export class ColorAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   color: RGBColor | null;
 
   constructor(color: RGBColor | null = null) {
@@ -268,8 +262,7 @@ export class ColorAssetStoreSearchFilter
 }
 
 export class SimilarAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader>
-{
+  implements SearchFilter<AssetShortHeader> {
   other: AssetShortHeader;
 
   constructor(other: AssetShortHeader) {

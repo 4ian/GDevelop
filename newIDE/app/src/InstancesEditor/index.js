@@ -71,7 +71,7 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   selectedLayer: string,
   initialInstances: gdInitialInstancesContainer,
   instancesEditorSettings: InstancesEditorSettings,
-  isInstanceOf3DObject: (gdInitialInstance) => boolean,
+  isInstanceOf3DObject: gdInitialInstance => boolean,
   onInstancesEditorSettingsMutated: (
     instancesEditorSettings: InstancesEditorSettings
   ) => void,
@@ -96,9 +96,9 @@ type Props = {|
   ...InstancesEditorPropsWithoutSizeAndScroll,
   width: number,
   height: number,
-  onViewPositionChanged?: (ViewPosition) => void,
-  onMouseMove?: (MouseEvent) => void,
-  onMouseLeave?: (MouseEvent) => void,
+  onViewPositionChanged?: ViewPosition => void,
+  onMouseMove?: MouseEvent => void,
+  onMouseLeave?: MouseEvent => void,
   screenType: ScreenType,
   showObjectInstancesIn3D: boolean,
 |};
@@ -229,7 +229,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.longTouchHandler = new LongTouchHandler({
       canvas: this.pixiRenderer.view,
-      onLongTouch: (event) =>
+      onLongTouch: event =>
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
@@ -267,14 +267,14 @@ export default class InstancesEditor extends Component<Props> {
       this.keyboardShortcuts.onMouseUp
     );
     if (onMouseMove)
-      this.pixiRenderer.view.addEventListener('mousemove', (event) => {
+      this.pixiRenderer.view.addEventListener('mousemove', event => {
         onMouseMove(event);
       });
     if (onMouseLeave)
-      this.pixiRenderer.view.addEventListener('mouseout', (event) => {
+      this.pixiRenderer.view.addEventListener('mouseout', event => {
         onMouseLeave(event);
       });
-    this.pixiRenderer.view.addEventListener('focusout', (event) => {
+    this.pixiRenderer.view.addEventListener('focusout', event => {
       if (this.keyboardShortcuts) {
         this.keyboardShortcuts.resetModifiers();
       }
@@ -290,10 +290,10 @@ export default class InstancesEditor extends Component<Props> {
       this.props.height
     );
     panable(this.backgroundArea);
-    this.backgroundArea.addEventListener('mousedown', (event) =>
+    this.backgroundArea.addEventListener('mousedown', event =>
       this._onDownBackground(event.data.global.x, event.data.global.y, event)
     );
-    this.backgroundArea.addEventListener('mouseup', (event) =>
+    this.backgroundArea.addEventListener('mouseup', event =>
       this._onUpBackground(event.data.global.x, event.data.global.y, event)
     );
     this.backgroundArea.addEventListener(
@@ -313,21 +313,21 @@ export default class InstancesEditor extends Component<Props> {
         return false;
       }
     );
-    this.backgroundArea.addEventListener('touchstart', (event) => {
+    this.backgroundArea.addEventListener('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;
       }
 
       this._onDownBackground(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.addEventListener('touchend', (event) => {
+    this.backgroundArea.addEventListener('touchend', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;
       }
 
       this._onUpBackground(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.addEventListener('globalmousemove', (event) => {
+    this.backgroundArea.addEventListener('globalmousemove', event => {
       const cursorX = event.data.global.x || 0;
       const cursorY = event.data.global.y || 0;
       this._onMouseMove(cursorX, cursorY);
@@ -340,7 +340,7 @@ export default class InstancesEditor extends Component<Props> {
         event.data.global.y
       )
     );
-    this.backgroundArea.addEventListener('panend', (event) => this._onPanEnd());
+    this.backgroundArea.addEventListener('panend', event => this._onPanEnd());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
@@ -627,8 +627,9 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    this.props.instancesEditorSettings.zoomFactor =
-      clampInstancesEditorZoom(zoomFactor);
+    this.props.instancesEditorSettings.zoomFactor = clampInstancesEditorZoom(
+      zoomFactor
+    );
 
     this.props.onInstancesEditorSettingsMutated(
       this.props.instancesEditorSettings
@@ -885,8 +886,8 @@ export default class InstancesEditor extends Component<Props> {
   ) => {
     this.fpsLimiter.notifyInteractionHappened();
 
-    const isMovingForTheFirstTimeSinceItIsDown =
-      !this.hasCursorMovedSinceItIsDown;
+    const isMovingForTheFirstTimeSinceItIsDown = !this
+      .hasCursorMovedSinceItIsDown;
     this.hasCursorMovedSinceItIsDown = true;
 
     const sceneDeltaX = deltaX / this.getZoomFactor();
@@ -915,8 +916,7 @@ export default class InstancesEditor extends Component<Props> {
       this.keyboardShortcuts.shouldCloneInstances() &&
       isMovingForTheFirstTimeSinceItIsDown
     ) {
-      const selectedInstances =
-        this.props.instancesSelection.getSelectedInstances();
+      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
       for (let i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
         this.props.initialInstances
@@ -929,8 +929,7 @@ export default class InstancesEditor extends Component<Props> {
       this._onInstanceClicked(instance);
     }
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.instancesMover.moveBy(
       selectedInstances,
       sceneDeltaX,
@@ -952,8 +951,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.instancesMover.endMove();
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesMoved(selectedInstances);
   };
 
@@ -966,8 +964,7 @@ export default class InstancesEditor extends Component<Props> {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     const forceProportional =
       this.props.screenType === 'touch' &&
       canMoveOnX(grabbingLocation) &&
@@ -987,8 +984,7 @@ export default class InstancesEditor extends Component<Props> {
   _onResizeEnd = () => {
     this.instancesResizer.endResize();
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesResized(selectedInstances);
   };
 
@@ -997,8 +993,7 @@ export default class InstancesEditor extends Component<Props> {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.instancesRotator.rotateBy(
       selectedInstances,
       sceneDeltaX,
@@ -1010,8 +1005,7 @@ export default class InstancesEditor extends Component<Props> {
   _onRotateEnd = () => {
     this.instancesRotator.endRotate();
 
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesRotated(selectedInstances);
   };
 
@@ -1021,12 +1015,11 @@ export default class InstancesEditor extends Component<Props> {
 
   moveSelection = (x: number, y: number) => {
     this.fpsLimiter.notifyInteractionHappened();
-    const selectedInstances =
-      this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     const unlockedSelectedInstances = selectedInstances.filter(
-      (instance) => !instance.isLocked()
+      instance => !instance.isLocked()
     );
-    unlockedSelectedInstances.forEach((instance) => {
+    unlockedSelectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
     });
@@ -1074,7 +1067,7 @@ export default class InstancesEditor extends Component<Props> {
     let contentAABB: ?Rectangle;
     const getInstanceRectangle = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
-    getInstanceRectangle.invoke = (instancePtr) => {
+    getInstanceRectangle.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         instancePtr,
@@ -1116,7 +1109,7 @@ export default class InstancesEditor extends Component<Props> {
       firstInstance,
       new Rectangle()
     );
-    otherInstances.forEach((instance) => {
+    otherInstances.forEach(instance => {
       selectedInstancesRectangle.union(
         instanceMeasurer.getInstanceAABB(instance, new Rectangle())
       );
@@ -1221,7 +1214,7 @@ export default class InstancesEditor extends Component<Props> {
     return (
       <DropTarget
         canDrop={() => true}
-        hover={(monitor) => {
+        hover={monitor => {
           this.fpsLimiter.notifyInteractionHappened();
           const { _instancesAdder, viewPosition, canvasArea } = this;
           if (!_instancesAdder || !canvasArea || !viewPosition) return;
@@ -1238,7 +1231,7 @@ export default class InstancesEditor extends Component<Props> {
             this.props.selectedLayer
           );
         }}
-        drop={(monitor) => {
+        drop={monitor => {
           this.fpsLimiter.notifyInteractionHappened();
 
           const { _instancesAdder, viewPosition, canvasArea } = this;
@@ -1257,8 +1250,9 @@ export default class InstancesEditor extends Component<Props> {
             x - canvasRect.left,
             y - canvasRect.top
           );
-          const instances =
-            _instancesAdder.updateTemporaryInstancePositions(pos);
+          const instances = _instancesAdder.updateTemporaryInstancePositions(
+            pos
+          );
           _instancesAdder.commitTemporaryInstances();
           this.props.onInstancesAdded(instances);
         }}
@@ -1273,7 +1267,7 @@ export default class InstancesEditor extends Component<Props> {
 
           return connectDropTarget(
             <div
-              ref={(canvasArea) => (this.canvasArea = canvasArea)}
+              ref={canvasArea => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
               id={instancesEditorId}
             />

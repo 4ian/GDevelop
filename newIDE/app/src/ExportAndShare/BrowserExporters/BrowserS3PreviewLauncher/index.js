@@ -55,7 +55,7 @@ export const immediatelyOpenNewPreviewWindow = (
 
 export default class BrowserS3PreviewLauncher extends React.Component<
   Props,
-  State,
+  State
 > {
   canDoNetworkPreview = () => false;
   canDoHotReload = () => false;
@@ -101,8 +101,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       error: null,
     });
 
-    const debuggerIds =
-      this.getPreviewDebuggerServer().getExistingDebuggerIds();
+    const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
     const lastDebuggerId = debuggerIds.length
       ? debuggerIds[debuggerIds.length - 1]
       : null;
@@ -131,8 +130,11 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     }
 
     try {
-      const { exporter, outputDir, browserS3FileSystem } =
-        await this._prepareExporter();
+      const {
+        exporter,
+        outputDir,
+        browserS3FileSystem,
+      } = await this._prepareExporter();
 
       const previewExportOptions = new gd.PreviewExportOptions(
         project,

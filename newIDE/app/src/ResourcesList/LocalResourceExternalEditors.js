@@ -68,7 +68,7 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
   const urlsToDownload: Array<ResourceToDownload> = [];
   const filesToRead: Array<ResourceToReadLocally> = [];
   const resourcesManager = project.getResourcesManager();
-  resourceNames.forEach((resourceName) => {
+  resourceNames.forEach(resourceName => {
     if (!resourcesManager.hasResource(resourceName)) return;
 
     const resource = resourcesManager.getResource(resourceName);
@@ -91,18 +91,19 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
     }
   });
 
-  const downloadedBlobs: Array<ItemResult<ResourceToDownload>> =
-    await downloadUrlsToBlobs({
-      urlContainers: urlsToDownload,
-      onProgress: (count, total) => {},
-    });
+  const downloadedBlobs: Array<
+    ItemResult<ResourceToDownload>
+  > = await downloadUrlsToBlobs({
+    urlContainers: urlsToDownload,
+    onProgress: (count, total) => {},
+  });
 
   const resourcesToDataUrl = new Map<
     string,
     {|
       dataUrl: string,
       localFilePath?: string,
-    |},
+    |}
   >();
   await Promise.all(
     downloadedBlobs.map(async ({ error, blob, item }) => {
@@ -113,7 +114,9 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
           });
         } catch (error) {
           console.error(
-            `Unable to read data from resource "${item.resourceName}" - ignoring it.`,
+            `Unable to read data from resource "${
+              item.resourceName
+            }" - ignoring it.`,
             error
           );
         }
@@ -140,7 +143,7 @@ export const downloadAndPrepareExternalEditorBase64Resources = async ({
     })
   );
 
-  return resourceNames.map((resourceName) => {
+  return resourceNames.map(resourceName => {
     const resourceData = resourcesToDataUrl.get(resourceName);
     if (!resourceData)
       return {
@@ -194,11 +197,10 @@ const editWithLocalExternalEditor = async ({
     resources,
   };
   sendExternalEditorOpened(externalEditorName);
-  const externalEditorOutput: ?ExternalEditorOutput =
-    await openAndWaitForExternalEditorWindow(
-      externalEditorName,
-      externalEditorInput
-    );
+  const externalEditorOutput: ?ExternalEditorOutput = await openAndWaitForExternalEditorWindow(
+    externalEditorName,
+    externalEditorInput
+  );
   if (!externalEditorOutput) return null; // Changes cancelled.
 
   // Save the edited files back to the GDevelop resources, as "blob urls" (blob:...)
@@ -259,7 +261,7 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Piskel`,
     editDisplayName: t`Edit with Piskel`,
     kind: 'image',
-    edit: async (options) => {
+    edit: async options => {
       return await editWithLocalExternalEditor({
         options,
         externalEditorName: 'piskel',
@@ -274,7 +276,7 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Jfxr`,
     editDisplayName: t`Edit with Jfxr`,
     kind: 'audio',
-    edit: async (options) => {
+    edit: async options => {
       return await editWithLocalExternalEditor({
         options,
         externalEditorName: 'jfxr',
@@ -289,7 +291,7 @@ const editors: Array<ResourceExternalEditor> = [
     createDisplayName: t`Create with Yarn`,
     editDisplayName: t`Edit with Yarn`,
     kind: 'json',
-    edit: async (options) => {
+    edit: async options => {
       return await editWithLocalExternalEditor({
         options,
         externalEditorName: 'yarn',

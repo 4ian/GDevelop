@@ -35,20 +35,23 @@ const TeamGroupNameField = ({
     setIsEditingName(true);
   }, []);
 
-  const onClickDeleteGroup = React.useCallback(async () => {
-    setIsDeleting(true);
-    try {
-      await onDeleteGroup(group);
-      // No need to set back isDeleting flag to false since the component should
-      // be unmounted by the time the API call is done.
-    } catch (error) {
-      console.error(
-        `An error occurred when deleting the group ${group.id}`,
-        error
-      );
-      setIsDeleting(false);
-    }
-  }, [group, onDeleteGroup]);
+  const onClickDeleteGroup = React.useCallback(
+    async () => {
+      setIsDeleting(true);
+      try {
+        await onDeleteGroup(group);
+        // No need to set back isDeleting flag to false since the component should
+        // be unmounted by the time the API call is done.
+      } catch (error) {
+        console.error(
+          `An error occurred when deleting the group ${group.id}`,
+          error
+        );
+        setIsDeleting(false);
+      }
+    },
+    [group, onDeleteGroup]
+  );
 
   return (
     <Line noMargin>
@@ -58,7 +61,7 @@ const TeamGroupNameField = ({
           maxLength={50}
           autoFocus="desktopAndMobileDevices"
           value={group.name}
-          callback={async (newGroupName) => {
+          callback={async newGroupName => {
             await onFinishEditingGroupName(group, newGroupName);
             setIsEditingName(false);
           }}

@@ -14,7 +14,7 @@ const findCommonPrefix = (values: Array<string>): string => {
   for (let index = 0; hasFoundBiggerPrefix; index++) {
     const character = values[0].charAt(index);
     hasFoundBiggerPrefix = values.every(
-      (value) => value.length > index && value.charAt(index) === character
+      value => value.length > index && value.charAt(index) === character
     );
     if (!hasFoundBiggerPrefix) {
       prefixLength = index;
@@ -53,7 +53,7 @@ export const groupResourcesByAnimations = (
   }
 
   // Extract the frame indexes from the file names.
-  const namedResources = resources.map((resource) => {
+  const namedResources = resources.map(resource => {
     // The resource name is used instead of the resource file path because
     // cloud projects are prefixing files names with a UID.
     const basename = path.basename(
@@ -69,7 +69,7 @@ export const groupResourcesByAnimations = (
         ? basename.substring(0, basename.length - indexMatches[0].length)
         : basename
     );
-    if (separators.some((separator) => name.endsWith(separator))) {
+    if (separators.some(separator => name.endsWith(separator))) {
       name = name.substring(0, name.length - 1);
     }
     return {
@@ -80,7 +80,7 @@ export const groupResourcesByAnimations = (
   });
 
   const commonPrefix = findCommonPrefix(
-    namedResources.map((resources) => resources.name)
+    namedResources.map(resources => resources.name)
   );
   // Remove the common prefix as it's probably the object name.
   for (const namedResource of namedResources) {
@@ -95,7 +95,7 @@ export const groupResourcesByAnimations = (
       name,
       enumeratedResources
         .sort((a, b) => (a.index || 0) - (b.index || 0))
-        .map((resource) => resource.resource)
+        .map(resource => resource.resource)
     );
   }
   return resourcesByAnimation;

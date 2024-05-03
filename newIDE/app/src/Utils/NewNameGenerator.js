@@ -1,9 +1,9 @@
 // @flow
 
 const newNameGenerator = (
-  name: string,
-  exists: (string) => boolean,
-  prefix: string = ''
+  name /*:string */,
+  exists /*:(string) => boolean */,
+  prefix /*: string */ = ''
 ): string => {
   if (!exists(name)) return name;
   if (prefix && !exists(prefix + name)) return prefix + name;

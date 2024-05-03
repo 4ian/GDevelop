@@ -17,12 +17,13 @@ const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
   EditorProps,
-  void,
+  void
 > {
   render() {
     const { objectConfiguration, renderObjectNameField } = this.props;
-    const shapePainterConfiguration =
-      gd.asShapePainterConfiguration(objectConfiguration);
+    const shapePainterConfiguration = gd.asShapePainterConfiguration(
+      objectConfiguration
+    );
 
     return (
       <ColumnStackLayout noMargin>
@@ -58,7 +59,7 @@ export default class PanelSpriteEditor extends React.Component<
               g: shapePainterConfiguration.getOutlineColorG(),
               b: shapePainterConfiguration.getOutlineColorB(),
             })}
-            onChange={(color) => {
+            onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 shapePainterConfiguration.setOutlineColor(
@@ -77,7 +78,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={shapePainterConfiguration.getOutlineOpacity()}
-            onChange={(value) => {
+            onChange={value => {
               shapePainterConfiguration.setOutlineOpacity(
                 parseInt(value, 10) || 0
               );
@@ -90,7 +91,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={shapePainterConfiguration.getOutlineSize()}
-            onChange={(value) => {
+            onChange={value => {
               shapePainterConfiguration.setOutlineSize(
                 parseInt(value, 10) || 0
               );
@@ -108,7 +109,7 @@ export default class PanelSpriteEditor extends React.Component<
               g: shapePainterConfiguration.getFillColorG(),
               b: shapePainterConfiguration.getFillColorB(),
             })}
-            onChange={(color) => {
+            onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 shapePainterConfiguration.setFillColor(
@@ -127,7 +128,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={shapePainterConfiguration.getFillOpacity()}
-            onChange={(value) => {
+            onChange={value => {
               shapePainterConfiguration.setFillOpacity(
                 parseInt(value, 10) || 0
               );

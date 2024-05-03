@@ -21,19 +21,19 @@ export const shouldDisplayGithubStarCard = ({
   badges: ?Array<Badge>,
 |}) => {
   return (
-    !badges || !badges.some((badge) => badge.achievementId === 'github-star')
+    !badges || !badges.some(badge => badge.achievementId === 'github-star')
   );
 };
 
 export const GithubStarCard = ({ onOpenProfile, achievements }: Props) => {
   const githubStarAchievement =
     (achievements &&
-      achievements.find((achievement) => achievement.id === 'github-star')) ||
+      achievements.find(achievement => achievement.id === 'github-star')) ||
     null;
 
   return (
     <CalloutCard
-      renderImage={(style) => (
+      renderImage={style => (
         <img
           src="res/github-star-credits.svg"
           alt="Star on GitHub"

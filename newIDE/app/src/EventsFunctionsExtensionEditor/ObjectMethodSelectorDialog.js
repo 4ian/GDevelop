@@ -40,7 +40,7 @@ const MethodListItem = ({
 }: {|
   icon: React.Node,
   disabled: boolean,
-  onChoose: (EventsFunctionCreationParameters) => void,
+  onChoose: EventsFunctionCreationParameters => void,
   name: string,
   description: React.Node,
 |}) => {

@@ -13,7 +13,7 @@ import {
 // $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
-  _: (message) => message.id,
+  _: message => message.id,
 });
 
 describe('FormatExpressionCall', () => {

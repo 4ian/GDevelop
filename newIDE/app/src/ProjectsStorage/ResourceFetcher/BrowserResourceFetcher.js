@@ -39,7 +39,9 @@ const BrowserResourceFetcher: ResourceFetcher = {
     const fetcher = fetchers[storageProvider.internalName];
     if (!fetcher)
       throw new Error(
-        `Can't find a ResourceFetcher for ${storageProvider.internalName} - have you registered the storage provider here?`
+        `Can't find a ResourceFetcher for ${
+          storageProvider.internalName
+        } - have you registered the storage provider here?`
       );
 
     return fetcher(options);

@@ -25,7 +25,7 @@ type Props = {|
   buildId: string,
   game: Game,
   onClose: () => void,
-  onApply: (PartialGameChange) => Promise<void>,
+  onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
   i18n: I18nType,
 |};
@@ -124,7 +124,7 @@ export const OnlineGamePropertiesDialog = ({
               onPublish({ saveProject: true });
             }}
             disabled={isLoading}
-            buildMenuTemplate={(i18n) => [
+            buildMenuTemplate={i18n => [
               {
                 label: i18n._(t`Publish without saving project`),
                 click: () => onPublish({ saveProject: false }),

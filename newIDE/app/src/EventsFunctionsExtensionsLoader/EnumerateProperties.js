@@ -24,7 +24,7 @@ export const toGdPropertyDescriptor = (
     .setValue(enumeratedProperty.value)
     .setHidden(enumeratedProperty.isHidden);
 
-  enumeratedProperty.extraInfo.forEach((extraInfo) => {
+  enumeratedProperty.extraInfo.forEach(extraInfo => {
     propertyDescriptor.addExtraInfo(extraInfo);
   });
 

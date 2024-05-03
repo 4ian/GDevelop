@@ -8,7 +8,7 @@ type Props<T> = {|
   min: number,
   max: number,
   step: number,
-  scale?: (number) => number,
+  scale?: number => number,
   valueLabelDisplay?: 'auto',
   marks?: boolean,
   onChange: (value: T) => void,
@@ -16,7 +16,7 @@ type Props<T> = {|
 
 // We are obliged to override the label color value since it is not
 // customizable from Slider props.
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(theme => {
   return {
     valueLabel: {
       '& > span > span': { color: theme.palette.secondary.contrastText },

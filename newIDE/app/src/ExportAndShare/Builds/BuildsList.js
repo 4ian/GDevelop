@@ -27,8 +27,8 @@ type Props = {|
   loadBuilds: () => void,
   game: Game,
   onGameUpdated?: () => Promise<void>,
-  onBuildUpdated: (Build) => void,
-  onBuildDeleted: (Build) => void,
+  onBuildUpdated: Build => void,
+  onBuildDeleted: Build => void,
 |};
 
 type BuildFilter = BuildType | 'all-build';
@@ -73,13 +73,13 @@ const filterBuilds = (builds: ?Array<Build>, buildFilter: BuildFilter) => {
   if (!builds) return;
   switch (buildFilter) {
     case 'web-build':
-      return builds.filter((build) => build.type === 'web-build');
+      return builds.filter(build => build.type === 'web-build');
     case 'cordova-build':
-      return builds.filter((build) => build.type === 'cordova-build');
+      return builds.filter(build => build.type === 'cordova-build');
     case 'cordova-ios-build':
-      return builds.filter((build) => build.type === 'cordova-ios-build');
+      return builds.filter(build => build.type === 'cordova-ios-build');
     case 'electron-build':
-      return builds.filter((build) => build.type === 'electron-build');
+      return builds.filter(build => build.type === 'electron-build');
     default:
       return builds;
   }
@@ -110,8 +110,9 @@ const BuildsList = ({
   onBuildDeleted,
 }: Props) => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
-  const [buildFilter, setBuildFilter] =
-    React.useState<BuildFilter>('all-build');
+  const [buildFilter, setBuildFilter] = React.useState<BuildFilter>(
+    'all-build'
+  );
   const displayedBuilds = filterBuilds(builds, buildFilter);
 
   return (

@@ -19,7 +19,7 @@ const styles = {
 
 type Props = {|
   tags: Tags,
-  onRemove: (string) => void,
+  onRemove: string => void,
 |};
 
 const TagChips = ({ tags, onRemove }: Props) => {
@@ -37,7 +37,7 @@ const TagChips = ({ tags, onRemove }: Props) => {
     [focusedTag]
   );
 
-  const handleDeleteTag = (tag: string) => (event) => {
+  const handleDeleteTag = (tag: string) => event => {
     const deletedTagIndex = tags.indexOf(tag);
     tagsRefs.current.splice(deletedTagIndex, 1);
     if (event.nativeEvent instanceof KeyboardEvent) {

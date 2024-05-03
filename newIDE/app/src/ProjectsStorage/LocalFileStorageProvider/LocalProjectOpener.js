@@ -49,9 +49,9 @@ export const onOpen = (
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
   const projectPath = path.dirname(filePath);
-  return readJSONFile(filePath).then((object) => {
+  return readJSONFile(filePath).then(object => {
     return unsplit(object, {
-      getReferencePartialObject: (referencePath) => {
+      getReferencePartialObject: referencePath => {
         return readJSONFile(path.join(projectPath, referencePath) + '.json');
       },
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',

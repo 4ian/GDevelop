@@ -32,8 +32,8 @@ export type NavigationState = {|
   clearHistory: () => void,
   clearPreviousPageFromHistory: () => void,
   openSearchResultPage: () => void,
-  openTagPage: (string) => void,
-  openShopCategoryPage: (string) => void,
+  openTagPage: string => void,
+  openShopCategoryPage: string => void,
   openPackPage: ({|
     assetPack: PublicAssetPack | PrivateAssetPack,
     previousSearchText: string,
@@ -50,8 +50,8 @@ export type NavigationState = {|
     assetShortHeader: AssetShortHeader,
     previousSearchText: string,
   |}) => void,
-  navigateInsideFolder: (string) => void,
-  goBackToFolderIndex: (number) => void,
+  navigateInsideFolder: string => void,
+  goBackToFolderIndex: number => void,
 |};
 
 const noFilter: FiltersState = {
@@ -137,7 +137,7 @@ export const useShopNavigation = (): NavigationState => {
         return assetStoreHomePageState;
       },
       clearHistory: () => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           if (previousHistory.previousPages.length <= 1) return previousHistory;
 
           const currentPage =
@@ -148,7 +148,7 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
       clearPreviousPageFromHistory: () => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           if (previousHistory.previousPages.length <= 1) return previousHistory;
 
           const newPreviousPages = previousHistory.previousPages.slice(
@@ -159,7 +159,7 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
       openSearchResultPage: () => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -178,7 +178,7 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
       openTagPage: (tag: string) => {
-        setHistory((previousHistory) => ({
+        setHistory(previousHistory => ({
           ...previousHistory,
           previousPages: [
             ...previousHistory.previousPages,
@@ -205,7 +205,7 @@ export const useShopNavigation = (): NavigationState => {
         }));
       },
       openShopCategoryPage: (category: string) => {
-        setHistory((previousHistory) => ({
+        setHistory(previousHistory => ({
           ...previousHistory,
           previousPages: [
             ...previousHistory.previousPages,
@@ -229,7 +229,7 @@ export const useShopNavigation = (): NavigationState => {
         assetPack: PublicAssetPack | PrivateAssetPack,
         previousSearchText: string,
       |}) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -238,11 +238,10 @@ export const useShopNavigation = (): NavigationState => {
             ...currentPage,
             searchText: previousSearchText,
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSearchText,
@@ -286,7 +285,7 @@ export const useShopNavigation = (): NavigationState => {
         privateAssetPackListingData: PrivateAssetPackListingData,
         previousSearchText: string,
       |}) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -295,11 +294,10 @@ export const useShopNavigation = (): NavigationState => {
             ...currentPage,
             searchText: previousSearchText,
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSearchText,
@@ -329,7 +327,7 @@ export const useShopNavigation = (): NavigationState => {
         assetShortHeader: AssetShortHeader,
         previousSearchText: string,
       |}) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -338,11 +336,10 @@ export const useShopNavigation = (): NavigationState => {
             ...currentPage,
             searchText: previousSearchText,
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSearchText,
@@ -372,7 +369,7 @@ export const useShopNavigation = (): NavigationState => {
         privateGameTemplateListingData: PrivateGameTemplateListingData,
         previousSearchText: string,
       |}) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -381,11 +378,10 @@ export const useShopNavigation = (): NavigationState => {
             ...currentPage,
             searchText: previousSearchText,
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSearchText,
@@ -399,8 +395,7 @@ export const useShopNavigation = (): NavigationState => {
                 openedShopCategory: null,
                 openedAssetPack: null,
                 openedPrivateAssetPackListingData: null,
-                openedPrivateGameTemplateListingData:
-                  privateGameTemplateListingData,
+                openedPrivateGameTemplateListingData: privateGameTemplateListingData,
                 filtersState: noFilter,
                 displayAssets: false,
                 selectedFolders: [],
@@ -410,7 +405,7 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
       navigateInsideFolder: (folderTag: string) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -419,11 +414,10 @@ export const useShopNavigation = (): NavigationState => {
             ...currentPage,
             selectedFolders: [...currentPage.selectedFolders, folderTag],
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSelectedFolder,
@@ -435,7 +429,7 @@ export const useShopNavigation = (): NavigationState => {
         });
       },
       goBackToFolderIndex: (folderIndex: number) => {
-        setHistory((previousHistory) => {
+        setHistory(previousHistory => {
           const currentPage =
             previousHistory.previousPages[
               previousHistory.previousPages.length - 1
@@ -447,11 +441,10 @@ export const useShopNavigation = (): NavigationState => {
               folderIndex + 1
             ),
           };
-          const previousPagesWithoutCurrentPage =
-            previousHistory.previousPages.slice(
-              0,
-              previousHistory.previousPages.length - 1
-            );
+          const previousPagesWithoutCurrentPage = previousHistory.previousPages.slice(
+            0,
+            previousHistory.previousPages.length - 1
+          );
           const previousPages = [
             ...previousPagesWithoutCurrentPage,
             currentPageWithSelectedFolder,

@@ -100,7 +100,7 @@ export const CustomObjectPackResults = ({
         <AssetsList
           assetShortHeaders={selectedAssetPackSearchResults}
           error={error}
-          onOpenDetails={(assetShortHeader) => {
+          onOpenDetails={assetShortHeader => {
             if (isAssetBeingInstalled) return;
             onAssetSelect(assetShortHeader);
           }}
@@ -292,7 +292,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
     ],
   };
   installedEnumeratedObjectMetadatas.forEach(
-    (installedEnumeratedObjectMetadata) => {
+    installedEnumeratedObjectMetadata => {
       const category = translateExtensionCategory(
         installedEnumeratedObjectMetadata.categoryFullName,
         i18n
@@ -302,7 +302,7 @@ const getMergedInstalledWithDefaultEnumeratedObjectMetadataByCategory = ({
       const objectIndex = defaultEnumeratedObjectMetadatasByCategory[
         category
       ].findIndex(
-        (enumeratedObjectMetadata) =>
+        enumeratedObjectMetadata =>
           enumeratedObjectMetadata.name ===
           installedEnumeratedObjectMetadata.name
       );
@@ -356,8 +356,9 @@ export default function NewObjectFromScratch({
     [project, i18n]
   );
 
-  const { DismissableTutorialMessage } =
-    useDismissableTutorialMessage('intro-object-types');
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-object-types'
+  );
 
   return !selectedCustomObject || !selectedCustomObject.assetStorePackTag ? (
     <ScrollView>
@@ -367,21 +368,20 @@ export default function NewObjectFromScratch({
         </Line>
       )}
       <List>
-        {Object.keys(enumeratedObjectMetadatasByCategory).map((category) => {
+        {Object.keys(enumeratedObjectMetadatasByCategory).map(category => {
           const categoryEnumeratedObjectMetadatas =
             enumeratedObjectMetadatasByCategory[category];
           return (
             <React.Fragment key={category}>
               <Subheader>{category}</Subheader>
               {categoryEnumeratedObjectMetadatas.map(
-                (enumeratedObjectMetadata) => (
+                enumeratedObjectMetadata => (
                   <ObjectListItem
                     key={enumeratedObjectMetadata.name}
                     enumeratedObjectMetadata={enumeratedObjectMetadata}
-                    id={`object-category-${enumeratedObjectMetadata.name}`.replace(
-                      /:/g,
-                      '-'
-                    )}
+                    id={`object-category-${
+                      enumeratedObjectMetadata.name
+                    }`.replace(/:/g, '-')}
                     onClick={() => {
                       sendNewObjectCreated(enumeratedObjectMetadata.name);
                       if (enumeratedObjectMetadata.assetStorePackTag) {

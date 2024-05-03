@@ -154,7 +154,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                       [selectableArea]: true,
                     })}
                     onClick={this.edit}
-                    onKeyPress={(event) => {
+                    onKeyPress={event => {
                       if (shouldActivate(event)) {
                         this.edit(event);
                       }
@@ -195,16 +195,15 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                     ? this.props.scope.externalEvents.getName()
                     : undefined
                 }
-                onChange={(text) => {
+                onChange={text => {
                   linkEvent.setTarget(text);
                   this.props.onUpdate();
                 }}
                 isInline
                 onRequestClose={this.cancelEditing}
                 onApply={this.endEditing}
-                ref={(externalEventsAutoComplete) =>
-                  (this._externalEventsAutoComplete =
-                    externalEventsAutoComplete)
+                ref={externalEventsAutoComplete =>
+                  (this._externalEventsAutoComplete = externalEventsAutoComplete)
                 }
               />
             </InlinePopover>

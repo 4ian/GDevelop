@@ -18,7 +18,7 @@ export const SurveyCard = ({
 }: Props) => {
   return (
     <CalloutCard
-      renderImage={(style) => (
+      renderImage={style => (
         <img src="res/start-survey.svg" style={style} alt="Survey" />
       )}
     >

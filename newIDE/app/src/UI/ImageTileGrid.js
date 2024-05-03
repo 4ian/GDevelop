@@ -83,7 +83,7 @@ const styles = {
 };
 
 // Styles to give a visible hover for the mouse cursor.
-const useStylesForTileHover = makeStyles((theme) =>
+const useStylesForTileHover = makeStyles(theme =>
   createStyles({
     tile: {
       transition: 'transform 0.3s ease-in-out',

@@ -31,9 +31,12 @@ const CreditsStatusBanner = ({ displayPurchaseAction }: Props) => {
   );
 
   // Ensure credits are refreshed when this component is shown.
-  React.useEffect(() => {
-    onRefreshLimits();
-  }, [onRefreshLimits]);
+  React.useEffect(
+    () => {
+      onRefreshLimits();
+    },
+    [onRefreshLimits]
+  );
 
   if (!limits) {
     return null;

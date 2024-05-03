@@ -208,8 +208,13 @@ const StartInAppTutorialDialog = ({
       // Always show the "not started" dialog for the mini tutorials.
       isMiniTutorial(tutorialId) ? 'notStarted' : tutorialCompletionStatus
     ];
-  const { title, content, primaryAction, secondaryAction, tertiaryAction } =
-    dialogContent;
+  const {
+    title,
+    content,
+    primaryAction,
+    secondaryAction,
+    tertiaryAction,
+  } = dialogContent;
 
   const actions = [
     <FlatButton

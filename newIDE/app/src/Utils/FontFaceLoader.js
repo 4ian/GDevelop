@@ -17,7 +17,7 @@ export const loadFontFace = (fontFamily: string, src: string) => {
         : // For other resources, use "same-origin" as done by default by fetch.
           'same-origin',
     })
-      .then((response) => {
+      .then(response => {
         if (!response.ok) {
           const errorMessage =
             'Unable to fetch ' +
@@ -31,7 +31,7 @@ export const loadFontFace = (fontFamily: string, src: string) => {
 
         return response.arrayBuffer();
       })
-      .then((arrayBuffer) => {
+      .then(arrayBuffer => {
         const fontFace = new FontFace(fontFamily, arrayBuffer, {});
 
         // $FlowFixMe - FontFace not recognised by Flow.
@@ -56,7 +56,7 @@ export const loadFontFace = (fontFamily: string, src: string) => {
 
     // $FlowFixMe
     document.head.appendChild(newStyle);
-    return new FontFaceObserver(fontFamily, {}).load().catch((err) => {
+    return new FontFaceObserver(fontFamily, {}).load().catch(err => {
       console.warn(`Error while loading font ${fontFamily}`, err);
 
       throw err;

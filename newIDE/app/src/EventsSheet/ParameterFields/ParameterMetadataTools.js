@@ -31,11 +31,10 @@ export const getLastObjectParameterValue = ({
 
   let objectName = null;
   if (instructionMetadata && instruction) {
-    const objectParameterIndex =
-      gd.ParameterMetadataTools.getObjectParameterIndexFor(
-        instructionMetadata.getParameters(),
-        parameterIndex
-      );
+    const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
+      instructionMetadata.getParameters(),
+      parameterIndex
+    );
     if (
       objectParameterIndex >= 0 &&
       objectParameterIndex < instruction.getParametersCount()
@@ -45,11 +44,10 @@ export const getLastObjectParameterValue = ({
         .getPlainString();
     }
   } else if (expressionMetadata && expression) {
-    const objectParameterIndex =
-      gd.ParameterMetadataTools.getObjectParameterIndexFor(
-        expressionMetadata.getParameters(),
-        parameterIndex
-      );
+    const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
+      expressionMetadata.getParameters(),
+      parameterIndex
+    );
     if (
       objectParameterIndex >= 0 &&
       objectParameterIndex < expression.getParametersCount()
@@ -65,11 +63,10 @@ export const getLastObjectParameterObjectType = (
   parameters: gdVectorParameterMetadata,
   parameterIndex: number
 ) => {
-  const objectParameterIndex =
-    gd.ParameterMetadataTools.getObjectParameterIndexFor(
-      parameters,
-      parameterIndex
-    );
+  const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
+    parameters,
+    parameterIndex
+  );
   if (objectParameterIndex < 0 || objectParameterIndex >= parameters.size()) {
     return '';
   }
@@ -140,7 +137,7 @@ export const tryExtractStringLiteralContent = (
 export const getParameterChoiceAutocompletions = (
   parameterMetadata: ?gdParameterMetadata
 ): Array<ExpressionAutocompletion> =>
-  getParameterChoiceValues(parameterMetadata).map((choice) => ({
+  getParameterChoiceValues(parameterMetadata).map(choice => ({
     kind: 'Text',
     completion: `"${choice}"`,
   }));

@@ -13,29 +13,35 @@ const useLayersListCommands = (props: Props) => {
   const { layout, onEditLayerEffects, onEditLayer } = props;
 
   useCommandWithOptions('EDIT_LAYER_EFFECTS', true, {
-    generateOptions: React.useCallback(() => {
-      const layersCount = layout.getLayersCount();
-      return mapReverseFor(0, layersCount, (i) => {
-        const layer = layout.getLayerAt(i);
-        return {
-          text: layer.getName() || 'Base layer',
-          handler: () => onEditLayerEffects(layer),
-        };
-      });
-    }, [layout, onEditLayerEffects]),
+    generateOptions: React.useCallback(
+      () => {
+        const layersCount = layout.getLayersCount();
+        return mapReverseFor(0, layersCount, i => {
+          const layer = layout.getLayerAt(i);
+          return {
+            text: layer.getName() || 'Base layer',
+            handler: () => onEditLayerEffects(layer),
+          };
+        });
+      },
+      [layout, onEditLayerEffects]
+    ),
   });
 
   useCommandWithOptions('EDIT_LAYER', true, {
-    generateOptions: React.useCallback(() => {
-      const layersCount = layout.getLayersCount();
-      return mapReverseFor(0, layersCount, (i) => {
-        const layer = layout.getLayerAt(i);
-        return {
-          text: layer.getName() || 'Base layer',
-          handler: () => onEditLayer(layer),
-        };
-      });
-    }, [layout, onEditLayer]),
+    generateOptions: React.useCallback(
+      () => {
+        const layersCount = layout.getLayersCount();
+        return mapReverseFor(0, layersCount, i => {
+          const layer = layout.getLayerAt(i);
+          return {
+            text: layer.getName() || 'Base layer',
+            handler: () => onEditLayer(layer),
+          };
+        });
+      },
+      [layout, onEditLayer]
+    ),
   });
 };
 

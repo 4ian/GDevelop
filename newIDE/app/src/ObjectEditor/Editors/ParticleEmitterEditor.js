@@ -21,7 +21,7 @@ const gd = global.gd;
 
 export default class ParticleEmitterEditor extends React.Component<
   EditorProps,
-  void,
+  void
 > {
   render() {
     const {
@@ -31,14 +31,15 @@ export default class ParticleEmitterEditor extends React.Component<
       objectName,
       renderObjectNameField,
     } = this.props;
-    const particleEmitterConfiguration =
-      gd.asParticleEmitterConfiguration(objectConfiguration);
+    const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
+      objectConfiguration
+    );
     const tutorialIds = getObjectTutorialIds(objectConfiguration.getType());
 
     return (
       <ColumnStackLayout noMargin>
         {renderObjectNameField && renderObjectNameField()}
-        {tutorialIds.map((tutorialId) => (
+        {tutorialIds.map(tutorialId => (
           <DismissableTutorialMessage
             key={tutorialId}
             tutorialId={tutorialId}
@@ -75,7 +76,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getRendererParam1()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setRendererParam1(parseFloat(value));
               this.forceUpdate();
             }}
@@ -90,7 +91,7 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               type="number"
               value={particleEmitterConfiguration.getRendererParam1()}
-              onChange={(value) => {
+              onChange={value => {
                 particleEmitterConfiguration.setRendererParam1(
                   parseFloat(value)
                 );
@@ -103,7 +104,7 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               type="number"
               value={particleEmitterConfiguration.getRendererParam2()}
-              onChange={(value) => {
+              onChange={value => {
                 particleEmitterConfiguration.setRendererParam2(
                   parseFloat(value)
                 );
@@ -120,7 +121,7 @@ export default class ParticleEmitterEditor extends React.Component<
             resourceKind="image"
             resourceName={particleEmitterConfiguration.getParticleTexture()}
             defaultNewResourceName={objectName}
-            onChange={(resourceName) => {
+            onChange={resourceName => {
               particleEmitterConfiguration.setParticleTexture(resourceName);
               this.forceUpdate();
             }}
@@ -136,7 +137,7 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               type="number"
               value={particleEmitterConfiguration.getRendererParam1()}
-              onChange={(value) => {
+              onChange={value => {
                 particleEmitterConfiguration.setRendererParam1(
                   Math.max(0, parseFloat(value))
                 );
@@ -149,7 +150,7 @@ export default class ParticleEmitterEditor extends React.Component<
               fullWidth
               type="number"
               value={particleEmitterConfiguration.getRendererParam2()}
-              onChange={(value) => {
+              onChange={value => {
                 particleEmitterConfiguration.setRendererParam2(
                   Math.max(0, parseFloat(value))
                 );
@@ -168,7 +169,7 @@ export default class ParticleEmitterEditor extends React.Component<
               g: particleEmitterConfiguration.getParticleGreen1(),
               b: particleEmitterConfiguration.getParticleBlue1(),
             })}
-            onChange={(color) => {
+            onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 particleEmitterConfiguration.setParticleRed1(rgbColor.r);
@@ -185,7 +186,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleAlpha1()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleAlpha1(
                 parseInt(value, 10) || 0
               );
@@ -203,7 +204,7 @@ export default class ParticleEmitterEditor extends React.Component<
               g: particleEmitterConfiguration.getParticleGreen2(),
               b: particleEmitterConfiguration.getParticleBlue2(),
             })}
-            onChange={(color) => {
+            onChange={color => {
               const rgbColor = rgbStringAndAlphaToRGBColor(color);
               if (rgbColor) {
                 particleEmitterConfiguration.setParticleRed2(rgbColor.r);
@@ -220,7 +221,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleAlpha2()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleAlpha2(
                 parseInt(value, 10) || 0
               );
@@ -254,7 +255,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getMaxParticleNb()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setMaxParticleNb(
                 parseInt(value, 10) || 0
               );
@@ -271,7 +272,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getTank()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setTank(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -284,7 +285,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getFlow()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setFlow(parseFloat(value) || 0);
               this.forceUpdate();
             }}
@@ -299,7 +300,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getEmitterForceMin()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setEmitterForceMin(
                 parseFloat(value) || 0
               );
@@ -314,7 +315,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getEmitterForceMax()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setEmitterForceMax(
                 parseFloat(value) || 0
               );
@@ -329,7 +330,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getConeSprayAngle()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setConeSprayAngle(
                 parseFloat(value) || 0
               );
@@ -342,7 +343,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getZoneRadius()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setZoneRadius(
                 parseFloat(value) || 0
               );
@@ -357,7 +358,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleGravityX()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleGravityX(
                 parseFloat(value)
               );
@@ -370,7 +371,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleGravityY()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleGravityY(
                 parseFloat(value)
               );
@@ -387,7 +388,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleLifeTimeMin()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleLifeTimeMin(
                 parseFloat(value)
               );
@@ -402,7 +403,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleLifeTimeMax()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleLifeTimeMax(
                 parseFloat(value)
               );
@@ -417,7 +418,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleSize1()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleSize1(parseFloat(value));
               this.forceUpdate();
             }}
@@ -428,7 +429,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleSize2()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleSize2(parseFloat(value));
               this.forceUpdate();
             }}
@@ -443,7 +444,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleAngle1()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleAngle1(parseFloat(value));
               this.forceUpdate();
             }}
@@ -456,7 +457,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getParticleAngle2()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setParticleAngle2(parseFloat(value));
               this.forceUpdate();
             }}
@@ -471,7 +472,7 @@ export default class ParticleEmitterEditor extends React.Component<
             fullWidth
             type="number"
             value={particleEmitterConfiguration.getJumpForwardInTimeOnCreation()}
-            onChange={(value) => {
+            onChange={value => {
               particleEmitterConfiguration.setJumpForwardInTimeOnCreation(
                 parseFloat(value)
               );

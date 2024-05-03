@@ -18,7 +18,7 @@ export const Default = () => (
     initialValue={1}
     render={(value, onChange) => (
       <Slider
-        onChange={(newValue) => {
+        onChange={newValue => {
           action('onChange')(newValue);
           onChange(newValue);
         }}

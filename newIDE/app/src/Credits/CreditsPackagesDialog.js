@@ -89,8 +89,11 @@ const CreditsPackagesDialog = ({
   missingCredits,
   showCalloutTip,
 }: Props) => {
-  const { error, fetchCreditsPackages, creditsPackageListingDatas } =
-    React.useContext(CreditsPackageStoreContext);
+  const {
+    error,
+    fetchCreditsPackages,
+    creditsPackageListingDatas,
+  } = React.useContext(CreditsPackageStoreContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const [
     purchasingCreditsPackageListingData,
@@ -98,17 +101,19 @@ const CreditsPackagesDialog = ({
   ] = React.useState<?CreditsPackageListingData>(null);
   const { isMediumScreen } = useResponsiveWindowSize();
 
-  React.useEffect(() => {
-    fetchCreditsPackages();
-  }, [fetchCreditsPackages]);
+  React.useEffect(
+    () => {
+      fetchCreditsPackages();
+    },
+    [fetchCreditsPackages]
+  );
 
   // Split credit packages on multiple lines to spread them as much as possible.
   // Logic is different based on the screen size so that it looks ok.
-  const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) =
-    React.useMemo(
-      () => getItemsSplitInLines(creditsPackageListingDatas, isMediumScreen),
-      [creditsPackageListingDatas, isMediumScreen]
-    );
+  const creditsPackageListingDatasArrays: ?(CreditsPackageListingData[][]) = React.useMemo(
+    () => getItemsSplitInLines(creditsPackageListingDatas, isMediumScreen),
+    [creditsPackageListingDatas, isMediumScreen]
+  );
 
   return (
     <I18n>
@@ -164,15 +169,20 @@ const CreditsPackagesDialog = ({
                   >
                     {creditsPackageListingDatasArray.map(
                       (creditsPackageListingData, index) => {
-                        const { id, name, description } =
-                          creditsPackageListingData;
+                        const {
+                          id,
+                          name,
+                          description,
+                        } = creditsPackageListingData;
                         const shouldSuggestPackage =
                           !suggestedPackage || suggestedPackage.id === id;
                         return (
                           <div
                             style={{
                               ...styles.creditsPackage,
-                              border: `1px solid ${gdevelopTheme.palette.secondary}`,
+                              border: `1px solid ${
+                                gdevelopTheme.palette.secondary
+                              }`,
                             }}
                             key={id}
                           >
@@ -202,8 +212,7 @@ const CreditsPackagesDialog = ({
                                     noMargin
                                   >
                                     {renderProductPrice({
-                                      productListingData:
-                                        creditsPackageListingData,
+                                      productListingData: creditsPackageListingData,
                                       usageType: 'default',
                                       i18n,
                                     })}

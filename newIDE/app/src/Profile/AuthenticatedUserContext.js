@@ -59,7 +59,7 @@ export type AuthenticatedUser = {|
     payload: PatchUserPayload,
     preferences: PreferencesValues
   ) => Promise<void>,
-  onResetPassword: (ForgotPasswordForm) => Promise<void>,
+  onResetPassword: ForgotPasswordForm => Promise<void>,
   onOpenLoginDialog: () => void,
   onOpenEditProfileDialog: () => void,
   onOpenChangeEmailDialog: () => void,

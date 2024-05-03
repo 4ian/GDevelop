@@ -35,7 +35,7 @@ export const downloadUrlsToBlobs = async <Item: { url: string }>({
 
   const { results } = await PromisePool.withConcurrency(20)
     .for(urlContainers)
-    .process<ItemResult<Item>>(async (urlContainer) => {
+    .process<ItemResult<Item>>(async urlContainer => {
       const { url } = urlContainer;
 
       try {
@@ -76,7 +76,9 @@ export const downloadUrlsToBlobs = async <Item: { url: string }>({
 
         if (!response.ok) {
           throw new Error(
-            `Error while downloading "${urlWithParameters}" (status: ${response.status})`
+            `Error while downloading "${urlWithParameters}" (status: ${
+              response.status
+            })`
           );
         }
 
@@ -101,7 +103,7 @@ export const downloadUrlsToBlobs = async <Item: { url: string }>({
 };
 
 export const convertBlobToFiles = <
-  Item: { resource: gdResource, filename: string },
+  Item: { resource: gdResource, filename: string }
 >(
   itemResults: Array<ItemResult<Item>>,
   onError: (resourceName: string, error: Error) => void
@@ -127,9 +129,9 @@ export function convertBlobToDataURL(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     // $FlowFixMe - it's guaranted for reader.result to be a string.
-    reader.onload = (_e) => resolve(reader.result);
-    reader.onerror = (_e) => reject(reader.error);
-    reader.onabort = (_e) => reject(new Error('Read aborted'));
+    reader.onload = _e => resolve(reader.result);
+    reader.onerror = _e => reject(reader.error);
+    reader.onabort = _e => reject(new Error('Read aborted'));
     reader.readAsDataURL(blob);
   });
 }

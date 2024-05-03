@@ -18,15 +18,15 @@ type Props = {|
   directionIndex: number,
   spriteIndex: number,
 
-  chooseAnimation: (number) => void,
-  chooseDirection: (number) => void,
-  chooseSprite: (number) => void,
+  chooseAnimation: number => void,
+  chooseDirection: number => void,
+  chooseSprite: number => void,
 
   sameForAllAnimations: boolean,
   sameForAllSprites: boolean,
 
-  setSameForAllAnimations: (boolean) => Promise<void>,
-  setSameForAllSprites: (boolean) => Promise<void>,
+  setSameForAllAnimations: boolean => Promise<void>,
+  setSameForAllSprites: boolean => Promise<void>,
 
   setSameForAllAnimationsLabel: React.Node,
   setSameForAllSpritesLabel: React.Node,
@@ -80,7 +80,7 @@ const SpriteSelector = ({
             chooseAnimation(parseInt(value, 10) || 0)
           }
         >
-          {mapFor(0, animations.getAnimationsCount(), (i) => {
+          {mapFor(0, animations.getAnimationsCount(), i => {
             const animation = animations.getAnimation(i);
             return (
               <SelectOption
@@ -100,7 +100,7 @@ const SpriteSelector = ({
               chooseDirection(parseInt(value, 10) || 0)
             }
           >
-            {mapFor(0, animation.getDirectionsCount(), (i) => {
+            {mapFor(0, animation.getDirectionsCount(), i => {
               return (
                 <SelectOption value={i} key={i} label={t`Direction #${i}`} />
               );
@@ -116,7 +116,7 @@ const SpriteSelector = ({
               chooseSprite(parseInt(value, 10) || 0)
             }
           >
-            {mapFor(0, direction.getSpritesCount(), (i) => {
+            {mapFor(0, direction.getSpritesCount(), i => {
               return <SelectOption value={i} key={i} label={t`Frame #${i}`} />;
             })}
           </SelectField>

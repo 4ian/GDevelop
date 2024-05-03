@@ -17,7 +17,7 @@ export type ExternalProperties = {|
 
 type Props = {|
   open: boolean,
-  onChoose: (ExternalProperties) => void,
+  onChoose: ExternalProperties => void,
   layoutName?: ?string,
   onClose: () => void,
   project: gdProject,
@@ -35,16 +35,20 @@ export default function ExternalPropertiesDialog({
   helpTexts,
 }: Props) {
   const initialLayoutName = layoutName || '';
-  const [selectedLayoutName, setSelectedLayoutName] =
-    React.useState<string>(initialLayoutName);
-  const onClick = React.useCallback(() => {
-    if (!selectedLayoutName) return;
+  const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
+    initialLayoutName
+  );
+  const onClick = React.useCallback(
+    () => {
+      if (!selectedLayoutName) return;
 
-    const externalProperties: ExternalProperties = {
-      layoutName: selectedLayoutName,
-    };
-    onChoose(externalProperties);
-  }, [onChoose, selectedLayoutName]);
+      const externalProperties: ExternalProperties = {
+        layoutName: selectedLayoutName,
+      };
+      onChoose(externalProperties);
+    },
+    [onChoose, selectedLayoutName]
+  );
 
   const actions = [
     <FlatButton
@@ -62,7 +66,7 @@ export default function ExternalPropertiesDialog({
     />,
   ];
 
-  const layoutNames = mapFor(0, project.getLayoutsCount(), (i) => {
+  const layoutNames = mapFor(0, project.getLayoutsCount(), i => {
     return project.getLayoutAt(i).getName();
   });
 
@@ -91,9 +95,9 @@ export default function ExternalPropertiesDialog({
           aria-label="Associated scene"
           name="associated-layout"
           value={selectedLayoutName}
-          onChange={(event) => setSelectedLayoutName(event.target.value)}
+          onChange={event => setSelectedLayoutName(event.target.value)}
         >
-          {layoutNames.map((name) => (
+          {layoutNames.map(name => (
             <FormControlLabel
               key={name}
               value={name}

@@ -16,13 +16,14 @@ type CommunityLeaderboardsState = {|
   fetchCommunityLeaderboards: () => Promise<void>,
 |};
 
-export const CommunityLeaderboardsContext =
-  React.createContext<CommunityLeaderboardsState>({
+export const CommunityLeaderboardsContext = React.createContext<CommunityLeaderboardsState>(
+  {
     userLeaderboards: null,
     gameLeaderboards: null,
     error: null,
     fetchCommunityLeaderboards: async () => {},
-  });
+  }
+);
 
 type CommunityLeaderboardsStateProviderProps = {|
   children: React.Node,
@@ -32,10 +33,10 @@ export const CommunityLeaderboardsStateProvider = ({
   children,
 }: CommunityLeaderboardsStateProviderProps) => {
   const [userLeaderboards, setUserLeaderboards] = React.useState<
-    Array<UserLeaderboard>,
+    Array<UserLeaderboard>
   >([]);
   const [gameLeaderboards, setGameLeaderboards] = React.useState<
-    Array<GameLeaderboard>,
+    Array<GameLeaderboard>
   >([]);
 
   const [error, setError] = React.useState<?Error>(null);

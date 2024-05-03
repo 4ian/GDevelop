@@ -45,7 +45,7 @@ export const canAccessTutorial = (
   if (
     capabilities &&
     capabilities.privateTutorials &&
-    capabilities.privateTutorials.allowedIdPrefixes.some((prefix) =>
+    capabilities.privateTutorials.allowedIdPrefixes.some(prefix =>
       tutorial.id.startsWith(prefix)
     )
   )
@@ -57,7 +57,7 @@ export const canAccessTutorial = (
 export const listAllTutorials = (): Promise<Array<Tutorial>> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/tutorial`)
-    .then((response) => response.data);
+    .then(response => response.data);
 };
 
 export const getObjectTutorialIds = (type: string): Array<string> => {

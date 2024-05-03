@@ -21,13 +21,14 @@ type AnnouncementsFeedState = {|
   fetchAnnouncementsAndPromotions: () => Promise<void>,
 |};
 
-export const AnnouncementsFeedContext =
-  React.createContext<AnnouncementsFeedState>({
+export const AnnouncementsFeedContext = React.createContext<AnnouncementsFeedState>(
+  {
     announcements: null,
     promotions: null,
     error: null,
     fetchAnnouncementsAndPromotions: async () => {},
-  });
+  }
+);
 
 type AnnouncementsFeedStateProviderProps = {|
   children: React.Node,
@@ -36,8 +37,9 @@ type AnnouncementsFeedStateProviderProps = {|
 export const AnnouncementsFeedStateProvider = ({
   children,
 }: AnnouncementsFeedStateProviderProps) => {
-  const [announcements, setAnnouncements] =
-    React.useState<?(Announcement[])>(null);
+  const [announcements, setAnnouncements] = React.useState<?(Announcement[])>(
+    null
+  );
   const [error, setError] = React.useState<?Error>(null);
   const [promotions, setPromotions] = React.useState<?(Promotion[])>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -57,10 +59,8 @@ export const AnnouncementsFeedStateProvider = ({
       // Logic to remove once promotions are displayed to enough users.
       // For now, we filter out promotions from the announcements.
       const filteredAnnouncements = fetchedAnnouncements.filter(
-        (announcement) =>
-          !fetchedPromotions.find(
-            (promotion) => promotion.id === announcement.id
-          )
+        announcement =>
+          !fetchedPromotions.find(promotion => promotion.id === announcement.id)
       );
 
       setAnnouncements(filteredAnnouncements);
@@ -74,17 +74,20 @@ export const AnnouncementsFeedStateProvider = ({
   }, []);
 
   // Preload the announcements and promotions when the app loads.
-  React.useEffect(() => {
-    // Don't attempt to load again announcements if they
-    // were loaded already.
-    if (announcements || isLoading.current) return;
+  React.useEffect(
+    () => {
+      // Don't attempt to load again announcements if they
+      // were loaded already.
+      if (announcements || isLoading.current) return;
 
-    const timeoutId = setTimeout(() => {
-      console.info('Pre-fetching announcements from the api...');
-      fetchAnnouncementsAndPromotions();
-    }, ANNOUNCEMENTS_FETCH_TIMEOUT);
-    return () => clearTimeout(timeoutId);
-  }, [fetchAnnouncementsAndPromotions, announcements, isLoading]);
+      const timeoutId = setTimeout(() => {
+        console.info('Pre-fetching announcements from the api...');
+        fetchAnnouncementsAndPromotions();
+      }, ANNOUNCEMENTS_FETCH_TIMEOUT);
+      return () => clearTimeout(timeoutId);
+    },
+    [fetchAnnouncementsAndPromotions, announcements, isLoading]
+  );
 
   const announcementsFeedState = React.useMemo(
     () => ({

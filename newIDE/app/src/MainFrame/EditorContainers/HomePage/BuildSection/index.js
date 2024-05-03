@@ -147,8 +147,10 @@ const BuildSection = ({
   const { showDeleteConfirmation, showAlert } = useAlertDialog();
   const { removeRecentProjectFile } = React.useContext(PreferencesContext);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
-  const [showAllGameTemplates, setShowAllGameTemplates] =
-    React.useState<boolean>(false);
+  const [
+    showAllGameTemplates,
+    setShowAllGameTemplates,
+  ] = React.useState<boolean>(false);
   const { privateGameTemplateListingDatas } = React.useContext(
     PrivateGameTemplateStoreContext
   );
@@ -172,8 +174,10 @@ const BuildSection = ({
     onOpenLoginDialog,
   } = authenticatedUser;
   const { windowSize, isMobile, isLandscape } = useResponsiveWindowSize();
-  const [lastModifiedInfoByProjectId, setLastModifiedInfoByProjectId] =
-    React.useState({});
+  const [
+    lastModifiedInfoByProjectId,
+    setLastModifiedInfoByProjectId,
+  ] = React.useState({});
 
   const columnsCount = getItemsColumns(windowSize, isLandscape);
 
@@ -187,8 +191,9 @@ const BuildSection = ({
     [privateGameTemplateListingDatas, exampleShortHeaders, columnsCount]
   );
 
-  let projectFiles: Array<FileMetadataAndStorageProviderName> =
-    getRecentProjectFiles().filter((file) => file.fileMetadata);
+  let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
+    file => file.fileMetadata
+  );
 
   if (cloudProjects) {
     projectFiles = projectFiles.concat(
@@ -200,24 +205,28 @@ const BuildSection = ({
 
   // Look at projects where lastCommittedBy is not the current user, and fetch
   // public profiles of the users that have modified them.
-  React.useEffect(() => {
-    const updateModificationInfoByProjectId = async () => {
-      if (!cloudProjects || !profile) return;
+  React.useEffect(
+    () => {
+      const updateModificationInfoByProjectId = async () => {
+        if (!cloudProjects || !profile) return;
 
-      const _lastModifiedInfoByProjectId = await getLastModifiedInfoByProjectId(
-        {
-          cloudProjects,
-          profile,
-        }
-      );
-      setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
-    };
+        const _lastModifiedInfoByProjectId = await getLastModifiedInfoByProjectId(
+          {
+            cloudProjects,
+            profile,
+          }
+        );
+        setLastModifiedInfoByProjectId(_lastModifiedInfoByProjectId);
+      };
 
-    updateModificationInfoByProjectId();
-  }, [cloudProjects, profile]);
+      updateModificationInfoByProjectId();
+    },
+    [cloudProjects, profile]
+  );
 
-  const hasTooManyCloudProjects =
-    checkIfHasTooManyCloudProjects(authenticatedUser);
+  const hasTooManyCloudProjects = checkIfHasTooManyCloudProjects(
+    authenticatedUser
+  );
 
   const onDeleteCloudProject = async (
     i18n: I18nType,
@@ -244,8 +253,9 @@ const BuildSection = ({
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
     } catch (error) {
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       const message =
         extractedStatusAndCode && extractedStatusAndCode.status === 403
           ? t`You don't have permissions to delete this project.`
@@ -323,20 +333,23 @@ const BuildSection = ({
     []
   );
 
-  const refreshCloudProjects = React.useCallback(async () => {
-    if (isRefreshing) return;
-    if (!authenticated) {
-      setShowCloudProjectsInfoIfNotLoggedIn(true);
-      return;
-    }
-    try {
-      setIsRefreshing(true);
-      await onCloudProjectsChanged();
-    } finally {
-      // Wait a bit to avoid spam as we don't have a "loading" state.
-      setTimeout(() => setIsRefreshing(false), 2000);
-    }
-  }, [onCloudProjectsChanged, isRefreshing, authenticated]);
+  const refreshCloudProjects = React.useCallback(
+    async () => {
+      if (isRefreshing) return;
+      if (!authenticated) {
+        setShowCloudProjectsInfoIfNotLoggedIn(true);
+        return;
+      }
+      try {
+        setIsRefreshing(true);
+        await onCloudProjectsChanged();
+      } finally {
+        // Wait a bit to avoid spam as we don't have a "loading" state.
+        setTimeout(() => setIsRefreshing(false), 2000);
+      }
+    },
+    [onCloudProjectsChanged, isRefreshing, authenticated]
+  );
 
   projectFiles.sort((a, b) => {
     if (!a.fileMetadata.lastModifiedDate) return 1;
@@ -356,14 +369,14 @@ const BuildSection = ({
         numberOfItemsExclusivelyInCarousel: showAllGameTemplates
           ? 0
           : isMobile
-            ? 3
-            : 5,
+          ? 3
+          : 5,
         numberOfItemsInCarousel: showAllGameTemplates ? 0 : isMobile ? 8 : 12,
         numberOfItemsInGrid: showAllGameTemplates
           ? allGameTemplatesAndExamplesFlaggedAsGameCount
           : isMobile
-            ? 16
-            : 20,
+          ? 16
+          : 20,
         privateGameTemplatesPeriodicity: isMobile ? 2 : 3,
       }),
     [
@@ -554,7 +567,7 @@ const BuildSection = ({
                 </Line>
               )}
               <List>
-                {projectFiles.map((file) => (
+                {projectFiles.map(file => (
                   <ProjectFileListItem
                     key={file.fileMetadata.fileIdentifier}
                     file={file}

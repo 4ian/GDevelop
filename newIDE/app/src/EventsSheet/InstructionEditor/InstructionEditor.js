@@ -58,20 +58,17 @@ type InstructionEditorState = {|
 
 type InstructionEditorSetters = {|
   /** Select an instruction - which can be a free or an object instruction. */
-  chooseInstruction: (type: string) => {|
-    ...InstructionEditorState,
-    instruction: gdInstruction,
-  |},
+  chooseInstruction: (
+    type: string
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
   /** Select an object, so that then this object specific instructions can be searched and selected. */
-  chooseObject: (objectName: string) => {|
-    ...InstructionEditorState,
-    instruction: gdInstruction,
-  |},
+  chooseObject: (
+    objectName: string
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
   /** Select an instruction for the currently selected object. */
-  chooseObjectInstruction: (type: string) => {|
-    ...InstructionEditorState,
-    instruction: gdInstruction,
-  |},
+  chooseObjectInstruction: (
+    type: string
+  ) => {| ...InstructionEditorState, instruction: gdInstruction |},
 |};
 
 const findInstruction = (
@@ -96,17 +93,16 @@ export const useInstructionEditor = ({
     objectName: string,
     discardInstructionTypeIfNotInObjectInstructions: boolean
   ): InstructionEditorState => {
-    const chosenObjectInstructionsInfo =
-      filterEnumeratedInstructionOrExpressionMetadataByScope(
-        enumerateObjectAndBehaviorsInstructions(
-          isCondition,
-          globalObjectsContainer,
-          objectsContainer,
-          objectName,
-          i18n
-        ),
-        scope
-      );
+    const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateObjectAndBehaviorsInstructions(
+        isCondition,
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        i18n
+      ),
+      scope
+    );
 
     // As we changed to a new object, verify if the instruction is still valid for this object. If not,
     // discard the chosen instruction - this is to avoid the user creating invalid instructions.

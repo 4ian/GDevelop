@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 export type PublicProfileState = {
-  openUserPublicProfile: (string) => void,
+  openUserPublicProfile: string => void,
 };
 
 const initialPublicProfileState = {

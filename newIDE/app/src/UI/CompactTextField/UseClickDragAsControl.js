@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 type Props = {|
-  onChange: (number) => void,
+  onChange: number => void,
   onGetInitialValue: () => number,
 |};
 

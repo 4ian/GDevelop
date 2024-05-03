@@ -127,7 +127,7 @@ const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function KeyField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -155,7 +155,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         fullWidth
         value={value}
         onChange={onChange}
-        dataSource={keyNames.map((keyName) => ({
+        dataSource={keyNames.map(keyName => ({
           text: keyName,
           value: keyName,
         }))}
@@ -168,7 +168,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             <Trans>You must select a key.</Trans>
           ) : !isKeyValid(value) ? (
             <Trans>You must select a valid key. "{value}" is not valid.</Trans>
-          ) : undefined
+          ) : (
+            undefined
+          )
         }
       />
     );

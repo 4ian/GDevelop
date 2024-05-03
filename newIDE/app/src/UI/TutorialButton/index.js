@@ -20,7 +20,7 @@ const TutorialButton = (props: PropsType) => {
   const { tutorials } = React.useContext(TutorialContext);
   if (!tutorials || !props.tutorialId) return props.renderIfNotFound || null; // Loading or errored, do not display the tutorial.
   const tutorial: ?Tutorial = tutorials.find(
-    (tutorial) => tutorial.id === props.tutorialId
+    tutorial => tutorial.id === props.tutorialId
   );
   if (!tutorial) {
     console.warn(`Tutorial with id ${props.tutorialId || ''} not found`);

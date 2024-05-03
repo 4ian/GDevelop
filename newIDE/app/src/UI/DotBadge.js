@@ -6,7 +6,7 @@ import { createStyles, makeStyles } from '@material-ui/core';
 type BadgeColor = 'secondary' | 'primary' | 'error' | 'success';
 
 const useStyles = (color: BadgeColor) =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: { flexDirection: 'column' },
       anchorOriginTopRightCircle: {

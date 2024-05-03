@@ -63,7 +63,7 @@ const getItemLineHeight = ({
 };
 
 const useStylesForContainer = () =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: {
         '&:hover img': {
@@ -119,38 +119,45 @@ const Slideshow = ({
     itemMobileRatio,
   });
   const classesForContainer = useStylesForContainer();
-  const [isFocusingOrOverContainer, setIsFocusingContainer] =
-    React.useState(false);
+  const [isFocusingOrOverContainer, setIsFocusingContainer] = React.useState(
+    false
+  );
   const leftImageRecentlyTimeoutId = React.useRef(null);
   const nextSlideTimeoutId = React.useRef(null);
 
   const [currentSlide, setCurrentSlide] = React.useState(0);
 
-  const handleLeftArrowClick = React.useCallback(() => {
-    if (!items || items.length === 1) return;
+  const handleLeftArrowClick = React.useCallback(
+    () => {
+      if (!items || items.length === 1) return;
 
-    // Clear the timeout to avoid changing the slide while the user
-    // is interacting with the slideshow.
-    if (nextSlideTimeoutId.current) {
-      clearTimeout(nextSlideTimeoutId.current);
-      nextSlideTimeoutId.current = null;
-    }
+      // Clear the timeout to avoid changing the slide while the user
+      // is interacting with the slideshow.
+      if (nextSlideTimeoutId.current) {
+        clearTimeout(nextSlideTimeoutId.current);
+        nextSlideTimeoutId.current = null;
+      }
 
-    setCurrentSlide(currentSlide === 0 ? items.length - 1 : currentSlide - 1);
-  }, [items, currentSlide]);
+      setCurrentSlide(currentSlide === 0 ? items.length - 1 : currentSlide - 1);
+    },
+    [items, currentSlide]
+  );
 
-  const handleRightArrowClick = React.useCallback(() => {
-    if (!items || items.length === 1) return;
+  const handleRightArrowClick = React.useCallback(
+    () => {
+      if (!items || items.length === 1) return;
 
-    // Clear the timeout to avoid changing the slide while the user
-    // is interacting with the slideshow.
-    if (nextSlideTimeoutId.current) {
-      clearTimeout(nextSlideTimeoutId.current);
-      nextSlideTimeoutId.current = null;
-    }
+      // Clear the timeout to avoid changing the slide while the user
+      // is interacting with the slideshow.
+      if (nextSlideTimeoutId.current) {
+        clearTimeout(nextSlideTimeoutId.current);
+        nextSlideTimeoutId.current = null;
+      }
 
-    setCurrentSlide(currentSlide === items.length - 1 ? 0 : currentSlide + 1);
-  }, [items, currentSlide]);
+      setCurrentSlide(currentSlide === items.length - 1 ? 0 : currentSlide + 1);
+    },
+    [items, currentSlide]
+  );
 
   React.useEffect(
     () => {
@@ -167,25 +174,31 @@ const Slideshow = ({
     [handleRightArrowClick]
   );
 
-  const handleOverOrFocusContainer = React.useCallback(() => {
-    // If the user was going out just before, cancel the timeout.
-    if (leftImageRecentlyTimeoutId.current) {
-      clearTimeout(leftImageRecentlyTimeoutId.current);
-      leftImageRecentlyTimeoutId.current = null;
-    }
-    if (isFocusingOrOverContainer) return;
-    setIsFocusingContainer(true);
-  }, [isFocusingOrOverContainer]);
+  const handleOverOrFocusContainer = React.useCallback(
+    () => {
+      // If the user was going out just before, cancel the timeout.
+      if (leftImageRecentlyTimeoutId.current) {
+        clearTimeout(leftImageRecentlyTimeoutId.current);
+        leftImageRecentlyTimeoutId.current = null;
+      }
+      if (isFocusingOrOverContainer) return;
+      setIsFocusingContainer(true);
+    },
+    [isFocusingOrOverContainer]
+  );
 
-  const handleLeaveOrBlurContainer = React.useCallback(() => {
-    // If this event is triggered multiple times, there already is a timeout
-    // so just return.
-    if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
-      return;
-    leftImageRecentlyTimeoutId.current = setTimeout(() => {
-      setIsFocusingContainer(false);
-    }, 1000);
-  }, [isFocusingOrOverContainer]);
+  const handleLeaveOrBlurContainer = React.useCallback(
+    () => {
+      // If this event is triggered multiple times, there already is a timeout
+      // so just return.
+      if (!isFocusingOrOverContainer || leftImageRecentlyTimeoutId.current)
+        return;
+      leftImageRecentlyTimeoutId.current = setTimeout(() => {
+        setIsFocusingContainer(false);
+      }, 1000);
+    },
+    [isFocusingOrOverContainer]
+  );
 
   if (!items) {
     // If they're loading, display a skeleton so that it doesn't jump when loaded.

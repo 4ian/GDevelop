@@ -52,23 +52,22 @@ export const indieVerifiedFirebaseUser: FirebaseUser = {
   emailVerified: true,
 };
 
-export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> =
-  [
-    {
-      id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
-      name: 'Worms 2D',
-      createdAt: '2022-02-05T00:36:53.972Z',
-      updatedAt: '2022-02-07T00:36:53.972Z',
-      lastModifiedAt: '2022-02-07T00:36:53.972Z',
-    },
-    {
-      id: 'fb4d878a-1935-4916-b681-f9235475d35c',
-      name: 'Crash Bandicoot',
-      createdAt: '2020-01-24T00:36:53.972Z',
-      updatedAt: '2022-02-07T00:36:53.972Z',
-      lastModifiedAt: '2020-02-06T00:36:53.972Z',
-    },
-  ];
+export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d35c',
+    name: 'Crash Bandicoot',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    updatedAt: '2022-02-07T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
 
 const tenCloudProjects: Array<CloudProjectWithUserAccessInfo> = [
   {
@@ -296,2017 +295,2025 @@ export const noSubscription: Subscription = {
   pricingSystemId: null,
 };
 
-export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[] =
-  [
-    {
-      id: 'free',
-      isLegacy: false,
-      nameByLocale: {
-        en: 'Free',
-      },
-      targetAudiences: ['CASUAL'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
-      },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
-      },
-      descriptionByLocale: {
-        en: 'Create your first game 100% free.',
-      },
-      bulletPointsByLocale: [
-        {
-          en: 'Fully featured, open-source game engine',
-        },
-        {
-          en: 'Publish to Android/Desktop (once per day)',
-        },
-        {
-          en: 'Try GDevelop.io online services for free',
-        },
-        {
-          en: 'Thousands of free assets on the Asset Store',
-        },
-      ],
-      fullFeatures: [
-        {
-          featureName: 'ENGINE_AND_EDITOR',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: 'Nag screen',
-          },
-          trialLike: true,
-        },
-        {
-          featureName: 'CLOUD_PROJECTS',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '3',
-          },
-          tooltipByLocale: {
-            en: '10 for early bird accounts, created and verified before Feb 2024.',
-          },
-        },
-        {
-          featureName: 'MOBILE_APP',
-          pillarName: 'CREATION',
-          enabled: 'no',
-        },
-        {
-          featureName: 'AI_PROTOTYPING',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '1 per day',
-          },
-          trialLike: true,
-          tooltipByLocale: {
-            en: '2 per day for early bird accounts, created and verified before Feb 2024.',
-          },
-        },
-        {
-          featureName: 'PUBLISH_GD_GAMES',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_DESKTOP',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '1 per day',
-          },
-          tooltipByLocale: {
-            en: '2 per day for early bird accounts, created and verified before Feb 2024.',
-          },
-          trialLike: true,
-        },
-        {
-          featureName: 'PUBLISH_ANDROID',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '1 per day',
-          },
-          tooltipByLocale: {
-            en: '2 per day for early bird accounts, created and verified before Feb 2024.',
-          },
-          trialLike: true,
-        },
-        {
-          featureName: 'PUBLISH_IOS',
-          pillarName: 'PUBLISHING',
-          enabled: 'no',
-        },
-        {
-          featureName: 'MANUAL_EXPORT',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'REMOVE_MANDATORY_LOGO',
-          pillarName: 'PUBLISHING',
-          enabled: 'no',
-        },
-        {
-          featureName: 'VERSION_HISTORY',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'COLLABORATORS',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'INVOICES',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FEEDBACKS',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: '3 per game',
-          },
-        },
-        {
-          featureName: 'LEADERBOARDS',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: '1 per game',
-          },
-        },
-        {
-          featureName: 'LEADERBOARDS_STYLING',
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'ANALYTICS',
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'MULTIPLAYER',
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-          upcoming: true,
-        },
-        {
-          featureName: 'EMBED_GD_GAMES',
-          upcoming: true,
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'DEDICATED_COMMUNITY_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'no',
-        },
-        {
-          featureName: 'DEDICATED_SUPPORT_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FREE_CREDITS',
-          pillarName: 'MARKETING',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FEATURING_TIER1',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER2',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER3',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'GET_FREE_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'BUY_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'no',
-        },
-        {
-          featureName: 'ADMOB_ADS',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'COMMUNITY_IAP',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_GAMES',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_ON_ASSET_STORE',
-          pillarName: 'MONETIZATION',
-          descriptionByLocale: {
-            en: 'Yes - get in touch',
-          },
-        },
-      ],
-      pricingSystems: [],
+export const subscriptionPlansWithPricingSystems: SubscriptionPlanWithPricingSystems[] = [
+  {
+    id: 'free',
+    isLegacy: false,
+    nameByLocale: {
+      en: 'Free',
     },
-    {
-      id: 'gdevelop_silver',
-      isLegacy: false,
-      nameByLocale: {
-        en: 'Silver',
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
       },
-      targetAudiences: ['CASUAL'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
+      CREATION: {
+        en: 'Creation',
       },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
+      MARKETING: {
+        en: 'Marketing & Promotion',
       },
-      descriptionByLocale: {
-        en: 'Publish your first games on Android.',
+      PRO: {
+        en: 'Professional features',
       },
-      specificRequirementByLocale: {
-        en: "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
+      PUBLISHING: {
+        en: 'Publishing',
       },
-      bulletPointsByLocale: [
-        {
-          en: 'Publish on Google Play, desktop and on the web',
-        },
-        {
-          en: 'Access GDevelop mobile app (iOS/Android)',
-        },
-        {
-          en: 'Analytics to follow your game virality',
-        },
-        {
-          en: '100 credits per month',
-        },
-      ],
-      fullFeatures: [
-        {
-          featureName: 'ENGINE_AND_EDITOR',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLOUD_PROJECTS',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '50',
-          },
-        },
-        {
-          featureName: 'MOBILE_APP',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'AI_PROTOTYPING',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '10 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_GD_GAMES',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_DESKTOP',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '10 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_ANDROID',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '10 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_IOS',
-          pillarName: 'PUBLISHING',
-          enabled: 'no',
-        },
-        {
-          featureName: 'MANUAL_EXPORT',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'REMOVE_MANDATORY_LOGO',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'VERSION_HISTORY',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'COLLABORATORS',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'INVOICES',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FEEDBACKS',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: '10 per game',
-          },
-        },
-        {
-          featureName: 'LEADERBOARDS',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: '1 per game',
-          },
-        },
-        {
-          featureName: 'LEADERBOARDS_STYLING',
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'ANALYTICS',
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'MULTIPLAYER',
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-          upcoming: true,
-        },
-        {
-          featureName: 'EMBED_GD_GAMES',
-          upcoming: true,
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'DEDICATED_COMMUNITY_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'no',
-        },
-        {
-          featureName: 'DEDICATED_SUPPORT_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FREE_CREDITS',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: '100 per month',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER1',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER2',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER3',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'GET_FREE_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'BUY_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'no',
-        },
-        {
-          featureName: 'ADMOB_ADS',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'COMMUNITY_IAP',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_GAMES',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_ON_ASSET_STORE',
-          pillarName: 'MONETIZATION',
-          descriptionByLocale: {
-            en: 'Yes - get in touch',
-          },
-        },
-      ],
-      pricingSystems: [
-        {
-          id: 'silver_1month_499EUR',
-          planId: 'gdevelop_silver',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 499,
-          region: 'eurozone',
-        },
-        {
-          id: 'silver_1year_3599EUR',
-          planId: 'gdevelop_silver',
-          period: 'year',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 3599,
-          region: 'eurozone',
-        },
-      ],
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
     },
-    {
-      id: 'gdevelop_gold',
-      isLegacy: false,
-      nameByLocale: {
-        en: 'Gold',
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
       },
-      targetAudiences: ['CASUAL'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
       },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
       },
-      descriptionByLocale: {
-        en: 'Full creation and marketing features. Publish anywhere.',
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
       },
-      specificRequirementByLocale: {
-        en: "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
+      MOBILE_APP: {
+        en: 'Mobile app access',
       },
-      bulletPointsByLocale: [
-        {
-          en: 'Publish your game on iOS',
-        },
-        {
-          en: 'Dedicated channel on Discord',
-        },
-        {
-          en: 'Unlimited leaderboards and player feedbacks',
-        },
-        {
-          en: '300 credits per month, to promote your game or use in asset store',
-        },
-        {
-          en: '1 free asset pack to claim per month',
-        },
-      ],
-      fullFeatures: [
-        {
-          featureName: 'ENGINE_AND_EDITOR',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLOUD_PROJECTS',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '100',
-          },
-        },
-        {
-          featureName: 'MOBILE_APP',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'AI_PROTOTYPING',
-          pillarName: 'CREATION',
-          descriptionByLocale: {
-            en: '100 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_GD_GAMES',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_DESKTOP',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '100 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_ANDROID',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '100 per day',
-          },
-        },
-        {
-          featureName: 'PUBLISH_IOS',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '5 per month',
-          },
-        },
-        {
-          featureName: 'MANUAL_EXPORT',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'REMOVE_MANDATORY_LOGO',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'VERSION_HISTORY',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'COLLABORATORS',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'INVOICES',
-          pillarName: 'PRO',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FEEDBACKS',
-          pillarName: 'SOCIAL',
-          unlimited: true,
-        },
-        {
-          featureName: 'LEADERBOARDS',
-          pillarName: 'SOCIAL',
-          unlimited: true,
-        },
-        {
-          featureName: 'LEADERBOARDS_STYLING',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: 'Custom colors',
-          },
-        },
-        {
-          featureName: 'ANALYTICS',
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'MULTIPLAYER',
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-          upcoming: true,
-        },
-        {
-          featureName: 'EMBED_GD_GAMES',
-          upcoming: true,
-          pillarName: 'SOCIAL',
-          enabled: 'no',
-        },
-        {
-          featureName: 'DEDICATED_COMMUNITY_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEDICATED_SUPPORT_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'no',
-        },
-        {
-          featureName: 'FREE_CREDITS',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: '300 per month',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER1',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER2',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER3',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'GET_FREE_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'BUY_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          descriptionByLocale: {
-            en: '1 per month',
-          },
-        },
-        {
-          featureName: 'ADMOB_ADS',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'COMMUNITY_IAP',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_GAMES',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_ON_ASSET_STORE',
-          pillarName: 'MONETIZATION',
-          descriptionByLocale: {
-            en: 'Yes - get in touch',
-          },
-        },
-      ],
-      pricingSystems: [
-        {
-          id: 'gold_1month_999EUR',
-          planId: 'gdevelop_gold',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 999,
-          region: 'eurozone',
-        },
-        {
-          id: 'gold_1year_7199EUR',
-          planId: 'gdevelop_gold',
-          period: 'year',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 7199,
-          region: 'eurozone',
-        },
-      ],
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
     },
-    {
-      id: 'gdevelop_startup',
-      isLegacy: false,
-      nameByLocale: {
-        en: 'Pro',
-      },
-      targetAudiences: ['PRO'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
-      },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
-      },
-      descriptionByLocale: {
-        en: 'Full professional features.',
-      },
-      bulletPointsByLocale: [
-        {
-          en: 'Dedicated support channel on Discord for pros',
-        },
-        {
-          en: 'Collaboration: share projects with teammates',
-        },
-        {
-          en: 'Version history for projects',
-        },
-        {
-          en: 'Unlimited cloud projects',
-        },
-        {
-          en: 'Access to the upcoming pro marketplace',
-        },
-        {
-          en: 'Billing/invoices available',
-        },
-      ],
-      fullFeatures: [
-        {
-          featureName: 'ENGINE_AND_EDITOR',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLOUD_PROJECTS',
-          pillarName: 'CREATION',
-          unlimited: true,
-        },
-        {
-          featureName: 'MOBILE_APP',
-          pillarName: 'CREATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'AI_PROTOTYPING',
-          pillarName: 'CREATION',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_GD_GAMES',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_DESKTOP',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_ANDROID',
-          pillarName: 'PUBLISHING',
-          unlimited: true,
-        },
-        {
-          featureName: 'PUBLISH_IOS',
-          pillarName: 'PUBLISHING',
-          descriptionByLocale: {
-            en: '15 per month',
-          },
-        },
-        {
-          featureName: 'MANUAL_EXPORT',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'REMOVE_MANDATORY_LOGO',
-          pillarName: 'PUBLISHING',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'VERSION_HISTORY',
-          pillarName: 'PRO',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'COLLABORATORS',
-          pillarName: 'PRO',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'INVOICES',
-          pillarName: 'PRO',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'FEEDBACKS',
-          pillarName: 'SOCIAL',
-          unlimited: true,
-        },
-        {
-          featureName: 'LEADERBOARDS',
-          pillarName: 'SOCIAL',
-          unlimited: true,
-        },
-        {
-          featureName: 'LEADERBOARDS_STYLING',
-          pillarName: 'SOCIAL',
-          descriptionByLocale: {
-            en: 'Custom CSS/styling',
-          },
-        },
-        {
-          featureName: 'ANALYTICS',
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'MULTIPLAYER',
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-          upcoming: true,
-        },
-        {
-          featureName: 'EMBED_GD_GAMES',
-          upcoming: true,
-          pillarName: 'SOCIAL',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEDICATED_COMMUNITY_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'DEDICATED_SUPPORT_CHANNEL',
-          pillarName: 'SUPPORT',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'FREE_CREDITS',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: '1000 per month',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER1',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER2',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'FEATURING_TIER3',
-          pillarName: 'MARKETING',
-          descriptionByLocale: {
-            en: 'Buy with credits',
-          },
-        },
-        {
-          featureName: 'GET_FREE_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'BUY_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
-          pillarName: 'ASSET-STORE',
-          descriptionByLocale: {
-            en: '1 per month',
-          },
-        },
-        {
-          featureName: 'ADMOB_ADS',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'COMMUNITY_IAP',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_GAMES',
-          pillarName: 'MONETIZATION',
-          enabled: 'yes',
-        },
-        {
-          featureName: 'SELL_ON_ASSET_STORE',
-          pillarName: 'MONETIZATION',
-          descriptionByLocale: {
-            en: 'Yes - get in touch',
-          },
-        },
-      ],
-      pricingSystems: [
-        {
-          id: 'startup_1month_3000EUR',
-          planId: 'gdevelop_startup',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 3000,
-          region: 'eurozone',
-        },
-        {
-          id: 'startup_1year_30900EUR',
-          planId: 'gdevelop_startup',
-          period: 'year',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 30900,
-          region: 'eurozone',
-        },
-      ],
+    descriptionByLocale: {
+      en: 'Create your first game 100% free.',
     },
-    {
-      id: 'gdevelop_education',
-      isLegacy: false,
-      nameByLocale: {
-        en: 'Education',
+    bulletPointsByLocale: [
+      {
+        en: 'Fully featured, open-source game engine',
       },
-      targetAudiences: ['EDUCATION'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
+      {
+        en: 'Publish to Android/Desktop (once per day)',
       },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
+      {
+        en: 'Try GDevelop.io online services for free',
+      },
+      {
+        en: 'Thousands of free assets on the Asset Store',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: 'Nag screen',
         },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
+        trialLike: true,
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '3',
         },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
+        tooltipByLocale: {
+          en:
+            '10 for early bird accounts, created and verified before Feb 2024.',
         },
       },
-      descriptionByLocale: {
-        en: 'Teach logic, coding and game creation.',
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'no',
       },
-      bulletPointsByLocale: [
-        {
-          en: 'Full anonymous accounts for students',
-          'ar-SA': 'سرية الطلاب.',
-          'de-DE': 'Anonymität der Schüler.',
-          'es-ES': 'Anonimato de los estudiantes.',
-          'fr-FR': 'Anonymat des étudiants.',
-          'it-IT': 'Anonimato degli studenti.',
-          'ja-JP': '学生の匿名性。',
-          'ko-KR': '학생 익명성.',
-          'pl-PL': 'Anonimowość uczniów.',
-          'pt-BR': 'Anonimato dos alunos.',
-          'ru-RU': 'Анонимность студентов.',
-          'sl-SI': 'Anonimnost študentov.',
-          'uk-UA': 'Анонімність студентів.',
-          'zh-CN': '学生匿名性。',
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '1 per day',
         },
-        {
-          en: 'NDPA or custom privacy agreements',
+        trialLike: true,
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
         },
-        {
-          en: 'Organize students per classroom',
-          'ar-SA': 'تنظيم الطلاب حسب الصف.',
-          'de-DE': 'Schüler pro Klassenzimmer organisieren.',
-          'es-ES': 'Organizar estudiantes por aulas.',
-          'fr-FR': 'Organiser les étudiants par classe.',
-          'it-IT': 'Organizza gli studenti per classe.',
-          'ja-JP': 'クラスごとに学生を組織化。',
-          'ko-KR': '학생을 강의실별로 정리하십시오.',
-          'pl-PL': 'Organizuj uczniów według sal lekcyjnych.',
-          'pt-BR': 'Organize os alunos por sala de aula.',
-          'ru-RU': 'Организация студентов по классам.',
-          'sl-SI': 'Organizacija študentov po učilnicah.',
-          'uk-UA': 'Організація студентів за класами.',
-          'zh-CN': '根据教室组织学生。',
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '1 per day',
         },
-        {
-          en: 'Access students projects',
-          'ar-SA': 'الوصول إلى مشاريع الطلاب الخاصة بك',
-          'de-DE': 'Zugriff auf die Projekte Ihrer Schüler.',
-          'es-ES': 'Acceda a los proyectos de sus estudiantes.',
-          'fr-FR': 'Accédez aux projets de vos étudiants.',
-          'it-IT': 'Accedi ai progetti dei tuoi studenti.',
-          'ja-JP': '生徒のプロジェクトにアクセス。',
-          'ko-KR': '학생 프로젝트에 액세스하십시오.',
-          'pl-PL': 'Dostęp do projektów uczniów.',
-          'pt-BR': 'Acesse os projetos dos seus alunos.',
-          'ru-RU': 'Доступ к проектам ваших студентов.',
-          'sl-SI': 'Dostop do projektov vaših študentov.',
-          'uk-UA': 'Доступ до проектів ваших студентів.',
-          'zh-CN': '访问您的学生项目。',
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
         },
-        {
-          en: 'Version history for all projects',
+        trialLike: true,
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '1 per day',
         },
-        {
-          en: 'Publishing to any platform',
+        tooltipByLocale: {
+          en:
+            '2 per day for early bird accounts, created and verified before Feb 2024.',
         },
-        {
-          en: 'GDevelop mobile app full access',
+        trialLike: true,
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '3 per game',
         },
-      ],
-      fullFeatures: [],
-      pricingSystems: [
-        {
-          id: 'education_1month_299EUR',
-          planId: 'gdevelop_education',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 299,
-          isPerUser: true,
-          region: 'eurozone',
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '1 per game',
         },
-        {
-          id: 'education_1year_2999EUR',
-          planId: 'gdevelop_education',
-          period: 'year',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 2999,
-          isPerUser: true,
-          region: 'eurozone',
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
         },
-      ],
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
+      },
+    ],
+    pricingSystems: [],
+  },
+  {
+    id: 'gdevelop_silver',
+    isLegacy: false,
+    nameByLocale: {
+      en: 'Silver',
     },
-    {
-      id: 'gdevelop_indie',
-      isLegacy: true,
-      nameByLocale: {
-        en: 'Silver (Legacy)',
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
       },
-      targetAudiences: ['CASUAL'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
+      CREATION: {
+        en: 'Creation',
       },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
+      MARKETING: {
+        en: 'Marketing & Promotion',
       },
-      descriptionByLocale: {
-        en: 'Build more and faster',
+      PRO: {
+        en: 'Professional features',
       },
-      bulletPointsByLocale: [
-        {
-          en: '50 cloud projects with 250MB of resources per project and 3-month version history.',
-        },
-        {
-          en: '10 packagings per day for Android and for desktop.',
-        },
-        {
-          en: 'Unlimited leaderboards and unlimited player feedback responses.',
-        },
-      ],
-      fullFeatures: [],
-      pricingSystems: [
-        {
-          id: 'indie_1month',
-          planId: 'gdevelop_indie',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 200,
-          region: 'default',
-        },
-      ],
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
     },
-    {
-      id: 'gdevelop_pro',
-      isLegacy: true,
-      nameByLocale: {
-        en: 'Gold (Legacy)',
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
       },
-      targetAudiences: ['CASUAL'],
-      pillarNamesPerLocale: {
-        'ASSET-STORE': {
-          en: 'Asset Store',
-        },
-        CREATION: {
-          en: 'Creation',
-        },
-        MARKETING: {
-          en: 'Marketing & Promotion',
-        },
-        PRO: {
-          en: 'Professional features',
-        },
-        PUBLISHING: {
-          en: 'Publishing',
-        },
-        SOCIAL: {
-          en: 'Social & Online',
-        },
-        SUPPORT: {
-          en: 'Community & Support',
-        },
-        MONETIZATION: {
-          en: 'Monetization',
-        },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
       },
-      featureNamesByLocale: {
-        ENGINE_AND_EDITOR: {
-          en: 'Open-source (MIT) editor and game engine',
-        },
-        DEBUGGER_AND_LIVE_PREVIEW: {
-          en: 'Debugger and live preview',
-        },
-        CLOUD_PROJECTS: {
-          en: 'Cloud projects',
-        },
-        AI_PROTOTYPING: {
-          en: 'Game prototypes with AI',
-        },
-        MOBILE_APP: {
-          en: 'Mobile app access',
-        },
-        MANUAL_EXPORT: {
-          en: 'Export (any platform) manually with devtools',
-        },
-        PUBLISH_GD_GAMES: {
-          en: 'Publish your game on gd.games',
-        },
-        PUBLISH_DESKTOP: {
-          en: 'Publish for desktop (Windows, macOS, Linux)',
-        },
-        PUBLISH_ANDROID: {
-          en: 'Publish your game on Google Play (Android)',
-        },
-        PUBLISH_IOS: {
-          en: 'Publish your game on iOS (App Store)',
-        },
-        REMOVE_MANDATORY_LOGO: {
-          en: 'Remove GDevelop logo/watermark',
-        },
-        VERSION_HISTORY: {
-          en: 'Version history',
-        },
-        COLLABORATORS: {
-          en: 'Collaborator (project sharing)',
-        },
-        INVOICES: {
-          en: 'Invoices for your company',
-        },
-        LEADERBOARDS: {
-          en: 'Leaderboards for games',
-        },
-        LEADERBOARDS_STYLING: {
-          en: 'Leaderboards styling',
-        },
-        ANALYTICS: {
-          en: 'Analytics on game usage',
-        },
-        FEEDBACKS: {
-          en: 'Player feedbacks',
-        },
-        MULTIPLAYER: {
-          en: 'Multiplayer',
-        },
-        EMBED_GD_GAMES: {
-          en: 'Embed game on any website in one click',
-        },
-        DEDICATED_SUPPORT_CHANNEL: {
-          en: 'Dedicated professional support channel',
-        },
-        DEDICATED_COMMUNITY_CHANNEL: {
-          en: 'Dedicated community channel',
-        },
-        FREE_CREDITS: {
-          en: 'Free credits every month',
-        },
-        FEATURING_TIER1: {
-          en: 'Featuring on gd.games',
-        },
-        FEATURING_TIER2: {
-          en: 'Featuring on social/newsletter',
-        },
-        FEATURING_TIER3: {
-          en: 'Featuring inside GDevelop',
-        },
-        GET_FREE_ASSET_PACKS: {
-          en: 'Use thousands of free asset packs',
-        },
-        CLAIM_PREMIUM_ASSET_PACKS: {
-          en: 'Claim a premium asset pack or template',
-        },
-        BUY_PREMIUM_ASSET_PACKS: {
-          en: 'Buy premium asset packs',
-        },
-        ADMOB_ADS: {
-          en: 'Show ads in games (Admob for Android)',
-        },
-        COMMUNITY_IAP: {
-          en: 'In-App Purchases (community extension)',
-        },
-        SELL_GAMES: {
-          en: 'Sell your games (Steam, App Stores...)',
-        },
-        SELL_ON_ASSET_STORE: {
-          en: 'Sell your assets or templates on GDevelop Asset Store',
-        },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
       },
-      descriptionByLocale: {
-        en: 'Experimented creators, ambitious games',
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
       },
-      bulletPointsByLocale: [
-        {
-          en: '100 cloud projects with 500MB of resources per project and one-year version history.',
-        },
-        {
-          en: '70 packagings per day for Android and for desktop.',
-        },
-        {
-          en: 'Unlimited leaderboards and unlimited player feedback responses.',
-        },
-        {
-          en: 'Immerse your players by removing GDevelop logo when the game loads.',
-        },
-      ],
-      fullFeatures: [],
-      pricingSystems: [
-        {
-          id: 'pro_1month',
-          planId: 'gdevelop_pro',
-          period: 'month',
-          periodCount: 1,
-          currency: 'EUR',
-          amountInCents: 700,
-          region: 'default',
-        },
-      ],
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
     },
-  ];
+    descriptionByLocale: {
+      en: 'Publish your first games on Android.',
+    },
+    specificRequirementByLocale: {
+      en:
+        "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
+    },
+    bulletPointsByLocale: [
+      {
+        en: 'Publish on Google Play, desktop and on the web',
+      },
+      {
+        en: 'Access GDevelop mobile app (iOS/Android)',
+      },
+      {
+        en: 'Analytics to follow your game virality',
+      },
+      {
+        en: '100 credits per month',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '50',
+        },
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '10 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        enabled: 'no',
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '10 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: '1 per game',
+        },
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '100 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'no',
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
+      },
+    ],
+    pricingSystems: [
+      {
+        id: 'silver_1month_499EUR',
+        planId: 'gdevelop_silver',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 499,
+        region: 'eurozone',
+      },
+      {
+        id: 'silver_1year_3599EUR',
+        planId: 'gdevelop_silver',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 3599,
+        region: 'eurozone',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_gold',
+    isLegacy: false,
+    nameByLocale: {
+      en: 'Gold',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Full creation and marketing features. Publish anywhere.',
+    },
+    specificRequirementByLocale: {
+      en:
+        "If you're using your GDevelop account for a company having more than $50,000 USD revenue per year, you must use the Pro membership.",
+    },
+    bulletPointsByLocale: [
+      {
+        en: 'Publish your game on iOS',
+      },
+      {
+        en: 'Dedicated channel on Discord',
+      },
+      {
+        en: 'Unlimited leaderboards and player feedbacks',
+      },
+      {
+        en: '300 credits per month, to promote your game or use in asset store',
+      },
+      {
+        en: '1 free asset pack to claim per month',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '100',
+        },
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '100 per day',
+        },
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '5 per month',
+        },
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: 'Custom colors',
+        },
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'no',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'no',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '300 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        descriptionByLocale: {
+          en: '1 per month',
+        },
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
+      },
+    ],
+    pricingSystems: [
+      {
+        id: 'gold_1month_999EUR',
+        planId: 'gdevelop_gold',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 999,
+        region: 'eurozone',
+      },
+      {
+        id: 'gold_1year_7199EUR',
+        planId: 'gdevelop_gold',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 7199,
+        region: 'eurozone',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_startup',
+    isLegacy: false,
+    nameByLocale: {
+      en: 'Pro',
+    },
+    targetAudiences: ['PRO'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Full professional features.',
+    },
+    bulletPointsByLocale: [
+      {
+        en: 'Dedicated support channel on Discord for pros',
+      },
+      {
+        en: 'Collaboration: share projects with teammates',
+      },
+      {
+        en: 'Version history for projects',
+      },
+      {
+        en: 'Unlimited cloud projects',
+      },
+      {
+        en: 'Access to the upcoming pro marketplace',
+      },
+      {
+        en: 'Billing/invoices available',
+      },
+    ],
+    fullFeatures: [
+      {
+        featureName: 'ENGINE_AND_EDITOR',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEBUGGER_AND_LIVE_PREVIEW',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLOUD_PROJECTS',
+        pillarName: 'CREATION',
+        unlimited: true,
+      },
+      {
+        featureName: 'MOBILE_APP',
+        pillarName: 'CREATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'AI_PROTOTYPING',
+        pillarName: 'CREATION',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_GD_GAMES',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_DESKTOP',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_ANDROID',
+        pillarName: 'PUBLISHING',
+        unlimited: true,
+      },
+      {
+        featureName: 'PUBLISH_IOS',
+        pillarName: 'PUBLISHING',
+        descriptionByLocale: {
+          en: '15 per month',
+        },
+      },
+      {
+        featureName: 'MANUAL_EXPORT',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'REMOVE_MANDATORY_LOGO',
+        pillarName: 'PUBLISHING',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'VERSION_HISTORY',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COLLABORATORS',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'INVOICES',
+        pillarName: 'PRO',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'FEEDBACKS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS',
+        pillarName: 'SOCIAL',
+        unlimited: true,
+      },
+      {
+        featureName: 'LEADERBOARDS_STYLING',
+        pillarName: 'SOCIAL',
+        descriptionByLocale: {
+          en: 'Custom CSS/styling',
+        },
+      },
+      {
+        featureName: 'ANALYTICS',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'MULTIPLAYER',
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+        upcoming: true,
+      },
+      {
+        featureName: 'EMBED_GD_GAMES',
+        upcoming: true,
+        pillarName: 'SOCIAL',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_COMMUNITY_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'DEDICATED_SUPPORT_CHANNEL',
+        pillarName: 'SUPPORT',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'FREE_CREDITS',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: '1000 per month',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER1',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER2',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'FEATURING_TIER3',
+        pillarName: 'MARKETING',
+        descriptionByLocale: {
+          en: 'Buy with credits',
+        },
+      },
+      {
+        featureName: 'GET_FREE_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'BUY_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'CLAIM_PREMIUM_ASSET_PACKS',
+        pillarName: 'ASSET-STORE',
+        descriptionByLocale: {
+          en: '1 per month',
+        },
+      },
+      {
+        featureName: 'ADMOB_ADS',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'COMMUNITY_IAP',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_GAMES',
+        pillarName: 'MONETIZATION',
+        enabled: 'yes',
+      },
+      {
+        featureName: 'SELL_ON_ASSET_STORE',
+        pillarName: 'MONETIZATION',
+        descriptionByLocale: {
+          en: 'Yes - get in touch',
+        },
+      },
+    ],
+    pricingSystems: [
+      {
+        id: 'startup_1month_3000EUR',
+        planId: 'gdevelop_startup',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 3000,
+        region: 'eurozone',
+      },
+      {
+        id: 'startup_1year_30900EUR',
+        planId: 'gdevelop_startup',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 30900,
+        region: 'eurozone',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_education',
+    isLegacy: false,
+    nameByLocale: {
+      en: 'Education',
+    },
+    targetAudiences: ['EDUCATION'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Teach logic, coding and game creation.',
+    },
+    bulletPointsByLocale: [
+      {
+        en: 'Full anonymous accounts for students',
+        'ar-SA': 'سرية الطلاب.',
+        'de-DE': 'Anonymität der Schüler.',
+        'es-ES': 'Anonimato de los estudiantes.',
+        'fr-FR': 'Anonymat des étudiants.',
+        'it-IT': 'Anonimato degli studenti.',
+        'ja-JP': '学生の匿名性。',
+        'ko-KR': '학생 익명성.',
+        'pl-PL': 'Anonimowość uczniów.',
+        'pt-BR': 'Anonimato dos alunos.',
+        'ru-RU': 'Анонимность студентов.',
+        'sl-SI': 'Anonimnost študentov.',
+        'uk-UA': 'Анонімність студентів.',
+        'zh-CN': '学生匿名性。',
+      },
+      {
+        en: 'NDPA or custom privacy agreements',
+      },
+      {
+        en: 'Organize students per classroom',
+        'ar-SA': 'تنظيم الطلاب حسب الصف.',
+        'de-DE': 'Schüler pro Klassenzimmer organisieren.',
+        'es-ES': 'Organizar estudiantes por aulas.',
+        'fr-FR': 'Organiser les étudiants par classe.',
+        'it-IT': 'Organizza gli studenti per classe.',
+        'ja-JP': 'クラスごとに学生を組織化。',
+        'ko-KR': '학생을 강의실별로 정리하십시오.',
+        'pl-PL': 'Organizuj uczniów według sal lekcyjnych.',
+        'pt-BR': 'Organize os alunos por sala de aula.',
+        'ru-RU': 'Организация студентов по классам.',
+        'sl-SI': 'Organizacija študentov po učilnicah.',
+        'uk-UA': 'Організація студентів за класами.',
+        'zh-CN': '根据教室组织学生。',
+      },
+      {
+        en: 'Access students projects',
+        'ar-SA': 'الوصول إلى مشاريع الطلاب الخاصة بك',
+        'de-DE': 'Zugriff auf die Projekte Ihrer Schüler.',
+        'es-ES': 'Acceda a los proyectos de sus estudiantes.',
+        'fr-FR': 'Accédez aux projets de vos étudiants.',
+        'it-IT': 'Accedi ai progetti dei tuoi studenti.',
+        'ja-JP': '生徒のプロジェクトにアクセス。',
+        'ko-KR': '학생 프로젝트에 액세스하십시오.',
+        'pl-PL': 'Dostęp do projektów uczniów.',
+        'pt-BR': 'Acesse os projetos dos seus alunos.',
+        'ru-RU': 'Доступ к проектам ваших студентов.',
+        'sl-SI': 'Dostop do projektov vaših študentov.',
+        'uk-UA': 'Доступ до проектів ваших студентів.',
+        'zh-CN': '访问您的学生项目。',
+      },
+      {
+        en: 'Version history for all projects',
+      },
+      {
+        en: 'Publishing to any platform',
+      },
+      {
+        en: 'GDevelop mobile app full access',
+      },
+    ],
+    fullFeatures: [],
+    pricingSystems: [
+      {
+        id: 'education_1month_299EUR',
+        planId: 'gdevelop_education',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 299,
+        isPerUser: true,
+        region: 'eurozone',
+      },
+      {
+        id: 'education_1year_2999EUR',
+        planId: 'gdevelop_education',
+        period: 'year',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 2999,
+        isPerUser: true,
+        region: 'eurozone',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_indie',
+    isLegacy: true,
+    nameByLocale: {
+      en: 'Silver (Legacy)',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Build more and faster',
+    },
+    bulletPointsByLocale: [
+      {
+        en:
+          '50 cloud projects with 250MB of resources per project and 3-month version history.',
+      },
+      {
+        en: '10 packagings per day for Android and for desktop.',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+      },
+    ],
+    fullFeatures: [],
+    pricingSystems: [
+      {
+        id: 'indie_1month',
+        planId: 'gdevelop_indie',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 200,
+        region: 'default',
+      },
+    ],
+  },
+  {
+    id: 'gdevelop_pro',
+    isLegacy: true,
+    nameByLocale: {
+      en: 'Gold (Legacy)',
+    },
+    targetAudiences: ['CASUAL'],
+    pillarNamesPerLocale: {
+      'ASSET-STORE': {
+        en: 'Asset Store',
+      },
+      CREATION: {
+        en: 'Creation',
+      },
+      MARKETING: {
+        en: 'Marketing & Promotion',
+      },
+      PRO: {
+        en: 'Professional features',
+      },
+      PUBLISHING: {
+        en: 'Publishing',
+      },
+      SOCIAL: {
+        en: 'Social & Online',
+      },
+      SUPPORT: {
+        en: 'Community & Support',
+      },
+      MONETIZATION: {
+        en: 'Monetization',
+      },
+    },
+    featureNamesByLocale: {
+      ENGINE_AND_EDITOR: {
+        en: 'Open-source (MIT) editor and game engine',
+      },
+      DEBUGGER_AND_LIVE_PREVIEW: {
+        en: 'Debugger and live preview',
+      },
+      CLOUD_PROJECTS: {
+        en: 'Cloud projects',
+      },
+      AI_PROTOTYPING: {
+        en: 'Game prototypes with AI',
+      },
+      MOBILE_APP: {
+        en: 'Mobile app access',
+      },
+      MANUAL_EXPORT: {
+        en: 'Export (any platform) manually with devtools',
+      },
+      PUBLISH_GD_GAMES: {
+        en: 'Publish your game on gd.games',
+      },
+      PUBLISH_DESKTOP: {
+        en: 'Publish for desktop (Windows, macOS, Linux)',
+      },
+      PUBLISH_ANDROID: {
+        en: 'Publish your game on Google Play (Android)',
+      },
+      PUBLISH_IOS: {
+        en: 'Publish your game on iOS (App Store)',
+      },
+      REMOVE_MANDATORY_LOGO: {
+        en: 'Remove GDevelop logo/watermark',
+      },
+      VERSION_HISTORY: {
+        en: 'Version history',
+      },
+      COLLABORATORS: {
+        en: 'Collaborator (project sharing)',
+      },
+      INVOICES: {
+        en: 'Invoices for your company',
+      },
+      LEADERBOARDS: {
+        en: 'Leaderboards for games',
+      },
+      LEADERBOARDS_STYLING: {
+        en: 'Leaderboards styling',
+      },
+      ANALYTICS: {
+        en: 'Analytics on game usage',
+      },
+      FEEDBACKS: {
+        en: 'Player feedbacks',
+      },
+      MULTIPLAYER: {
+        en: 'Multiplayer',
+      },
+      EMBED_GD_GAMES: {
+        en: 'Embed game on any website in one click',
+      },
+      DEDICATED_SUPPORT_CHANNEL: {
+        en: 'Dedicated professional support channel',
+      },
+      DEDICATED_COMMUNITY_CHANNEL: {
+        en: 'Dedicated community channel',
+      },
+      FREE_CREDITS: {
+        en: 'Free credits every month',
+      },
+      FEATURING_TIER1: {
+        en: 'Featuring on gd.games',
+      },
+      FEATURING_TIER2: {
+        en: 'Featuring on social/newsletter',
+      },
+      FEATURING_TIER3: {
+        en: 'Featuring inside GDevelop',
+      },
+      GET_FREE_ASSET_PACKS: {
+        en: 'Use thousands of free asset packs',
+      },
+      CLAIM_PREMIUM_ASSET_PACKS: {
+        en: 'Claim a premium asset pack or template',
+      },
+      BUY_PREMIUM_ASSET_PACKS: {
+        en: 'Buy premium asset packs',
+      },
+      ADMOB_ADS: {
+        en: 'Show ads in games (Admob for Android)',
+      },
+      COMMUNITY_IAP: {
+        en: 'In-App Purchases (community extension)',
+      },
+      SELL_GAMES: {
+        en: 'Sell your games (Steam, App Stores...)',
+      },
+      SELL_ON_ASSET_STORE: {
+        en: 'Sell your assets or templates on GDevelop Asset Store',
+      },
+    },
+    descriptionByLocale: {
+      en: 'Experimented creators, ambitious games',
+    },
+    bulletPointsByLocale: [
+      {
+        en:
+          '100 cloud projects with 500MB of resources per project and one-year version history.',
+      },
+      {
+        en: '70 packagings per day for Android and for desktop.',
+      },
+      {
+        en: 'Unlimited leaderboards and unlimited player feedback responses.',
+      },
+      {
+        en:
+          'Immerse your players by removing GDevelop logo when the game loads.',
+      },
+    ],
+    fullFeatures: [],
+    pricingSystems: [
+      {
+        id: 'pro_1month',
+        planId: 'gdevelop_pro',
+        period: 'month',
+        periodCount: 1,
+        currency: 'EUR',
+        amountInCents: 700,
+        region: 'default',
+      },
+    ],
+  },
+];
 
 const prices = {
   'cordova-build': {
@@ -2850,12 +2857,11 @@ export const fakeSilverAuthenticatedUser: AuthenticatedUser = {
   subscription: subscriptionForSilverUser,
   limits: limitsForSilverUser,
 };
-export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser =
-  {
-    ...defaultAuthenticatedUserWithNoSubscription,
-    subscription: silverSubscriptionButCancelAtPeriodEnd,
-    limits: limitsForSilverUser,
-  };
+export const fakeSilverButCancelAtPeriodEndAuthenticatedUser: AuthenticatedUser = {
+  ...defaultAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionButCancelAtPeriodEnd,
+  limits: limitsForSilverUser,
+};
 export const fakeSilverAuthenticatedUserWithCloudProjects: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
   subscription: subscriptionForSilverUser,
@@ -2900,19 +2906,17 @@ export const fakeAuthenticatedUserWithNoSubscription: AuthenticatedUser = {
   limits: limitsForNoSubscriptionUser,
 };
 
-export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser =
-  {
-    ...fakeAuthenticatedUserWithNoSubscription,
-    subscription: silverSubscriptionWithRedemptionCode,
-    limits: limitsForSilverUser,
-  };
+export const fakeAuthenticatedUserWithValidSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithRedemptionCode,
+  limits: limitsForSilverUser,
+};
 
-export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser =
-  {
-    ...fakeAuthenticatedUserWithNoSubscription,
-    subscription: silverSubscriptionWithExpiredRedemptionCode,
-    limits: limitsForSilverUser,
-  };
+export const fakeAuthenticatedUserWithExpiredSilverRedemptionCode: AuthenticatedUser = {
+  ...fakeAuthenticatedUserWithNoSubscription,
+  subscription: silverSubscriptionWithExpiredRedemptionCode,
+  limits: limitsForSilverUser,
+};
 
 export const fakeAuthenticatedUserWithLegacyIndieSubscription = {
   ...fakeSilverAuthenticatedUser,
@@ -2926,13 +2930,12 @@ export const fakeAuthenticatedUserWithLegacyProSubscription = {
   limits: limitsForGoldUser,
 };
 
-export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser =
-  {
-    ...fakeSilverAuthenticatedUser,
-    cloudProjects: tenCloudProjects,
-    subscription: noSubscription,
-    limits: limitsReached,
-  };
+export const fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  cloudProjects: tenCloudProjects,
+  subscription: noSubscription,
+  limits: limitsReached,
+};
 
 export const fakeAuthenticatedUserWithEmailVerified: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
@@ -2977,12 +2980,11 @@ export const fakeAuthenticatedUserWithGitHubStarBadge: AuthenticatedUser = {
   ],
 };
 
-export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser =
-  {
-    ...fakeSilverAuthenticatedUser,
-    subscription: noSubscription,
-    limits: limitsForNoSubscriptionUserWithCredits,
-  };
+export const fakeAuthenticatedUserWithNoSubscriptionAndCredits: AuthenticatedUser = {
+  ...fakeSilverAuthenticatedUser,
+  subscription: noSubscription,
+  limits: limitsForNoSubscriptionUserWithCredits,
+};
 
 export const fakeNotAuthenticatedUser: AuthenticatedUser = {
   ...defaultAuthenticatedUserWithNoSubscription,
@@ -3284,7 +3286,8 @@ export const fakeAssetWithCustomObject: Asset = {
       resources: [
         {
           alwaysLoaded: false,
-          file: 'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Hovered.png',
           kind: 'image',
           metadata: '',
           name: 'object_YellowButton_Hovered.png',
@@ -3297,7 +3300,8 @@ export const fakeAssetWithCustomObject: Asset = {
         },
         {
           alwaysLoaded: false,
-          file: 'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Idle.png',
           kind: 'image',
           metadata: '',
           name: 'object_YellowButton_Idle.png',
@@ -3310,7 +3314,8 @@ export const fakeAssetWithCustomObject: Asset = {
         },
         {
           alwaysLoaded: false,
-          file: 'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
+          file:
+            'https://resources.gdevelop-app.com/assets/Custom objects/object_YellowButton_Pressed.png',
           kind: 'image',
           metadata: '',
           name: 'object_YellowButton_Pressed.png',
@@ -3523,11 +3528,10 @@ export const fireBulletExtensionHeader: ExtensionHeader = {
   iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
 };
 
-export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader =
-  {
-    ...fireBulletExtensionShortHeader,
-    gdevelopVersion: '2000.0.0',
-  };
+export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  gdevelopVersion: '2000.0.0',
+};
 
 export const alreadyInstalledExtensionShortHeader: ExtensionShortHeader = {
   ...fireBulletExtensionShortHeader,
@@ -3541,12 +3545,11 @@ export const newerVersionExtensionShortHeader: ExtensionShortHeader = {
   version: '1.2.4',
 };
 
-export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader =
-  {
-    ...fireBulletExtensionShortHeader,
-    tier: 'community',
-    name: 'SomeAlreadyInstalledExtension',
-  };
+export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  tier: 'community',
+  name: 'SomeAlreadyInstalledExtension',
+};
 
 export const flashExtensionShortHeader: ExtensionShortHeader = {
   tier: 'reviewed',
@@ -3597,7 +3600,8 @@ export const communityTierExtensionShortHeader: ExtensionShortHeader = {
   fullName: 'Fake Community extension',
   name: 'FakeCommunityExtension',
   version: '0.0.2',
-  url: 'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension.json',
+  url:
+    'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension.json',
   headerUrl:
     'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
@@ -3762,17 +3766,31 @@ const deleteDurationMetrics = (
   return gameMetrics;
 };
 
-export const gameRollingMetricsFor364Days: GameMetrics[] =
-  generateGameRollingMetricsFor364Days();
-export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] =
-  deleteDurationMetrics(generateGameRollingMetricsFor364Days(), 17);
-export const gameRollingMetricsWithOnly19Days: GameMetrics[] =
-  gameRollingMetricsFor364Days.slice(0, 19);
-export const gameRollingMetricsWithOnly1Day: GameMetrics[] =
-  gameRollingMetricsFor364Days.slice(0, 1);
+export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
+export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
+  generateGameRollingMetricsFor364Days(),
+  17
+);
+export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  19
+);
+export const gameRollingMetricsWithOnly1Day: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  1
+);
 export const gameRollingMetricsWithHoles: GameMetrics[] = [
-  4, 12, 13, 25, 33, 107, 108, 109, 110, 230,
-].map((index) => gameRollingMetricsFor364Days[index]);
+  4,
+  12,
+  13,
+  25,
+  33,
+  107,
+  108,
+  109,
+  110,
+  230,
+].map(index => gameRollingMetricsFor364Days[index]);
 export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
   {
     date: '2020-10-01',
@@ -3809,7 +3827,8 @@ export const showcasedGame1: ShowcasedGame = {
   ],
   links: [
     {
-      url: 'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
+      url:
+        'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
       type: 'app-store',
     },
     {
@@ -3880,26 +3899,25 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   codeSizeLevel: 'small',
 };
 
-export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData =
-  {
-    name: 'Fake private game template',
-    description: 'This is a fake private game template',
-    id: 'fake-id',
-    sellerId: 'fake-seller-id',
-    isSellerGDevelop: false,
-    productType: 'GAME_TEMPLATE',
-    listing: 'GAME_TEMPLATE',
-    categories: ['adventure'],
-    updatedAt: '2020-01-01',
-    createdAt: '2020-01-01',
-    thumbnailUrls: [],
-    prices: [],
-    creditPrices: [],
-    appStoreProductId: 'fake-app-store-product-id',
-    includedListableProductIds: [],
-    sellerStripeAccountId: 'fake-seller-stripe-account-id',
-    stripeProductId: 'fake-stripe-product-id',
-  };
+export const fakePrivateGameTemplateListingData: PrivateGameTemplateListingData = {
+  name: 'Fake private game template',
+  description: 'This is a fake private game template',
+  id: 'fake-id',
+  sellerId: 'fake-seller-id',
+  isSellerGDevelop: false,
+  productType: 'GAME_TEMPLATE',
+  listing: 'GAME_TEMPLATE',
+  categories: ['adventure'],
+  updatedAt: '2020-01-01',
+  createdAt: '2020-01-01',
+  thumbnailUrls: [],
+  prices: [],
+  creditPrices: [],
+  appStoreProductId: 'fake-app-store-product-id',
+  includedListableProductIds: [],
+  sellerStripeAccountId: 'fake-seller-stripe-account-id',
+  stripeProductId: 'fake-stripe-product-id',
+};
 
 export const fakeAssetPacks: PublicAssetPacks = {
   starterPacks: [
@@ -4043,7 +4061,8 @@ export const commentUnprocessed: Comment = {
   type: 'FEEDBACK',
   gameId: 'complete-game-id',
   buildId: 'complete-build-id',
-  text: "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
+  text:
+    "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
     version: 1,
     visuals: 2,
@@ -4079,7 +4098,8 @@ export const commentProcessed: Comment = {
   type: 'FEEDBACK',
   gameId: 'complete-game-id',
   buildId: 'complete-build-id',
-  text: "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
+  text:
+    "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
     version: 1,
     visuals: 2,
@@ -4102,7 +4122,8 @@ export const fakeAnnouncements: Announcement[] = [
       en: 'Some title',
     },
     markdownMessageByLocale: {
-      en: 'Something to announce which is really really cool [with a link](https://gdevelop.io) and *other* **markdown** ~~formatting~~!',
+      en:
+        'Something to announce which is really really cool [with a link](https://gdevelop.io) and *other* **markdown** ~~formatting~~!',
     },
   },
   {
@@ -4113,7 +4134,8 @@ export const fakeAnnouncements: Announcement[] = [
       en: 'Some title',
     },
     markdownMessageByLocale: {
-      en: 'Something nothing important but urgent to announce, with a button and [with a link](https://gdevelop.io) too.',
+      en:
+        'Something nothing important but urgent to announce, with a button and [with a link](https://gdevelop.io) too.',
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
@@ -4139,7 +4161,8 @@ export const fakeAnnouncements: Announcement[] = [
       en: 'Some title',
     },
     markdownMessageByLocale: {
-      en: 'Something important but not urgent to announce, with a big image.\n\n![some image](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png)',
+      en:
+        'Something important but not urgent to announce, with a big image.\n\n![some image](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20banner.png)',
     },
     buttonLabelByLocale: { en: 'View' },
     buttonUrl: 'https://gdevelop.io',
@@ -4151,10 +4174,12 @@ export const fakeAnnouncements: Announcement[] = [
       en: '',
     },
     markdownMessageByLocale: {
-      en: '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+      en:
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Updated.png)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
     },
     mobileMarkdownMessageByLocale: {
-      en: '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
+      en:
+        '[![GDevelop Mega pack](https://resources.gdevelop.io/announcements/GDevelops_Mega_Pack_Mobile.jpg)](https://play.google.com/store/apps/details?id=io.gdevelop.ide)',
     },
   },
 ];
@@ -4184,7 +4209,8 @@ export const fakeGameTemplateLicenses = [
       en: 'Unlimited commercial use',
     },
     descriptionByLocale: {
-      en: 'Use this game template for unlimited commercial games, on an unlimited number of projects and platforms.',
+      en:
+        'Use this game template for unlimited commercial games, on an unlimited number of projects and platforms.',
     },
   },
 ];
@@ -4214,7 +4240,8 @@ export const fakeAssetPackLicenses = [
       en: 'Unlimited commercial use',
     },
     descriptionByLocale: {
-      en: 'Use these assets for unlimited commercial games, on an unlimited number of projects and platforms.',
+      en:
+        'Use these assets for unlimited commercial games, on an unlimited number of projects and platforms.',
     },
   },
 ];

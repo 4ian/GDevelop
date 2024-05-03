@@ -40,7 +40,7 @@ const black: RGBColor = {
 export const filterEditableWithEventTextDialog = (
   events: Array<gdBaseEvent>
 ): Array<gdBaseEvent> => {
-  return events.filter((event) =>
+  return events.filter(event =>
     [
       'BuiltinCommonInstructions::Group',
       'BuiltinCommonInstructions::Comment',
@@ -57,80 +57,86 @@ const EventTextDialog = (props: Props) => {
 
   const eventType = event.getType();
 
-  React.useEffect(() => {
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      const commentEvent = gd.asCommentEvent(event);
+  React.useEffect(
+    () => {
+      if (eventType === 'BuiltinCommonInstructions::Comment') {
+        const commentEvent = gd.asCommentEvent(event);
 
-      setTextColor({
-        r: commentEvent.getTextColorRed(),
-        g: commentEvent.getTextColorGreen(),
-        b: commentEvent.getTextColorBlue(),
-      });
+        setTextColor({
+          r: commentEvent.getTextColorRed(),
+          g: commentEvent.getTextColorGreen(),
+          b: commentEvent.getTextColorBlue(),
+        });
 
-      setBackgroundColor({
-        r: commentEvent.getBackgroundColorRed(),
-        g: commentEvent.getBackgroundColorGreen(),
-        b: commentEvent.getBackgroundColorBlue(),
-      });
+        setBackgroundColor({
+          r: commentEvent.getBackgroundColorRed(),
+          g: commentEvent.getBackgroundColorGreen(),
+          b: commentEvent.getBackgroundColorBlue(),
+        });
 
-      setTextValue(gd.asCommentEvent(event).getComment());
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      var groupEvent = gd.asGroupEvent(event);
-      const r = groupEvent.getBackgroundColorR(),
-        g = groupEvent.getBackgroundColorG(),
-        b = groupEvent.getBackgroundColorB();
+        setTextValue(gd.asCommentEvent(event).getComment());
+      } else if (eventType === 'BuiltinCommonInstructions::Group') {
+        var groupEvent = gd.asGroupEvent(event);
+        const r = groupEvent.getBackgroundColorR(),
+          g = groupEvent.getBackgroundColorG(),
+          b = groupEvent.getBackgroundColorB();
 
-      // Text color is automatically chosen for groups.
-      setTextColor(() => {
-        return (r + g + b) / 3 > 200 ? black : white;
-      });
+        // Text color is automatically chosen for groups.
+        setTextColor(() => {
+          return (r + g + b) / 3 > 200 ? black : white;
+        });
 
-      setBackgroundColor({
-        r: groupEvent.getBackgroundColorR(),
-        g: groupEvent.getBackgroundColorG(),
-        b: groupEvent.getBackgroundColorB(),
-      });
+        setBackgroundColor({
+          r: groupEvent.getBackgroundColorR(),
+          g: groupEvent.getBackgroundColorG(),
+          b: groupEvent.getBackgroundColorB(),
+        });
 
-      setTextValue(gd.asGroupEvent(event).getName());
-    } else {
-      console.error(
-        'Dialog was opened for an unsupported event type: ' + eventType
-      );
-    }
-  }, [event, eventType]);
+        setTextValue(gd.asGroupEvent(event).getName());
+      } else {
+        console.error(
+          'Dialog was opened for an unsupported event type: ' + eventType
+        );
+      }
+    },
+    [event, eventType]
+  );
 
-  const onApply = React.useCallback(() => {
-    if (eventType === 'BuiltinCommonInstructions::Comment') {
-      //Text value
-      gd.asCommentEvent(event).setComment(textValue);
+  const onApply = React.useCallback(
+    () => {
+      if (eventType === 'BuiltinCommonInstructions::Comment') {
+        //Text value
+        gd.asCommentEvent(event).setComment(textValue);
 
-      //Text color
-      gd.asCommentEvent(event).setTextColor(
-        textColor.r,
-        textColor.g,
-        textColor.b
-      );
-      //Background color
-      gd.asCommentEvent(event).setBackgroundColor(
-        backgroundColor.r,
-        backgroundColor.g,
-        backgroundColor.b
-      );
-    } else if (eventType === 'BuiltinCommonInstructions::Group') {
-      //Text value
-      gd.asGroupEvent(event).setName(textValue);
+        //Text color
+        gd.asCommentEvent(event).setTextColor(
+          textColor.r,
+          textColor.g,
+          textColor.b
+        );
+        //Background color
+        gd.asCommentEvent(event).setBackgroundColor(
+          backgroundColor.r,
+          backgroundColor.g,
+          backgroundColor.b
+        );
+      } else if (eventType === 'BuiltinCommonInstructions::Group') {
+        //Text value
+        gd.asGroupEvent(event).setName(textValue);
 
-      //Text color for group not supported in Core, instead GroupEvent.js handle this
-      //Background color
-      gd.asGroupEvent(event).setBackgroundColor(
-        backgroundColor.r,
-        backgroundColor.g,
-        backgroundColor.b
-      );
-    }
-    props.onApply();
-    return;
-  }, [props, event, eventType, textValue, textColor, backgroundColor]);
+        //Text color for group not supported in Core, instead GroupEvent.js handle this
+        //Background color
+        gd.asGroupEvent(event).setBackgroundColor(
+          backgroundColor.r,
+          backgroundColor.g,
+          backgroundColor.b
+        );
+      }
+      props.onApply();
+      return;
+    },
+    [props, event, eventType, textValue, textColor, backgroundColor]
+  );
 
   return (
     <Dialog
@@ -168,7 +174,7 @@ const EventTextDialog = (props: Props) => {
             style={styles.sizeTextField}
             disableAlpha
             color={backgroundColor}
-            onChangeComplete={(color) => {
+            onChangeComplete={color => {
               setBackgroundColor(color.rgb);
             }}
           />
@@ -182,7 +188,7 @@ const EventTextDialog = (props: Props) => {
                 style={styles.sizeTextField}
                 disableAlpha
                 color={textColor}
-                onChangeComplete={(color) => {
+                onChangeComplete={color => {
                   setTextColor(color.rgb);
                 }}
               />
@@ -200,7 +206,7 @@ const EventTextDialog = (props: Props) => {
                 rows={8}
                 rowsMax={30}
                 value={textValue}
-                onChange={(value) => {
+                onChange={value => {
                   setTextValue(value);
                 }}
               />

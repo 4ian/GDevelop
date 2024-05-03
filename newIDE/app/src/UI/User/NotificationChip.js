@@ -38,22 +38,25 @@ const NotificationChip = (props: Props) => {
   const isThereASingleUnseenNotification = React.useMemo<boolean>(
     () =>
       !!notifications &&
-      notifications.some((notification) => !notification.seenAt),
+      notifications.some(notification => !notification.seenAt),
     [notifications]
   );
 
-  const onMarkAllAsRead = React.useCallback(async () => {
-    if (!notifications || !profile) return;
+  const onMarkAllAsRead = React.useCallback(
+    async () => {
+      if (!notifications || !profile) return;
 
-    const mostRecentNotification = notifications[0];
-    if (!mostRecentNotification) return;
+      const mostRecentNotification = notifications[0];
+      if (!mostRecentNotification) return;
 
-    await markNotificationsAsSeen(getAuthorizationHeader, {
-      allStartingFromNotificationId: mostRecentNotification.id,
-      userId: profile.id,
-    });
-    await onRefreshNotifications();
-  }, [notifications, profile, getAuthorizationHeader, onRefreshNotifications]);
+      await markNotificationsAsSeen(getAuthorizationHeader, {
+        allStartingFromNotificationId: mostRecentNotification.id,
+        userId: profile.id,
+      });
+      await onRefreshNotifications();
+    },
+    [notifications, profile, getAuthorizationHeader, onRefreshNotifications]
+  );
 
   const onMarkNotificationAsSeen = React.useCallback(
     async (notification: Notification) => {
@@ -78,7 +81,7 @@ const NotificationChip = (props: Props) => {
     <>
       <IconButton
         size="small"
-        onClick={(e) => {
+        onClick={e => {
           setAnchorEl(e.currentTarget);
         }}
       >

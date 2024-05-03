@@ -110,9 +110,9 @@ const styles = {
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator?: ?Array<PrivateGameTemplateListingData>,
-  onGameTemplateOpen: (PrivateGameTemplateListingData) => void,
-  onAssetPackOpen?: (PrivateAssetPackListingData) => void,
-  onCreateWithGameTemplate: (PrivateGameTemplateListingData) => void,
+  onGameTemplateOpen: PrivateGameTemplateListingData => void,
+  onAssetPackOpen?: PrivateAssetPackListingData => void,
+  onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
   simulateAppStoreProduct?: boolean,
 |};
 
@@ -139,8 +139,9 @@ const PrivateGameTemplateInformationPage = ({
   const { openCreditsPackageDialog, openCreditsUsageDialog } = React.useContext(
     CreditsPackageStoreContext
   );
-  const [gameTemplate, setGameTemplate] =
-    React.useState<?PrivateGameTemplate>(null);
+  const [gameTemplate, setGameTemplate] = React.useState<?PrivateGameTemplate>(
+    null
+  );
   const [selectedUsageType, setSelectedUsageType] = React.useState<string>(
     privateGameTemplateListingData.prices[0].usageType
   );
@@ -149,10 +150,14 @@ const PrivateGameTemplateInformationPage = ({
     setPurchasingPrivateGameTemplateListingData,
   ] = React.useState<?PrivateGameTemplateListingData>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
-  const [openSellerPublicProfileDialog, setOpenSellerPublicProfileDialog] =
-    React.useState<boolean>(false);
-  const [sellerPublicProfile, setSellerPublicProfile] =
-    React.useState<?UserPublicProfile>(null);
+  const [
+    openSellerPublicProfileDialog,
+    setOpenSellerPublicProfileDialog,
+  ] = React.useState<boolean>(false);
+  const [
+    sellerPublicProfile,
+    setSellerPublicProfile,
+  ] = React.useState<?UserPublicProfile>(null);
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const { windowSize, isLandscape, isMediumScreen } = useResponsiveWindowSize();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
@@ -216,8 +221,7 @@ const PrivateGameTemplateInformationPage = ({
   const otherTemplatesFromTheSameAuthorTiles = React.useMemo(
     () =>
       getOtherProductsFromSameAuthorTiles({
-        otherProductListingDatasFromSameCreator:
-          privateGameTemplateListingDatasFromSameCreator,
+        otherProductListingDatasFromSameCreator: privateGameTemplateListingDatasFromSameCreator,
         currentProductListingData: privateGameTemplateListingData,
         receivedProducts: receivedGameTemplates,
         onProductOpen: onGameTemplateOpen,
@@ -230,143 +234,152 @@ const PrivateGameTemplateInformationPage = ({
     ]
   );
 
-  React.useEffect(() => {
-    (async () => {
-      setIsFetching(true);
-      try {
-        const [gameTemplate, profile] = await Promise.all([
-          getPrivateGameTemplate(id),
-          getUserPublicProfile(sellerId),
-        ]);
+  React.useEffect(
+    () => {
+      (async () => {
+        setIsFetching(true);
+        try {
+          const [gameTemplate, profile] = await Promise.all([
+            getPrivateGameTemplate(id),
+            getUserPublicProfile(sellerId),
+          ]);
 
-        setGameTemplate(gameTemplate);
-        setSellerPublicProfile(profile);
-      } catch (error) {
-        const extractedStatusAndCode =
-          extractGDevelopApiErrorStatusAndCode(error);
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setErrorText(
-            <Trans>
-              Game template not found - An error occurred, please try again
-              later.
-            </Trans>
+          setGameTemplate(gameTemplate);
+          setSellerPublicProfile(profile);
+        } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
           );
-        } else {
-          setErrorText(
-            <Trans>An error occurred, please try again later.</Trans>
-          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+            setErrorText(
+              <Trans>
+                Game template not found - An error occurred, please try again
+                later.
+              </Trans>
+            );
+          } else {
+            setErrorText(
+              <Trans>An error occurred, please try again later.</Trans>
+            );
+          }
+        } finally {
+          setIsFetching(false);
         }
-      } finally {
-        setIsFetching(false);
+      })();
+    },
+    [id, sellerId]
+  );
+
+  const onClickBuy = React.useCallback(
+    async () => {
+      if (!gameTemplate) return;
+      if (isAlreadyReceived) {
+        onCreateWithGameTemplate(privateGameTemplateListingData);
+        return;
       }
-    })();
-  }, [id, sellerId]);
 
-  const onClickBuy = React.useCallback(async () => {
-    if (!gameTemplate) return;
-    if (isAlreadyReceived) {
-      onCreateWithGameTemplate(privateGameTemplateListingData);
-      return;
-    }
+      try {
+        const price = privateGameTemplateListingData.prices.find(
+          price => price.usageType === selectedUsageType
+        );
 
-    try {
-      const price = privateGameTemplateListingData.prices.find(
-        (price) => price.usageType === selectedUsageType
-      );
+        sendGameTemplateBuyClicked({
+          gameTemplateId: gameTemplate.id,
+          gameTemplateName: gameTemplate.name,
+          gameTemplateTag: gameTemplate.tag,
+          currency: price ? price.currency : undefined,
+          usageType: selectedUsageType,
+        });
+
+        setPurchasingPrivateGameTemplateListingData(
+          privateGameTemplateListingData
+        );
+      } catch (e) {
+        console.warn('Unable to send event', e);
+      }
+    },
+    [
+      gameTemplate,
+      privateGameTemplateListingData,
+      isAlreadyReceived,
+      onCreateWithGameTemplate,
+      selectedUsageType,
+    ]
+  );
+
+  const onClickBuyWithCredits = React.useCallback(
+    async () => {
+      if (!privateGameTemplateListingData || !gameTemplate) return;
+
+      if (!profile || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
+
+      if (isAlreadyReceived) {
+        onCreateWithGameTemplate(privateGameTemplateListingData);
+        return;
+      }
 
       sendGameTemplateBuyClicked({
         gameTemplateId: gameTemplate.id,
         gameTemplateName: gameTemplate.name,
         gameTemplateTag: gameTemplate.tag,
-        currency: price ? price.currency : undefined,
         usageType: selectedUsageType,
+        currency: 'CREDITS',
       });
 
-      setPurchasingPrivateGameTemplateListingData(
-        privateGameTemplateListingData
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const gameTemplatePriceForUsageType = privateGameTemplateListingData.creditPrices.find(
+        price => price.usageType === selectedUsageType
       );
-    } catch (e) {
-      console.warn('Unable to send event', e);
-    }
-  }, [
-    gameTemplate,
-    privateGameTemplateListingData,
-    isAlreadyReceived,
-    onCreateWithGameTemplate,
-    selectedUsageType,
-  ]);
+      if (!gameTemplatePriceForUsageType) {
+        console.error(
+          'Unable to find the price for the selected usage type',
+          selectedUsageType
+        );
+        return;
+      }
+      const gameTemplateCreditsAmount = gameTemplatePriceForUsageType.amount;
+      if (currentCreditsAmount < gameTemplateCreditsAmount) {
+        openCreditsPackageDialog({
+          missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,
+        });
+        return;
+      }
 
-  const onClickBuyWithCredits = React.useCallback(async () => {
-    if (!privateGameTemplateListingData || !gameTemplate) return;
-
-    if (!profile || !limits) {
-      // User not logged in, suggest to log in.
-      onOpenLoginDialog();
-      return;
-    }
-
-    if (isAlreadyReceived) {
-      onCreateWithGameTemplate(privateGameTemplateListingData);
-      return;
-    }
-
-    sendGameTemplateBuyClicked({
-      gameTemplateId: gameTemplate.id,
-      gameTemplateName: gameTemplate.name,
-      gameTemplateTag: gameTemplate.tag,
-      usageType: selectedUsageType,
-      currency: 'CREDITS',
-    });
-
-    const currentCreditsAmount = limits.credits.userBalance.amount;
-    const gameTemplatePriceForUsageType =
-      privateGameTemplateListingData.creditPrices.find(
-        (price) => price.usageType === selectedUsageType
-      );
-    if (!gameTemplatePriceForUsageType) {
-      console.error(
-        'Unable to find the price for the selected usage type',
-        selectedUsageType
-      );
-      return;
-    }
-    const gameTemplateCreditsAmount = gameTemplatePriceForUsageType.amount;
-    if (currentCreditsAmount < gameTemplateCreditsAmount) {
-      openCreditsPackageDialog({
-        missingCredits: gameTemplateCreditsAmount - currentCreditsAmount,
+      openCreditsUsageDialog({
+        title: <Trans>Purchase {gameTemplate.name}</Trans>,
+        message: (
+          <Trans>
+            You are about to use {gameTemplateCreditsAmount} credits to purchase
+            the game template {gameTemplate.name}. Continue?
+          </Trans>
+        ),
+        onConfirm: () =>
+          buyProductWithCredits(getAuthorizationHeader, {
+            productId: privateGameTemplateListingData.id,
+            usageType: selectedUsageType,
+            userId: profile.id,
+          }),
+        successMessage: <Trans>🎉 You can now use your template!</Trans>,
       });
-      return;
-    }
-
-    openCreditsUsageDialog({
-      title: <Trans>Purchase {gameTemplate.name}</Trans>,
-      message: (
-        <Trans>
-          You are about to use {gameTemplateCreditsAmount} credits to purchase
-          the game template {gameTemplate.name}. Continue?
-        </Trans>
-      ),
-      onConfirm: () =>
-        buyProductWithCredits(getAuthorizationHeader, {
-          productId: privateGameTemplateListingData.id,
-          usageType: selectedUsageType,
-          userId: profile.id,
-        }),
-      successMessage: <Trans>🎉 You can now use your template!</Trans>,
-    });
-  }, [
-    profile,
-    limits,
-    privateGameTemplateListingData,
-    gameTemplate,
-    onCreateWithGameTemplate,
-    isAlreadyReceived,
-    openCreditsPackageDialog,
-    selectedUsageType,
-    openCreditsUsageDialog,
-    getAuthorizationHeader,
-    onOpenLoginDialog,
-  ]);
+    },
+    [
+      profile,
+      limits,
+      privateGameTemplateListingData,
+      gameTemplate,
+      onCreateWithGameTemplate,
+      isAlreadyReceived,
+      openCreditsPackageDialog,
+      selectedUsageType,
+      openCreditsUsageDialog,
+      getAuthorizationHeader,
+      onOpenLoginDialog,
+    ]
+  );
 
   const mediaItems = React.useMemo(
     () =>
@@ -464,7 +477,7 @@ const PrivateGameTemplateInformationPage = ({
                           />
                         </Line>
                         {!isAlreadyReceived &&
-                          !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
+                        !privateGameTemplateListingData.includedListableProductIds && ( // Bundles don't have a preview link.
                             <Column noMargin>
                               <RaisedButton
                                 primary

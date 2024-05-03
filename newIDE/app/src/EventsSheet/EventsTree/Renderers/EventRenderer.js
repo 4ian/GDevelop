@@ -19,28 +19,28 @@ export type EventRendererProps = {
 
   onUpdate: () => void,
   selected: boolean,
-  onAddNewInstruction: (InstructionsListContext) => void,
-  onPasteInstructions: (InstructionsListContext) => void,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: (InstructionContext) => void,
-  onInstructionDoubleClick: (InstructionContext) => void,
+  onInstructionClick: InstructionContext => void,
+  onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: (ParameterContext) => void,
+  onParameterClick: ParameterContext => void,
   onEndEditingEvent: () => void,
   selection: any,
 
-  onOpenLayout: (string) => void,
-  onOpenExternalEvents: (string) => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
 
   leftIndentWidth: number,
-  renderObjectThumbnail: (string) => React.Node,
+  renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
   windowSize: WindowSizeType,

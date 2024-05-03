@@ -34,11 +34,14 @@ export default function EventsBasedBehaviorEditorPanel({
 }: Props) {
   const [currentTab, setCurrentTab] = React.useState<TabName>('configuration');
 
-  const onPropertiesUpdated = React.useCallback(() => {
-    if (unsavedChanges) {
-      unsavedChanges.triggerUnsavedChanges();
-    }
-  }, [unsavedChanges]);
+  const onPropertiesUpdated = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+    },
+    [unsavedChanges]
+  );
 
   return (
     <Background>

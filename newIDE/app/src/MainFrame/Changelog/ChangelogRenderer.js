@@ -76,7 +76,7 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
           be made to your project.
         </AlertMessage>
       )}
-      {releases.map((release) =>
+      {releases.map(release =>
         release.name ? (
           <MarkdownText
             key={release.name}

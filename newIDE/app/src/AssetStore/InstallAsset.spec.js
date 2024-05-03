@@ -128,7 +128,10 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added.
       expect(
-        project.getResourcesManager().getAllResourceNames().toJSArray()
+        project
+          .getResourcesManager()
+          .getAllResourceNames()
+          .toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'player-ship1.png',
@@ -166,7 +169,10 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added.
       expect(
-        project.getResourcesManager().getAllResourceNames().toJSArray()
+        project
+          .getResourcesManager()
+          .getAllResourceNames()
+          .toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'renamed-player-ship1.png',
@@ -201,7 +207,10 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added
       expect(
-        project.getResourcesManager().getAllResourceNames().toJSArray()
+        project
+          .getResourcesManager()
+          .getAllResourceNames()
+          .toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'player-ship1.png',
@@ -209,7 +218,10 @@ describe('InstallAsset', () => {
         'player-ship2.png',
       ]);
       expect(
-        project.getResourcesManager().getResource('player-ship1.png2').getFile()
+        project
+          .getResourcesManager()
+          .getResource('player-ship1.png2')
+          .getFile()
       ).toBe('https://example.com/player-ship1.png');
 
       // Verify the resource names used by the object

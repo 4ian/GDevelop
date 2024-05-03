@@ -18,22 +18,25 @@ const Changelog = ({ onUpdated }: Props) => {
   const [releases, setReleases] = React.useState<?Array<Release>>(null);
   const [error, setError] = React.useState<?Error>(null);
 
-  React.useEffect(() => {
-    getReleases()
-      .then((releases) => {
-        setError(null);
-        setReleases(releases);
-        if (onUpdated) {
-          onUpdated();
-        }
-      })
-      .catch((error: ?Error) => {
-        setError(error);
-        if (onUpdated) {
-          onUpdated();
-        }
-      });
-  }, [onUpdated]);
+  React.useEffect(
+    () => {
+      getReleases()
+        .then(releases => {
+          setError(null);
+          setReleases(releases);
+          if (onUpdated) {
+            onUpdated();
+          }
+        })
+        .catch((error: ?Error) => {
+          setError(error);
+          if (onUpdated) {
+            onUpdated();
+          }
+        });
+    },
+    [onUpdated]
+  );
 
   return (
     <ChangelogRenderer

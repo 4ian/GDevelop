@@ -37,21 +37,24 @@ function ConfirmDeleteDialog(props: Props) {
     setTextInput('');
   };
 
-  React.useEffect(() => {
-    if (open && shouldAutofocus && !confirmText) {
-      // If the dialog is opened and autofocus should be set and there is no confirm text
-      // to enter, focus Confirm button to enable quick deletion with only keyboard navigation.
-      setTimeout(
-        () => {
-          if (confirmButtonRef.current) {
-            confirmButtonRef.current.focus();
-          }
-        },
-        // Wait for component to be mounted so that confirmButtonRef targets something.
-        50
-      );
-    }
-  }, [open, shouldAutofocus, confirmText]);
+  React.useEffect(
+    () => {
+      if (open && shouldAutofocus && !confirmText) {
+        // If the dialog is opened and autofocus should be set and there is no confirm text
+        // to enter, focus Confirm button to enable quick deletion with only keyboard navigation.
+        setTimeout(
+          () => {
+            if (confirmButtonRef.current) {
+              confirmButtonRef.current.focus();
+            }
+          },
+          // Wait for component to be mounted so that confirmButtonRef targets something.
+          50
+        );
+      }
+    },
+    [open, shouldAutofocus, confirmText]
+  );
 
   return (
     <I18n>

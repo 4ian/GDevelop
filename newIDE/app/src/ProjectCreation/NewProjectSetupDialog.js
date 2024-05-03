@@ -112,39 +112,49 @@ const NewProjectSetupDialog = ({
     selectedExampleShortHeader
       ? `${generateName()} (${selectedExampleShortHeader.name})`
       : selectedPrivateGameTemplateListingData
-        ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
-        : generateName();
+      ? `${generateName()} (${selectedPrivateGameTemplateListingData.name})`
+      : generateName();
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
   const { showAlert } = useAlertDialog();
   const isOnline = useOnlineStatus();
-  const { values, setNewProjectsDefaultStorageProviderName } =
-    React.useContext(PreferencesContext);
-  const { currentlyRunningInAppTutorial } =
-    React.useContext(InAppTutorialContext);
+  const { values, setNewProjectsDefaultStorageProviderName } = React.useContext(
+    PreferencesContext
+  );
+  const { currentlyRunningInAppTutorial } = React.useContext(
+    InAppTutorialContext
+  );
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const [projectNameError, setProjectNameError] =
-    React.useState<?React.Node>(null);
+  const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
+    null
+  );
   const [projectName, setProjectName] = React.useState<string>(
     generateProjectName()
   );
   const [generationPrompt, setGenerationPrompt] = React.useState<string>('');
-  const [isGeneratingProject, setIsGeneratingProject] =
-    React.useState<boolean>(false);
-  const [generatingProjectId, setGeneratingProjectId] =
-    React.useState<?string>(null);
-  const [resolutionOption, setResolutionOption] =
-    React.useState<ResolutionOption>('desktopMobileLandscape');
-  const [customWidth, setCustomWidth] =
-    React.useState<?number>(defaultCustomWidth);
-  const [customHeight, setCustomHeight] =
-    React.useState<?number>(defaultCustomHeight);
-  const [optimizeForPixelArt, setOptimizeForPixelArt] =
-    React.useState<boolean>(false);
+  const [isGeneratingProject, setIsGeneratingProject] = React.useState<boolean>(
+    false
+  );
+  const [generatingProjectId, setGeneratingProjectId] = React.useState<?string>(
+    null
+  );
+  const [
+    resolutionOption,
+    setResolutionOption,
+  ] = React.useState<ResolutionOption>('desktopMobileLandscape');
+  const [customWidth, setCustomWidth] = React.useState<?number>(
+    defaultCustomWidth
+  );
+  const [customHeight, setCustomHeight] = React.useState<?number>(
+    defaultCustomHeight
+  );
+  const [optimizeForPixelArt, setOptimizeForPixelArt] = React.useState<boolean>(
+    false
+  );
   const [allowPlayersToLogIn, setAllowPlayersToLogIn] = React.useState<boolean>(
     // Enable player login by default for new games, unless a tutorial is running or offline.
     !!currentlyRunningInAppTutorial || !isOnline ? false : true
@@ -249,52 +259,56 @@ const NewProjectSetupDialog = ({
     (hasNotSelectedAStorageProvider &&
       !shouldAllowCreatingProjectWithoutSaving);
 
-  const generateProject = React.useCallback(async () => {
-    if (shouldNotAllowCreatingProject) return;
-    if (!profile) return;
+  const generateProject = React.useCallback(
+    async () => {
+      if (shouldNotAllowCreatingProject) return;
+      if (!profile) return;
 
-    setIsGeneratingProject(true);
-    try {
-      const generatedProject = await createGeneratedProject(
-        getAuthorizationHeader,
-        {
-          userId: profile.id,
-          prompt: generationPrompt,
-          width: selectedWidth,
-          height: selectedHeight,
-          projectName,
+      setIsGeneratingProject(true);
+      try {
+        const generatedProject = await createGeneratedProject(
+          getAuthorizationHeader,
+          {
+            userId: profile.id,
+            prompt: generationPrompt,
+            width: selectedWidth,
+            height: selectedHeight,
+            projectName,
+          }
+        );
+        setGeneratingProjectId(generatedProject.id);
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.code === 'project-generation/quota-exceeded'
+        ) {
+          setGenerationPrompt('');
+          // Fetch the limits again to show the warning about quota.
+          await authenticatedUser.onRefreshLimits();
+        } else {
+          showAlert({
+            title: t`Unable to generate project`,
+            message: t`Looks like the AI service is not available. Please try again later or create a project without a prompt.`,
+          });
         }
-      );
-      setGeneratingProjectId(generatedProject.id);
-    } catch (error) {
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
-      if (
-        extractedStatusAndCode &&
-        extractedStatusAndCode.code === 'project-generation/quota-exceeded'
-      ) {
-        setGenerationPrompt('');
-        // Fetch the limits again to show the warning about quota.
-        await authenticatedUser.onRefreshLimits();
-      } else {
-        showAlert({
-          title: t`Unable to generate project`,
-          message: t`Looks like the AI service is not available. Please try again later or create a project without a prompt.`,
-        });
+        setIsGeneratingProject(false);
       }
-      setIsGeneratingProject(false);
-    }
-  }, [
-    shouldNotAllowCreatingProject,
-    getAuthorizationHeader,
-    generationPrompt,
-    profile,
-    projectName,
-    showAlert,
-    authenticatedUser,
-    selectedHeight,
-    selectedWidth,
-  ]);
+    },
+    [
+      shouldNotAllowCreatingProject,
+      getAuthorizationHeader,
+      generationPrompt,
+      profile,
+      projectName,
+      showAlert,
+      authenticatedUser,
+      selectedHeight,
+      selectedWidth,
+    ]
+  );
 
   const onValidate = React.useCallback(
     async (i18n: I18nType) => {
@@ -424,7 +438,7 @@ const NewProjectSetupDialog = ({
           <ColumnStackLayout noMargin>
             {isStartingProjectFromScratch && (
               <ResolutionOptions
-                onClick={(key) => setResolutionOption(key)}
+                onClick={key => setResolutionOption(key)}
                 selectedOption={resolutionOption}
                 disabled={isLoading}
                 customHeight={customHeight}
@@ -476,10 +490,10 @@ const NewProjectSetupDialog = ({
                 // (for example: the "URL" storage provider, which is read only,
                 // or the "DownloadFile" storage provider, which is not a persistent storage).
                 .filter(
-                  (storageProvider) =>
+                  storageProvider =>
                     !!storageProvider.renderNewProjectSaveAsLocationChooser
                 )
-                .map((storageProvider) => (
+                .map(storageProvider => (
                   <SelectOption
                     key={storageProvider.internalName}
                     value={storageProvider.internalName}

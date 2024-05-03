@@ -37,26 +37,29 @@ export const useWindowControlsOverlayWatcher = ({
   // $FlowFixMe - this API is not handled by Flow.
   const { windowControlsOverlay } = navigator;
 
-  React.useEffect(() => {
-    let listenerCallback = null;
-    if (windowControlsOverlay) {
-      listenerCallback = debounce(() => {
-        onChanged();
-      }, 50);
-      windowControlsOverlay.addEventListener(
-        'geometrychange',
-        listenerCallback
-      );
-    }
-    return () => {
-      if (listenerCallback) {
-        windowControlsOverlay.removeEventListener(
+  React.useEffect(
+    () => {
+      let listenerCallback = null;
+      if (windowControlsOverlay) {
+        listenerCallback = debounce(() => {
+          onChanged();
+        }, 50);
+        windowControlsOverlay.addEventListener(
           'geometrychange',
           listenerCallback
         );
       }
-    };
-  }, [onChanged, windowControlsOverlay]);
+      return () => {
+        if (listenerCallback) {
+          windowControlsOverlay.removeEventListener(
+            'geometrychange',
+            listenerCallback
+          );
+        }
+      };
+    },
+    [onChanged, windowControlsOverlay]
+  );
 };
 
 /**
@@ -302,7 +305,7 @@ export default class Window {
         'electron-editor-context-menu'
       );
 
-      window.addEventListener('contextmenu', function (e) {
+      window.addEventListener('contextmenu', function(e) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) return;
 
@@ -311,12 +314,12 @@ export default class Window {
         // The 'contextmenu' event is emitted after 'selectionchange' has fired but possibly before the
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
-        setTimeout(function () {
+        setTimeout(function() {
           menu.popup({ window: remote.getCurrentWindow() });
         }, 30);
       });
     } else if (document) {
-      document.addEventListener('contextmenu', function (e: any) {
+      document.addEventListener('contextmenu', function(e: any) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();

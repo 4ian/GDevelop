@@ -97,7 +97,7 @@ const getObjectAssetResourcesByName = (
 ): { [string]: any /*(serialized gdResource)*/ } => {
   const resourcesByName = {};
 
-  objectAsset.resources.forEach((resource) => {
+  objectAsset.resources.forEach(resource => {
     resourcesByName[resource.name] = resource;
   });
 
@@ -129,18 +129,22 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       useSearchItem,
     } = React.useContext(AssetStoreContext);
     const [asset, setAsset] = React.useState<?Asset>(null);
-    const [selectedAnimationName, setSelectedAnimationName] =
-      React.useState<?string>(null);
+    const [
+      selectedAnimationName,
+      setSelectedAnimationName,
+    ] = React.useState<?string>(null);
     const [error, setError] = React.useState<?Error>(null);
     const isAssetPrivate = isPrivateAsset(assetShortHeader);
     const { fetchPrivateAsset } = React.useContext(
       PrivateAssetsAuthorizationContext
     );
     const [authorPublicProfiles, setAuthorPublicProfiles] = React.useState<
-      UserPublicProfile[],
+      UserPublicProfile[]
     >([]);
-    const [selectedAuthorPublicProfile, setSelectedAuthorPublicProfile] =
-      React.useState<?UserPublicProfile>(null);
+    const [
+      selectedAuthorPublicProfile,
+      setSelectedAuthorPublicProfile,
+    ] = React.useState<?UserPublicProfile>(null);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -170,79 +174,92 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
       };
     };
 
-    const loadAsset = React.useCallback(() => {
-      (async () => {
-        try {
-          // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
-          setAsset(null);
-          const loadedAsset = isAssetPrivate
-            ? await fetchPrivateAsset(assetShortHeader, {
-                environment,
-              })
-            : await getPublicAsset(assetShortHeader, {
-                environment,
-              });
-          if (!loadedAsset) {
-            console.error('Cannot load private asset');
-            throw new Error('Cannot load private asset');
-          }
-          setAsset(loadedAsset);
+    const loadAsset = React.useCallback(
+      () => {
+        (async () => {
+          try {
+            // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
+            setAsset(null);
+            const loadedAsset = isAssetPrivate
+              ? await fetchPrivateAsset(assetShortHeader, {
+                  environment,
+                })
+              : await getPublicAsset(assetShortHeader, {
+                  environment,
+                });
+            if (!loadedAsset) {
+              console.error('Cannot load private asset');
+              throw new Error('Cannot load private asset');
+            }
+            setAsset(loadedAsset);
 
-          if (loadedAsset.objectType === 'sprite') {
-            // Only sprites have animations and we select the first one.
-            const firstAnimationName =
-              loadedAsset.objectAssets[0].object.animations[0].name;
-            setSelectedAnimationName(firstAnimationName);
+            if (loadedAsset.objectType === 'sprite') {
+              // Only sprites have animations and we select the first one.
+              const firstAnimationName =
+                loadedAsset.objectAssets[0].object.animations[0].name;
+              setSelectedAnimationName(firstAnimationName);
+            }
+          } catch (error) {
+            console.error('Error while loading asset:', error);
+            setError(error);
           }
-        } catch (error) {
-          console.error('Error while loading asset:', error);
-          setError(error);
-        }
-        onAssetLoaded && onAssetLoaded();
-      })();
-    }, [
-      onAssetLoaded,
-      isAssetPrivate,
-      fetchPrivateAsset,
-      assetShortHeader,
-      environment,
-    ]);
+          onAssetLoaded && onAssetLoaded();
+        })();
+      },
+      [
+        onAssetLoaded,
+        isAssetPrivate,
+        fetchPrivateAsset,
+        assetShortHeader,
+        environment,
+      ]
+    );
 
     const isImageResourceSmooth = React.useMemo(
       () => !isPixelArt(assetShortHeader),
       [assetShortHeader]
     );
 
-    React.useEffect(() => {
-      if (!asset) {
-        loadAsset();
-      }
-    }, [asset, loadAsset]);
+    React.useEffect(
+      () => {
+        if (!asset) {
+          loadAsset();
+        }
+      },
+      [asset, loadAsset]
+    );
 
-    const loadAuthorPublicProfiles = React.useCallback(async () => {
-      try {
-        const authorIds: Array<string> = (asset && asset.authorIds) || [];
-        if (authorIds.length === 0) return;
-        const userPublicProfileByIds =
-          await getUserPublicProfilesByIds(authorIds);
-        const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
-          (id) => userPublicProfileByIds[id]
-        );
-        setAuthorPublicProfiles(userPublicProfiles);
-      } catch (error) {
-        // Catch error, but don't display it to the user.
-        console.error('Error while loading author public profiles:', error);
-      }
-    }, [asset]);
+    const loadAuthorPublicProfiles = React.useCallback(
+      async () => {
+        try {
+          const authorIds: Array<string> = (asset && asset.authorIds) || [];
+          if (authorIds.length === 0) return;
+          const userPublicProfileByIds = await getUserPublicProfilesByIds(
+            authorIds
+          );
+          const userPublicProfiles = Object.keys(userPublicProfileByIds).map(
+            id => userPublicProfileByIds[id]
+          );
+          setAuthorPublicProfiles(userPublicProfiles);
+        } catch (error) {
+          // Catch error, but don't display it to the user.
+          console.error('Error while loading author public profiles:', error);
+        }
+      },
+      [asset]
+    );
 
-    React.useEffect(() => {
-      loadAuthorPublicProfiles();
-    }, [loadAuthorPublicProfiles]);
+    React.useEffect(
+      () => {
+        loadAuthorPublicProfiles();
+      },
+      [loadAuthorPublicProfiles]
+    );
 
     const assetAuthors: ?Array<Author> =
       asset && authors
         ? asset.authors
-            .map((authorName) => {
+            .map(authorName => {
               return authors.find(({ name }) => name === authorName);
             })
             .filter(Boolean)
@@ -273,7 +290,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
     const direction = animation ? animation.directions[0] : null;
     const animationResources =
       asset && direction
-        ? direction.sprites.map((sprite) => assetResources[sprite.image])
+        ? direction.sprites.map(sprite => assetResources[sprite.image])
         : null;
 
     const similarAssetFilters = React.useMemo(
@@ -298,7 +315,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                       <Trans>by</Trans>
                     </Text>
                     {!!assetAuthors &&
-                      assetAuthors.map((author) => (
+                      assetAuthors.map(author => (
                         <Text size="body" key={author.name}>
                           <Link
                             key={author.name}
@@ -312,7 +329,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         </Text>
                       ))}
                     {!!authorPublicProfiles.length &&
-                      authorPublicProfiles.map((userPublicProfile) => {
+                      authorPublicProfiles.map(userPublicProfile => {
                         const username =
                           userPublicProfile.username || 'GDevelop user';
                         return (
@@ -372,8 +389,8 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               {asset ? (
                 <>
                   {asset.objectType === 'sprite' &&
-                    animationResources &&
-                    typeof selectedAnimationName === 'string' && // Animation name can be empty string.
+                  animationResources &&
+                  typeof selectedAnimationName === 'string' && // Animation name can be empty string.
                     direction && (
                       <AnimationPreview
                         animationName={selectedAnimationName}
@@ -427,10 +444,9 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         <IconButton
                           size="small"
                           onClick={() => {
-                            const previousAnimationIndex =
-                              assetAnimations.findIndex(
-                                ({ name }) => name === selectedAnimationName
-                              );
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
                             const newAnimationIndex =
                               previousAnimationIndex === 0
                                 ? assetAnimations.length - 1
@@ -453,7 +469,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         textAlign="center"
                         disableUnderline
                       >
-                        {assetAnimations.map((animation) => {
+                        {assetAnimations.map(animation => {
                           const isAnimationNameEmpty = !animation.name;
                           return (
                             <SelectOption
@@ -473,10 +489,9 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
                         <IconButton
                           size="small"
                           onClick={() => {
-                            const previousAnimationIndex =
-                              assetAnimations.findIndex(
-                                ({ name }) => name === selectedAnimationName
-                              );
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
                             const newAnimationIndex =
                               previousAnimationIndex ===
                               assetAnimations.length - 1
@@ -541,7 +556,7 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
               <Line expand noMargin justifyContent="center">
                 <AssetsList
                   assetShortHeaders={truncatedSearchResults}
-                  onOpenDetails={(assetShortHeader) => {
+                  onOpenDetails={assetShortHeader => {
                     setAsset(null);
                     onOpenDetails(assetShortHeader);
                   }}
@@ -562,11 +577,11 @@ export const AssetDetails = React.forwardRef<Props, AssetDetailsInterface>(
             <PublicProfileDialog
               userId={selectedAuthorPublicProfile.id}
               onClose={() => setSelectedAuthorPublicProfile(null)}
-              onAssetPackOpen={(assetPack) => {
+              onAssetPackOpen={assetPack => {
                 onPrivateAssetPackSelection(assetPack);
                 setSelectedAuthorPublicProfile(null);
               }}
-              onGameTemplateOpen={(gameTemplate) => {
+              onGameTemplateOpen={gameTemplate => {
                 onPrivateGameTemplateSelection(gameTemplate);
                 setSelectedAuthorPublicProfile(null);
               }}

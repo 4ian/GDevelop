@@ -1,5 +1,6 @@
 // @flow
 
+/*::
 export type TestProject = {|
   project: gdProject,
   shapePainterObjectConfiguration: gdObjectConfiguration,
@@ -52,13 +53,15 @@ export type TestProject = {|
   unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
   emptyObjectsContainer: gdObjectsContainer,
 |};
+*/
+
 /**
  * Create a dummy project using libGD.js filled with a
  * few elements that can be used for testing.
  *
  * @param gd The GD instance to use to create the project.
  */
-export const makeTestProject = (gd: libGDevelop): TestProject => {
+export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create and expose a game project
   const project = gd.ProjectHelper.createNewGDJSProject();
 
@@ -509,7 +512,7 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
   jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
-  const makeKeyPressedCondition = (key) => {
+  const makeKeyPressedCondition = key => {
     const condition = new gd.Instruction();
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
@@ -517,7 +520,7 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
     return condition; // This leaks memory if not deleted
   };
 
-  const makeMouseButtonPressedCondition = (button) => {
+  const makeMouseButtonPressedCondition = button => {
     const condition = new gd.Instruction();
     condition.setType('SourisBouton');
     condition.setParametersCount(2);
@@ -525,7 +528,7 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
     return condition; // This leaks memory if not deleted
   };
 
-  const makeDeleteAction = (objectToDelete) => {
+  const makeDeleteAction = objectToDelete => {
     var action = new gd.Instruction(); //Add a simple action
     action.setType('Delete');
     action.setParametersCount(2);
@@ -642,11 +645,10 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
   const emptyEventsList = new gd.EventsList();
 
   // Events functions extension
-  const someAlreadyInstalledExtension =
-    project.insertNewEventsFunctionsExtension(
-      'SomeAlreadyInstalledExtension',
-      0
-    );
+  const someAlreadyInstalledExtension = project.insertNewEventsFunctionsExtension(
+    'SomeAlreadyInstalledExtension',
+    0
+  );
   someAlreadyInstalledExtension.setNamespace('SomeAlreadyInstalledExtension');
   someAlreadyInstalledExtension.setName('SomeAlreadyInstalledExtension');
   someAlreadyInstalledExtension.setFullName(
@@ -655,8 +657,10 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
   someAlreadyInstalledExtension.setVersion('1.2.3');
 
   // Events functions extension
-  const testEventsFunctionsExtension =
-    project.insertNewEventsFunctionsExtension('TestExt', 0);
+  const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+    'TestExt',
+    0
+  );
   testEventsFunctionsExtension.setNamespace('MyExt');
   testEventsFunctionsExtension.setVersion('1.1');
   testEventsFunctionsExtension.setName('My name');
@@ -664,8 +668,10 @@ export const makeTestProject = (gd: libGDevelop): TestProject => {
   testEventsFunctionsExtension.setDescription('My description');
 
   // Events function
-  const testEventsFunction =
-    testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction', 0);
+  const testEventsFunction = testEventsFunctionsExtension.insertNewEventsFunction(
+    'MyTestFunction',
+    0
+  );
 
   const parameter1 = new gd.ParameterMetadata();
   parameter1.setType('objectList');

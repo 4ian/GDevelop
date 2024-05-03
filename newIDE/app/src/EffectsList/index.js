@@ -57,10 +57,12 @@ const gd: libGDevelop = global.gd;
 
 const EFFECTS_CLIPBOARD_KIND = 'Effects';
 
-const DragSourceAndDropTarget2D =
-  makeDragSourceAndDropTarget('2d-effects-list');
-const DragSourceAndDropTarget3D =
-  makeDragSourceAndDropTarget('3d-effects-list');
+const DragSourceAndDropTarget2D = makeDragSourceAndDropTarget(
+  '2d-effects-list'
+);
+const DragSourceAndDropTarget3D = makeDragSourceAndDropTarget(
+  '3d-effects-list'
+);
 
 const styles = {
   rowContainer: {
@@ -80,9 +82,9 @@ export const useEffectOverridingAlertDialog = () => {
   return async (existingEffectNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
       title: t`Existing effects`,
-      message: t`These effects already exist:${
-        '\n\n - ' + existingEffectNames.join('\n\n - ') + '\n\n'
-      }Do you want to replace them?`,
+      message: t`These effects already exist:${'\n\n - ' +
+        existingEffectNames.join('\n\n - ') +
+        '\n\n'}Do you want to replace them?`,
       confirmButtonLabel: t`Replace`,
       dismissButtonLabel: t`Omit`,
     });
@@ -217,7 +219,7 @@ const Effect = React.forwardRef(
                     errorText={nameErrors[effect.ptr]}
                     translatableHintText={t`Enter the effect name`}
                     value={effect.getName()}
-                    onChange={(newName) => {
+                    onChange={newName => {
                       renameEffect(effect, newName);
                     }}
                     fullWidth
@@ -237,7 +239,7 @@ const Effect = React.forwardRef(
                     fullWidth
                     translatableHintText={t`Choose the effect to apply`}
                   >
-                    {allEffectMetadata.map((effectMetadata) => (
+                    {allEffectMetadata.map(effectMetadata => (
                       <SelectOption
                         key={effectMetadata.type}
                         value={effectMetadata.type}
@@ -300,7 +302,7 @@ const Effect = React.forwardRef(
                         resourceManagementProps={resourceManagementProps}
                         renderExtraDescriptionText={
                           showEffectParameterNames
-                            ? (parameterName) =>
+                            ? parameterName =>
                                 i18n._(
                                   t`Property name in events: \`${parameterName}\` `
                                 )
@@ -335,7 +337,7 @@ const getEnumeratedEffectMetadata = (
   effectType: string
 ): ?EnumeratedEffectMetadata => {
   return allEffectDescriptions.find(
-    (effectMetadata) => effectMetadata.type === effectType
+    effectMetadata => effectMetadata.type === effectType
   );
 };
 
@@ -391,21 +393,25 @@ export default function EffectsList(props: Props) {
     target,
   } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
-  const [justAddedEffectName, setJustAddedEffectName] =
-    React.useState<?string>(null);
+  const [justAddedEffectName, setJustAddedEffectName] = React.useState<?string>(
+    null
+  );
   const justAddedEffectElement = React.useRef<?any>(null);
 
-  React.useEffect(() => {
-    if (
-      scrollView.current &&
-      justAddedEffectElement.current &&
-      justAddedEffectName
-    ) {
-      scrollView.current.scrollTo(justAddedEffectElement.current);
-      setJustAddedEffectName(null);
-      justAddedEffectElement.current = null;
-    }
-  }, [justAddedEffectName]);
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedEffectElement.current &&
+        justAddedEffectName
+      ) {
+        scrollView.current.scrollTo(justAddedEffectElement.current);
+        setJustAddedEffectName(null);
+        justAddedEffectElement.current = null;
+      }
+    },
+    [justAddedEffectName]
+  );
 
   const draggedEffect = React.useRef<?gdEffect>(null);
 
@@ -419,32 +425,34 @@ export default function EffectsList(props: Props) {
     [props.project]
   );
 
-  const all3DEffectMetadata = React.useMemo(() => {
-    const lightEffectMetadata = [];
-    const fogEffectMetadata = [];
-    const otherEffectMetadata = [];
-    for (const effect of allEffectMetadata) {
-      if (!effect.isMarkedAsOnlyWorkingFor3D) {
-        continue;
+  const all3DEffectMetadata = React.useMemo(
+    () => {
+      const lightEffectMetadata = [];
+      const fogEffectMetadata = [];
+      const otherEffectMetadata = [];
+      for (const effect of allEffectMetadata) {
+        if (!effect.isMarkedAsOnlyWorkingFor3D) {
+          continue;
+        }
+        if (effect.type.endsWith('Light')) {
+          lightEffectMetadata.push(effect);
+        } else if (effect.type.endsWith('Fog')) {
+          fogEffectMetadata.push(effect);
+        } else {
+          otherEffectMetadata.push(effect);
+        }
       }
-      if (effect.type.endsWith('Light')) {
-        lightEffectMetadata.push(effect);
-      } else if (effect.type.endsWith('Fog')) {
-        fogEffectMetadata.push(effect);
-      } else {
-        otherEffectMetadata.push(effect);
-      }
-    }
-    return [
-      ...lightEffectMetadata,
-      ...fogEffectMetadata,
-      ...otherEffectMetadata,
-    ];
-  }, [allEffectMetadata]);
+      return [
+        ...lightEffectMetadata,
+        ...fogEffectMetadata,
+        ...otherEffectMetadata,
+      ];
+    },
+    [allEffectMetadata]
+  );
 
   const all2DEffectMetadata = React.useMemo(
-    () =>
-      allEffectMetadata.filter((effect) => effect.isMarkedAsOnlyWorkingFor2D),
+    () => allEffectMetadata.filter(effect => effect.isMarkedAsOnlyWorkingFor2D),
     [allEffectMetadata]
   );
 
@@ -472,7 +480,7 @@ export default function EffectsList(props: Props) {
 
   const _addEffect = React.useCallback(
     (is3D: boolean) => {
-      const newName = newNameGenerator('Effect', (name) =>
+      const newName = newNameGenerator('Effect', name =>
         effectsContainer.hasEffectNamed(name)
       );
       const effect = effectsContainer.insertNewEffect(
@@ -522,23 +530,26 @@ export default function EffectsList(props: Props) {
     [forceUpdate]
   );
 
-  const copyAllEffects = React.useCallback(() => {
-    Clipboard.set(
-      EFFECTS_CLIPBOARD_KIND,
-      mapFor(0, effectsContainer.getEffectsCount(), (index: number) => {
-        const effect: gdEffect = effectsContainer.getEffectAt(index);
-        return {
-          name: effect.getName(),
-          type: effect.getEffectType(),
-          serializedEffect: serializeToJSObject(effect),
-        };
-      })
-    );
-    forceUpdate();
-  }, [forceUpdate, effectsContainer]);
+  const copyAllEffects = React.useCallback(
+    () => {
+      Clipboard.set(
+        EFFECTS_CLIPBOARD_KIND,
+        mapFor(0, effectsContainer.getEffectsCount(), (index: number) => {
+          const effect: gdEffect = effectsContainer.getEffectAt(index);
+          return {
+            name: effect.getName(),
+            type: effect.getEffectType(),
+            serializedEffect: serializeToJSObject(effect),
+          };
+        })
+      );
+      forceUpdate();
+    },
+    [forceUpdate, effectsContainer]
+  );
 
   const pasteEffects = React.useCallback(
-    async (effectInsertionIndex) => {
+    async effectInsertionIndex => {
       const clipboardContent = Clipboard.get(EFFECTS_CLIPBOARD_KIND);
       const effectContents = SafeExtractor.extractArray(clipboardContent);
       if (!effectContents) return;
@@ -551,7 +562,7 @@ export default function EffectsList(props: Props) {
         name: string,
         serializedEffect: string,
       }> = [];
-      effectContents.forEach((effectContent) => {
+      effectContents.forEach(effectContent => {
         const name = SafeExtractor.extractStringProperty(effectContent, 'name');
         const type = SafeExtractor.extractStringProperty(effectContent, 'type');
         const serializedEffect = SafeExtractor.extractObjectProperty(
@@ -599,7 +610,7 @@ export default function EffectsList(props: Props) {
       let shouldOverrideEffects = false;
       if (existingNamedEffects.length > 0) {
         shouldOverrideEffects = await showEffectOverridingConfirmation(
-          existingNamedEffects.map((namedEffect) => namedEffect.name)
+          existingNamedEffects.map(namedEffect => namedEffect.name)
         );
 
         if (shouldOverrideEffects) {
@@ -632,9 +643,12 @@ export default function EffectsList(props: Props) {
     ]
   );
 
-  const pasteEffectsAtTheEnd = React.useCallback(async () => {
-    await pasteEffects(effectsContainer.getEffectsCount());
-  }, [effectsContainer, pasteEffects]);
+  const pasteEffectsAtTheEnd = React.useCallback(
+    async () => {
+      await pasteEffects(effectsContainer.getEffectsCount());
+    },
+    [effectsContainer, pasteEffects]
+  );
 
   const pasteEffectsBefore = React.useCallback(
     async (effect: gdEffect) => {
@@ -667,34 +681,37 @@ export default function EffectsList(props: Props) {
 
   const isClipboardContainingEffects = Clipboard.has(EFFECTS_CLIPBOARD_KIND);
 
-  const getDuplicatedUniqueEffectMetadata = React.useCallback(() => {
-    if (effectsContainer.getEffectsCount() < 2) {
-      return null;
-    }
-    const uniqueEffectTypes = [];
-    for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
-      const effect: gdEffect = effectsContainer.getEffectAt(i);
-      const effectType = effect.getEffectType();
-      const effectMetadata = getEnumeratedEffectMetadata(
-        allEffectMetadata,
-        effectType
-      );
-      if (!effectMetadata) {
-        continue;
+  const getDuplicatedUniqueEffectMetadata = React.useCallback(
+    () => {
+      if (effectsContainer.getEffectsCount() < 2) {
+        return null;
       }
-      // TODO Add an `isUnique` attribute in effect metadata if more effect are unique.
-      if (
-        effectType === 'Scene3D::LinearFog' ||
-        effectType === 'Scene3D::ExponentialFog'
-      ) {
-        if (uniqueEffectTypes.includes(effectType)) {
-          return effectMetadata;
+      const uniqueEffectTypes = [];
+      for (let i = 0; i < effectsContainer.getEffectsCount(); i++) {
+        const effect: gdEffect = effectsContainer.getEffectAt(i);
+        const effectType = effect.getEffectType();
+        const effectMetadata = getEnumeratedEffectMetadata(
+          allEffectMetadata,
+          effectType
+        );
+        if (!effectMetadata) {
+          continue;
         }
-        uniqueEffectTypes.push(effectType);
+        // TODO Add an `isUnique` attribute in effect metadata if more effect are unique.
+        if (
+          effectType === 'Scene3D::LinearFog' ||
+          effectType === 'Scene3D::ExponentialFog'
+        ) {
+          if (uniqueEffectTypes.includes(effectType)) {
+            return effectMetadata;
+          }
+          uniqueEffectTypes.push(effectType);
+        }
       }
-    }
-    return null;
-  }, [allEffectMetadata, effectsContainer]);
+      return null;
+    },
+    [allEffectMetadata, effectsContainer]
+  );
 
   const duplicatedUniqueEffectMetadata = getDuplicatedUniqueEffectMetadata();
 
@@ -706,8 +723,8 @@ export default function EffectsList(props: Props) {
     props.layerRenderingType === '2d'
       ? effects2DCount
       : props.layerRenderingType === '3d'
-        ? effects3DCount
-        : effectsContainer.getEffectsCount();
+      ? effects3DCount
+      : effectsContainer.getEffectsCount();
 
   return (
     <I18n>
@@ -763,8 +780,9 @@ export default function EffectsList(props: Props) {
                           0,
                           effectsContainer.getEffectsCount(),
                           (i: number) => {
-                            const effect: gdEffect =
-                              effectsContainer.getEffectAt(i);
+                            const effect: gdEffect = effectsContainer.getEffectAt(
+                              i
+                            );
                             const effectType = effect.getEffectType();
                             const effectMetadata = getEnumeratedEffectMetadata(
                               allEffectMetadata,
@@ -853,8 +871,9 @@ export default function EffectsList(props: Props) {
                           0,
                           effectsContainer.getEffectsCount(),
                           (i: number) => {
-                            const effect: gdEffect =
-                              effectsContainer.getEffectAt(i);
+                            const effect: gdEffect = effectsContainer.getEffectAt(
+                              i
+                            );
                             const effectType = effect.getEffectType();
                             const effectMetadata = getEnumeratedEffectMetadata(
                               allEffectMetadata,

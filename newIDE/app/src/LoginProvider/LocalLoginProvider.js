@@ -69,7 +69,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
         });
       }
       setupAuthenticationWebSocket({
-        onConnectionEstablished: (connectionId) => {
+        onConnectionEstablished: connectionId => {
           if (signal && signal.aborted) return;
           const url = new URL(authenticationPortalUrl);
           url.searchParams.set('connection-id', connectionId);
@@ -90,13 +90,13 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
               provider === 'google'
                 ? GoogleAuthProvider.credential(data.credential)
                 : provider === 'github'
-                  ? GithubAuthProvider.credential(data.accessToken)
-                  : new OAuthProvider('apple.com').credential({
-                      idToken: data.id_token,
-                      // Typescript types declaration indicates the parameter `rawNonce` should be
-                      // set but it only works with `nonce`.
-                      nonce: data.raw_nonce,
-                    });
+                ? GithubAuthProvider.credential(data.accessToken)
+                : new OAuthProvider('apple.com').credential({
+                    idToken: data.id_token,
+                    // Typescript types declaration indicates the parameter `rawNonce` should be
+                    // set but it only works with `nonce`.
+                    nonce: data.raw_nonce,
+                  });
             await signInWithCredential(this.auth, credential);
             resolve();
             terminateWebSocket();
@@ -108,7 +108,7 @@ class LocalLoginProvider implements LoginProvider, FirebaseBasedLoginProvider {
             reject(error);
           }
         },
-        onError: (error) => {
+        onError: error => {
           if (signal && signal.aborted) return;
           terminateWebSocket();
           console.error(

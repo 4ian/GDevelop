@@ -33,7 +33,7 @@ export type BoxSearchResultsInterface = {|
 export const BoxSearchResults = React.forwardRef<
   // $FlowFixMe The generic type can't pass through.
   Props<SearchItem>,
-  BoxSearchResultsInterface,
+  BoxSearchResultsInterface
 >(
   (
     {

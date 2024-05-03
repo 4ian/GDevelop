@@ -114,8 +114,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
       logsManager,
       onOpenedEditorsChanged,
     } = this.props;
-    const { selectedInspector, selectedInspectorFullPath, rawMode } =
-      this.state;
+    const {
+      selectedInspector,
+      selectedInspectorFullPath,
+      rawMode,
+    } = this.state;
 
     const editors = {
       inspectors: {
@@ -246,12 +249,12 @@ export default class DebuggerContent extends React.Component<Props, State> {
       <PreferencesContext.Consumer>
         {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
           <EditorMosaic
-            ref={(editors) => (this._editors = editors)}
+            ref={editors => (this._editors = editors)}
             editors={editors}
             initialNodes={
               getDefaultEditorMosaicNode('debugger') || initialMosaicEditorNodes
             }
-            onPersistNodes={(node) =>
+            onPersistNodes={node =>
               setDefaultEditorMosaicNode('debugger', node)
             }
             onOpenedEditorsChanged={onOpenedEditorsChanged}

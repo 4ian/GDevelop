@@ -97,27 +97,27 @@ type EventsContainerProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: (InstructionsListContext) => void,
-  onPasteInstructions: (InstructionsListContext) => void,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: (InstructionContext) => void,
-  onInstructionDoubleClick: (InstructionContext) => void,
+  onInstructionClick: InstructionContext => void,
+  onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: (ParameterContext) => void,
+  onParameterClick: ParameterContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEndEditingEvent: () => void,
   onEventContextMenu: (x: number, y: number) => void,
-  onOpenExternalEvents: (string) => void,
-  onOpenLayout: (string) => void,
-  renderObjectThumbnail: (string) => Node,
+  onOpenExternalEvents: string => void,
+  onOpenLayout: string => void,
+  renderObjectThumbnail: string => Node,
 
   screenType: ScreenType,
   eventsSheetHeight: number,
@@ -149,9 +149,12 @@ const EventContainer = (props: EventsContainerProps) => {
   const forceUpdate = useForceUpdate();
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const height = containerRef.current ? containerRef.current.offsetHeight : 0;
-  React.useEffect(() => {
-    eventsHeightsCache.setEventHeight(event, height);
-  }, [event, eventsHeightsCache, height]);
+  React.useEffect(
+    () => {
+      eventsHeightsCache.setEventHeight(event, height);
+    },
+    [event, eventsHeightsCache, height]
+  );
 
   const _onEventContextMenu = React.useCallback(
     (domEvent: MouseEvent) => {
@@ -295,8 +298,8 @@ type EventsTreeProps = {|
     eventContext: EventContext
   ) => void,
   onAddNewEvent: (eventType: string, eventsList: gdEventsList) => void,
-  onOpenExternalEvents: (string) => void,
-  onOpenLayout: (string) => void,
+  onOpenExternalEvents: string => void,
+  onOpenLayout: string => void,
   showObjectThumbnails: boolean,
 
   searchResults: ?Array<gdBaseEvent>,
@@ -355,7 +358,7 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
  */
 export default class ThemableEventsTree extends Component<
   EventsTreeProps,
-  State,
+  State
 > {
   static defaultProps = {
     selection: getInitialSelection(),
@@ -399,7 +402,7 @@ export default class ThemableEventsTree extends Component<
       this.setState({
         ...this.state,
         treeData: this.state.treeData.filter(
-          (data) => data.key !== 'eventstree-tutorial-node'
+          data => data.key !== 'eventstree-tutorial-node'
         ),
       });
     }
@@ -466,7 +469,7 @@ export default class ThemableEventsTree extends Component<
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
-      (event) => event.ptr === searchedEvent.ptr
+      event => event.ptr === searchedEvent.ptr
     );
   }
 
@@ -480,7 +483,7 @@ export default class ThemableEventsTree extends Component<
       }
     );
     return rowIndexes
-      .map((rowIndex) => {
+      .map(rowIndex => {
         if (!flatDataTree[rowIndex]) return null;
         const {
           node: { event, eventsList, indexInList },
@@ -501,7 +504,7 @@ export default class ThemableEventsTree extends Component<
     const treeData = mapFor<SortableTreeNode>(
       0,
       eventsList.getEventsCount(),
-      (i) => {
+      i => {
         const event = eventsList.getEventAt(i);
         flatData.push(event);
 
@@ -625,7 +628,7 @@ export default class ThemableEventsTree extends Component<
   };
 
   _onDrop = (
-    moveFunction: (MoveFunctionArguments) => void,
+    moveFunction: MoveFunctionArguments => void,
     currentNode: SortableTreeNode
   ) => {
     const draggedNode = this.state.draggedNode;
@@ -676,7 +679,7 @@ export default class ThemableEventsTree extends Component<
     if (!event) return;
 
     const isNodeTemporaryUnfolded = this.temporaryUnfoldedNodes.some(
-      (foldedNode) => node.key === foldedNode.key
+      foldedNode => node.key === foldedNode.key
     );
     if (isOverLazy) {
       if (!this._hoverTimerId && !node.expanded) {
@@ -697,7 +700,7 @@ export default class ThemableEventsTree extends Component<
 
   _restoreFoldedNodes = () => {
     this.temporaryUnfoldedNodes.forEach(
-      (node) => node.event && node.event.setFolded(true)
+      node => node.event && node.event.setFolded(true)
     );
 
     this.temporaryUnfoldedNodes = [];
@@ -772,43 +775,43 @@ export default class ThemableEventsTree extends Component<
                 eventsHeightsCache={this.eventsHeightsCache}
                 selection={this.props.selection}
                 leftIndentWidth={depth * getIndentWidth(this.props.windowSize)}
-                onAddNewInstruction={(instructionsListContext) =>
+                onAddNewInstruction={instructionsListContext =>
                   this.props.onAddNewInstruction(
                     eventContext,
                     instructionsListContext
                   )
                 }
-                onPasteInstructions={(instructionsListContext) =>
+                onPasteInstructions={instructionsListContext =>
                   this.props.onPasteInstructions(
                     eventContext,
                     instructionsListContext
                   )
                 }
-                onMoveToInstruction={(instructionContext) =>
+                onMoveToInstruction={instructionContext =>
                   this.props.onMoveToInstruction(
                     eventContext,
                     instructionContext
                   )
                 }
-                onMoveToInstructionsList={(instructionContext) =>
+                onMoveToInstructionsList={instructionContext =>
                   this.props.onMoveToInstructionsList(
                     eventContext,
                     instructionContext
                   )
                 }
-                onInstructionClick={(instructionContext) =>
+                onInstructionClick={instructionContext =>
                   this.props.onInstructionClick(
                     eventContext,
                     instructionContext
                   )
                 }
-                onInstructionDoubleClick={(instructionContext) =>
+                onInstructionDoubleClick={instructionContext =>
                   this.props.onInstructionDoubleClick(
                     eventContext,
                     instructionContext
                   )
                 }
-                onParameterClick={(parameterContext) =>
+                onParameterClick={parameterContext =>
                   this.props.onParameterClick(eventContext, parameterContext)
                 }
                 onEventClick={() =>
@@ -857,7 +860,7 @@ export default class ThemableEventsTree extends Component<
                   onDrop={this._onDrop}
                   activateTargets={!isDragged && !!this.state.draggedNode}
                   windowSize={this.props.windowSize}
-                  getNodeAtPath={(path) =>
+                  getNodeAtPath={path =>
                     getNodeAtPath({
                       path,
                       treeData: this.state.treeData,
@@ -887,7 +890,7 @@ export default class ThemableEventsTree extends Component<
     const { event } = node;
     if (!event) return false;
 
-    return searchResults.find((highlightedEvent) =>
+    return searchResults.find(highlightedEvent =>
       gd.compare(highlightedEvent, event)
     );
   };
@@ -958,8 +961,8 @@ export default class ThemableEventsTree extends Component<
             this.props.searchResults ? eventsTreeWithSearchResults : ''
           }
           reactVirtualizedListProps={{
-            ref: (list) => (this._list = list),
-            onScroll: (event) => {
+            ref: list => (this._list = list),
+            onScroll: event => {
               this.props.onScroll && this.props.onScroll();
               this.setState({
                 isScrolledTop: event.scrollTop === 0,

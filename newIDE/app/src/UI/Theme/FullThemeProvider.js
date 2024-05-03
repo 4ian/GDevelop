@@ -26,23 +26,26 @@ export const FullThemeProvider = ({ children, forcedThemeName }: Props) => {
 
   const themeNameToUse = forcedThemeName || themeName;
 
-  const theme = React.useMemo(() => {
-    const fullTheme = getFullTheme({
-      themeName: themeNameToUse,
-      language,
-      isMobile,
-    });
+  const theme = React.useMemo(
+    () => {
+      const fullTheme = getFullTheme({
+        themeName: themeNameToUse,
+        language,
+        isMobile,
+      });
 
-    try {
-      const { body } = document;
-      if (!body) throw new Error('Document has no body.');
-      body.className = fullTheme.gdevelopTheme.uiRootClassName;
-    } catch (error) {
-      console.error('An error occurred while changing global theme:', error);
-    }
+      try {
+        const { body } = document;
+        if (!body) throw new Error('Document has no body.');
+        body.className = fullTheme.gdevelopTheme.uiRootClassName;
+      } catch (error) {
+        console.error('An error occurred while changing global theme:', error);
+      }
 
-    return fullTheme;
-  }, [themeNameToUse, language, isMobile]);
+      return fullTheme;
+    },
+    [themeNameToUse, language, isMobile]
+  );
 
   return (
     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>

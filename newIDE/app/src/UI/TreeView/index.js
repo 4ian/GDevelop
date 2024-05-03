@@ -65,9 +65,9 @@ export type ItemData<Item> = {|
   renamedItemId: ?string,
   canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
   onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
-  onEditItem?: (Item) => void,
+  onEditItem?: Item => void,
   isMobile: boolean,
-  DragSourceAndDropTarget: (any) => React.Node,
+  DragSourceAndDropTarget: any => React.Node,
   getItemHtmlId?: (Item, index: number) => ?string,
   forceDefaultDraggingPreview?: boolean,
   shouldSelectUponContextMenuOpening?: boolean,
@@ -90,9 +90,9 @@ const getItemProps = memoizeOne(
     |}) => void,
     canDrop?: ?(Item, where: 'before' | 'inside' | 'after') => boolean,
     onDrop: (Item, where: 'before' | 'inside' | 'after') => void,
-    onEditItem?: (Item) => void,
+    onEditItem?: Item => void,
     isMobile: boolean,
-    DragSourceAndDropTarget: (any) => React.Node,
+    DragSourceAndDropTarget: any => React.Node,
     getItemHtmlId?: (Item, index: number) => ?string,
     forceDefaultDraggingPreview?: boolean,
     shouldSelectUponContextMenuOpening?: boolean
@@ -120,11 +120,11 @@ export type TreeViewInterface<Item> = {|
   forceUpdateList: () => void,
   scrollToItem: (Item, placement?: 'smart' | 'start') => void,
   scrollToItemFromId: (itemId: string, placement?: 'smart' | 'start') => void,
-  renameItem: (Item) => void,
+  renameItem: Item => void,
   renameItemFromId: (itemId: string) => void,
   openItems: (string[]) => void,
   closeItems: (string[]) => void,
-  animateItem: (Item) => void,
+  animateItem: Item => void,
   areItemsOpen: (Array<Item>) => boolean[],
 |};
 
@@ -132,23 +132,23 @@ type Props<Item> = {|
   height: number,
   width?: number,
   items: Item[],
-  getItemName: (Item) => string | React.Node,
-  getItemId: (Item) => string,
+  getItemName: Item => string | React.Node,
+  getItemId: Item => string,
   getItemHtmlId?: (Item, index: number) => ?string,
-  getItemChildren: (Item) => ?(Item[]),
-  getItemThumbnail?: (Item) => ?string,
-  getItemDataset?: (Item) => ?HTMLDataset,
-  onEditItem?: (Item) => void,
+  getItemChildren: Item => ?(Item[]),
+  getItemThumbnail?: Item => ?string,
+  getItemDataset?: Item => ?HTMLDataset,
+  onEditItem?: Item => void,
   buildMenuTemplate: (Item, index: number) => any,
-  getItemRightButton?: (Item) => ?MenuButton,
-  renderRightComponent?: (Item) => ?React.Node,
+  getItemRightButton?: Item => ?MenuButton,
+  renderRightComponent?: Item => ?React.Node,
   /**
    * Callback called when a folder is collapsed (folded).
    */
   onCollapseItem?: (Item: Item) => void,
   searchText?: string,
   selectedItems: $ReadOnlyArray<Item>,
-  onClickItem?: (Item) => void,
+  onClickItem?: Item => void,
   onSelectItems: (Item[]) => void,
   multiSelect: boolean,
   onRenameItem: (Item, newName: string) => void,
@@ -214,8 +214,10 @@ const TreeView = <Item: ItemBaseAttributes>(
   const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const listRef = React.useRef<?FixedSizeList>(null);
-  const [openedDuringSearchNodeIds, setOpenedDuringSearchNodeIds] =
-    React.useState<string[]>([]);
+  const [
+    openedDuringSearchNodeIds,
+    setOpenedDuringSearchNodeIds,
+  ] = React.useState<string[]>([]);
   const { isMobile } = useResponsiveWindowSize();
   const forceUpdate = useForceUpdate();
   const [animatedItemId, setAnimatedItemId] = React.useState<string>('');
@@ -248,7 +250,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         (forceAllOpened || !collapsed || !!searchText || openedDuringSearch)
       ) {
         flattenedChildren = children
-          .map((child) =>
+          .map(child =>
             flattenNode(child, depth + 1, searchText, openedDuringSearch)
           )
           .flat();
@@ -337,9 +339,7 @@ const TreeView = <Item: ItemBaseAttributes>(
 
   const flattenOpened = React.useCallback(
     (items: Item[], searchText: ?string): FlattenedNode<Item>[] => {
-      return items
-        .map((item) => flattenNode(item, 0, searchText, false))
-        .flat();
+      return items.map(item => flattenNode(item, 0, searchText, false)).flat();
     },
     [flattenNode]
   );
@@ -352,7 +352,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         } else {
           if (!forceAllOpened)
             setOpenedDuringSearchNodeIds(
-              openedDuringSearchNodeIds.filter((id) => id !== node.id)
+              openedDuringSearchNodeIds.filter(id => id !== node.id)
             );
         }
       } else {
@@ -361,7 +361,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         } else {
           if (!forceAllOpened) {
             if (onCollapseItem) onCollapseItem(node.item);
-            setOpenedNodeIds(openedNodeIds.filter((id) => id !== node.id));
+            setOpenedNodeIds(openedNodeIds.filter(id => id !== node.id));
           }
         }
       }
@@ -389,7 +389,7 @@ const TreeView = <Item: ItemBaseAttributes>(
             if (selectedItems.length === 1) return;
             onSelectItems([node.item]);
           } else
-            onSelectItems(selectedItems.filter((item) => item !== node.item));
+            onSelectItems(selectedItems.filter(item => item !== node.item));
         } else {
           if (exclusive) onSelectItems([node.item]);
           else onSelectItems([...selectedItems, node.item]);
@@ -431,7 +431,7 @@ const TreeView = <Item: ItemBaseAttributes>(
         // Browse flattenedData in reverse order since scrollToItem is mainly used
         // to scroll to newly added object that is appended at the end of the list.
         // $FlowFixMe - Method introduced in 2022.
-        const index = flattenedData.findLastIndex((node) => node.id === itemId);
+        const index = flattenedData.findLastIndex(node => node.id === itemId);
         if (index >= 0) {
           list.scrollToItem(index, placement);
         }
@@ -460,7 +460,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const openItems = React.useCallback(
     (itemIds: string[]) => {
       const notAlreadyOpenedNodeIds = itemIds.filter(
-        (itemId) => !openedNodeIds.includes(itemId)
+        itemId => !openedNodeIds.includes(itemId)
       );
       if (notAlreadyOpenedNodeIds.length > 0)
         setOpenedNodeIds([...openedNodeIds, ...notAlreadyOpenedNodeIds]);
@@ -471,7 +471,7 @@ const TreeView = <Item: ItemBaseAttributes>(
   const closeItems = React.useCallback(
     (itemIds: string[]) => {
       const newOpenedNodesIds = openedNodeIds.filter(
-        (openedNodeId) => !itemIds.includes(openedNodeId)
+        openedNodeId => !itemIds.includes(openedNodeId)
       );
       setOpenedNodeIds(newOpenedNodesIds);
     },
@@ -489,24 +489,27 @@ const TreeView = <Item: ItemBaseAttributes>(
     (items: Item[]) => {
       const itemIds = items.map(getItemId);
       const openedNodeIdsSet = new Set(openedNodeIds);
-      return itemIds.map((id) => openedNodeIdsSet.has(id));
+      return itemIds.map(id => openedNodeIdsSet.has(id));
     },
     [openedNodeIds, getItemId]
   );
 
-  React.useEffect(() => {
-    if (animatedItemId) {
-      const timeoutId = setTimeout(
-        // Animated item must be reset to remove the extra class to the node.
-        // Otherwise, if it has to be animated once again, the class is already here
-        // and the animation won't play.
-        () => setAnimatedItemId(''),
-        // Corresponds to the duration of the CSS animation.
-        400
-      );
-      return () => clearTimeout(timeoutId);
-    }
-  }, [animatedItemId]);
+  React.useEffect(
+    () => {
+      if (animatedItemId) {
+        const timeoutId = setTimeout(
+          // Animated item must be reset to remove the extra class to the node.
+          // Otherwise, if it has to be animated once again, the class is already here
+          // and the animation won't play.
+          () => setAnimatedItemId(''),
+          // Corresponds to the duration of the CSS animation.
+          400
+        );
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [animatedItemId]
+  );
 
   React.useImperativeHandle(
     // $FlowFixMe
@@ -578,11 +581,14 @@ const TreeView = <Item: ItemBaseAttributes>(
 
   // Reset opened nodes during search when user stops searching
   // or when the search text changes.
-  React.useEffect(() => {
-    if (!searchText || searchText.length > 0) {
-      setOpenedDuringSearchNodeIds([]);
-    }
-  }, [searchText]);
+  React.useEffect(
+    () => {
+      if (!searchText || searchText.length > 0) {
+        setOpenedDuringSearchNodeIds([]);
+      }
+    },
+    [searchText]
+  );
 
   const onKeyDown = React.useCallback(
     (event: KeyboardEvent) => {
@@ -592,7 +598,7 @@ const TreeView = <Item: ItemBaseAttributes>(
       let itemIndexInFlattenedData = -1;
       if (item) {
         itemIndexInFlattenedData = flattenedData.findIndex(
-          (node) => node.id === getItemId(item)
+          node => node.id === getItemId(item)
         );
       }
 
@@ -705,7 +711,7 @@ const TreeView = <Item: ItemBaseAttributes>(
           itemCount={flattenedData.length}
           itemSize={32}
           width={typeof width === 'number' ? width : '100%'}
-          itemKey={(index) => flattenedData[index].id}
+          itemKey={index => flattenedData[index].id}
           // Flow does not seem to accept the generic used in FixedSizeList
           // can itself use a generic.
           // $FlowFixMe

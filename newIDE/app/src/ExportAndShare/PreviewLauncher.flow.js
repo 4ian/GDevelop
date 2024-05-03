@@ -35,7 +35,10 @@ export type PreviewDebuggerServerCallbacks = {|
     id: DebuggerId,
     debuggerIds: Array<DebuggerId>,
   |}) => void,
-  onConnectionErrored: ({| id: DebuggerId, errorMessage: string |}) => void,
+  onConnectionErrored: ({|
+    id: DebuggerId,
+    errorMessage: string,
+  |}) => void,
   onHandleParsedMessage: ({| id: DebuggerId, parsedMessage: Object |}) => void,
 |};
 
@@ -79,5 +82,5 @@ export type PreviewLauncherInterface = {
  */
 export type PreviewLauncherComponent = React.AbstractComponent<
   PreviewLauncherProps,
-  PreviewLauncherInterface,
+  PreviewLauncherInterface
 >;

@@ -18,7 +18,7 @@ import Text from '../../UI/Text';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ForceMultiplierField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?ButtonInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (button.current) focusButton(button.current);
     };
     React.useImperativeHandle(ref, () => ({

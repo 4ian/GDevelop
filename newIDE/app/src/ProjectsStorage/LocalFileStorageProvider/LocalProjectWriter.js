@@ -83,18 +83,18 @@ const writeProjectFiles = (
       getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
       shouldSplit: splitPaths(
         new Set(
-          splittedProjectFolderNames.map((folderName) => `/${folderName}/*`)
+          splittedProjectFolderNames.map(folderName => `/${folderName}/*`)
         )
       ),
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
     });
 
     return Promise.all(
-      partialObjects.map((partialObject) => {
+      partialObjects.map(partialObject => {
         return writeAndCheckFormattedJSONFile(
           partialObject.object,
           path.join(projectPath, partialObject.reference) + '.json'
-        ).catch((err) => {
+        ).catch(err => {
           console.error('Unable to write a partial file:', err);
           throw err;
         });
@@ -103,7 +103,7 @@ const writeProjectFiles = (
       return writeAndCheckFormattedJSONFile(
         serializedProjectObject,
         filePath
-      ).catch((err) => {
+      ).catch(err => {
         console.error('Unable to write the split project:', err);
         throw err;
       });
@@ -112,7 +112,7 @@ const writeProjectFiles = (
     return writeAndCheckFormattedJSONFile(
       serializedProjectObject,
       filePath
-    ).catch((err) => {
+    ).catch(err => {
       console.error('Unable to write the project:', err);
       throw err;
     });
@@ -183,7 +183,9 @@ export const onSaveProjectAs = async (
   saveAsLocation: ?SaveAsLocation,
   options: {|
     onStartSaving: () => void,
-    onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
+    onMoveResources: ({|
+      newFileMetadata: FileMetadata,
+    |}) => Promise<void>,
   |}
 ): Promise<{|
   wasSaved: boolean,
@@ -224,7 +226,7 @@ export const onAutoSaveProject = (
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
   return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
-    (err) => {
+    err => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;
     }
@@ -258,8 +260,8 @@ export const getProjectLocation = ({
   const outputPath = saveAsLocation
     ? path.dirname(saveAsLocation.fileIdentifier)
     : newProjectsDefaultFolder
-      ? newProjectsDefaultFolder
-      : '';
+    ? newProjectsDefaultFolder
+    : '';
   const projectFileName = projectName
     ? cleanUpProjectFileName(projectName) + '.json'
     : 'game.json';
@@ -288,7 +290,7 @@ export const renderNewProjectSaveAsLocationChooser = ({
     <LocalFolderPicker
       fullWidth
       value={path.dirname(projectLocation.fileIdentifier)}
-      onChange={(newOutputPath) => {
+      onChange={newOutputPath => {
         const newOutputFileIdentifier = path.join(
           newOutputPath,
           path.basename(projectLocation.fileIdentifier)

@@ -19,9 +19,9 @@ import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
 export type ExtensionTreeViewItemCallbacks = {|
-  onDeleteEventsFunctionsExtension: (gdEventsFunctionsExtension) => void,
+  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => void,
   onRenameEventsFunctionsExtension: (string, string) => void,
-  onOpenEventsFunctionsExtension: (string) => void,
+  onOpenEventsFunctionsExtension: string => void,
   onReloadEventsFunctionsExtensions: () => void,
 |};
 
@@ -201,12 +201,14 @@ export class ExtensionTreeViewItemContent implements TreeViewItemContent {
     if (!name || !copiedEventsFunctionsExtension) return;
 
     const project = this.props.project;
-    const newName = newNameGenerator(name, (name) =>
+    const newName = newNameGenerator(name, name =>
       isExtensionNameTaken(name, project)
     );
 
-    const newEventsFunctionsExtension =
-      project.insertNewEventsFunctionsExtension(newName, this.getIndex() + 1);
+    const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      newName,
+      this.getIndex() + 1
+    );
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,

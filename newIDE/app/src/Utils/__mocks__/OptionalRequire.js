@@ -13,7 +13,7 @@ const mockFs = {
   ensureDir: jest.fn(),
   existsSync: jest.fn(),
   promises: {
-    readFile: jest.fn((filePath) =>
+    readFile: jest.fn(filePath =>
       Promise.resolve('Fake content for file with path:' + filePath)
     ),
   },

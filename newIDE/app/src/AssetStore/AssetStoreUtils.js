@@ -48,8 +48,9 @@ const findPublicAssetPackWithUserFriendlySlug = (
   userFriendlySlug: string
 ): PublicAssetPack | null => {
   for (const publicAssetPack of publicAssetPacks.starterPacks) {
-    const publicAssetPackUserFriendlySlug =
-      getPublicAssetPackUserFriendlySlug(publicAssetPack);
+    const publicAssetPackUserFriendlySlug = getPublicAssetPackUserFriendlySlug(
+      publicAssetPack
+    );
     if (publicAssetPackUserFriendlySlug === userFriendlySlug)
       return publicAssetPack;
   }
@@ -66,10 +67,11 @@ export const getAssetPackFromUserFriendlySlug = ({
   publicAssetPacks: PublicAssetPacks,
   userFriendlySlug: string,
 |}): PublicAssetPack | PrivateAssetPack | null => {
-  const receivedAssetPackId =
-    getIdFromPrivateProductUserFriendlySlug(userFriendlySlug);
+  const receivedAssetPackId = getIdFromPrivateProductUserFriendlySlug(
+    userFriendlySlug
+  );
   const receivedAssetPack = receivedAssetPacks.find(
-    (privateAssetPack) => receivedAssetPackId === privateAssetPack.id
+    privateAssetPack => receivedAssetPackId === privateAssetPack.id
   );
   if (receivedAssetPack) return receivedAssetPack;
 
@@ -89,10 +91,11 @@ export const getPrivateAssetPackListingDataFromUserFriendlySlug = ({
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   userFriendlySlug: string,
 |}): ?PrivateAssetPackListingData => {
-  const privateAssetPackId =
-    getIdFromPrivateProductUserFriendlySlug(userFriendlySlug);
+  const privateAssetPackId = getIdFromPrivateProductUserFriendlySlug(
+    userFriendlySlug
+  );
   const privateAssetPackListingData = privateAssetPackListingDatas.find(
-    (privateAssetPack) => privateAssetPackId === privateAssetPack.id
+    privateAssetPack => privateAssetPackId === privateAssetPack.id
   );
   if (privateAssetPackListingData) return privateAssetPackListingData;
 
@@ -106,10 +109,11 @@ export const getPrivateGameTemplateListingDataFromUserFriendlySlug = ({
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
   userFriendlySlug: string,
 |}): ?PrivateGameTemplateListingData => {
-  const privateGameTemplateId =
-    getIdFromPrivateProductUserFriendlySlug(userFriendlySlug);
+  const privateGameTemplateId = getIdFromPrivateProductUserFriendlySlug(
+    userFriendlySlug
+  );
   const privateGameTemplateListingData = privateGameTemplateListingDatas.find(
-    (privateGameTemplate) => privateGameTemplateId === privateGameTemplate.id
+    privateGameTemplate => privateGameTemplateId === privateGameTemplate.id
   );
   if (privateGameTemplateListingData) return privateGameTemplateListingData;
 

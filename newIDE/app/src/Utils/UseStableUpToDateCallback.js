@@ -13,9 +13,12 @@ export function useStableUpToDateCallback<ReturnType, ArgTypes>(
   const callbackRef = React.useRef<() => ReturnType>(callback);
 
   // Whenever the callback changes, store the latest version in a ref.
-  React.useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+  React.useEffect(
+    () => {
+      callbackRef.current = callback;
+    },
+    [callback]
+  );
 
   // This function will never change, but will always call the latest
   // callback that was created in a render, so it's fine to call it even
@@ -31,13 +34,16 @@ export function useStableUpToDateCallback<ReturnType, ArgTypes>(
  * Wrap an object, possibly from useState, in a ref that contains always
  * the latest version of the object (i.e: the object at the latest render).
  */
-export function useStableUpToDateRef<ObjectType>(object: ObjectType): {|
-  current: ObjectType,
-|} {
+export function useStableUpToDateRef<ObjectType>(
+  object: ObjectType
+): {| current: ObjectType |} {
   const objectRef = React.useRef<ObjectType>(object);
-  React.useEffect(() => {
-    objectRef.current = object;
-  }, [object]);
+  React.useEffect(
+    () => {
+      objectRef.current = object;
+    },
+    [object]
+  );
 
   return objectRef;
 }

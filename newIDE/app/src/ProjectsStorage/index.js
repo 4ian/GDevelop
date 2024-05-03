@@ -71,8 +71,7 @@ export type ResourcesActionsProps = {|
   cleanUserSelectionOfResources: () => void,
 |};
 
-export type ResourcesActionsMenuBuilder =
-  (ResourcesActionsProps) => Array<MenuItemTemplate>;
+export type ResourcesActionsMenuBuilder = ResourcesActionsProps => Array<MenuItemTemplate>;
 
 /**
  * Interface returned by a storage provider to manipulate files.
@@ -118,7 +117,9 @@ export type StorageProviderOperations = {|
     saveAsLocation: ?SaveAsLocation, // This is the new location to save to.
     options: {|
       onStartSaving: () => void,
-      onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
+      onMoveResources: ({|
+        newFileMetadata: FileMetadata,
+      |}) => Promise<void>,
     |}
   ) => Promise<{|
     wasSaved: boolean,
@@ -170,7 +171,7 @@ export type StorageProvider = {|
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
   renderIcon?: ({| size?: 'small' | 'medium' |}) => React.Node,
-  getFileMetadataFromAppArguments?: (AppArguments) => ?FileMetadata,
+  getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
   getProjectLocation?: ({|
     projectName: string,
     saveAsLocation: ?SaveAsLocation,

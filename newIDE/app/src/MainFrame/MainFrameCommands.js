@@ -25,10 +25,10 @@ type Item =
 const generateProjectItemOptions = <T: Item>(
   project: ?gdProject,
   enumerate: (project: gdProject) => Array<T>,
-  onOpen: (string) => void
+  onOpen: string => void
 ) => {
   if (!project) return [];
-  return enumerate(project).map((item) => ({
+  return enumerate(project).map(item => ({
     text: item.getName(),
     handler: () => onOpen(item.getName()),
   }));
@@ -54,10 +54,10 @@ type CommandHandlers = {|
   onCloseProject: () => Promise<void>,
   onExportGame: () => void,
   onInviteCollaborators: () => void,
-  onOpenLayout: (string) => void,
-  onOpenExternalEvents: (string) => void,
-  onOpenExternalLayout: (string) => void,
-  onOpenEventsFunctionsExtension: (string) => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
+  onOpenExternalLayout: string => void,
+  onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
   onOpenProfile: () => void,
 |};

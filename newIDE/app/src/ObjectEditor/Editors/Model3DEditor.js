@@ -110,21 +110,26 @@ const Model3DEditor = ({
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-  const [justAddedAnimationName, setJustAddedAnimationName] =
-    React.useState<?string>(null);
+  const [
+    justAddedAnimationName,
+    setJustAddedAnimationName,
+  ] = React.useState<?string>(null);
   const justAddedAnimationElement = React.useRef<?any>(null);
 
-  React.useEffect(() => {
-    if (
-      scrollView.current &&
-      justAddedAnimationElement.current &&
-      justAddedAnimationName
-    ) {
-      scrollView.current.scrollTo(justAddedAnimationElement.current);
-      setJustAddedAnimationName(null);
-      justAddedAnimationElement.current = null;
-    }
-  }, [justAddedAnimationName]);
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedAnimationElement.current &&
+        justAddedAnimationName
+      ) {
+        scrollView.current.scrollTo(justAddedAnimationElement.current);
+        setJustAddedAnimationName(null);
+        justAddedAnimationElement.current = null;
+      }
+    },
+    [justAddedAnimationName]
+  );
   const { showAlert } = useAlertDialog();
 
   const draggedAnimationIndex = React.useRef<number | null>(null);
@@ -162,16 +167,19 @@ const Model3DEditor = ({
     loadGltf(properties.get('modelResourceName').getValue());
   }
 
-  const model3D = React.useMemo<THREE.Object3D | null>(() => {
-    if (!gltf) {
-      return null;
-    }
-    const clonedModel3D = SkeletonUtils.clone(gltf.scene);
-    const threeObject = new THREE.Group();
-    threeObject.rotation.order = 'ZYX';
-    threeObject.add(clonedModel3D);
-    return threeObject;
-  }, [gltf]);
+  const model3D = React.useMemo<THREE.Object3D | null>(
+    () => {
+      if (!gltf) {
+        return null;
+      }
+      const clonedModel3D = SkeletonUtils.clone(gltf.scene);
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      threeObject.add(clonedModel3D);
+      return threeObject;
+    },
+    [gltf]
+  );
 
   const [originLocation, setOriginLocation] = React.useState<string>(() =>
     properties.get('originLocation').getValue()
@@ -193,45 +201,47 @@ const Model3DEditor = ({
   const [rotationZ, setRotationZ] = React.useState<number>(
     () => parseFloat(properties.get('rotationZ').getValue()) || 0
   );
-  const onRotationChange = React.useCallback(() => {
-    setRotationX(parseFloat(properties.get('rotationX').getValue()));
-    setRotationY(parseFloat(properties.get('rotationY').getValue()));
-    setRotationZ(parseFloat(properties.get('rotationZ').getValue()));
-  }, [properties]);
-  const modelSize = React.useMemo<{
-    x: number,
-    y: number,
-    z: number,
-  } | null>(() => {
-    if (!model3D) {
-      return null;
-    }
-    // These formulas are also used in:
-    // - gdjs.Model3DRuntimeObject3DRenderer._updateDefaultTransformation
-    // - Model3DRendered2DInstance
-    model3D.rotation.set(
-      (rotationX * Math.PI) / 180,
-      (rotationY * Math.PI) / 180,
-      (rotationZ * Math.PI) / 180
-    );
-    model3D.updateMatrixWorld(true);
-    const boundingBox = new THREE.Box3().setFromObject(model3D);
-    if (originLocation === 'ModelOrigin') {
-      // Keep the origin as part of the model.
-      // For instance, a model can be 1 face of a cube and we want to keep the
-      // inside as part of the object even if it's just void.
-      // It also avoids to have the origin outside of the object box.
-      boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
-    }
-    const sizeX = boundingBox.max.x - boundingBox.min.x;
-    const sizeY = boundingBox.max.y - boundingBox.min.y;
-    const sizeZ = boundingBox.max.z - boundingBox.min.z;
-    return {
-      x: sizeX < epsilon ? 0 : sizeX,
-      y: sizeY < epsilon ? 0 : sizeY,
-      z: sizeZ < epsilon ? 0 : sizeZ,
-    };
-  }, [model3D, originLocation, rotationX, rotationY, rotationZ]);
+  const onRotationChange = React.useCallback(
+    () => {
+      setRotationX(parseFloat(properties.get('rotationX').getValue()));
+      setRotationY(parseFloat(properties.get('rotationY').getValue()));
+      setRotationZ(parseFloat(properties.get('rotationZ').getValue()));
+    },
+    [properties]
+  );
+  const modelSize = React.useMemo<{ x: number, y: number, z: number } | null>(
+    () => {
+      if (!model3D) {
+        return null;
+      }
+      // These formulas are also used in:
+      // - gdjs.Model3DRuntimeObject3DRenderer._updateDefaultTransformation
+      // - Model3DRendered2DInstance
+      model3D.rotation.set(
+        (rotationX * Math.PI) / 180,
+        (rotationY * Math.PI) / 180,
+        (rotationZ * Math.PI) / 180
+      );
+      model3D.updateMatrixWorld(true);
+      const boundingBox = new THREE.Box3().setFromObject(model3D);
+      if (originLocation === 'ModelOrigin') {
+        // Keep the origin as part of the model.
+        // For instance, a model can be 1 face of a cube and we want to keep the
+        // inside as part of the object even if it's just void.
+        // It also avoids to have the origin outside of the object box.
+        boundingBox.expandByPoint(new THREE.Vector3(0, 0, 0));
+      }
+      const sizeX = boundingBox.max.x - boundingBox.min.x;
+      const sizeY = boundingBox.max.y - boundingBox.min.y;
+      const sizeZ = boundingBox.max.z - boundingBox.min.z;
+      return {
+        x: sizeX < epsilon ? 0 : sizeX,
+        y: sizeY < epsilon ? 0 : sizeY,
+        z: sizeZ < epsilon ? 0 : sizeZ,
+      };
+    },
+    [model3D, originLocation, rotationX, rotationY, rotationZ]
+  );
 
   const [width, setWidth] = React.useState<number>(
     () => parseFloat(properties.get('width').getValue()) || 0
@@ -242,21 +252,27 @@ const Model3DEditor = ({
   const [depth, setDepth] = React.useState<number>(
     () => parseFloat(properties.get('depth').getValue()) || 0
   );
-  const onDimensionChange = React.useCallback(() => {
-    setWidth(parseFloat(properties.get('width').getValue()));
-    setHeight(parseFloat(properties.get('height').getValue()));
-    setDepth(parseFloat(properties.get('depth').getValue()));
-  }, [properties]);
-  const scale = React.useMemo<number | null>(() => {
-    if (!modelSize) {
-      return null;
-    }
-    return Math.min(
-      modelSize.x < epsilon ? Number.POSITIVE_INFINITY : width / modelSize.x,
-      modelSize.y < epsilon ? Number.POSITIVE_INFINITY : height / modelSize.y,
-      modelSize.z < epsilon ? Number.POSITIVE_INFINITY : depth / modelSize.z
-    );
-  }, [depth, height, modelSize, width]);
+  const onDimensionChange = React.useCallback(
+    () => {
+      setWidth(parseFloat(properties.get('width').getValue()));
+      setHeight(parseFloat(properties.get('height').getValue()));
+      setDepth(parseFloat(properties.get('depth').getValue()));
+    },
+    [properties]
+  );
+  const scale = React.useMemo<number | null>(
+    () => {
+      if (!modelSize) {
+        return null;
+      }
+      return Math.min(
+        modelSize.x < epsilon ? Number.POSITIVE_INFINITY : width / modelSize.x,
+        modelSize.y < epsilon ? Number.POSITIVE_INFINITY : height / modelSize.y,
+        modelSize.z < epsilon ? Number.POSITIVE_INFINITY : depth / modelSize.z
+      );
+    },
+    [depth, height, modelSize, width]
+  );
 
   const setScale = React.useCallback(
     (scale: number) => {
@@ -275,38 +291,76 @@ const Model3DEditor = ({
     [forceUpdate, modelSize, objectConfiguration, onDimensionChange]
   );
 
-  const scanNewAnimations = React.useCallback(() => {
-    if (!gltf) {
-      return;
-    }
-    setNameErrors({});
-
-    const animationSources = mapFor(
-      0,
-      model3DConfiguration.getAnimationsCount(),
-      (animationIndex) =>
-        model3DConfiguration.getAnimation(animationIndex).getSource()
-    );
-
-    let hasAddedAnimation = false;
-    for (const resourceAnimation of gltf.animations) {
-      if (animationSources.includes(resourceAnimation.name)) {
-        continue;
+  const scanNewAnimations = React.useCallback(
+    () => {
+      if (!gltf) {
+        return;
       }
-      const newAnimationName = model3DConfiguration.hasAnimationNamed(
-        resourceAnimation.name
-      )
-        ? ''
-        : resourceAnimation.name;
+      setNameErrors({});
 
-      const newAnimation = new gd.Model3DAnimation();
-      newAnimation.setName(newAnimationName);
-      newAnimation.setSource(resourceAnimation.name);
-      model3DConfiguration.addAnimation(newAnimation);
-      newAnimation.delete();
-      hasAddedAnimation = true;
-    }
-    if (hasAddedAnimation) {
+      const animationSources = mapFor(
+        0,
+        model3DConfiguration.getAnimationsCount(),
+        animationIndex =>
+          model3DConfiguration.getAnimation(animationIndex).getSource()
+      );
+
+      let hasAddedAnimation = false;
+      for (const resourceAnimation of gltf.animations) {
+        if (animationSources.includes(resourceAnimation.name)) {
+          continue;
+        }
+        const newAnimationName = model3DConfiguration.hasAnimationNamed(
+          resourceAnimation.name
+        )
+          ? ''
+          : resourceAnimation.name;
+
+        const newAnimation = new gd.Model3DAnimation();
+        newAnimation.setName(newAnimationName);
+        newAnimation.setSource(resourceAnimation.name);
+        model3DConfiguration.addAnimation(newAnimation);
+        newAnimation.delete();
+        hasAddedAnimation = true;
+      }
+      if (hasAddedAnimation) {
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
+
+        // Scroll to the bottom of the list.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          if (scrollView.current) {
+            scrollView.current.scrollToBottom();
+          }
+        }, 100); // A few ms is enough for a new render to be done.
+      } else {
+        showAlert({
+          title: t`No new animation`,
+          message: t`Every animation from the GLB file is already in the list.`,
+        });
+      }
+    },
+    [
+      forceUpdate,
+      gltf,
+      model3DConfiguration,
+      onObjectUpdated,
+      onSizeUpdated,
+      showAlert,
+    ]
+  );
+
+  const addAnimation = React.useCallback(
+    () => {
+      setNameErrors({});
+
+      const emptyAnimation = new gd.Model3DAnimation();
+      model3DConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
       forceUpdate();
       onSizeUpdated();
       if (onObjectUpdated) onObjectUpdated();
@@ -320,44 +374,12 @@ const Model3DEditor = ({
           scrollView.current.scrollToBottom();
         }
       }, 100); // A few ms is enough for a new render to be done.
-    } else {
-      showAlert({
-        title: t`No new animation`,
-        message: t`Every animation from the GLB file is already in the list.`,
-      });
-    }
-  }, [
-    forceUpdate,
-    gltf,
-    model3DConfiguration,
-    onObjectUpdated,
-    onSizeUpdated,
-    showAlert,
-  ]);
-
-  const addAnimation = React.useCallback(() => {
-    setNameErrors({});
-
-    const emptyAnimation = new gd.Model3DAnimation();
-    model3DConfiguration.addAnimation(emptyAnimation);
-    emptyAnimation.delete();
-    forceUpdate();
-    onSizeUpdated();
-    if (onObjectUpdated) onObjectUpdated();
-
-    // Scroll to the bottom of the list.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      if (scrollView.current) {
-        scrollView.current.scrollToBottom();
-      }
-    }, 100); // A few ms is enough for a new render to be done.
-  }, [forceUpdate, onObjectUpdated, onSizeUpdated, model3DConfiguration]);
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, model3DConfiguration]
+  );
 
   const removeAnimation = React.useCallback(
-    (animationIndex) => {
+    animationIndex => {
       setNameErrors({});
 
       model3DConfiguration.removeAnimation(animationIndex);
@@ -432,7 +454,7 @@ const Model3DEditor = ({
   );
 
   const sourceSelectOptions = gltf
-    ? gltf.animations.map((animation) => {
+    ? gltf.animations.map(animation => {
         return (
           <SelectOption
             key={animation.name}
@@ -454,7 +476,7 @@ const Model3DEditor = ({
             propertyName="modelResourceName"
             project={project}
             resourceManagementProps={resourceManagementProps}
-            onChange={(resourceName) => {
+            onChange={resourceName => {
               loadGltf(resourceName);
             }}
           />
@@ -536,7 +558,7 @@ const Model3DEditor = ({
             <SemiControlledTextField
               floatingLabelFixed
               floatingLabelText={<Trans>Scaling factor</Trans>}
-              onChange={(value) => setScale(parseFloat(value) || 0)}
+              onChange={value => setScale(parseFloat(value) || 0)}
               value={
                 scale === null ? '' : removeTrailingZeroes(scale.toPrecision(5))
               }
@@ -638,9 +660,10 @@ const Model3DEditor = ({
                 {mapFor(
                   0,
                   model3DConfiguration.getAnimationsCount(),
-                  (animationIndex) => {
-                    const animation =
-                      model3DConfiguration.getAnimation(animationIndex);
+                  animationIndex => {
+                    const animation = model3DConfiguration.getAnimation(
+                      animationIndex
+                    );
 
                     const animationRef =
                       justAddedAnimationName === animation.getName()
@@ -698,7 +721,7 @@ const Model3DEditor = ({
                                     errorText={nameErrors[animationIndex]}
                                     translatableHintText={t`Optional animation name`}
                                     value={animation.getName()}
-                                    onChange={(text) =>
+                                    onChange={text =>
                                       changeAnimationName(animationIndex, text)
                                     }
                                     fullWidth

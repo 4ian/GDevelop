@@ -189,14 +189,21 @@ const PrivateAssetPackInformationPage = ({
   );
   const [assetPack, setAssetPack] = React.useState<?PrivateAssetPack>(null);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
-  const [isRedeemingProduct, setIsRedeemingProduct] =
-    React.useState<boolean>(false);
-  const [openSellerPublicProfileDialog, setOpenSellerPublicProfileDialog] =
-    React.useState<boolean>(false);
-  const [sellerPublicProfile, setSellerPublicProfile] =
-    React.useState<?UserPublicProfile>(null);
-  const [displayPasswordPrompt, setDisplayPasswordPrompt] =
-    React.useState<boolean>(false);
+  const [isRedeemingProduct, setIsRedeemingProduct] = React.useState<boolean>(
+    false
+  );
+  const [
+    openSellerPublicProfileDialog,
+    setOpenSellerPublicProfileDialog,
+  ] = React.useState<boolean>(false);
+  const [
+    sellerPublicProfile,
+    setSellerPublicProfile,
+  ] = React.useState<?UserPublicProfile>(null);
+  const [
+    displayPasswordPrompt,
+    setDisplayPasswordPrompt,
+  ] = React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const [errorText, setErrorText] = React.useState<?React.Node>(null);
   const { isLandscape, isMediumScreen, windowSize } = useResponsiveWindowSize();
@@ -231,7 +238,7 @@ const PrivateAssetPackInformationPage = ({
         productListingDatas: privateAssetPackListingDatas,
         productListingData: privateAssetPackListingData,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: (product) =>
+        onProductOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
@@ -249,7 +256,7 @@ const PrivateAssetPackInformationPage = ({
         product: assetPack,
         productListingDatas: privateAssetPackListingDatas,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: (product) =>
+        onProductOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
@@ -263,11 +270,10 @@ const PrivateAssetPackInformationPage = ({
   const otherPacksFromTheSameAuthorTiles = React.useMemo(
     () =>
       getOtherProductsFromSameAuthorTiles({
-        otherProductListingDatasFromSameCreator:
-          privateAssetPackListingDatasFromSameCreator,
+        otherProductListingDatasFromSameCreator: privateAssetPackListingDatasFromSameCreator,
         currentProductListingData: privateAssetPackListingData,
         receivedProducts: receivedAssetPacks,
-        onProductOpen: (product) =>
+        onProductOpen: product =>
           onAssetPackOpen(product, { forceProductPage: true }),
       }),
     [
@@ -284,192 +290,206 @@ const PrivateAssetPackInformationPage = ({
     else onRedeemAssetPack();
   };
 
-  const onRedeemAssetPack = React.useCallback(async () => {
-    if (!profile || isRedeemingProduct) return;
-    setIsRedeemingProduct(true);
-    try {
-      await redeemPrivateAssetPack({
-        privateAssetPackListingData,
-        getAuthorizationHeader,
-        userId: profile.id,
-        password,
-      });
-      await Promise.all([
-        onRefreshAssetPackPurchases(),
-        onPurchaseSuccessful(),
-      ]);
-    } catch (error) {
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
-      if (
-        extractedStatusAndCode &&
-        extractedStatusAndCode.status === 402 &&
-        extractedStatusAndCode.code ===
-          'product-redemption/old-redeemed-subscription'
-      ) {
-        await showAlert({
-          title: t`Error when claiming asset pack`,
-          message: t`The monthly free asset pack perk was not part of your plan at the time you got your subscription to GDevelop. To enjoy this perk, please purchase a new subscription.`,
-        });
-      } else {
-        console.error(
-          'An error occurred when claiming the asset pack:',
-          extractedStatusAndCode
-        );
-        await showAlert({
-          title: t`Error when claiming asset pack`,
-          message: t`Something wrong happened when claiming the asset pack. Please check your internet connection or try again later.`,
-        });
-      }
-    } finally {
-      setIsRedeemingProduct(false);
-    }
-  }, [
-    privateAssetPackListingData,
-    getAuthorizationHeader,
-    profile,
-    showAlert,
-    password,
-    onPurchaseSuccessful,
-    isRedeemingProduct,
-    onRefreshAssetPackPurchases,
-  ]);
-
-  React.useEffect(() => {
-    (async () => {
-      setIsFetching(true);
+  const onRedeemAssetPack = React.useCallback(
+    async () => {
+      if (!profile || isRedeemingProduct) return;
+      setIsRedeemingProduct(true);
       try {
-        const [assetPack, profile] = await Promise.all([
-          getPrivateAssetPack(id),
-          getUserPublicProfile(sellerId),
+        await redeemPrivateAssetPack({
+          privateAssetPackListingData,
+          getAuthorizationHeader,
+          userId: profile.id,
+          password,
+        });
+        await Promise.all([
+          onRefreshAssetPackPurchases(),
+          onPurchaseSuccessful(),
         ]);
-
-        setAssetPack(assetPack);
-        setSellerPublicProfile(profile);
       } catch (error) {
-        const extractedStatusAndCode =
-          extractGDevelopApiErrorStatusAndCode(error);
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setErrorText(
-            <Trans>
-              Asset pack not found - An error occurred, please try again later.
-            </Trans>
-          );
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (
+          extractedStatusAndCode &&
+          extractedStatusAndCode.status === 402 &&
+          extractedStatusAndCode.code ===
+            'product-redemption/old-redeemed-subscription'
+        ) {
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`The monthly free asset pack perk was not part of your plan at the time you got your subscription to GDevelop. To enjoy this perk, please purchase a new subscription.`,
+          });
         } else {
-          setErrorText(
-            <Trans>An error occurred, please try again later.</Trans>
+          console.error(
+            'An error occurred when claiming the asset pack:',
+            extractedStatusAndCode
           );
+          await showAlert({
+            title: t`Error when claiming asset pack`,
+            message: t`Something wrong happened when claiming the asset pack. Please check your internet connection or try again later.`,
+          });
         }
       } finally {
-        setIsFetching(false);
+        setIsRedeemingProduct(false);
       }
-    })();
-  }, [id, sellerId]);
+    },
+    [
+      privateAssetPackListingData,
+      getAuthorizationHeader,
+      profile,
+      showAlert,
+      password,
+      onPurchaseSuccessful,
+      isRedeemingProduct,
+      onRefreshAssetPackPurchases,
+    ]
+  );
 
-  const onClickBuy = React.useCallback(async () => {
-    if (!assetPack) return;
-    if (isAlreadyReceived) {
-      onAssetPackOpen(privateAssetPackListingData);
-      return;
-    }
+  React.useEffect(
+    () => {
+      (async () => {
+        setIsFetching(true);
+        try {
+          const [assetPack, profile] = await Promise.all([
+            getPrivateAssetPack(id),
+            getUserPublicProfile(sellerId),
+          ]);
 
-    try {
-      const price = privateAssetPackListingData.prices.find(
-        (price) => price.usageType === selectedUsageType
-      );
+          setAssetPack(assetPack);
+          setSellerPublicProfile(profile);
+        } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+            setErrorText(
+              <Trans>
+                Asset pack not found - An error occurred, please try again
+                later.
+              </Trans>
+            );
+          } else {
+            setErrorText(
+              <Trans>An error occurred, please try again later.</Trans>
+            );
+          }
+        } finally {
+          setIsFetching(false);
+        }
+      })();
+    },
+    [id, sellerId]
+  );
+
+  const onClickBuy = React.useCallback(
+    async () => {
+      if (!assetPack) return;
+      if (isAlreadyReceived) {
+        onAssetPackOpen(privateAssetPackListingData);
+        return;
+      }
+
+      try {
+        const price = privateAssetPackListingData.prices.find(
+          price => price.usageType === selectedUsageType
+        );
+        sendAssetPackBuyClicked({
+          assetPackId: assetPack.id,
+          assetPackName: assetPack.name,
+          assetPackTag: assetPack.tag,
+          assetPackKind: 'private',
+          usageType: selectedUsageType,
+          currency: price ? price.currency : undefined,
+        });
+
+        setPurchasingPrivateAssetPackListingData(privateAssetPackListingData);
+      } catch (e) {
+        console.warn('Unable to send event', e);
+      }
+    },
+    [
+      assetPack,
+      privateAssetPackListingData,
+      isAlreadyReceived,
+      onAssetPackOpen,
+      selectedUsageType,
+    ]
+  );
+
+  const onClickBuyWithCredits = React.useCallback(
+    async () => {
+      if (!privateAssetPackListingData || !assetPack) return;
+
+      if (!profile || !limits) {
+        // User not logged in, suggest to log in.
+        onOpenLoginDialog();
+        return;
+      }
+
+      if (isAlreadyReceived) {
+        onAssetPackOpen(privateAssetPackListingData);
+        return;
+      }
+
       sendAssetPackBuyClicked({
         assetPackId: assetPack.id,
         assetPackName: assetPack.name,
         assetPackTag: assetPack.tag,
         assetPackKind: 'private',
+        currency: 'CREDITS',
         usageType: selectedUsageType,
-        currency: price ? price.currency : undefined,
       });
 
-      setPurchasingPrivateAssetPackListingData(privateAssetPackListingData);
-    } catch (e) {
-      console.warn('Unable to send event', e);
-    }
-  }, [
-    assetPack,
-    privateAssetPackListingData,
-    isAlreadyReceived,
-    onAssetPackOpen,
-    selectedUsageType,
-  ]);
-
-  const onClickBuyWithCredits = React.useCallback(async () => {
-    if (!privateAssetPackListingData || !assetPack) return;
-
-    if (!profile || !limits) {
-      // User not logged in, suggest to log in.
-      onOpenLoginDialog();
-      return;
-    }
-
-    if (isAlreadyReceived) {
-      onAssetPackOpen(privateAssetPackListingData);
-      return;
-    }
-
-    sendAssetPackBuyClicked({
-      assetPackId: assetPack.id,
-      assetPackName: assetPack.name,
-      assetPackTag: assetPack.tag,
-      assetPackKind: 'private',
-      currency: 'CREDITS',
-      usageType: selectedUsageType,
-    });
-
-    const currentCreditsAmount = limits.credits.userBalance.amount;
-    const assetPackPriceForUsageType =
-      privateAssetPackListingData.creditPrices.find(
-        (price) => price.usageType === selectedUsageType
+      const currentCreditsAmount = limits.credits.userBalance.amount;
+      const assetPackPriceForUsageType = privateAssetPackListingData.creditPrices.find(
+        price => price.usageType === selectedUsageType
       );
-    if (!assetPackPriceForUsageType) {
-      console.error(
-        'Unable to find the price for the selected usage type',
-        selectedUsageType
-      );
-      return;
-    }
-    const assetPackCreditsAmount = assetPackPriceForUsageType.amount;
-    if (currentCreditsAmount < assetPackCreditsAmount) {
-      openCreditsPackageDialog({
-        missingCredits: assetPackCreditsAmount - currentCreditsAmount,
+      if (!assetPackPriceForUsageType) {
+        console.error(
+          'Unable to find the price for the selected usage type',
+          selectedUsageType
+        );
+        return;
+      }
+      const assetPackCreditsAmount = assetPackPriceForUsageType.amount;
+      if (currentCreditsAmount < assetPackCreditsAmount) {
+        openCreditsPackageDialog({
+          missingCredits: assetPackCreditsAmount - currentCreditsAmount,
+        });
+        return;
+      }
+
+      openCreditsUsageDialog({
+        title: <Trans>Purchase {assetPack.name}</Trans>,
+        message: (
+          <Trans>
+            You are about to use {assetPackCreditsAmount} credits to purchase
+            the asset pack {assetPack.name}. Continue?
+          </Trans>
+        ),
+        onConfirm: () =>
+          buyProductWithCredits(getAuthorizationHeader, {
+            productId: privateAssetPackListingData.id,
+            usageType: selectedUsageType,
+            userId: profile.id,
+          }),
+        successMessage: <Trans>🎉 You can now use your assets!</Trans>,
       });
-      return;
-    }
-
-    openCreditsUsageDialog({
-      title: <Trans>Purchase {assetPack.name}</Trans>,
-      message: (
-        <Trans>
-          You are about to use {assetPackCreditsAmount} credits to purchase the
-          asset pack {assetPack.name}. Continue?
-        </Trans>
-      ),
-      onConfirm: () =>
-        buyProductWithCredits(getAuthorizationHeader, {
-          productId: privateAssetPackListingData.id,
-          usageType: selectedUsageType,
-          userId: profile.id,
-        }),
-      successMessage: <Trans>🎉 You can now use your assets!</Trans>,
-    });
-  }, [
-    profile,
-    limits,
-    privateAssetPackListingData,
-    assetPack,
-    onAssetPackOpen,
-    isAlreadyReceived,
-    openCreditsPackageDialog,
-    selectedUsageType,
-    openCreditsUsageDialog,
-    getAuthorizationHeader,
-    onOpenLoginDialog,
-  ]);
+    },
+    [
+      profile,
+      limits,
+      privateAssetPackListingData,
+      assetPack,
+      onAssetPackOpen,
+      isAlreadyReceived,
+      openCreditsPackageDialog,
+      selectedUsageType,
+      openCreditsUsageDialog,
+      getAuthorizationHeader,
+      onOpenLoginDialog,
+    ]
+  );
 
   const mediaItems = React.useMemo(
     () =>
@@ -481,12 +501,9 @@ const PrivateAssetPackInformationPage = ({
     [assetPack, privateAssetPackListingData, simulateAppStoreProduct]
   );
 
-  const calloutToGetSubscriptionOrClaimAssetPack =
-    getCalloutToGetSubscriptionOrClaimAssetPack({
-      subscription,
-      privateAssetPackListingData,
-      isAlreadyReceived,
-    });
+  const calloutToGetSubscriptionOrClaimAssetPack = getCalloutToGetSubscriptionOrClaimAssetPack(
+    { subscription, privateAssetPackListingData, isAlreadyReceived }
+  );
 
   return (
     <I18n>
@@ -655,7 +672,7 @@ const PrivateAssetPackInformationPage = ({
                   <Text size="sub-title">
                     <Trans>Content</Trans>
                   </Text>
-                  {sortedContentType.map((type) => {
+                  {sortedContentType.map(type => {
                     if (assetPack.content[type]) {
                       return (
                         <li key={type}>
@@ -725,11 +742,11 @@ const PrivateAssetPackInformationPage = ({
             <PublicProfileDialog
               userId={sellerId}
               onClose={() => setOpenSellerPublicProfileDialog(false)}
-              onAssetPackOpen={(assetPackListingData) => {
+              onAssetPackOpen={assetPackListingData => {
                 onAssetPackOpen(assetPackListingData);
                 setOpenSellerPublicProfileDialog(false);
               }}
-              onGameTemplateOpen={(gameTemplateListingData) => {
+              onGameTemplateOpen={gameTemplateListingData => {
                 onGameTemplateOpen(gameTemplateListingData);
                 setOpenSellerPublicProfileDialog(false);
               }}

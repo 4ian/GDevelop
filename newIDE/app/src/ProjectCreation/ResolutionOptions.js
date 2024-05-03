@@ -114,7 +114,7 @@ const ResolutionDimensionTextField = ({
     inputStyle={{ padding: 0 }}
     type="number"
     value={value ? value.toString(10) : ''}
-    onChange={(newValueString) => {
+    onChange={newValueString => {
       // Allow any value, we will clean the value on blur.
       const newValueInt = parseInt(newValueString, 10);
       // Important to allow null when the user is clearing the field.
@@ -140,7 +140,7 @@ const ResolutionDimensionTextField = ({
 
 // Styles to give the impression of pressing an element.
 const useStylesForButtonBase = (selected: boolean) =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: {
         outline: selected
@@ -203,7 +203,7 @@ const ResolutionOptions = ({
   onCustomHeightChange,
 }: {|
   selectedOption: string,
-  onClick: (ResolutionOption) => void,
+  onClick: ResolutionOption => void,
   disabled?: boolean,
   customWidth: ?number,
   customHeight: ?number,

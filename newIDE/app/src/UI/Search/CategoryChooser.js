@@ -13,7 +13,7 @@ import ChevronArrowBottom from '../CustomSvgIcons/ChevronArrowBottom';
 
 const nodeIdSeparator = ';-/>'; // A seemingly random string to ensure no clashes with tag names.
 const toNodeId = (nodes: Array<TagsTreeNode>) =>
-  nodes.map((node) => node.name).join(nodeIdSeparator);
+  nodes.map(node => node.name).join(nodeIdSeparator);
 
 const TagsTreeItems = ({
   tagsTreeNodes,
@@ -22,11 +22,11 @@ const TagsTreeItems = ({
 }: {|
   parentNodes: Array<TagsTreeNode>,
   tagsTreeNodes: Array<TagsTreeNode>,
-  onChoose: (ChosenCategory) => void,
+  onChoose: ChosenCategory => void,
 |}) => {
   if (!tagsTreeNodes.length) return null;
 
-  return tagsTreeNodes.map((node) => {
+  return tagsTreeNodes.map(node => {
     const newParentNodes = [...parentNodes, node];
     return (
       <TreeItem
@@ -81,7 +81,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
       />
       <TagsTreeItems
         tagsTreeNodes={allFilters.tagsTree}
-        onChoose={(category) => {
+        onChoose={category => {
           setChosenCategory(category);
           if (onChoiceChange) onChoiceChange(category);
         }}

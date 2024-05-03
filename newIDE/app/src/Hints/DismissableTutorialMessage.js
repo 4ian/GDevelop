@@ -12,8 +12,9 @@ type Props = {|
  * or was previously hidden before rendering.
  */
 const DismissableTutorialMessage = ({ tutorialId }: Props) => {
-  const { DismissableTutorialMessage: ReturnedDismissableTutorialMessage } =
-    useDismissableTutorialMessage(tutorialId);
+  const {
+    DismissableTutorialMessage: ReturnedDismissableTutorialMessage,
+  } = useDismissableTutorialMessage(tutorialId);
   return ReturnedDismissableTutorialMessage;
 };
 

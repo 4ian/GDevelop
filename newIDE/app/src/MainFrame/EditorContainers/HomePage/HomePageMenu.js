@@ -153,11 +153,11 @@ export const getTabsToDisplay = ({
     displayPlayTab ? 'play' : null,
     'community',
   ].filter(Boolean);
-  return tabs.map((tab) => homePageMenuTabs[tab]);
+  return tabs.map(tab => homePageMenuTabs[tab]);
 };
 
 type Props = {|
-  setActiveTab: (HomeTab) => void,
+  setActiveTab: HomeTab => void,
   activeTab: HomeTab,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,
@@ -171,8 +171,10 @@ export const HomePageMenu = ({
 }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { limits } = React.useContext(AuthenticatedUserContext);
-  const [isHomePageMenuDrawerOpen, setIsHomePageMenuDrawerOpen] =
-    React.useState(false);
+  const [
+    isHomePageMenuDrawerOpen,
+    setIsHomePageMenuDrawerOpen,
+  ] = React.useState(false);
 
   const tabsToDisplay = getTabsToDisplay({ limits });
 

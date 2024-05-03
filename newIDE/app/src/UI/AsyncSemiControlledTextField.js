@@ -67,10 +67,13 @@ const AsyncSemiControlledTextField = ({
     [errorText]
   );
 
-  const cancel = React.useCallback(() => {
-    setNewValue(value);
-    onCancel();
-  }, [value, onCancel]);
+  const cancel = React.useCallback(
+    () => {
+      setNewValue(value);
+      onCancel();
+    },
+    [value, onCancel]
+  );
 
   return (
     <TextField
@@ -78,7 +81,7 @@ const AsyncSemiControlledTextField = ({
       disabled={isLoading}
       onChange={onChangeValue}
       errorText={errorText}
-      onKeyUp={(event) => {
+      onKeyUp={event => {
         if (shouldValidate(event)) {
           onFinishEditingValue();
         } else if (shouldCloseOrCancel(event)) {

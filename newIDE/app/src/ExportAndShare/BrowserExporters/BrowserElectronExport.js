@@ -56,7 +56,7 @@ export const browserElectronExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput,
+  CompressionOutput
 > = {
   name: exportPipelineName,
   packageNameWarningType: 'desktop',
@@ -129,7 +129,7 @@ export const browserElectronExportPipeline: ExportPipeline<
     return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then((blobFiles) => ({
+    }).then(blobFiles => ({
       blobFiles,
       textFiles,
     }));
@@ -152,7 +152,7 @@ export const browserElectronExportPipeline: ExportPipeline<
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
-            {(blobDownloadUrl) => (
+            {blobDownloadUrl => (
               <RaisedButton
                 primary
                 onClick={() => openBlobDownloadUrl(blobDownloadUrl, 'game.zip')}

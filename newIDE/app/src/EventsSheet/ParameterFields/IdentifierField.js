@@ -33,16 +33,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         parameterIndex,
       }) || '';
 
-    const autocompletionIdentifierNames: ExpressionAutocompletion[] =
-      React.useMemo(() => {
+    const autocompletionIdentifierNames: ExpressionAutocompletion[] = React.useMemo(
+      () => {
         if (!parameterIndex) {
           return [];
         }
         const parameterMetadata = instructionMetadata
           ? instructionMetadata.getParameter(parameterIndex)
           : expressionMetadata
-            ? expressionMetadata.getParameter(parameterIndex)
-            : null;
+          ? expressionMetadata.getParameter(parameterIndex)
+          : null;
         const identifierName = parameterMetadata
           ? parameterMetadata.getExtraInfo()
           : '';
@@ -60,11 +60,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 .toJSArray()
             : [];
 
-        return allIdentifierExpressions.map((expression) => ({
+        return allIdentifierExpressions.map(expression => ({
           kind: 'FullExpression',
           completion: expression,
         }));
-      }, [
+      },
+      [
         project,
         layout,
         expressionMetadata,
@@ -72,11 +73,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         parameterIndex,
         // Users can change the objectName with other fields.
         objectName,
-      ]);
+      ]
+    );
 
     const field = React.useRef<?GenericExpressionField>(null);
 
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -90,7 +92,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={(expression) =>
+        onGetAdditionalAutocompletions={expression =>
           autocompletionIdentifierNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

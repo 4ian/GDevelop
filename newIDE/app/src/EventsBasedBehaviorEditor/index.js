@@ -37,12 +37,15 @@ export default function EventsBasedBehaviorEditor({
 }: Props) {
   const forceUpdate = useForceUpdate();
 
-  const onChange = React.useCallback(() => {
-    if (unsavedChanges) {
-      unsavedChanges.triggerUnsavedChanges();
-    }
-    forceUpdate();
-  }, [forceUpdate, unsavedChanges]);
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   // An array containing all the object types that are using the behavior
   const allObjectTypes: Array<string> = React.useMemo(
@@ -81,7 +84,7 @@ export default function EventsBasedBehaviorEditor({
             commitOnBlur
             floatingLabelText={<Trans>Name displayed in editor</Trans>}
             value={eventsBasedBehavior.getFullName()}
-            onChange={(text) => {
+            onChange={text => {
               eventsBasedBehavior.setFullName(text);
               onChange();
             }}
@@ -94,7 +97,7 @@ export default function EventsBasedBehaviorEditor({
               t`Explain what the behavior is doing to the object. Start with a verb when possible.`
             )}
             value={eventsBasedBehavior.getDescription()}
-            onChange={(text) => {
+            onChange={text => {
               eventsBasedBehavior.setDescription(text);
               onChange();
             }}
@@ -116,13 +119,13 @@ export default function EventsBasedBehaviorEditor({
               allObjectTypes.length === 0
                 ? undefined /* Allow anything as the behavior is not used */
                 : allObjectTypes.length === 1
-                  ? [
-                      '',
-                      allObjectTypes[0],
-                    ] /* Allow only the type of the objects using the behavior */
-                  : [
-                      '',
-                    ] /* More than one type of object are using the behavior. Only "any object" can be used on this behavior */
+                ? [
+                    '',
+                    allObjectTypes[0],
+                  ] /* Allow only the type of the objects using the behavior */
+                : [
+                    '',
+                  ] /* More than one type of object are using the behavior. Only "any object" can be used on this behavior */
             }
           />
           {allObjectTypes.length > 1 && (

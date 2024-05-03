@@ -56,7 +56,7 @@ const ObjectGroupEditor = ({
     if (objectsInGroup.length === 0) {
       return null;
     }
-    objectsInGroup.forEach((objectName) => {
+    objectsInGroup.forEach(objectName => {
       const objectType = gd.getTypeOfObject(
         globalObjectsContainer,
         objectsContainer,
@@ -103,7 +103,7 @@ const ObjectGroupEditor = ({
         {group
           .getAllObjectsNames()
           .toJSArray()
-          .map((objectName) => {
+          .map(objectName => {
             let object = getObjectByName(
               globalObjectsContainer,
               objectsContainer,

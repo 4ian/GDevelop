@@ -51,10 +51,10 @@ export const CalloutCard = ({ children, renderImage }: Props) => {
           windowSize === 'small'
             ? styles.smallImageSize
             : windowSize === 'medium'
-              ? styles.mediumImageSize
-              : windowSize === 'large'
-                ? styles.largeImageSize
-                : styles.xlargeImageSize
+            ? styles.mediumImageSize
+            : windowSize === 'large'
+            ? styles.largeImageSize
+            : styles.xlargeImageSize
         )}
         {children}
       </ResponsiveLineStackLayout>

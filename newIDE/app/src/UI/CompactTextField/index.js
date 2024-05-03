@@ -68,19 +68,19 @@ const CompactTextField = ({
   const idToUse = React.useRef<string>(id || makeTimestampedId());
   const controlProps = useClickDragAsControl({
     // $FlowExpectedError - Click drag controls should not be used if value type is not number.
-    onChange: (value) => onChange(value, 'iconControl'),
+    onChange: value => onChange(value, 'iconControl'),
     // $FlowExpectedError
     onGetInitialValue: () => value,
   });
 
   const onBlurInput = React.useCallback(
-    (event) => {
+    event => {
       if (onBlur) onBlur(event);
     },
     [onBlur]
   );
   const onFocusInput = React.useCallback(
-    (event) => {
+    event => {
       if (onFocus) onFocus(event);
     },
     [onFocus]
@@ -139,10 +139,10 @@ const CompactTextField = ({
             value === null
               ? ''
               : typeof value === 'number'
-                ? toFixedWithoutTrailingZeros(value, 2)
-                : value
+              ? toFixedWithoutTrailingZeros(value, 2)
+              : value
           }
-          onChange={(e) => onChange(e.currentTarget.value, 'keyInput')}
+          onChange={e => onChange(e.currentTarget.value, 'keyInput')}
           placeholder={placeholder}
           onBlur={onBlurInput}
           onFocus={onFocusInput}

@@ -17,7 +17,7 @@ const PlaySection = () => {
   const paletteType = gdevelopTheme.palette.type;
   const [iframeHeight, setIframeHeight] = React.useState(null);
 
-  window.addEventListener('message', (event) => {
+  window.addEventListener('message', event => {
     if (
       event.origin === 'https://gd.games' &&
       event.data.id === 'set-embedded-height'

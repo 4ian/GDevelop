@@ -55,25 +55,27 @@ export const Default = () => {
     .onGet(`${GDevelopProjectApi.baseUrl}/project/${projectId}/version`)
     .reply(200, versions)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
 
   createZipWithSingleTextFile(JSON.stringify(emptyGameContent)).then(
-    (zipFile) => {
+    zipFile => {
       const resourcesMock = new MockAdapter(resourcesAxiosClient, {
         delayResponse: 500,
       });
       resourcesMock
         .onGet(
-          `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${versions[1].id}.zip`
+          `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${
+            versions[1].id
+          }.zip`
         )
         .reply(200, zipFile, {
           'content-type': 'application/zip',
         })
         .onAny()
-        .reply((config) => {
+        .reply(config => {
           console.error(`Unexpected call to ${config.url} (${config.method})`);
           return [504, null];
         });
@@ -123,7 +125,7 @@ export const NoFallbackVersion = () => {
     .onGet(`${GDevelopProjectApi.baseUrl}/project/${projectId}/version`)
     .reply(200, versions)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -132,25 +134,29 @@ export const NoFallbackVersion = () => {
 
   createZipWithSingleTextFile(
     stringifiedEmptyGameJson.slice(0, stringifiedEmptyGameJson.length - 5)
-  ).then((zipFile) => {
+  ).then(zipFile => {
     const resourcesMock = new MockAdapter(resourcesAxiosClient, {
       delayResponse: 500,
     });
     resourcesMock
       .onGet(
-        `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${versions[1].id}.zip`
+        `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${
+          versions[1].id
+        }.zip`
       )
       .reply(200, zipFile, {
         'content-type': 'application/zip',
       })
       .onGet(
-        `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${versions[2].id}.zip`
+        `${GDevelopProjectResourcesStorage.baseUrl}/${projectId}/versions/${
+          versions[2].id
+        }.zip`
       )
       .reply(200, zipFile, {
         'content-type': 'application/zip',
       })
       .onAny()
-      .reply((config) => {
+      .reply(config => {
         console.error(`Unexpected call to ${config.url} (${config.method})`);
         return [504, null];
       });
@@ -179,7 +185,7 @@ export const Errored = () => {
     .onGet(`${GDevelopProjectApi.baseUrl}/project/${projectId}/version`)
     .reply(500)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

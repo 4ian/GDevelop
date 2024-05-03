@@ -25,7 +25,7 @@ const styles = {
 
 // We are obliged to override the StepIcon colors through StepLabel
 // since it is not customizable from Stepper props.
-const useStepLabelStyles = makeStyles((theme) => ({
+const useStepLabelStyles = makeStyles(theme => ({
   text: { fill: theme.palette.secondary.contrastText },
   completed: {
     fill: theme.palette.secondary.main,
@@ -35,7 +35,7 @@ const useStepLabelStyles = makeStyles((theme) => ({
   },
 }));
 
-const usetStepConnectorStyles = makeStyles((theme) => ({
+const usetStepConnectorStyles = makeStyles(theme => ({
   root: {
     flex: 0,
   },
@@ -67,7 +67,7 @@ const CustomStepLabel = (props: { children: React.Node }) => {
   return (
     <StepLabel
       {...props}
-      StepIconComponent={(iconProps) => (
+      StepIconComponent={iconProps => (
         <StepIcon {...iconProps} classes={classes} />
       )}
     >
@@ -97,14 +97,14 @@ const BuildStepsProgress = ({
       exportStep === 'resources-download'
         ? 0
         : exportStep === 'compress' || exportStep === 'upload'
-          ? 1
-          : exportStep === 'waiting-for-build' || exportStep === 'build'
-            ? 2
-            : exportStep === 'done'
-              ? hasBuildStep
-                ? 2
-                : 1
-              : -1,
+        ? 1
+        : exportStep === 'waiting-for-build' || exportStep === 'build'
+        ? 2
+        : exportStep === 'done'
+        ? hasBuildStep
+          ? 2
+          : 1
+        : -1,
     [exportStep, hasBuildStep]
   );
   const stepConnectorStyles = usetStepConnectorStyles();

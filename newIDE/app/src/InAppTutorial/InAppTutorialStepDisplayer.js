@@ -81,8 +81,8 @@ const getWrongEditorTooltip = (
     expectedEditor.editor === 'Scene'
       ? i18n._(t`the scene editor`)
       : expectedEditor.editor === 'Home'
-        ? i18n._(t`the home page`)
-        : i18n._(t`the events sheet`);
+      ? i18n._(t`the home page`)
+      : i18n._(t`the events sheet`);
 
   const sceneMention = expectedEditor.scene
     ? ` for scene "${expectedEditor.scene}"`
@@ -151,15 +151,20 @@ function InAppTutorialStepDisplayer({
   progress,
   goToNextStep,
 }: Props) {
-  const [elementToHighlight, setElementToHighlight] =
-    React.useState<?HTMLElement>(null);
+  const [
+    elementToHighlight,
+    setElementToHighlight,
+  ] = React.useState<?HTMLElement>(null);
   const [elementWithId, setElementWithId] = React.useState<?HTMLElement>(null);
-  const [hideBehindOtherDialog, setHideBehindOtherDialog] =
-    React.useState<boolean>(false);
-  const [assistantImage, setAssistantImage] =
-    React.useState<?HTMLDivElement>(null);
+  const [
+    hideBehindOtherDialog,
+    setHideBehindOtherDialog,
+  ] = React.useState<boolean>(false);
+  const [assistantImage, setAssistantImage] = React.useState<?HTMLDivElement>(
+    null
+  );
 
-  const defineAssistantImage = React.useCallback((node) => {
+  const defineAssistantImage = React.useCallback(node => {
     if (node) {
       setAssistantImage(node);
     }
@@ -167,14 +172,19 @@ function InAppTutorialStepDisplayer({
 
   // The element could disappear if the user closes a dialog for instance.
   // So we need to periodically query it.
-  const queryElement = React.useCallback(() => {
-    if (!elementToHighlightId) return;
+  const queryElement = React.useCallback(
+    () => {
+      if (!elementToHighlightId) return;
 
-    const { elementToHighlight, elementWithId } =
-      queryElementOrItsMostVisuallySignificantParent(elementToHighlightId);
-    setElementToHighlight(elementToHighlight);
-    setElementWithId(elementWithId);
-  }, [elementToHighlightId]);
+      const {
+        elementToHighlight,
+        elementWithId,
+      } = queryElementOrItsMostVisuallySignificantParent(elementToHighlightId);
+      setElementToHighlight(elementToHighlight);
+      setElementWithId(elementWithId);
+    },
+    [elementToHighlightId]
+  );
   useInterval(queryElement, ELEMENT_QUERY_FREQUENCY);
 
   // Material UI dialogs are displayed at z-index 1300 and out of the root
@@ -187,40 +197,44 @@ function InAppTutorialStepDisplayer({
   // through the latest dialog. So we have to "manually" hide them when we detect
   // the element to highlight is both on a dialog and that there's another dialog
   // opened above it.
-  const hideIfBehindOtherDialog = React.useCallback(() => {
-    if (!elementToHighlight) return;
-    setHideBehindOtherDialog(false);
-    const rootDialog = getElementToHighlightRootDialog(elementToHighlight);
-    if (!rootDialog) {
-      // if the element to highlight in not on a dialog, the highlighter
-      // is on a z index close to element to highlight. So it will be hidden
-      // behind a dialog if there's one, so no need to force-hide it.
-      return;
-    }
-    if (isThereAnOpenDialogInTheFollowingSiblings(rootDialog)) {
-      setHideBehindOtherDialog(true);
-    }
-  }, [elementToHighlight]);
+  const hideIfBehindOtherDialog = React.useCallback(
+    () => {
+      if (!elementToHighlight) return;
+      setHideBehindOtherDialog(false);
+      const rootDialog = getElementToHighlightRootDialog(elementToHighlight);
+      if (!rootDialog) {
+        // if the element to highlight in not on a dialog, the highlighter
+        // is on a z index close to element to highlight. So it will be hidden
+        // behind a dialog if there's one, so no need to force-hide it.
+        return;
+      }
+      if (isThereAnOpenDialogInTheFollowingSiblings(rootDialog)) {
+        setHideBehindOtherDialog(true);
+      }
+    },
+    [elementToHighlight]
+  );
   useInterval(hideIfBehindOtherDialog, HIDE_QUERY_FREQUENCY);
 
-  React.useEffect(() => {
-    setElementToHighlight(null);
-    setHideBehindOtherDialog(false);
-  }, [elementToHighlightId]);
+  React.useEffect(
+    () => {
+      setElementToHighlight(null);
+      setHideBehindOtherDialog(false);
+    },
+    [elementToHighlightId]
+  );
 
-  React.useEffect(() => {
-    // If the element is missing and we are on the right editor, go back
-    // to fallback step after a delay.
-    if (elementToHighlightId && !elementToHighlight && !expectedEditor) {
-      const timeoutId = setTimeout(goToFallbackStep, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [
-    elementToHighlightId,
-    elementToHighlight,
-    goToFallbackStep,
-    expectedEditor,
-  ]);
+  React.useEffect(
+    () => {
+      // If the element is missing and we are on the right editor, go back
+      // to fallback step after a delay.
+      if (elementToHighlightId && !elementToHighlight && !expectedEditor) {
+        const timeoutId = setTimeout(goToFallbackStep, 1000);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [elementToHighlightId, elementToHighlight, goToFallbackStep, expectedEditor]
+  );
 
   const renderHighlighter = () => {
     if (
@@ -258,32 +272,35 @@ function InAppTutorialStepDisplayer({
     );
   };
 
-  const getFillAutomaticallyFunction = React.useCallback(() => {
-    if (!nextStepTrigger || !nextStepTrigger.valueEquals) {
-      return undefined;
-    }
+  const getFillAutomaticallyFunction = React.useCallback(
+    () => {
+      if (!nextStepTrigger || !nextStepTrigger.valueEquals) {
+        return undefined;
+      }
 
-    if (
-      !(elementWithId instanceof HTMLInputElement) &&
-      !(elementWithId instanceof HTMLTextAreaElement)
-    ) {
-      return undefined;
-    }
+      if (
+        !(elementWithId instanceof HTMLInputElement) &&
+        !(elementWithId instanceof HTMLTextAreaElement)
+      ) {
+        return undefined;
+      }
 
-    const valuePropertyDescriptor = Object.getOwnPropertyDescriptor(
-      elementWithId.constructor.prototype,
-      'value'
-    );
-    if (!valuePropertyDescriptor) return undefined;
-    const valueSetter = valuePropertyDescriptor.set;
-    if (!valueSetter) return undefined;
-    return () => {
-      valueSetter.call(elementWithId, nextStepTrigger.valueEquals);
-      // Trigger blur to make sure the value is taken into account
-      // by the React input.
-      elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
-    };
-  }, [nextStepTrigger, elementWithId]);
+      const valuePropertyDescriptor = Object.getOwnPropertyDescriptor(
+        elementWithId.constructor.prototype,
+        'value'
+      );
+      if (!valuePropertyDescriptor) return undefined;
+      const valueSetter = valuePropertyDescriptor.set;
+      if (!valueSetter) return undefined;
+      return () => {
+        valueSetter.call(elementWithId, nextStepTrigger.valueEquals);
+        // Trigger blur to make sure the value is taken into account
+        // by the React input.
+        elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
+      };
+    },
+    [nextStepTrigger, elementWithId]
+  );
 
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor) {

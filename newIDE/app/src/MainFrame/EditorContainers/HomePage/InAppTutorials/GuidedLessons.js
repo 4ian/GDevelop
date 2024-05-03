@@ -118,44 +118,44 @@ const GuidedLessons = ({ selectInAppTutorial, lessonsIds }: Props) => {
       title: t`Joystick controls`,
       description: t`Learn how to add a joystick to control the player.`,
       durationInMinutes: 1,
-      renderImage: (props) => <Joystick {...props} />,
+      renderImage: props => <Joystick {...props} />,
     },
     {
       id: HEALTH_BAR_IN_APP_TUTORIAL_ID,
       title: t`Health bar`,
       description: t`Learn how to display the health of a player on the foreground.`,
       durationInMinutes: 2,
-      renderImage: (props) => <HealthBar {...props} />,
+      renderImage: props => <HealthBar {...props} />,
     },
     {
       id: OBJECT_3D_IN_APP_TUTORIAL_ID,
       title: t`3D box`,
       description: t`Learn how to add a 3D box to your game.`,
       durationInMinutes: 2,
-      renderImage: (props) => <Object3D {...props} />,
+      renderImage: props => <Object3D {...props} />,
     },
     {
       id: CAMERA_PARALLAX_IN_APP_TUTORIAL_ID,
       title: t`Background`,
       description: t`Learn how to create a parallax background as well as a camera that follows the player.`,
       durationInMinutes: 2,
-      renderImage: (props) => <Parallax {...props} />,
+      renderImage: props => <Parallax {...props} />,
     },
     {
       id: TIMER_IN_APP_TUTORIAL_ID,
       title: t`Timer`,
       description: t`Learn how to use a timer to count a score.`,
       durationInMinutes: 2,
-      renderImage: (props) => <Timer {...props} />,
+      renderImage: props => <Timer {...props} />,
     },
     {
       id: PLINKO_MULTIPLIER_IN_APP_TUTORIAL_ID,
       title: t`Score multiplier`,
       description: t`Learn how to manipulate a score by adding collectibles.`,
       durationInMinutes: 3,
-      renderImage: (props) => <MultiplierScore {...props} />,
+      renderImage: props => <MultiplierScore {...props} />,
     },
-  ].filter((item) => displayedGuidedLessonsIds.includes(item.id));
+  ].filter(item => displayedGuidedLessonsIds.includes(item.id));
 
   return (
     <Line>

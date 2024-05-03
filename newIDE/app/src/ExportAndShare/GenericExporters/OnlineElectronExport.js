@@ -24,7 +24,7 @@ export const SetupExportHeader = ({
   if (!!build && build.status === 'complete') return null;
 
   const setTarget = (targetName: TargetName, enable: boolean) => {
-    updateExportState((prevExportState) => {
+    updateExportState(prevExportState => {
       if (enable && prevExportState.targets.indexOf(targetName) === -1) {
         return {
           ...prevExportState,
@@ -36,9 +36,7 @@ export const SetupExportHeader = ({
       ) {
         return {
           ...prevExportState,
-          targets: prevExportState.targets.filter(
-            (name) => name !== targetName
-          ),
+          targets: prevExportState.targets.filter(name => name !== targetName),
         };
       }
 

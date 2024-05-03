@@ -19,7 +19,7 @@ const NewTeamGroupNameField = ({ onValidateGroupName, onDismiss }: Props) => {
         autoFocus="desktopAndMobileDevices"
         translatableHintText={t`New group name`}
         value={''}
-        callback={async (newName) => {
+        callback={async newName => {
           await onValidateGroupName({ name: newName });
           onDismiss();
         }}

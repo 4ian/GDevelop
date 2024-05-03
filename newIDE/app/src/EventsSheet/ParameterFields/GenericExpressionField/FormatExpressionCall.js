@@ -59,7 +59,7 @@ export const getVisibleParameterTypes = (
 ): Array<string> => {
   const parameterTypes: Array<string> = mapVector(
     expressionMetadata.metadata.getParameters(),
-    (parameterMetadata) => parameterMetadata.getType()
+    parameterMetadata => parameterMetadata.getType()
   );
 
   if (expressionMetadata.scope.objectMetadata) {

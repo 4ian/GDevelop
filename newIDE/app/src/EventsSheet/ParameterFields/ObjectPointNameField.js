@@ -19,7 +19,7 @@ const gd: libGDevelop = global.gd;
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectPointNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -56,10 +56,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         const animations = spriteConfiguration.getAnimations();
 
         return getAllPointNames(animations)
-          .map((pointName) => (pointName.length > 0 ? pointName : null))
+          .map(pointName => (pointName.length > 0 ? pointName : null))
           .filter(Boolean)
           .sort()
-          .map((pointName) => ({
+          .map(pointName => ({
             kind: 'Text',
             completion: `"${pointName}"`,
           }));
@@ -75,7 +75,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         // group is a sprite and get the points that they all have in common.
         const pointsNamesByObject = mapVector(
           group.getAllObjectsNames(),
-          (objectName) => {
+          objectName => {
             const object = getObjectByName(project, scope.layout, objectName);
             if (!object || object.getType() !== 'Sprite') {
               return null;
@@ -86,19 +86,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             const animations = spriteConfiguration.getAnimations();
 
             return getAllPointNames(animations)
-              .map((pointName) => (pointName.length > 0 ? pointName : null))
+              .map(pointName => (pointName.length > 0 ? pointName : null))
               .filter(Boolean);
           }
         );
 
-        if (pointsNamesByObject.some((pointsNames) => !pointsNames)) return [];
+        if (pointsNamesByObject.some(pointsNames => !pointsNames)) return [];
 
         // Flow fears that pointsNamesByObject contains null values but this
         // possibility should be handled above.
         // $FlowExpectedError[incompatible-call]
         return intersection<string>(...pointsNamesByObject)
           .sort()
-          .map((pointName) => ({
+          .map(pointName => ({
             kind: 'Text',
             completion: `"${pointName}"`,
           }));
@@ -110,7 +110,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={(expression) =>
+        onGetAdditionalAutocompletions={expression =>
           getPointNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

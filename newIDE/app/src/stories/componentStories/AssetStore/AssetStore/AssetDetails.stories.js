@@ -35,7 +35,7 @@ export const PublicAsset = () => {
       <AssetDetails
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
-        onOpenDetails={(assetShortHeader) => {}}
+        onOpenDetails={assetShortHeader => {}}
         onPrivateAssetPackSelection={() => {}}
         onPrivateGameTemplateSelection={() => {}}
       />
@@ -45,7 +45,9 @@ export const PublicAsset = () => {
 PublicAsset.parameters = {
   mockData: [
     {
-      url: `https://resources.gdevelop-app.com/assets-database/assets/${fakeAssetShortHeader1.id}.json`,
+      url: `https://resources.gdevelop-app.com/assets-database/assets/${
+        fakeAssetShortHeader1.id
+      }.json`,
       method: 'GET',
       status: 200,
       response: fakeAssetWithCustomObject,
@@ -58,7 +60,7 @@ export const PrivateAsset = () => (
     <AssetDetails
       onTagSelection={() => {}}
       assetShortHeader={fakeAssetShortHeader1}
-      onOpenDetails={(assetShortHeader) => {}}
+      onOpenDetails={assetShortHeader => {}}
       onPrivateAssetPackSelection={() => {}}
       onPrivateGameTemplateSelection={() => {}}
     />
@@ -67,7 +69,9 @@ export const PrivateAsset = () => (
 PrivateAsset.parameters = {
   mockData: [
     {
-      url: `${GDevelopUserApi.baseUrl}/user-public-profile?id=ZJxWdIDmJzUA5iAWryEItxINA7n1`,
+      url: `${
+        GDevelopUserApi.baseUrl
+      }/user-public-profile?id=ZJxWdIDmJzUA5iAWryEItxINA7n1`,
       method: 'GET',
       status: 200,
       response: {
@@ -91,7 +95,9 @@ PrivateAsset.parameters = {
       },
     },
     {
-      url: `https://resources.gdevelop-app.com/assets-database/assets/${fakeAssetShortHeader1.id}.json`,
+      url: `https://resources.gdevelop-app.com/assets-database/assets/${
+        fakeAssetShortHeader1.id
+      }.json`,
       method: 'GET',
       status: 200,
       response: {
@@ -108,7 +114,7 @@ export const AssetWithMultipleAuthors = () => (
     <AssetDetails
       onTagSelection={() => {}}
       assetShortHeader={fakeAssetShortHeader1}
-      onOpenDetails={(assetShortHeader) => {}}
+      onOpenDetails={assetShortHeader => {}}
       onPrivateAssetPackSelection={() => {}}
       onPrivateGameTemplateSelection={() => {}}
     />
@@ -117,7 +123,9 @@ export const AssetWithMultipleAuthors = () => (
 PrivateAsset.parameters = {
   mockData: [
     {
-      url: `${GDevelopUserApi.baseUrl}/user-public-profile?id=ZJxWdIDmJzUA5iAWryEItxINA7n1,ABCWdIDmJzUA5iAWryEItxINA7n1`,
+      url: `${
+        GDevelopUserApi.baseUrl
+      }/user-public-profile?id=ZJxWdIDmJzUA5iAWryEItxINA7n1,ABCWdIDmJzUA5iAWryEItxINA7n1`,
       method: 'GET',
       status: 200,
       response: {
@@ -158,7 +166,9 @@ PrivateAsset.parameters = {
       },
     },
     {
-      url: `https://resources.gdevelop-app.com/assets-database/assets/${fakeAssetShortHeader1.id}.json`,
+      url: `https://resources.gdevelop-app.com/assets-database/assets/${
+        fakeAssetShortHeader1.id
+      }.json`,
       method: 'GET',
       status: 200,
       response: {

@@ -104,14 +104,21 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
 
     const draggedUserRef = React.useRef<?User>(null);
     const [selectedUser, setSelectedUser] = React.useState<?User>(null);
-    const [selectedUserProjects, setSelectedUserProjects] =
-      React.useState<?Array<CloudProjectWithUserAccessInfo>>(null);
-    const [isLoadingUserProjects, setIsLoadingUserProjects] =
-      React.useState<boolean>(false);
-    const [showNewGroupNameField, setShowNewGroupNameField] =
-      React.useState<boolean>(false);
-    const [isLoadingMembers, setIsLoadingMembers] =
-      React.useState<boolean>(false);
+    const [
+      selectedUserProjects,
+      setSelectedUserProjects,
+    ] = React.useState<?Array<CloudProjectWithUserAccessInfo>>(null);
+    const [
+      isLoadingUserProjects,
+      setIsLoadingUserProjects,
+    ] = React.useState<boolean>(false);
+    const [
+      showNewGroupNameField,
+      setShowNewGroupNameField,
+    ] = React.useState<boolean>(false);
+    const [isLoadingMembers, setIsLoadingMembers] = React.useState<boolean>(
+      false
+    );
     const [movingUsers, setMovingUsers] = React.useState<?{|
       groupId: string,
       users: User[],
@@ -137,16 +144,22 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
       [onListUserProjects]
     );
 
-    const onRefreshTeamMembers = React.useCallback(async () => {
-      setIsLoadingMembers(true);
-      try {
-        await onRefreshMembers();
-      } catch (error) {
-        console.error('An error occurred when refreshing team members:', error);
-      } finally {
-        setIsLoadingMembers(false);
-      }
-    }, [onRefreshMembers]);
+    const onRefreshTeamMembers = React.useCallback(
+      async () => {
+        setIsLoadingMembers(true);
+        try {
+          await onRefreshMembers();
+        } catch (error) {
+          console.error(
+            'An error occurred when refreshing team members:',
+            error
+          );
+        } finally {
+          setIsLoadingMembers(false);
+        }
+      },
+      [onRefreshMembers]
+    );
 
     const changeUserGroup = React.useCallback(
       async (user: User, group: TeamGroup) => {
@@ -158,7 +171,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
           await onChangeUserGroup(user, group);
         } catch (error) {
           console.error(
-            `An error occurred when changing user ${user.email} to group ${group.name}: `,
+            `An error occurred when changing user ${user.email} to group ${
+              group.name
+            }: `,
             error
           );
         } finally {
@@ -234,12 +249,12 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
         ? {
             group: membersNotInAGroup.group,
             members: membersNotInAGroup.members.filter(
-              (member) => !movingUsers.users.includes(member)
+              member => !movingUsers.users.includes(member)
             ),
           }
         : membersNotInAGroup;
     const groupsAndMembers = Object.keys(membersByGroupId)
-      .map((id) => (id === 'NONE' ? null : membersByGroupId[id]))
+      .map(id => (id === 'NONE' ? null : membersByGroupId[id]))
       .filter(Boolean)
       .sort((a, b) => a.group.name.localeCompare(b.group.name));
 
@@ -277,7 +292,7 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                   <List style={styles.list}>
                     {membersNotInAGroupToDisplay.members
                       .sort(sortMembersByNameOrEmail)
-                      .map((member) => (
+                      .map(member => (
                         <TeamMemberRow
                           isTemporary={false}
                           key={member.id}
@@ -323,9 +338,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                 groupsAndMembers.map(({ group, members }) => {
                   const membersToDisplay = [...members];
                   if (!!movingUsers && movingUsers.groupId === group.id) {
-                    movingUsers.users.forEach((movingUser) => {
+                    movingUsers.users.forEach(movingUser => {
                       if (
-                        !members.some((member) => member.id === movingUser.id)
+                        !members.some(member => member.id === movingUser.id)
                       ) {
                         membersToDisplay.push(movingUser);
                       }
@@ -351,7 +366,9 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                                 ? {
                                     backgroundColor:
                                       gdevelopTheme.paper.backgroundColor.light,
-                                    outline: `2px dashed ${gdevelopTheme.dropIndicator.canDrop}`,
+                                    outline: `2px dashed ${
+                                      gdevelopTheme.dropIndicator.canDrop
+                                    }`,
                                   }
                                 : undefined
                             }
@@ -369,11 +386,11 @@ const TeamSection = React.forwardRef<Props, TeamSectionInterface>(
                                 <List style={styles.list}>
                                   {membersToDisplay
                                     .sort(sortMembersByNameOrEmail)
-                                    .map((member) => {
+                                    .map(member => {
                                       const isTemporary =
                                         !!movingUsers &&
                                         movingUsers.users.some(
-                                          (user) => user.id === member.id
+                                          user => user.id === member.id
                                         );
                                       return (
                                         <TeamMemberRow

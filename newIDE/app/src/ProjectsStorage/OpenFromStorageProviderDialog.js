@@ -15,7 +15,7 @@ const electron = optionalRequire('electron');
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
-  onChooseProvider: (StorageProvider) => void,
+  onChooseProvider: StorageProvider => void,
   onClose: () => void,
 |};
 
@@ -25,7 +25,7 @@ const OpenFromStorageProviderDialog = ({
   onChooseProvider,
 }: Props) => {
   const isCloudStorageProviderEnabled = storageProviders.some(
-    (provider) => provider.internalName === 'Cloud'
+    provider => provider.internalName === 'Cloud'
   );
   return (
     <I18n>
@@ -54,8 +54,8 @@ const OpenFromStorageProviderDialog = ({
           )}
           <List useGap>
             {storageProviders
-              .filter((storageProvider) => !storageProvider.hiddenInOpenDialog)
-              .map((storageProvider) => (
+              .filter(storageProvider => !storageProvider.hiddenInOpenDialog)
+              .map(storageProvider => (
                 <StorageProviderListItem
                   key={storageProvider.internalName}
                   onChooseProvider={onChooseProvider}

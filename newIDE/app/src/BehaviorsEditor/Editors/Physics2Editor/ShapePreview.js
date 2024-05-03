@@ -170,8 +170,8 @@ const ShapePreview = (props: Props) => {
           (dimensionA > 0
             ? dimensionA
             : imageWidth + imageHeight > 0
-              ? (imageWidth + imageHeight) / 4
-              : 1) * imageZoomFactor
+            ? (imageWidth + imageHeight) / 4
+            : 1) * imageZoomFactor
         }
       />
     );
@@ -240,18 +240,14 @@ const ShapePreview = (props: Props) => {
           fillRule="evenodd"
           points={vertices
             .map(
-              (vertex) =>
-                `${
-                  (vertex.x +
-                    offsetX +
-                    (polygonOrigin === 'Center' ? imageWidth / 2 : 0)) *
-                  imageZoomFactor
-                },${
-                  (vertex.y +
-                    offsetY +
-                    (polygonOrigin === 'Center' ? imageHeight / 2 : 0)) *
-                  imageZoomFactor
-                }`
+              vertex =>
+                `${(vertex.x +
+                  offsetX +
+                  (polygonOrigin === 'Center' ? imageWidth / 2 : 0)) *
+                  imageZoomFactor},${(vertex.y +
+                  offsetY +
+                  (polygonOrigin === 'Center' ? imageHeight / 2 : 0)) *
+                  imageZoomFactor}`
             )
             .join(' ')}
         />

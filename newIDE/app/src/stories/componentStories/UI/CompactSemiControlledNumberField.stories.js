@@ -82,7 +82,7 @@ export const Default = () => {
             id="with-icon"
             value={value3}
             onChange={setValue3}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
@@ -94,7 +94,7 @@ export const Default = () => {
             onChange={setValue4}
             errored
             errorText={'An error occurred.'}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
@@ -106,7 +106,7 @@ export const Default = () => {
             value={value5}
             onChange={setValue5}
             placeholder="With placeholder"
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
@@ -117,7 +117,7 @@ export const Default = () => {
             disabled
             value={777}
             onChange={() => {}}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             useLeftIconAsNumberControl
             leftIconTooltip={'Angle'}
           />
@@ -128,11 +128,11 @@ export const Default = () => {
           <CompactSemiControlledNumberField
             value={value6}
             onChange={setValue6}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
             useLeftIconAsNumberControl
             id="with-end-adornment"
-            renderEndAdornmentOnHover={(className) => (
+            renderEndAdornmentOnHover={className => (
               <Restore className={className} />
             )}
             onClickEndAdornment={action('onClickEndAdornment')}
@@ -144,10 +144,10 @@ export const Default = () => {
             disabled
             value={45.1}
             onChange={() => {}}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle disabled'}
             useLeftIconAsNumberControl
-            renderEndAdornmentOnHover={(className) => (
+            renderEndAdornmentOnHover={className => (
               <Restore className={className} />
             )}
             onClickEndAdornment={action('onClickEndAdornment')}

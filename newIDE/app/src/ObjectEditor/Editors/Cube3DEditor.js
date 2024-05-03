@@ -96,12 +96,12 @@ const Cube3DEditor = ({
     .get('facesOrientation')
     .getExtraInfo()
     .toJSArray()
-    .map((value) => ({ value, label: value }));
+    .map(value => ({ value, label: value }));
   const backFaceUpThroughWhichAxisRotationChoices = properties
     .get('backFaceUpThroughWhichAxisRotation')
     .getExtraInfo()
     .toJSArray()
-    .map((value) => ({ value, label: value }));
+    .map(value => ({ value, label: value }));
 
   return (
     <ColumnStackLayout noMargin>
@@ -110,7 +110,7 @@ const Cube3DEditor = ({
         <Trans>Default size</Trans>
       </Text>
       <ResponsiveLineStackLayout expand noColumnMargin>
-        {['width', 'height', 'depth'].map((propertyName) => {
+        {['width', 'height', 'depth'].map(propertyName => {
           const property = properties.get(propertyName);
           const measurementUnit = property.getMeasurementUnit();
           const endAdornment = {
@@ -129,7 +129,7 @@ const Cube3DEditor = ({
                 commitOnBlur
                 floatingLabelFixed
                 floatingLabelText={property.getLabel()}
-                onChange={(value) => onChangeProperty(propertyName, value)}
+                onChange={value => onChangeProperty(propertyName, value)}
                 value={property.getValue()}
                 endAdornment={
                   <Tooltip title={endAdornment.tooltipContent}>
@@ -180,7 +180,7 @@ const Cube3DEditor = ({
             onChangeProperty('facesOrientation', newValue);
           }}
         >
-          {facesOrientationChoices.map((choice) => (
+          {facesOrientationChoices.map(choice => (
             <SelectOption
               label={choice.label}
               value={choice.value}
@@ -202,7 +202,7 @@ const Cube3DEditor = ({
             onChangeProperty('backFaceUpThroughWhichAxisRotation', newValue);
           }}
         >
-          {backFaceUpThroughWhichAxisRotationChoices.map((choice) => (
+          {backFaceUpThroughWhichAxisRotationChoices.map(choice => (
             <SelectOption
               label={choice.label}
               value={choice.value}
@@ -239,7 +239,7 @@ const Cube3DEditor = ({
             </AlertMessage>
           )}
       </ColumnStackLayout>
-      {facesProperties.map((faceProperty) => (
+      {facesProperties.map(faceProperty => (
         <React.Fragment key={faceProperty.id}>
           <Text size="block-title">{faceProperty.blockName}</Text>
           <ColumnStackLayout noMargin>
@@ -291,7 +291,7 @@ const Cube3DEditor = ({
               defaultNewResourceName={
                 objectName + '_' + faceProperty.newResourceNameSuffix
               }
-              onChange={(value) =>
+              onChange={value =>
                 onChangeProperty(faceProperty.resourceNameProperty, value)
               }
               id={`cube3d-object-${faceProperty.resourceNameProperty}`}

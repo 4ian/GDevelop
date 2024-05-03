@@ -43,12 +43,11 @@ export default class LayerRemoveDialog extends Component<Props, State> {
   render() {
     if (!this.props.layersContainer || !this.props.open) return null;
 
-    const instancesCountInLayout =
-      gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
-        this.props.project,
-        this.props.layersContainer,
-        this.props.layerRemoved
-      );
+    const instancesCountInLayout = gd.WholeProjectRefactorer.getLayoutAndExternalLayoutLayerInstancesCount(
+      this.props.project,
+      this.props.layersContainer,
+      this.props.layerRemoved
+    );
 
     let actions = [
       <FlatButton

@@ -64,8 +64,10 @@ type ServiceWorkerUpdateStatus =
   | 'update-ready';
 
 export const useServiceWorkerUpdateStatus = () => {
-  const [serviceWorkerUpdateStatus, setServiceWorkerUpdateStatus] =
-    React.useState<ServiceWorkerUpdateStatus>('unknown');
+  const [
+    serviceWorkerUpdateStatus,
+    setServiceWorkerUpdateStatus,
+  ] = React.useState<ServiceWorkerUpdateStatus>('unknown');
 
   React.useEffect(() => {
     (async () => {

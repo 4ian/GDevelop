@@ -70,13 +70,16 @@ const PointsEditor = ({
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-  const [selectedPointName, setSelectedPointName] =
-    React.useState<?string>(null);
-  const [highlightedPointName, setHighlightedPointName] =
-    React.useState<?string>(null);
+  const [selectedPointName, setSelectedPointName] = React.useState<?string>(
+    null
+  );
+  const [
+    highlightedPointName,
+    setHighlightedPointName,
+  ] = React.useState<?string>(null);
 
   const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
-    [number, number],
+    [number, number]
   >([0, 0]);
 
   const forceUpdate = useForceUpdate();
@@ -104,7 +107,7 @@ const PointsEditor = ({
     (samePointsForAnimations: boolean, samePointsForSprites: boolean) => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, animations.getAnimationsCount(), (i) => {
+          mapFor(0, animations.getAnimationsCount(), i => {
             const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
@@ -119,18 +122,18 @@ const PointsEditor = ({
     [animation, sprite, animations, forceUpdate, onPointsUpdated]
   );
 
-  const chooseAnimation = (index) => {
+  const chooseAnimation = index => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  const chooseDirection = (index) => {
+  const chooseDirection = index => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  const chooseSprite = (index) => {
+  const chooseSprite = index => {
     setSpriteIndex(index);
   };
 
@@ -138,14 +141,17 @@ const PointsEditor = ({
   // to enable the toggle.
   // Note: we do not recompute if all animations have the same points, as we consider
   // that if the user has enabled/disabled this, they want to keep it that way.
-  React.useEffect(() => {
-    if (!sprite || !animation) {
-      return;
-    }
-    setSamePointsForSprites(
-      allAnimationSpritesHaveSamePointsAs(sprite, animation)
-    );
-  }, [animation, sprite]);
+  React.useEffect(
+    () => {
+      if (!sprite || !animation) {
+        return;
+      }
+      setSamePointsForSprites(
+        allAnimationSpritesHaveSamePointsAs(sprite, animation)
+      );
+    },
+    [animation, sprite]
+  );
 
   const setSamePointsForAllAnimations = React.useCallback(
     async (enable: boolean) => {
@@ -219,7 +225,7 @@ const PointsEditor = ({
                 resourceName
               )}
               onImageSize={setCurrentSpriteSize}
-              renderOverlay={(overlayProps) =>
+              renderOverlay={overlayProps =>
                 sprite && (
                   <PointsPreview
                     {...overlayProps}

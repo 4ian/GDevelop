@@ -53,12 +53,12 @@ export type EnumeratedInstructionOrExpressionMetadata =
  * filter the ones that are not usable from the current "scope".
  */
 export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
-  +T: EnumeratedInstructionOrExpressionMetadata,
+  +T: EnumeratedInstructionOrExpressionMetadata
 >(
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  return list.filter((enumeratedInstructionOrExpressionMetadata) =>
+  return list.filter(enumeratedInstructionOrExpressionMetadata =>
     isFunctionVisibleInGivenScope(
       enumeratedInstructionOrExpressionMetadata,
       scope
@@ -70,8 +70,10 @@ const isFunctionVisibleInGivenScope = (
   enumeratedInstructionOrExpressionMetadata: EnumeratedInstructionOrExpressionMetadata,
   scope: EventsScope
 ): boolean => {
-  const { behaviorMetadata, extension } =
-    enumeratedInstructionOrExpressionMetadata.scope;
+  const {
+    behaviorMetadata,
+    extension,
+  } = enumeratedInstructionOrExpressionMetadata.scope;
   const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
   return !!(

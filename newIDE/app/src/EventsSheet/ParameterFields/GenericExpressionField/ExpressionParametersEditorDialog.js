@@ -26,7 +26,7 @@ type Props = {
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   expressionMetadata: gdExpressionMetadata,
-  onDone: (ParameterValues) => void,
+  onDone: ParameterValues => void,
   onRequestClose: () => void,
   parameterRenderingService?: {
     components: any,

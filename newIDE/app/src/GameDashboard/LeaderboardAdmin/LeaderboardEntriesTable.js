@@ -74,7 +74,7 @@ const LeaderboardEntriesTable = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {entries.map((entry) => (
+              {entries.map(entry => (
                 <TableRow key={entry.id}>
                   <TableCell align="center">
                     {customizationSettings

@@ -11,8 +11,7 @@ const getAdapatedMessageAndRouteNavigationParams = (
   routeNavigationParams?: { route: Route, params: RouteArguments },
   isClickableContent?: boolean,
 |} => {
-  const markdownClickableImageRegex =
-    /\[!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)\]\((?<linkHref>[^\s]*)\)/;
+  const markdownClickableImageRegex = /\[!\[(?<alt>[^\][]*)\]\((?<imageSource>[^\s]*)\)\]\((?<linkHref>[^\s]*)\)/;
   let matches = message.match(markdownClickableImageRegex);
   let groups = matches && matches.groups;
   if (groups && groups.alt && groups.imageSource && groups.linkHref) {

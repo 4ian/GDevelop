@@ -77,7 +77,7 @@ const defaultPanelConfigByEditor = {
 // Forward ref to allow Scene editor to force update some editors
 const MosaicEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayProps,
-  SceneEditorsDisplayInterface,
+  SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
     project,
@@ -87,12 +87,15 @@ const MosaicEditorsDisplay = React.forwardRef<
     onSelectInstances,
   } = props;
   const { isMobile } = useResponsiveWindowSize();
-  const { getDefaultEditorMosaicNode, setDefaultEditorMosaicNode } =
-    React.useContext(PreferencesContext);
+  const {
+    getDefaultEditorMosaicNode,
+    setDefaultEditorMosaicNode,
+  } = React.useContext(PreferencesContext);
   const selectedInstances = props.instancesSelection.getSelectedInstances();
 
-  const instancesPropertiesEditorRef =
-    React.useRef<?CompactInstancePropertiesEditorInterface>(null);
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
+    null
+  );
   const layersListRef = React.useRef<?LayersListInterface>(null);
   const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
@@ -141,7 +144,7 @@ const MosaicEditorsDisplay = React.forwardRef<
     return editorMosaicRef.current.getOpenedEditorNames().includes(editorId);
   }, []);
   const renameObjectFolderOrObjectWithContext = React.useCallback(
-    (objectWithContext) => {
+    objectWithContext => {
       if (objectsListRef.current)
         objectsListRef.current.renameObjectFolderOrObjectWithContext(
           objectWithContext
@@ -222,7 +225,7 @@ const MosaicEditorsDisplay = React.forwardRef<
   );
 
   const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
-    .map((objectFolderOrObjectWithContext) => {
+    .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
 
       if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
@@ -315,7 +318,7 @@ const MosaicEditorsDisplay = React.forwardRef<
           instancesEditorShortcutsCallbacks={
             props.instancesEditorShortcutsCallbacks
           }
-          wrappedEditorRef={(editor) => {
+          wrappedEditorRef={editor => {
             editorRef.current = editor;
           }}
           pauseRendering={!props.isActive}
@@ -362,7 +365,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               }
               onAddObjectInstance={props.onAddObjectInstance}
               onObjectPasted={props.updateBehaviorsSharedData}
-              beforeSetAsGlobalObject={(objectName) =>
+              beforeSetAsGlobalObject={objectName =>
                 props.canObjectOrGroupBeGlobal(i18n, objectName)
               }
               ref={objectsListRef}
@@ -389,7 +392,7 @@ const MosaicEditorsDisplay = React.forwardRef<
               getValidatedObjectOrGroupName={(newName, global) =>
                 props.getValidatedObjectOrGroupName(newName, global, i18n)
               }
-              beforeSetAsGlobalGroup={(groupName) =>
+              beforeSetAsGlobalGroup={groupName =>
                 props.canObjectOrGroupBeGlobal(i18n, groupName)
               }
               unsavedChanges={props.unsavedChanges}
@@ -407,9 +410,7 @@ const MosaicEditorsDisplay = React.forwardRef<
         getDefaultEditorMosaicNode('scene-editor') || initialMosaicEditorNodes
       }
       onOpenedEditorsChanged={props.onOpenedEditorsChanged}
-      onPersistNodes={(node) =>
-        setDefaultEditorMosaicNode('scene-editor', node)
-      }
+      onPersistNodes={node => setDefaultEditorMosaicNode('scene-editor', node)}
       ref={editorMosaicRef}
     />
   );

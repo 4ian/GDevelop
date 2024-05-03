@@ -46,8 +46,7 @@ let loadedTextures = {};
 const invalidTexture = PIXI.Texture.from('res/error48.png');
 let loadedThreeTextures = {};
 let loadedThreeMaterials = {};
-let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> =
-  {};
+let loadedOrLoading3DModelPromises: ResourcePromise<THREE.THREE_ADDONS.GLTF> = {};
 let spineAtlasPromises: ResourcePromise<SpineTextureAtlasOrLoadingError> = {};
 let spineDataPromises: ResourcePromise<SpineDataOrLoadingError> = {};
 
@@ -105,12 +104,12 @@ const load3DModel = (
   return new Promise((resolve, reject) => {
     gltfLoader.load(
       url,
-      (gltf) => {
+      gltf => {
         traverseToRemoveMetalnessFromMeshes(gltf.scene);
         resolve(gltf);
       },
       undefined,
-      (error) => {
+      error => {
         reject(error);
       }
     );
@@ -257,7 +256,7 @@ export default class PixiResourcesLoader {
       embedderResourceKind
     );
     await Promise.all(
-      embeddedResources.map((embeddedResource) =>
+      embeddedResources.map(embeddedResource =>
         this.reloadResource(project, embeddedResource.getName())
       )
     );
@@ -323,11 +322,11 @@ export default class PixiResourcesLoader {
       PIXI.Assets.resolver.prefer();
     }
 
-    const matchingMaterials = Object.keys(loadedThreeMaterials).filter((key) =>
+    const matchingMaterials = Object.keys(loadedThreeMaterials).filter(key =>
       key.startsWith(resourceName)
     );
     if (matchingMaterials.length > 0) {
-      matchingMaterials.forEach((key) => {
+      matchingMaterials.forEach(key => {
         loadedThreeMaterials[key].dispose();
         delete loadedThreeMaterials[key];
       });
@@ -343,7 +342,7 @@ export default class PixiResourcesLoader {
     const resourcesManager = project.getResourcesManager();
 
     const imageResources = resourceNames
-      .map((resourceName) => {
+      .map(resourceName => {
         if (!resourcesManager.hasResource(resourceName)) {
           return null;
         }
@@ -355,7 +354,7 @@ export default class PixiResourcesLoader {
       })
       .filter(Boolean);
     const videoResources = resourceNames
-      .map((resourceName) => {
+      .map(resourceName => {
         if (!resourcesManager.hasResource(resourceName)) {
           return null;
         }
@@ -369,7 +368,7 @@ export default class PixiResourcesLoader {
 
     // TODO use a PromisePool to be able to abort the previous reload of resources.
     await Promise.all([
-      ...imageResources.map(async (resource) => {
+      ...imageResources.map(async resource => {
         const resourceName = resource.getName();
         try {
           const url = ResourcesLoader.getResourceFullUrl(
@@ -395,7 +394,7 @@ export default class PixiResourcesLoader {
           );
         }
       }),
-      ...videoResources.map(async (resource) => {
+      ...videoResources.map(async resource => {
         const resourceName = resource.getName();
         try {
           const url = ResourcesLoader.getResourceFullUrl(
@@ -426,7 +425,7 @@ export default class PixiResourcesLoader {
 
           loadedTextures[resourceName].baseTexture.resource
             .load()
-            .catch((error) => {
+            .catch(error => {
               console.error(
                 `Unable to load video texture from url ${url}:`,
                 error
@@ -479,7 +478,7 @@ export default class PixiResourcesLoader {
       loadedTextures[resourceName] = invalidTexture;
       return loadedTextures[resourceName];
     }
-    loadedTextures[resourceName].baseTexture.resource.load().catch((error) => {
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load texture from url ${url}:`, error);
       loadedTextures[resourceName] = invalidTexture;
     });
@@ -645,63 +644,61 @@ export default class PixiResourcesLoader {
       {}
     );
 
-    return (spineAtlasPromises[spineTextureAtlasName] = new Promise(
-      (resolve) => {
-        const atlasUrl = ResourcesLoader.getResourceFullUrl(
-          project,
-          spineTextureAtlasName,
-          {
-            isResourceForPixi: true,
-          }
-        );
-        PIXI.Assets.setPreferences({
-          preferWorkers: false,
-          crossOrigin: checkIfCredentialsRequired(atlasUrl)
-            ? 'use-credentials'
-            : 'anonymous',
-        });
-        PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
-        PIXI.Assets.load(spineTextureAtlasName).then(
-          (atlas) => {
-            // Ideally atlas of type `TextureAtlas` should be passed here.
-            // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
-            // and search the other mentions to this issue in the codebase).
-            //
-            // This branching covers all possible ways to make it work fine,
-            // if issue is fixed in pixi-spine or after migration to spine-pixi.
-            if (typeof atlas === 'string') {
-              new PIXI_SPINE.TextureAtlas(
-                atlas,
-                (textureName, textureCb) =>
-                  textureCb(images[textureName].baseTexture),
-                (textureAtlas) =>
-                  resolve({
-                    textureAtlas,
-                    loadingError: null,
-                    loadingErrorReason: null,
-                  })
-              );
-            } else {
-              resolve({
-                textureAtlas: atlas,
-                loadingError: null,
-                loadingErrorReason: null,
-              });
-            }
-          },
-          (err) => {
-            console.error(
-              `Error while loading Spine atlas "${spineTextureAtlasName}": ${err}.\nCheck if you selected the correct pair of atlas and image files.`
+    return (spineAtlasPromises[spineTextureAtlasName] = new Promise(resolve => {
+      const atlasUrl = ResourcesLoader.getResourceFullUrl(
+        project,
+        spineTextureAtlasName,
+        {
+          isResourceForPixi: true,
+        }
+      );
+      PIXI.Assets.setPreferences({
+        preferWorkers: false,
+        crossOrigin: checkIfCredentialsRequired(atlasUrl)
+          ? 'use-credentials'
+          : 'anonymous',
+      });
+      PIXI.Assets.add(spineTextureAtlasName, atlasUrl, { images });
+      PIXI.Assets.load(spineTextureAtlasName).then(
+        atlas => {
+          // Ideally atlas of type `TextureAtlas` should be passed here.
+          // But there is a known issue in case of preloaded images (see https://github.com/pixijs/spine/issues/537
+          // and search the other mentions to this issue in the codebase).
+          //
+          // This branching covers all possible ways to make it work fine,
+          // if issue is fixed in pixi-spine or after migration to spine-pixi.
+          if (typeof atlas === 'string') {
+            new PIXI_SPINE.TextureAtlas(
+              atlas,
+              (textureName, textureCb) =>
+                textureCb(images[textureName].baseTexture),
+              textureAtlas =>
+                resolve({
+                  textureAtlas,
+                  loadingError: null,
+                  loadingErrorReason: null,
+                })
             );
+          } else {
             resolve({
-              textureAtlas: null,
-              loadingError: err,
-              loadingErrorReason: 'atlas-resource-loading-error',
+              textureAtlas: atlas,
+              loadingError: null,
+              loadingErrorReason: null,
             });
           }
-        );
-      }
-    ));
+        },
+        err => {
+          console.error(
+            `Error while loading Spine atlas "${spineTextureAtlasName}": ${err}.\nCheck if you selected the correct pair of atlas and image files.`
+          );
+          resolve({
+            textureAtlas: null,
+            loadingError: err,
+            loadingErrorReason: 'atlas-resource-loading-error',
+          });
+        }
+      );
+    }));
   }
 
   /**
@@ -756,9 +753,9 @@ export default class PixiResourcesLoader {
       };
     }
 
-    return (spineDataPromises[spineName] = new Promise((resolve) => {
+    return (spineDataPromises[spineName] = new Promise(resolve => {
       this._getSpineTextureAtlas(project, spineTextureAtlasName).then(
-        (textureAtlasOrLoadingError) => {
+        textureAtlasOrLoadingError => {
           if (!textureAtlasOrLoadingError.textureAtlas) {
             return resolve({
               skeleton: null,
@@ -784,14 +781,14 @@ export default class PixiResourcesLoader {
             spineAtlas: textureAtlasOrLoadingError.textureAtlas,
           });
           PIXI.Assets.load(spineName).then(
-            (jsonData) => {
+            jsonData => {
               resolve({
                 skeleton: jsonData.spineData,
                 loadingError: null,
                 loadingErrorReason: null,
               });
             },
-            (err) => {
+            err => {
               console.error(
                 `Error while loading Spine data "${spineName}": ${err}.\nCheck if you selected correct files.`
               );
@@ -850,7 +847,7 @@ export default class PixiResourcesLoader {
       return loadedTextures[resourceName];
     }
 
-    loadedTextures[resourceName].baseTexture.resource.load().catch((error) => {
+    loadedTextures[resourceName].baseTexture.resource.load().catch(error => {
       console.error(`Unable to load video texture from url ${url}:`, error);
       loadedTextures[resourceName] = invalidTexture;
     });
@@ -900,7 +897,7 @@ export default class PixiResourcesLoader {
       return Promise.resolve('Arial');
     }
 
-    return loadFontFace(fontFamily, fullFilename).then((loadedFace) => {
+    return loadFontFace(fontFamily, fullFilename).then(loadedFace => {
       loadedFontFamilies[resourceName] = fontFamily;
 
       return fontFamily;
@@ -960,7 +957,7 @@ export default class PixiResourcesLoader {
       .get(fullUrl, {
         withCredentials: checkIfCredentialsRequired(fullUrl),
       })
-      .then((response) => {
+      .then(response => {
         loadedBitmapFonts[resourceName] = response;
         return response.data;
       });
@@ -999,6 +996,6 @@ export default class PixiResourcesLoader {
       .get(fullUrl, {
         withCredentials: checkIfCredentialsRequired(fullUrl),
       })
-      .then((response) => response.data);
+      .then(response => response.data);
   }
 }

@@ -19,7 +19,7 @@ const styles = {
 
 export default class StandardEvent extends React.Component<
   EventRendererProps,
-  *,
+  *
 > {
   render() {
     var standardEvent = gd.asStandardEvent(this.props.event);

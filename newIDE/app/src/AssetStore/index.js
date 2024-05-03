@@ -88,9 +88,9 @@ const identifyAssetPackKind = ({
     !!privateAssetPackListingDatas.find(({ id }) => id === assetPack.id)
     ? 'private'
     : publicAssetPacks &&
-        publicAssetPacks.starterPacks.find(({ tag }) => tag === assetPack.tag)
-      ? 'public'
-      : 'unknown';
+      publicAssetPacks.starterPacks.find(({ tag }) => tag === assetPack.tag)
+    ? 'public'
+    : 'unknown';
 };
 
 export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
@@ -143,14 +143,17 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
 
     // Don't open the filters panel automatically.
     const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
-    const openFiltersPanelIfAppropriate = React.useCallback(() => {
-      if (isMobile) {
-        // Never open automatically the filters on small screens
-        return;
-      }
+    const openFiltersPanelIfAppropriate = React.useCallback(
+      () => {
+        if (isMobile) {
+          // Never open automatically the filters on small screens
+          return;
+        }
 
-      setIsFiltersPanelOpen(true);
-    }, [isMobile]);
+        setIsFiltersPanelOpen(true);
+      },
+      [isMobile]
+    );
 
     const { receivedAssetPacks, receivedGameTemplates } = React.useContext(
       AuthenticatedUserContext
@@ -179,10 +182,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       [setAssetStoreSearchText, setPrivateGameTemplateSearchText]
     );
 
-    const fetchAssetsAndGameTemplates = React.useCallback(() => {
-      fetchAssetsAndFilters();
-      fetchGameTemplates();
-    }, [fetchAssetsAndFilters, fetchGameTemplates]);
+    const fetchAssetsAndGameTemplates = React.useCallback(
+      () => {
+        fetchAssetsAndFilters();
+        fetchGameTemplates();
+      },
+      [fetchAssetsAndFilters, fetchGameTemplates]
+    );
 
     const storeError = assetStoreError || privateGameTemplateStoreError;
 
@@ -214,13 +220,16 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
     const getScrollView = React.useCallback(() => {
       return assetsHome.current || assetDetails.current || assetsList.current;
     }, []);
-    const saveScrollPosition = React.useCallback(() => {
-      const scrollView = getScrollView();
-      if (!scrollView) {
-        return;
-      }
-      currentPage.scrollPosition = scrollView.getScrollPosition();
-    }, [getScrollView, currentPage]);
+    const saveScrollPosition = React.useCallback(
+      () => {
+        const scrollView = getScrollView();
+        if (!scrollView) {
+          return;
+        }
+        currentPage.scrollPosition = scrollView.getScrollPosition();
+      },
+      [getScrollView, currentPage]
+    );
     // This is also called when the asset detail page has loaded.
     const applyBackScrollPosition = React.useCallback(
       (page: AssetStorePageState) => {
@@ -347,7 +356,7 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ) => {
         const receivedAssetPack = receivedAssetPacks
           ? receivedAssetPacks.find(
-              (pack) => pack.id === privateAssetPackListingData.id
+              pack => pack.id === privateAssetPackListingData.id
             )
           : null;
 
@@ -442,10 +451,10 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       (tag: string) => {
         const privateAssetPack =
           receivedAssetPacks &&
-          receivedAssetPacks.find((pack) => pack.tag === tag);
+          receivedAssetPacks.find(pack => pack.tag === tag);
         const publicAssetPack =
           publicAssetPacks &&
-          publicAssetPacks.starterPacks.find((pack) => pack.tag === tag);
+          publicAssetPacks.starterPacks.find(pack => pack.tag === tag);
         saveScrollPosition();
         setSearchText('');
         if (privateAssetPack) {
@@ -475,14 +484,17 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
       ]
     );
 
-    React.useEffect(() => {
-      if (shouldAutofocusSearchbar && searchBar.current) {
-        searchBar.current.focus();
-      }
-    }, [shouldAutofocusSearchbar]);
+    React.useEffect(
+      () => {
+        if (shouldAutofocusSearchbar && searchBar.current) {
+          searchBar.current.focus();
+        }
+      },
+      [shouldAutofocusSearchbar]
+    );
 
-    const privateAssetPackListingDatasFromSameCreator: ?Array<PrivateAssetPackListingData> =
-      React.useMemo(() => {
+    const privateAssetPackListingDatasFromSameCreator: ?Array<PrivateAssetPackListingData> = React.useMemo(
+      () => {
         if (
           !openedPrivateAssetPackListingData ||
           !privateAssetPackListingDatas ||
@@ -490,23 +502,25 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
         )
           return null;
 
-        const receivedAssetPackIds = receivedAssetPacks.map((pack) => pack.id);
+        const receivedAssetPackIds = receivedAssetPacks.map(pack => pack.id);
 
         return privateAssetPackListingDatas
           .filter(
-            (pack) =>
+            pack =>
               pack.sellerId === openedPrivateAssetPackListingData.sellerId &&
               !receivedAssetPackIds.includes(pack.sellerId)
           )
           .sort((pack1, pack2) => pack1.name.localeCompare(pack2.name));
-      }, [
+      },
+      [
         openedPrivateAssetPackListingData,
         privateAssetPackListingDatas,
         receivedAssetPacks,
-      ]);
+      ]
+    );
 
-    const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> =
-      React.useMemo(() => {
+    const privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData> = React.useMemo(
+      () => {
         if (
           !openedPrivateGameTemplateListingData ||
           !privateGameTemplateListingDatas ||
@@ -515,12 +529,12 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           return null;
 
         const receivedGameTemplateIds = receivedGameTemplates.map(
-          (template) => template.id
+          template => template.id
         );
 
         return privateGameTemplateListingDatas
           .filter(
-            (template) =>
+            template =>
               template.sellerId ===
                 openedPrivateGameTemplateListingData.sellerId &&
               !receivedGameTemplateIds.includes(template.sellerId)
@@ -528,11 +542,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
           .sort((template1, template2) =>
             template1.name.localeCompare(template2.name)
           );
-      }, [
+      },
+      [
         openedPrivateGameTemplateListingData,
         privateGameTemplateListingDatas,
         receivedGameTemplates,
-      ]);
+      ]
+    );
 
     return (
       <Column expand noMargin useFullHeight noOverflowParent id="asset-store">
@@ -600,14 +616,13 @@ export const AssetStore = React.forwardRef<Props, AssetStoreInterface>(
                     label={<Trans>Back</Trans>}
                     onClick={async () => {
                       const page = shopNavigationState.backToPreviousPage();
-                      const isUpdatingSearchtext =
-                        reApplySearchTextIfNeeded(page);
+                      const isUpdatingSearchtext = reApplySearchTextIfNeeded(
+                        page
+                      );
                       if (isUpdatingSearchtext) {
                         // Updating the search is not instant, so we cannot apply the scroll position
                         // right away. We force a wait as there's no easy way to know when results are completely updated.
-                        await new Promise((resolve) =>
-                          setTimeout(resolve, 500)
-                        );
+                        await new Promise(resolve => setTimeout(resolve, 500));
                         setScrollUpdateIsNeeded(page);
                         applyBackScrollPosition(page); // We apply it manually, because the layout effect won't be called again.
                       } else {

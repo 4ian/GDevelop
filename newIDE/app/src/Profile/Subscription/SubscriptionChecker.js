@@ -40,7 +40,7 @@ const styles = {
 
 const SubscriptionChecker = React.forwardRef<
   Props,
-  SubscriptionCheckerInterface,
+  SubscriptionCheckerInterface
 >(({ mode, id, title, onChangeSubscription }, ref) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);

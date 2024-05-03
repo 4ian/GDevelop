@@ -29,7 +29,7 @@ type Props = {|
   canRedo?: boolean,
   onAdd: () => void,
   searchText: string,
-  onChangeSearchText: (string) => void,
+  onChangeSearchText: string => void,
   iconStyle?: any,
 |};
 
@@ -82,7 +82,7 @@ const VariablesListToolbar = React.memo<Props>((props: Props) => {
     },
   ];
 
-  const buttonsToDisplay = buttons.filter((button) => button.display);
+  const buttonsToDisplay = buttons.filter(button => button.display);
   return (
     <Line justifyContent="space-between" alignItems="center">
       <Column noMargin>

@@ -41,8 +41,8 @@ type Props = {|
   onCancel: () => void,
 
   // Object renaming:
-  onRename: (string) => void,
-  getValidatedObjectOrGroupName: (string) => string,
+  onRename: string => void,
+  getValidatedObjectOrGroupName: string => string,
 
   // Passed down to object editors:
   project: gdProject,
@@ -103,12 +103,11 @@ const InnerDialog = (props: InnerDialogProps) => {
   const onApply = async () => {
     props.onApply();
 
-    const changeset =
-      gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-        props.project,
-        getOriginalContentSerializedElement().getChild('variables'),
-        props.object.getVariables()
-      );
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild('variables'),
+      props.object.getVariables()
+    );
     if (changeset.hasRemovedVariables()) {
       // While we support refactoring that would remove all references (actions, conditions...)
       // it's both a bit dangerous for the user and we would need to show the user what
@@ -130,14 +129,18 @@ const InnerDialog = (props: InnerDialogProps) => {
     props.onRename(objectName);
   };
 
-  const { DismissableTutorialMessage } =
-    useDismissableTutorialMessage('intro-variables');
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-variables'
+  );
 
-  React.useEffect(() => {
-    if (currentTab === 'behaviors') {
-      sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
-    }
-  }, [currentTab]);
+  React.useEffect(
+    () => {
+      if (currentTab === 'behaviors') {
+        sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
+      }
+    },
+    [currentTab]
+  );
 
   const askConfirmationAndOpenBehaviorEvents = React.useCallback(
     async (extensionName, behaviorName) => {
@@ -248,7 +251,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 floatingLabelFixed
                 value={objectName}
                 translatableHintText={t`Object Name`}
-                onChange={(newObjectName) => {
+                onChange={newObjectName => {
                   if (newObjectName === objectName) return;
 
                   setObjectName(

@@ -33,7 +33,7 @@ export const cleanUpGameSlug = (gameSlug: string) => {
   if (isCyrillic(gameSlug)) {
     latinGameSlug = gameSlug
       .split('')
-      .map(function (char) {
+      .map(function(char) {
         const latin = cyrillicToLatinMapping[char];
         return latin === undefined ? char : latin;
       })
@@ -57,31 +57,31 @@ type Props = {|
   project: gdProject,
   disabled?: boolean,
   // Properties visible in the project properties and game dialogs.
-  setName: (string) => void,
+  setName: string => void,
   name: string,
-  setDescription: (string) => void,
+  setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
   setAuthorUsernames: (string[]) => void,
   authorIds: string[],
-  setOrientation: (string) => void,
+  setOrientation: string => void,
   orientation: string,
   // Properties only visible in the game dialog.
   setCategories?: (string[]) => void,
   categories?: string[],
   setOwnerIds?: (string[]) => void,
   ownerIds?: string[],
-  setPlayableWithKeyboard?: (boolean) => void,
+  setPlayableWithKeyboard?: boolean => void,
   playWithKeyboard?: boolean,
-  setPlayableWithGamepad?: (boolean) => void,
+  setPlayableWithGamepad?: boolean => void,
   playWithGamepad?: boolean,
-  setPlayableWithMobile?: (boolean) => void,
+  setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
   userSlug?: string,
-  setUserSlug?: (string) => void,
+  setUserSlug?: string => void,
   gameSlug?: string,
-  setGameSlug?: (string) => void,
-  setDiscoverable?: (boolean) => void,
+  setGameSlug?: string => void,
+  setDiscoverable?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: string,
@@ -125,10 +125,10 @@ export function PublicGameProperties({
     userSlug && !!userSlug.length && profile && profile.username;
 
   const hasValidGameSlug =
-    hasGameSlug && profile && userSlug !== profile.username;
+    hasGameSlug && (profile && userSlug !== profile.username);
 
   const [allGameCategories, setAllGameCategories] = React.useState<
-    GameCategory[],
+    GameCategory[]
   >([]);
 
   const fetchGameCategories = React.useCallback(async () => {
@@ -140,9 +140,12 @@ export function PublicGameProperties({
     }
   }, []);
 
-  React.useEffect(() => {
-    fetchGameCategories();
-  }, [fetchGameCategories]);
+  React.useEffect(
+    () => {
+      fetchGameCategories();
+    },
+    [fetchGameCategories]
+  );
 
   return (
     <I18n>
@@ -182,7 +185,7 @@ export function PublicGameProperties({
                   }
                   value={
                     categories
-                      ? categories.map((category) => ({
+                      ? categories.map(category => ({
                           value: category,
                           text: getCategoryName(category, i18n),
                         }))
@@ -190,7 +193,7 @@ export function PublicGameProperties({
                   }
                   onChange={(event, values) => {
                     setCategories(
-                      values ? values.map((category) => category.value) : []
+                      values ? values.map(category => category.value) : []
                     );
                     setCategoryInput('');
                   }}
@@ -203,7 +206,7 @@ export function PublicGameProperties({
                       setCategoryInput(value);
                     }
                   }}
-                  dataSource={allGameCategories.map((category) => ({
+                  dataSource={allGameCategories.map(category => ({
                     value: category.name,
                     text: getCategoryName(category.name, i18n),
                     disabled: category.type === 'admin-only',
@@ -278,9 +281,7 @@ export function PublicGameProperties({
                   maxLength={GAME_SLUG_MAX_LENGTH}
                   type="text"
                   value={hasGameSlug ? gameSlug || '' : ''}
-                  onChange={(gameSlug) =>
-                    setGameSlug(cleanUpGameSlug(gameSlug))
-                  }
+                  onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
                 />
               </Line>
               {!hasGameSlug && (
@@ -294,15 +295,15 @@ export function PublicGameProperties({
           )}
           <UsersAutocomplete
             userIds={authorIds}
-            onChange={(userIdAndUsernames) => {
+            onChange={userIdAndUsernames => {
               setAuthorIds(
                 userIdAndUsernames.map(
-                  (userIdAndUsername) => userIdAndUsername.userId
+                  userIdAndUsername => userIdAndUsername.userId
                 )
               );
               setAuthorUsernames(
                 userIdAndUsernames.map(
-                  (userIdAndUsername) => userIdAndUsername.username
+                  userIdAndUsername => userIdAndUsername.username
                 )
               );
             }}
@@ -319,8 +320,8 @@ export function PublicGameProperties({
           {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
-              onChange={(userData) =>
-                setOwnerIds(userData.map((data) => data.userId))
+              onChange={userData =>
+                setOwnerIds(userData.map(data => data.userId))
               }
               floatingLabelText={<Trans>Owners</Trans>}
               helperText={

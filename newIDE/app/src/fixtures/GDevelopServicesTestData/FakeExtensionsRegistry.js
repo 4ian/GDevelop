@@ -22,7 +22,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Some fake extension',
       name: 'SomeAlreadyInstalledExtension',
       version: '0.0.3',
-      url: 'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/SomeAlreadyInstalledExtension-header.json',
       tags: 'ledge tolerance,jump,platform',
@@ -100,7 +101,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Advanced p2p event handling',
       name: 'AdvancedP2PEventHandling',
       version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AdvancedP2PEventHandling-header.json',
       tags: 'p2p,performance,advanced',
@@ -160,7 +162,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Animated Back and Forth Movement',
       name: 'AnimatedBackAndForthMovement',
       version: '0.0.1',
-      url: 'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/AnimatedBackAndForthMovement-header.json',
       tags: 'back,forth,movement',
@@ -193,7 +196,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       url: 'https://resources.gdevelop-app.com/extensions/ArrayTools.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/ArrayTools-header.json',
-      tags: 'array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert',
+      tags:
+        'array,variable,index,tool,math,string,sort,find,slice,cut,random,copy,combine,concat,append,insert',
       category: 'General',
       previewIconUrl:
         'https://resources.gdevelop-app.com/assets/Icons/code-array.svg',
@@ -308,7 +312,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Behavior Remapper',
       name: 'BehaviorRemapper',
       version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/BehaviorRemapper.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/BehaviorRemapper.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/BehaviorRemapper-header.json',
       tags: 'remapper,key,bindings,presets,platformer,top-down',
@@ -532,7 +537,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Cancellable draggable object',
       name: 'CancellableDraggable',
       version: '0.1.1',
-      url: 'https://resources.gdevelop-app.com/extensions/CancellableDraggable.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/CancellableDraggable.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CancellableDraggable-header.json',
       tags: 'drag,drop',
@@ -785,7 +791,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Copy camera settings',
       name: 'CopyCameraSettings',
       version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/CopyCameraSettings.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/CopyCameraSettings.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CopyCameraSettings-header.json',
       tags: 'camera,clone,zoom,position,layer,angle,copy',
@@ -815,7 +822,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Create multiple copies of an object',
       name: 'CreateMultipleCopiesOfObject',
       version: '0.2.3',
-      url: 'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CreateMultipleCopiesOfObject-header.json',
       tags: 'create,multiple,object,grid,row,column',
@@ -845,7 +853,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Current game version',
       name: 'CurrentGameVersion',
       version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/CurrentGameVersion.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/CurrentGameVersion.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/CurrentGameVersion-header.json',
       tags: 'version',
@@ -976,7 +985,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Discord rich presence (Windows, Mac, Linux)',
       name: 'DiscordRichPresence',
       version: '1.0.1',
-      url: 'https://resources.gdevelop-app.com/extensions/DiscordRichPresence.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/DiscordRichPresence.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DiscordRichPresence-header.json',
       tags: 'discord,rich,presence,integration,status',
@@ -1038,7 +1048,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Drag camera with the mouse (or touchscreen)',
       name: 'DragCameraWithPointer',
       version: '1.1.0',
-      url: 'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DragCameraWithPointer-header.json',
       tags: 'pointer,drag,camera,scroll,gestures',
@@ -1076,7 +1087,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Draggable (for physics objects)',
       name: 'DraggablePhysics',
       version: '1.0.0',
-      url: 'https://resources.gdevelop-app.com/extensions/DraggablePhysics.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/DraggablePhysics.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggablePhysics-header.json',
       tags: 'draggable,mouse,touch,physics,object,joint,fling',
@@ -1109,7 +1121,8 @@ export const fakeExtensionsRegistry: ExtensionsRegistry & {
       fullName: 'Draggable slider',
       name: 'DraggableSliderControl',
       version: '1.0.3',
-      url: 'https://resources.gdevelop-app.com/extensions/DraggableSliderControl.json',
+      url:
+        'https://resources.gdevelop-app.com/extensions/DraggableSliderControl.json',
       headerUrl:
         'https://resources.gdevelop-app.com/extensions/DraggableSliderControl-header.json',
       tags: 'draggable,slider,shape painter,ui,widget',

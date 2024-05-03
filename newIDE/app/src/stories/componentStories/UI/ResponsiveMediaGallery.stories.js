@@ -24,27 +24,33 @@ export const Default = () => (
             mediaItems={[
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
               },
             ]}
             altTextTemplate={'Image {imageIndex}'}
@@ -60,27 +66,33 @@ export const Default = () => (
             mediaItems={[
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/gdevelop platformer.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/particles emitter.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/lucid icons pack.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/wesxdz skullcup.png',
               },
               {
                 kind: 'image',
-                url: 'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
+                url:
+                  'https://resources.gdevelop-app.com/assets/Packs/casual buttons pack.png',
               },
             ]}
             altTextTemplate={'Image {imageIndex}'}

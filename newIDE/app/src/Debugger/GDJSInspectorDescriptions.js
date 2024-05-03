@@ -50,7 +50,7 @@ export const getInspectorDescriptions = (
       key: ['_sceneStack', '_stack'],
       renderInspector: () => null,
       initiallyOpen: true,
-      getSubInspectors: (gdjsStack) => {
+      getSubInspectors: gdjsStack => {
         if (!gdjsStack) return [];
 
         return gdjsStack.map((runtimeScene, index) => ({
@@ -64,7 +64,7 @@ export const getInspectorDescriptions = (
             />
           ),
           initiallyOpen: true,
-          getSubInspectors: (runtimeScene) => [
+          getSubInspectors: runtimeScene => [
             {
               label: 'Scene variables',
               key: `_variables`,
@@ -81,10 +81,10 @@ export const getInspectorDescriptions = (
               key: `_instances`,
               renderInspector: () => null,
               initiallyOpen: true,
-              getSubInspectors: (instances) => {
+              getSubInspectors: instances => {
                 if (!instances || !instances.items) return [];
 
-                return Object.keys(instances.items).map((objectName) => {
+                return Object.keys(instances.items).map(objectName => {
                   if (
                     !instances.items[objectName] ||
                     typeof instances.items[objectName].length === 'undefined'
@@ -92,13 +92,15 @@ export const getInspectorDescriptions = (
                     return null;
 
                   return {
-                    label: `${objectName} (${instances.items[objectName].length})`,
+                    label: `${objectName} (${
+                      instances.items[objectName].length
+                    })`,
                     key: ['items', objectName],
                     renderInspector: () => null,
-                    getSubInspectors: (instancesList) =>
+                    getSubInspectors: instancesList =>
                       instancesList
                         ? instancesList
-                            .filter((runtimeObject) => !!runtimeObject)
+                            .filter(runtimeObject => !!runtimeObject)
                             .map((runtimeObject, index) => {
                               return {
                                 label: `#${runtimeObject.id}`,

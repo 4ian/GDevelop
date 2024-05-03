@@ -21,7 +21,10 @@ const updateDiscordRichPresence = (project: ?gdProject) => {
 };
 
 export const useDiscordRichPresence = (project: ?gdProject) => {
-  useEffect(() => {
-    updateDiscordRichPresence(project);
-  }, [project]);
+  useEffect(
+    () => {
+      updateDiscordRichPresence(project);
+    },
+    [project]
+  );
 };

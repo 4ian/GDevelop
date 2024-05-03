@@ -32,19 +32,24 @@ const WikiSearchBar = ({ id }: Props) => {
       setValue('');
     }
   };
-  const [algoliaSearchStableStatus, setAlgoliaSearchStableStatus] =
-    React.useState<'error' | 'ok'>('ok');
+  const [
+    algoliaSearchStableStatus,
+    setAlgoliaSearchStableStatus,
+  ] = React.useState<'error' | 'ok'>('ok');
 
   const { results, status } = useInstantSearch();
   const { refine } = useSearchBox();
 
-  React.useEffect(() => {
-    if (algoliaSearchStableStatus === 'ok' && status === 'error') {
-      setAlgoliaSearchStableStatus('error');
-    } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
-      setAlgoliaSearchStableStatus('ok');
-    }
-  }, [status, algoliaSearchStableStatus]);
+  React.useEffect(
+    () => {
+      if (algoliaSearchStableStatus === 'ok' && status === 'error') {
+        setAlgoliaSearchStableStatus('error');
+      } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
+        setAlgoliaSearchStableStatus('ok');
+      }
+    },
+    [status, algoliaSearchStableStatus]
+  );
 
   const launchSearch = useDebounce(() => {
     if (value) {
@@ -60,53 +65,56 @@ const WikiSearchBar = ({ id }: Props) => {
 
   const nonEmpty = !!value && value.length > 0;
 
-  const commands: Array<GoToWikiCommand> = React.useMemo(() => {
-    if (!value) return [];
-    if (results.hits.length === 0)
-      return [
-        {
-          hit: {
-            content: (
-              <Trans>
-                No results found. The search is only available in English at the
-                moment.
-              </Trans>
-            ),
-            objectID: 'no-result',
-            url: 'https://wiki.gdevelop.io',
-            hierarchy: { lvl0: '' },
+  const commands: Array<GoToWikiCommand> = React.useMemo(
+    () => {
+      if (!value) return [];
+      if (results.hits.length === 0)
+        return [
+          {
+            hit: {
+              content: (
+                <Trans>
+                  No results found. The search is only available in English at
+                  the moment.
+                </Trans>
+              ),
+              objectID: 'no-result',
+              url: 'https://wiki.gdevelop.io',
+              hierarchy: { lvl0: '' },
+            },
+            handler: () => {},
           },
-          handler: () => {},
-        },
-      ];
-    if (algoliaSearchStableStatus === 'error')
-      return [
-        {
-          hit: {
-            content: (
-              <Trans>
-                An error occurred while searching for a result. Please try again
-                later.
-              </Trans>
-            ),
-            objectID: 'error',
-            url: 'https://wiki.gdevelop.io',
-            hierarchy: { lvl0: '' },
+        ];
+      if (algoliaSearchStableStatus === 'error')
+        return [
+          {
+            hit: {
+              content: (
+                <Trans>
+                  An error occurred while searching for a result. Please try
+                  again later.
+                </Trans>
+              ),
+              objectID: 'error',
+              url: 'https://wiki.gdevelop.io',
+              hierarchy: { lvl0: '' },
+            },
+            handler: () => {},
           },
-          handler: () => {},
-        },
-      ];
+        ];
 
-    const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
-      (hit: AlgoliaSearchHitType) => {
-        return {
-          hit,
-          handler: () => Window.openExternalURL(hit.url),
-        };
-      }
-    );
-    return algoliaCommands;
-  }, [results.hits, value, algoliaSearchStableStatus]);
+      const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
+        (hit: AlgoliaSearchHitType) => {
+          return {
+            hit,
+            handler: () => Window.openExternalURL(hit.url),
+          };
+        }
+      );
+      return algoliaCommands;
+    },
+    [results.hits, value, algoliaSearchStableStatus]
+  );
 
   const handleAutocompleteInput = (
     event: any,
@@ -163,13 +171,13 @@ const WikiSearchBar = ({ id }: Props) => {
               onInputChange={handleAutocompleteInputChange}
               onBlur={handleBlur}
               onFocus={handleFocus}
-              filterOptions={(options) => options}
-              PopperComponent={(props) => (
+              filterOptions={options => options}
+              PopperComponent={props => (
                 <div style={popperContainerStyle}>{props.children}</div>
               )}
               getOptionLabel={() => ''}
               renderOption={({ hit }) => <AlgoliaSearchHit hit={hit} />}
-              renderInput={(params) => (
+              renderInput={params => (
                 <MuiTextField
                   margin="none"
                   {...params}

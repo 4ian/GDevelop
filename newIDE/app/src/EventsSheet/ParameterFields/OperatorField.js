@@ -29,7 +29,7 @@ const mapTypeToOperators: { [string]: Array<string> } = {
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function OperatorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -47,11 +47,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const operators =
       mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
 
-    React.useEffect(() => {
-      if (!value && comparedValueType !== 'unknown') {
-        onChange('=');
-      }
-    }, [value, onChange, comparedValueType]);
+    React.useEffect(
+      () => {
+        if (!value && comparedValueType !== 'unknown') {
+          onChange('=');
+        }
+      },
+      [value, onChange, comparedValueType]
+    );
 
     return (
       <SelectField
@@ -71,7 +74,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             : undefined
         }
       >
-        {operators.map((operator) => (
+        {operators.map(operator => (
           <SelectOption
             key={operator}
             value={operator}

@@ -153,7 +153,7 @@ const getSubSectionIcon = (
 
 // Styles to improve the interaction with the button.
 const useStylesForWidget = () =>
-  makeStyles((theme) => {
+  makeStyles(theme => {
     return createStyles({
       root: {
         border: `1px solid ${theme.palette.text.disabled}`,
@@ -307,8 +307,10 @@ const PublishHome = ({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
-  const [hasSkippedSubSectionSelection, setHasSkippedSubSectionSelection] =
-    React.useState<boolean>(false);
+  const [
+    hasSkippedSubSectionSelection,
+    setHasSkippedSubSectionSelection,
+  ] = React.useState<boolean>(false);
   const [builds, setBuilds] = React.useState<?Array<Build>>(null);
 
   const { showAlert } = useAlertDialog();
@@ -327,24 +329,30 @@ const PublishHome = ({
     }
   };
 
-  const refreshBuilds = React.useCallback(async () => {
-    if (!profile) return;
+  const refreshBuilds = React.useCallback(
+    async () => {
+      if (!profile) return;
 
-    try {
-      const userBuilds = await getBuilds(getAuthorizationHeader, profile.id);
-      setBuilds(userBuilds);
-    } catch (error) {
-      console.error('Error while loading builds:', error);
-      showAlert({
-        title: t`Error while loading builds`,
-        message: t`An error occurred while loading your builds. Verify your internet connection and try again.`,
-      });
-    }
-  }, [profile, getAuthorizationHeader, showAlert]);
+      try {
+        const userBuilds = await getBuilds(getAuthorizationHeader, profile.id);
+        setBuilds(userBuilds);
+      } catch (error) {
+        console.error('Error while loading builds:', error);
+        showAlert({
+          title: t`Error while loading builds`,
+          message: t`An error occurred while loading your builds. Verify your internet connection and try again.`,
+        });
+      }
+    },
+    [profile, getAuthorizationHeader, showAlert]
+  );
 
-  React.useEffect(() => {
-    refreshBuilds();
-  }, [refreshBuilds]);
+  React.useEffect(
+    () => {
+      refreshBuilds();
+    },
+    [refreshBuilds]
+  );
 
   const shouldShowBackButton = !!(chosenSection || chosenSubSection);
 

@@ -199,7 +199,7 @@ export default function makeExtensionsLoader({
     loadAllExtensions(
       _: TranslationFunction
     ): Promise<
-      Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>,
+      Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
     > {
       return Promise.resolve(
         jsExtensions

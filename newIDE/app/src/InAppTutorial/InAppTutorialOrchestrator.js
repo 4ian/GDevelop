@@ -58,7 +58,7 @@ const interpolateText = (
   const placeholderReplacingRegex = /\$\(([\w:]+)\)/g;
   const match = text.matchAll(placeholderReplacingRegex);
   let formattedText = text;
-  [...match].forEach((match) => {
+  [...match].forEach(match => {
     let replacement;
     const instructionWithBrackets = match[0];
     const instruction = match[1];
@@ -204,7 +204,9 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const objectKey = splittedElementId[1];
-    return `#scene-editor[data-active] #objects-list div[data-object-name="${data[objectKey]}"]`;
+    return `#scene-editor[data-active] #objects-list div[data-object-name="${
+      data[objectKey]
+    }"]`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.sceneInProjectManager
@@ -212,7 +214,9 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const sceneKey = splittedElementId[1];
-    return `div[role="presentation"][data-open="true"] #project-manager [id^="scene-item"][data-scene="${data[sceneKey]}"]`;
+    return `div[role="presentation"][data-open="true"] #project-manager [id^="scene-item"][data-scene="${
+      data[sceneKey]
+    }"]`;
   } else if (
     elementId.startsWith(
       selectorInterpolationProjectDataAccessors.objectInObjectOrResourceSelector
@@ -220,7 +224,9 @@ const interpolateElementId = (
   ) {
     const splittedElementId = elementId.split(':');
     const objectKey = splittedElementId[1];
-    return `#instruction-or-object-selector div[data-object-name="${data[objectKey]}"]`;
+    return `#instruction-or-object-selector div[data-object-name="${
+      data[objectKey]
+    }"]`;
   }
 
   return elementId;
@@ -229,7 +235,7 @@ const interpolateElementId = (
 const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
   if (!text) return false;
   if (text.messageByLocale) {
-    return Object.values(text.messageByLocale).some((localizedText) =>
+    return Object.values(text.messageByLocale).some(localizedText =>
       // $FlowFixMe - known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
       localizedText.includes(
         `$(${textInterpolationProjectDataAccessors.instancesCount}`
@@ -243,7 +249,7 @@ const containsProjectDataToDisplay = (text?: TranslatedText): boolean => {
         )) ||
       (typeof text.messageDescriptor === 'object' &&
         Object.values(text.messageDescriptor).some(
-          (value) =>
+          value =>
             typeof value === 'string' &&
             value.includes(
               `$(${textInterpolationProjectDataAccessors.instancesCount}`
@@ -368,36 +374,43 @@ const useGiveTrivialBadgeWhenTutorialIsFinished = ({
 }) => {
   // Destructure the user data to avoid the effect to run at every change of the user
   // which is unrelated to badges or the user profile.
-  const { badges, onBadgesChanged, profile, getAuthorizationHeader } =
-    authenticatedUser;
-
-  React.useEffect(() => {
-    (async () => {
-      if (!profile || !displayEndDialog) return;
-
-      try {
-        // Give a (trivial) badge when a tutorial is finished.
-        await retryIfFailed({ times: 3 }, () =>
-          createOrEnsureBadgeForUser(
-            { badges, onBadgesChanged, profile, getAuthorizationHeader },
-            getTutorialCompletedAchievementId(tutorial.id)
-          )
-        );
-      } catch (error) {
-        console.error(
-          `Couldn't create completion badge for tutorial ${tutorial.id}.`,
-          error
-        );
-      }
-    })();
-  }, [
-    displayEndDialog,
+  const {
     badges,
     onBadgesChanged,
     profile,
     getAuthorizationHeader,
-    tutorial.id,
-  ]);
+  } = authenticatedUser;
+
+  React.useEffect(
+    () => {
+      (async () => {
+        if (!profile || !displayEndDialog) return;
+
+        try {
+          // Give a (trivial) badge when a tutorial is finished.
+          await retryIfFailed({ times: 3 }, () =>
+            createOrEnsureBadgeForUser(
+              { badges, onBadgesChanged, profile, getAuthorizationHeader },
+              getTutorialCompletedAchievementId(tutorial.id)
+            )
+          );
+        } catch (error) {
+          console.error(
+            `Couldn't create completion badge for tutorial ${tutorial.id}.`,
+            error
+          );
+        }
+      })();
+    },
+    [
+      displayEndDialog,
+      badges,
+      onBadgesChanged,
+      profile,
+      getAuthorizationHeader,
+      tutorial.id,
+    ]
+  );
 };
 
 type Props = {|
@@ -425,7 +438,7 @@ export type InAppTutorialOrchestratorInterface = {|
 
 const InAppTutorialOrchestrator = React.forwardRef<
   Props,
-  InAppTutorialOrchestratorInterface,
+  InAppTutorialOrchestratorInterface
 >(
   (
     {
@@ -440,20 +453,26 @@ const InAppTutorialOrchestrator = React.forwardRef<
     ref
   ) => {
     const forceUpdate = useForceUpdate();
-    const [wrongEditorInfoOpen, setWrongEditorInfoOpen] =
-      React.useState<boolean>(false);
-    const [currentStepIndex, setCurrentStepIndex] =
-      React.useState<number>(startStepIndex);
-    const [endIndicesPerPhase, setEndIndicesPerPhase] =
-      React.useState<?Array<number>>(null);
+    const [
+      wrongEditorInfoOpen,
+      setWrongEditorInfoOpen,
+    ] = React.useState<boolean>(false);
+    const [currentStepIndex, setCurrentStepIndex] = React.useState<number>(
+      startStepIndex
+    );
+    const [
+      endIndicesPerPhase,
+      setEndIndicesPerPhase,
+    ] = React.useState<?Array<number>>(null);
     const [data, setData] = React.useState<{| [key: string]: string |}>(
       startProjectData
     );
     const objectCountBySceneRef = React.useRef<{|
       [sceneName: string]: number,
     |}>({});
-    const [displayEndDialog, setDisplayEndDialog] =
-      React.useState<boolean>(false);
+    const [displayEndDialog, setDisplayEndDialog] = React.useState<boolean>(
+      false
+    );
     const currentStepFallbackStepIndex = React.useRef<number>(0);
     const [expectedEditor, setExpectedEditor] = React.useState<{|
       editor: EditorIdentifier,
@@ -469,17 +488,23 @@ const InAppTutorialOrchestrator = React.forwardRef<
       setElementWithValueToWatchIfEquals,
     ] = React.useState<?string>(null);
     const inputExpectedValueRef = React.useRef<?string>(null);
-    const [objectSceneInstancesToWatch, setObjectSceneInstancesToWatch] =
-      React.useState<?{|
-        sceneName: ?string,
-        objectName: string,
-        count?: number,
-      |}>(null);
-    const [sceneObjectCountToWatch, setSceneObjectCountToWatch] =
-      React.useState<boolean>(false);
+    const [
+      objectSceneInstancesToWatch,
+      setObjectSceneInstancesToWatch,
+    ] = React.useState<?{|
+      sceneName: ?string,
+      objectName: string,
+      count?: number,
+    |}>(null);
+    const [
+      sceneObjectCountToWatch,
+      setSceneObjectCountToWatch,
+    ] = React.useState<boolean>(false);
     const domObserverRef = React.useRef<?MutationObserver>(null);
-    const [shouldWatchProjectChanges, setShouldWatchProjectChanges] =
-      React.useState<boolean>(false);
+    const [
+      shouldWatchProjectChanges,
+      setShouldWatchProjectChanges,
+    ] = React.useState<boolean>(false);
     const preferences = React.useContext(PreferencesContext);
     const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
@@ -500,27 +525,31 @@ const InAppTutorialOrchestrator = React.forwardRef<
     );
 
     // Reset current step index on tutorial change.
-    React.useEffect(() => {
-      changeStep(startStepIndex);
-      for (let index = startStepIndex; index >= 0; index--) {
-        if (!tutorial.flow[index].isOnClosableDialog) {
-          currentStepFallbackStepIndex.current = index;
-          break;
+    React.useEffect(
+      () => {
+        changeStep(startStepIndex);
+        for (let index = startStepIndex; index >= 0; index--) {
+          if (!tutorial.flow[index].isOnClosableDialog) {
+            currentStepFallbackStepIndex.current = index;
+            break;
+          }
         }
-      }
-      // Find the last editor switch to set the expected editor and scene.
-      let newExpectedEditor = { editor: 'Home' };
-      for (let index = startStepIndex; index >= 0; index--) {
-        if (
-          tutorial.flow[index].id &&
-          tutorial.editorSwitches.hasOwnProperty(tutorial.flow[index].id)
-        ) {
-          newExpectedEditor = tutorial.editorSwitches[tutorial.flow[index].id];
-          break;
+        // Find the last editor switch to set the expected editor and scene.
+        let newExpectedEditor = { editor: 'Home' };
+        for (let index = startStepIndex; index >= 0; index--) {
+          if (
+            tutorial.flow[index].id &&
+            tutorial.editorSwitches.hasOwnProperty(tutorial.flow[index].id)
+          ) {
+            newExpectedEditor =
+              tutorial.editorSwitches[tutorial.flow[index].id];
+            break;
+          }
         }
-      }
-      setExpectedEditor(newExpectedEditor);
-    }, [tutorial, changeStep, startStepIndex]);
+        setExpectedEditor(newExpectedEditor);
+      },
+      [tutorial, changeStep, startStepIndex]
+    );
 
     const goToStep = React.useCallback(
       ({
@@ -568,41 +597,47 @@ const InAppTutorialOrchestrator = React.forwardRef<
     );
 
     // Compute phases start positions on flow change.
-    React.useEffect(() => {
-      const indices = [];
-      for (
-        let flowStepIndex = 0;
-        flowStepIndex < tutorial.flow.length;
-        flowStepIndex++
-      ) {
-        if (tutorial.flow[flowStepIndex].isCheckpoint) {
-          indices.push(flowStepIndex);
+    React.useEffect(
+      () => {
+        const indices = [];
+        for (
+          let flowStepIndex = 0;
+          flowStepIndex < tutorial.flow.length;
+          flowStepIndex++
+        ) {
+          if (tutorial.flow[flowStepIndex].isCheckpoint) {
+            indices.push(flowStepIndex);
+          }
         }
-      }
-      indices.push(tutorial.flow.length - 1); // Last phase ends at last flow step.
-      setEndIndicesPerPhase(indices);
-    }, [tutorial.flow]);
+        indices.push(tutorial.flow.length - 1); // Last phase ends at last flow step.
+        setEndIndicesPerPhase(indices);
+      },
+      [tutorial.flow]
+    );
 
-    const computeProgress = React.useCallback((): Array<number> => {
-      if (!endIndicesPerPhase) return [0];
-      const startIndicesPerPhase = getPhasesStartIndices(endIndicesPerPhase);
+    const computeProgress = React.useCallback(
+      (): Array<number> => {
+        if (!endIndicesPerPhase) return [0];
+        const startIndicesPerPhase = getPhasesStartIndices(endIndicesPerPhase);
 
-      return endIndicesPerPhase.map((endIndex, i) => {
-        if (currentStepIndex >= endIndex) {
-          return 100;
-        }
-        const startIndex = startIndicesPerPhase[i];
-        if (currentStepIndex < startIndex) {
-          return 0;
-        }
-        return Math.floor(
-          ((currentStepIndex - startIndex) / (endIndex - startIndex)) * 100
-        );
-      });
-    }, [currentStepIndex, endIndicesPerPhase]);
+        return endIndicesPerPhase.map((endIndex, i) => {
+          if (currentStepIndex >= endIndex) {
+            return 100;
+          }
+          const startIndex = startIndicesPerPhase[i];
+          if (currentStepIndex < startIndex) {
+            return 0;
+          }
+          return Math.floor(
+            ((currentStepIndex - startIndex) / (endIndex - startIndex)) * 100
+          );
+        });
+      },
+      [currentStepIndex, endIndicesPerPhase]
+    );
 
-    const hasCurrentSceneObjectsCountIncreased =
-      React.useCallback((): boolean => {
+    const hasCurrentSceneObjectsCountIncreased = React.useCallback(
+      (): boolean => {
         if (!project || project.getLayoutsCount() === 0 || !currentSceneName)
           return false;
         const count = countObjectsInScene({
@@ -615,7 +650,9 @@ const InAppTutorialOrchestrator = React.forwardRef<
           typeof count === 'number' &&
           count > initialCount
         );
-      }, [project, currentSceneName]);
+      },
+      [project, currentSceneName]
+    );
 
     const getProgress = () => {
       return {
@@ -625,73 +662,78 @@ const InAppTutorialOrchestrator = React.forwardRef<
       };
     };
 
-    const watchDomForNextStepTrigger = React.useCallback(() => {
-      // Find the next mandatory (not-skippable) step (It can be the current step).
-      let indexOfNextMandatoryStep = currentStepIndex;
-      while (flow[indexOfNextMandatoryStep].skippable) {
-        indexOfNextMandatoryStep += 1;
-      }
-
-      let shouldGoToStepAtIndex: number | null = null;
-      // Browse skippable steps in reverse orders to directly go to the
-      // furthest step if possible.
-      // TODO: Add support for not-dom based triggers
-      for (
-        let stepIndex = indexOfNextMandatoryStep;
-        stepIndex >= currentStepIndex;
-        stepIndex--
-      ) {
-        const isThisStepAlreadyDone = isDomBasedTriggerComplete(
-          flow[stepIndex].nextStepTrigger,
-          data
-        );
-        if (isThisStepAlreadyDone) {
-          shouldGoToStepAtIndex = stepIndex + 1;
-          break;
+    const watchDomForNextStepTrigger = React.useCallback(
+      () => {
+        // Find the next mandatory (not-skippable) step (It can be the current step).
+        let indexOfNextMandatoryStep = currentStepIndex;
+        while (flow[indexOfNextMandatoryStep].skippable) {
+          indexOfNextMandatoryStep += 1;
         }
-      }
-      if (shouldGoToStepAtIndex === null) {
-        // No trigger has been detected for the next mandatory step or the in-between
-        // skippable steps.
-        // Let's now check that, if there's a shortcut, it may have been triggered.
-        const { shortcuts } = flow[currentStepIndex];
-        if (!shortcuts) return;
-        for (let shortcutStep of shortcuts) {
-          // Find the first shortcut in the list that can be triggered.
-          // TODO: Add support for all triggers types
-          if (
-            isDomBasedTriggerComplete(shortcutStep.trigger, data) ||
-            (shortcutStep.trigger &&
-              (shortcutStep.trigger.objectAddedInLayout ||
-                (shortcutStep.trigger.presenceOfElement &&
-                  shortcutStep.trigger.presenceOfElement.match(
-                    legacyItemInObjectListDomSelectorPattern
-                  ))) &&
-              hasCurrentSceneObjectsCountIncreased())
-          ) {
-            shouldGoToStepAtIndex = flow.findIndex(
-              (step) => step.id === shortcutStep.stepId
-            );
-            if (shouldGoToStepAtIndex < 0) {
-              console.warn(
-                `Step with id ${shortcutStep.stepId} could not be found. Shortcut not taken.`
-              );
-              return;
-            }
+
+        let shouldGoToStepAtIndex: number | null = null;
+        // Browse skippable steps in reverse orders to directly go to the
+        // furthest step if possible.
+        // TODO: Add support for not-dom based triggers
+        for (
+          let stepIndex = indexOfNextMandatoryStep;
+          stepIndex >= currentStepIndex;
+          stepIndex--
+        ) {
+          const isThisStepAlreadyDone = isDomBasedTriggerComplete(
+            flow[stepIndex].nextStepTrigger,
+            data
+          );
+          if (isThisStepAlreadyDone) {
+            shouldGoToStepAtIndex = stepIndex + 1;
             break;
           }
         }
-        if (shouldGoToStepAtIndex === null) return;
-      }
+        if (shouldGoToStepAtIndex === null) {
+          // No trigger has been detected for the next mandatory step or the in-between
+          // skippable steps.
+          // Let's now check that, if there's a shortcut, it may have been triggered.
+          const { shortcuts } = flow[currentStepIndex];
+          if (!shortcuts) return;
+          for (let shortcutStep of shortcuts) {
+            // Find the first shortcut in the list that can be triggered.
+            // TODO: Add support for all triggers types
+            if (
+              isDomBasedTriggerComplete(shortcutStep.trigger, data) ||
+              (shortcutStep.trigger &&
+                (shortcutStep.trigger.objectAddedInLayout ||
+                  (shortcutStep.trigger.presenceOfElement &&
+                    shortcutStep.trigger.presenceOfElement.match(
+                      legacyItemInObjectListDomSelectorPattern
+                    ))) &&
+                hasCurrentSceneObjectsCountIncreased())
+            ) {
+              shouldGoToStepAtIndex = flow.findIndex(
+                step => step.id === shortcutStep.stepId
+              );
+              if (shouldGoToStepAtIndex < 0) {
+                console.warn(
+                  `Step with id ${
+                    shortcutStep.stepId
+                  } could not be found. Shortcut not taken.`
+                );
+                return;
+              }
+              break;
+            }
+          }
+          if (shouldGoToStepAtIndex === null) return;
+        }
 
-      goToStep({ stepIndex: shouldGoToStepAtIndex, gatherData: true });
-    }, [
-      currentStepIndex,
-      goToStep,
-      data,
-      flow,
-      hasCurrentSceneObjectsCountIncreased,
-    ]);
+        goToStep({ stepIndex: shouldGoToStepAtIndex, gatherData: true });
+      },
+      [
+        currentStepIndex,
+        goToStep,
+        data,
+        flow,
+        hasCurrentSceneObjectsCountIncreased,
+      ]
+    );
 
     const handleDomMutation = useDebounce(watchDomForNextStepTrigger, 200);
 
@@ -721,194 +763,226 @@ const InAppTutorialOrchestrator = React.forwardRef<
       changeData,
     }));
 
-    const onPreviewLaunch = React.useCallback(() => {
-      if (!currentStep) return;
-      const { nextStepTrigger } = currentStep;
-      if (nextStepTrigger && nextStepTrigger.previewLaunched) {
-        goToNextStep();
-      }
-    }, [goToNextStep, currentStep]);
-
-    // Set up mutation observer to be able to detect any change in the dom.
-    React.useEffect(() => {
-      const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
-      if (!appContainer) return;
-      const observer = new MutationObserver(handleDomMutation);
-      observer.observe(appContainer, {
-        childList: true,
-        attributes: false,
-        subtree: true,
-        characterData: true,
-      });
-      domObserverRef.current = observer;
-      return () => {
-        if (domObserverRef.current) {
-          domObserverRef.current.disconnect();
-          domObserverRef.current = null;
-        }
-      };
-    }, [handleDomMutation]);
-
-    // Methods to run on each step change.
-    React.useEffect(() => {
-      if (!currentStep) return;
-      const { id, isOnClosableDialog } = currentStep;
-      // Set expected editor on each step change
-      if (id && editorSwitches.hasOwnProperty(id)) {
-        setExpectedEditor(editorSwitches[id]);
-      }
-      // Set fallback step index to the new step index if it is not on a closable dialog.
-      if (!isOnClosableDialog) {
-        currentStepFallbackStepIndex.current = currentStepIndex;
-      }
-      // At each step start, reset change watching logics.
-      setElementWithValueToWatchIfChanged(null);
-      setElementWithValueToWatchIfEquals(null);
-      setObjectSceneInstancesToWatch(null);
-      setSceneObjectCountToWatch(false);
-      setShouldWatchProjectChanges(false);
-      // If index out of bounds, display end dialog.
-      if (currentStepIndex >= stepCount) {
-        setDisplayEndDialog(true);
-      }
-    }, [currentStep, currentStepIndex, stepCount, editorSwitches]);
-
-    // Update some refs on each step change and on current scene change.
-    React.useEffect(() => {
-      if (!currentStep || !currentSceneName || !project) return;
-      const count = countObjectsInScene({
-        project,
-        sceneName: currentSceneName,
-      });
-      if (typeof count !== 'number') return;
-      objectCountBySceneRef.current[currentSceneName] = count;
-    }, [currentStep, currentSceneName, project]);
-
-    // Set up watchers if the next step trigger is not dom-based.
-    React.useEffect(() => {
-      if (!currentStep) return;
-      const { nextStepTrigger, elementToHighlightId } = currentStep;
-      if (nextStepTrigger && nextStepTrigger.valueEquals) {
-        if (!elementToHighlightId) return;
-        inputExpectedValueRef.current = nextStepTrigger.valueEquals;
-        setElementWithValueToWatchIfEquals(elementToHighlightId);
-      } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
-        if (!elementToHighlightId) return;
-        const elementToWatch = document.querySelector(elementToHighlightId);
-
-        if (elementToWatch) {
-          inputInitialValueRef.current = getInputValue(elementToWatch);
-        }
-        setElementWithValueToWatchIfChanged(elementToHighlightId);
-      } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
-        const [objectKey, sceneKey] =
-          nextStepTrigger.instanceAddedOnScene.split(':');
-        const objectName = data[objectKey];
-        if (!objectName) return;
-        const sceneName = sceneKey ? data[sceneKey] : undefined;
-        setObjectSceneInstancesToWatch({
-          objectName,
-          sceneName,
-          count: nextStepTrigger.instancesCount,
-        });
-      } else if (
-        nextStepTrigger &&
-        (nextStepTrigger.objectAddedInLayout ||
-          (nextStepTrigger.presenceOfElement &&
-            nextStepTrigger.presenceOfElement.match(
-              legacyItemInObjectListDomSelectorPattern
-            )))
-      ) {
-        setSceneObjectCountToWatch(true);
-      }
-    }, [currentStep, data]);
-
-    // Detect in tooltip texts if project changes should be watched
-    React.useEffect(() => {
-      if (!currentStep) return;
-      const { tooltip } = currentStep;
-      if (!tooltip) return;
-      if (
-        [tooltip.description, tooltip.title].some((translatedText) =>
-          containsProjectDataToDisplay(translatedText)
-        )
-      ) {
-        setShouldWatchProjectChanges(true);
-      }
-    }, [currentStep]);
-
-    const watchInputChanges = React.useCallback(() => {
-      if (!elementWithValueToWatchIfChanged) return;
-      const elementToWatch = document.querySelector(
-        elementWithValueToWatchIfChanged
-      );
-      const inputInitialValue = inputInitialValueRef.current;
-
-      if (
-        elementToWatch &&
-        getInputValue(elementToWatch) !== inputInitialValue
-      ) {
-        goToNextStep();
-      }
-    }, [goToNextStep, elementWithValueToWatchIfChanged]);
-
-    const watchInputEquals = React.useCallback(() => {
-      if (!elementWithValueToWatchIfEquals) return;
-      const elementToWatch = document.querySelector(
-        elementWithValueToWatchIfEquals
-      );
-      const inputExpectedValue = inputExpectedValueRef.current;
-      if (!inputExpectedValue) return;
-
-      // We trim all spaces to not be picky about the user input inside expressions.
-      // Ex: "1 + 1" === "1+1"
-      if (
-        elementToWatch &&
-        getInputValue(elementToWatch).replace(/\s/g, '') ===
-          inputExpectedValue.replace(/\s/g, '')
-      ) {
-        goToNextStep();
-      }
-    }, [goToNextStep, elementWithValueToWatchIfEquals]);
-
-    const watchSceneInstanceChanges = React.useCallback(() => {
-      if (!objectSceneInstancesToWatch) return;
-      if (!project || project.getLayoutsCount() === 0) return;
-      const {
-        objectName,
-        sceneName: layoutName,
-        count,
-      } = objectSceneInstancesToWatch;
-      const layout =
-        layoutName && project.hasLayoutNamed(layoutName)
-          ? project.getLayout(layoutName)
-          : project.getLayoutAt(0);
-      if (!count) {
-        // If no count is provided, we just check if there is at least one instance.
-        const instances = layout.getInitialInstances();
-        if (instances.hasInstancesOfObject(objectName)) {
+    const onPreviewLaunch = React.useCallback(
+      () => {
+        if (!currentStep) return;
+        const { nextStepTrigger } = currentStep;
+        if (nextStepTrigger && nextStepTrigger.previewLaunched) {
           goToNextStep();
         }
-      } else {
-        // Otherwise, we check if there is the expected number of instances.
-        const instancesCount = getInstanceCountInLayoutForObject(
-          layout.getInitialInstances(),
-          objectName
-        );
-        if (instancesCount >= count) goToNextStep();
-      }
-    }, [project, goToNextStep, objectSceneInstancesToWatch]);
+      },
+      [goToNextStep, currentStep]
+    );
 
-    const watchSceneObjects = React.useCallback(() => {
-      if (!sceneObjectCountToWatch) return;
-      if (hasCurrentSceneObjectsCountIncreased()) {
-        goToNextStep(true);
-      }
-    }, [
-      hasCurrentSceneObjectsCountIncreased,
-      goToNextStep,
-      sceneObjectCountToWatch,
-    ]);
+    // Set up mutation observer to be able to detect any change in the dom.
+    React.useEffect(
+      () => {
+        const appContainer = document.querySelector('body'); // We could have only watch the React root node but Material UI created dialog out of this node.
+        if (!appContainer) return;
+        const observer = new MutationObserver(handleDomMutation);
+        observer.observe(appContainer, {
+          childList: true,
+          attributes: false,
+          subtree: true,
+          characterData: true,
+        });
+        domObserverRef.current = observer;
+        return () => {
+          if (domObserverRef.current) {
+            domObserverRef.current.disconnect();
+            domObserverRef.current = null;
+          }
+        };
+      },
+      [handleDomMutation]
+    );
+
+    // Methods to run on each step change.
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { id, isOnClosableDialog } = currentStep;
+        // Set expected editor on each step change
+        if (id && editorSwitches.hasOwnProperty(id)) {
+          setExpectedEditor(editorSwitches[id]);
+        }
+        // Set fallback step index to the new step index if it is not on a closable dialog.
+        if (!isOnClosableDialog) {
+          currentStepFallbackStepIndex.current = currentStepIndex;
+        }
+        // At each step start, reset change watching logics.
+        setElementWithValueToWatchIfChanged(null);
+        setElementWithValueToWatchIfEquals(null);
+        setObjectSceneInstancesToWatch(null);
+        setSceneObjectCountToWatch(false);
+        setShouldWatchProjectChanges(false);
+        // If index out of bounds, display end dialog.
+        if (currentStepIndex >= stepCount) {
+          setDisplayEndDialog(true);
+        }
+      },
+      [currentStep, currentStepIndex, stepCount, editorSwitches]
+    );
+
+    // Update some refs on each step change and on current scene change.
+    React.useEffect(
+      () => {
+        if (!currentStep || !currentSceneName || !project) return;
+        const count = countObjectsInScene({
+          project,
+          sceneName: currentSceneName,
+        });
+        if (typeof count !== 'number') return;
+        objectCountBySceneRef.current[currentSceneName] = count;
+      },
+      [currentStep, currentSceneName, project]
+    );
+
+    // Set up watchers if the next step trigger is not dom-based.
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { nextStepTrigger, elementToHighlightId } = currentStep;
+        if (nextStepTrigger && nextStepTrigger.valueEquals) {
+          if (!elementToHighlightId) return;
+          inputExpectedValueRef.current = nextStepTrigger.valueEquals;
+          setElementWithValueToWatchIfEquals(elementToHighlightId);
+        } else if (nextStepTrigger && nextStepTrigger.valueHasChanged) {
+          if (!elementToHighlightId) return;
+          const elementToWatch = document.querySelector(elementToHighlightId);
+
+          if (elementToWatch) {
+            inputInitialValueRef.current = getInputValue(elementToWatch);
+          }
+          setElementWithValueToWatchIfChanged(elementToHighlightId);
+        } else if (nextStepTrigger && nextStepTrigger.instanceAddedOnScene) {
+          const [
+            objectKey,
+            sceneKey,
+          ] = nextStepTrigger.instanceAddedOnScene.split(':');
+          const objectName = data[objectKey];
+          if (!objectName) return;
+          const sceneName = sceneKey ? data[sceneKey] : undefined;
+          setObjectSceneInstancesToWatch({
+            objectName,
+            sceneName,
+            count: nextStepTrigger.instancesCount,
+          });
+        } else if (
+          nextStepTrigger &&
+          (nextStepTrigger.objectAddedInLayout ||
+            (nextStepTrigger.presenceOfElement &&
+              nextStepTrigger.presenceOfElement.match(
+                legacyItemInObjectListDomSelectorPattern
+              )))
+        ) {
+          setSceneObjectCountToWatch(true);
+        }
+      },
+      [currentStep, data]
+    );
+
+    // Detect in tooltip texts if project changes should be watched
+    React.useEffect(
+      () => {
+        if (!currentStep) return;
+        const { tooltip } = currentStep;
+        if (!tooltip) return;
+        if (
+          [tooltip.description, tooltip.title].some(translatedText =>
+            containsProjectDataToDisplay(translatedText)
+          )
+        ) {
+          setShouldWatchProjectChanges(true);
+        }
+      },
+      [currentStep]
+    );
+
+    const watchInputChanges = React.useCallback(
+      () => {
+        if (!elementWithValueToWatchIfChanged) return;
+        const elementToWatch = document.querySelector(
+          elementWithValueToWatchIfChanged
+        );
+        const inputInitialValue = inputInitialValueRef.current;
+
+        if (
+          elementToWatch &&
+          getInputValue(elementToWatch) !== inputInitialValue
+        ) {
+          goToNextStep();
+        }
+      },
+      [goToNextStep, elementWithValueToWatchIfChanged]
+    );
+
+    const watchInputEquals = React.useCallback(
+      () => {
+        if (!elementWithValueToWatchIfEquals) return;
+        const elementToWatch = document.querySelector(
+          elementWithValueToWatchIfEquals
+        );
+        const inputExpectedValue = inputExpectedValueRef.current;
+        if (!inputExpectedValue) return;
+
+        // We trim all spaces to not be picky about the user input inside expressions.
+        // Ex: "1 + 1" === "1+1"
+        if (
+          elementToWatch &&
+          getInputValue(elementToWatch).replace(/\s/g, '') ===
+            inputExpectedValue.replace(/\s/g, '')
+        ) {
+          goToNextStep();
+        }
+      },
+      [goToNextStep, elementWithValueToWatchIfEquals]
+    );
+
+    const watchSceneInstanceChanges = React.useCallback(
+      () => {
+        if (!objectSceneInstancesToWatch) return;
+        if (!project || project.getLayoutsCount() === 0) return;
+        const {
+          objectName,
+          sceneName: layoutName,
+          count,
+        } = objectSceneInstancesToWatch;
+        const layout =
+          layoutName && project.hasLayoutNamed(layoutName)
+            ? project.getLayout(layoutName)
+            : project.getLayoutAt(0);
+        if (!count) {
+          // If no count is provided, we just check if there is at least one instance.
+          const instances = layout.getInitialInstances();
+          if (instances.hasInstancesOfObject(objectName)) {
+            goToNextStep();
+          }
+        } else {
+          // Otherwise, we check if there is the expected number of instances.
+          const instancesCount = getInstanceCountInLayoutForObject(
+            layout.getInitialInstances(),
+            objectName
+          );
+          if (instancesCount >= count) goToNextStep();
+        }
+      },
+      [project, goToNextStep, objectSceneInstancesToWatch]
+    );
+
+    const watchSceneObjects = React.useCallback(
+      () => {
+        if (!sceneObjectCountToWatch) return;
+        if (hasCurrentSceneObjectsCountIncreased()) {
+          goToNextStep(true);
+        }
+      },
+      [
+        hasCurrentSceneObjectsCountIncreased,
+        goToNextStep,
+        sceneObjectCountToWatch,
+      ]
+    );
 
     useInterval(forceUpdate, shouldWatchProjectChanges ? 500 : null);
     useInterval(
@@ -1041,9 +1115,12 @@ const InAppTutorialOrchestrator = React.forwardRef<
       wrongEditorInfoOpen ? 0 : 1000
     );
 
-    React.useEffect(() => {
-      checkIfWrongEditor();
-    }, [checkIfWrongEditor, currentEditor, currentSceneName]);
+    React.useEffect(
+      () => {
+        checkIfWrongEditor();
+      },
+      [checkIfWrongEditor, currentEditor, currentSceneName]
+    );
 
     useGiveTrivialBadgeWhenTutorialIsFinished({
       authenticatedUser,

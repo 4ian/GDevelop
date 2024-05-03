@@ -22,12 +22,15 @@ const AuthenticatedUserProfileDetails = ({
 }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
-  const openEmailVerificationDialog = React.useCallback(() => {
-    authenticatedUser.onOpenEmailVerificationDialog({
-      sendEmailAutomatically: true,
-      showSendEmailButton: false,
-    });
-  }, [authenticatedUser]);
+  const openEmailVerificationDialog = React.useCallback(
+    () => {
+      authenticatedUser.onOpenEmailVerificationDialog({
+        sendEmailAutomatically: true,
+        showSendEmailButton: false,
+      });
+    },
+    [authenticatedUser]
+  );
 
   return firebaseUser && profile ? (
     <ColumnStackLayout noMargin>

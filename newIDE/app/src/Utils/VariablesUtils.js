@@ -13,9 +13,12 @@ export const hasChildThatContainsStringInNameOrValue = (
     case gd.Variable.String:
       return normalizeString(variable.getString()).includes(searchText);
     case gd.Variable.Number:
-      return variable.getValue().toString().includes(searchText);
+      return variable
+        .getValue()
+        .toString()
+        .includes(searchText);
     case gd.Variable.Array:
-      return mapFor(0, variable.getChildrenCount(), (index) => {
+      return mapFor(0, variable.getChildrenCount(), index => {
         const childVariable = variable.getAtIndex(index);
         return hasChildThatContainsStringInNameOrValue(
           childVariable,
@@ -26,7 +29,7 @@ export const hasChildThatContainsStringInNameOrValue = (
       return variable
         .getAllChildrenNames()
         .toJSArray()
-        .map((childName) => {
+        .map(childName => {
           const childVariable = variable.getChild(childName);
           return (
             normalizeString(childName).includes(searchText) ||
@@ -48,7 +51,7 @@ export const insertInVariablesContainer = (
 ): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
-    (name) => {
+    name => {
       return (
         variablesContainer.has(name) ||
         (!!inheritedVariablesContainer && inheritedVariablesContainer.has(name))
@@ -87,7 +90,7 @@ export const insertInVariableChildren = (
 ): string => {
   const newName = newNameGenerator(
     name,
-    (_name) => targetParentVariable.hasChild(_name),
+    _name => targetParentVariable.hasChild(_name),
     'CopyOf'
   );
   const newVariable = new gd.Variable();
@@ -101,7 +104,7 @@ export const insertInVariableChildren = (
 export const hasVariablesContainerSubChildren = (
   variablesContainer: gdVariablesContainer
 ): boolean =>
-  mapFor(0, variablesContainer.count(), (index) => {
+  mapFor(0, variablesContainer.count(), index => {
     const variable = variablesContainer.getAt(index);
 
     return isCollectionVariable(variable) && variable.getChildrenCount() > 0;

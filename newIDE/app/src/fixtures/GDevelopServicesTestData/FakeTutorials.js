@@ -6,7 +6,8 @@ export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
   id: 'education-curriculum-1',
   isPrivateTutorial: true,
   redeemHintByLocale: {
-    en: 'This tutorial is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
+    en:
+      'This tutorial is made for education and accessible to teachers and subscribers to the GDevelop Education plan only.',
   },
   redeemLinkByLocale: {
     en: 'https://gdevelop.io/pricing/education',
@@ -23,14 +24,17 @@ export const fakeEducationCurriculumPrivateTutorial: Tutorial = {
   type: 'pdf-tutorial',
   category: 'education-curriculum',
   duration: 360,
-  link: 'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
+  link:
+    'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
   linkByLocale: {
-    en: 'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
+    en:
+      'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-1/action/redirect-to-pdf',
   },
   thumbnailUrl:
     'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
   thumbnailUrlByLocale: {
-    en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+    en:
+      'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
   },
 };
 
@@ -62,14 +66,17 @@ export const fakeTutorials: Array<Tutorial> = [
     type: 'pdf-tutorial',
     category: 'education-curriculum',
     duration: 360,
-    link: 'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+    link:
+      'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
     linkByLocale: {
-      en: 'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
+      en:
+        'https://api-dev.gdevelop.io/asset/pdf-tutorial/education-curriculum-2/action/redirect-to-pdf',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     },
   },
   {
@@ -81,19 +88,23 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn the basics of GDevelop and game creation. Start in a few minutes thanks to our playlist of 5 minutes video, and start making your own game today.',
     descriptionByLocale: {
-      en: 'Learn the basics of GDevelop and game creation. Start in a few minutes thanks to our playlist of 5 minutes video, and start making your own game today.',
+      en:
+        'Learn the basics of GDevelop and game creation. Start in a few minutes thanks to our playlist of 5 minutes video, and start making your own game today.',
     },
     type: 'video',
     category: 'official-beginner',
     duration: 360,
-    link: 'https://www.youtube.com/watch?v=595-swNh0Mw&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8&ab_channel=GDevelop',
+    link:
+      'https://www.youtube.com/watch?v=595-swNh0Mw&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8&ab_channel=GDevelop',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=595-swNh0Mw&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8&ab_channel=GDevelop',
+      en:
+        'https://www.youtube.com/watch?v=595-swNh0Mw&list=PL3YlZTdKiS89Kj7IQVPoNElJCWrjZaCC8&ab_channel=GDevelop',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-started.png',
     },
   },
   {
@@ -105,7 +116,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Every gamedev knows that setting up menus can be a really time consuming task, but with GDevelop's new custom objects, it's one of the quickest parts of the game making process.",
     descriptionByLocale: {
-      en: "Every gamedev knows that setting up menus can be a really time consuming task, but with GDevelop's new custom objects, it's one of the quickest parts of the game making process.",
+      en:
+        "Every gamedev knows that setting up menus can be a really time consuming task, but with GDevelop's new custom objects, it's one of the quickest parts of the game making process.",
     },
     type: 'video',
     category: 'official-beginner',
@@ -127,7 +139,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Get your game in front of a larger audience by doing these 5 things. Developing a good game is only half the battle, getting that good game in front of more people increases the chance your game will be a hit. Marketing and sharing your game can be just as much work as creating the game in the first place.\r',
     descriptionByLocale: {
-      en: 'Get your game in front of a larger audience by doing these 5 things. Developing a good game is only half the battle, getting that good game in front of more people increases the chance your game will be a hit. Marketing and sharing your game can be just as much work as creating the game in the first place.\r',
+      en:
+        'Get your game in front of a larger audience by doing these 5 things. Developing a good game is only half the battle, getting that good game in front of more people increases the chance your game will be a hit. Marketing and sharing your game can be just as much work as creating the game in the first place.\r',
     },
     type: 'video',
     category: 'official-beginner',
@@ -149,14 +162,17 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      en:
+        "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     },
     type: 'video',
     category: 'official-beginner',
     duration: 800,
-    link: 'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf&ab_channel=GDevelop',
+    link:
+      'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf&ab_channel=GDevelop',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf&ab_channel=GDevelop',
+      en:
+        'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf&ab_channel=GDevelop',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/mckuSpr8vio',
@@ -171,7 +187,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Extensions make game development a LOT easier, giving you functionality that you would otherwise have to create yourself. Saving you time and energy in the process of developing your game. This video was created to show you the most commonly used extensions in the GDevelop game engine, which is a no-code, open-source, free, and easy game engine.\r',
     descriptionByLocale: {
-      en: 'Extensions make game development a LOT easier, giving you functionality that you would otherwise have to create yourself. Saving you time and energy in the process of developing your game. This video was created to show you the most commonly used extensions in the GDevelop game engine, which is a no-code, open-source, free, and easy game engine.\r',
+      en:
+        'Extensions make game development a LOT easier, giving you functionality that you would otherwise have to create yourself. Saving you time and energy in the process of developing your game. This video was created to show you the most commonly used extensions in the GDevelop game engine, which is a no-code, open-source, free, and easy game engine.\r',
     },
     type: 'video',
     category: 'official-beginner',
@@ -193,7 +210,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video shows how easy it is to publish your game on gd.games, formerly known as liluo, GDevelop's game hosting platform.",
     descriptionByLocale: {
-      en: "This video shows how easy it is to publish your game on gd.games, formerly known as liluo, GDevelop's game hosting platform.",
+      en:
+        "This video shows how easy it is to publish your game on gd.games, formerly known as liluo, GDevelop's game hosting platform.",
     },
     type: 'video',
     category: 'official-beginner',
@@ -216,8 +234,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video goes over the basics of GDevelop by creating a quick example game. GDevelop's no code event system, behaviors and extensions, adding sound effects, and more.",
     descriptionByLocale: {
-      en: "This video goes over the basics of GDevelop by creating a quick example game. GDevelop's no code event system, behaviors and extensions, adding sound effects, and more.",
-      fr: 'On vous montre comment utiliser ChatGPT pour créer des jeux vidéo avec GDevelop.',
+      en:
+        "This video goes over the basics of GDevelop by creating a quick example game. GDevelop's no code event system, behaviors and extensions, adding sound effects, and more.",
+      fr:
+        'On vous montre comment utiliser ChatGPT pour créer des jeux vidéo avec GDevelop.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -243,7 +263,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video goes over the object types in GDevelop, and briefly shows what each one can be used for. This will be useful for any game developers who are just starting out with the engine, or someone who doesn't understand some of the object types.",
     descriptionByLocale: {
-      en: "This video goes over the object types in GDevelop, and briefly shows what each one can be used for. This will be useful for any game developers who are just starting out with the engine, or someone who doesn't understand some of the object types.",
+      en:
+        "This video goes over the object types in GDevelop, and briefly shows what each one can be used for. This will be useful for any game developers who are just starting out with the engine, or someone who doesn't understand some of the object types.",
       fr: "Les différents type d'objets de GDevelop.",
     },
     type: 'video',
@@ -270,8 +291,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This will be useful for any game developers who are just starting out with the engine, or someone who hasn't been using all of the tools the game engine has to offer.",
     descriptionByLocale: {
-      en: "This will be useful for any game developers who are just starting out with the engine, or someone who hasn't been using all of the tools the game engine has to offer.",
-      fr: 'Comment utiliser les événements, pour créer la logique de votre jeu.',
+      en:
+        "This will be useful for any game developers who are just starting out with the engine, or someone who hasn't been using all of the tools the game engine has to offer.",
+      fr:
+        'Comment utiliser les événements, pour créer la logique de votre jeu.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -297,8 +320,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video, we'll take an introductory look at variables. We will learn the differences between scene, global, and object variables, as well as when to use them. The focus here is on concrete examples, so that you can leave with some real ideas of how to apply variables in your own game!",
     descriptionByLocale: {
-      en: "In this video, we'll take an introductory look at variables. We will learn the differences between scene, global, and object variables, as well as when to use them. The focus here is on concrete examples, so that you can leave with some real ideas of how to apply variables in your own game!",
-      fr: 'Les différents types de variables de GDevelop et surtout dans quel contexte et comment les utiliser.',
+      en:
+        "In this video, we'll take an introductory look at variables. We will learn the differences between scene, global, and object variables, as well as when to use them. The focus here is on concrete examples, so that you can leave with some real ideas of how to apply variables in your own game!",
+      fr:
+        'Les différents types de variables de GDevelop et surtout dans quel contexte et comment les utiliser.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -324,8 +349,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video goes over the expression builder. What it's used for and what sort's of things it's capable of. It also goes over a practical example of adding health points to a character. This will be useful for any game developers who are just starting out with the engine, or someone who hasn't tried using the expression builder yet.",
     descriptionByLocale: {
-      en: "This video goes over the expression builder. What it's used for and what sort's of things it's capable of. It also goes over a practical example of adding health points to a character. This will be useful for any game developers who are just starting out with the engine, or someone who hasn't tried using the expression builder yet.",
-      fr: 'Comment générer des expressions avec GDevelop sans programmer, quand et comment les utiliser.',
+      en:
+        "This video goes over the expression builder. What it's used for and what sort's of things it's capable of. It also goes over a practical example of adding health points to a character. This will be useful for any game developers who are just starting out with the engine, or someone who hasn't tried using the expression builder yet.",
+      fr:
+        'Comment générer des expressions avec GDevelop sans programmer, quand et comment les utiliser.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -351,8 +378,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "As a game creator, you want to get from concept to finished product as soon as possible. Behaviors and functions (extensions) address this by letting you not reinvent the wheel, so you can focus on actually making your game! In this video, we'll go over the basics of behaviors and functions as well as how you can use them in your next project.",
     descriptionByLocale: {
-      en: "As a game creator, you want to get from concept to finished product as soon as possible. Behaviors and functions (extensions) address this by letting you not reinvent the wheel, so you can focus on actually making your game! In this video, we'll go over the basics of behaviors and functions as well as how you can use them in your next project.",
-      fr: 'Présentation des extensions de GDevelop sans programmer, qui permettent de se concentrer sur le gameplay.',
+      en:
+        "As a game creator, you want to get from concept to finished product as soon as possible. Behaviors and functions (extensions) address this by letting you not reinvent the wheel, so you can focus on actually making your game! In this video, we'll go over the basics of behaviors and functions as well as how you can use them in your next project.",
+      fr:
+        'Présentation des extensions de GDevelop sans programmer, qui permettent de se concentrer sur le gameplay.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -378,8 +407,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video teaches GDevelop users about game optimization, and briefly goes over most of the areas that could be causing lag or poor performance in your game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video teaches GDevelop users about game optimization, and briefly goes over most of the areas that could be causing lag or poor performance in your game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
-      fr: 'Comment optimiser votre jeu vidéo pour gagner en rapidité et en volume de fichiers.',
+      en:
+        'This video teaches GDevelop users about game optimization, and briefly goes over most of the areas that could be causing lag or poor performance in your game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      fr:
+        'Comment optimiser votre jeu vidéo pour gagner en rapidité et en volume de fichiers.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -594,8 +625,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'How to get started with game dev. Check out GDevelop today!\nGDevelop is a 2D cross-platform, free and open-source game engine.',
     descriptionByLocale: {
-      en: 'How to get started with game dev. Check out GDevelop today!\nGDevelop is a 2D cross-platform, free and open-source game engine.',
-      fr: 'Cette vidéo passe rapidement en revue le fonctionnement de GDevelop, pour comprendre les principaux concepts.',
+      en:
+        'How to get started with game dev. Check out GDevelop today!\nGDevelop is a 2D cross-platform, free and open-source game engine.',
+      fr:
+        'Cette vidéo passe rapidement en revue le fonctionnement de GDevelop, pour comprendre les principaux concepts.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -620,7 +653,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to create games with GDevelop, a 2D cross-platform, free and open-source game engine. You can create games with minimal coding and run them on most major platforms.',
     descriptionByLocale: {
-      en: 'Learn how to create games with GDevelop, a 2D cross-platform, free and open-source game engine. You can create games with minimal coding and run them on most major platforms.',
+      en:
+        'Learn how to create games with GDevelop, a 2D cross-platform, free and open-source game engine. You can create games with minimal coding and run them on most major platforms.',
     },
     type: 'video',
     category: 'official-beginner',
@@ -643,15 +677,19 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Showing some of the tools you can use in GDevelop that will allow you to fix any problem you might run into while creating your game. Gamedev is stressful enough, use these development tools to help you create your dream game with less of a headache.',
     descriptionByLocale: {
-      en: 'Showing some of the tools you can use in GDevelop that will allow you to fix any problem you might run into while creating your game. Gamedev is stressful enough, use these development tools to help you create your dream game with less of a headache.',
-      fr: 'On vous montre une méthode pour corriger les bugs auxquels vous pourriez être confronté.',
+      en:
+        'Showing some of the tools you can use in GDevelop that will allow you to fix any problem you might run into while creating your game. Gamedev is stressful enough, use these development tools to help you create your dream game with less of a headache.',
+      fr:
+        'On vous montre une méthode pour corriger les bugs auxquels vous pourriez être confronté.',
     },
     type: 'video',
     category: 'official-intermediate',
     duration: 718,
-    link: 'https://youtu.be/8krGoBuQpBI?list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm',
+    link:
+      'https://youtu.be/8krGoBuQpBI?list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm',
     linkByLocale: {
-      en: 'https://youtu.be/8krGoBuQpBI?list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm',
+      en:
+        'https://youtu.be/8krGoBuQpBI?list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm',
       fr: 'https://youtu.be/K1yQUUmZJ2U',
     },
     thumbnailUrl:
@@ -669,19 +707,23 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn deeper concept related to game creation with GDevelop: make multiple levels, add leaderboards to your game, touch controls, save and load, use the physics engine... These videos are the best way to see everything you can do with GDevelop!',
     descriptionByLocale: {
-      en: 'Learn deeper concept related to game creation with GDevelop: make multiple levels, add leaderboards to your game, touch controls, save and load, use the physics engine... These videos are the best way to see everything you can do with GDevelop!',
+      en:
+        'Learn deeper concept related to game creation with GDevelop: make multiple levels, add leaderboards to your game, touch controls, save and load, use the physics engine... These videos are the best way to see everything you can do with GDevelop!',
     },
     type: 'video',
     category: 'official-intermediate',
     duration: 327,
-    link: 'https://www.youtube.com/watch?v=5NzMs1JRuXA&list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm&ab_channel=GDevelop',
+    link:
+      'https://www.youtube.com/watch?v=5NzMs1JRuXA&list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm&ab_channel=GDevelop',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=5NzMs1JRuXA&list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm&ab_channel=GDevelop',
+      en:
+        'https://www.youtube.com/watch?v=5NzMs1JRuXA&list=PL3YlZTdKiS89LrdlHcHo5vePN3O3UhGwm&ab_channel=GDevelop',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/get-better.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/get-better.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/get-better.png',
     },
   },
   {
@@ -693,7 +735,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Improve game feel (Or Juice) by doing 4 of these 6 things, and then the other 2 will help you get and retain players for your game. Wikipedia says that "Game feel (sometimes referred to as "game juice") is the intangible, tactile sensation experienced when interacting with video games." But there are a number of common things that developers do the make games feel more fun to interact with. So in this video we\'ll explain those to help you make a better game, get more players for your game, and retain those players for longer.',
     descriptionByLocale: {
-      en: 'Improve game feel (Or Juice) by doing 4 of these 6 things, and then the other 2 will help you get and retain players for your game. Wikipedia says that "Game feel (sometimes referred to as "game juice") is the intangible, tactile sensation experienced when interacting with video games." But there are a number of common things that developers do the make games feel more fun to interact with. So in this video we\'ll explain those to help you make a better game, get more players for your game, and retain those players for longer.',
+      en:
+        'Improve game feel (Or Juice) by doing 4 of these 6 things, and then the other 2 will help you get and retain players for your game. Wikipedia says that "Game feel (sometimes referred to as "game juice") is the intangible, tactile sensation experienced when interacting with video games." But there are a number of common things that developers do the make games feel more fun to interact with. So in this video we\'ll explain those to help you make a better game, get more players for your game, and retain those players for longer.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -716,7 +759,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Making money from your video games is possible and there are lots of ways to do it. This video quickly goes over 4 of the most straight forward ways to earn money through game development. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'Making money from your video games is possible and there are lots of ways to do it. This video quickly goes over 4 of the most straight forward ways to earn money through game development. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'Making money from your video games is possible and there are lots of ways to do it. This video quickly goes over 4 of the most straight forward ways to earn money through game development. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
       fr: '4 façons de monétiser facilement un jeu vidéo avec GDevelop.',
     },
     type: 'video',
@@ -743,7 +787,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'In this tutorial, we cover the object picking system, which is integral to certain kinds of game behaviors, such as checkpoint systems for instance! These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
     descriptionByLocale: {
-      en: 'In this tutorial, we cover the object picking system, which is integral to certain kinds of game behaviors, such as checkpoint systems for instance! These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
+      en:
+        'In this tutorial, we cover the object picking system, which is integral to certain kinds of game behaviors, such as checkpoint systems for instance! These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
       fr: 'Comment gérer des checkpoints avec GDevelop.',
     },
     type: 'video',
@@ -769,7 +814,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video shows you how to add a leaderboard to your game in the GDevelop game engine. How to set up the leaderboards, customize them, trigger them with events, and display them on screen. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video shows you how to add a leaderboard to your game in the GDevelop game engine. How to set up the leaderboards, customize them, trigger them with events, and display them on screen. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'This video shows you how to add a leaderboard to your game in the GDevelop game engine. How to set up the leaderboards, customize them, trigger them with events, and display them on screen. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -792,8 +838,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "You've created a level for your game, but now need to make a second level. How can you do this without copy pasting everything over to a new scene? In fact, GDevelop offers a suite of tools to solve problems like these, which will save you time as a game creator.",
     descriptionByLocale: {
-      en: "You've created a level for your game, but now need to make a second level. How can you do this without copy pasting everything over to a new scene? In fact, GDevelop offers a suite of tools to solve problems like these, which will save you time as a game creator.",
-      fr: 'Comment utiliser les calques, événements externes et objets globaux pour gagner en productivité avec GDevelop.',
+      en:
+        "You've created a level for your game, but now need to make a second level. How can you do this without copy pasting everything over to a new scene? In fact, GDevelop offers a suite of tools to solve problems like these, which will save you time as a game creator.",
+      fr:
+        'Comment utiliser les calques, événements externes et objets globaux pour gagner en productivité avec GDevelop.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -819,7 +867,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'To finish off our coverage of object types in GDevelop, we go over the two currently experimental types: Bitmap Text and Tiled!',
     descriptionByLocale: {
-      en: 'To finish off our coverage of object types in GDevelop, we go over the two currently experimental types: Bitmap Text and Tiled!',
+      en:
+        'To finish off our coverage of object types in GDevelop, we go over the two currently experimental types: Bitmap Text and Tiled!',
       fr: 'Les objets Bitmap Text et Tiledmap et comment les utiliser.',
     },
     type: 'video',
@@ -847,8 +896,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Learn what the different variables' types are for and how to use them.\rBooleans, Arrays, and Structures won't hold any secrets for you anymore!",
     descriptionByLocale: {
-      en: "Learn what the different variables' types are for and how to use them.\rBooleans, Arrays, and Structures won't hold any secrets for you anymore!",
-      fr: 'Les variables booléennes et des structures de données avec GDevelop.',
+      en:
+        "Learn what the different variables' types are for and how to use them.\rBooleans, Arrays, and Structures won't hold any secrets for you anymore!",
+      fr:
+        'Les variables booléennes et des structures de données avec GDevelop.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -874,7 +925,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video shows how to create a level select menu. How to create a menu and change scenes, as well as how lock off levels so they can't be accessed until the level before it is beaten. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.",
     descriptionByLocale: {
-      en: "This video shows how to create a level select menu. How to create a menu and change scenes, as well as how lock off levels so they can't be accessed until the level before it is beaten. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.",
+      en:
+        "This video shows how to create a level select menu. How to create a menu and change scenes, as well as how lock off levels so they can't be accessed until the level before it is beaten. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.",
       fr: 'Comment intégrer des menus et niveaux avec GDevelop.',
     },
     type: 'video',
@@ -901,7 +953,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video shows how to create basic touch screen controls, using them to control a platformer character. It also teaches the viewer how to set up your game to expand to fill up the entire screen regardless of the original resolution using the anchor behavior. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
     descriptionByLocale: {
-      en: 'This video shows how to create basic touch screen controls, using them to control a platformer character. It also teaches the viewer how to set up your game to expand to fill up the entire screen regardless of the original resolution using the anchor behavior. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
+      en:
+        'This video shows how to create basic touch screen controls, using them to control a platformer character. It also teaches the viewer how to set up your game to expand to fill up the entire screen regardless of the original resolution using the anchor behavior. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
       fr: 'Comment ajouter le support pour un jeu vidéo mobile.',
     },
     type: 'video',
@@ -928,8 +981,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video shows how to toggle the state of an object, in this case a mute button, using a variable. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
     descriptionByLocale: {
-      en: 'This video shows how to toggle the state of an object, in this case a mute button, using a variable. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
-      fr: "Comment modifier l'apparence d'un objet en fonction des actions du joueur en utilisant des variables.",
+      en:
+        'This video shows how to toggle the state of an object, in this case a mute button, using a variable. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
+      fr:
+        "Comment modifier l'apparence d'un objet en fonction des actions du joueur en utilisant des variables.",
     },
     type: 'video',
     category: 'official-intermediate',
@@ -955,8 +1010,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video shows the actions and conditions related to animations for a sprite object. How to change an animation by it's name or number in order. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.",
     descriptionByLocale: {
-      en: "This video shows the actions and conditions related to animations for a sprite object. How to change an animation by it's name or number in order. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.",
-      fr: "Cette vidéo montre les actions et les conditions liées aux animations pour un objet sprite. Comment changer une animation par son nom ou son numéro d'animation. Ceci vous explique également les états d'un objet avec des variables.",
+      en:
+        "This video shows the actions and conditions related to animations for a sprite object. How to change an animation by it's name or number in order. As well as how toggling/cycling object states with variables can be used in a game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.",
+      fr:
+        "Cette vidéo montre les actions et les conditions liées aux animations pour un objet sprite. Comment changer une animation par son nom ou son numéro d'animation. Ceci vous explique également les états d'un objet avec des variables.",
     },
     type: 'video',
     category: 'official-intermediate',
@@ -982,8 +1039,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over some of the events related to the physics engine in GDevelop. Explaining what forces and impulses are used for, and going over a use case for the revolute joint.(Pinball) These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video goes over some of the events related to the physics engine in GDevelop. Explaining what forces and impulses are used for, and going over a use case for the revolute joint.(Pinball) These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
-      fr: 'Cette vidéo montre comment utiliser les événements en lien avec le comportement Physics 2.0.',
+      en:
+        'This video goes over some of the events related to the physics engine in GDevelop. Explaining what forces and impulses are used for, and going over a use case for the revolute joint.(Pinball) These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      fr:
+        'Cette vidéo montre comment utiliser les événements en lien avec le comportement Physics 2.0.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -1009,8 +1068,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over some commonly used expressions, that you will find useful for your games in GDevelop. Showing you where you would use these useful expressions, and why. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video goes over some commonly used expressions, that you will find useful for your games in GDevelop. Showing you where you would use these useful expressions, and why. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
-      fr: 'Comment et quels sont les expressions les plus couramment utilisées.',
+      en:
+        'This video goes over some commonly used expressions, that you will find useful for your games in GDevelop. Showing you where you would use these useful expressions, and why. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      fr:
+        'Comment et quels sont les expressions les plus couramment utilisées.',
     },
     type: 'video',
     category: 'official-intermediate',
@@ -1036,7 +1097,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over camera controls within the GDevelop game engine. Going over camera movement, zoom, rotation, and camera shake. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video goes over camera controls within the GDevelop game engine. Going over camera movement, zoom, rotation, and camera shake. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'This video goes over camera controls within the GDevelop game engine. Going over camera movement, zoom, rotation, and camera shake. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
       fr: "Comment utiliser la caméra à travers différents cas d'utilisation.",
     },
     type: 'video',
@@ -1063,7 +1125,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video goes over timers and the new wait action within the GDevelop game engine. Going over both timers by explaining how they're different, and showing some use cases for each. Including using the timers to control the firerate of a gun, and using the wait action to delay sections of a count down timer. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "This video goes over timers and the new wait action within the GDevelop game engine. Going over both timers by explaining how they're different, and showing some use cases for each. Including using the timers to control the firerate of a gun, and using the wait action to delay sections of a count down timer. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      en:
+        "This video goes over timers and the new wait action within the GDevelop game engine. Going over both timers by explaining how they're different, and showing some use cases for each. Including using the timers to control the firerate of a gun, and using the wait action to delay sections of a count down timer. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
       fr: 'Comment utiliser les chronomètres (timer) et les pauses (wait).',
     },
     type: 'video',
@@ -1089,7 +1152,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "As you transcend the basics of GDevelop, you'll want to have things stay the same each time someone opens your game. In this video, we take a look at how to accomplish exactly this!",
     descriptionByLocale: {
-      en: "As you transcend the basics of GDevelop, you'll want to have things stay the same each time someone opens your game. In this video, we take a look at how to accomplish exactly this!",
+      en:
+        "As you transcend the basics of GDevelop, you'll want to have things stay the same each time someone opens your game. In this video, we take a look at how to accomplish exactly this!",
     },
     type: 'video',
     category: 'official-intermediate',
@@ -1115,14 +1179,17 @@ export const fakeTutorials: Array<Tutorial> = [
     type: 'video',
     category: 'official-advanced',
     duration: 267,
-    link: 'https://www.youtube.com/watch?v=2eOhvUIL4vg&list=PL3YlZTdKiS886KwTTyWJ3Zg1CjZq9jxvI',
+    link:
+      'https://www.youtube.com/watch?v=2eOhvUIL4vg&list=PL3YlZTdKiS886KwTTyWJ3Zg1CjZq9jxvI',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=2eOhvUIL4vg&list=PL3YlZTdKiS886KwTTyWJ3Zg1CjZq9jxvI',
+      en:
+        'https://www.youtube.com/watch?v=2eOhvUIL4vg&list=PL3YlZTdKiS886KwTTyWJ3Zg1CjZq9jxvI',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/IndepthSeriesThumbnail.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/IndepthSeriesThumbnail.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/IndepthSeriesThumbnail.png',
     },
   },
   {
@@ -1135,7 +1202,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "As you begin making more advanced games with GDevelop, you'll want to learn this trick to save/load all of your variables with just 3 actions. This will allow you to develop larger games without the worry of your save/load system getting too out of hand.",
     descriptionByLocale: {
-      en: "As you begin making more advanced games with GDevelop, you'll want to learn this trick to save/load all of your variables with just 3 actions. This will allow you to develop larger games without the worry of your save/load system getting too out of hand.",
+      en:
+        "As you begin making more advanced games with GDevelop, you'll want to learn this trick to save/load all of your variables with just 3 actions. This will allow you to develop larger games without the worry of your save/load system getting too out of hand.",
       fr: 'Comment enregistrer vos scores ou vos parties avec GDevelop.',
     },
     type: 'video',
@@ -1161,7 +1229,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video we'll be exporting a game from GDevelop. We'll be exporting both a html game file and a PC build. This video will also show people how to upload that exported game to itch.io, as well as good practices to ensure your game can be found when you search for games made with the GDevelop engine.",
     descriptionByLocale: {
-      en: "In this video we'll be exporting a game from GDevelop. We'll be exporting both a html game file and a PC build. This video will also show people how to upload that exported game to itch.io, as well as good practices to ensure your game can be found when you search for games made with the GDevelop engine.",
+      en:
+        "In this video we'll be exporting a game from GDevelop. We'll be exporting both a html game file and a PC build. This video will also show people how to upload that exported game to itch.io, as well as good practices to ensure your game can be found when you search for games made with the GDevelop engine.",
     },
     type: 'video',
     category: 'official-advanced',
@@ -1183,7 +1252,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video teaches GDevelop users about the tween behavior, and briefly goes over some simple juicy game effects and animations. We show an example of how to do squash and stretch, the Mario game ghost, and the Mario game coin block. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video teaches GDevelop users about the tween behavior, and briefly goes over some simple juicy game effects and animations. We show an example of how to do squash and stretch, the Mario game ghost, and the Mario game coin block. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'This video teaches GDevelop users about the tween behavior, and briefly goes over some simple juicy game effects and animations. We show an example of how to do squash and stretch, the Mario game ghost, and the Mario game coin block. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1205,7 +1275,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over the platformer behavior. How to use it, and what sort of events relate to the behavior. We take you from a blank scene to having a moving animated platformer character. This will be useful for any game developers who are just starting out with the engine, or someone who might have missed something with the platformer behavior.',
     descriptionByLocale: {
-      en: 'This video goes over the platformer behavior. How to use it, and what sort of events relate to the behavior. We take you from a blank scene to having a moving animated platformer character. This will be useful for any game developers who are just starting out with the engine, or someone who might have missed something with the platformer behavior.',
+      en:
+        'This video goes over the platformer behavior. How to use it, and what sort of events relate to the behavior. We take you from a blank scene to having a moving animated platformer character. This will be useful for any game developers who are just starting out with the engine, or someone who might have missed something with the platformer behavior.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1227,7 +1298,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over the top down movement behavior. How to use it, and what sort of conditions relate to the behavior. We show you the different styles of movement that can come from the behavior as well as how to achieve an isometric or 2.5D game effect with Z-ordering. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.',
     descriptionByLocale: {
-      en: 'This video goes over the top down movement behavior. How to use it, and what sort of conditions relate to the behavior. We show you the different styles of movement that can come from the behavior as well as how to achieve an isometric or 2.5D game effect with Z-ordering. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.',
+      en:
+        'This video goes over the top down movement behavior. How to use it, and what sort of conditions relate to the behavior. We show you the different styles of movement that can come from the behavior as well as how to achieve an isometric or 2.5D game effect with Z-ordering. This tutorial will be useful for any game developers using GDevelop, a no-code, open-source, free, and easy game-making app.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1249,7 +1321,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over the basics of the physics engine in GDevelop. What the various options do within the behavior page, and some examples of how to use it. As well as how to make a basic brick breaker game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
     descriptionByLocale: {
-      en: 'This video goes over the basics of the physics engine in GDevelop. What the various options do within the behavior page, and some examples of how to use it. As well as how to make a basic brick breaker game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
+      en:
+        'This video goes over the basics of the physics engine in GDevelop. What the various options do within the behavior page, and some examples of how to use it. As well as how to make a basic brick breaker game. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game making app.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1271,7 +1344,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over the basics of the particle emitter object in GDevelop. What the various options do within the object page, and some examples of how to use it. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video goes over the basics of the particle emitter object in GDevelop. What the various options do within the object page, and some examples of how to use it. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'This video goes over the basics of the particle emitter object in GDevelop. What the various options do within the object page, and some examples of how to use it. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1293,7 +1367,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video goes over the sprite object for the GDevelop game engine. Going over collision masks, points, and animations while explaining the use cases for those tools. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     descriptionByLocale: {
-      en: 'This video goes over the sprite object for the GDevelop game engine. Going over collision masks, points, and animations while explaining the use cases for those tools. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
+      en:
+        'This video goes over the sprite object for the GDevelop game engine. Going over collision masks, points, and animations while explaining the use cases for those tools. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.',
     },
     type: 'video',
     category: 'official-advanced',
@@ -1315,18 +1390,22 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.',
     descriptionByLocale: {
-      en: 'Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.',
+      en:
+        'Make a hyper-casual mobile game where the player must grab shapes and avoid bombs.',
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/geometry-monster?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/geometry-monster?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/geometry-monster?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/geometry-monster?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/geometry-monster.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/geometry-monster.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/geometry-monster.png',
     },
   },
   {
@@ -1339,21 +1418,25 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to make a Platformer game from scratch! Starting from zero, you will learn how to make a fun platform game, using assets found in the GDevelop asset store.',
     descriptionByLocale: {
-      en: 'Learn how to make a Platformer game from scratch! Starting from zero, you will learn how to make a fun platform game, using assets found in the GDevelop asset store.',
+      en:
+        'Learn how to make a Platformer game from scratch! Starting from zero, you will learn how to make a fun platform game, using assets found in the GDevelop asset store.',
       fr: 'Comment créer un jeu de plateforme avec GDevelop.',
     },
     type: 'video',
     category: 'full-game',
     duration: 392,
-    link: 'https://www.youtube.com/watch?v=eU0kkLSdw0Y&list=PL3YlZTdKiS898Wio0tvKjQM0x3zo4V0Mb&ab_channel=GDevelop',
+    link:
+      'https://www.youtube.com/watch?v=eU0kkLSdw0Y&list=PL3YlZTdKiS898Wio0tvKjQM0x3zo4V0Mb&ab_channel=GDevelop',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=eU0kkLSdw0Y&list=PL3YlZTdKiS898Wio0tvKjQM0x3zo4V0Mb&ab_channel=GDevelop',
+      en:
+        'https://www.youtube.com/watch?v=eU0kkLSdw0Y&list=PL3YlZTdKiS898Wio0tvKjQM0x3zo4V0Mb&ab_channel=GDevelop',
       fr: 'https://youtu.be/VcOiDHpWgnE',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/platformer.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/platformer.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/platformer.png',
     },
   },
   {
@@ -1366,14 +1449,17 @@ export const fakeTutorials: Array<Tutorial> = [
     description: 'How to make Zelda without coding',
     descriptionByLocale: {
       en: 'How to make Zelda without coding',
-      fr: "Du fait de l'excellente réputation dont bénéficie Zelda chez les joueurs de jeux vidéo, il semble important de passer en revue certains des mécanismes qui ont contribué à son succès. On vous montre ainsi comment sont gérés le mouvement, les états d'animation, la profondeur et les masques de collision.",
+      fr:
+        "Du fait de l'excellente réputation dont bénéficie Zelda chez les joueurs de jeux vidéo, il semble important de passer en revue certains des mécanismes qui ont contribué à son succès. On vous montre ainsi comment sont gérés le mouvement, les états d'animation, la profondeur et les masques de collision.",
     },
     type: 'video',
     category: 'full-game',
     duration: 317,
-    link: 'https://www.youtube.com/watch?v=mWiLZ6fYXTU&list=PL3YlZTdKiS880W7Xh6ijk2cCEbSL3KSVo',
+    link:
+      'https://www.youtube.com/watch?v=mWiLZ6fYXTU&list=PL3YlZTdKiS880W7Xh6ijk2cCEbSL3KSVo',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=mWiLZ6fYXTU&list=PL3YlZTdKiS880W7Xh6ijk2cCEbSL3KSVo',
+      en:
+        'https://www.youtube.com/watch?v=mWiLZ6fYXTU&list=PL3YlZTdKiS880W7Xh6ijk2cCEbSL3KSVo',
       fr: 'https://youtu.be/6MwRZjgi9bs',
     },
     thumbnailUrl:
@@ -1392,15 +1478,19 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to make a tower defense game similar to Bloons TD or Kingdom Rush with this game development tutorial. Discover how to implement game mechanics like spawning waves of enemies, moving them to different waypoints, and utilizing the new array tool conditions/actions.\r\n',
     descriptionByLocale: {
-      en: 'Learn how to make a tower defense game similar to Bloons TD or Kingdom Rush with this game development tutorial. Discover how to implement game mechanics like spawning waves of enemies, moving them to different waypoints, and utilizing the new array tool conditions/actions.\r\n',
-      fr: "Apprenez à créer un jeu de tower defense similaire à Bloons TD ou Kingdom Rush. Découvrez comment mettre en œuvre des mécanismes de jeu comme générer des vagues d'ennemis, les déplacer vers sur des chemins et utiliser les nouvelles conditions/actions de type tableau.",
+      en:
+        'Learn how to make a tower defense game similar to Bloons TD or Kingdom Rush with this game development tutorial. Discover how to implement game mechanics like spawning waves of enemies, moving them to different waypoints, and utilizing the new array tool conditions/actions.\r\n',
+      fr:
+        "Apprenez à créer un jeu de tower defense similaire à Bloons TD ou Kingdom Rush. Découvrez comment mettre en œuvre des mécanismes de jeu comme générer des vagues d'ennemis, les déplacer vers sur des chemins et utiliser les nouvelles conditions/actions de type tableau.",
     },
     type: 'video',
     category: 'full-game',
     duration: 380,
-    link: 'https://www.youtube.com/watch?v=b2eavtLhftI&list=PL3YlZTdKiS8_Fn9gR4COSVrTCQxxWkudZ',
+    link:
+      'https://www.youtube.com/watch?v=b2eavtLhftI&list=PL3YlZTdKiS8_Fn9gR4COSVrTCQxxWkudZ',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=b2eavtLhftI&list=PL3YlZTdKiS8_Fn9gR4COSVrTCQxxWkudZ',
+      en:
+        'https://www.youtube.com/watch?v=b2eavtLhftI&list=PL3YlZTdKiS8_Fn9gR4COSVrTCQxxWkudZ',
       fr: 'https://www.youtube.com/watch?v=b4HxfXIqjaE',
     },
     thumbnailUrl:
@@ -1419,15 +1509,19 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
-      fr: "Créez un jeu de défense contre des vagues d'ennemis en utilisant GDevelop. Dans cette série de didacticiels adaptés aux débutants, nous aborderons les mouvements des joueurs, le tir d'une balle, la logique de l'ennemi et l'apparition des ennemis.",
+      en:
+        "Create a wave defense game without coding, using GDevelop. We'll try to cover everything in this series from basic gun mechanics to enemies and more. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      fr:
+        "Créez un jeu de défense contre des vagues d'ennemis en utilisant GDevelop. Dans cette série de didacticiels adaptés aux débutants, nous aborderons les mouvements des joueurs, le tir d'une balle, la logique de l'ennemi et l'apparition des ennemis.",
     },
     type: 'video',
     category: 'full-game',
     duration: 800,
-    link: 'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf',
+    link:
+      'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf',
+      en:
+        'https://www.youtube.com/watch?v=mckuSpr8vio&list=PL3YlZTdKiS8_R32-DlXGi7YGZNfG7B8Vf',
       fr: 'https://youtu.be/HVORBXnQw10',
     },
     thumbnailUrl:
@@ -1445,7 +1539,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Roguelikes are deceptively simple to make. The two main features of modern day roguelikes are permadeath and randomized levels, so once you've created the base mechanics of the game you can just layer on new things to that core gameplay loop.",
     descriptionByLocale: {
-      en: "Roguelikes are deceptively simple to make. The two main features of modern day roguelikes are permadeath and randomized levels, so once you've created the base mechanics of the game you can just layer on new things to that core gameplay loop.",
+      en:
+        "Roguelikes are deceptively simple to make. The two main features of modern day roguelikes are permadeath and randomized levels, so once you've created the base mechanics of the game you can just layer on new things to that core gameplay loop.",
     },
     type: 'video',
     category: 'full-game',
@@ -1467,19 +1562,23 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to make the Asteroids game! Starting from zero, these videos will teach you how to make this game.',
     descriptionByLocale: {
-      en: 'Learn how to make the Asteroids game! Starting from zero, these videos will teach you how to make this game.',
+      en:
+        'Learn how to make the Asteroids game! Starting from zero, these videos will teach you how to make this game.',
     },
     type: 'video',
     category: 'full-game',
     duration: 413,
-    link: 'https://www.youtube.com/watch?v=w1SCpQ-mRCk&list=PL3YlZTdKiS8_Q8UPu2BJV5P5gYA-Q-k19&ab_channel=GDevelop',
+    link:
+      'https://www.youtube.com/watch?v=w1SCpQ-mRCk&list=PL3YlZTdKiS8_Q8UPu2BJV5P5gYA-Q-k19&ab_channel=GDevelop',
     linkByLocale: {
-      en: 'https://www.youtube.com/watch?v=w1SCpQ-mRCk&list=PL3YlZTdKiS8_Q8UPu2BJV5P5gYA-Q-k19&ab_channel=GDevelop',
+      en:
+        'https://www.youtube.com/watch?v=w1SCpQ-mRCk&list=PL3YlZTdKiS8_Q8UPu2BJV5P5gYA-Q-k19&ab_channel=GDevelop',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/playlists/asteroids.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/playlists/asteroids.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/playlists/asteroids.png',
     },
   },
   {
@@ -1491,7 +1590,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Creating a cyberpunk racing game with mobile touch screen controls. Game developers will be familiar with this obstacle dodging gameplay, but with good art and some game juice, you can create a compelling gameplay experience.',
     descriptionByLocale: {
-      en: 'Creating a cyberpunk racing game with mobile touch screen controls. Game developers will be familiar with this obstacle dodging gameplay, but with good art and some game juice, you can create a compelling gameplay experience.',
+      en:
+        'Creating a cyberpunk racing game with mobile touch screen controls. Game developers will be familiar with this obstacle dodging gameplay, but with good art and some game juice, you can create a compelling gameplay experience.',
     },
     type: 'video',
     category: 'full-game',
@@ -1513,7 +1613,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Sokoban games are block pushing puzzle games, where the levels are small, and the player needs to figure out which sequence of pushes will result in them winning the game.',
     descriptionByLocale: {
-      en: 'Sokoban games are block pushing puzzle games, where the levels are small, and the player needs to figure out which sequence of pushes will result in them winning the game.',
+      en:
+        'Sokoban games are block pushing puzzle games, where the levels are small, and the player needs to figure out which sequence of pushes will result in them winning the game.',
     },
     type: 'video',
     category: 'full-game',
@@ -1536,8 +1637,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Metroidvania games all have 1 thing in common, the game worlds consist of a series of locks(Things you can't pass yet) and keys(The tool you needed to get passed it). So in this video we show game developers just how easy it is to create this sort of system in GDevelop using Boolean variables to unlock abilities, get over obstacles, and unlock doors.",
     descriptionByLocale: {
-      en: "Metroidvania games all have 1 thing in common, the game worlds consist of a series of locks(Things you can't pass yet) and keys(The tool you needed to get passed it). So in this video we show game developers just how easy it is to create this sort of system in GDevelop using Boolean variables to unlock abilities, get over obstacles, and unlock doors.",
-      fr: 'Les jeux Metroidvania ont tous une chose en commun, les mondes du jeu consistent en une série de portes et de clés. Dans cette vidéo, nous montrons à quel point il est facile de créer ce genre de système dans GDevelop en utilisant des variables booléennes pour débloquer des capacités, franchir des obstacles et déverrouiller des portes.',
+      en:
+        "Metroidvania games all have 1 thing in common, the game worlds consist of a series of locks(Things you can't pass yet) and keys(The tool you needed to get passed it). So in this video we show game developers just how easy it is to create this sort of system in GDevelop using Boolean variables to unlock abilities, get over obstacles, and unlock doors.",
+      fr:
+        'Les jeux Metroidvania ont tous une chose en commun, les mondes du jeu consistent en une série de portes et de clés. Dans cette vidéo, nous montrons à quel point il est facile de créer ce genre de système dans GDevelop en utilisant des variables booléennes pour débloquer des capacités, franchir des obstacles et déverrouiller des portes.',
     },
     type: 'video',
     category: 'full-game',
@@ -1563,8 +1666,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "City building games like Sim City have lots of individual mechanics that come together to create something fun. In this video we're going to show how simple the basics of creating a city builder can be.",
     descriptionByLocale: {
-      en: "City building games like Sim City have lots of individual mechanics that come together to create something fun. In this video we're going to show how simple the basics of creating a city builder can be.",
-      fr: "Les jeux de construction de villes comme Sim City comportent de nombreux mécanismes individuels qui s'assemblent pour créer quelque chose d'amusant. Dans cette vidéo, nous allons montrer à quel point les bases de la création d'un jeu de construction de ville peuvent être simples. ",
+      en:
+        "City building games like Sim City have lots of individual mechanics that come together to create something fun. In this video we're going to show how simple the basics of creating a city builder can be.",
+      fr:
+        "Les jeux de construction de villes comme Sim City comportent de nombreux mécanismes individuels qui s'assemblent pour créer quelque chose d'amusant. Dans cette vidéo, nous allons montrer à quel point les bases de la création d'un jeu de construction de ville peuvent être simples. ",
     },
     type: 'video',
     category: 'full-game',
@@ -1589,7 +1694,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Stardew Valley is a great game created by a solo developer, and we thought it would be useful for game developers to see a video explaining some of it's mechanics, and how to add those mechanics to their game in GDevelop.",
     descriptionByLocale: {
-      en: "Stardew Valley is a great game created by a solo developer, and we thought it would be useful for game developers to see a video explaining some of it's mechanics, and how to add those mechanics to their game in GDevelop.",
+      en:
+        "Stardew Valley is a great game created by a solo developer, and we thought it would be useful for game developers to see a video explaining some of it's mechanics, and how to add those mechanics to their game in GDevelop.",
     },
     type: 'video',
     category: 'full-game',
@@ -1611,7 +1717,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'With Pokemon scarlet and violet coming out, we decided show game developers how to go about creating a top down rpg game in GDevelop. With top down movement and turn based battles, similar to pokemon.',
     descriptionByLocale: {
-      en: 'With Pokemon scarlet and violet coming out, we decided show game developers how to go about creating a top down rpg game in GDevelop. With top down movement and turn based battles, similar to pokemon.',
+      en:
+        'With Pokemon scarlet and violet coming out, we decided show game developers how to go about creating a top down rpg game in GDevelop. With top down movement and turn based battles, similar to pokemon.',
     },
     type: 'video',
     category: 'full-game',
@@ -1633,7 +1740,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Idle clicker games are incredibly popular, and surprisingly easy to make. So in this video we show how to add clicker game mechanics to your game with GDevelop.',
     descriptionByLocale: {
-      en: 'Idle clicker games are incredibly popular, and surprisingly easy to make. So in this video we show how to add clicker game mechanics to your game with GDevelop.',
+      en:
+        'Idle clicker games are incredibly popular, and surprisingly easy to make. So in this video we show how to add clicker game mechanics to your game with GDevelop.',
     },
     type: 'video',
     category: 'full-game',
@@ -1656,7 +1764,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video we'll be creating a platformer, using the platformer behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "In this video we'll be creating a platformer, using the platformer behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      en:
+        "In this video we'll be creating a platformer, using the platformer behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
       fr: 'Comment créer un jeu de plateforme avec GDevelop.',
     },
     type: 'video',
@@ -1683,8 +1792,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video we'll be adding 2 types of enemies to our platformer game. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "In this video we'll be adding 2 types of enemies to our platformer game. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
-      fr: "La 2ème partie consacrée à la création d'un jeu de plateforme avec GDevelop.",
+      en:
+        "In this video we'll be adding 2 types of enemies to our platformer game. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      fr:
+        "La 2ème partie consacrée à la création d'un jeu de plateforme avec GDevelop.",
     },
     type: 'video',
     category: 'full-game',
@@ -1710,8 +1821,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this platformer example video we'll be going over ladders, a checkpoint system, the parallaxing background, and a win screen with a points system. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
     descriptionByLocale: {
-      en: "In this platformer example video we'll be going over ladders, a checkpoint system, the parallaxing background, and a win screen with a points system. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
-      fr: "La 3ème partie consacrée à la création d'un jeu de plateforme avec GDevelop.",
+      en:
+        "In this platformer example video we'll be going over ladders, a checkpoint system, the parallaxing background, and a win screen with a points system. We'll be going through this tutorial at a fairly quick pace because you should have watched our other tutorials before watching this video. These tutorials are designed to teach you how to make a game in GDevelop, a no-code, open-source, free, and easy game engine.",
+      fr:
+        "La 3ème partie consacrée à la création d'un jeu de plateforme avec GDevelop.",
     },
     type: 'video',
     category: 'full-game',
@@ -1737,7 +1850,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video we'll be recreating asteroids using the physics behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the intro tutorial playlist before watching this video.",
     descriptionByLocale: {
-      en: "In this video we'll be recreating asteroids using the physics behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the intro tutorial playlist before watching this video.",
+      en:
+        "In this video we'll be recreating asteroids using the physics behavior that comes with GDevelop by default. We'll be going through this tutorial at a fairly quick pace because you should have watched the intro tutorial playlist before watching this video.",
       fr: 'Comment créer un jeu d’astéroïdes avec GDevelop.',
     },
     type: 'video',
@@ -1764,8 +1878,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "In this video we'll be adding game juice. Which is basically particle effects, sound effects, screen shake, and everything that makes a game feel good to play. If you haven't watched the first video in this 2 part series, be sure to do so because it goes over how we actually built this game.",
     descriptionByLocale: {
-      en: "In this video we'll be adding game juice. Which is basically particle effects, sound effects, screen shake, and everything that makes a game feel good to play. If you haven't watched the first video in this 2 part series, be sure to do so because it goes over how we actually built this game.",
-      fr: 'Voici la suite de la vidéo qui vous montre comment créer un jeu d’astéroïdes avec GDevelop sans programmer.',
+      en:
+        "In this video we'll be adding game juice. Which is basically particle effects, sound effects, screen shake, and everything that makes a game feel good to play. If you haven't watched the first video in this 2 part series, be sure to do so because it goes over how we actually built this game.",
+      fr:
+        'Voici la suite de la vidéo qui vous montre comment créer un jeu d’astéroïdes avec GDevelop sans programmer.',
     },
     type: 'video',
     category: 'full-game',
@@ -1793,9 +1909,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/platformer/start?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/platformer/start?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/platformer/start?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/platformer/start?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/platformer.png',
@@ -1815,14 +1933,17 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/space-shooter?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/space-shooter?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/space-shooter?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/space-shooter?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/space-shooter.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/space-shooter.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/space-shooter.png',
     },
   },
   {
@@ -1845,7 +1966,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/2d-car-physics-movement.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/2d-car-physics-movement.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/2d-car-physics-movement.jpg',
     },
   },
   {
@@ -1857,7 +1979,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Create a 2D platform game where the player can shoot at enemies chasing him.',
     descriptionByLocale: {
-      en: 'Create a 2D platform game where the player can shoot at enemies chasing him.',
+      en:
+        'Create a 2D platform game where the player can shoot at enemies chasing him.',
     },
     type: 'video',
     category: 'full-game',
@@ -1869,7 +1992,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/2d-platformer-shooter.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/2d-platformer-shooter.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/2d-platformer-shooter.jpg',
     },
   },
   {
@@ -1884,9 +2008,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/tank-shooter?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/tank-shooter?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/tank-shooter?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/tank-shooter?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/TankShooter.jpg',
@@ -1903,18 +2029,22 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Make a simple game where the player must jump on platforms for as long as possible.',
     descriptionByLocale: {
-      en: 'Make a simple game where the player must jump on platforms for as long as possible.',
+      en:
+        'Make a simple game where the player must jump on platforms for as long as possible.',
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/endless-runner?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/endless-runner?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/endless-runner?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/endless-runner?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/EndlessRunner.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/EndlessRunner.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/EndlessRunner.jpg',
     },
   },
   {
@@ -1930,9 +2060,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/roadrider?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/roadrider?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/roadrider?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/roadrider?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/EndlessCar.jpg',
@@ -1949,13 +2081,16 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Create a simple breakout game where you must destroy all the bricks on the screen.',
     descriptionByLocale: {
-      en: 'Create a simple breakout game where you must destroy all the bricks on the screen.',
+      en:
+        'Create a simple breakout game where you must destroy all the bricks on the screen.',
     },
     type: 'text',
     category: 'full-game',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/breakout?utm_source=gdevelop&utm_medium=help-link',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/breakout?utm_source=gdevelop&utm_medium=help-link',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/breakout?utm_source=gdevelop&utm_medium=help-link',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/breakout?utm_source=gdevelop&utm_medium=help-link',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/Breakout.jpg',
@@ -1973,18 +2108,22 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Create a playable game for everyone in an intuitive and comprehensive way with these five tips and common mistakes to avoid to enhance your game. How to keep the players playing longer your game, why a good intro for your game is important, and how to make gameplay moments more immersive by getting players emotionally engaged.',
     descriptionByLocale: {
-      en: 'Create a playable game for everyone in an intuitive and comprehensive way with these five tips and common mistakes to avoid to enhance your game. How to keep the players playing longer your game, why a good intro for your game is important, and how to make gameplay moments more immersive by getting players emotionally engaged.',
+      en:
+        'Create a playable game for everyone in an intuitive and comprehensive way with these five tips and common mistakes to avoid to enhance your game. How to keep the players playing longer your game, why a good intro for your game is important, and how to make gameplay moments more immersive by getting players emotionally engaged.',
     },
     type: 'text',
     category: 'game-mechanic',
-    link: 'https://gdevelop.io/page/how-to-make-a-good-game-the-tips-and-mistakes-to-avoid',
+    link:
+      'https://gdevelop.io/page/how-to-make-a-good-game-the-tips-and-mistakes-to-avoid',
     linkByLocale: {
-      en: 'https://gdevelop.io/page/how-to-make-a-good-game-the-tips-and-mistakes-to-avoid',
+      en:
+        'https://gdevelop.io/page/how-to-make-a-good-game-the-tips-and-mistakes-to-avoid',
     },
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/b4d5d9b9f5661fca5be4522b578ffceb2d89c5e6-1200x630.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/b4d5d9b9f5661fca5be4522b578ffceb2d89c5e6-1200x630.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/b4d5d9b9f5661fca5be4522b578ffceb2d89c5e6-1200x630.png',
     },
   },
   {
@@ -1996,7 +2135,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "Creating a game is an exciting journey that opens up a world of possibilities.\r\nThese best practices when making games guide will help you to bring our vision to life and create the best experiences for our players. Let's explore the essential knowledge you need to make your first game good and entertaining.",
     descriptionByLocale: {
-      en: "Creating a game is an exciting journey that opens up a world of possibilities.\r\nThese best practices when making games guide will help you to bring our vision to life and create the best experiences for our players. Let's explore the essential knowledge you need to make your first game good and entertaining.",
+      en:
+        "Creating a game is an exciting journey that opens up a world of possibilities.\r\nThese best practices when making games guide will help you to bring our vision to life and create the best experiences for our players. Let's explore the essential knowledge you need to make your first game good and entertaining.",
     },
     type: 'text',
     category: 'game-mechanic',
@@ -2007,7 +2147,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/best-practices-when-making-games.png',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/best-practices-when-making-games.png',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/best-practices-when-making-games.png',
     },
   },
   {
@@ -2020,8 +2161,10 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Saving and loading many objects in your game scene, so your objects can be persistent even after changing scene in your game, can be a tricky thing to do. This short tutorial video goes over the easiest way to save the name, position, and more properties into an array to use when loading object back in to your game',
     descriptionByLocale: {
-      en: 'Saving and loading many objects in your game scene, so your objects can be persistent even after changing scene in your game, can be a tricky thing to do. This short tutorial video goes over the easiest way to save the name, position, and more properties into an array to use when loading object back in to your game',
-      fr: 'On vous montre comment sauvegarder tous les objets de votre scène une seule instruction sans coder',
+      en:
+        'Saving and loading many objects in your game scene, so your objects can be persistent even after changing scene in your game, can be a tricky thing to do. This short tutorial video goes over the easiest way to save the name, position, and more properties into an array to use when loading object back in to your game',
+      fr:
+        'On vous montre comment sauvegarder tous les objets de votre scène une seule instruction sans coder',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2046,7 +2189,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Game feel, or game juice, is that extra bit of polish that helps make a game go from "good" to great. In this video we\'ll cover and show examples of the different effects that add to game feel.',
     descriptionByLocale: {
-      en: 'Game feel, or game juice, is that extra bit of polish that helps make a game go from "good" to great. In this video we\'ll cover and show examples of the different effects that add to game feel.',
+      en:
+        'Game feel, or game juice, is that extra bit of polish that helps make a game go from "good" to great. In this video we\'ll cover and show examples of the different effects that add to game feel.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2068,7 +2212,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Randomly generated content in video games can create a lot of variety for your players. In this video we talk about 3 different ways to randomly generate levels in your game.\r\n',
     descriptionByLocale: {
-      en: 'Randomly generated content in video games can create a lot of variety for your players. In this video we talk about 3 different ways to randomly generate levels in your game.\r\n',
+      en:
+        'Randomly generated content in video games can create a lot of variety for your players. In this video we talk about 3 different ways to randomly generate levels in your game.\r\n',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2090,7 +2235,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       "This video shows 1 of the many ways there are to set up a boss fight. It goes over randomly picking behaviors from a set list you've created, and expanding on that list of boss behaviors and as the boss loses health.",
     descriptionByLocale: {
-      en: "This video shows 1 of the many ways there are to set up a boss fight. It goes over randomly picking behaviors from a set list you've created, and expanding on that list of boss behaviors and as the boss loses health.",
+      en:
+        "This video shows 1 of the many ways there are to set up a boss fight. It goes over randomly picking behaviors from a set list you've created, and expanding on that list of boss behaviors and as the boss loses health.",
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2112,7 +2258,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'It is possible to create a 3D game using GDevelop with an extension that was created by PANDAKO, who is a long time GDevelop user and community member. ',
     descriptionByLocale: {
-      en: 'It is possible to create a 3D game using GDevelop with an extension that was created by PANDAKO, who is a long time GDevelop user and community member. ',
+      en:
+        'It is possible to create a 3D game using GDevelop with an extension that was created by PANDAKO, who is a long time GDevelop user and community member. ',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2134,7 +2281,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This video shows game developers using GDevelop how to easily implement melee combat in their game. Showing two different kinds of attacks, and how to make enemies attack the player.',
     descriptionByLocale: {
-      en: 'This video shows game developers using GDevelop how to easily implement melee combat in their game. Showing two different kinds of attacks, and how to make enemies attack the player.',
+      en:
+        'This video shows game developers using GDevelop how to easily implement melee combat in their game. Showing two different kinds of attacks, and how to make enemies attack the player.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2156,7 +2304,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'RNG is a useful tool for gamedevs, especially with roguelikes or games with repetition as part of their game loop. Loot drops, enemy behavior, and level generation can all be forms of randomization. And in this video we tackle some of the simplest forms of RNG to help get your game started.',
     descriptionByLocale: {
-      en: 'RNG is a useful tool for gamedevs, especially with roguelikes or games with repetition as part of their game loop. Loot drops, enemy behavior, and level generation can all be forms of randomization. And in this video we tackle some of the simplest forms of RNG to help get your game started.',
+      en:
+        'RNG is a useful tool for gamedevs, especially with roguelikes or games with repetition as part of their game loop. Loot drops, enemy behavior, and level generation can all be forms of randomization. And in this video we tackle some of the simplest forms of RNG to help get your game started.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2178,7 +2327,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'This new update makes managing the health and stats of your characters, enemies, and object in game much easier!  We show how to make a juicy hit, and then use the health extension to modify how the hit works with the player.',
     descriptionByLocale: {
-      en: 'This new update makes managing the health and stats of your characters, enemies, and object in game much easier!  We show how to make a juicy hit, and then use the health extension to modify how the hit works with the player.',
+      en:
+        'This new update makes managing the health and stats of your characters, enemies, and object in game much easier!  We show how to make a juicy hit, and then use the health extension to modify how the hit works with the player.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2200,7 +2350,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'We go over a number of simple game enemies, and then a couple more advanced versions that use similar mechanics to enemies in Mario and Hollow Knight. We create AI for patrolling enemies, flying enemies, and enemies that wait in place to attack the player.',
     descriptionByLocale: {
-      en: 'We go over a number of simple game enemies, and then a couple more advanced versions that use similar mechanics to enemies in Mario and Hollow Knight. We create AI for patrolling enemies, flying enemies, and enemies that wait in place to attack the player.',
+      en:
+        'We go over a number of simple game enemies, and then a couple more advanced versions that use similar mechanics to enemies in Mario and Hollow Knight. We create AI for patrolling enemies, flying enemies, and enemies that wait in place to attack the player.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2432,7 +2583,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Create animated buttons that can be shown in your game menus (main menu, selection screen, etc...).',
     descriptionByLocale: {
-      en: 'Create animated buttons that can be shown in your game menus (main menu, selection screen, etc...).',
+      en:
+        'Create animated buttons that can be shown in your game menus (main menu, selection screen, etc...).',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2444,7 +2596,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/animated-buttons.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/animated-buttons.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/animated-buttons.jpg',
     },
   },
   {
@@ -2456,7 +2609,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to add a selector to choose a character (or anything else) in your game.',
     descriptionByLocale: {
-      en: 'Learn how to add a selector to choose a character (or anything else) in your game.',
+      en:
+        'Learn how to add a selector to choose a character (or anything else) in your game.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2468,7 +2622,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/character-selection-feature.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/character-selection-feature.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/character-selection-feature.jpg',
     },
   },
   {
@@ -2480,7 +2635,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to create a dynamic light following the player, with a flickering effect.',
     descriptionByLocale: {
-      en: 'Learn how to create a dynamic light following the player, with a flickering effect.',
+      en:
+        'Learn how to create a dynamic light following the player, with a flickering effect.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2492,7 +2648,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/flickering-dynamic-light-effect.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/flickering-dynamic-light-effect.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/flickering-dynamic-light-effect.jpg',
     },
   },
   {
@@ -2515,7 +2672,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/ghost-enemy-following-player.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/ghost-enemy-following-player.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/ghost-enemy-following-player.jpg',
     },
   },
   {
@@ -2527,7 +2685,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'How to show a health bar on screen and a potion to give back health to the player.',
     descriptionByLocale: {
-      en: 'How to show a health bar on screen and a potion to give back health to the player.',
+      en:
+        'How to show a health bar on screen and a potion to give back health to the player.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2539,7 +2698,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/health-bar-and-health-potion.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/health-bar-and-health-potion.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/health-bar-and-health-potion.jpg',
     },
   },
   {
@@ -2551,7 +2711,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.',
     descriptionByLocale: {
-      en: 'Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.',
+      en:
+        'Learn how to make a melee/sword attack with a randomly triggered animation each time a key is pressed.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2563,7 +2724,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/melee-sword-attack.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/melee-sword-attack.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/melee-sword-attack.jpg',
     },
   },
   {
@@ -2575,7 +2737,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'How to open a loot chest with a key that the player can find in the level.',
     descriptionByLocale: {
-      en: 'How to open a loot chest with a key that the player can find in the level.',
+      en:
+        'How to open a loot chest with a key that the player can find in the level.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2587,7 +2750,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/opening-chest.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/opening-chest.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/opening-chest.jpg',
     },
   },
   {
@@ -2599,7 +2763,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to use particle emitters in GDevelop to create effects like fire, explosion, magic beam, etc...',
     descriptionByLocale: {
-      en: 'Learn how to use particle emitters in GDevelop to create effects like fire, explosion, magic beam, etc...',
+      en:
+        'Learn how to use particle emitters in GDevelop to create effects like fire, explosion, magic beam, etc...',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2611,7 +2776,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/particle-effects.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/particle-effects.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/particle-effects.jpg',
     },
   },
   {
@@ -2658,7 +2824,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/physics-engine-platformer-game.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/physics-engine-platformer-game.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/physics-engine-platformer-game.jpg',
     },
   },
   {
@@ -2681,7 +2848,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/push-objects.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/push-objects.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/push-objects.jpg',
     },
   },
   {
@@ -2704,7 +2872,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/responsive-ui.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/responsive-ui.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/responsive-ui.jpg',
     },
   },
   {
@@ -2716,7 +2885,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.',
     descriptionByLocale: {
-      en: 'Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.',
+      en:
+        'Learn how to add a screen shake effect when the player falls from a very high platform in a platformer.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2728,7 +2898,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/screen-shake-timer-variables.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/screen-shake-timer-variables.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/screen-shake-timer-variables.jpg',
     },
   },
   {
@@ -2751,7 +2922,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/simple-game-physics-particles.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/simple-game-physics-particles.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/simple-game-physics-particles.jpg',
     },
   },
   {
@@ -2763,7 +2935,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Create a trampoline in your platformer game, making the player jump very high when stepped on.',
     descriptionByLocale: {
-      en: 'Create a trampoline in your platformer game, making the player jump very high when stepped on.',
+      en:
+        'Create a trampoline in your platformer game, making the player jump very high when stepped on.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2775,7 +2948,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/simple-trampoline-platformer.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/simple-trampoline-platformer.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/simple-trampoline-platformer.jpg',
     },
   },
   {
@@ -2787,7 +2961,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to make the camera follow the player in a smooth movement.',
     descriptionByLocale: {
-      en: 'Learn how to make the camera follow the player in a smooth movement.',
+      en:
+        'Learn how to make the camera follow the player in a smooth movement.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2799,7 +2974,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/smooth-camera-movement.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/smooth-camera-movement.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/smooth-camera-movement.jpg',
     },
   },
   {
@@ -2811,7 +2987,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'How to create a joystick displayed on screen, useful to control the player in mobile games.',
     descriptionByLocale: {
-      en: 'How to create a joystick displayed on screen, useful to control the player in mobile games.',
+      en:
+        'How to create a joystick displayed on screen, useful to control the player in mobile games.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2823,7 +3000,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/touch-360-joystick-controller.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/touch-360-joystick-controller.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/touch-360-joystick-controller.jpg',
     },
   },
   {
@@ -2835,7 +3013,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to use the Tween Behavior and how it can be used to add more life and animation to you projects.',
     descriptionByLocale: {
-      en: 'Learn how to use the Tween Behavior and how it can be used to add more life and animation to you projects.',
+      en:
+        'Learn how to use the Tween Behavior and how it can be used to add more life and animation to you projects.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2847,7 +3026,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/tween-behavior.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/tween-behavior.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/tween-behavior.jpg',
     },
   },
   {
@@ -2859,7 +3039,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn how to save the player progress, and other information, and to load them again later.',
     descriptionByLocale: {
-      en: 'Learn how to save the player progress, and other information, and to load them again later.',
+      en:
+        'Learn how to save the player progress, and other information, and to load them again later.',
     },
     type: 'video',
     category: 'game-mechanic',
@@ -2871,7 +3052,8 @@ export const fakeTutorials: Array<Tutorial> = [
     thumbnailUrl:
       'https://resources.gdevelop-app.com/tutorials/images/save-and-load.jpg',
     thumbnailUrlByLocale: {
-      en: 'https://resources.gdevelop-app.com/tutorials/images/save-and-load.jpg',
+      en:
+        'https://resources.gdevelop-app.com/tutorials/images/save-and-load.jpg',
     },
   },
   {
@@ -2921,13 +3103,16 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Discover GDevelop Prefabs to speed up your game development journey.',
     descriptionByLocale: {
-      en: 'Discover GDevelop Prefabs to speed up your game development journey.',
+      en:
+        'Discover GDevelop Prefabs to speed up your game development journey.',
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/objects/custom-objects-prefab-template/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -2941,13 +3126,16 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Are you a beginner in game development? Get familiar with the basics here.',
     descriptionByLocale: {
-      en: 'Are you a beginner in game development? Get familiar with the basics here.',
+      en:
+        'Are you a beginner in game development? Get familiar with the basics here.',
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/tutorials/basic-game-making-concepts/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/tutorials/basic-game-making-concepts/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/tutorials/basic-game-making-concepts/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/tutorials/basic-game-making-concepts/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3023,7 +3211,8 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Learn where to publish your game and the associated process to do so.',
     descriptionByLocale: {
-      en: 'Learn where to publish your game and the associated process to do so.',
+      en:
+        'Learn where to publish your game and the associated process to do so.',
     },
     type: 'text',
     category: 'recommendations',
@@ -3043,13 +3232,16 @@ export const fakeTutorials: Array<Tutorial> = [
     description:
       'Read about how GDevelop was used to create educational content for students.',
     descriptionByLocale: {
-      en: 'Read about how GDevelop was used to create educational content for students.',
+      en:
+        'Read about how GDevelop was used to create educational content for students.',
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://gdevelop.io/blog/using-gdevelop-in-eu-backed-projects-in-croatia',
+    link:
+      'https://gdevelop.io/blog/using-gdevelop-in-eu-backed-projects-in-croatia',
     linkByLocale: {
-      en: 'https://gdevelop.io/blog/using-gdevelop-in-eu-backed-projects-in-croatia',
+      en:
+        'https://gdevelop.io/blog/using-gdevelop-in-eu-backed-projects-in-croatia',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3085,9 +3277,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/all-features/firebase/realtime_database/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/all-features/firebase/realtime_database/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/all-features/firebase/realtime_database/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/all-features/firebase/realtime_database/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3124,9 +3318,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://gdevelop.io/page/how-to-publish-game-on-epic-games-store-and-why-you-should',
+    link:
+      'https://gdevelop.io/page/how-to-publish-game-on-epic-games-store-and-why-you-should',
     linkByLocale: {
-      en: 'https://gdevelop.io/page/how-to-publish-game-on-epic-games-store-and-why-you-should',
+      en:
+        'https://gdevelop.io/page/how-to-publish-game-on-epic-games-store-and-why-you-should',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3144,9 +3340,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://gdevelop.io/page/how-to-publish-your-game-on-newgrounds-and-why-you-should-do-it',
+    link:
+      'https://gdevelop.io/page/how-to-publish-your-game-on-newgrounds-and-why-you-should-do-it',
     linkByLocale: {
-      en: 'https://gdevelop.io/page/how-to-publish-your-game-on-newgrounds-and-why-you-should-do-it',
+      en:
+        'https://gdevelop.io/page/how-to-publish-your-game-on-newgrounds-and-why-you-should-do-it',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3164,9 +3362,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/publishing/android_and_ios_with_cordova/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/publishing/android_and_ios_with_cordova/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/publishing/android_and_ios_with_cordova/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/publishing/android_and_ios_with_cordova/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3202,9 +3402,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/publishing/publishing-to-amazon-app-store/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/publishing/publishing-to-amazon-app-store/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/publishing/publishing-to-amazon-app-store/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/publishing/publishing-to-amazon-app-store/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},
@@ -3241,9 +3443,11 @@ export const fakeTutorials: Array<Tutorial> = [
     },
     type: 'text',
     category: 'recommendations',
-    link: 'https://wiki.gdevelop.io/gdevelop5/publishing/html5_game_in_a_local_folder/',
+    link:
+      'https://wiki.gdevelop.io/gdevelop5/publishing/html5_game_in_a_local_folder/',
     linkByLocale: {
-      en: 'https://wiki.gdevelop.io/gdevelop5/publishing/html5_game_in_a_local_folder/',
+      en:
+        'https://wiki.gdevelop.io/gdevelop5/publishing/html5_game_in_a_local_folder/',
     },
     thumbnailUrl: '',
     thumbnailUrlByLocale: {},

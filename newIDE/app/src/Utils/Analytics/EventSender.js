@@ -493,8 +493,7 @@ export const sendInAppTutorialProgress = ({
       tutorialId,
       step,
       isCompleted,
-      spentMoreThan30SecondsSinceLastStep:
-        !!spentMoreThan30SecondsSinceLastStep,
+      spentMoreThan30SecondsSinceLastStep: !!spentMoreThan30SecondsSinceLastStep,
     });
   };
 

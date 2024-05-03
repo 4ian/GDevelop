@@ -30,7 +30,9 @@ export default {
 const mockApiDataForPublicAssets = [
   // Mock a successful response for the first asset:
   {
-    url: `https://api-dev.gdevelop.io/asset/asset/${fakeAssetShortHeader1.id}?environment=live`,
+    url: `https://api-dev.gdevelop.io/asset/asset/${
+      fakeAssetShortHeader1.id
+    }?environment=live`,
     method: 'GET',
     status: 200,
     response: {
@@ -48,7 +50,9 @@ const mockApiDataForPublicAssets = [
 
   // Also mock a successful response for the second asset:
   {
-    url: `https://api-dev.gdevelop.io/asset/asset/${fakeAssetShortHeader2.id}?environment=live`,
+    url: `https://api-dev.gdevelop.io/asset/asset/${
+      fakeAssetShortHeader2.id
+    }?environment=live`,
     method: 'GET',
     status: 200,
     response: {
@@ -60,7 +64,9 @@ const mockApiDataForPublicAssets = [
 
 const mockFailedApiDataForPublicAsset1 = [
   {
-    url: `https://api-dev.gdevelop.io/asset/asset/${fakeAssetShortHeader1.id}?environment=live`,
+    url: `https://api-dev.gdevelop.io/asset/asset/${
+      fakeAssetShortHeader1.id
+    }?environment=live`,
     method: 'GET',
     status: 500,
     response: {
@@ -71,10 +77,10 @@ const mockFailedApiDataForPublicAsset1 = [
 ];
 
 const fakeEventsFunctionsExtensionsContext = {
-  loadProjectEventsFunctionsExtensions: async (project) => {},
-  unloadProjectEventsFunctionsExtensions: (project) => {},
+  loadProjectEventsFunctionsExtensions: async project => {},
+  unloadProjectEventsFunctionsExtensions: project => {},
   unloadProjectEventsFunctionsExtension: (project, extensionName) => {},
-  reloadProjectEventsFunctionsExtensions: async (project) => {},
+  reloadProjectEventsFunctionsExtensions: async project => {},
   reloadProjectEventsFunctionsExtensionMetadata: (project, extension) => {},
   getEventsFunctionsExtensionWriter: () => LocalEventsFunctionsExtensionWriter,
   getEventsFunctionsExtensionOpener: () => LocalEventsFunctionsExtensionOpener,

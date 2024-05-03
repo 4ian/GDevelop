@@ -17,8 +17,10 @@ export default {
 
 export const Default = () => {
   const [infoBarOpen, setInfoBarOpen] = React.useState<boolean>(false);
-  const [infoBarWithActionOpen, setInfoBarWithActionOpen] =
-    React.useState<boolean>(false);
+  const [
+    infoBarWithActionOpen,
+    setInfoBarWithActionOpen,
+  ] = React.useState<boolean>(false);
   return (
     <>
       <Line>

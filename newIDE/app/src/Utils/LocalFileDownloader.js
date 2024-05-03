@@ -17,7 +17,7 @@ export type ItemResult<Item> = {|
 |};
 
 export const downloadUrlsToLocalFiles = async <
-  Item: { url: string, filePath: string },
+  Item: { url: string, filePath: string }
 >({
   urlContainers,
   onProgress,
@@ -30,7 +30,7 @@ export const downloadUrlsToLocalFiles = async <
 
   const { results } = await PromisePool.withConcurrency(20)
     .for(urlContainers)
-    .process<ItemResult<Item>>(async (urlContainer) => {
+    .process<ItemResult<Item>>(async urlContainer => {
       const { url, filePath } = urlContainer;
 
       try {

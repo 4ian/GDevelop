@@ -120,7 +120,7 @@ export type ProductLicense = {|
 |};
 
 export const listListedPrivateAssetPacks = async (): Promise<
-  Array<PrivateAssetPackListingData>,
+  Array<PrivateAssetPackListingData>
 > => {
   const response = await client.get('/asset-pack');
   const assetPacks = response.data;
@@ -132,7 +132,7 @@ export const listListedPrivateAssetPacks = async (): Promise<
 };
 
 export const listListedPrivateGameTemplates = async (): Promise<
-  Array<PrivateGameTemplateListingData>,
+  Array<PrivateGameTemplateListingData>
 > => {
   const response = await client.get('/game-template');
   const gameTemplates = response.data;
@@ -144,7 +144,7 @@ export const listListedPrivateGameTemplates = async (): Promise<
 };
 
 export const listListedCreditsPackages = async (): Promise<
-  Array<CreditsPackageListingData>,
+  Array<CreditsPackageListingData>
 > => {
   const response = await client.get('/credits-package');
   const creditsPackages = response.data;
@@ -315,7 +315,7 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
   allResourcePaths: Array<string>,
 |}): Promise<?string> => {
   const isFetchingGameTemplateAuthorizedResources = allResourcePaths.some(
-    (resourcePath) =>
+    resourcePath =>
       isURL(resourcePath) &&
       isPrivateGameTemplateResourceAuthorizedUrl(resourcePath)
   );
@@ -327,11 +327,10 @@ export const fetchTokenForPrivateGameTemplateAuthorizationIfNeeded = async ({
         'Can not fetch resources from a private game template without being authenticated.'
       );
     }
-    const tokenForPrivateGameTemplateAuthorization =
-      await getAuthorizationTokenForPrivateGameTemplates(
-        authenticatedUser.getAuthorizationHeader,
-        { userId }
-      );
+    const tokenForPrivateGameTemplateAuthorization = await getAuthorizationTokenForPrivateGameTemplates(
+      authenticatedUser.getAuthorizationHeader,
+      { userId }
+    );
     return tokenForPrivateGameTemplateAuthorization;
   }
   return null;
@@ -415,7 +414,7 @@ export const canRedeemProduct = ({
             'gdevelop_silver',
             'gdevelop_gold',
           ].some(
-            (planId) =>
+            planId =>
               subscription.planId === planId &&
               !requiredPlanIds.includes(planId)
           ),
@@ -444,14 +443,15 @@ export const getCalloutToGetSubscriptionOrClaimAssetPack = ({
     return null;
   if (subscription && subscription.benefitsFromEducationPlan) return null;
 
-  const applicableRedeemConditions =
-    privateAssetPackListingData.redeemConditions.filter((redeemCondition) => {
+  const applicableRedeemConditions = privateAssetPackListingData.redeemConditions.filter(
+    redeemCondition => {
       return privateAssetPackListingData.prices.some(
-        (price) =>
+        price =>
           price.usageType === redeemCondition.usageType &&
           redeemCondition.reason === 'subscription'
       );
-    });
+    }
+  );
 
   // The first redeem condition is the priority one.
   const firstApplicableRedeemCondition = applicableRedeemConditions[0];

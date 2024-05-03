@@ -7,7 +7,7 @@ import classes from './CompactSemiControlledTextField.module.css';
 type Props = {|
   id?: string,
   value: string,
-  onChange: (string) => void,
+  onChange: string => void,
   commitOnBlur?: boolean,
   disabled?: boolean,
   errored?: boolean,
@@ -35,15 +35,15 @@ const CompactSemiControlledTextField = ({
       <CompactTextField
         type="text"
         value={focused ? text : value}
-        onFocus={(event) => {
+        onFocus={event => {
           setFocused(true);
           setText(value);
         }}
-        onChange={(newValue) => {
+        onChange={newValue => {
           setText(newValue);
           if (!commitOnBlur) onChange(newValue);
         }}
-        onBlur={(event) => {
+        onBlur={event => {
           if (value !== event.currentTarget.value) {
             onChange(event.currentTarget.value);
           }

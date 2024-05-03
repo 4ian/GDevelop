@@ -17,7 +17,11 @@ describe('ContainsSubInstructions', () => {
     insertInstruction(list.get(0).getSubInstructions(), 'Type1.1');
     insertInstruction(list.get(0).getSubInstructions(), 'Type1.2');
     insertInstruction(
-      list.get(0).getSubInstructions().get(1).getSubInstructions(),
+      list
+        .get(0)
+        .getSubInstructions()
+        .get(1)
+        .getSubInstructions(),
       'Type1.2.1'
     );
     insertInstruction(list, 'Type2');
@@ -47,19 +51,31 @@ describe('ContainsSubInstructions', () => {
     expect(
       containsSubInstructions(
         list.get(0),
-        list.get(0).getSubInstructions().get(1).getSubInstructions()
+        list
+          .get(0)
+          .getSubInstructions()
+          .get(1)
+          .getSubInstructions()
       )
     ).toBe(true);
     expect(
       containsSubInstructions(
         list.get(1),
-        list.get(0).getSubInstructions().get(1).getSubInstructions()
+        list
+          .get(0)
+          .getSubInstructions()
+          .get(1)
+          .getSubInstructions()
       )
     ).toBe(false);
     expect(
       containsSubInstructions(
         list.get(2),
-        list.get(0).getSubInstructions().get(1).getSubInstructions()
+        list
+          .get(0)
+          .getSubInstructions()
+          .get(1)
+          .getSubInstructions()
       )
     ).toBe(false);
 

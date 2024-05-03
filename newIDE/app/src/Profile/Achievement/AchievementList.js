@@ -38,43 +38,48 @@ const AchievementList = ({
   displayUnclaimedAchievements,
   displayNotifications,
 }: Props) => {
-  const [achievementsWithBadgeData, setAchievementsWithBadgeData] =
-    React.useState<Array<AchievementWithBadgeData>>([]);
+  const [
+    achievementsWithBadgeData,
+    setAchievementsWithBadgeData,
+  ] = React.useState<Array<AchievementWithBadgeData>>([]);
 
-  React.useEffect(() => {
-    const badgeByAchievementId = badges.reduce((acc, badge) => {
-      acc[badge.achievementId] = badge;
-      return acc;
-    }, {});
-
-    const achievementsWithBadgeData = achievements.reduce(
-      (acc, achievement) => {
-        const badge = badgeByAchievementId[achievement.id];
-        const hasBadge = !!badge;
-        if (hasBadge || (!hasBadge && displayUnclaimedAchievements)) {
-          acc.push({
-            ...achievement,
-            seen: hasBadge ? badge.seen : undefined,
-            unlockedAt: hasBadge ? parseISO(badge.unlockedAt) : null,
-          });
-        }
-
+  React.useEffect(
+    () => {
+      const badgeByAchievementId = badges.reduce((acc, badge) => {
+        acc[badge.achievementId] = badge;
         return acc;
-      },
-      []
-    );
+      }, {});
 
-    achievementsWithBadgeData.sort(compareAchievements);
+      const achievementsWithBadgeData = achievements.reduce(
+        (acc, achievement) => {
+          const badge = badgeByAchievementId[achievement.id];
+          const hasBadge = !!badge;
+          if (hasBadge || (!hasBadge && displayUnclaimedAchievements)) {
+            acc.push({
+              ...achievement,
+              seen: hasBadge ? badge.seen : undefined,
+              unlockedAt: hasBadge ? parseISO(badge.unlockedAt) : null,
+            });
+          }
 
-    setAchievementsWithBadgeData(achievementsWithBadgeData);
-  }, [badges, achievements, displayUnclaimedAchievements]);
+          return acc;
+        },
+        []
+      );
+
+      achievementsWithBadgeData.sort(compareAchievements);
+
+      setAchievementsWithBadgeData(achievementsWithBadgeData);
+    },
+    [badges, achievements, displayUnclaimedAchievements]
+  );
 
   return (
     <Column noMargin>
       <I18n>
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>
-            {achievementsWithBadgeData.map((achievementWithBadgeData) => (
+            {achievementsWithBadgeData.map(achievementWithBadgeData => (
               <Line
                 key={achievementWithBadgeData.id}
                 justifyContent="space-between"

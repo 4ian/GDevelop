@@ -245,11 +245,11 @@ const PrivateGameTemplateInformationPageStory = ({
       errorCode
         ? errorMessage || null
         : gameTemplates.find(
-            (assetPack) => assetPack.id === privateGameTemplateListingData.id
+            assetPack => assetPack.id === privateGameTemplateListingData.id
           )
     )
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -260,7 +260,7 @@ const PrivateGameTemplateInformationPageStory = ({
     .onGet('/product-license')
     .reply(200, fakeGameTemplateLicenses)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -281,7 +281,7 @@ const PrivateGameTemplateInformationPageStory = ({
           ...authenticatedUser,
           receivedGameTemplates,
           gameTemplatePurchases: receivedGameTemplates.map(
-            (privateGameTemplate) => ({
+            privateGameTemplate => ({
               id: 'purchase-id',
               productType: 'GAME_TEMPLATE',
               usageType: 'commercial',
@@ -306,7 +306,7 @@ const PrivateGameTemplateInformationPageStory = ({
                 action('create with game template')()
               }
               privateGameTemplateListingDatasFromSameCreator={allPrivateGameTemplateListingData.filter(
-                (gameTemplateListingData) =>
+                gameTemplateListingData =>
                   gameTemplateListingData.id !==
                   privateGameTemplateListingData.id
               )}

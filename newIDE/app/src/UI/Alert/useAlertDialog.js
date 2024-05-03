@@ -18,7 +18,7 @@ const useAlertDialog = () => {
 
   const showAlert = React.useCallback(
     (options: ShowAlertDialogOptions): Promise<void> =>
-      new Promise((resolve) => {
+      new Promise(resolve => {
         showAlertDialog({ callback: resolve, ...options });
       }),
     [showAlertDialog]
@@ -26,7 +26,7 @@ const useAlertDialog = () => {
 
   const showConfirmation = React.useCallback(
     (options: ShowConfirmDialogOptions): Promise<boolean> =>
-      new Promise((resolve) => {
+      new Promise(resolve => {
         showConfirmDialog({ callback: resolve, ...options });
       }),
     [showConfirmDialog]
@@ -34,7 +34,7 @@ const useAlertDialog = () => {
 
   const showDeleteConfirmation = React.useCallback(
     (options: ShowConfirmDeleteDialogOptions): Promise<boolean> =>
-      new Promise((resolve) => {
+      new Promise(resolve => {
         showConfirmDeleteDialog({ callback: resolve, ...options });
       }),
     [showConfirmDeleteDialog]
@@ -49,7 +49,7 @@ const useAlertDialog = () => {
    */
   const showYesNoCancel = React.useCallback(
     (options: ShowYesNoCancelDialogOptions): Promise<boolean> =>
-      new Promise((resolve) => {
+      new Promise(resolve => {
         showYesNoCancelDialog({ callback: resolve, ...options });
       }),
     [showYesNoCancelDialog]

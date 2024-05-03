@@ -31,14 +31,15 @@ type Props = {|
   rootEventsList: gdEventsList,
 |};
 
-const makeMenuTemplateBuilderForEvents =
-  (onAddEvent: (eventType: string) => void) => () =>
-    enumerateEventsMetadata().map((metadata) => {
-      return {
-        label: metadata.fullName,
-        click: () => onAddEvent(metadata.type),
-      };
-    });
+const makeMenuTemplateBuilderForEvents = (
+  onAddEvent: (eventType: string) => void
+) => () =>
+  enumerateEventsMetadata().map(metadata => {
+    return {
+      label: metadata.fullName,
+      click: () => onAddEvent(metadata.type),
+    };
+  });
 
 const addButtonTooltipLabelMouse = t`Right-click for more events`;
 const addButtonTooltipLabelTouch = t`Long press for more events`;

@@ -30,10 +30,10 @@ type Props = {|
   project: gdProject,
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
-  onEditObjectByName: (string) => void,
+  onEditObjectByName: string => void,
   onInstancesModified?: (Array<gdInitialInstance>) => void,
-  onGetInstanceSize: (gdInitialInstance) => [number, number, number],
-  editInstanceVariables: (gdInitialInstance) => void,
+  onGetInstanceSize: gdInitialInstance => [number, number, number],
+  editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
   historyHandler?: HistoryHandler,
@@ -169,7 +169,7 @@ const makeSchema = ({
       getLabel: () => i18n._(t`Prevent selection in the editor`),
       valueType: 'boolean',
       disabled: (instances: gdInitialInstance[]) => {
-        return instances.some((instance) => !instance.isLocked());
+        return instances.some(instance => !instance.isLocked());
       },
       getValue: (instance: gdInitialInstance) => instance.isSealed(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
@@ -319,32 +319,35 @@ const InstancePropertiesEditor = ({
   // TODO: multiple instances support.
   const instance = instances[0];
 
-  const { object, instanceSchema } = React.useMemo(() => {
-    if (!instance) return {};
+  const { object, instanceSchema } = React.useMemo(
+    () => {
+      if (!instance) return {};
 
-    const associatedObjectName = instance.getObjectName();
-    const object = getObjectByName(project, layout, associatedObjectName);
-    const properties = instance.getCustomProperties(project, layout);
-    if (!object) return {};
+      const associatedObjectName = instance.getObjectName();
+      const object = getObjectByName(project, layout, associatedObjectName);
+      const properties = instance.getCustomProperties(project, layout);
+      if (!object) return {};
 
-    const is3DInstance = gd.MetadataProvider.getObjectMetadata(
-      project.getCurrentPlatform(),
-      object.getType()
-    ).isRenderedIn3D();
-    const instanceSchemaForCustomProperties = propertiesMapToSchema(
-      properties,
-      (instance: gdInitialInstance) =>
-        instance.getCustomProperties(project, layout),
-      (instance: gdInitialInstance, name, value) =>
-        instance.updateCustomProperty(name, value, project, layout)
-    );
-    return {
-      object,
-      instanceSchema: is3DInstance
-        ? schemaFor3D.concat(instanceSchemaForCustomProperties)
-        : schemaFor2D.concat(instanceSchemaForCustomProperties),
-    };
-  }, [project, layout, instance, schemaFor2D, schemaFor3D]);
+      const is3DInstance = gd.MetadataProvider.getObjectMetadata(
+        project.getCurrentPlatform(),
+        object.getType()
+      ).isRenderedIn3D();
+      const instanceSchemaForCustomProperties = propertiesMapToSchema(
+        properties,
+        (instance: gdInitialInstance) =>
+          instance.getCustomProperties(project, layout),
+        (instance: gdInitialInstance, name, value) =>
+          instance.updateCustomProperty(name, value, project, layout)
+      );
+      return {
+        object,
+        instanceSchema: is3DInstance
+          ? schemaFor3D.concat(instanceSchemaForCustomProperties)
+          : schemaFor2D.concat(instanceSchemaForCustomProperties),
+      };
+    },
+    [project, layout, instance, schemaFor2D, schemaFor3D]
+  );
 
   if (!object || !instance || !instanceSchema) return null;
 
@@ -408,7 +411,7 @@ const InstancePropertiesEditor = ({
 
 const InstancePropertiesEditorContainer = React.forwardRef<
   Props,
-  InstancePropertiesEditorInterface,
+  InstancePropertiesEditorInterface
 >((props, ref) => {
   const forceUpdate = useForceUpdate();
   React.useImperativeHandle(ref, () => ({

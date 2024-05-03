@@ -18,7 +18,7 @@ export const WorkingCode = () => {
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
     .reply(200)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -37,7 +37,7 @@ export const CodeDoesNotExist = () => {
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
     .reply(404)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -56,7 +56,7 @@ export const UnknownError = () => {
     .onPost(`${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`)
     .reply(500)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -77,7 +77,7 @@ export const CannotBeRedeemedAnymoreError = () => {
       code: 'redemption-code/cannot-be-redeemed-anymore',
     })
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -98,7 +98,7 @@ export const AlreadyRedeemedByUser = () => {
       code: 'user-redeemed-code/already-redeemed-by-user',
     })
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

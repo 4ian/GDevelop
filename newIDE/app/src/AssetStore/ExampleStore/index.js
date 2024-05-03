@@ -69,10 +69,13 @@ export const ExampleStore = ({
   const shouldAutofocusSearchbar = useShouldAutofocusInput();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
 
-  React.useEffect(() => {
-    if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
-      searchBarRef.current.focus();
-  }, [shouldAutofocusSearchbar, focusOnMount]);
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
+        searchBarRef.current.focus();
+    },
+    [shouldAutofocusSearchbar, focusOnMount]
+  );
 
   // Tags are applied to both examples and game templates.
   const tagsHandler = React.useMemo(
@@ -101,22 +104,28 @@ export const ExampleStore = ({
     [setExampleStoreSearchText, setGameTemplateStoreSearchText]
   );
 
-  const fetchGameTemplatesAndExamples = React.useCallback(() => {
-    fetchGameTemplates();
-    fetchExamplesAndFilters();
-  }, [fetchGameTemplates, fetchExamplesAndFilters]);
+  const fetchGameTemplatesAndExamples = React.useCallback(
+    () => {
+      fetchGameTemplates();
+      fetchExamplesAndFilters();
+    },
+    [fetchGameTemplates, fetchExamplesAndFilters]
+  );
 
   // Load examples and game templates on mount.
-  React.useEffect(() => {
-    fetchGameTemplatesAndExamples();
-  }, [fetchGameTemplatesAndExamples]);
+  React.useEffect(
+    () => {
+      fetchGameTemplatesAndExamples();
+    },
+    [fetchGameTemplatesAndExamples]
+  );
 
   const getExampleShortHeaderMatches = (
     exampleShortHeader: ExampleShortHeader
   ): SearchMatch[] => {
     if (!exampleShortHeadersSearchResults) return [];
     const exampleMatches = exampleShortHeadersSearchResults.find(
-      (result) => result.item.id === exampleShortHeader.id
+      result => result.item.id === exampleShortHeader.id
     );
     return exampleMatches ? exampleMatches.matches : [];
   };
@@ -125,20 +134,21 @@ export const ExampleStore = ({
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ): SearchMatch[] => {
     if (!privateGameTemplateListingDatasSearchResults) return [];
-    const gameTemplateMatches =
-      privateGameTemplateListingDatasSearchResults.find(
-        (result) => result.item.id === privateGameTemplateListingData.id
-      );
+    const gameTemplateMatches = privateGameTemplateListingDatasSearchResults.find(
+      result => result.item.id === privateGameTemplateListingData.id
+    );
     return gameTemplateMatches ? gameTemplateMatches.matches : [];
   };
 
-  const searchItems: (ExampleShortHeader | PrivateGameTemplateListingData)[] =
-    React.useMemo(() => {
+  const searchItems: (
+    | ExampleShortHeader
+    | PrivateGameTemplateListingData
+  )[] = React.useMemo(
+    () => {
       const searchItems = [];
-      const privateGameTemplateItems =
-        privateGameTemplateListingDatasSearchResults
-          ? privateGameTemplateListingDatasSearchResults.map(({ item }) => item)
-          : [];
+      const privateGameTemplateItems = privateGameTemplateListingDatasSearchResults
+        ? privateGameTemplateListingDatasSearchResults.map(({ item }) => item)
+        : [];
       const exampleShortHeaderItems = exampleShortHeadersSearchResults
         ? exampleShortHeadersSearchResults.map(({ item }) => item)
         : [];
@@ -159,21 +169,26 @@ export const ExampleStore = ({
       }
 
       return searchItems;
-    }, [
+    },
+    [
       exampleShortHeadersSearchResults,
       privateGameTemplateListingDatasSearchResults,
       searchText,
       tagsHandler,
-    ]);
+    ]
+  );
 
-  const defaultTags = React.useMemo(() => {
-    const allDefaultTags = [
-      ...(exampleFilters ? exampleFilters.defaultTags : []),
-      ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
-    ];
-    const uniqueTags = new Set(allDefaultTags);
-    return Array.from(uniqueTags);
-  }, [exampleFilters, gameTemplateFilters]);
+  const defaultTags = React.useMemo(
+    () => {
+      const allDefaultTags = [
+        ...(exampleFilters ? exampleFilters.defaultTags : []),
+        ...(gameTemplateFilters ? gameTemplateFilters.defaultTags : []),
+      ];
+      const uniqueTags = new Set(allDefaultTags);
+      return Array.from(uniqueTags);
+    },
+    [exampleFilters, gameTemplateFilters]
+  );
 
   return (
     <React.Fragment>
@@ -229,7 +244,7 @@ export const ExampleStore = ({
                 const isTemplateOwned =
                   !!receivedGameTemplates &&
                   !!receivedGameTemplates.find(
-                    (template) => template.id === item.id
+                    template => template.id === item.id
                   );
                 return (
                   <PrivateGameTemplateListItem

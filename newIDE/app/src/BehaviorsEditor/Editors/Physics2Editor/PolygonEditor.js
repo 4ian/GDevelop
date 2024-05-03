@@ -120,7 +120,7 @@ const PolygonEditor = ({
                   margin="none"
                   fullWidth
                   value={value.x.toString(10)}
-                  onChange={(newValue) =>
+                  onChange={newValue =>
                     onChangeVertexX(parseFloat(newValue) || 0, index)
                   }
                   type="number"
@@ -131,7 +131,7 @@ const PolygonEditor = ({
                   margin="none"
                   fullWidth
                   value={value.y.toString(10)}
-                  onChange={(newValue) =>
+                  onChange={newValue =>
                     onChangeVertexY(parseFloat(newValue) || 0, index)
                   }
                   type="number"

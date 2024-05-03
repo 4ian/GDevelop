@@ -6,7 +6,7 @@ describe('ProcessByChunk', () => {
   test('empty array', async () => {
     const processChunk = jest.fn().mockImplementation(async () => {});
     await processByChunk([], {
-      transformItem: async (item) => item,
+      transformItem: async item => item,
       isChunkTooBig: () => true,
       processChunk,
     });
@@ -16,11 +16,11 @@ describe('ProcessByChunk', () => {
 
   test('chunk never too big', async () => {
     let results = [];
-    const processChunk = async (chunk) => {
+    const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
     await processByChunk(['fake-item'], {
-      transformItem: async (item) => item,
+      transformItem: async item => item,
       isChunkTooBig: () => false,
       processChunk,
     });
@@ -29,7 +29,7 @@ describe('ProcessByChunk', () => {
 
     results = [];
     await processByChunk(['fake-item-1', 'fake-item-2', 'fake-item-3'], {
-      transformItem: async (item) => item,
+      transformItem: async item => item,
       isChunkTooBig: () => false,
       processChunk,
     });
@@ -39,12 +39,12 @@ describe('ProcessByChunk', () => {
 
   test('chunks of 2', async () => {
     let results = [];
-    const processChunk = async (chunk) => {
+    const processChunk = async chunk => {
       results = [...results, ...chunk];
     };
     await processByChunk(['fake-item'], {
-      transformItem: async (item) => item,
-      isChunkTooBig: (chunk) => chunk.length >= 2,
+      transformItem: async item => item,
+      isChunkTooBig: chunk => chunk.length >= 2,
       processChunk,
     });
 
@@ -52,8 +52,8 @@ describe('ProcessByChunk', () => {
 
     results = [];
     await processByChunk(['fake-item-1', 'fake-item-2', 'fake-item-3'], {
-      transformItem: async (item) => item,
-      isChunkTooBig: (chunk) => chunk.length >= 2,
+      transformItem: async item => item,
+      isChunkTooBig: chunk => chunk.length >= 2,
       processChunk,
     });
 
@@ -62,13 +62,13 @@ describe('ProcessByChunk', () => {
 
   test('chunks of 2, transformed items', async () => {
     let results = [];
-    const processChunk = async (chunk) => {
+    const processChunk = async chunk => {
       expect(chunk.length <= 2).toBe(true);
       results = [...results, ...chunk];
     };
     await processByChunk(['fake-item'], {
-      transformItem: async (item) => 'mapped-' + item,
-      isChunkTooBig: (chunk) => chunk.length > 2,
+      transformItem: async item => 'mapped-' + item,
+      isChunkTooBig: chunk => chunk.length > 2,
       processChunk,
     });
 
@@ -76,8 +76,8 @@ describe('ProcessByChunk', () => {
 
     results = [];
     await processByChunk(['fake-item-1', 'fake-item-2', 'fake-item-3'], {
-      transformItem: async (item) => 'mapped-' + item,
-      isChunkTooBig: (chunk) => chunk.length > 2,
+      transformItem: async item => 'mapped-' + item,
+      isChunkTooBig: chunk => chunk.length > 2,
       processChunk,
     });
 

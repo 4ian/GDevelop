@@ -27,7 +27,7 @@ const RawContentInspector = ({ gameData, onEdit }: Props) => (
       collapsed={1}
       name={false}
       src={gameData}
-      onEdit={(edit) => {
+      onEdit={edit => {
         return onEdit(edit.namespace.concat(edit.name), edit.new_value);
       }}
       groupArraysAfterLength={50}

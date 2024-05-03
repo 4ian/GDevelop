@@ -45,7 +45,7 @@ const renderEmpty = () => {
 
 const ResourcePropertiesEditor = React.forwardRef<
   Props,
-  ResourcePropertiesEditorInterface,
+  ResourcePropertiesEditorInterface
 >(
   (
     {
@@ -74,7 +74,7 @@ const ResourcePropertiesEditor = React.forwardRef<
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak.
-        newResources.forEach((resource) => resource.delete());
+        newResources.forEach(resource => resource.delete());
 
         onResourcePathUpdated();
         forceUpdate();
@@ -101,10 +101,9 @@ const ResourcePropertiesEditor = React.forwardRef<
           setValue: (resource: gdResource, newValue: string) =>
             resource.setFile(newValue),
           onEditButtonClick: () => {
-            const storageProvider =
-              resourceManagementProps.getStorageProvider();
+            const storageProvider = resourceManagementProps.getStorageProvider();
             const resourceSources = resourceManagementProps.resourceSources
-              .filter((source) => source.kind === resources[0].getKind())
+              .filter(source => source.kind === resources[0].getKind())
               .filter(
                 ({ onlyForStorageProvider }) =>
                   !onlyForStorageProvider ||
@@ -115,16 +114,15 @@ const ResourcePropertiesEditor = React.forwardRef<
             if (firstResourceSource) chooseResourcePath(firstResourceSource);
           },
           onEditButtonBuildMenuTemplate: (i18n: I18nType) => {
-            const storageProvider =
-              resourceManagementProps.getStorageProvider();
+            const storageProvider = resourceManagementProps.getStorageProvider();
             return resourceManagementProps.resourceSources
-              .filter((source) => source.kind === resources[0].getKind())
+              .filter(source => source.kind === resources[0].getKind())
               .filter(
                 ({ onlyForStorageProvider }) =>
                   !onlyForStorageProvider ||
                   onlyForStorageProvider === storageProvider.internalName
               )
-              .map((source) => ({
+              .map(source => ({
                 label: i18n._(source.displayName),
                 click: () => chooseResourcePath(source),
               }));
@@ -134,25 +132,28 @@ const ResourcePropertiesEditor = React.forwardRef<
       [resourceManagementProps, resources, chooseResourcePath]
     );
 
-    const renderResourcesProperties = React.useCallback(() => {
-      //TODO: Multiple resources support
-      const properties = resources[0].getProperties();
-      const resourceSchema = propertiesMapToSchema(
-        properties,
-        (resource) => resource.getProperties(),
-        (resource, name, value) => {
-          resource.updateProperty(name, value);
-          forceUpdate();
-        }
-      );
+    const renderResourcesProperties = React.useCallback(
+      () => {
+        //TODO: Multiple resources support
+        const properties = resources[0].getProperties();
+        const resourceSchema = propertiesMapToSchema(
+          properties,
+          resource => resource.getProperties(),
+          (resource, name, value) => {
+            resource.updateProperty(name, value);
+            forceUpdate();
+          }
+        );
 
-      return (
-        <PropertiesEditor
-          schema={schema.concat(resourceSchema)}
-          instances={resources}
-        />
-      );
-    }, [resources, schema, forceUpdate]);
+        return (
+          <PropertiesEditor
+            schema={schema.concat(resourceSchema)}
+            instances={resources}
+          />
+        );
+      },
+      [resources, schema, forceUpdate]
+    );
 
     const renderPreview = () => {
       if (!resources || !resources.length) return;
@@ -173,7 +174,7 @@ const ResourcePropertiesEditor = React.forwardRef<
         <ScrollView>
           <ColumnStackLayout
             expand
-            key={resources.map((resource) => '' + resource.ptr).join(';')}
+            key={resources.map(resource => '' + resource.ptr).join(';')}
           >
             {!resources || !resources.length
               ? renderEmpty()

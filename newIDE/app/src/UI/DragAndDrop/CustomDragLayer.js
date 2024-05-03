@@ -123,29 +123,32 @@ const CustomDragLayer = ({
   clientOffset,
 }: InternalCustomDragLayerProps) => {
   const screenType = useScreenType();
-  const renderedItem = React.useMemo(() => {
-    if (!item || !clientOffset) return null;
+  const renderedItem = React.useMemo(
+    () => {
+      if (!item || !clientOffset) return null;
 
-    if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
-      return null;
-    }
+      if (shouldHidePreviewBecauseDraggingOnSceneEditorCanvas(clientOffset)) {
+        return null;
+      }
 
-    const thumbnailSize =
-      screenType === 'touch' ? THUMBNAIL_SIZE_TOUCHSCREEN : THUMBNAIL_SIZE;
+      const thumbnailSize =
+        screenType === 'touch' ? THUMBNAIL_SIZE_TOUCHSCREEN : THUMBNAIL_SIZE;
 
-    return item.thumbnail ? (
-      <CorsAwareImage
-        alt={item.name}
-        src={item.thumbnail}
-        style={{
-          maxWidth: thumbnailSize,
-          maxHeight: thumbnailSize,
-        }}
-      />
-    ) : (
-      <Text>{item.name}</Text>
-    );
-  }, [item, clientOffset, screenType]);
+      return item.thumbnail ? (
+        <CorsAwareImage
+          alt={item.name}
+          src={item.thumbnail}
+          style={{
+            maxWidth: thumbnailSize,
+            maxHeight: thumbnailSize,
+          }}
+        />
+      ) : (
+        <Text>{item.name}</Text>
+      );
+    },
+    [item, clientOffset, screenType]
+  );
 
   if (!isDragging) {
     return null;
@@ -181,7 +184,8 @@ const collect = (monitor: any): InternalCustomDragLayerProps => ({
 });
 
 // $FlowFixMe - Forcing the type of the component, unsure how to make the DragLayer happy.
-const ExternalCustomDragLayer: ({||}) => React.Node =
-  DragLayer(collect)(CustomDragLayer);
+const ExternalCustomDragLayer: ({||}) => React.Node = DragLayer(collect)(
+  CustomDragLayer
+);
 
 export default ExternalCustomDragLayer;

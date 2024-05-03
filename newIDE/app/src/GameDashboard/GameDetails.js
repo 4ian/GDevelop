@@ -89,9 +89,9 @@ type Props = {|
   project: ?gdProject,
   onGameUpdated: () => Promise<void>,
   onGameDeleted: () => void,
-  onLoading: (boolean) => void,
+  onLoading: boolean => void,
   currentTab: GameDetailsTab,
-  setCurrentTab: (GameDetailsTab) => void,
+  setCurrentTab: GameDetailsTab => void,
   analyticsSource: 'profile' | 'homepage' | 'projectManager',
 |};
 
@@ -105,13 +105,16 @@ const GameDetails = ({
   setCurrentTab,
   analyticsSource,
 }: Props) => {
-  const { routeArguments, removeRouteArguments } =
-    React.useContext(RouterContext);
+  const { routeArguments, removeRouteArguments } = React.useContext(
+    RouterContext
+  );
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [gameUnregisterErrorText, setGameUnregisterErrorText] =
-    React.useState<?string>(null);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?string>(null);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
   const { showConfirmation, showAlert } = useAlertDialog();
 
@@ -124,44 +127,59 @@ const GameDetails = ({
   ] = React.useState(false);
 
   // If a game dashboard tab is specified, switch to it.
-  React.useEffect(() => {
-    if (routeArguments['games-dashboard-tab']) {
-      // Ensure that the tab is valid.
-      const gameDetailsTab = gameDetailsTabs.find(
-        (gameDetailsTab) =>
-          gameDetailsTab.value === routeArguments['games-dashboard-tab']
-      );
-      if (gameDetailsTab) setCurrentTab(gameDetailsTab.value);
-      // Cleanup once open, to ensure it is not opened again.
-      removeRouteArguments(['games-dashboard-tab']);
-    }
-  }, [routeArguments, removeRouteArguments, setCurrentTab]);
+  React.useEffect(
+    () => {
+      if (routeArguments['games-dashboard-tab']) {
+        // Ensure that the tab is valid.
+        const gameDetailsTab = gameDetailsTabs.find(
+          gameDetailsTab =>
+            gameDetailsTab.value === routeArguments['games-dashboard-tab']
+        );
+        if (gameDetailsTab) setCurrentTab(gameDetailsTab.value);
+        // Cleanup once open, to ensure it is not opened again.
+        removeRouteArguments(['games-dashboard-tab']);
+      }
+    },
+    [routeArguments, removeRouteArguments, setCurrentTab]
+  );
 
-  const loadPublicGame = React.useCallback(async () => {
-    setPublicGameError(null);
-    try {
-      const publicGameResponse = await getPublicGame(game.id);
-      setPublicGame(publicGameResponse);
-    } catch (err) {
-      console.error(`Unable to load the game:`, err);
-      setPublicGameError(err);
-    }
-  }, [game]);
+  const loadPublicGame = React.useCallback(
+    async () => {
+      setPublicGameError(null);
+      try {
+        const publicGameResponse = await getPublicGame(game.id);
+        setPublicGame(publicGameResponse);
+      } catch (err) {
+        console.error(`Unable to load the game:`, err);
+        setPublicGameError(err);
+      }
+    },
+    [game]
+  );
 
-  React.useEffect(() => {
-    loadPublicGame();
-  }, [loadPublicGame]);
+  React.useEffect(
+    () => {
+      loadPublicGame();
+    },
+    [loadPublicGame]
+  );
 
-  React.useEffect(() => {
-    sendGameDetailsOpened({ from: analyticsSource });
-  }, [analyticsSource]);
+  React.useEffect(
+    () => {
+      sendGameDetailsOpened({ from: analyticsSource });
+    },
+    [analyticsSource]
+  );
 
-  const handleGameUpdated = React.useCallback(() => {
-    // Set Public Game to null to show the loader.
-    // It will be refetched thanks to loadPublicGame, because Game is updated.
-    setPublicGame(null);
-    onGameUpdated();
-  }, [onGameUpdated]);
+  const handleGameUpdated = React.useCallback(
+    () => {
+      // Set Public Game to null to show the loader.
+      // It will be refetched thanks to loadPublicGame, because Game is updated.
+      setPublicGame(null);
+      onGameUpdated();
+    },
+    [onGameUpdated]
+  );
 
   const updateGameFromProject = async (
     partialGameChange: PartialGameChange,
@@ -286,8 +304,9 @@ const GameDetails = ({
         onGameDeleted();
       } catch (error) {
         console.error('Unable to delete the game:', error);
-        const extractedStatusAndCode =
-          extractGDevelopApiErrorStatusAndCode(error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
         if (
           extractedStatusAndCode &&
           extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'
@@ -306,22 +325,25 @@ const GameDetails = ({
     [onLoading, game.id, profile, onGameDeleted, getAuthorizationHeader]
   );
 
-  const unpublishGame = React.useCallback(async () => {
-    if (!profile) return;
+  const unpublishGame = React.useCallback(
+    async () => {
+      if (!profile) return;
 
-    const { id } = profile;
-    try {
-      setIsGameUpdating(true);
-      await updateGame(getAuthorizationHeader, id, game.id, {
-        publicWebBuildId: null,
-      });
-      handleGameUpdated();
-    } catch (err) {
-      console.error('Unable to update the game', err);
-    } finally {
-      setIsGameUpdating(false);
-    }
-  }, [game, getAuthorizationHeader, profile, handleGameUpdated]);
+      const { id } = profile;
+      try {
+        setIsGameUpdating(true);
+        await updateGame(getAuthorizationHeader, id, game.id, {
+          publicWebBuildId: null,
+        });
+        handleGameUpdated();
+      } catch (err) {
+        console.error('Unable to update the game', err);
+      } finally {
+        setIsGameUpdating(false);
+      }
+    },
+    [game, getAuthorizationHeader, profile, handleGameUpdated]
+  );
 
   const onClickUnregister = React.useCallback(
     async (i18n: I18nType) => {
@@ -353,11 +375,11 @@ const GameDetails = ({
 
   const authorUsernames =
     publicGame &&
-    publicGame.authors.map((author) => author.username).filter(Boolean);
+    publicGame.authors.map(author => author.username).filter(Boolean);
 
   const ownerUsernames =
     publicGame &&
-    publicGame.owners.map((owner) => owner.username).filter(Boolean);
+    publicGame.owners.map(owner => owner.username).filter(Boolean);
 
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
@@ -412,7 +434,9 @@ const GameDetails = ({
                                     ownerUsernames &&
                                     ownerUsernames.includes(username) ? (
                                       <Crown />
-                                    ) : undefined
+                                    ) : (
+                                      undefined
+                                    )
                                   }
                                   className="notranslate"
                                   label={username}
@@ -567,7 +591,7 @@ const GameDetails = ({
             <PublicGamePropertiesDialog
               project={project}
               publicGame={publicGame}
-              onApply={async (partialGameChange) => {
+              onApply={async partialGameChange => {
                 const isGameUpdated = await updateGameFromProject(
                   partialGameChange,
                   i18n

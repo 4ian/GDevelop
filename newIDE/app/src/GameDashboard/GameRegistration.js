@@ -46,83 +46,99 @@ export const GameRegistration = ({
   } = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
   const [error, setError] = React.useState<Error | null>(null);
-  const [gameAvailabilityError, setGameAvailabilityError] =
-    React.useState<?GameAvailabilityError>(null);
+  const [
+    gameAvailabilityError,
+    setGameAvailabilityError,
+  ] = React.useState<?GameAvailabilityError>(null);
   const [game, setGame] = React.useState<Game | null>(null);
-  const [registrationInProgress, setRegistrationInProgress] =
-    React.useState(false);
-  const [toggleGameStatsEmailInProgress, setToggleGameStatsEmailInProgress] =
-    React.useState(false);
-  const [toggleGameCommentsInProgress, setToggleGameCommentsInProgress] =
-    React.useState(false);
-  const [marketingPlansDialogOpen, setMarketingPlansDialogOpen] =
-    React.useState(false);
+  const [registrationInProgress, setRegistrationInProgress] = React.useState(
+    false
+  );
+  const [
+    toggleGameStatsEmailInProgress,
+    setToggleGameStatsEmailInProgress,
+  ] = React.useState(false);
+  const [
+    toggleGameCommentsInProgress,
+    setToggleGameCommentsInProgress,
+  ] = React.useState(false);
+  const [
+    marketingPlansDialogOpen,
+    setMarketingPlansDialogOpen,
+  ] = React.useState(false);
 
-  const loadGame = React.useCallback(async () => {
-    if (!profile || !project) return;
+  const loadGame = React.useCallback(
+    async () => {
+      if (!profile || !project) return;
 
-    const { id } = profile;
-    setError(null);
-    try {
-      const game = await getGame(
-        getAuthorizationHeader,
-        id,
-        project.getProjectUuid()
-      );
-      setGameAvailabilityError(null);
-      setGame(game);
-    } catch (error) {
-      console.error(
-        `Unable to get the game ${project.getProjectUuid()}`,
-        error
-      );
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
-      if (extractedStatusAndCode) {
-        if (extractedStatusAndCode.status === 403) {
-          setGameAvailabilityError('not-owned');
-          return;
-        } else if (extractedStatusAndCode.status === 404) {
-          setGameAvailabilityError('not-found');
-          return;
+      const { id } = profile;
+      setError(null);
+      try {
+        const game = await getGame(
+          getAuthorizationHeader,
+          id,
+          project.getProjectUuid()
+        );
+        setGameAvailabilityError(null);
+        setGame(game);
+      } catch (error) {
+        console.error(
+          `Unable to get the game ${project.getProjectUuid()}`,
+          error
+        );
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode) {
+          if (extractedStatusAndCode.status === 403) {
+            setGameAvailabilityError('not-owned');
+            return;
+          } else if (extractedStatusAndCode.status === 404) {
+            setGameAvailabilityError('not-found');
+            return;
+          }
+          setGameAvailabilityError('unexpected');
         }
-        setGameAvailabilityError('unexpected');
+
+        setError(error);
       }
+    },
+    [project, getAuthorizationHeader, profile]
+  );
 
-      setError(error);
-    }
-  }, [project, getAuthorizationHeader, profile]);
+  const onRegisterGame = React.useCallback(
+    async () => {
+      if (!profile || !project) return;
 
-  const onRegisterGame = React.useCallback(async () => {
-    if (!profile || !project) return;
-
-    const { id } = profile;
-    setRegistrationInProgress(true);
-    try {
-      await registerGame(getAuthorizationHeader, id, {
-        gameId: project.getProjectUuid(),
-        authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitled game',
-        templateSlug: project.getTemplateSlug(),
-      });
-      loadGame();
-      if (onGameRegistered) onGameRegistered();
-    } catch (error) {
-      console.error('Unable to register the game', error);
-      showAlert({
-        title: t`Unable to register the game`,
-        message: t`Verify your internet connection or try again later.`,
-      });
-    }
-    setRegistrationInProgress(false);
-  }, [
-    getAuthorizationHeader,
-    profile,
-    project,
-    loadGame,
-    onGameRegistered,
-    showAlert,
-  ]);
+      const { id } = profile;
+      setRegistrationInProgress(true);
+      try {
+        await registerGame(getAuthorizationHeader, id, {
+          gameId: project.getProjectUuid(),
+          authorName: project.getAuthor() || 'Unspecified publisher',
+          gameName: project.getName() || 'Untitled game',
+          templateSlug: project.getTemplateSlug(),
+        });
+        loadGame();
+        if (onGameRegistered) onGameRegistered();
+      } catch (error) {
+        console.error('Unable to register the game', error);
+        showAlert({
+          title: t`Unable to register the game`,
+          message: t`Verify your internet connection or try again later.`,
+        });
+      }
+      setRegistrationInProgress(false);
+    },
+    [
+      getAuthorizationHeader,
+      profile,
+      project,
+      loadGame,
+      onGameRegistered,
+      showAlert,
+    ]
+  );
 
   const onToggleGameStatsEmail = React.useCallback(
     async (value: boolean) => {
@@ -170,11 +186,14 @@ export const GameRegistration = ({
     [profile, game, getAuthorizationHeader, showAlert]
   );
 
-  React.useEffect(() => {
-    if (!game) {
-      loadGame();
-    }
-  }, [loadGame, game]);
+  React.useEffect(
+    () => {
+      if (!game) {
+        loadGame();
+      }
+    },
+    [loadGame, game]
+  );
 
   if (!project) {
     return null;

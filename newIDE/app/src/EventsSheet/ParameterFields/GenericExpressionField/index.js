@@ -141,7 +141,7 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
 
-  const errorHighlights: Array<Highlight> = mapVector(errors, (error) => ({
+  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
     begin: error.getStartPosition(),
     end: error.getEndPosition() + 1,
     message: error.getMessage(),
@@ -197,7 +197,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     this._enqueueValidation.cancel();
   }
 
-  focus: FieldFocusFunction = (options) => {
+  focus: FieldFocusFunction = options => {
     if (this._field) {
       this._field.focus(options);
       if (options && options.selectAll) {
@@ -473,7 +473,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expression.length > 0 &&
       expression.charAt(expression.length - 1) === ' '
     ) {
-      this.setState((state) => ({
+      this.setState(state => ({
         errorText: formattedErrorText,
         errorHighlights,
         autocompletions: getAutocompletionsInitialState(),
@@ -484,14 +484,13 @@ export default class ExpressionField extends React.Component<Props, State> {
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
       : 0;
-    const completionDescriptions =
-      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-        gd.JsPlatform.get(),
-        projectScopedContainers,
-        expressionType,
-        expressionNode,
-        cursorPosition - 1
-      );
+    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      projectScopedContainers,
+      expressionType,
+      expressionNode,
+      cursorPosition - 1
+    );
 
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
@@ -511,7 +510,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     parser.delete();
 
-    this.setState((state) => ({
+    this.setState(state => ({
       errorText: formattedErrorText,
       errorHighlights,
       autocompletions: setNewAutocompletions(
@@ -535,8 +534,8 @@ export default class ExpressionField extends React.Component<Props, State> {
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : this.props.isInline
-        ? undefined
-        : '-'; // We're using multiline TextField, which does not support having no label.
+      ? undefined
+      : '-'; // We're using multiline TextField, which does not support having no label.
     const longDescription = parameterMetadata
       ? parameterMetadata.getLongDescription()
       : undefined;
@@ -590,11 +589,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                       inputStyle={styles.input}
                       onChange={this._handleChange}
                       onBlur={this._handleBlurEvent}
-                      ref={(field) => (this._field = field)}
+                      ref={field => (this._field = field)}
                       onFocus={this._handleFocus}
                       errorText={this.state.errorText}
                       onClick={() => this._enqueueValidation()}
-                      onKeyDown={(event) => {
+                      onKeyDown={event => {
                         const autocompletions = handleAutocompletionsKeyDown(
                           this.state.autocompletions,
                           {
@@ -677,7 +676,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                           this.state.autocompletions.selectedCompletionIndex
                         }
                         onScroll={this._onExpressionAutocompletionsScroll}
-                        onChoose={(expressionAutocompletion) => {
+                        onChoose={expressionAutocompletion => {
                           this._insertAutocompletion(expressionAutocompletion);
 
                           setTimeout(
@@ -690,7 +689,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                     )}
                 </div>
               )}
-              renderButton={(style) => (
+              renderButton={style => (
                 <React.Fragment>
                   {!this.props.isInline &&
                     this.props.renderExtraButton &&
@@ -706,8 +705,8 @@ export default class ExpressionField extends React.Component<Props, State> {
                         expressionType === 'string'
                           ? '"ABC"'
                           : expressionType === 'number'
-                            ? '123'
-                            : ''
+                          ? '123'
+                          : ''
                       }
                       primary
                       style={style}
@@ -728,7 +727,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   expressionMetadata={
                     this.state.selectedExpressionInfo.metadata
                   }
-                  onDone={(parameterValues) => {
+                  onDone={parameterValues => {
                     if (!this.state.selectedExpressionInfo) return;
 
                     this.insertExpression(

@@ -90,22 +90,22 @@ export const Default = ({
     authenticated === 'no'
       ? fakeNotAuthenticatedUser
       : authenticated === 'loading'
-        ? fakeAuthenticatedUserLoggingIn
-        : userSubscriptionId === 'none'
-          ? fakeAuthenticatedUserWithNoSubscription
-          : userSubscriptionId === 'gdevelop_silver'
-            ? fakeSilverAuthenticatedUser
-            : userSubscriptionId === 'gdevelop_gold'
-              ? fakeGoldAuthenticatedUser
-              : userSubscriptionId === 'gdevelop_startup'
-                ? fakeStartupAuthenticatedUser
-                : userSubscriptionId === 'gdevelop_education'
-                  ? fakeAuthenticatedUserWithEducationPlan
-                  : userSubscriptionId === 'gdevelop_indie'
-                    ? fakeAuthenticatedUserWithLegacyIndieSubscription
-                    : userSubscriptionId === 'gdevelop_pro'
-                      ? fakeAuthenticatedUserWithLegacyProSubscription
-                      : fakeNotAuthenticatedUser;
+      ? fakeAuthenticatedUserLoggingIn
+      : userSubscriptionId === 'none'
+      ? fakeAuthenticatedUserWithNoSubscription
+      : userSubscriptionId === 'gdevelop_silver'
+      ? fakeSilverAuthenticatedUser
+      : userSubscriptionId === 'gdevelop_gold'
+      ? fakeGoldAuthenticatedUser
+      : userSubscriptionId === 'gdevelop_startup'
+      ? fakeStartupAuthenticatedUser
+      : userSubscriptionId === 'gdevelop_education'
+      ? fakeAuthenticatedUserWithEducationPlan
+      : userSubscriptionId === 'gdevelop_indie'
+      ? fakeAuthenticatedUserWithLegacyIndieSubscription
+      : userSubscriptionId === 'gdevelop_pro'
+      ? fakeAuthenticatedUserWithLegacyProSubscription
+      : fakeNotAuthenticatedUser;
 
   if (authenticatedUser.subscription) {
     if (pricingSystem === 'redeemed') {
@@ -120,8 +120,7 @@ export const Default = ({
     } else if (pricingSystem === 'manually added') {
       authenticatedUser.subscription.pricingSystemId = 'MANUALLY_ADDED';
     } else {
-      authenticatedUser.subscription.cancelAtPeriodEnd =
-        !!willCancelAtPeriodEndOrIsExpired;
+      authenticatedUser.subscription.cancelAtPeriodEnd = !!willCancelAtPeriodEndOrIsExpired;
       if (userSubscriptionId === 'gdevelop_silver') {
         if (pricingSystem === 'yearly') {
           authenticatedUser.subscription.pricingSystemId =
@@ -163,7 +162,7 @@ export const Default = ({
   const { subscription: userSubscription } = authenticatedUser;
   const userLegacySubscriptionPlanWithPricingSystem = userSubscription
     ? subscriptionPlansWithPricingSystems.find(
-        (planWithPricingSystem) =>
+        planWithPricingSystem =>
           planWithPricingSystem.id === userSubscription.planId &&
           planWithPricingSystem.isLegacy
       )

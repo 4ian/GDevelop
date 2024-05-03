@@ -47,17 +47,21 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
     { initialEditorName, editors, transitions, onEditorChanged }: Props,
     ref
   ) => {
-    const [currentEditorName, setCurrentEditorName] =
-      React.useState(initialEditorName);
+    const [currentEditorName, setCurrentEditorName] = React.useState(
+      initialEditorName
+    );
     const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
     React.useImperativeHandle(ref, () => ({
-      openEditor: (editorName) => {
+      openEditor: editorName => {
         setCurrentEditorName(editorName);
       },
     }));
-    React.useEffect(() => {
-      onEditorChanged(currentEditorName);
-    }, [currentEditorName, onEditorChanged]);
+    React.useEffect(
+      () => {
+        onEditorChanged(currentEditorName);
+      },
+      [currentEditorName, onEditorChanged]
+    );
 
     const transition = transitions[currentEditorName];
     let buttonLineJustifyContent = 'space-between';

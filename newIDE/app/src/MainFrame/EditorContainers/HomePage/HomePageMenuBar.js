@@ -68,7 +68,7 @@ export const styles = {
 };
 
 type Props = {|
-  setActiveTab: (HomeTab) => void,
+  setActiveTab: HomeTab => void,
   activeTab: HomeTab,
   onOpenPreferences: () => void,
   onOpenAbout: () => void,

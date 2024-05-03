@@ -55,7 +55,7 @@ const getValidatedPropertyName = (
 ): string => {
   const safeAndUniqueNewName = newNameGenerator(
     gd.Project.getSafeName(newName),
-    (tentativeNewName) => {
+    tentativeNewName => {
       if (
         properties.has(tentativeNewName) ||
         PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
@@ -87,17 +87,20 @@ export default function EventsBasedObjectPropertiesEditor({
 
   const forceUpdate = useForceUpdate();
 
-  const addProperty = React.useCallback(() => {
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const addProperty = React.useCallback(
+    () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const newName = newNameGenerator('Property', (name) =>
-      properties.has(name)
-    );
-    const property = properties.insertNew(newName, properties.getCount());
-    property.setType('Number');
-    forceUpdate();
-    onPropertiesUpdated && onPropertiesUpdated();
-  }, [eventsBasedObject, forceUpdate, onPropertiesUpdated]);
+      const newName = newNameGenerator('Property', name =>
+        properties.has(name)
+      );
+      const property = properties.insertNew(newName, properties.getCount());
+      property.setType('Number');
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
   const removeProperty = React.useCallback(
     (name: string) => {
@@ -128,7 +131,7 @@ export default function EventsBasedObjectPropertiesEditor({
           property.getValue()
         );
         const vectorString = new gd.VectorString();
-        newExtraInfo.forEach((item) => vectorString.push_back(item));
+        newExtraInfo.forEach(item => vectorString.push_back(item));
         property.setExtraInfo(vectorString);
         vectorString.delete();
         property.setValue(newExtraInfo[defaultValueIndex] || '');
@@ -138,17 +141,20 @@ export default function EventsBasedObjectPropertiesEditor({
     [forceUpdate]
   );
 
-  const getPropertyGroupNames = React.useCallback((): Array<string> => {
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const getPropertyGroupNames = React.useCallback(
+    (): Array<string> => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const groupNames = new Set<string>();
-    for (let i = 0; i < properties.size(); i++) {
-      const property = properties.at(i);
-      const group = property.getGroup() || '';
-      groupNames.add(group);
-    }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));
-  }, [eventsBasedObject]);
+      const groupNames = new Set<string>();
+      for (let i = 0; i < properties.size(); i++) {
+        const property = properties.at(i);
+        const group = property.getGroup() || '';
+        groupNames.add(group);
+      }
+      return [...groupNames].sort((a, b) => a.localeCompare(b));
+    },
+    [eventsBasedObject]
+  );
 
   const properties = eventsBasedObject.getPropertyDescriptors();
 
@@ -170,7 +176,7 @@ export default function EventsBasedObjectPropertiesEditor({
                             commitOnBlur
                             translatableHintText={t`Enter the property name`}
                             value={property.getName()}
-                            onChange={(newName) => {
+                            onChange={newName => {
                               if (newName === property.getName()) return;
 
                               const validatedNewName = getValidatedPropertyName(
@@ -240,11 +246,10 @@ export default function EventsBasedObjectPropertiesEditor({
                                 );
                                 onEventsFunctionsAdded();
                               },
-                              enabled:
-                                gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                  eventsBasedObject,
-                                  property
-                                ),
+                              enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                eventsBasedObject,
+                                property
+                              ),
                             },
                           ]}
                         />
@@ -297,15 +302,13 @@ export default function EventsBasedObjectPropertiesEditor({
                                 {mapFor(
                                   0,
                                   gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
-                                  (i) => {
-                                    const measurementUnit =
-                                      gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
-                                        i
-                                      );
-                                    const unitShortLabel =
-                                      getMeasurementUnitShortLabel(
-                                        measurementUnit
-                                      );
+                                  i => {
+                                    const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                      i
+                                    );
+                                    const unitShortLabel = getMeasurementUnitShortLabel(
+                                      measurementUnit
+                                    );
                                     const label =
                                       measurementUnit.getLabel() +
                                       (unitShortLabel.length > 0
@@ -332,7 +335,7 @@ export default function EventsBasedObjectPropertiesEditor({
                                     : 'ABC'
                                 }
                                 value={property.getValue()}
-                                onChange={(newValue) => {
+                                onChange={newValue => {
                                   property.setValue(newValue);
                                   forceUpdate();
                                   onPropertiesUpdated && onPropertiesUpdated();
@@ -400,7 +403,7 @@ export default function EventsBasedObjectPropertiesEditor({
                               disableAlpha
                               fullWidth
                               color={property.getValue()}
-                              onChange={(color) => {
+                              onChange={color => {
                                 property.setValue(color);
                                 forceUpdate();
                                 onPropertiesUpdated && onPropertiesUpdated();
@@ -414,7 +417,7 @@ export default function EventsBasedObjectPropertiesEditor({
                               translatableHintText={t`Make the purpose of the property easy to understand`}
                               floatingLabelFixed
                               value={property.getLabel()}
-                              onChange={(text) => {
+                              onChange={text => {
                                 property.setLabel(text);
                                 forceUpdate();
                               }}
@@ -425,17 +428,15 @@ export default function EventsBasedObjectPropertiesEditor({
                               hintText={t`Leave it empty to use the default group`}
                               fullWidth
                               value={property.getGroup()}
-                              onChange={(text) => {
+                              onChange={text => {
                                 property.setGroup(text);
                                 forceUpdate();
                                 onPropertiesUpdated && onPropertiesUpdated();
                               }}
-                              dataSource={getPropertyGroupNames().map(
-                                (name) => ({
-                                  text: name,
-                                  value: name,
-                                })
-                              )}
+                              dataSource={getPropertyGroupNames().map(name => ({
+                                text: name,
+                                value: name,
+                              }))}
                               openOnFocus={true}
                             />
                           </ResponsiveLineStackLayout>
@@ -445,7 +446,7 @@ export default function EventsBasedObjectPropertiesEditor({
                             translatableHintText={t`Optionally, explain the purpose of the property in more details`}
                             floatingLabelFixed
                             value={property.getDescription()}
-                            onChange={(text) => {
+                            onChange={text => {
                               property.setDescription(text);
                               forceUpdate();
                             }}

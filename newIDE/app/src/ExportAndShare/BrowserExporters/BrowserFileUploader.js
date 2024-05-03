@@ -18,7 +18,7 @@ export const uploadBlobFile = (
       },
       // Allow any arbitrary large file to be sent
       maxContentLength: Infinity,
-      onUploadProgress: (progressEvent) => {
+      onUploadProgress: progressEvent => {
         if (!progressEvent || !progressEvent.total) {
           onProgress(0, 0);
           return;

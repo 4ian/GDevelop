@@ -87,18 +87,22 @@ const MarketingPlans = ({ game }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const { showAlert } = useAlertDialog();
   const [gameFeaturings, setGameFeaturings] = React.useState<
-    GameFeaturing[] | null,
+    GameFeaturing[] | null
   >(null);
-  const [gameFeaturingsError, setGameFeaturingsError] =
-    React.useState<?Error>(null);
+  const [gameFeaturingsError, setGameFeaturingsError] = React.useState<?Error>(
+    null
+  );
 
-  const activeGameFeaturings: ?(GameFeaturing[]) = React.useMemo(() => {
-    if (!gameFeaturings) return null;
+  const activeGameFeaturings: ?(GameFeaturing[]) = React.useMemo(
+    () => {
+      if (!gameFeaturings) return null;
 
-    return gameFeaturings.filter(
-      (gameFeaturing) => gameFeaturing.expiresAt > Date.now() / 1000
-    );
-  }, [gameFeaturings]);
+      return gameFeaturings.filter(
+        gameFeaturing => gameFeaturing.expiresAt > Date.now() / 1000
+      );
+    },
+    [gameFeaturings]
+  );
 
   const isMarketingPlanActive = React.useCallback(
     (marketingPlan: MarketingPlan) => {
@@ -107,9 +111,9 @@ const MarketingPlans = ({ game }: Props) => {
 
       // A marketing plan is considered active if it has all the included featurings active.
       return includedMarketingPlanFeaturings.every(
-        (includedMarketingPlanFeaturing) =>
+        includedMarketingPlanFeaturing =>
           activeGameFeaturings.some(
-            (activeGameFeaturing) =>
+            activeGameFeaturing =>
               activeGameFeaturing.featuring === includedMarketingPlanFeaturing
           )
       );
@@ -121,7 +125,7 @@ const MarketingPlans = ({ game }: Props) => {
     (marketingPlan: MarketingPlan) => {
       if (!activeGameFeaturings) return [];
 
-      return activeGameFeaturings.filter((activeGameFeaturing) =>
+      return activeGameFeaturings.filter(activeGameFeaturing =>
         marketingPlan.includedFeaturings.includes(activeGameFeaturing.featuring)
       );
     },
@@ -141,28 +145,43 @@ const MarketingPlans = ({ game }: Props) => {
     [limits, profile]
   );
 
-  React.useEffect(() => {
-    fetchMarketingPlans();
-  }, [fetchMarketingPlans]);
+  React.useEffect(
+    () => {
+      fetchMarketingPlans();
+    },
+    [fetchMarketingPlans]
+  );
 
-  const fetchGameFeaturings = React.useCallback(async () => {
-    if (!profile) return;
-    try {
-      setGameFeaturingsError(null);
-      const gameFeaturings = await listGameFeaturings(getAuthorizationHeader, {
-        gameId: game.id,
-        userId: profile.id,
-      });
-      setGameFeaturings(gameFeaturings);
-    } catch (error) {
-      console.error('An error occurred while fetching game featurings.', error);
-      setGameFeaturingsError(error);
-    }
-  }, [game, getAuthorizationHeader, profile]);
+  const fetchGameFeaturings = React.useCallback(
+    async () => {
+      if (!profile) return;
+      try {
+        setGameFeaturingsError(null);
+        const gameFeaturings = await listGameFeaturings(
+          getAuthorizationHeader,
+          {
+            gameId: game.id,
+            userId: profile.id,
+          }
+        );
+        setGameFeaturings(gameFeaturings);
+      } catch (error) {
+        console.error(
+          'An error occurred while fetching game featurings.',
+          error
+        );
+        setGameFeaturingsError(error);
+      }
+    },
+    [game, getAuthorizationHeader, profile]
+  );
 
-  React.useEffect(() => {
-    fetchGameFeaturings();
-  }, [fetchGameFeaturings]);
+  React.useEffect(
+    () => {
+      fetchGameFeaturings();
+    },
+    [fetchGameFeaturings]
+  );
 
   const onPurchase = React.useCallback(
     async (i18n: I18nType, marketingPlan: MarketingPlan) => {
@@ -185,7 +204,9 @@ const MarketingPlans = ({ game }: Props) => {
         if (requiresManualContact) {
           await showAlert({
             title: t`Featuring already active`,
-            message: t`You already have an active ${translatedName} featuring for your game ${game.gameName}. Check your emails or discord, we will get in touch with you to get the campaign up!`,
+            message: t`You already have an active ${translatedName} featuring for your game ${
+              game.gameName
+            }. Check your emails or discord, we will get in touch with you to get the campaign up!`,
           });
         }
         return;
@@ -283,8 +304,9 @@ const MarketingPlans = ({ game }: Props) => {
       return <Trans>Fix those issues to get the campaign up!</Trans>;
     }
 
-    const activeFeaturingsForPlan =
-      getActiveFeaturingsOfMarketingPlan(marketingPlan);
+    const activeFeaturingsForPlan = getActiveFeaturingsOfMarketingPlan(
+      marketingPlan
+    );
 
     if (activeFeaturingsForPlan.length === 0) {
       // Should not happen.
@@ -342,7 +364,7 @@ const MarketingPlans = ({ game }: Props) => {
               </Trans>
             </Text>
             <ResponsiveLineStackLayout noColumnMargin>
-              {marketingPlans.map((marketingPlan) => {
+              {marketingPlans.map(marketingPlan => {
                 const {
                   id,
                   nameByLocale,

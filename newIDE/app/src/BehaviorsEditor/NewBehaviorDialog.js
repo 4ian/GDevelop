@@ -68,16 +68,15 @@ export default function NewBehaviorDialog({
     ): Array<string> => {
       mapVector(
         behaviorMetadata.getRequiredBehaviorTypes(),
-        (requiredBehaviorType) => {
+        requiredBehaviorType => {
           if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
             return;
           }
           allRequiredBehaviorTypes.push(requiredBehaviorType);
-          const requiredBehaviorMetadata =
-            gd.MetadataProvider.getBehaviorMetadata(
-              project.getCurrentPlatform(),
-              requiredBehaviorType
-            );
+          const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            requiredBehaviorType
+          );
           getAllRequiredBehaviorTypes(
             requiredBehaviorMetadata,
             allRequiredBehaviorTypes
@@ -89,8 +88,8 @@ export default function NewBehaviorDialog({
     [project]
   );
 
-  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> =
-    React.useMemo(() => {
+  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () => {
       const platform = project.getCurrentPlatform();
       const behaviorMetadataList =
         project && platform
@@ -101,8 +100,8 @@ export default function NewBehaviorDialog({
             )
           : [];
       return behaviorMetadataList
-        .filter((behavior) => !behavior.behaviorMetadata.isHidden())
-        .map((behavior) => ({
+        .filter(behavior => !behavior.behaviorMetadata.isHidden())
+        .map(behavior => ({
           type: behavior.type,
           fullName: behavior.fullName,
           description: behavior.description,
@@ -114,25 +113,28 @@ export default function NewBehaviorDialog({
           ),
           tags: behavior.tags,
         }));
-    }, [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]);
+    },
+    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
+  );
 
-  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> =
-    React.useMemo(
-      () =>
-        allInstalledBehaviorMetadataList.filter(
-          (behavior) => !deprecatedBehaviorsInformation[behavior.type]
-        ),
-      [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
-    );
+  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () =>
+      allInstalledBehaviorMetadataList.filter(
+        behavior => !deprecatedBehaviorsInformation[behavior.type]
+      ),
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
+  );
 
-  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> =
-    React.useMemo(() => {
+  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () => {
       const deprecatedBehaviors = allInstalledBehaviorMetadataList.filter(
-        (behavior) => deprecatedBehaviorsInformation[behavior.type]
+        behavior => deprecatedBehaviorsInformation[behavior.type]
       );
-      deprecatedBehaviors.forEach((behavior) => (behavior.isDeprecated = true));
+      deprecatedBehaviors.forEach(behavior => (behavior.isDeprecated = true));
       return deprecatedBehaviors;
-    }, [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]);
+    },
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
+  );
 
   if (!open || !project) return null;
 
@@ -201,10 +203,10 @@ export default function NewBehaviorDialog({
             objectType={objectType}
             objectBehaviorsTypes={objectBehaviorsTypes}
             isInstalling={isInstalling}
-            onInstall={async (shortHeader) =>
+            onInstall={async shortHeader =>
               onInstallExtension(i18n, shortHeader)
             }
-            onChoose={(behaviorType) => chooseBehavior(i18n, behaviorType)}
+            onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
             installedBehaviorMetadataList={installedBehaviorMetadataList}
             deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
           />

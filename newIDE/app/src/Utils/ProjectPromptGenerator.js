@@ -128,7 +128,7 @@ const gameTypes = [
   'megaman',
 ];
 
-const startWithVowel = (word) =>
+const startWithVowel = word =>
   ['a', 'e', 'i', 'o', 'u'].includes(word[0].toLowerCase());
 const formatWordWithAdaptedDeterminer = (word: string) =>
   `${startWithVowel(word) ? 'an' : 'a'} ${word}`;

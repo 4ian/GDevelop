@@ -159,11 +159,14 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
   const [progress, setProgress] = React.useState(0);
   const [genericError, setGenericError] = React.useState(null);
   const [isFetching, setIsFetching] = React.useState(false);
-  const [result, setResult] =
-    React.useState<?GenericRetryableProcessWithProgressResults>(null);
+  const [
+    result,
+    setResult,
+  ] = React.useState<?GenericRetryableProcessWithProgressResults>(null);
   const [onRetry, setOnRetry] = React.useState<?RetryOrAbandonCallback>(null);
-  const [onAbandon, setOnAbandon] =
-    React.useState<?RetryOrAbandonCallback>(null);
+  const [onAbandon, setOnAbandon] = React.useState<?RetryOrAbandonCallback>(
+    null
+  );
 
   const ensureProcessIsDone = React.useCallback(
     async (options: DoProcessOptions) => {
@@ -196,19 +199,23 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
 
       // An error happened. Store the errors and offer a way to
       // retry.
-      return new Promise((resolve) => {
-        setOnRetry((): RetryOrAbandonCallback => () => {
-          // Launch the fetch again, and solve the promise once
-          // this new fetch resolve itself.
-          resolve(ensureProcessIsDone(options));
-        });
-        setOnAbandon((): RetryOrAbandonCallback => () => {
-          // Abandon: resolve immediately, closing the dialog
-          setIsFetching(false);
-          setGenericError(null);
-          setResult(null);
-          resolve();
-        });
+      return new Promise(resolve => {
+        setOnRetry(
+          (): RetryOrAbandonCallback => () => {
+            // Launch the fetch again, and solve the promise once
+            // this new fetch resolve itself.
+            resolve(ensureProcessIsDone(options));
+          }
+        );
+        setOnAbandon(
+          (): RetryOrAbandonCallback => () => {
+            // Abandon: resolve immediately, closing the dialog
+            setIsFetching(false);
+            setGenericError(null);
+            setResult(null);
+            resolve();
+          }
+        );
 
         // Display the errors to the user:
         setResult(newResult);
@@ -218,21 +225,24 @@ export const useGenericRetryableProcessWithProgress = <DoProcessOptions>({
     [onDoProcess]
   );
 
-  const renderProcessDialog = React.useCallback(() => {
-    const hasErrors =
-      (result && result.erroredResources.length >= 0) || !!genericError;
-    if (!isFetching && !hasErrors) return null;
+  const renderProcessDialog = React.useCallback(
+    () => {
+      const hasErrors =
+        (result && result.erroredResources.length >= 0) || !!genericError;
+      if (!isFetching && !hasErrors) return null;
 
-    return (
-      <GenericRetryableProcessWithProgressDialog
-        progress={progress}
-        result={result}
-        genericError={genericError}
-        onAbandon={onAbandon}
-        onRetry={onRetry}
-      />
-    );
-  }, [isFetching, progress, result, onAbandon, onRetry, genericError]);
+      return (
+        <GenericRetryableProcessWithProgressDialog
+          progress={progress}
+          result={result}
+          genericError={genericError}
+          onAbandon={onAbandon}
+          onRetry={onRetry}
+        />
+      );
+    },
+    [isFetching, progress, result, onAbandon, onRetry, genericError]
+  );
 
   return React.useMemo(
     () => ({

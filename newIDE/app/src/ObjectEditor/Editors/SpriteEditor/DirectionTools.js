@@ -71,7 +71,7 @@ const DirectionTools = ({
   const hasNoSprites = direction.getSpritesCount() === 0;
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  const saveTimeBetweenFrames = (newTimeBetweenFramesString) => {
+  const saveTimeBetweenFrames = newTimeBetweenFramesString => {
     if (!newTimeBetweenFramesString) return;
     const newTimeBetweenFrames = Math.max(
       parseFloat(newTimeBetweenFramesString),
@@ -124,8 +124,8 @@ const DirectionTools = ({
                         ? t`Edit`
                         : t`Create`
                       : hasSprites
-                        ? imageResourceExternalEditors[0].editDisplayName
-                        : imageResourceExternalEditors[0].createDisplayName
+                      ? imageResourceExternalEditors[0].editDisplayName
+                      : imageResourceExternalEditors[0].createDisplayName
                   )}
                   icon={<Edit />}
                   onClick={() =>

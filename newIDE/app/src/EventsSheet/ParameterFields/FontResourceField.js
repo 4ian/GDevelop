@@ -15,7 +15,7 @@ import {
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FontResourceField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?ResourceSelectorInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({

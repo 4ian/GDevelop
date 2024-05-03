@@ -98,7 +98,7 @@ type Props = {|
   onChooseProject: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => Promise<void>,
   onOpenExampleStore: () => void,
-  onSelectExampleShortHeader: (ExampleShortHeader) => void,
+  onSelectExampleShortHeader: ExampleShortHeader => void,
   onPreviewPrivateGameTemplateListingData: (
     privateGameTemplateListingData: PrivateGameTemplateListingData
   ) => void,
@@ -173,10 +173,13 @@ export const HomePage = React.memo<Props>(
         shop: { setInitialGameTemplateUserFriendlySlug },
       } = React.useContext(PrivateGameTemplateStoreContext);
       const [openedGame, setOpenedGame] = React.useState<?Game>(null);
-      const [gameDetailsCurrentTab, setGameDetailsCurrentTab] =
-        React.useState<GameDetailsTab>('details');
-      const { routeArguments, removeRouteArguments } =
-        React.useContext(RouterContext);
+      const [
+        gameDetailsCurrentTab,
+        setGameDetailsCurrentTab,
+      ] = React.useState<GameDetailsTab>('details');
+      const { routeArguments, removeRouteArguments } = React.useContext(
+        RouterContext
+      );
 
       const { isMobile } = useResponsiveWindowSize();
       const {
@@ -191,22 +194,29 @@ export const HomePage = React.memo<Props>(
       const initialTab = isShopRequestedAtOpening.current
         ? 'shop'
         : isGamesDashboardRequestedAtOpening.current
-          ? 'manage'
-          : showGetStartedSectionByDefault
-            ? 'get-started'
-            : 'build';
+        ? 'manage'
+        : showGetStartedSectionByDefault
+        ? 'get-started'
+        : 'build';
 
       const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
-      const [learnInitialCategory, setLearnInitialCategory] =
-        React.useState<TutorialCategory | null>(null);
+      const [
+        learnInitialCategory,
+        setLearnInitialCategory,
+      ] = React.useState<TutorialCategory | null>(null);
 
-      const { setInitialPackUserFriendlySlug } =
-        React.useContext(AssetStoreContext);
-      const [displayTooltipDelayed, setDisplayTooltipDelayed] =
-        React.useState<boolean>(false);
+      const { setInitialPackUserFriendlySlug } = React.useContext(
+        AssetStoreContext
+      );
+      const [
+        displayTooltipDelayed,
+        setDisplayTooltipDelayed,
+      ] = React.useState<boolean>(false);
       const { games, gamesFetchingError, fetchGames } = useGamesList();
-      const { shouldDisplayNewFeatureHighlighting, acknowledgeNewFeature } =
-        useDisplayNewFeature();
+      const {
+        shouldDisplayNewFeatureHighlighting,
+        acknowledgeNewFeature,
+      } = useDisplayNewFeature();
       const manageTabElement = document.getElementById('home-manage-tab');
       const shouldDisplayTooltip = shouldDisplayNewFeatureHighlighting({
         featureId: 'gamesDashboardInHomePage',
@@ -218,63 +228,78 @@ export const HomePage = React.memo<Props>(
       const displayTooltip =
         isActive && shouldDisplayTooltip && manageTabElement;
 
-      const onCloseTooltip = React.useCallback(() => {
-        setDisplayTooltipDelayed(false);
-        acknowledgeNewFeature({ featureId: 'gamesDashboardInHomePage' });
-      }, [acknowledgeNewFeature]);
+      const onCloseTooltip = React.useCallback(
+        () => {
+          setDisplayTooltipDelayed(false);
+          acknowledgeNewFeature({ featureId: 'gamesDashboardInHomePage' });
+        },
+        [acknowledgeNewFeature]
+      );
 
       // Open the store and a pack or game template if asked to do so, either at
       // app opening, either when the route changes (when clicking on an announcement
       // that redirects to the asset store for instance).
-      React.useEffect(() => {
-        if (isShopRequested(routeArguments)) {
-          setActiveTab('shop');
-          if (routeArguments['asset-pack']) {
-            setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+      React.useEffect(
+        () => {
+          if (isShopRequested(routeArguments)) {
+            setActiveTab('shop');
+            if (routeArguments['asset-pack']) {
+              setInitialPackUserFriendlySlug(routeArguments['asset-pack']);
+            }
+            if (routeArguments['game-template']) {
+              setInitialGameTemplateUserFriendlySlug(
+                routeArguments['game-template']
+              );
+            }
+            // Remove the arguments so that the asset store is not opened again.
+            removeRouteArguments([
+              'initial-dialog',
+              'asset-pack',
+              'game-template',
+            ]);
+          } else if (isGamesDashboardRequested(routeArguments)) {
+            setActiveTab('manage');
+            removeRouteArguments(['initial-dialog']);
           }
-          if (routeArguments['game-template']) {
-            setInitialGameTemplateUserFriendlySlug(
-              routeArguments['game-template']
-            );
-          }
-          // Remove the arguments so that the asset store is not opened again.
-          removeRouteArguments([
-            'initial-dialog',
-            'asset-pack',
-            'game-template',
-          ]);
-        } else if (isGamesDashboardRequested(routeArguments)) {
-          setActiveTab('manage');
-          removeRouteArguments(['initial-dialog']);
-        }
-      }, [
-        routeArguments,
-        removeRouteArguments,
-        setInitialPackUserFriendlySlug,
-        setInitialGameTemplateUserFriendlySlug,
-      ]);
+        },
+        [
+          routeArguments,
+          removeRouteArguments,
+          setInitialPackUserFriendlySlug,
+          setInitialGameTemplateUserFriendlySlug,
+        ]
+      );
 
-      React.useEffect(() => {
-        if (initialTab === 'get-started') {
-          incrementGetStartedSectionViewCount();
-        }
-      }, [initialTab]);
+      React.useEffect(
+        () => {
+          if (initialTab === 'get-started') {
+            incrementGetStartedSectionViewCount();
+          }
+        },
+        [initialTab]
+      );
 
       // Load everything when the user opens the home page, to avoid future loading times.
-      React.useEffect(() => {
-        fetchExamplesAndFilters();
-        fetchGameTemplates();
-        fetchTutorials();
-      }, [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]);
+      React.useEffect(
+        () => {
+          fetchExamplesAndFilters();
+          fetchGameTemplates();
+          fetchTutorials();
+        },
+        [fetchExamplesAndFilters, fetchTutorials, fetchGameTemplates]
+      );
 
       // Only fetch games if the user decides to open the games dashboard tab
       // or the build tab to enable the context menu on project list items that
       // redirects to the games dashboard.
-      React.useEffect(() => {
-        if ((activeTab === 'manage' || activeTab === 'build') && !games) {
-          fetchGames();
-        }
-      }, [fetchGames, activeTab, games]);
+      React.useEffect(
+        () => {
+          if ((activeTab === 'manage' || activeTab === 'build') && !games) {
+            fetchGames();
+          }
+        },
+        [fetchGames, activeTab, games]
+      );
 
       React.useEffect(
         () => {
@@ -294,43 +319,52 @@ export const HomePage = React.memo<Props>(
       );
 
       // Fetch user cloud projects when home page becomes active
-      React.useEffect(() => {
-        if (isActive && authenticated) {
-          onCloudProjectsChanged();
-        }
-      }, [isActive, authenticated, onCloudProjectsChanged]);
+      React.useEffect(
+        () => {
+          if (isActive && authenticated) {
+            onCloudProjectsChanged();
+          }
+        },
+        [isActive, authenticated, onCloudProjectsChanged]
+      );
 
       const getProject = React.useCallback(() => {
         return undefined;
       }, []);
 
-      const updateToolbar = React.useCallback(() => {
-        if (setToolbar) {
-          setToolbar(
-            <HomePageHeader
-              hasProject={!!project}
-              onOpenLanguageDialog={onOpenLanguageDialog}
-              onOpenProfile={onOpenProfile}
-              onOpenProjectManager={onOpenProjectManager}
-              onSave={onSave}
-              canSave={canSave}
-            />
-          );
-        }
-      }, [
-        setToolbar,
-        onOpenLanguageDialog,
-        onOpenProfile,
-        onOpenProjectManager,
-        project,
-        onSave,
-        canSave,
-      ]);
+      const updateToolbar = React.useCallback(
+        () => {
+          if (setToolbar) {
+            setToolbar(
+              <HomePageHeader
+                hasProject={!!project}
+                onOpenLanguageDialog={onOpenLanguageDialog}
+                onOpenProfile={onOpenProfile}
+                onOpenProjectManager={onOpenProjectManager}
+                onSave={onSave}
+                canSave={canSave}
+              />
+            );
+          }
+        },
+        [
+          setToolbar,
+          onOpenLanguageDialog,
+          onOpenProfile,
+          onOpenProjectManager,
+          project,
+          onSave,
+          canSave,
+        ]
+      );
 
       // Ensure the toolbar is up to date when the active tab changes.
-      React.useEffect(() => {
-        updateToolbar();
-      }, [updateToolbar]);
+      React.useEffect(
+        () => {
+          updateToolbar();
+        },
+        [updateToolbar]
+      );
 
       const forceUpdateEditor = React.useCallback(() => {
         // No updates to be done
@@ -343,11 +377,14 @@ export const HomePage = React.memo<Props>(
       }));
 
       // If the user logs out and is on the team view section, go back to the build section.
-      React.useEffect(() => {
-        if (activeTab === 'team-view' && !authenticated) {
-          setActiveTab('build');
-        }
-      }, [authenticated, activeTab]);
+      React.useEffect(
+        () => {
+          if (activeTab === 'team-view' && !authenticated) {
+            setActiveTab('build');
+          }
+        },
+        [authenticated, activeTab]
+      );
 
       const onUserSurveyStarted = React.useCallback(() => {
         if (userSurveyStartedRef.current) return;
@@ -374,7 +411,7 @@ export const HomePage = React.memo<Props>(
       const onManageGame = React.useCallback(
         ({ gameId }: {| gameId: string |}) => {
           if (!games) return;
-          const matchingGame = games.find((game) => game.id === gameId);
+          const matchingGame = games.find(game => game.id === gameId);
           if (!matchingGame) return;
           setOpenedGame(matchingGame);
           setActiveTab('manage');
@@ -385,9 +422,7 @@ export const HomePage = React.memo<Props>(
       const canManageGame = React.useCallback(
         ({ gameId }: {| gameId: string |}): boolean => {
           if (!games) return false;
-          const matchingGameIndex = games.findIndex(
-            (game) => game.id === gameId
-          );
+          const matchingGameIndex = games.findIndex(game => game.id === gameId);
           return matchingGameIndex > -1;
         },
         [games]

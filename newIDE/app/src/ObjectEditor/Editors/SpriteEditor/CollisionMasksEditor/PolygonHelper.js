@@ -17,7 +17,7 @@ export const addVertexOnLongestEdge = (vertices: gdVectorVector2f) => {
       let previousX = lastVertex.x;
       let previousY = lastVertex.y;
       let squaredDistanceMax = -1;
-      mapFor(0, verticesSize, (index) => {
+      mapFor(0, verticesSize, index => {
         const vertex = vertices.at(index);
         const x = vertex.x;
         const y = vertex.y;
@@ -224,7 +224,7 @@ export const getMagnetizedVertexForDeletion = (
  * @param y Divisor value.
  * @returns Return the remainder using Euclidean division.
  */
-const mod = function (x: number, y: number): number {
+const mod = function(x: number, y: number): number {
   return ((x % y) + y) % y;
 };
 

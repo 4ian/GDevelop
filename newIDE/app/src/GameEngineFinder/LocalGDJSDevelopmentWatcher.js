@@ -13,24 +13,27 @@ export const LocalGDJSDevelopmentWatcher = () => {
   const preferences = React.useContext(PreferencesContext);
   const shouldWatch = preferences.values.useGDJSDevelopmentWatcher;
 
-  React.useEffect(() => {
-    if (!shouldWatch) {
-      // Nothing to set up in the effect if watch is deactivated.
-      return;
-    }
+  React.useEffect(
+    () => {
+      if (!shouldWatch) {
+        // Nothing to set up in the effect if watch is deactivated.
+        return;
+      }
 
-    if (!ipcRenderer) {
-      console.error(
-        'Unable to find ipcRenderer to set up GDJS development watchers'
-      );
-      return;
-    }
+      if (!ipcRenderer) {
+        console.error(
+          'Unable to find ipcRenderer to set up GDJS development watchers'
+        );
+        return;
+      }
 
-    ipcRenderer.send('setup-local-gdjs-development-watcher');
-    return () => {
-      ipcRenderer.send('close-local-gdjs-development-watcher');
-    };
-  }, [shouldWatch]);
+      ipcRenderer.send('setup-local-gdjs-development-watcher');
+      return () => {
+        ipcRenderer.send('close-local-gdjs-development-watcher');
+      };
+    },
+    [shouldWatch]
+  );
 
   return null;
 };

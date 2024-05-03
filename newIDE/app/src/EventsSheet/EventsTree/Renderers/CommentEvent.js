@@ -48,7 +48,7 @@ type State = {|
 
 export default class CommentEvent extends React.Component<
   EventRendererProps,
-  State,
+  State
 > {
   state = {
     editing: false,
@@ -134,7 +134,7 @@ export default class CommentEvent extends React.Component<
           backgroundColor,
         }}
         onClick={this.edit}
-        onKeyUp={(event) => {
+        onKeyUp={event => {
           if (!this.state.editing && shouldActivate(event)) {
             this.edit();
           }
@@ -146,7 +146,7 @@ export default class CommentEvent extends React.Component<
           <TextField
             multiline
             margin="none"
-            ref={(textField) => (this._textField = textField)}
+            ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}
             translatableHintText={t`<Enter comment>`}
             onBlur={this.endEditing}
@@ -158,7 +158,7 @@ export default class CommentEvent extends React.Component<
             }}
             fullWidth
             id="comment-title"
-            onKeyDown={(event) => {
+            onKeyDown={event => {
               if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
@@ -167,7 +167,7 @@ export default class CommentEvent extends React.Component<
           />
         ) : (
           <span
-            ref={(selectable) => (this._selectable = selectable)}
+            ref={selectable => (this._selectable = selectable)}
             className={classNames({
               [selectableArea]: true,
               [disabledText]: this.props.disabled,

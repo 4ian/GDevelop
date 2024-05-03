@@ -27,12 +27,15 @@ export default function EventsBasedObjectEditor({
 }: Props) {
   const forceUpdate = useForceUpdate();
 
-  const onChange = React.useCallback(() => {
-    if (unsavedChanges) {
-      unsavedChanges.triggerUnsavedChanges();
-    }
-    forceUpdate();
-  }, [forceUpdate, unsavedChanges]);
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   return (
     <ColumnStackLayout expand noMargin>
@@ -63,7 +66,7 @@ export default function EventsBasedObjectEditor({
         commitOnBlur
         floatingLabelText={<Trans>Name displayed in editor</Trans>}
         value={eventsBasedObject.getFullName()}
-        onChange={(text) => {
+        onChange={text => {
           eventsBasedObject.setFullName(text);
           onChange();
         }}
@@ -75,7 +78,7 @@ export default function EventsBasedObjectEditor({
         floatingLabelFixed
         translatableHintText={t`The description of the object should explain what the object is doing, and, briefly, how to use it.`}
         value={eventsBasedObject.getDescription()}
-        onChange={(text) => {
+        onChange={text => {
           eventsBasedObject.setDescription(text);
           onChange();
         }}
@@ -89,7 +92,7 @@ export default function EventsBasedObjectEditor({
         value={
           eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
         }
-        onChange={(newName) => {
+        onChange={newName => {
           eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
           onChange();
         }}

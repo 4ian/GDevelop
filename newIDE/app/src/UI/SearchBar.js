@@ -17,8 +17,8 @@ import SearchBarContainer from './SearchBarContainer';
 import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 type TagsHandler = {|
-  remove: (string) => void,
-  add: (string) => void,
+  remove: string => void,
+  add: string => void,
   chosenTags: Set<string>,
 |};
 
@@ -29,9 +29,9 @@ type Props = {|
   /** Sets placeholder for the embedded text field. */
   placeholder?: MessageDescriptor,
   /** Fired when the text value changes. */
-  onChange?: (string) => void,
+  onChange?: string => void,
   /** Fired when the search icon is clicked. */
-  onRequestSearch: (string) => void,
+  onRequestSearch: string => void,
   /** Set if rounding should be applied or not. */
   aspect?: 'integrated-search-bar',
   /** The value of the text field. */
@@ -101,8 +101,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     // This variable represents the value of the autocomplete, used to
     // highlight an option and to determine if an option is selectable, or
     // if an event should be fired when an option is selected.
-    const [autocompleteValue, setAutocompleteValue] =
-      React.useState<string>(parentValue);
+    const [autocompleteValue, setAutocompleteValue] = React.useState<string>(
+      parentValue
+    );
 
     const textField = React.useRef<?TextFieldInterface>(null);
 
@@ -125,33 +126,39 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       [onChange, setValue]
     );
 
-    React.useEffect(() => {
-      // The value given by the parent has priority: if it changes,
-      // the search bar must display it.
-      setValue(parentValue);
-    }, [parentValue]);
+    React.useEffect(
+      () => {
+        // The value given by the parent has priority: if it changes,
+        // the search bar must display it.
+        setValue(parentValue);
+      },
+      [parentValue]
+    );
 
     const shouldAutofocusSearchbar = useShouldAutofocusInput();
     const shouldAutoFocusTextField = !autoFocus
       ? false
       : autoFocus === 'desktopAndMobileDevices'
-        ? true
-        : shouldAutofocusSearchbar;
+      ? true
+      : shouldAutofocusSearchbar;
     const previousChosenTagsCount = React.useRef<number>(
       tagsHandler ? tagsHandler.chosenTags.size : 0
     );
-    React.useEffect(() => {
-      // Used to focus search bar when all tags have been removed.
-      // It is convenient when using keyboard to remove all tags and
-      // quickly get back to the text field.
-      if (
-        shouldAutoFocusTextField &&
-        tagsHandler &&
-        tagsHandler.chosenTags.size === 0 &&
-        previousChosenTagsCount.current > 0
-      )
-        focus();
-    }, [tagsHandler, shouldAutoFocusTextField]);
+    React.useEffect(
+      () => {
+        // Used to focus search bar when all tags have been removed.
+        // It is convenient when using keyboard to remove all tags and
+        // quickly get back to the text field.
+        if (
+          shouldAutoFocusTextField &&
+          tagsHandler &&
+          tagsHandler.chosenTags.size === 0 &&
+          previousChosenTagsCount.current > 0
+        )
+          focus();
+      },
+      [tagsHandler, shouldAutoFocusTextField]
+    );
 
     const handleBlur = () => {
       setIsInputFocused(false);
@@ -242,7 +249,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <Collapse in={tagsHandler.chosenTags.size > 0}>
                       <TagChips
                         tags={Array.from(tagsHandler.chosenTags)}
-                        onRemove={(tag) => {
+                        onRemove={tag => {
                           if (tagsHandler.chosenTags.size === 1) {
                             // If the last tag is removed, focus the search bar.
                             focus();
@@ -269,18 +276,18 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                   onKeyPress={handleKeyPressed}
                   onBlur={handleBlur}
                   onFocus={handleFocus}
-                  getOptionDisabled={(option) =>
+                  getOptionDisabled={option =>
                     option.disabled ||
                     (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
                   }
                   getOptionSelected={(option, _) =>
                     !!tagsHandler && tagsHandler.chosenTags.has(option)
                   }
-                  PopperComponent={(props) => (
+                  PopperComponent={props => (
                     <div style={popperContainerStyle}>{props.children}</div>
                   )}
-                  renderOption={(option) => <Text noMargin>{option}</Text>}
-                  renderInput={(params) => (
+                  renderOption={option => <Text noMargin>{option}</Text>}
+                  renderInput={params => (
                     <MuiTextField
                       margin="none"
                       {...params}

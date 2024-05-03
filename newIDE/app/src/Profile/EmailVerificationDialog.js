@@ -36,11 +36,14 @@ export default function EmailVerificationDialog({
   const [hasSentEmailManually, setHasSentEmailManually] = React.useState(false);
 
   // Send the email once on dialog opening if configured as so.
-  React.useEffect(() => {
-    if (!isVerified && sendEmailAutomatically) {
-      onSendEmail();
-    }
-  }, [isVerified, onSendEmail, sendEmailAutomatically]);
+  React.useEffect(
+    () => {
+      if (!isVerified && sendEmailAutomatically) {
+        onSendEmail();
+      }
+    },
+    [isVerified, onSendEmail, sendEmailAutomatically]
+  );
 
   // Check every 5 seconds if the email has been verified.
   useInterval(

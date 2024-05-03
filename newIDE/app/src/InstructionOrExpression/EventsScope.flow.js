@@ -35,11 +35,10 @@ export const getProjectScopedContainersFromScope = (
     );
   }
 
-  const projectScopedContainers =
-    gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
-      globalObjectsContainer,
-      objectsContainer
-    );
+  const projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
+    globalObjectsContainer,
+    objectsContainer
+  );
 
   if (eventsBasedBehavior) {
     projectScopedContainers.addPropertiesContainer(

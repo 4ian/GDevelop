@@ -22,14 +22,16 @@ export const checkIfHasTooManyCloudProjects = (
   const { limits, cloudProjects } = authenticatedUser;
 
   return limits && cloudProjects
-    ? cloudProjects.filter((cloudProject) => !cloudProject.deletedAt).length >=
+    ? cloudProjects.filter(cloudProject => !cloudProject.deletedAt).length >=
         limits.capabilities.cloudProjects.maximumCount
     : false;
 };
 
 export const MaxProjectCountAlertMessage = ({ onUpgrade, limits }: Props) => {
-  const { maximumCount, canMaximumCountBeIncreased } =
-    limits.capabilities.cloudProjects;
+  const {
+    maximumCount,
+    canMaximumCountBeIncreased,
+  } = limits.capabilities.cloudProjects;
 
   return (
     <Line noMargin>

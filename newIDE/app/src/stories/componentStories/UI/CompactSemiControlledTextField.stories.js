@@ -83,7 +83,7 @@ export const Default = () => {
             commitOnBlur
             value={value3}
             onChange={setValue3}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
           />
           <div>State value is {value3}</div>
@@ -95,7 +95,7 @@ export const Default = () => {
             onChange={setValue4}
             errored
             errorText={'An error occurred.'}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
           />
           <div>State value is {value4}</div>
@@ -106,7 +106,7 @@ export const Default = () => {
             value={value5}
             onChange={setValue5}
             placeholder="With placeholder"
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
           />
           <div>State value is {value5}</div>
@@ -116,7 +116,7 @@ export const Default = () => {
             disabled
             value={'disabled field'}
             onChange={() => {}}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
           />
           <div>Disabled field</div>
@@ -126,10 +126,10 @@ export const Default = () => {
           <CompactSemiControlledTextField
             value={value6}
             onChange={setValue6}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle'}
             id="with-end-adornment"
-            renderEndAdornmentOnHover={(className) => (
+            renderEndAdornmentOnHover={className => (
               <Restore className={className} />
             )}
             onClickEndAdornment={action('onClickEndAdornment')}
@@ -140,10 +140,10 @@ export const Default = () => {
           <CompactSemiControlledTextField
             disabled
             value={'Disabled field'}
-            onChange={(valueAsString) => {}}
-            renderLeftIcon={(className) => <Angle className={className} />}
+            onChange={valueAsString => {}}
+            renderLeftIcon={className => <Angle className={className} />}
             leftIconTooltip={'Angle disabled'}
-            renderEndAdornmentOnHover={(className) => (
+            renderEndAdornmentOnHover={className => (
               <Restore className={className} />
             )}
             onClickEndAdornment={action('onClickEndAdornment')}

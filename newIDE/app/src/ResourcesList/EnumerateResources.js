@@ -9,6 +9,11 @@ export const filterResourcesList = (
   const lowercaseSearchText = searchText.toLowerCase();
 
   return list.filter((resource: gdResource) => {
-    return resource.getName().toLowerCase().indexOf(lowercaseSearchText) !== -1;
+    return (
+      resource
+        .getName()
+        .toLowerCase()
+        .indexOf(lowercaseSearchText) !== -1
+    );
   });
 };

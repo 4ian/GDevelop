@@ -49,7 +49,7 @@ const PrivateTutorialViewDialogStory = ({
     .onGet(`/pdf-tutorial/${privatePdfTutorial.id}`)
     .reply(errorCode || 200, errorCode ? null : privatePdfTutorial)
     .onAny()
-    .reply((config) => {
+    .reply(config => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

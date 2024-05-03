@@ -2,7 +2,7 @@ import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default (props) => (
+export default props => (
   <SvgIcon {...props} viewBox="0 0 23.109 23.124">
     <g id="Expression">
       <path

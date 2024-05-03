@@ -46,7 +46,7 @@ export const fakeBrowserOnlineWebExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput,
+  CompressionOutput
 > = {
   name: exportPipelineName,
   onlineBuildType: 'web-build',

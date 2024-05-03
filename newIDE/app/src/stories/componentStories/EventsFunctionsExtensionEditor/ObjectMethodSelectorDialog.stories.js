@@ -20,7 +20,7 @@ export const Default = () => (
       <ObjectMethodSelectorDialog
         eventsBasedObject={testProject.testEventsBasedObject}
         onCancel={() => action('Cancel')}
-        onChoose={(parameters) => action('Choose function type', parameters)}
+        onChoose={parameters => action('Choose function type', parameters)}
       />
     )}
   </I18n>

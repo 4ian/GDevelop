@@ -11,8 +11,7 @@ const remote = optionalRequire('@electron/remote');
  * Wraps an Electron Menu
  */
 export default class ElectronMenuImplementation
-  implements ContextMenuImplementation
-{
+  implements ContextMenuImplementation {
   menuTemplate: Array<MenuItemTemplate>;
   menu: any; // TODO: Is it necessary to store the menu in a class variable?
 

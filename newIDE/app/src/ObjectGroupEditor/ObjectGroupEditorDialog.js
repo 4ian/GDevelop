@@ -25,11 +25,13 @@ const ObjectGroupEditorDialog = ({
   objectsContainer,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const { onCancelChanges, notifyOfChange } =
-    useSerializableObjectCancelableEditor({
-      serializableObject: group,
-      onCancel,
-    });
+  const {
+    onCancelChanges,
+    notifyOfChange,
+  } = useSerializableObjectCancelableEditor({
+    serializableObject: group,
+    onCancel,
+  });
 
   return (
     <Dialog

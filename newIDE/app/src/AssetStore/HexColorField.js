@@ -101,7 +101,7 @@ export const HexColorField = ({
         type="text"
         hintText={'#ff8844'}
         value={colorString}
-        onChange={(event) => handleTextChange(event.target.value)}
+        onChange={event => handleTextChange(event.target.value)}
       />
       <div style={floatingLabelText ? styles.picker : styles.pickerNoLabel}>
         <ColorPicker

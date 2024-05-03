@@ -14,7 +14,7 @@ export const setupAuthenticationWebSocket = ({
     provider: 'apple' | 'google' | 'github',
     data: any,
   |}) => Promise<void>,
-  onError: (Error) => void,
+  onError: Error => void,
   onTimeout: () => void,
 |}) => {
   webSocket = new WebSocket(GDevelopAuthorizationWebSocketApi.baseUrl);
@@ -29,13 +29,13 @@ export const setupAuthenticationWebSocket = ({
     console.info('WebSocket - Closed.');
     clearTimeout(timeoutId);
   };
-  webSocket.onerror = (event) => {
+  webSocket.onerror = event => {
     console.error('WebSocket - Error:', event);
     clearTimeout(timeoutId);
     onError(event);
   };
 
-  webSocket.onmessage = (event) => {
+  webSocket.onmessage = event => {
     if (event.data) {
       if (typeof event.data !== 'string') {
         console.error(

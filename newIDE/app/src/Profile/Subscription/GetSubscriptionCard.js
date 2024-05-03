@@ -51,7 +51,7 @@ const GetSubscriptionCard = ({
 
   return (
     <CalloutCard
-      renderImage={(style) => (
+      renderImage={style => (
         <img src="res/diamond.svg" style={styles.diamondIcon} alt="diamond" />
       )}
     >

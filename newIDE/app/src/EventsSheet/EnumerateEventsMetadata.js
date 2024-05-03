@@ -16,15 +16,15 @@ export const enumerateEventsMetadata = (): Array<EventMetadata> => {
     .getAllPlatformExtensions();
 
   return flatten(
-    mapFor(0, allExtensions.size(), (i) => {
+    mapFor(0, allExtensions.size(), i => {
       const extension = allExtensions.at(i);
       const extensionEvents = extension.getAllEvents();
 
       return extensionEvents
         .keys()
         .toJSArray()
-        .filter((type) => type !== 'BuiltinAsync::Async')
-        .map((type) => {
+        .filter(type => type !== 'BuiltinAsync::Async')
+        .map(type => {
           const metadata = extensionEvents.get(type);
           return {
             type,

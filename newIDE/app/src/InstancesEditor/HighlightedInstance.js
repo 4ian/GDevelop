@@ -7,7 +7,7 @@ import Rectangle from '../Utils/Rectangle';
 export default class HighlightedInstance {
   instanceMeasurer: InstanceMeasurer;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
-  isInstanceOf3DObject: (gdInitialInstance) => boolean;
+  isInstanceOf3DObject: gdInitialInstance => boolean;
   highlightedInstance: gdInitialInstance | null;
   isHighlightedInstanceOf3DObject: boolean;
   highlightRectangle: PIXI.Container;
@@ -21,7 +21,7 @@ export default class HighlightedInstance {
   }: {
     instanceMeasurer: InstanceMeasurer,
     toCanvasCoordinates: (x: number, y: number) => [number, number],
-    isInstanceOf3DObject: (gdInitialInstance) => boolean,
+    isInstanceOf3DObject: gdInitialInstance => boolean,
   }) {
     this.instanceMeasurer = instanceMeasurer;
     this.toCanvasCoordinates = toCanvasCoordinates;

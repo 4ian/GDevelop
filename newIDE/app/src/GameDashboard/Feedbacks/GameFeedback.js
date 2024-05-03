@@ -101,12 +101,10 @@ const getDisplayedFeedbacks = (
   if (!feedbacks) return null;
   let filteredFeedbacksByBuild = feedbacks;
   if (filter === 'game-only') {
-    filteredFeedbacksByBuild = feedbacks.filter(
-      (feedback) => !feedback.buildId
-    );
+    filteredFeedbacksByBuild = feedbacks.filter(feedback => !feedback.buildId);
   } else if (filter) {
     filteredFeedbacksByBuild = feedbacks.filter(
-      (feedback) => feedback.buildId === filter
+      feedback => feedback.buildId === filter
     );
   }
 
@@ -136,8 +134,9 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   }>(null);
   const [filter, setFilter] = React.useState<string>('');
   const [isErrored, setIsErrored] = React.useState(false);
-  const [isMarkingAllAsProcessed, setIsMarkingAllAsProcessed] =
-    React.useState(false);
+  const [isMarkingAllAsProcessed, setIsMarkingAllAsProcessed] = React.useState(
+    false
+  );
 
   const displayedFeedbacks = getDisplayedFeedbacks(
     i18n,
@@ -149,7 +148,9 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
 
   const displayedFeedbacksArray: Comment[] = displayedFeedbacks
     ? // $FlowFixMe - Flow doesn't understand that we're flattening the array.
-      Object.values(displayedFeedbacks).filter(Boolean).flat()
+      Object.values(displayedFeedbacks)
+        .filter(Boolean)
+        .flat()
     : [];
 
   const getBuildNameOption = (buildId: string) => {
@@ -182,31 +183,34 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     return build.name ? `${build.name} (${shortenedUuid})` : shortenedUuid;
   };
 
-  const loadFeedbacksAndBuilds = React.useCallback(async () => {
-    setIsErrored(false);
-    const { getAuthorizationHeader, profile } = authenticatedUser;
-    if (!profile) {
-      setIsErrored(true);
-      return;
-    }
-    try {
-      const [feedbacks, builds] = await Promise.all([
-        listComments(getAuthorizationHeader, profile.id, {
-          gameId: game.id,
-          type: RETRIEVED_COMMENT_TYPE,
-        }),
-        getBuilds(getAuthorizationHeader, profile.id, game.id),
-      ]);
-      setFeedbacks(feedbacks);
-      const buildsByIds = builds.reduce((acc, build) => {
-        acc[build.id] = build;
-        return acc;
-      }, {});
-      setBuildsByIds(buildsByIds);
-    } catch {
-      setIsErrored(true);
-    }
-  }, [authenticatedUser, game]);
+  const loadFeedbacksAndBuilds = React.useCallback(
+    async () => {
+      setIsErrored(false);
+      const { getAuthorizationHeader, profile } = authenticatedUser;
+      if (!profile) {
+        setIsErrored(true);
+        return;
+      }
+      try {
+        const [feedbacks, builds] = await Promise.all([
+          listComments(getAuthorizationHeader, profile.id, {
+            gameId: game.id,
+            type: RETRIEVED_COMMENT_TYPE,
+          }),
+          getBuilds(getAuthorizationHeader, profile.id, game.id),
+        ]);
+        setFeedbacks(feedbacks);
+        const buildsByIds = builds.reduce((acc, build) => {
+          acc[build.id] = build;
+          return acc;
+        }, {});
+        setBuildsByIds(buildsByIds);
+      } catch {
+        setIsErrored(true);
+      }
+    },
+    [authenticatedUser, game]
+  );
 
   const onCommentUpdated = (updatedComment: Comment) => {
     if (!feedbacks) return;
@@ -214,7 +218,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
       if (!previousFeedbacks) return previousFeedbacks;
       const newFeedbacks = [...previousFeedbacks];
       const updatedFeedbackIndex = newFeedbacks.findIndex(
-        (feedback) => feedback.id === updatedComment.id
+        feedback => feedback.id === updatedComment.id
       );
       if (updatedFeedbackIndex === -1) return;
       newFeedbacks[updatedFeedbackIndex] = updatedComment;
@@ -234,9 +238,12 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     };
   };
 
-  React.useEffect(() => {
-    loadFeedbacksAndBuilds();
-  }, [loadFeedbacksAndBuilds]);
+  React.useEffect(
+    () => {
+      loadFeedbacksAndBuilds();
+    },
+    [loadFeedbacksAndBuilds]
+  );
 
   const openOptionsContextMenu = (event: MouseEvent) => {
     if (contextMenu.current) {
@@ -250,8 +257,8 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
       setIsMarkingAllAsProcessed(true);
       await Promise.all(
         displayedFeedbacksArray
-          .filter((comment) => !comment.processedAt)
-          .map((comment) =>
+          .filter(comment => !comment.processedAt)
+          .map(comment =>
             updateComment(getAuthorizationHeader, profile.id, {
               gameId: comment.gameId,
               commentId: comment.id,
@@ -350,7 +357,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                             value={'game-only'}
                             label={t`On game page only`}
                           />
-                          {Object.keys(buildsByIds).map((buildId) => {
+                          {Object.keys(buildsByIds).map(buildId => {
                             return (
                               <SelectOption
                                 key={buildId}
@@ -417,9 +424,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                             <Column justifyContent="center">
                               <IconButton
                                 disabled={isMarkingAllAsProcessed}
-                                onClick={(event) =>
-                                  openOptionsContextMenu(event)
-                                }
+                                onClick={event => openOptionsContextMenu(event)}
                               >
                                 {!isMarkingAllAsProcessed ? (
                                   <Options fontSize="small" />

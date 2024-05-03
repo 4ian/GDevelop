@@ -9,7 +9,7 @@ import { focusButton } from './Button';
 type Props = {|
   leftButton: {| label: React.Node, value: string, id?: string |},
   rightButton: {| label: React.Node, value: string, id?: string |},
-  onChange: (string) => void,
+  onChange: string => void,
   value: string,
 |};
 

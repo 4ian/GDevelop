@@ -36,7 +36,7 @@ class ScopedCommandManager implements CommandManagerInterface {
   };
 
   registerAllCommandsToCentralManager = () => {
-    Object.keys(this._commands).forEach((commandName) => {
+    Object.keys(this._commands).forEach(commandName => {
       this._centralManager.registerCommand(
         commandName,
         this._commands[commandName]
@@ -45,13 +45,13 @@ class ScopedCommandManager implements CommandManagerInterface {
   };
 
   deregisterAllCommandsFromCentralManager = () => {
-    Object.keys(this._commands).forEach((commandName) => {
+    Object.keys(this._commands).forEach(commandName => {
       this._centralManager.deregisterCommand(commandName);
     });
   };
 
   getAllNamedCommands = () => {
-    return Object.keys(this._commands).map<NamedCommand>((commandName) => {
+    return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const cmd = this._commands[commandName];
       // $FlowFixMe
       return { ...cmd, name: commandName };
@@ -76,15 +76,18 @@ const CommandsContextScopedProvider = (props: Props) => {
     () => new ScopedCommandManager(centralManager)
   );
 
-  React.useEffect(() => {
-    if (!props.active) return;
-    scopedManager.setActive(true);
-    scopedManager.registerAllCommandsToCentralManager();
-    return () => {
-      scopedManager.setActive(false);
-      scopedManager.deregisterAllCommandsFromCentralManager();
-    };
-  }, [props.active, scopedManager]);
+  React.useEffect(
+    () => {
+      if (!props.active) return;
+      scopedManager.setActive(true);
+      scopedManager.registerAllCommandsToCentralManager();
+      return () => {
+        scopedManager.setActive(false);
+        scopedManager.deregisterAllCommandsFromCentralManager();
+      };
+    },
+    [props.active, scopedManager]
+  );
 
   return (
     <CommandsContext.Provider value={scopedManager}>

@@ -41,9 +41,9 @@ export const mosaicContainsNode = (
     !!mosaic &&
     (mosaic === node ||
       // $FlowFixMe
-      (!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
-      // $FlowFixMe
-      (!!mosaic.second && mosaicContainsNode(mosaic.second, node)))
+      ((!!mosaic.first && mosaicContainsNode(mosaic.first, node)) ||
+        // $FlowFixMe
+        (!!mosaic.second && mosaicContainsNode(mosaic.second, node))))
   );
 };
 
@@ -212,7 +212,7 @@ const getNodeSize = (
 
 const defaultToolbarControls = [<CloseButton key="close" />];
 
-const renderMosaicWindowPreview = (props) => (
+const renderMosaicWindowPreview = props => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">
       <div className="mosaic-window-title">{props.title}</div>
@@ -256,7 +256,7 @@ type Props = {|
   },
   limitToOneSecondaryEditor?: boolean,
   onOpenedEditorsChanged?: () => void,
-  onPersistNodes?: (EditorMosaicNode) => void,
+  onPersistNodes?: EditorMosaicNode => void,
 |};
 
 /**
@@ -276,8 +276,9 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
     },
     ref
   ) => {
-    const [mosaicNode, setMosaicNode] =
-      React.useState<?EditorMosaicNode>(initialNodes);
+    const [mosaicNode, setMosaicNode] = React.useState<?EditorMosaicNode>(
+      initialNodes
+    );
     const collapsedEditorSize = React.useRef<Map<string, number>>(new Map());
 
     const openEditor = React.useCallback(
@@ -299,7 +300,7 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
         if (limitToOneSecondaryEditor && editor.type === 'secondary') {
           // Replace the existing secondary editor, if any.
           const secondaryEditorName = openedEditorNames.find(
-            (editorName) => editors[editorName].type === 'secondary'
+            editorName => editors[editorName].type === 'secondary'
           );
           if (secondaryEditorName) {
             setMosaicNode(
@@ -386,13 +387,16 @@ const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
       }
     }, 2000);
 
-    React.useEffect(() => {
-      if (onOpenedEditorsChanged) {
-        onOpenedEditorsChanged();
-      }
+    React.useEffect(
+      () => {
+        if (onOpenedEditorsChanged) {
+          onOpenedEditorsChanged();
+        }
 
-      debouncedPersistNodes();
-    }, [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]);
+        debouncedPersistNodes();
+      },
+      [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]
+    );
 
     return (
       <I18n>

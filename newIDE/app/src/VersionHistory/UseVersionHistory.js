@@ -61,7 +61,7 @@ const mergeVersionsLists = (
 ) => {
   const mostRecentVersionDateInList2 = Date.parse(list2[0].createdAt);
   const moreRecentVersionsInList1 = list1.filter(
-    (version) => Date.parse(version.createdAt) > mostRecentVersionDateInList2
+    version => Date.parse(version.createdAt) > mostRecentVersionDateInList2
   );
   return [...moreRecentVersionsInList1, ...list2];
 };
@@ -99,34 +99,44 @@ const useVersionHistory = ({
   const { openSubscriptionDialog } = React.useContext(
     SubscriptionSuggestionContext
   );
-  const [versionsFetchingError, setVersionsFetchingError] =
-    React.useState<?React.Node>(null);
+  const [
+    versionsFetchingError,
+    setVersionsFetchingError,
+  ] = React.useState<?React.Node>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const ignoreFileMetadataChangesRef = React.useRef<boolean>(false);
   const freezeWhileLoadingSpecificVersionRef = React.useRef<boolean>(false);
   const { subscription, getAuthorizationHeader, profile } = authenticatedUser;
   const storageProvider = getStorageProvider();
-  const [state, setState] =
-    React.useState<PaginationState>(emptyPaginationState);
-  const [checkedOutVersionStatus, setCheckedOutVersionStatus] =
-    React.useState<?OpenedVersionStatus>(null);
-  const [versionHistoryPanelOpen, setVersionHistoryPanelOpen] =
-    React.useState<boolean>(false);
+  const [state, setState] = React.useState<PaginationState>(
+    emptyPaginationState
+  );
+  const [
+    checkedOutVersionStatus,
+    setCheckedOutVersionStatus,
+  ] = React.useState<?OpenedVersionStatus>(null);
+  const [
+    versionHistoryPanelOpen,
+    setVersionHistoryPanelOpen,
+  ] = React.useState<boolean>(false);
   const storageProviderInternalName = storageProvider.internalName;
   const isCloudProject =
     storageProviderInternalName === CloudStorageProvider.internalName;
-  const isUserAllowedToSeeVersionHistory =
-    canUseCloudProjectHistory(subscription);
+  const isUserAllowedToSeeVersionHistory = canUseCloudProjectHistory(
+    subscription
+  );
   const [cloudProjectId, setCloudProjectId] = React.useState<?string>(
     getCloudProjectFileMetadataIdentifier(
       storageProviderInternalName,
       fileMetadata
     )
   );
-  const [cloudProjectLastModifiedDate, setCloudProjectLastModifiedDate] =
-    React.useState<?number>(
-      isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
-    );
+  const [
+    cloudProjectLastModifiedDate,
+    setCloudProjectLastModifiedDate,
+  ] = React.useState<?number>(
+    isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
+  );
   const shouldFetchVersions =
     isCloudProject && isUserAllowedToSeeVersionHistory;
   const latestVersionId =
@@ -136,66 +146,168 @@ const useVersionHistory = ({
   // This effect is used to avoid having cloudProjectId and cloudProjectLastModifiedDate
   // set to null when checking out a version, unmounting the VersionHistory component,
   // making it lose its state (fetched versions and collapse states).
-  React.useEffect(() => {
-    if (ignoreFileMetadataChangesRef.current) return;
-    setCloudProjectId(
-      getCloudProjectFileMetadataIdentifier(
-        storageProviderInternalName,
-        fileMetadata
-      )
-    );
-    setCloudProjectLastModifiedDate(
-      isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
-    );
-  }, [storageProviderInternalName, isCloudProject, fileMetadata]);
+  React.useEffect(
+    () => {
+      if (ignoreFileMetadataChangesRef.current) return;
+      setCloudProjectId(
+        getCloudProjectFileMetadataIdentifier(
+          storageProviderInternalName,
+          fileMetadata
+        )
+      );
+      setCloudProjectLastModifiedDate(
+        isCloudProject && fileMetadata ? fileMetadata.lastModifiedDate : null
+      );
+    },
+    [storageProviderInternalName, isCloudProject, fileMetadata]
+  );
 
   // This effect is run in 2 cases:
   // - at start up to list the versions (when both cloudProjectId and
   //   cloudProjectLastModifiedDate are set at the same time)
   // - when a new save is done (cloudProjectLastModifiedDate is updated)
-  React.useEffect(() => {
-    (async () => {
+  React.useEffect(
+    () => {
+      (async () => {
+        if (freezeWhileLoadingSpecificVersionRef.current) return;
+        if (!cloudProjectId || !shouldFetchVersions) {
+          setState(emptyPaginationState);
+          return;
+        }
+        setVersionsFetchingError(null);
+        try {
+          const listing = await listVersionsOfProject(
+            getAuthorizationHeader,
+            authenticatedUserId,
+            cloudProjectId,
+            // This effect should only run when the project changes, or the user subscription.
+            // So we fetch the first page of versions.
+            { forceUri: null }
+          );
+          if (!listing) return;
+
+          setState(currentState => {
+            if (!currentState.versions) {
+              // Initial loading of versions.
+              return {
+                versions: listing.versions,
+                nextPageUri: listing.nextPageUri,
+              };
+            }
+            // From here, we're in the case where some versions were already loaded
+            // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
+            // So the versions that are fetched should not replace the whole history that
+            // the user maybe spent time to load.
+            return {
+              versions: mergeVersionsLists(
+                listing.versions,
+                currentState.versions
+              ),
+              // Do not change next page URI.
+              nextPageUri: currentState.nextPageUri,
+            };
+          });
+        } catch (error) {
+          console.error(
+            'An error occurred while fetching project versions:',
+            error
+          );
+          setVersionsFetchingError(
+            <Trans>
+              Could not load the project versions. Verify your internet
+              connection or try again later.
+            </Trans>
+          );
+        }
+      })();
+    },
+    [
+      storageProvider,
+      getAuthorizationHeader,
+      authenticatedUserId,
+      cloudProjectId,
+      shouldFetchVersions,
+      cloudProjectLastModifiedDate,
+    ]
+  );
+
+  // This effect watches the unsavedChanges instance to change the opened version status.
+  React.useEffect(
+    () => {
       if (freezeWhileLoadingSpecificVersionRef.current) return;
-      if (!cloudProjectId || !shouldFetchVersions) {
-        setState(emptyPaginationState);
-        return;
+      setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
+        if (
+          !currentCheckedOutVersionStatus ||
+          (hasUnsavedChanges &&
+            currentCheckedOutVersionStatus.status === 'unsavedChanges')
+        ) {
+          return currentCheckedOutVersionStatus;
+        }
+
+        return {
+          version: currentCheckedOutVersionStatus.version,
+          status: 'unsavedChanges',
+        };
+      });
+    },
+    [hasUnsavedChanges]
+  );
+
+  // This effect watches the isSavingProject flag to change the opened version status.
+  React.useEffect(
+    () => {
+      if (freezeWhileLoadingSpecificVersionRef.current) return;
+      setCheckedOutVersionStatus(currentCheckedOutVersionStatus => {
+        if (
+          !currentCheckedOutVersionStatus ||
+          (isSavingProject &&
+            currentCheckedOutVersionStatus.status === 'saving')
+        ) {
+          return currentCheckedOutVersionStatus;
+        }
+
+        return isSavingProject
+          ? {
+              version: currentCheckedOutVersionStatus.version,
+              status: 'saving',
+            }
+          : null;
+      });
+    },
+    [isSavingProject]
+  );
+
+  // This effect watches the project file metadata to reset the opened version
+  // if the project is closed.
+  React.useEffect(
+    () => {
+      if (!fileMetadata) {
+        setCheckedOutVersionStatus(null);
       }
+    },
+    [fileMetadata]
+  );
+
+  const onLoadMoreVersions = React.useCallback(
+    async () => {
+      if (!cloudProjectId) return;
+
       setVersionsFetchingError(null);
       try {
         const listing = await listVersionsOfProject(
           getAuthorizationHeader,
           authenticatedUserId,
           cloudProjectId,
-          // This effect should only run when the project changes, or the user subscription.
-          // So we fetch the first page of versions.
-          { forceUri: null }
+          { forceUri: state.nextPageUri }
         );
         if (!listing) return;
-
-        setState((currentState) => {
-          if (!currentState.versions) {
-            // Initial loading of versions.
-            return {
-              versions: listing.versions,
-              nextPageUri: listing.nextPageUri,
-            };
-          }
-          // From here, we're in the case where some versions were already loaded
-          // so the effect is triggered by a modification of cloudProjectLastModifiedDate.
-          // So the versions that are fetched should not replace the whole history that
-          // the user maybe spent time to load.
-          return {
-            versions: mergeVersionsLists(
-              listing.versions,
-              currentState.versions
-            ),
-            // Do not change next page URI.
-            nextPageUri: currentState.nextPageUri,
-          };
+        setState({
+          versions: [...(state.versions || []), ...listing.versions],
+          nextPageUri: listing.nextPageUri,
         });
       } catch (error) {
         console.error(
-          'An error occurred while fetching project versions:',
+          'An error occurred while fetching more project versions:',
           error
         );
         setVersionsFetchingError(
@@ -205,119 +317,39 @@ const useVersionHistory = ({
           </Trans>
         );
       }
-    })();
-  }, [
-    storageProvider,
-    getAuthorizationHeader,
-    authenticatedUserId,
-    cloudProjectId,
-    shouldFetchVersions,
-    cloudProjectLastModifiedDate,
-  ]);
-
-  // This effect watches the unsavedChanges instance to change the opened version status.
-  React.useEffect(() => {
-    if (freezeWhileLoadingSpecificVersionRef.current) return;
-    setCheckedOutVersionStatus((currentCheckedOutVersionStatus) => {
-      if (
-        !currentCheckedOutVersionStatus ||
-        (hasUnsavedChanges &&
-          currentCheckedOutVersionStatus.status === 'unsavedChanges')
-      ) {
-        return currentCheckedOutVersionStatus;
-      }
-
-      return {
-        version: currentCheckedOutVersionStatus.version,
-        status: 'unsavedChanges',
-      };
-    });
-  }, [hasUnsavedChanges]);
-
-  // This effect watches the isSavingProject flag to change the opened version status.
-  React.useEffect(() => {
-    if (freezeWhileLoadingSpecificVersionRef.current) return;
-    setCheckedOutVersionStatus((currentCheckedOutVersionStatus) => {
-      if (
-        !currentCheckedOutVersionStatus ||
-        (isSavingProject && currentCheckedOutVersionStatus.status === 'saving')
-      ) {
-        return currentCheckedOutVersionStatus;
-      }
-
-      return isSavingProject
-        ? {
-            version: currentCheckedOutVersionStatus.version,
-            status: 'saving',
-          }
-        : null;
-    });
-  }, [isSavingProject]);
-
-  // This effect watches the project file metadata to reset the opened version
-  // if the project is closed.
-  React.useEffect(() => {
-    if (!fileMetadata) {
-      setCheckedOutVersionStatus(null);
-    }
-  }, [fileMetadata]);
-
-  const onLoadMoreVersions = React.useCallback(async () => {
-    if (!cloudProjectId) return;
-
-    setVersionsFetchingError(null);
-    try {
-      const listing = await listVersionsOfProject(
-        getAuthorizationHeader,
-        authenticatedUserId,
-        cloudProjectId,
-        { forceUri: state.nextPageUri }
-      );
-      if (!listing) return;
-      setState({
-        versions: [...(state.versions || []), ...listing.versions],
-        nextPageUri: listing.nextPageUri,
-      });
-    } catch (error) {
-      console.error(
-        'An error occurred while fetching more project versions:',
-        error
-      );
-      setVersionsFetchingError(
-        <Trans>
-          Could not load the project versions. Verify your internet connection
-          or try again later.
-        </Trans>
-      );
-    }
-  }, [getAuthorizationHeader, authenticatedUserId, cloudProjectId, state]);
+    },
+    [getAuthorizationHeader, authenticatedUserId, cloudProjectId, state]
+  );
 
   const openVersionHistoryPanel = React.useCallback(() => {
     setVersionHistoryPanelOpen(true);
   }, []);
 
-  const onQuitVersionHistory = React.useCallback(async () => {
-    if (!fileMetadata || !checkedOutVersionStatus || !latestVersionId) return;
-    freezeWhileLoadingSpecificVersionRef.current = true;
-    ignoreFileMetadataChangesRef.current = true;
-    try {
-      await onOpenCloudProjectOnSpecificVersion({
-        fileMetadata,
-        versionId: latestVersionId,
-        ignoreUnsavedChanges: true,
-        openingMessage: t`Opening latest save...`,
-      });
-      setCheckedOutVersionStatus(null);
-    } finally {
-      freezeWhileLoadingSpecificVersionRef.current = false;
-      ignoreFileMetadataChangesRef.current = false;
-    }
-  }, [
-    fileMetadata,
-    onOpenCloudProjectOnSpecificVersion,
-    checkedOutVersionStatus,
-    latestVersionId,
-  ]);
+  const onQuitVersionHistory = React.useCallback(
+    async () => {
+      if (!fileMetadata || !checkedOutVersionStatus || !latestVersionId) return;
+      freezeWhileLoadingSpecificVersionRef.current = true;
+      ignoreFileMetadataChangesRef.current = true;
+      try {
+        await onOpenCloudProjectOnSpecificVersion({
+          fileMetadata,
+          versionId: latestVersionId,
+          ignoreUnsavedChanges: true,
+          openingMessage: t`Opening latest save...`,
+        });
+        setCheckedOutVersionStatus(null);
+      } finally {
+        freezeWhileLoadingSpecificVersionRef.current = false;
+        ignoreFileMetadataChangesRef.current = false;
+      }
+    },
+    [
+      fileMetadata,
+      onOpenCloudProjectOnSpecificVersion,
+      checkedOutVersionStatus,
+      latestVersionId,
+    ]
+  );
 
   const onCheckoutVersion = React.useCallback(
     async (version: ExpandedCloudProjectVersion) => {
@@ -373,10 +405,10 @@ const useVersionHistory = ({
         attributes
       );
       if (!updatedVersion) return;
-      setState((currentState) => {
+      setState(currentState => {
         if (!currentState.versions) return currentState;
         return {
-          versions: currentState.versions.map((version) =>
+          versions: currentState.versions.map(version =>
             version.id === updatedVersion.id
               ? { ...version, label: updatedVersion.label }
               : version

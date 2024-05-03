@@ -75,7 +75,7 @@ import SwitchHorizontal from '../../UI/CustomSvgIcons/SwitchHorizontal';
 import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type Props = {|
-  onLoading: (boolean) => void,
+  onLoading: boolean => void,
   project?: gdProject,
   leaderboardIdToSelectAtOpening?: string,
 |};
@@ -129,18 +129,18 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
   action: payload.name
     ? 'leaderboardNameUpdate'
     : payload.sort
-      ? 'leaderboardSortUpdate'
-      : payload.visibility
-        ? 'leaderboardVisibilityUpdate'
-        : payload.ignoreCustomPlayerNames !== undefined
-          ? 'leaderboardIgnoreCustomPlayerNamesUpdate'
-          : payload.autoPlayerNamePrefix !== undefined
-            ? 'leaderboardAutoPlayerNamePrefixUpdate'
-            : payload.primary
-              ? 'leaderboardPrimaryUpdate'
-              : payload.customizationSettings
-                ? 'leaderboardAppearanceUpdate'
-                : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
+    ? 'leaderboardSortUpdate'
+    : payload.visibility
+    ? 'leaderboardVisibilityUpdate'
+    : payload.ignoreCustomPlayerNames !== undefined
+    ? 'leaderboardIgnoreCustomPlayerNamesUpdate'
+    : payload.autoPlayerNamePrefix !== undefined
+    ? 'leaderboardAutoPlayerNamePrefixUpdate'
+    : payload.primary
+    ? 'leaderboardPrimaryUpdate'
+    : payload.customizationSettings
+    ? 'leaderboardAppearanceUpdate'
+    : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
   message: payload.name ? (
     <Trans>
       An error occurred when updating the name of the leaderboard, please close
@@ -211,8 +211,9 @@ export const LeaderboardAdmin = ({
 }: Props) => {
   const isOnline = useOnlineStatus();
   const { isMobile } = useResponsiveWindowSize();
-  const [isEditingAppearance, setIsEditingAppearance] =
-    React.useState<boolean>(false);
+  const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
+    false
+  );
   const { showConfirmation, showDeleteConfirmation } = useAlertDialog();
   const [
     displayMaxLeaderboardCountReachedWarning,
@@ -221,23 +222,33 @@ export const LeaderboardAdmin = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { limits } = authenticatedUser;
 
-  const [isEditingSortOptions, setIsEditingSortOptions] =
-    React.useState<boolean>(false);
+  const [
+    isEditingSortOptions,
+    setIsEditingSortOptions,
+  ] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
-  const [isEditingAutoPlayerNamePrefix, setIsEditingAutoPlayerNamePrefix] =
-    React.useState<boolean>(false);
-  const [isRequestPending, setIsRequestPending] =
-    React.useState<boolean>(false);
+  const [
+    isEditingAutoPlayerNamePrefix,
+    setIsEditingAutoPlayerNamePrefix,
+  ] = React.useState<boolean>(false);
+  const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
+    false
+  );
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
-  const [newAutoPlayerNamePrefix, setNewAutoPlayerNamePrefix] =
-    React.useState<string>('');
+  const [
+    newAutoPlayerNamePrefix,
+    setNewAutoPlayerNamePrefix,
+  ] = React.useState<string>('');
   const newNameTextFieldRef = React.useRef<?TextFieldInterface>(null);
-  const newAutoPlayerNamePrefixTextFieldRef =
-    React.useRef<?TextFieldInterface>(null);
+  const newAutoPlayerNamePrefixTextFieldRef = React.useRef<?TextFieldInterface>(
+    null
+  );
   const [apiError, setApiError] = React.useState<?ApiError>(null);
-  const [displayGameRegistration, setDisplayGameRegistration] =
-    React.useState<boolean>(false);
+  const [
+    displayGameRegistration,
+    setDisplayGameRegistration,
+  ] = React.useState<boolean>(false);
 
   const {
     leaderboards,
@@ -294,35 +305,39 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  const onListLeaderboards = React.useCallback(() => {
-    const fetchAndHandleError = async () => {
-      setIsRequestPending(true); // We only set the local loading state here to avoid blocking the dialog buttons on first load.
-      setApiError(null);
-      try {
-        await listLeaderboards();
-      } catch (error) {
-        const extractedStatusAndCode =
-          extractGDevelopApiErrorStatusAndCode(error);
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setDisplayGameRegistration(true);
-          return;
+  const onListLeaderboards = React.useCallback(
+    () => {
+      const fetchAndHandleError = async () => {
+        setIsRequestPending(true); // We only set the local loading state here to avoid blocking the dialog buttons on first load.
+        setApiError(null);
+        try {
+          await listLeaderboards();
+        } catch (error) {
+          const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+            error
+          );
+          if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+            setDisplayGameRegistration(true);
+            return;
+          }
+          console.error('An error occurred when fetching leaderboards', error);
+          setApiError({
+            action: 'leaderboardsFetching',
+            message: (
+              <Trans>
+                An error occurred when fetching the leaderboards, please close
+                the dialog and reopen it.
+              </Trans>
+            ),
+          });
+        } finally {
+          setIsRequestPending(false);
         }
-        console.error('An error occurred when fetching leaderboards', error);
-        setApiError({
-          action: 'leaderboardsFetching',
-          message: (
-            <Trans>
-              An error occurred when fetching the leaderboards, please close the
-              dialog and reopen it.
-            </Trans>
-          ),
-        });
-      } finally {
-        setIsRequestPending(false);
-      }
-    };
-    fetchAndHandleError();
-  }, [listLeaderboards]);
+      };
+      fetchAndHandleError();
+    },
+    [listLeaderboards]
+  );
 
   const onFetchLeaderboardEntries = async () => {
     setIsLoading(true);
@@ -396,8 +411,9 @@ export const LeaderboardAdmin = ({
       await resetLeaderboard();
     } catch (error) {
       console.error('An error occurred when resetting leaderboard', error);
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       setApiError({
         action: 'leaderboardReset',
         message:
@@ -424,7 +440,9 @@ export const LeaderboardAdmin = ({
     const translatedConfirmText = i18n._(t`delete`);
 
     const deleteAnswer = await showDeleteConfirmation({
-      title: t`Do you really want to permanently delete the leaderboard ${currentLeaderboard.name}?`,
+      title: t`Do you really want to permanently delete the leaderboard ${
+        currentLeaderboard.name
+      }?`,
       message: t`You’re about to permanently delete this leaderboard and all of its entries. This can't be undone.`,
       fieldMessage: t`To confirm, type "${translatedConfirmText}"`,
       confirmText: translatedConfirmText,
@@ -481,17 +499,23 @@ export const LeaderboardAdmin = ({
     }
   };
 
-  React.useEffect(() => {
-    if (isEditingName && newNameTextFieldRef.current) {
-      newNameTextFieldRef.current.focus();
-    }
-  }, [isEditingName]);
+  React.useEffect(
+    () => {
+      if (isEditingName && newNameTextFieldRef.current) {
+        newNameTextFieldRef.current.focus();
+      }
+    },
+    [isEditingName]
+  );
 
-  React.useEffect(() => {
-    if (leaderboards === null) {
-      onListLeaderboards();
-    }
-  }, [leaderboards, onListLeaderboards]);
+  React.useEffect(
+    () => {
+      if (leaderboards === null) {
+        onListLeaderboards();
+      }
+    },
+    [leaderboards, onListLeaderboards]
+  );
 
   React.useEffect(() => {
     if (currentLeaderboard) onFetchLeaderboardEntries();
@@ -499,16 +523,22 @@ export const LeaderboardAdmin = ({
     // eslint-disable-next-line
   }, []);
 
-  React.useEffect(() => {
-    if (!!leaderboardIdToSelectAtOpening)
-      selectLeaderboard(leaderboardIdToSelectAtOpening);
-  }, [leaderboardIdToSelectAtOpening, selectLeaderboard]);
+  React.useEffect(
+    () => {
+      if (!!leaderboardIdToSelectAtOpening)
+        selectLeaderboard(leaderboardIdToSelectAtOpening);
+    },
+    [leaderboardIdToSelectAtOpening, selectLeaderboard]
+  );
 
-  const onCopy = React.useCallback(() => {
-    if (!currentLeaderboard) return;
-    // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
-    navigator.clipboard.writeText(currentLeaderboard.id);
-  }, [currentLeaderboard]);
+  const onCopy = React.useCallback(
+    () => {
+      if (!currentLeaderboard) return;
+      // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
+      navigator.clipboard.writeText(currentLeaderboard.id);
+    },
+    [currentLeaderboard]
+  );
   if (!isOnline) {
     return (
       <CenteredError>
@@ -599,7 +629,7 @@ export const LeaderboardAdmin = ({
             value={newName}
             errorText={newNameError}
             onChange={(e, text) => setNewName(text)}
-            onKeyPress={(event) => {
+            onKeyPress={event => {
               if (shouldValidate(event) && !isRequestPending) {
                 onUpdateLeaderboard(i18n, { name: newName });
               }
@@ -839,8 +869,7 @@ export const LeaderboardAdmin = ({
         <IconButton
           onClick={async () => {
             await onUpdateLeaderboard(i18n, {
-              ignoreCustomPlayerNames:
-                !currentLeaderboard.ignoreCustomPlayerNames,
+              ignoreCustomPlayerNames: !currentLeaderboard.ignoreCustomPlayerNames,
             });
           }}
           tooltip={
@@ -868,7 +897,7 @@ export const LeaderboardAdmin = ({
             maxLength={40}
             value={newAutoPlayerNamePrefix}
             onChange={(e, text) => setNewAutoPlayerNamePrefix(text)}
-            onKeyPress={(event) => {
+            onKeyPress={event => {
               if (shouldValidate(event) && !isRequestPending) {
                 onUpdateLeaderboard(i18n, {
                   autoPlayerNamePrefix: newAutoPlayerNamePrefix,
@@ -998,9 +1027,9 @@ export const LeaderboardAdmin = ({
                   t`Users can chose to see only players' best entries or not.`
                 )
               : currentLeaderboard.playerUnicityDisplayChoice ===
-                  'PREFER_UNIQUE'
-                ? i18n._(t`Only player's best entries are displayed.`)
-                : i18n._(t`All entries are displayed.`)
+                'PREFER_UNIQUE'
+              ? i18n._(t`Only player's best entries are displayed.`)
+              : i18n._(t`All entries are displayed.`)
           }
         >
           <SelectOption
@@ -1074,7 +1103,7 @@ export const LeaderboardAdmin = ({
                             selectLeaderboard(leaderboardId);
                           }}
                         >
-                          {leaderboards.map((leaderboard) => (
+                          {leaderboards.map(leaderboard => (
                             <SelectOption
                               key={leaderboard.id}
                               value={leaderboard.id}
@@ -1217,7 +1246,7 @@ export const LeaderboardAdmin = ({
                         ? currentLeaderboard.customizationSettings
                         : null
                     }
-                    onDeleteEntry={(entry) => onDeleteEntry(i18n, entry)}
+                    onDeleteEntry={entry => onDeleteEntry(i18n, entry)}
                     isLoading={isRequestPending || isEditingName}
                     navigation={{
                       goToNextPage,

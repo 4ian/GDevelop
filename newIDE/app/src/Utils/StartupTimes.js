@@ -21,7 +21,7 @@ if (!GD_STARTUP_TIMES) {
 export const getStartupTimesSummary = (): Summary => {
   let previousStep = ['<init>', 0];
 
-  let steps = GD_STARTUP_TIMES.map((step) => {
+  let steps = GD_STARTUP_TIMES.map(step => {
     const stepSummary = {
       stepName: step[0],
       time: step[1],

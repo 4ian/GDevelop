@@ -40,7 +40,7 @@ export const fetchRelativeResourcesToFullUrls = async ({
   }
 
   let fetchedResourcesCount = 0;
-  const resourcesToFetch = allResourceNames.filter((resourceName) => {
+  const resourcesToFetch = allResourceNames.filter(resourceName => {
     const resource = resourcesManager.getResource(resourceName);
     const isResourceAnUrl = isURL(resource.getFile());
 
@@ -50,7 +50,7 @@ export const fetchRelativeResourcesToFullUrls = async ({
 
   await PromisePool.withConcurrency(20)
     .for(resourcesToFetch)
-    .process(async (resourceName) => {
+    .process(async resourceName => {
       const resource = resourcesManager.getResource(resourceName);
 
       try {

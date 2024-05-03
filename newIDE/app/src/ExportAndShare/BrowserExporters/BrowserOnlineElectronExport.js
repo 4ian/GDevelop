@@ -55,7 +55,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput,
+  CompressionOutput
 > = {
   name: exportPipelineName,
   onlineBuildType: 'electron-build',
@@ -77,7 +77,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: (props) => <SetupExportHeader {...props} />,
+  renderHeader: props => <SetupExportHeader {...props} />,
 
   renderExportFlow: (props: ExportFlowProps) => (
     <ExportFlow {...props} exportPipelineName={exportPipelineName} />
@@ -138,7 +138,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then((blobFiles) => ({
+    }).then(blobFiles => ({
       blobFiles,
       textFiles,
     }));
@@ -160,7 +160,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then((uploadOptions) => {
+    return getBuildFileUploadOptions().then(uploadOptions => {
       return uploadBlobFile(
         blobFile,
         uploadOptions,

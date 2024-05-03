@@ -46,14 +46,12 @@ const getGamesToDisplay = ({
     const searchResults = searchClient.search(
       getFuseSearchQueryForSimpleArray(searchText)
     );
-    return searchResults.map((result) => result.item);
+    return searchResults.map(result => result.item);
   }
   const projectUuid = project ? project.getProjectUuid() : null;
-  const thisGame = games.find(
-    (game) => !!projectUuid && game.id === projectUuid
-  );
+  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
   const orderedGames = thisGame
-    ? [thisGame, ...games.filter((game) => game.id !== thisGame.id)]
+    ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
     : games;
   return orderedGames.slice(
     currentPage * pageSize,
@@ -69,8 +67,11 @@ type Props = {|
 |};
 
 const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
-  const { routeArguments, addRouteArguments, removeRouteArguments } =
-    React.useContext(RouterContext);
+  const {
+    routeArguments,
+    addRouteArguments,
+    removeRouteArguments,
+  } = React.useContext(RouterContext);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -98,86 +99,93 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
     })
   );
 
-  const onRegisterGame = React.useCallback(async () => {
-    if (!profile || !project) return;
+  const onRegisterGame = React.useCallback(
+    async () => {
+      if (!profile || !project) return;
 
-    const { id } = profile;
-    try {
-      setIsGameRegistering(true);
-      await registerGame(getAuthorizationHeader, id, {
-        gameId: project.getProjectUuid(),
-        authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitled game',
-        templateSlug: project.getTemplateSlug(),
-      });
-      await onRefreshGames();
-    } catch (error) {
-      console.error('Unable to register the game.', error);
-      const extractedStatusAndCode =
-        extractGDevelopApiErrorStatusAndCode(error);
-      if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-        await showAlert({
-          title: t`Game already registered`,
-          message: t`The project currently opened is registered online but you don't have
+      const { id } = profile;
+      try {
+        setIsGameRegistering(true);
+        await registerGame(getAuthorizationHeader, id, {
+          gameId: project.getProjectUuid(),
+          authorName: project.getAuthor() || 'Unspecified publisher',
+          gameName: project.getName() || 'Untitled game',
+          templateSlug: project.getTemplateSlug(),
+        });
+        await onRefreshGames();
+      } catch (error) {
+        console.error('Unable to register the game.', error);
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+          await showAlert({
+            title: t`Game already registered`,
+            message: t`The project currently opened is registered online but you don't have
           access to it. Ask the original owner of the game to share it with you
           to be able to manage it.`,
-        });
-      } else {
-        await showAlert({
-          title: t`Unable to register the game`,
-          message: t`An error happened while registering the game. Verify your internet connection
-          or retry later.`,
-        });
-      }
-    } finally {
-      setIsGameRegistering(false);
-    }
-  }, [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]);
-
-  React.useEffect(() => {
-    const loadInitialGame = async () => {
-      // When games are loaded and we have an initial game id, try to open it.
-      const initialGameId = routeArguments['game-id'];
-      if (games && initialGameId) {
-        const game = games.find((game) => game.id === initialGameId);
-        removeRouteArguments(['game-id']);
-        if (game) {
-          onOpenGame(game);
+          });
         } else {
-          // If the game is not in the list, then either
-          // - allow to register it, if it's the current project.
-          // - suggest to open the file before continuing, if it's not the current project.
-          if (project && project.getProjectUuid() === initialGameId) {
-            const answer = await showConfirmation({
-              title: t`Game not found`,
-              message: t`This project is not registered online. Register it now
-              to get access to leaderboards, player accounts, analytics and more!`,
-              confirmButtonLabel: t`Register`,
-            });
-            if (!answer) return;
+          await showAlert({
+            title: t`Unable to register the game`,
+            message: t`An error happened while registering the game. Verify your internet connection
+          or retry later.`,
+          });
+        }
+      } finally {
+        setIsGameRegistering(false);
+      }
+    },
+    [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]
+  );
 
-            await onRegisterGame();
+  React.useEffect(
+    () => {
+      const loadInitialGame = async () => {
+        // When games are loaded and we have an initial game id, try to open it.
+        const initialGameId = routeArguments['game-id'];
+        if (games && initialGameId) {
+          const game = games.find(game => game.id === initialGameId);
+          removeRouteArguments(['game-id']);
+          if (game) {
+            onOpenGame(game);
           } else {
-            await showAlert({
-              title: t`Game not found`,
-              message: t`The game you're trying to open is not registered online. Open the project
+            // If the game is not in the list, then either
+            // - allow to register it, if it's the current project.
+            // - suggest to open the file before continuing, if it's not the current project.
+            if (project && project.getProjectUuid() === initialGameId) {
+              const answer = await showConfirmation({
+                title: t`Game not found`,
+                message: t`This project is not registered online. Register it now
+              to get access to leaderboards, player accounts, analytics and more!`,
+                confirmButtonLabel: t`Register`,
+              });
+              if (!answer) return;
+
+              await onRegisterGame();
+            } else {
+              await showAlert({
+                title: t`Game not found`,
+                message: t`The game you're trying to open is not registered online. Open the project
               file, then register it before continuing.`,
-            });
+              });
+            }
           }
         }
-      }
-    };
-    loadInitialGame();
-  }, [
-    games,
-    routeArguments,
-    removeRouteArguments,
-    onRegisterGame,
-    showConfirmation,
-    showAlert,
-    project,
-    onOpenGame,
-  ]);
+      };
+      loadInitialGame();
+    },
+    [
+      games,
+      routeArguments,
+      removeRouteArguments,
+      onRegisterGame,
+      showConfirmation,
+      showAlert,
+      project,
+      onOpenGame,
+    ]
+  );
 
   const getGamesToDisplayDebounced = useDebounce(
     () => {
@@ -231,7 +239,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
         </Column>
         <IconButton
           tooltip={t`Previous page`}
-          onClick={() => setCurrentPage((currentPage) => currentPage - 1)}
+          onClick={() => setCurrentPage(currentPage => currentPage - 1)}
           disabled={!!searchText || currentPage === 0}
         >
           <ChevronArrowLeft />
@@ -241,7 +249,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
         </Text>
         <IconButton
           tooltip={t`Next page`}
-          onClick={() => setCurrentPage((currentPage) => currentPage + 1)}
+          onClick={() => setCurrentPage(currentPage => currentPage + 1)}
           disabled={
             !!searchText || (currentPage + 1) * pageSize >= games.length
           }
@@ -251,7 +259,7 @@ const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
       </Line>
 
       {displayedGames.length > 0 ? (
-        displayedGames.map((game) => (
+        displayedGames.map(game => (
           <GameCard
             key={game.id}
             isCurrentGame={!!projectUuid && game.id === projectUuid}

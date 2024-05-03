@@ -40,39 +40,42 @@ const CreditsUsageDialog = ({
     onRefreshLimits,
   } = React.useContext(AuthenticatedUserContext);
 
-  const onPurchase = React.useCallback(async () => {
-    setIsPurchasing(true);
-    try {
-      await onConfirm();
-      // We assume that the purchase was successful, so we refresh the purchases and limits,
-      // no need to wait for those to complete as they are not critical to the purchase.
-      onRefreshGameTemplatePurchases();
-      onRefreshAssetPackPurchases();
-      onPurchaseSuccessful();
-      onRefreshLimits();
-      if (closeAutomaticallyAfterSuccess) onClose();
+  const onPurchase = React.useCallback(
+    async () => {
+      setIsPurchasing(true);
+      try {
+        await onConfirm();
+        // We assume that the purchase was successful, so we refresh the purchases and limits,
+        // no need to wait for those to complete as they are not critical to the purchase.
+        onRefreshGameTemplatePurchases();
+        onRefreshAssetPackPurchases();
+        onPurchaseSuccessful();
+        onRefreshLimits();
+        if (closeAutomaticallyAfterSuccess) onClose();
 
-      // Show a success message to the user.
-      setisPurchaseSuccessful(true);
-    } catch (error) {
-      console.error('An error happened while purchasing a product:', error);
-      await showAlert({
-        title: t`Could not purchase this product`,
-        message: t`An error happened while purchasing this product. Verify your internet connection or try again later.`,
-      });
-    } finally {
-      setIsPurchasing(false);
-    }
-  }, [
-    onConfirm,
-    onRefreshGameTemplatePurchases,
-    onRefreshAssetPackPurchases,
-    onPurchaseSuccessful,
-    onRefreshLimits,
-    showAlert,
-    closeAutomaticallyAfterSuccess,
-    onClose,
-  ]);
+        // Show a success message to the user.
+        setisPurchaseSuccessful(true);
+      } catch (error) {
+        console.error('An error happened while purchasing a product:', error);
+        await showAlert({
+          title: t`Could not purchase this product`,
+          message: t`An error happened while purchasing this product. Verify your internet connection or try again later.`,
+        });
+      } finally {
+        setIsPurchasing(false);
+      }
+    },
+    [
+      onConfirm,
+      onRefreshGameTemplatePurchases,
+      onRefreshAssetPackPurchases,
+      onPurchaseSuccessful,
+      onRefreshLimits,
+      showAlert,
+      closeAutomaticallyAfterSuccess,
+      onClose,
+    ]
+  );
 
   return (
     <I18n>

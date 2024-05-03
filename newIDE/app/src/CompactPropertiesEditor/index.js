@@ -35,10 +35,10 @@ export type Instances = Array<Instance>;
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
   name: string,
-  getLabel?: (Instance) => string,
-  getDescription?: (Instance) => string,
+  getLabel?: Instance => string,
+  getDescription?: Instance => string,
   hideLabel?: boolean,
-  getExtraDescription?: (Instance) => string,
+  getExtraDescription?: Instance => string,
   disabled?: (instances: Array<gdInitialInstance>) => boolean,
   onEditButtonBuildMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   onEditButtonClick?: () => void,
@@ -48,42 +48,42 @@ export type ValueFieldCommonProperties = {|
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
-      getValue: (Instance) => number,
+      getValue: Instance => number,
       setValue: (instance: Instance, newValue: number) => void,
       // TODO: support this attribute.
-      getEndAdornment?: (Instance) => {|
+      getEndAdornment?: Instance => {|
         label: string,
         tooltipContent: React.Node,
       |},
-      getEndAdornmentIcon?: (Instance) => ?(className: string) => React.Node,
-      onClickEndAdornment?: (Instance) => void,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
+      onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'string',
-      getValue: (Instance) => string,
+      getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<{|
         value: string,
         label: string,
         labelIsUserDefined?: boolean,
       |}>,
-      getEndAdornmentIcon?: (Instance) => ?(className: string) => React.Node,
-      onClickEndAdornment?: (Instance) => void,
+      getEndAdornmentIcon?: Instance => ?(className: string) => React.Node,
+      onClickEndAdornment?: Instance => void,
       renderLeftIcon?: (className?: string) => React.Node,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'boolean',
-      getValue: (Instance) => boolean,
+      getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'enumIcon',
       renderIcon: (value: any) => React.Node,
-      getValue: (Instance) => any,
+      getValue: Instance => any,
       isHighlighted: (value: any) => boolean,
       setValue: (instance: Instance, newValue: any) => void,
       getNextValue: (currentValue: any) => any,
@@ -91,13 +91,13 @@ export type PrimitiveValueField =
     |}
   | {|
       valueType: 'color',
-      getValue: (Instance) => string,
+      getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'textarea',
-      getValue: (Instance) => string,
+      getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |};
@@ -107,7 +107,7 @@ type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
   fallbackResourceKind?: ResourceKind,
-  getValue: (Instance) => string,
+  getValue: Instance => string,
   setValue: (instance: Instance, newValue: string) => void,
   renderLeftIcon?: (className?: string) => React.Node,
   ...ValueFieldCommonProperties,
@@ -117,7 +117,7 @@ type Title = {|
   name: string,
   title: string,
   renderLeftIcon: (className?: string) => React.Node,
-  getValue?: (Instance) => string,
+  getValue?: Instance => string,
   nonFieldType: 'title',
   defaultValue?: string,
 |};
@@ -138,7 +138,7 @@ type VerticalCenterWithBar = {|
 type ActionButton = {|
   label: string,
   disabled: 'onValuesDifferent',
-  getValue: (Instance) => string,
+  getValue: Instance => string,
   nonFieldType: 'button',
   getIcon?: ({| fontSize: string |}) => React.Node,
   onClick: (instance: Instance) => void,
@@ -168,7 +168,7 @@ export type Field =
 export type Schema = Array<Field>;
 
 type Props = {|
-  onInstancesModified?: (Instances) => void,
+  onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
@@ -403,11 +403,11 @@ const CompactPropertiesEditor = ({
             instances,
             field,
           }),
-          onChange: (newValue) => {
+          onChange: newValue => {
             // If the value is not a number, the user is probably still typing, adding a dot or a comma.
             // So don't update the value, it will be reverted if they leave the field.
             if (isNaN(newValue)) return;
-            instances.forEach((i) => setValue(i, newValue));
+            instances.forEach(i => setValue(i, newValue));
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
@@ -415,7 +415,7 @@ const CompactPropertiesEditor = ({
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
-            instances.forEach((i) => onClickEndAdornment(i));
+            instances.forEach(i => onClickEndAdornment(i));
             _onInstancesModified(instances);
           },
         };
@@ -491,8 +491,8 @@ const CompactPropertiesEditor = ({
             size="small"
             tooltip={getFieldLabel({ instances, field })}
             selected={field.isHighlighted(value)}
-            onClick={(event) => {
-              instances.forEach((i) =>
+            onClick={event => {
+              instances.forEach(i =>
                 field.setValue(i, field.getNextValue(value))
               );
               _onInstancesModified(instances);
@@ -538,8 +538,8 @@ const CompactPropertiesEditor = ({
             field,
             defaultValue: '(Multiple values)',
           }),
-          onChange: (newValue) => {
-            instances.forEach((i) => setValue(i, newValue || ''));
+          onChange: newValue => {
+            instances.forEach(i => setValue(i, newValue || ''));
             _onInstancesModified(instances);
           },
           disabled: getDisabled({ instances, field }),
@@ -547,7 +547,7 @@ const CompactPropertiesEditor = ({
             getFieldEndAdornmentIcon({ instances, field }) || undefined,
           onClickEndAdornment: () => {
             if (!onClickEndAdornment) return;
-            instances.forEach((i) => onClickEndAdornment(i));
+            instances.forEach(i => onClickEndAdornment(i));
             _onInstancesModified(instances);
           },
         };
@@ -601,7 +601,7 @@ const CompactPropertiesEditor = ({
             // floatingLabelText={getFieldLabel({ instances, field })}
             // helperMarkdownText={getFieldDescription(field)}
             onChange={(newValue: string) => {
-              instances.forEach((i) => setValue(i, parseFloat(newValue) || 0));
+              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
             disabled={field.disabled}
@@ -623,7 +623,7 @@ const CompactPropertiesEditor = ({
             // floatingLabelText={getFieldLabel({ instances, field })}
             // helperMarkdownText={getFieldDescription(field)}
             onChange={(newValue: string) => {
-              instances.forEach((i) => setValue(i, newValue || ''));
+              instances.forEach(i => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
             disabled={getDisabled({ instances, field })}
@@ -697,8 +697,8 @@ const CompactPropertiesEditor = ({
           field,
           defaultValue: '(Multiple values)',
         })}
-        onChange={(newValue) => {
-          instances.forEach((i) => setValue(i, newValue));
+        onChange={newValue => {
+          instances.forEach(i => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
         floatingLabelText={getFieldLabel({ instances, field })}
@@ -815,7 +815,7 @@ const CompactPropertiesEditor = ({
   }, []);
 
   return renderContainer(
-    schema.map((field) => {
+    schema.map(field => {
       if (!!field.nonFieldType) {
         if (field.nonFieldType === 'title') {
           return renderTitle(field);

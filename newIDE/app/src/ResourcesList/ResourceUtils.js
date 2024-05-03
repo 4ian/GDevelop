@@ -71,7 +71,7 @@ export const copyAllToProjectFolder = (
   const projectPath = path.dirname(project.getProjectFile());
 
   return Promise.all(
-    resourcePaths.map((resourcePath) => {
+    resourcePaths.map(resourcePath => {
       if (isPathInProjectFolder(project, resourcePath)) {
         newToOldFilePaths.set(resourcePath, resourcePath);
 
@@ -87,7 +87,7 @@ export const copyAllToProjectFolder = (
 
       const newFileNameWithoutExtension = newNameGenerator(
         fileNameWithoutExtension,
-        (tentativeFileName) => {
+        tentativeFileName => {
           const tentativePath =
             path.join(projectPath, tentativeFileName) + fileExtension;
           return fs.existsSync(tentativePath);
@@ -99,8 +99,8 @@ export const copyAllToProjectFolder = (
         newFileNameWithoutExtension + fileExtension
       );
 
-      return new Promise((resolve) => {
-        fs.copyFile(resourcePath, resourceNewPath, (err) => {
+      return new Promise(resolve => {
+        fs.copyFile(resourcePath, resourceNewPath, err => {
           if (err) {
             newToOldFilePaths.set(resourcePath, resourcePath);
 

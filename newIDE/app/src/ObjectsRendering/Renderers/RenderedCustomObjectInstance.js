@@ -24,16 +24,14 @@ const gd: libGDevelop = global.gd;
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
-export default class RenderedCustomObjectInstance
-  extends Rendered3DInstance
-  implements LayoutedParent<RenderedInstance | Rendered3DInstance>
-{
+export default class RenderedCustomObjectInstance extends Rendered3DInstance
+  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
   childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
   childrenRenderedInstanceByNames: Map<
     string,
-    RenderedInstance | Rendered3DInstance,
+    RenderedInstance | Rendered3DInstance
   >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
@@ -122,7 +120,7 @@ export default class RenderedCustomObjectInstance
     this.childrenRenderedInstances = [];
     this.childrenRenderedInstanceByNames = new Map<
       string,
-      RenderedInstance | Rendered3DInstance,
+      RenderedInstance | Rendered3DInstance
     >();
 
     if (!eventBasedObject) {
@@ -134,7 +132,7 @@ export default class RenderedCustomObjectInstance
       customObjectConfiguration
     );
 
-    mapReverseFor(0, eventBasedObject.getObjectsCount(), (i) => {
+    mapReverseFor(0, eventBasedObject.getObjectsCount(), i => {
       const childObject = eventBasedObject.getObjectAt(i);
 
       const childLayout = childLayouts.get(childObject.getName()) || {
@@ -144,10 +142,9 @@ export default class RenderedCustomObjectInstance
         depthLayout: {},
       };
 
-      const childObjectConfiguration =
-        customObjectConfiguration.getChildObjectConfiguration(
-          childObject.getName()
-        );
+      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+        childObject.getName()
+      );
       const childInstance = new ChildInstance();
       const renderer = ObjectsRenderingService.createNewInstanceRenderer(
         project,
@@ -200,8 +197,9 @@ export default class RenderedCustomObjectInstance
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
   ) {
-    const customObjectConfiguration =
-      gd.asCustomObjectConfiguration(objectConfiguration);
+    const customObjectConfiguration = gd.asCustomObjectConfiguration(
+      objectConfiguration
+    );
 
     const eventBasedObject = project.hasEventsBasedObject(
       customObjectConfiguration.getType()
@@ -217,7 +215,10 @@ export default class RenderedCustomObjectInstance
       if (
         animations.getAnimationsCount() > 0 &&
         animations.getAnimation(0).getDirectionsCount() > 0 &&
-        animations.getAnimation(0).getDirection(0).getSpritesCount() > 0
+        animations
+          .getAnimation(0)
+          .getDirection(0)
+          .getSpritesCount() > 0
       ) {
         const imageName = animations
           .getAnimation(0)
@@ -231,10 +232,9 @@ export default class RenderedCustomObjectInstance
 
     for (let i = 0; i < eventBasedObject.getObjectsCount(); i++) {
       const childObject = eventBasedObject.getObjectAt(i);
-      const childObjectConfiguration =
-        customObjectConfiguration.getChildObjectConfiguration(
-          childObject.getName()
-        );
+      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+        childObject.getName()
+      );
       const childType = childObjectConfiguration.getType();
       if (
         childType === 'Sprite' ||

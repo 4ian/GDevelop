@@ -9,7 +9,7 @@ export default class RefGetter extends Component {
 
   render() {
     return React.cloneElement(this.props.children, {
-      ref: (ref) => (this._ref = ref),
+      ref: ref => (this._ref = ref),
     });
   }
 }

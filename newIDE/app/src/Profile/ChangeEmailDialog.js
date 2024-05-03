@@ -89,7 +89,7 @@ const ChangeEmailDialog = ({
               if (!isEmailValid) setIsEmailValid(true);
               setEmail(value);
             }}
-            onBlur={(event) => {
+            onBlur={event => {
               const trimmedEmail = event.currentTarget.value.trim();
               setEmail(trimmedEmail);
               setIsEmailValid(emailRegex.test(trimmedEmail));

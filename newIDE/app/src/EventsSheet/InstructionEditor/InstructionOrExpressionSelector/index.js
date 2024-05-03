@@ -54,7 +54,7 @@ type Props<T> = {|
 |};
 
 const InstructionOrExpressionSelector = <
-  T: EnumeratedInstructionOrExpressionMetadata,
+  T: EnumeratedInstructionOrExpressionMetadata
 >({
   focusOnMount,
   instructionsInfo,
@@ -98,7 +98,7 @@ const InstructionOrExpressionSelector = <
               'fullGroupName',
             ])
           )
-          .map((result) => ({
+          .map(result => ({
             item: result.item,
             matches: tuneMatches(result, searchText),
           }))
@@ -161,8 +161,7 @@ const InstructionOrExpressionSelector = <
                   matches,
                 }) =>
                   renderInstructionOrExpressionListItem({
-                    instructionOrExpressionMetadata:
-                      enumeratedInstructionOrExpressionMetadata,
+                    instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
                     id: getInstructionOrExpressionIdentifier(
                       enumeratedInstructionOrExpressionMetadata
                     ),

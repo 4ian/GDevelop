@@ -24,14 +24,14 @@ type Props<Item> = {|
   addNewItemLabel?: React.Node | string,
   addNewItemId?: string,
   onRename: (Item, string) => void,
-  renderItemLabel?: (Item) => React.Node,
-  getItemName: (Item) => string,
-  getItemThumbnail?: (Item) => string,
+  renderItemLabel?: Item => React.Node,
+  getItemName: Item => string,
+  getItemThumbnail?: Item => string,
   getItemId?: (Item, index: number) => string,
   getItemData?: (Item, index: number) => HTMLDataset,
-  isItemBold?: (Item) => boolean,
+  isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
-  onEditItem?: (Item) => void,
+  onEditItem?: Item => void,
   renamedItem: ?Item,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
   buildMenuTemplate: (Item, index: number) => any,
@@ -42,7 +42,7 @@ type Props<Item> = {|
 |};
 
 export default class SortableVirtualizedItemList<Item> extends React.Component<
-  Props<Item>,
+  Props<Item>
 > {
   _list: ?List;
   DragSourceAndDropTarget = makeDragSourceAndDropTarget<Item>(
@@ -55,7 +55,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
   scrollToItem(item: Item) {
     const index = this.props.fullList.findIndex(
-      (listItem) =>
+      listItem =>
         this.props.getItemName(listItem) === this.props.getItemName(item)
     );
     if (this._list && index !== -1) {
@@ -82,7 +82,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     const itemName = getItemName(item);
 
     const selected =
-      selectedItems.findIndex((item) => getItemName(item) === itemName) !== -1;
+      selectedItems.findIndex(item => getItemName(item) === itemName) !== -1;
 
     return (
       <ItemRow
@@ -94,7 +94,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
           renderItemLabel ? () => renderItemLabel(item) : undefined
         }
         isBold={isItemBold ? isItemBold(item) : false}
-        onRename={(newName) => this.props.onRename(item, newName)}
+        onRename={newName => this.props.onRename(item, newName)}
         editingName={nameBeingEdited}
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
@@ -136,9 +136,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       <ResponsiveWindowMeasurer>
         {({ isMobile }) => (
           <ScreenTypeMeasurer>
-            {(screenType) => (
+            {screenType => (
               <List
-                ref={(list) => (this._list = list)}
+                ref={list => (this._list = list)}
                 // We override this function to avoid a bug in react-virtualized
                 // where the overscanCellsCount is not taken into account after a scroll
                 // see https://github.com/bvaughn/react-virtualized/issues/1582#issuecomment-785073746
@@ -189,7 +189,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                   const nameBeingEdited = renamedItem === item;
                   const isSelected =
                     selectedItems.findIndex(
-                      (selectedItem) =>
+                      selectedItem =>
                         getItemName(selectedItem) === getItemName(item)
                     ) !== -1;
                   // If on a touch screen, we only allow dragging if the item is selected.

@@ -22,7 +22,7 @@ const styles = {
 // We create the style outside of this component to avoid it
 // being re-created at each render.
 export const useStylesForArrowButtons = () =>
-  makeStyles((theme) =>
+  makeStyles(theme =>
     createStyles({
       root: {
         '&:hover': {

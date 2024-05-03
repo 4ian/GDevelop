@@ -45,20 +45,24 @@ const useResourcesChangedWatcher = ({ project, callback }: Props) => {
     [project]
   );
 
-  const triggerResourcesHaveChanged = React.useCallback(() => {
-    const projectCallbacks = getProjectCallbacks(project);
-    if (!projectCallbacks) return;
-    Object.keys(projectCallbacks).forEach((callbackId) => {
-      try {
-        projectCallbacks[callbackId]();
-      } catch (error) {}
-    });
-  }, [project]);
+  const triggerResourcesHaveChanged = React.useCallback(
+    () => {
+      const projectCallbacks = getProjectCallbacks(project);
+      if (!projectCallbacks) return;
+      Object.keys(projectCallbacks).forEach(callbackId => {
+        try {
+          projectCallbacks[callbackId]();
+        } catch (error) {}
+      });
+    },
+    [project]
+  );
 
   React.useEffect(
     () => {
-      const resourcesChangedCallbackId =
-        registerOnResourcesChangedCallback(callback);
+      const resourcesChangedCallbackId = registerOnResourcesChangedCallback(
+        callback
+      );
       return () => {
         unregisterOnResourcesChangedCallback(resourcesChangedCallbackId);
       };

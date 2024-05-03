@@ -49,19 +49,16 @@ export const importExtension = async (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject
 ): Promise<boolean> => {
-  const eventsFunctionsExtensionOpener =
-    eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
+  const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
   if (!eventsFunctionsExtensionOpener) return false;
 
   try {
-    const pathOrUrl =
-      await eventsFunctionsExtensionOpener.chooseEventsFunctionExtensionFile();
+    const pathOrUrl = await eventsFunctionsExtensionOpener.chooseEventsFunctionExtensionFile();
     if (!pathOrUrl) return false;
 
-    const serializedExtension =
-      await eventsFunctionsExtensionOpener.readEventsFunctionExtensionFile(
-        pathOrUrl
-      );
+    const serializedExtension = await eventsFunctionsExtensionOpener.readEventsFunctionExtensionFile(
+      pathOrUrl
+    );
 
     if (project.hasEventsFunctionsExtensionNamed(serializedExtension.name)) {
       const answer = Window.showConfirmDialog(

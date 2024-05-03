@@ -20,9 +20,9 @@ const styles = {
 };
 
 export type SceneTreeViewItemCallbacks = {|
-  onDeleteLayout: (gdLayout) => void,
+  onDeleteLayout: gdLayout => void,
   onRenameLayout: (string, string) => void,
-  onOpenLayout: (string) => void,
+  onOpenLayout: string => void,
 |};
 
 export type SceneTreeViewItemCommonProps = {|
@@ -224,7 +224,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
     if (!name || !copiedScene) return;
 
     const project = this.props.project;
-    const newName = newNameGenerator(name, (name) =>
+    const newName = newNameGenerator(name, name =>
       project.hasLayoutNamed(name)
     );
 
@@ -241,7 +241,7 @@ export class SceneTreeViewItemContent implements TreeViewItemContent {
 
   _duplicate(): void {
     const { project } = this.props;
-    const newName = newNameGenerator(this.scene.getName(), (name) =>
+    const newName = newNameGenerator(this.scene.getName(), name =>
       project.hasLayoutNamed(name)
     );
 

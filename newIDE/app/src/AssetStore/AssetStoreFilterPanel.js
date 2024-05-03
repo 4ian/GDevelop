@@ -52,7 +52,7 @@ const MultipleChoiceFilter = ({
           </AccordionHeader>
           <AccordionBody>
             <ColumnStackLayout>
-              {choices.map((tag) => (
+              {choices.map(tag => (
                 <InlineCheckbox
                   key={tag.value}
                   label={i18n._(tag.label)}
@@ -88,7 +88,7 @@ const SetFilter = ({
       filterKey={filterKey}
       title={title}
       choices={choices}
-      isChoiceChecked={(choice) => values.has(choice)}
+      isChoiceChecked={choice => values.has(choice)}
       setChoiceChecked={(choice, checked) => {
         if (checked) {
           values.add(choice);
@@ -106,7 +106,7 @@ type TagFilterProps = {|
   title: ?React.Node,
   choices: Choice[],
   searchFilter: TagAssetStoreSearchFilter,
-  setSearchFilter: (TagAssetStoreSearchFilter) => void,
+  setSearchFilter: TagAssetStoreSearchFilter => void,
   onFilterChange: () => void,
 |};
 
@@ -124,7 +124,7 @@ const TagFilter = ({
       title={title}
       choices={choices}
       values={searchFilter.tags}
-      setValues={(values) => {
+      setValues={values => {
         setSearchFilter(new TagAssetStoreSearchFilter(values));
         onFilterChange();
       }}
@@ -138,7 +138,7 @@ type RangeFilterProps = {|
   min: number,
   max: number,
   step: number,
-  scale: (number) => number,
+  scale: number => number,
   range: [number, number],
   setRange: ([number, number]) => void,
 |};
@@ -171,7 +171,7 @@ const RangeFilter = ({
                   scale={scale}
                   marks={true}
                   valueLabelDisplay="auto"
-                  onChange={(newValue) => setRange(newValue)}
+                  onChange={newValue => setRange(newValue)}
                 />
               </Line>
             </Column>
@@ -228,9 +228,12 @@ export const AssetStoreFilterPanel = () => {
     shopNavigationState,
   } = React.useContext(AssetStoreContext);
   const { receivedAssetPacks } = React.useContext(AuthenticatedUserContext);
-  const onChoiceChange = React.useCallback(() => {
-    shopNavigationState.openSearchResultPage();
-  }, [shopNavigationState]);
+  const onChoiceChange = React.useCallback(
+    () => {
+      shopNavigationState.openSearchResultPage();
+    },
+    [shopNavigationState]
+  );
   return (
     <Column noMargin>
       <MultipleChoiceFilter
@@ -241,7 +244,7 @@ export const AssetStoreFilterPanel = () => {
           { label: t`Premium`, value: 'premium' },
           { label: t`Owned`, value: 'owned' },
         ]}
-        isChoiceChecked={(choice) =>
+        isChoiceChecked={choice =>
           (choice === 'free' && assetPackFiltersState.typeFilter.isFree) ||
           (choice === 'premium' &&
             assetPackFiltersState.typeFilter.isPremium) ||
@@ -271,7 +274,7 @@ export const AssetStoreFilterPanel = () => {
           { label: t`Multiple frames`, value: 'multiple-frames' },
           { label: t`Multiple states`, value: 'multiple-states' },
         ]}
-        isChoiceChecked={(choice) =>
+        isChoiceChecked={choice =>
           (choice === 'multiple-frames' &&
             assetFiltersState.animatedFilter.mustBeAnimated) ||
           (choice === 'multiple-states' &&
@@ -314,12 +317,12 @@ export const AssetStoreFilterPanel = () => {
         min={Math.log2(DimensionAssetStoreSearchFilter.boundMin)}
         max={Math.log2(DimensionAssetStoreSearchFilter.boundMax)}
         step={0.5}
-        scale={(x) => Math.round(2 ** x)}
+        scale={x => Math.round(2 ** x)}
         range={[
           Math.log2(assetFiltersState.dimensionFilter.dimensionMin),
           Math.log2(assetFiltersState.dimensionFilter.dimensionMax),
         ]}
-        setRange={(range) => {
+        setRange={range => {
           assetFiltersState.setDimensionFilter(
             new DimensionAssetStoreSearchFilter(2 ** range[0], 2 ** range[1])
           );
@@ -336,7 +339,7 @@ export const AssetStoreFilterPanel = () => {
           { label: t`3D model`, value: 'Scene3D::Model3DObject' },
         ]}
         values={assetFiltersState.objectTypeFilter.objectTypes}
-        setValues={(values) => {
+        setValues={values => {
           assetFiltersState.setObjectTypeFilter(
             new ObjectTypeAssetStoreSearchFilter(values)
           );
@@ -347,7 +350,7 @@ export const AssetStoreFilterPanel = () => {
         filterKey="Color"
         title={<Trans>Color</Trans>}
         color={assetFiltersState.colorFilter.color}
-        setColor={(color) => {
+        setColor={color => {
           assetFiltersState.setColorFilter(
             new ColorAssetStoreSearchFilter(color)
           );
@@ -363,7 +366,7 @@ export const AssetStoreFilterPanel = () => {
             value: 'without-attribution',
           },
         ]}
-        isChoiceChecked={(choice) =>
+        isChoiceChecked={choice =>
           assetFiltersState.licenseFilter.attributionFreeOnly
         }
         setChoiceChecked={(choice, checked) => {

@@ -11,7 +11,7 @@ const gd: libGDevelop = global.gd;
 // $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
-  _: (message) => message.id,
+  _: message => message.id,
 });
 
 describe('EnumerateInstructions', () => {
@@ -25,7 +25,7 @@ describe('EnumerateInstructions', () => {
     // Test for the proper presence of a few conditions
     expect(
       instructions.find(
-        (instruction) =>
+        instruction =>
           instruction.type ===
           'AnimatableCapability::AnimatableBehavior::HasAnimationEnded'
       )
@@ -37,7 +37,7 @@ describe('EnumerateInstructions', () => {
       })
     );
     expect(
-      instructions.find((instruction) => instruction.type === 'Sprite')
+      instructions.find(instruction => instruction.type === 'Sprite')
     ).toEqual(
       expect.objectContaining({
         displayedName: 'Current frame',
@@ -47,7 +47,7 @@ describe('EnumerateInstructions', () => {
     );
     expect(
       instructions.find(
-        (instruction) => instruction.type === 'BuiltinCommonInstructions::Once'
+        instruction => instruction.type === 'BuiltinCommonInstructions::Once'
       )
     ).toEqual(
       expect.objectContaining({
@@ -57,7 +57,7 @@ describe('EnumerateInstructions', () => {
       })
     );
     expect(
-      instructions.find((instruction) => instruction.type === 'SourisSurObjet')
+      instructions.find(instruction => instruction.type === 'SourisSurObjet')
     ).toEqual(
       expect.objectContaining({
         displayedName: 'The cursor/touch is on an object',

@@ -22,8 +22,9 @@ type Props = {|
 |};
 
 export const UnsavedChangesContextProvider = (props: Props) => {
-  const [hasUnsavedChanges, setHasUnsavedChanges] =
-    React.useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState<boolean>(
+    false
+  );
   const triggerUnsavedChanges = (): void => {
     if (!hasUnsavedChanges) setHasUnsavedChanges(true);
   };

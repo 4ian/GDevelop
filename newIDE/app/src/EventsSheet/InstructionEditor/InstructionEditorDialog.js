@@ -103,31 +103,37 @@ const InstructionEditorDialog = ({
   i18n,
 }: Props) => {
   const forceUpdate = useForceUpdate();
-  const [instructionEditorState, instructionEditorSetters] =
-    useInstructionEditor({
-      instruction,
-      isCondition,
-      project,
-      isNewInstruction,
-      scope,
-      globalObjectsContainer,
-      objectsContainer,
-      i18n,
-    });
+  const [
+    instructionEditorState,
+    instructionEditorSetters,
+  ] = useInstructionEditor({
+    instruction,
+    isCondition,
+    project,
+    isNewInstruction,
+    scope,
+    globalObjectsContainer,
+    objectsContainer,
+    i18n,
+  });
   const {
     chosenObjectName,
     chosenObjectInstructionsInfo,
     chosenObjectInstructionsInfoTree,
   } = instructionEditorState;
-  const { chooseInstruction, chooseObject, chooseObjectInstruction } =
-    instructionEditorSetters;
+  const {
+    chooseInstruction,
+    chooseObject,
+    chooseObjectInstruction,
+  } = instructionEditorSetters;
   const hasObjectChosen =
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
   const chosenObject = chosenObjectName
     ? getObjectByName(project, scope.layout, chosenObjectName)
     : null;
-  const freeInstructionComponentRef =
-    React.useRef<?InstructionOrObjectSelector>(null);
+  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
+    null
+  );
   const [step, setStep] = React.useState(() =>
     getInitialStepName(isNewInstruction)
   );
@@ -138,10 +144,14 @@ const InstructionEditorDialog = ({
   const { isMobile, windowSize, isMediumScreen } = useResponsiveWindowSize();
   const isLargeScreen = windowSize === 'large' || windowSize === 'xlarge';
   const instructionType: string = instruction.getType();
-  const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] =
-    React.useState<boolean>(false);
-  const [newExtensionDialogOpen, setNewExtensionDialogOpen] =
-    React.useState<boolean>(false);
+  const [
+    newBehaviorDialogOpen,
+    setNewBehaviorDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    newExtensionDialogOpen,
+    setNewExtensionDialogOpen,
+  ] = React.useState<boolean>(false);
   const shouldAutofocusInput = useShouldAutofocusInput();
 
   // Handle the back button
@@ -186,16 +196,20 @@ const InstructionEditorDialog = ({
       freeInstructionComponentRef.current.reEnumerateInstructions(i18n);
   };
 
-  const instructionParametersEditor =
-    React.useRef<?InstructionParametersEditorInterface>(null);
+  const instructionParametersEditor = React.useRef<?InstructionParametersEditorInterface>(
+    null
+  );
   // Focus the parameters when showing them
-  React.useEffect(() => {
-    if (shouldAutofocusInput && step === 'parameters') {
-      if (instructionParametersEditor.current) {
-        instructionParametersEditor.current.focus();
+  React.useEffect(
+    () => {
+      if (shouldAutofocusInput && step === 'parameters') {
+        if (instructionParametersEditor.current) {
+          instructionParametersEditor.current.focus();
+        }
       }
-    }
-  }, [step, shouldAutofocusInput]);
+    },
+    [step, shouldAutofocusInput]
+  );
 
   const instructionMetadata = getInstructionMetadata({
     instructionType,
@@ -316,8 +330,7 @@ const InstructionEditorDialog = ({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              isMobile ||
-              step === 'object-or-free-instructions' ? (
+              (isMobile || step === 'object-or-free-instructions') ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>

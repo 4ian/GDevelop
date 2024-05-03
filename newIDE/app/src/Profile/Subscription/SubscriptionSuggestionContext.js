@@ -31,10 +31,11 @@ type SubscriptionSuggestionState = {|
   |}) => void,
 |};
 
-export const SubscriptionSuggestionContext =
-  React.createContext<SubscriptionSuggestionState>({
+export const SubscriptionSuggestionContext = React.createContext<SubscriptionSuggestionState>(
+  {
     openSubscriptionDialog: () => {},
-  });
+  }
+);
 
 type SubscriptionSuggestionProviderProps = {|
   children: React.Node,
@@ -50,7 +51,7 @@ export const SubscriptionSuggestionProvider = ({
     preStep?: 'subscriptionChecker',
   |}>(null);
   const [filter, setFilter] = React.useState<
-    'individual' | 'team' | 'education' | null,
+    'individual' | 'team' | 'education' | null
   >(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { showAlert } = useAlertDialog();
@@ -92,10 +93,9 @@ export const SubscriptionSuggestionProvider = ({
     [authenticatedUser.subscription, showAlert, simulateMobileApp]
   );
 
-  const value = React.useMemo(
-    () => ({ openSubscriptionDialog }),
-    [openSubscriptionDialog]
-  );
+  const value = React.useMemo(() => ({ openSubscriptionDialog }), [
+    openSubscriptionDialog,
+  ]);
 
   const availableSubscriptionPlansWithPrices = React.useMemo(
     () =>
@@ -107,32 +107,37 @@ export const SubscriptionSuggestionProvider = ({
     [subscriptionPlansWithPricingSystems]
   );
 
-  const userLegacySubscriptionPlanWithPricingSystem = React.useMemo(() => {
-    if (
-      !authenticatedUser.subscription ||
-      !authenticatedUser.subscription.planId ||
-      !authenticatedUser.subscription.pricingSystemId ||
-      !subscriptionPlansWithPricingSystems
-    ) {
-      return null;
-    }
-    const { planId: userPlanId, pricingSystemId: userPricingSystemId } =
-      authenticatedUser.subscription;
-    const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
-      (planWithPricingSystems) => planWithPricingSystems.id === userPlanId
-    );
-    if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
-      return null;
-    }
-    const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
-      (pricingSystem) => pricingSystem.id === userPricingSystemId
-    );
-    if (!userPricingSystem) return null;
-    return {
-      ...userPlanWithPricingSystems,
-      pricingSystems: [userPricingSystem],
-    };
-  }, [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]);
+  const userLegacySubscriptionPlanWithPricingSystem = React.useMemo(
+    () => {
+      if (
+        !authenticatedUser.subscription ||
+        !authenticatedUser.subscription.planId ||
+        !authenticatedUser.subscription.pricingSystemId ||
+        !subscriptionPlansWithPricingSystems
+      ) {
+        return null;
+      }
+      const {
+        planId: userPlanId,
+        pricingSystemId: userPricingSystemId,
+      } = authenticatedUser.subscription;
+      const userPlanWithPricingSystems = subscriptionPlansWithPricingSystems.find(
+        planWithPricingSystems => planWithPricingSystems.id === userPlanId
+      );
+      if (!userPlanWithPricingSystems || !userPlanWithPricingSystems.isLegacy) {
+        return null;
+      }
+      const userPricingSystem = userPlanWithPricingSystems.pricingSystems.find(
+        pricingSystem => pricingSystem.id === userPricingSystemId
+      );
+      if (!userPricingSystem) return null;
+      return {
+        ...userPlanWithPricingSystems,
+        pricingSystems: [userPricingSystem],
+      };
+    },
+    [subscriptionPlansWithPricingSystems, authenticatedUser.subscription]
+  );
 
   return (
     <SubscriptionSuggestionContext.Provider value={value}>

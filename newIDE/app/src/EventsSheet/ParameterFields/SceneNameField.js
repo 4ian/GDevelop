@@ -18,9 +18,11 @@ import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function SceneNameField(props: ParameterFieldProps, ref) {
-    const field =
-      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const field = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -30,11 +32,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     // The list is not kept with a memo because scenes could be added by
     // another component without this one to know.
     const layoutNames = props.project
-      ? enumerateLayouts(props.project).map((layout) => layout.getName())
+      ? enumerateLayouts(props.project).map(layout => layout.getName())
       : [];
 
     const isCurrentValueInLayoutsList = !!layoutNames.find(
-      (layoutName) => `"${layoutName}"` === props.value
+      layoutName => `"${layoutName}"` === props.value
     );
 
     // If the current value is not in the list of scenes, display an expression field.
@@ -59,7 +61,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = layoutNames.map((layoutName) => (
+    const selectOptions = layoutNames.map(layoutName => (
       <SelectOption
         key={layoutName}
         value={`"${layoutName}"`}
@@ -107,7 +109,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={(style) =>
+        renderButton={style =>
           isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

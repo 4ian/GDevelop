@@ -61,21 +61,26 @@ const SpineEditor = ({
   renderObjectNameField,
 }: EditorProps) => {
   const scrollView = React.useRef<?ScrollViewInterface>(null);
-  const [justAddedAnimationName, setJustAddedAnimationName] =
-    React.useState<?string>(null);
+  const [
+    justAddedAnimationName,
+    setJustAddedAnimationName,
+  ] = React.useState<?string>(null);
   const justAddedAnimationElement = React.useRef<?any>(null);
 
-  React.useEffect(() => {
-    if (
-      scrollView.current &&
-      justAddedAnimationElement.current &&
-      justAddedAnimationName
-    ) {
-      scrollView.current.scrollTo(justAddedAnimationElement.current);
-      setJustAddedAnimationName(null);
-      justAddedAnimationElement.current = null;
-    }
-  }, [justAddedAnimationName]);
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedAnimationElement.current &&
+        justAddedAnimationName
+      ) {
+        scrollView.current.scrollTo(justAddedAnimationElement.current);
+        setJustAddedAnimationName(null);
+        justAddedAnimationElement.current = null;
+      }
+    },
+    [justAddedAnimationName]
+  );
   const { showAlert } = useAlertDialog();
 
   const draggedAnimationIndex = React.useRef<number | null>(null);
@@ -97,71 +102,115 @@ const SpineEditor = ({
   });
 
   const [sourceSelectOptions, setSourceSelectOptions] = React.useState<
-    Array<Object>,
+    Array<Object>
   >([]);
   const spineResourceName = properties.get('spineResourceName').getValue();
 
-  React.useEffect(() => {
-    (async () => {
-      const spineData = await PixiResourcesLoader.getSpineData(
-        project,
-        spineResourceName
+  React.useEffect(
+    () => {
+      (async () => {
+        const spineData = await PixiResourcesLoader.getSpineData(
+          project,
+          spineResourceName
+        );
+
+        setSpineData(spineData);
+
+        if (spineData.skeleton) {
+          setSourceSelectOptions(
+            spineData.skeleton.animations.map(animation => (
+              <SelectOption
+                key={animation.name}
+                value={animation.name}
+                label={animation.name}
+                shouldNotTranslate
+              />
+            ))
+          );
+        }
+      })();
+    },
+    [project, spineResourceName, setSourceSelectOptions]
+  );
+
+  const onChangeSpineResourceName = React.useCallback(
+    () => {
+      spineConfiguration.removeAllAnimations();
+      forceUpdate();
+    },
+    [forceUpdate, spineConfiguration]
+  );
+
+  const scanNewAnimations = React.useCallback(
+    () => {
+      const { skeleton } = spineData;
+      if (!skeleton) return;
+
+      setNameErrors({});
+
+      const animationSources = mapFor(
+        0,
+        spineConfiguration.getAnimationsCount(),
+        animationIndex =>
+          spineConfiguration.getAnimation(animationIndex).getSource()
       );
 
-      setSpineData(spineData);
+      let hasAddedAnimation = false;
+      for (const resourceAnimation of skeleton.animations) {
+        if (animationSources.includes(resourceAnimation.name)) {
+          continue;
+        }
+        const newAnimationName = spineConfiguration.hasAnimationNamed(
+          resourceAnimation.name
+        )
+          ? ''
+          : resourceAnimation.name;
 
-      if (spineData.skeleton) {
-        setSourceSelectOptions(
-          spineData.skeleton.animations.map((animation) => (
-            <SelectOption
-              key={animation.name}
-              value={animation.name}
-              label={animation.name}
-              shouldNotTranslate
-            />
-          ))
-        );
+        const newAnimation = new gd.SpineAnimation();
+        newAnimation.setName(newAnimationName);
+        newAnimation.setSource(resourceAnimation.name);
+        spineConfiguration.addAnimation(newAnimation);
+        newAnimation.delete();
+        hasAddedAnimation = true;
       }
-    })();
-  }, [project, spineResourceName, setSourceSelectOptions]);
+      if (hasAddedAnimation) {
+        forceUpdate();
+        onSizeUpdated();
+        if (onObjectUpdated) onObjectUpdated();
 
-  const onChangeSpineResourceName = React.useCallback(() => {
-    spineConfiguration.removeAllAnimations();
-    forceUpdate();
-  }, [forceUpdate, spineConfiguration]);
-
-  const scanNewAnimations = React.useCallback(() => {
-    const { skeleton } = spineData;
-    if (!skeleton) return;
-
-    setNameErrors({});
-
-    const animationSources = mapFor(
-      0,
-      spineConfiguration.getAnimationsCount(),
-      (animationIndex) =>
-        spineConfiguration.getAnimation(animationIndex).getSource()
-    );
-
-    let hasAddedAnimation = false;
-    for (const resourceAnimation of skeleton.animations) {
-      if (animationSources.includes(resourceAnimation.name)) {
-        continue;
+        // Scroll to the bottom of the list.
+        // Ideally, we'd wait for the list to be updated to scroll, but
+        // to simplify the code, we just wait a few ms for a new render
+        // to be done.
+        setTimeout(() => {
+          if (scrollView.current) {
+            scrollView.current.scrollToBottom();
+          }
+        }, 100); // A few ms is enough for a new render to be done.
+      } else {
+        showAlert({
+          title: t`No new animation`,
+          message: t`Every animation from the Spine file is already in the list.`,
+        });
       }
-      const newAnimationName = spineConfiguration.hasAnimationNamed(
-        resourceAnimation.name
-      )
-        ? ''
-        : resourceAnimation.name;
+    },
+    [
+      forceUpdate,
+      spineData,
+      spineConfiguration,
+      onObjectUpdated,
+      onSizeUpdated,
+      showAlert,
+    ]
+  );
 
-      const newAnimation = new gd.SpineAnimation();
-      newAnimation.setName(newAnimationName);
-      newAnimation.setSource(resourceAnimation.name);
-      spineConfiguration.addAnimation(newAnimation);
-      newAnimation.delete();
-      hasAddedAnimation = true;
-    }
-    if (hasAddedAnimation) {
+  const addAnimation = React.useCallback(
+    () => {
+      setNameErrors({});
+
+      const emptyAnimation = new gd.SpineAnimation();
+      spineConfiguration.addAnimation(emptyAnimation);
+      emptyAnimation.delete();
       forceUpdate();
       onSizeUpdated();
       if (onObjectUpdated) onObjectUpdated();
@@ -175,44 +224,12 @@ const SpineEditor = ({
           scrollView.current.scrollToBottom();
         }
       }, 100); // A few ms is enough for a new render to be done.
-    } else {
-      showAlert({
-        title: t`No new animation`,
-        message: t`Every animation from the Spine file is already in the list.`,
-      });
-    }
-  }, [
-    forceUpdate,
-    spineData,
-    spineConfiguration,
-    onObjectUpdated,
-    onSizeUpdated,
-    showAlert,
-  ]);
-
-  const addAnimation = React.useCallback(() => {
-    setNameErrors({});
-
-    const emptyAnimation = new gd.SpineAnimation();
-    spineConfiguration.addAnimation(emptyAnimation);
-    emptyAnimation.delete();
-    forceUpdate();
-    onSizeUpdated();
-    if (onObjectUpdated) onObjectUpdated();
-
-    // Scroll to the bottom of the list.
-    // Ideally, we'd wait for the list to be updated to scroll, but
-    // to simplify the code, we just wait a few ms for a new render
-    // to be done.
-    setTimeout(() => {
-      if (scrollView.current) {
-        scrollView.current.scrollToBottom();
-      }
-    }, 100); // A few ms is enough for a new render to be done.
-  }, [forceUpdate, onObjectUpdated, onSizeUpdated, spineConfiguration]);
+    },
+    [forceUpdate, onObjectUpdated, onSizeUpdated, spineConfiguration]
+  );
 
   const removeAnimation = React.useCallback(
-    (animationIndex) => {
+    animationIndex => {
       setNameErrors({});
 
       spineConfiguration.removeAnimation(animationIndex);
@@ -370,9 +387,10 @@ const SpineEditor = ({
                     {mapFor(
                       0,
                       spineConfiguration.getAnimationsCount(),
-                      (animationIndex) => {
-                        const animation =
-                          spineConfiguration.getAnimation(animationIndex);
+                      animationIndex => {
+                        const animation = spineConfiguration.getAnimation(
+                          animationIndex
+                        );
 
                         const animationRef =
                           justAddedAnimationName === animation.getName()
@@ -434,7 +452,7 @@ const SpineEditor = ({
                                         errorText={nameErrors[animationIndex]}
                                         translatableHintText={t`Optional animation name`}
                                         value={animation.getName()}
-                                        onChange={(text) =>
+                                        onChange={text =>
                                           changeAnimationName(
                                             animationIndex,
                                             text

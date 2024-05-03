@@ -15,8 +15,8 @@ type Props = {|
   onLaunchNewPreview: () => void,
 |};
 
-const shouldDisplayDialogForLogs = (logs) =>
-  logs.filter((log) => log.kind === 'error' || log.kind === 'fatal').length > 0;
+const shouldDisplayDialogForLogs = logs =>
+  logs.filter(log => log.kind === 'error' || log.kind === 'fatal').length > 0;
 
 export default function HotReloadLogsDialog({
   onClose,

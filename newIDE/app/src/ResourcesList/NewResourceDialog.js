@@ -39,10 +39,9 @@ export const NewResourceDialog = ({
   onChooseResources,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
-  const storageProvider = React.useMemo(
-    () => getStorageProvider(),
-    [getStorageProvider]
-  );
+  const storageProvider = React.useMemo(() => getStorageProvider(), [
+    getStorageProvider,
+  ]);
   const preferences = React.useContext(PreferencesContext);
   const possibleResourceSources = resourceSources
     .filter(({ kind }) => kind === options.resourceKind)
@@ -79,9 +78,12 @@ export const NewResourceDialog = ({
   const [hasChangedTabs, setHasChangedTabs] = React.useState(false);
   const [isShowingAdvanced, setIsShowingAdvanced] = React.useState(false);
 
-  React.useEffect(() => {
-    return () => setHasChangedTabs(true);
-  }, [currentTab]);
+  React.useEffect(
+    () => {
+      return () => setHasChangedTabs(true);
+    },
+    [currentTab]
+  );
 
   React.useEffect(
     () => {
@@ -158,7 +160,7 @@ export const NewResourceDialog = ({
         />
       }
     >
-      {standaloneTabResourceSources.map((source) => {
+      {standaloneTabResourceSources.map(source => {
         if (currentTab !== 'standalone-' + source.name) return null;
 
         return source.renderComponent({
@@ -177,7 +179,7 @@ export const NewResourceDialog = ({
       {currentTab === 'import' ? (
         <Line expand noMargin>
           <ColumnStackLayout expand noMargin>
-            {importTabResourceSources.map((source) => (
+            {importTabResourceSources.map(source => (
               <React.Fragment key={source.name}>
                 <Text size="block-title">{i18n._(source.displayName)}</Text>
                 {source.renderComponent({
@@ -201,7 +203,7 @@ export const NewResourceDialog = ({
               </React.Fragment>
             ))}
             {isShowingAdvanced &&
-              importTabAdvancedResourceSources.map((source) => (
+              importTabAdvancedResourceSources.map(source => (
                 <React.Fragment key={source.name}>
                   <Text size="block-title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({

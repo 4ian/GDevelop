@@ -12,7 +12,7 @@ type Props = {|
   project: gdProject,
   objectType: string,
   value: string,
-  onChange: (string) => void,
+  onChange: string => void,
   disabled?: boolean,
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
 |};
@@ -22,7 +22,7 @@ type State = {|
 
 export default class BehaviorTypeSelector extends React.Component<
   Props,
-  State,
+  State
 > {
   state = {
     behaviorMetadata: enumerateBehaviorsMetadata(

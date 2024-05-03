@@ -53,33 +53,39 @@ export const useLongTouch = (
     clientX: 0,
     clientY: 0,
   });
-  const clear = React.useCallback(() => {
-    if (context) delete contextLocks[context];
-    timeout.current && clearTimeout(timeout.current);
-  }, [context]);
+  const clear = React.useCallback(
+    () => {
+      if (context) delete contextLocks[context];
+      timeout.current && clearTimeout(timeout.current);
+    },
+    [context]
+  );
 
-  React.useEffect(() => {
-    // Cancel the long touch if scrolling (otherwise we can get a long touch
-    // being activated while scroll and maintaining the touch on an element,
-    // which is weird for the user that just want to scroll).
-    document.addEventListener('scroll', clear, {
-      // Get notified as soon as the scroll happens.
-      capture: true,
+  React.useEffect(
+    () => {
+      // Cancel the long touch if scrolling (otherwise we can get a long touch
+      // being activated while scroll and maintaining the touch on an element,
+      // which is weird for the user that just want to scroll).
+      document.addEventListener('scroll', clear, {
+        // Get notified as soon as the scroll happens.
+        capture: true,
 
-      // No need for passive: true
-      // According to MDN: "You don't need to worry about the value of passive for the basic scroll event.
-      // Since it can't be canceled, event listeners can't block page rendering anyway".
-    });
+        // No need for passive: true
+        // According to MDN: "You don't need to worry about the value of passive for the basic scroll event.
+        // Since it can't be canceled, event listeners can't block page rendering anyway".
+      });
 
-    return () => {
-      // Ensure we remove the timeout waiting for the long press
-      // if the component is destroyed.
-      clear();
+      return () => {
+        // Ensure we remove the timeout waiting for the long press
+        // if the component is destroyed.
+        clear();
 
-      // Remove the listener for the scroll
-      document.removeEventListener('scroll', clear, { capture: true });
-    };
-  }, [clear]);
+        // Remove the listener for the scroll
+        document.removeEventListener('scroll', clear, { capture: true });
+      };
+    },
+    [clear]
+  );
 
   const start = React.useCallback(
     (event: TouchEvent) => {

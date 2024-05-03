@@ -26,7 +26,7 @@ export const setupResourcesWatcher =
         const debouncedCallback = wrap(
           memoize(() =>
             debounce(
-              (filePath) => {
+              filePath => {
                 const relativePath = path
                   .relative(folderPath, filePath)
                   .replace(/\\/g, '/');
@@ -56,7 +56,7 @@ export const setupResourcesWatcher =
         ];
         if (options && options.isProjectSplitInMultipleFiles) {
           ignore.push(
-            ...splittedProjectFolderNames.map((folderName) =>
+            ...splittedProjectFolderNames.map(folderName =>
               path.join(folderPath, folderName, '*.json')
             )
           );
@@ -71,7 +71,7 @@ export const setupResourcesWatcher =
 
         return () => {
           ipcRenderer.removeAllListeners('project-file-changed');
-          subscriptionIdPromise.then((subscriptionId) => {
+          subscriptionIdPromise.then(subscriptionId => {
             ipcRenderer.invoke(
               'local-filesystem-watcher-disable',
               subscriptionId

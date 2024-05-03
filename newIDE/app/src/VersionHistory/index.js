@@ -49,7 +49,7 @@ const groupVersionsByDay = (
   if (versions.length === 0) return {};
 
   const versionsGroupedByDay = {};
-  versions.forEach((version) => {
+  versions.forEach(version => {
     const dayDate = new Date(version.createdAt.slice(0, 10)).getTime();
     if (!versionsGroupedByDay[dayDate]) {
       versionsGroupedByDay[dayDate] = [version];
@@ -81,7 +81,7 @@ type Props = {|
   openedVersionStatus: ?OpenedVersionStatus,
   onLoadMore: () => Promise<void>,
   canLoadMore: boolean,
-  onCheckoutVersion: (ExpandedCloudProjectVersion) => Promise<void>,
+  onCheckoutVersion: ExpandedCloudProjectVersion => Promise<void>,
   isVisible: boolean,
 |};
 
@@ -96,17 +96,23 @@ const VersionHistory = React.memo<Props>(
     canLoadMore,
     onCheckoutVersion,
   }) => {
-    const [usersPublicProfileByIds, setUsersPublicProfileByIds] =
-      React.useState<?UserPublicProfileByIds>();
+    const [
+      usersPublicProfileByIds,
+      setUsersPublicProfileByIds,
+    ] = React.useState<?UserPublicProfileByIds>();
     const [editedVersionId, setEditedVersionId] = React.useState<?string>(null);
-    const [versionIdBeingRenamed, setVersionIdBeingRenamed] =
-      React.useState<?string>(null);
-    const [isLoadingMoreVersions, setIsLoadingMoreVersions] =
-      React.useState<boolean>(false);
+    const [
+      versionIdBeingRenamed,
+      setVersionIdBeingRenamed,
+    ] = React.useState<?string>(null);
+    const [
+      isLoadingMoreVersions,
+      setIsLoadingMoreVersions,
+    ] = React.useState<boolean>(false);
     const contextMenuRef = React.useRef<?ContextMenuInterface>(null);
 
     const userIdsToFetch = React.useMemo(
-      () => new Set(versions.map((version) => version.userId).filter(Boolean)),
+      () => new Set(versions.map(version => version.userId).filter(Boolean)),
       [versions]
     );
     const latestVersion = versions[0] || null;
@@ -116,23 +122,26 @@ const VersionHistory = React.memo<Props>(
       [versions]
     );
     const days = Object.keys(versionsGroupedByDay)
-      .map((dayStr) => Number(dayStr))
+      .map(dayStr => Number(dayStr))
       .sort()
       .reverse();
 
-    React.useEffect(() => {
-      (async () => {
-        if (!userIdsToFetch) return;
-        if (userIdsToFetch.size === 0) {
-          setUsersPublicProfileByIds({});
-          return;
-        }
-        const _usersPublicProfileByIds = await getUserPublicProfilesByIds(
-          Array.from(userIdsToFetch)
-        );
-        setUsersPublicProfileByIds(_usersPublicProfileByIds);
-      })();
-    }, [userIdsToFetch]);
+    React.useEffect(
+      () => {
+        (async () => {
+          if (!userIdsToFetch) return;
+          if (userIdsToFetch.size === 0) {
+            setUsersPublicProfileByIds({});
+            return;
+          }
+          const _usersPublicProfileByIds = await getUserPublicProfilesByIds(
+            Array.from(userIdsToFetch)
+          );
+          setUsersPublicProfileByIds(_usersPublicProfileByIds);
+        })();
+      },
+      [userIdsToFetch]
+    );
 
     const buildVersionMenuTemplate = React.useCallback(
       (i18n: I18nType, options: { version: ExpandedCloudProjectVersion }) => {
@@ -204,22 +213,28 @@ const VersionHistory = React.memo<Props>(
       []
     );
 
-    const loadMore = React.useCallback(async () => {
-      setIsLoadingMoreVersions(true);
-      try {
-        await onLoadMore();
-      } finally {
-        setIsLoadingMoreVersions(false);
-      }
-    }, [onLoadMore]);
+    const loadMore = React.useCallback(
+      async () => {
+        setIsLoadingMoreVersions(true);
+        try {
+          await onLoadMore();
+        } finally {
+          setIsLoadingMoreVersions(false);
+        }
+      },
+      [onLoadMore]
+    );
 
-    const getAnonymousAvatar = React.useCallback(() => {
-      let projectIdAsNumber = 0;
-      projectId.split('').forEach((character) => {
-        projectIdAsNumber += projectId.charCodeAt(0);
-      });
-      return anonymousAvatars[projectIdAsNumber % anonymousAvatars.length];
-    }, [projectId]);
+    const getAnonymousAvatar = React.useCallback(
+      () => {
+        let projectIdAsNumber = 0;
+        projectId.split('').forEach(character => {
+          projectIdAsNumber += projectId.charCodeAt(0);
+        });
+        return anonymousAvatars[projectIdAsNumber % anonymousAvatars.length];
+      },
+      [projectId]
+    );
 
     if (!usersPublicProfileByIds) return null;
 

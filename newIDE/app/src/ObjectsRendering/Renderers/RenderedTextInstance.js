@@ -137,12 +137,12 @@ export default class RenderedTextInstance extends RenderedInstance {
         this._project,
         textObjectConfiguration.getFontName()
       )
-        .then((fontFamily) => {
+        .then(fontFamily => {
           // Once the font is loaded, we can use the given fontFamily.
           this._fontFamily = fontFamily;
           this._styleFontDirty = true;
         })
-        .catch((err) => {
+        .catch(err => {
           // Ignore errors
           console.warn(
             'Unable to load font family for RenderedTextInstance',
@@ -189,8 +189,8 @@ export default class RenderedTextInstance extends RenderedInstance {
         this._textAlignment === 'right'
           ? 1
           : this._textAlignment === 'center'
-            ? 0.5
-            : 0;
+          ? 0.5
+          : 0;
 
       const width = this.getCustomWidth();
 

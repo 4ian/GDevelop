@@ -43,7 +43,9 @@ export const Errored = () => {
 Errored.parameters = {
   mockData: [
     {
-      url: `${GDevelopGenerationApi.baseUrl}/generated-project/fake-generating-project-id?userId=indie-user`,
+      url: `${
+        GDevelopGenerationApi.baseUrl
+      }/generated-project/fake-generating-project-id?userId=indie-user`,
       method: 'GET',
       status: 500,
       response: {},

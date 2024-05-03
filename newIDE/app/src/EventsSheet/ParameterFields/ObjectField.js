@@ -45,10 +45,11 @@ export const getRequiredBehaviorTypes = (
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectField(props: ParameterFieldProps, ref) {
-    const { currentlyRunningInAppTutorial } =
-      React.useContext(InAppTutorialContext);
+    const { currentlyRunningInAppTutorial } = React.useContext(
+      InAppTutorialContext
+    );
     const field = React.useRef<?ObjectSelectorInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       // Prevent focus of field if an in-app tutorial is running because
       // the popper of the tooltip and the popper of the semi controlled
       // autocomplete's dropdown are conflicting.
@@ -79,17 +80,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const requiredBehaviorTypes = React.useMemo(() => {
-      const functionMetadata = instructionMetadata || expressionMetadata;
-      if (!project || !functionMetadata || parameterIndex === undefined) {
-        return [];
-      }
-      return getRequiredBehaviorTypes(
-        project.getCurrentPlatform(),
-        functionMetadata,
-        parameterIndex
-      );
-    }, [expressionMetadata, instructionMetadata, parameterIndex, project]);
+    const requiredBehaviorTypes = React.useMemo(
+      () => {
+        const functionMetadata = instructionMetadata || expressionMetadata;
+        if (!project || !functionMetadata || parameterIndex === undefined) {
+          return [];
+        }
+        return getRequiredBehaviorTypes(
+          project.getCurrentPlatform(),
+          functionMetadata,
+          parameterIndex
+        );
+      },
+      [expressionMetadata, instructionMetadata, parameterIndex, project]
+    );
 
     return (
       <ObjectSelector

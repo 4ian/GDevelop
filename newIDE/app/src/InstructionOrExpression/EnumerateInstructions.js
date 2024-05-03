@@ -280,10 +280,8 @@ const enumerateInstruction = (
     isPrivate: instrMetadata.isPrivate(),
     isRelevantForLayoutEvents: instrMetadata.isRelevantForLayoutEvents(),
     isRelevantForFunctionEvents: instrMetadata.isRelevantForFunctionEvents(),
-    isRelevantForAsynchronousFunctionEvents:
-      instrMetadata.isRelevantForAsynchronousFunctionEvents(),
-    isRelevantForCustomObjectEvents:
-      instrMetadata.isRelevantForCustomObjectEvents(),
+    isRelevantForAsynchronousFunctionEvents: instrMetadata.isRelevantForAsynchronousFunctionEvents(),
+    isRelevantForCustomObjectEvents: instrMetadata.isRelevantForCustomObjectEvents(),
   };
 };
 
@@ -393,10 +391,10 @@ const orderFirstInstructionsWithoutGroup = (
   allInstructions: Array<EnumeratedInstructionMetadata>
 ) => {
   const noGroupInstructions = allInstructions.filter(
-    (instructionMetadata) => instructionMetadata.fullGroupName.length === 0
+    instructionMetadata => instructionMetadata.fullGroupName.length === 0
   );
   const instructionsWithGroups = allInstructions.filter(
-    (instructionMetadata) => instructionMetadata.fullGroupName.length !== 0
+    instructionMetadata => instructionMetadata.fullGroupName.length !== 0
   );
 
   return [...noGroupInstructions, ...instructionsWithGroups];
@@ -431,7 +429,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     )
     .toJSArray();
   const objectBehaviorTypes = new Set(
-    objectBehaviorNames.map((behaviorName) =>
+    objectBehaviorNames.map(behaviorName =>
       gd.getTypeOfBehavior(
         globalObjectsContainer,
         objectsContainer,
@@ -442,11 +440,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
   );
 
   // Enumerate instructions of the object.
-  const extensionAndObjectMetadata =
-    gd.MetadataProvider.getExtensionAndObjectMetadata(
-      gd.JsPlatform.get(),
-      objectType
-    );
+  const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+    gd.JsPlatform.get(),
+    objectType
+  );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
   const scope = { extension, objectMetadata };
@@ -489,11 +486,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
   // Enumerate instructions of the base object that the object "inherits" from.
   const baseObjectType = ''; /* An empty string means the base object */
   if (objectType !== baseObjectType) {
-    const baseExtensionAndObjectMetadata =
-      gd.MetadataProvider.getExtensionAndObjectMetadata(
-        gd.JsPlatform.get(),
-        baseObjectType
-      );
+    const baseExtensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      baseObjectType
+    );
     const baseObjectExtension = baseExtensionAndObjectMetadata.getExtension();
 
     allInstructions = [
@@ -515,10 +511,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
     const behaviorTypes = extension
       .getBehaviorsTypes()
       .toJSArray()
-      .filter((behaviorType) => objectBehaviorTypes.has(behaviorType));
+      .filter(behaviorType => objectBehaviorTypes.has(behaviorType));
 
     // eslint-disable-next-line
-    behaviorTypes.forEach((behaviorType) => {
+    behaviorTypes.forEach(behaviorType => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 
@@ -566,7 +562,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     !objectsContainer.getObjectGroups().has(objectName)
   ) {
     allInstructions = allInstructions.filter(
-      (instruction) => instruction.type !== 'CreateByName'
+      instruction => instruction.type !== 'CreateByName'
     );
   }
 

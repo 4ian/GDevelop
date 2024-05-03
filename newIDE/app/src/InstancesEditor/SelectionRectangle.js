@@ -42,7 +42,7 @@ export default class SelectionRectangle {
     this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
-    this.selector.invoke = (instancePtr) => {
+    this.selector.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const instanceAABB = this.instanceMeasurer.getInstanceAABB(

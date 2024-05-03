@@ -7,7 +7,7 @@ export const processByChunk = async <Item, MappedItem>(
     isChunkTooBig,
     processChunk,
   }: {|
-    transformItem: (Item) => Promise<MappedItem>,
+    transformItem: Item => Promise<MappedItem>,
     isChunkTooBig: (MappedItem[]) => boolean,
     processChunk: (MappedItem[]) => Promise<void>,
   |}

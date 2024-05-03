@@ -15,7 +15,7 @@ export const emailRegex = /^(.+)@(.+)$/;
 
 type Props = {|
   onClose: () => void,
-  onForgotPassword: (ForgotPasswordForm) => Promise<void>,
+  onForgotPassword: ForgotPasswordForm => Promise<void>,
 |};
 
 const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
@@ -91,11 +91,13 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               errorText={
                 !isEmailValid ? (
                   <Trans>Invalid email address.</Trans>
-                ) : undefined
+                ) : (
+                  undefined
+                )
               }
               type="email"
               fullWidth
-              onBlur={(event) => {
+              onBlur={event => {
                 const trimmedEmail = event.currentTarget.value.trim();
                 setEmail(trimmedEmail);
                 setIsEmailValid(emailRegex.test(trimmedEmail));

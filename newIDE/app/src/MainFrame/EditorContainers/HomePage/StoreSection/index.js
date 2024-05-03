@@ -30,37 +30,50 @@ const StoreSection = ({
   onOpenPrivateGameTemplateListingData,
   onOpenProfile,
 }: Props) => {
-  const [isAssetPackDialogInstallOpen, setIsAssetPackDialogInstallOpen] =
-    React.useState(false);
-  const { assetShortHeadersSearchResults, shopNavigationState } =
-    React.useContext(AssetStoreContext);
-  const { openedAssetPack, openedAssetShortHeader, selectedFolders } =
-    shopNavigationState.getCurrentPage();
+  const [
+    isAssetPackDialogInstallOpen,
+    setIsAssetPackDialogInstallOpen,
+  ] = React.useState(false);
+  const {
+    assetShortHeadersSearchResults,
+    shopNavigationState,
+  } = React.useContext(AssetStoreContext);
+  const {
+    openedAssetPack,
+    openedAssetShortHeader,
+    selectedFolders,
+  } = shopNavigationState.getCurrentPage();
 
-  const displayedAssetShortHeaders = React.useMemo(() => {
-    return openedAssetShortHeader
-      ? [openedAssetShortHeader]
-      : assetShortHeadersSearchResults
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return openedAssetShortHeader
+        ? [openedAssetShortHeader]
+        : assetShortHeadersSearchResults
         ? getAssetShortHeadersToDisplay(
             assetShortHeadersSearchResults,
             selectedFolders
           )
         : [];
-  }, [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]);
+    },
+    [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]
+  );
 
-  const existingAssetStoreIds = React.useMemo(() => {
-    if (!project || !isAssetPackDialogInstallOpen) {
-      return new Set<string>();
-    }
+  const existingAssetStoreIds = React.useMemo(
+    () => {
+      if (!project || !isAssetPackDialogInstallOpen) {
+        return new Set<string>();
+      }
 
-    return enumerateAssetStoreIds(project);
-  }, [
-    project,
-    // Force recompute existing installed asset ids when the dialog to install them is
-    // opened/closed, so that this list of ids is always up-to-date (but not recomputed at each render,
-    // just when you're likely to need it).
-    isAssetPackDialogInstallOpen,
-  ]);
+      return enumerateAssetStoreIds(project);
+    },
+    [
+      project,
+      // Force recompute existing installed asset ids when the dialog to install them is
+      // opened/closed, so that this list of ids is always up-to-date (but not recomputed at each render,
+      // just when you're likely to need it).
+      isAssetPackDialogInstallOpen,
+    ]
+  );
 
   return (
     <SectionContainer

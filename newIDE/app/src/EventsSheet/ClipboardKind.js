@@ -60,10 +60,10 @@ export const copySelectionToClipboard = (selection: SelectionState) => {
   const actionsList = new gd.InstructionsList();
   const conditionsList = new gd.InstructionsList();
 
-  getSelectedEvents(selection).forEach((event) =>
+  getSelectedEvents(selection).forEach(event =>
     eventsList.insertEvent(event, eventsList.getEventsCount())
   );
-  getSelectedInstructionsContexts(selection).forEach((instructionContext) => {
+  getSelectedInstructionsContexts(selection).forEach(instructionContext => {
     if (instructionContext.isCondition) {
       conditionsList.insert(
         instructionContext.instruction,
@@ -158,8 +158,9 @@ export const pasteInstructionsFromClipboardInSelection = (
     project
   );
 
-  const lastSelectedInstructionContext =
-    getLastSelectedInstructionContext(selection);
+  const lastSelectedInstructionContext = getLastSelectedInstructionContext(
+    selection
+  );
   if (lastSelectedInstructionContext) {
     if (lastSelectedInstructionContext.isCondition) {
       lastSelectedInstructionContext.instrsList.insertInstructions(
@@ -177,8 +178,9 @@ export const pasteInstructionsFromClipboardInSelection = (
       );
     }
   }
-  const lastSelectedInstructionsListsContext =
-    getLastSelectedInstructionsListsContext(selection);
+  const lastSelectedInstructionsListsContext = getLastSelectedInstructionsListsContext(
+    selection
+  );
   if (lastSelectedInstructionsListsContext) {
     if (lastSelectedInstructionsListsContext.isCondition) {
       lastSelectedInstructionsListsContext.instrsList.insertInstructions(

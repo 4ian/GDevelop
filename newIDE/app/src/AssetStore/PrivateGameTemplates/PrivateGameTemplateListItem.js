@@ -58,7 +58,7 @@ type Props = {|
   matches: ?Array<SearchMatch>,
   isOpening: boolean,
   onChoose: () => void,
-  onHeightComputed: (number) => void,
+  onHeightComputed: number => void,
   owned: boolean,
 |};
 
@@ -82,7 +82,7 @@ const PrivateGameTemplateListItem = ({
     const originalField = privateGameTemplateListingData[field];
 
     if (!matches) return originalField;
-    const nameMatches = matches.filter((match) => match.key === field);
+    const nameMatches = matches.filter(match => match.key === field);
     if (nameMatches.length === 0) return originalField;
 
     return (
@@ -139,7 +139,7 @@ const PrivateGameTemplateListItem = ({
                       key="premium"
                     />
                   )}
-                  {privateGameTemplateListingData.categories.map((category) => (
+                  {privateGameTemplateListingData.categories.map(category => (
                     <Chip
                       size="small"
                       style={styles.chip}

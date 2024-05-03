@@ -26,7 +26,7 @@ export default class BuildsWatcher {
     this.authenticatedUser = authenticatedUser;
     this.onBuildUpdated = onBuildUpdated;
 
-    builds.forEach((build) => {
+    builds.forEach(build => {
       if (build.status === 'pending') {
         if (
           (!build.createdAt ||

@@ -87,20 +87,23 @@ export default class InstancesResizer {
     const initialInstanceAABB = this._instanceAABBs[instance.ptr];
     if (initialInstanceAABB) return initialInstanceAABB;
 
-    return (this._instanceAABBs[instance.ptr] =
-      this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
+    return (this._instanceAABBs[
+      instance.ptr
+    ] = this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
   _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
-    const initialUnrotatedInstanceAABB =
-      this._unrotatedInstanceAABBs[instance.ptr];
+    const initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
+      instance.ptr
+    ];
     if (initialUnrotatedInstanceAABB) return initialUnrotatedInstanceAABB;
 
-    return (this._unrotatedInstanceAABBs[instance.ptr] =
-      this.instanceMeasurer.getUnrotatedInstanceAABB(
-        instance,
-        new Rectangle()
-      ));
+    return (this._unrotatedInstanceAABBs[
+      instance.ptr
+    ] = this.instanceMeasurer.getUnrotatedInstanceAABB(
+      instance,
+      new Rectangle()
+    ));
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
@@ -142,11 +145,12 @@ export default class InstancesResizer {
     this.totalDeltaY += deltaY;
 
     const nonLockedInstances = instances.filter(
-      (instance) => !instance.isLocked()
+      instance => !instance.isLocked()
     );
 
-    const initialSelectionAABB =
-      this._getOrCreateSelectionAABB(nonLockedInstances);
+    const initialSelectionAABB = this._getOrCreateSelectionAABB(
+      nonLockedInstances
+    );
     if (!initialSelectionAABB) return;
 
     // Round the grabbed handle position on the grid.
@@ -275,10 +279,12 @@ export default class InstancesResizer {
     for (let i = 0; i < nonLockedInstances.length; i++) {
       const selectedInstance = nonLockedInstances[i];
 
-      let initialUnrotatedInstanceAABB =
-        this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
-      let initialInstanceOriginPosition =
-        this._getOrCreateInstanceOriginPosition(selectedInstance);
+      let initialUnrotatedInstanceAABB = this._getOrCreateUnrotatedInstanceAABB(
+        selectedInstance
+      );
+      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
+        selectedInstance
+      );
 
       // Assume a size of 1 pixel to start the resizing
       // if the instance had a size of 0.

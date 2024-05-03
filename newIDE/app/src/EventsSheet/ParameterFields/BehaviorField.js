@@ -15,7 +15,7 @@ const gd: libGDevelop = global.gd;
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function BehaviorField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const focus: FieldFocusFunction = (options) => {
+    const focus: FieldFocusFunction = options => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -39,66 +39,69 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? parameterMetadata.getExtraInfo()
       : undefined;
 
-    const updateBehaviorsList = React.useCallback(() => {
-      const {
-        instructionMetadata,
-        instruction,
-        expressionMetadata,
-        expression,
-        parameterIndex,
-        globalObjectsContainer,
-        objectsContainer,
-      } = props;
-      const objectName = getLastObjectParameterValue({
-        instructionMetadata,
-        instruction,
-        expressionMetadata,
-        expression,
-        parameterIndex,
-      });
-      if (!objectName) return;
-
-      const newBehaviorNames = gd
-        .getBehaviorsOfObject(
+    const updateBehaviorsList = React.useCallback(
+      () => {
+        const {
+          instructionMetadata,
+          instruction,
+          expressionMetadata,
+          expression,
+          parameterIndex,
           globalObjectsContainer,
           objectsContainer,
-          objectName,
-          true
-        )
-        .toJSArray()
-        .filter((behaviorName) => {
-          return (
-            (!allowedBehaviorType ||
-              gd.getTypeOfBehavior(
-                globalObjectsContainer,
-                objectsContainer,
-                behaviorName,
-                false
-              ) === allowedBehaviorType) &&
-            (allowedBehaviorType ||
-              !gd.isDefaultBehavior(
-                globalObjectsContainer,
-                objectsContainer,
-                objectName,
-                behaviorName,
-                true
-              ))
-          );
+        } = props;
+        const objectName = getLastObjectParameterValue({
+          instructionMetadata,
+          instruction,
+          expressionMetadata,
+          expression,
+          parameterIndex,
         });
+        if (!objectName) return;
 
-      setBehaviorNames(newBehaviorNames);
-      if (!!props.value && newBehaviorNames.length === 0) {
-        // Force emptying the current value if there is no behavior.
-        // Useful when the object is changed to one without behaviors.
-        props.onChange('');
-      }
-    }, [props, allowedBehaviorType]);
+        const newBehaviorNames = gd
+          .getBehaviorsOfObject(
+            globalObjectsContainer,
+            objectsContainer,
+            objectName,
+            true
+          )
+          .toJSArray()
+          .filter(behaviorName => {
+            return (
+              (!allowedBehaviorType ||
+                gd.getTypeOfBehavior(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  behaviorName,
+                  false
+                ) === allowedBehaviorType) &&
+              (allowedBehaviorType ||
+                !gd.isDefaultBehavior(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectName,
+                  behaviorName,
+                  true
+                ))
+            );
+          });
+
+        setBehaviorNames(newBehaviorNames);
+        if (!!props.value && newBehaviorNames.length === 0) {
+          // Force emptying the current value if there is no behavior.
+          // Useful when the object is changed to one without behaviors.
+          props.onChange('');
+        }
+      },
+      [props, allowedBehaviorType]
+    );
 
     const getError = (value?: string) => {
       if (!value && !props.value) return null;
 
       const isValidChoice =
-        behaviorNames.filter((choice) => props.value === choice).length !== 0;
+        behaviorNames.filter(choice => props.value === choice).length !== 0;
 
       if (!isValidChoice) return 'This behavior is not attached to the object';
 
@@ -125,13 +128,19 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       [behaviorNames, props]
     );
 
-    React.useEffect(() => {
-      forceChooseBehavior();
-    }, [forceChooseBehavior]);
+    React.useEffect(
+      () => {
+        forceChooseBehavior();
+      },
+      [forceChooseBehavior]
+    );
 
-    React.useEffect(() => {
-      updateBehaviorsList();
-    }, [updateBehaviorsList]);
+    React.useEffect(
+      () => {
+        updateBehaviorsList();
+      },
+      [updateBehaviorsList]
+    );
 
     const noBehaviorErrorText =
       allowedBehaviorType !== '' ? (
@@ -157,10 +166,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         onChange={props.onChange}
         onRequestClose={props.onRequestClose}
         onApply={props.onApply}
-        onBlur={(event) => {
+        onBlur={event => {
           doValidation(event.currentTarget.value);
         }}
-        dataSource={behaviorNames.map((behaviorName) => ({
+        dataSource={behaviorNames.map(behaviorName => ({
           text: behaviorName,
           value: behaviorName,
         }))}

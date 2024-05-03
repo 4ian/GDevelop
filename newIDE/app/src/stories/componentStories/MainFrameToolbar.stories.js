@@ -76,11 +76,14 @@ export const NoProjectOpen = () => (
 
 export const NoProjectOpenWithFakeButtons = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
-  React.useEffect(() => {
-    if (toolbar.current) {
-      toolbar.current.setEditorToolbar(fakeEditorToolbar);
-    }
-  }, [toolbar]);
+  React.useEffect(
+    () => {
+      if (toolbar.current) {
+        toolbar.current.setEditorToolbar(fakeEditorToolbar);
+      }
+    },
+    [toolbar]
+  );
   return (
     <MainFrameToolbar
       {...defaultProps}
@@ -165,11 +168,14 @@ export const ProjectOpenPreviewOverridenOnExternalLayout = () => (
 
 export const ProjectOpenWithFakeButtons = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
-  React.useEffect(() => {
-    if (toolbar.current) {
-      toolbar.current.setEditorToolbar(fakeEditorToolbar);
-    }
-  }, [toolbar]);
+  React.useEffect(
+    () => {
+      if (toolbar.current) {
+        toolbar.current.setEditorToolbar(fakeEditorToolbar);
+      }
+    },
+    [toolbar]
+  );
   return <MainFrameToolbar {...defaultProps} ref={toolbar} isPreviewEnabled />;
 };
 

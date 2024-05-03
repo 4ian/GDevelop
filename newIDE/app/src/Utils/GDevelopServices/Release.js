@@ -32,5 +32,5 @@ export const findRelease = (
   releases: Array<Release>,
   name: string
 ): ?Release => {
-  return releases.find((release) => release.name === name);
+  return releases.find(release => release.name === name);
 };

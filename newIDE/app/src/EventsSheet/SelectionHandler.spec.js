@@ -505,17 +505,26 @@ describe('SelectionHandler', () => {
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2).getConditions().get(0)
+        gd
+          .asStandardEvent(standardEvent1_2)
+          .getConditions()
+          .get(0)
       )
     ).toBe(false);
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2).getConditions().get(1)
+        gd
+          .asStandardEvent(standardEvent1_2)
+          .getConditions()
+          .get(1)
       )
     ).toBe(true);
     expect(getSelectedInstructions(currentSelection)).toEqual([
-      gd.asStandardEvent(standardEvent1_2).getConditions().get(1),
+      gd
+        .asStandardEvent(standardEvent1_2)
+        .getConditions()
+        .get(1),
     ]);
     expect(getSelectedInstructionsLocatingEvents(currentSelection)).toEqual([
       standardEvent1_2,
@@ -523,7 +532,10 @@ describe('SelectionHandler', () => {
     expect(getLastSelectedInstructionContext(currentSelection)).toEqual({
       isCondition: true,
       instrsList: gd.asStandardEvent(standardEvent1_2).getConditions(),
-      instruction: gd.asStandardEvent(standardEvent1_2).getConditions().get(1),
+      instruction: gd
+        .asStandardEvent(standardEvent1_2)
+        .getConditions()
+        .get(1),
       indexInList: 1,
       eventContext: {
         event: standardEvent1_2,
@@ -543,7 +555,10 @@ describe('SelectionHandler', () => {
       {
         isCondition: false,
         instrsList: gd.asStandardEvent(standardEvent1_2_1).getActions(),
-        instruction: gd.asStandardEvent(standardEvent1_2_1).getActions().get(0),
+        instruction: gd
+          .asStandardEvent(standardEvent1_2_1)
+          .getActions()
+          .get(0),
         indexInList: 0,
       },
       true
@@ -580,30 +595,48 @@ describe('SelectionHandler', () => {
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2).getConditions().get(0)
+        gd
+          .asStandardEvent(standardEvent1_2)
+          .getConditions()
+          .get(0)
       )
     ).toBe(false);
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2).getConditions().get(1)
+        gd
+          .asStandardEvent(standardEvent1_2)
+          .getConditions()
+          .get(1)
       )
     ).toBe(true);
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2_1).getActions().get(0)
+        gd
+          .asStandardEvent(standardEvent1_2_1)
+          .getActions()
+          .get(0)
       )
     ).toBe(true);
     expect(
       isInstructionSelected(
         currentSelection,
-        gd.asStandardEvent(standardEvent1_2_1).getActions().get(1)
+        gd
+          .asStandardEvent(standardEvent1_2_1)
+          .getActions()
+          .get(1)
       )
     ).toBe(false);
     expect(getSelectedInstructions(currentSelection)).toEqual([
-      gd.asStandardEvent(standardEvent1_2).getConditions().get(1),
-      gd.asStandardEvent(standardEvent1_2_1).getActions().get(0),
+      gd
+        .asStandardEvent(standardEvent1_2)
+        .getConditions()
+        .get(1),
+      gd
+        .asStandardEvent(standardEvent1_2_1)
+        .getActions()
+        .get(0),
     ]);
     expect(getSelectedInstructionsLocatingEvents(currentSelection)).toEqual([
       standardEvent1_2,
@@ -612,7 +645,10 @@ describe('SelectionHandler', () => {
     expect(getLastSelectedInstructionContext(currentSelection)).toEqual({
       isCondition: false,
       instrsList: gd.asStandardEvent(standardEvent1_2_1).getActions(),
-      instruction: gd.asStandardEvent(standardEvent1_2_1).getActions().get(0),
+      instruction: gd
+        .asStandardEvent(standardEvent1_2_1)
+        .getActions()
+        .get(0),
       indexInList: 0,
       eventContext: {
         event: standardEvent1_2_1,

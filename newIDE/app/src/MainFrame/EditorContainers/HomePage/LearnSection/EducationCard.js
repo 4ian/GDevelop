@@ -19,7 +19,7 @@ type Props = {|
 export const EducationCard = ({ onSeeResources }: Props) => {
   return (
     <CalloutCard
-      renderImage={(style) => (
+      renderImage={style => (
         <img
           src="res/education-resources.svg"
           style={style}

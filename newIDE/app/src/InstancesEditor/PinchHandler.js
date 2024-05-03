@@ -93,7 +93,7 @@ const registerCanvasPinchDetector = ({
 
 type Props = {|
   canvas: HTMLCanvasElement,
-  setZoomFactor: (number) => void,
+  setZoomFactor: number => void,
   getZoomFactor: () => number,
   viewPosition: ViewPosition,
 |};
@@ -105,7 +105,7 @@ type Props = {|
 export default class PinchHandler {
   _lastPinchCenterX: number | null = null;
   _lastPinchCenterY: number | null = null;
-  _setZoomFactor: (number) => void;
+  _setZoomFactor: number => void;
   _getZoomFactor: () => number;
   _viewPosition: ViewPosition;
   _unregisterCanvasPinchDetector: () => void;

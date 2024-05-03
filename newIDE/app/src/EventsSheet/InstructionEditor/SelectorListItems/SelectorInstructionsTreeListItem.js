@@ -15,7 +15,7 @@ type Props<T> = {|
   useSubheaders?: boolean,
   selectedValue: ?string,
   initiallyOpenedPath?: ?Array<string>,
-  getGroupIconSrc: (string) => string,
+  getGroupIconSrc: string => string,
   parentGroupIconSrc?: ?string,
 
   // Optional ref that will be filled with the selected ListItem
@@ -23,7 +23,7 @@ type Props<T> = {|
 |};
 
 export const renderInstructionOrExpressionTree = <
-  T: EnumeratedInstructionOrExpressionMetadata,
+  T: EnumeratedInstructionOrExpressionMetadata
 >({
   instructionTreeNode,
   onChoose,
@@ -39,7 +39,7 @@ export const renderInstructionOrExpressionTree = <
     initiallyOpenedPath || [];
 
   return flatten(
-    Object.keys(instructionTreeNode).map((key) => {
+    Object.keys(instructionTreeNode).map(key => {
       // In theory, we should have a way to distinguish
       // between instruction (leaf nodes) and group (nodes). We use
       // the "type" properties, but this will fail if a group is called "type"
@@ -78,8 +78,7 @@ export const renderInstructionOrExpressionTree = <
         );
       } else {
         // $FlowFixMe - see above
-        const groupOfInstructionInformation: InstructionOrExpressionTreeNode =
-          instructionOrGroup;
+        const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
           const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return [

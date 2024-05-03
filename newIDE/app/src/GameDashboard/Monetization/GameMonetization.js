@@ -20,8 +20,10 @@ const GameMonetization = ({ game, onGameUpdated }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [pendingDisplayAdsOnGamePage, setPendingDisplayAdsOnGamePage] =
-    React.useState<boolean | null>(null);
+  const [
+    pendingDisplayAdsOnGamePage,
+    setPendingDisplayAdsOnGamePage,
+  ] = React.useState<boolean | null>(null);
 
   if (!profile) return null;
 

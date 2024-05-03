@@ -12,8 +12,10 @@ type Props = {|
 |};
 
 const PublicProfileProvider = ({ children }: Props) => {
-  const [visitedPublicProfileUserId, setVisitedPublicProfileUserId] =
-    React.useState<?string>(null);
+  const [
+    visitedPublicProfileUserId,
+    setVisitedPublicProfileUserId,
+  ] = React.useState<?string>(null);
 
   const openUserPublicProfile = React.useCallback(
     (userId: string): void => {
@@ -22,9 +24,12 @@ const PublicProfileProvider = ({ children }: Props) => {
     [setVisitedPublicProfileUserId]
   );
 
-  const closeUserPublicProfile = React.useCallback((): void => {
-    setVisitedPublicProfileUserId(null);
-  }, [setVisitedPublicProfileUserId]);
+  const closeUserPublicProfile = React.useCallback(
+    (): void => {
+      setVisitedPublicProfileUserId(null);
+    },
+    [setVisitedPublicProfileUserId]
+  );
 
   const publicProfileState: PublicProfileState = React.useMemo(
     () => ({

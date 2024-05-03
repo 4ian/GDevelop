@@ -61,8 +61,10 @@ export const BehaviorStore = ({
   onChoose,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
-  const [selectedBehaviorShortHeader, setSelectedBehaviorShortHeader] =
-    React.useState<?BehaviorShortHeader>(null);
+  const [
+    selectedBehaviorShortHeader,
+    setSelectedBehaviorShortHeader,
+  ] = React.useState<?BehaviorShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -79,22 +81,31 @@ export const BehaviorStore = ({
 
   const [showDeprecated, setShowDeprecated] = React.useState(false);
 
-  React.useEffect(() => {
-    setInstalledBehaviorMetadataList(
-      showDeprecated
-        ? [...installedBehaviorMetadataList, ...deprecatedBehaviorMetadataList]
-        : installedBehaviorMetadataList
-    );
-  }, [
-    deprecatedBehaviorMetadataList,
-    installedBehaviorMetadataList,
-    setInstalledBehaviorMetadataList,
-    showDeprecated,
-  ]);
+  React.useEffect(
+    () => {
+      setInstalledBehaviorMetadataList(
+        showDeprecated
+          ? [
+              ...installedBehaviorMetadataList,
+              ...deprecatedBehaviorMetadataList,
+            ]
+          : installedBehaviorMetadataList
+      );
+    },
+    [
+      deprecatedBehaviorMetadataList,
+      installedBehaviorMetadataList,
+      setInstalledBehaviorMetadataList,
+      showDeprecated,
+    ]
+  );
 
-  React.useEffect(() => {
-    fetchBehaviors();
-  }, [fetchBehaviors]);
+  React.useEffect(
+    () => {
+      fetchBehaviors();
+    },
+    [fetchBehaviors]
+  );
 
   const filteredSearchResults = searchResults ? searchResults : null;
 
@@ -113,7 +124,7 @@ export const BehaviorStore = ({
     ): SearchMatch[] => {
       if (!searchResults) return [];
       const extensionMatches = searchResults.find(
-        (result) => result.item.type === extensionShortHeader.type
+        result => result.item.type === extensionShortHeader.type
       );
       return extensionMatches ? extensionMatches.matches : [];
     },
@@ -168,7 +179,7 @@ export const BehaviorStore = ({
               }}
             >
               <SelectOption value="" label={t`All categories`} />
-              {allCategories.map((category) => (
+              {allCategories.map(category => (
                 <SelectOption
                   key={category}
                   value={category}

@@ -99,7 +99,7 @@ export type InAppTutorialFormattedTooltip = {|
 
 export type InAppTutorialDialog = {|
   content: Array<
-    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |},
+    TranslatedText | {| image: {| imageSource: string, linkHref?: string |} |}
   >,
 |};
 
@@ -170,11 +170,12 @@ const fetchLocalFileIfDesktop = async (filename: string): Promise<?Object> => {
 };
 
 export const fetchInAppTutorialShortHeaders = async (): Promise<
-  Array<InAppTutorialShortHeader>,
+  Array<InAppTutorialShortHeader>
 > => {
   try {
-    const inAppTutorialShortHeadersStoredLocally =
-      await fetchLocalFileIfDesktop('inAppTutorialShortHeaders');
+    const inAppTutorialShortHeadersStoredLocally = await fetchLocalFileIfDesktop(
+      'inAppTutorialShortHeaders'
+    );
     if (inAppTutorialShortHeadersStoredLocally)
       return inAppTutorialShortHeadersStoredLocally;
   } catch (error) {

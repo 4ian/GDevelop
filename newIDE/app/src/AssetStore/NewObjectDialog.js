@@ -47,13 +47,11 @@ export const useExtensionUpdateAlertDialog = () => {
   ): Promise<boolean> => {
     return await showConfirmation({
       title: t`Extension update`,
-      message: t`Before installing this asset, it's strongly recommended to update these extensions${
-        '\n\n - ' +
+      message: t`Before installing this asset, it's strongly recommended to update these extensions${'\n\n - ' +
         outOfDateExtensionShortHeaders
-          .map((extension) => extension.fullName)
+          .map(extension => extension.fullName)
           .join('\n\n - ') +
-        '\n\n'
-      }Do you want to update it now ?`,
+        '\n\n'}Do you want to update it now ?`,
       confirmButtonLabel: t`Update the extension`,
       dismissButtonLabel: t`Skip the update`,
     });
@@ -72,7 +70,7 @@ export const useFetchAssets = () => {
   ): Promise<Array<Asset>> => {
     const fetchedAssets = await PromisePool.withConcurrency(6)
       .for(assetShortHeaders)
-      .process<Asset>(async (assetShortHeader) => {
+      .process<Asset>(async assetShortHeader => {
         const asset = isPrivateAsset(assetShortHeader)
           ? await fetchPrivateAsset(assetShortHeader, {
               environment,
@@ -118,16 +116,18 @@ function NewObjectDialog({
   canInstallPrivateAsset,
 }: Props) {
   const { isMobile } = useResponsiveWindowSize();
-  const { setNewObjectDialogDefaultTab, getNewObjectDialogDefaultTab } =
-    React.useContext(PreferencesContext);
+  const {
+    setNewObjectDialogDefaultTab,
+    getNewObjectDialogDefaultTab,
+  } = React.useContext(PreferencesContext);
   const [currentTab, setCurrentTab] = React.useState(
     getNewObjectDialogDefaultTab()
   );
 
-  React.useEffect(
-    () => setNewObjectDialogDefaultTab(currentTab),
-    [setNewObjectDialogDefaultTab, currentTab]
-  );
+  React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
+    setNewObjectDialogDefaultTab,
+    currentTab,
+  ]);
 
   const {
     assetShortHeadersSearchResults,
@@ -135,18 +135,25 @@ function NewObjectDialog({
     environment,
     setEnvironment,
   } = React.useContext(AssetStoreContext);
-  const { openedAssetPack, openedAssetShortHeader, selectedFolders } =
-    shopNavigationState.getCurrentPage();
-  const [isAssetPackDialogInstallOpen, setIsAssetPackDialogInstallOpen] =
-    React.useState(false);
+  const {
+    openedAssetPack,
+    openedAssetShortHeader,
+    selectedFolders,
+  } = shopNavigationState.getCurrentPage();
+  const [
+    isAssetPackDialogInstallOpen,
+    setIsAssetPackDialogInstallOpen,
+  ] = React.useState(false);
   // Avoid memoizing the result of enumerateAssetStoreIds, as it does not get updated
   // when adding assets.
   const existingAssetStoreIds = enumerateAssetStoreIds(
     project,
     objectsContainer
   );
-  const [isAssetBeingInstalled, setIsAssetBeingInstalled] =
-    React.useState<boolean>(false);
+  const [
+    isAssetBeingInstalled,
+    setIsAssetBeingInstalled,
+  ] = React.useState<boolean>(false);
   const [
     selectedCustomObjectEnumeratedMetadata,
     setSelectedCustomObjectEnumeratedMetadata,
@@ -184,11 +191,12 @@ function NewObjectDialog({
         }
         const assets = await fetchAssets([assetShortHeader]);
         const asset = assets[0];
-        const requiredExtensionInstallation =
-          await checkRequiredExtensionsUpdateForAssets({
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
+          {
             assets,
             project,
-          });
+          }
+        );
         const shouldUpdateExtension =
           requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
             0 &&
@@ -234,7 +242,9 @@ function NewObjectDialog({
         console.error('Error while installing the asset:', error);
         showAlert({
           title: t`Could not install the asset`,
-          message: t`There was an error while installing the asset "${assetShortHeader.name}". Verify your internet connection or try again later.`,
+          message: t`There was an error while installing the asset "${
+            assetShortHeader.name
+          }". Verify your internet connection or try again later.`,
         });
         setIsAssetBeingInstalled(false);
         return false;
@@ -255,59 +265,68 @@ function NewObjectDialog({
     ]
   );
 
-  const onInstallEmptyCustomObject = React.useCallback(async () => {
-    const requiredExtensions =
-      selectedCustomObjectEnumeratedMetadata &&
-      selectedCustomObjectEnumeratedMetadata.requiredExtensions;
-    if (!selectedCustomObjectEnumeratedMetadata || !requiredExtensions) return;
-    try {
-      setIsAssetBeingInstalled(true);
-      const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
-        {
-          requiredExtensions,
+  const onInstallEmptyCustomObject = React.useCallback(
+    async () => {
+      const requiredExtensions =
+        selectedCustomObjectEnumeratedMetadata &&
+        selectedCustomObjectEnumeratedMetadata.requiredExtensions;
+      if (!selectedCustomObjectEnumeratedMetadata || !requiredExtensions)
+        return;
+      try {
+        setIsAssetBeingInstalled(true);
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdate(
+          {
+            requiredExtensions,
+            project,
+          }
+        );
+        const shouldUpdateExtension =
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
+            0 &&
+          (await showExtensionUpdateConfirmation(
+            requiredExtensionInstallation.outOfDateExtensionShortHeaders
+          ));
+        await installRequiredExtensions({
+          requiredExtensionInstallation,
+          shouldUpdateExtension,
+          eventsFunctionsExtensionsState,
           project,
-        }
-      );
-      const shouldUpdateExtension =
-        requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
-          0 &&
-        (await showExtensionUpdateConfirmation(
-          requiredExtensionInstallation.outOfDateExtensionShortHeaders
-        ));
-      await installRequiredExtensions({
-        requiredExtensionInstallation,
-        shouldUpdateExtension,
-        eventsFunctionsExtensionsState,
-        project,
-      });
+        });
 
-      onCreateNewObject(selectedCustomObjectEnumeratedMetadata.name);
-    } catch (error) {
-      console.error('Error while creating the object:', error);
-      showAlert({
-        title: t`Could not create the object`,
-        message: t`There was an error while creating the object "${selectedCustomObjectEnumeratedMetadata.fullName}". Verify your internet connection or try again later.`,
-      });
-    } finally {
-      setIsAssetBeingInstalled(false);
-    }
-  }, [
-    selectedCustomObjectEnumeratedMetadata,
-    onCreateNewObject,
-    project,
-    showExtensionUpdateConfirmation,
-    eventsFunctionsExtensionsState,
-    showAlert,
-  ]);
+        onCreateNewObject(selectedCustomObjectEnumeratedMetadata.name);
+      } catch (error) {
+        console.error('Error while creating the object:', error);
+        showAlert({
+          title: t`Could not create the object`,
+          message: t`There was an error while creating the object "${
+            selectedCustomObjectEnumeratedMetadata.fullName
+          }". Verify your internet connection or try again later.`,
+        });
+      } finally {
+        setIsAssetBeingInstalled(false);
+      }
+    },
+    [
+      selectedCustomObjectEnumeratedMetadata,
+      onCreateNewObject,
+      project,
+      showExtensionUpdateConfirmation,
+      eventsFunctionsExtensionsState,
+      showAlert,
+    ]
+  );
 
-  const displayedAssetShortHeaders = React.useMemo(() => {
-    return assetShortHeadersSearchResults
-      ? getAssetShortHeadersToDisplay(
-          assetShortHeadersSearchResults,
-          selectedFolders
-        )
-      : [];
-  }, [assetShortHeadersSearchResults, selectedFolders]);
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return assetShortHeadersSearchResults
+        ? getAssetShortHeadersToDisplay(
+            assetShortHeadersSearchResults,
+            selectedFolders
+          )
+        : [];
+    },
+    [assetShortHeadersSearchResults, selectedFolders]
+  );
 
   const mainAction =
     currentTab === 'asset-store' ? (
@@ -381,10 +400,13 @@ function NewObjectDialog({
     ) : null;
 
   const assetStore = React.useRef<?AssetStoreInterface>(null);
-  const handleClose = React.useCallback(() => {
-    assetStore.current && assetStore.current.onClose();
-    onClose();
-  }, [onClose]);
+  const handleClose = React.useCallback(
+    () => {
+      assetStore.current && assetStore.current.onClose();
+      onClose();
+    },
+    [onClose]
+  );
 
   return (
     <I18n>
@@ -410,10 +432,10 @@ function NewObjectDialog({
               openedAssetPack
                 ? () => setIsAssetPackDialogInstallOpen(true)
                 : openedAssetShortHeader
-                  ? async () => {
-                      await onInstallAsset(openedAssetShortHeader);
-                    }
-                  : undefined
+                ? async () => {
+                    await onInstallAsset(openedAssetShortHeader);
+                  }
+                : undefined
             }
             open
             flexBody
@@ -450,7 +472,7 @@ function NewObjectDialog({
                   setSelectedCustomObjectEnumeratedMetadata
                 }
                 selectedCustomObject={selectedCustomObjectEnumeratedMetadata}
-                onInstallAsset={async (assetShortHeader) => {
+                onInstallAsset={async assetShortHeader => {
                   const result = await onInstallAsset(assetShortHeader);
                   if (result) {
                     handleClose();

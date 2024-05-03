@@ -205,12 +205,22 @@ describe('SpriteObjectHelper', () => {
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
 
         // Moving a vertice of the polygon makes them different again.
-        sprite2.getCustomCollisionMask().at(0).getVertices().at(1).set_x(-20);
+        sprite2
+          .getCustomCollisionMask()
+          .at(0)
+          .getVertices()
+          .at(1)
+          .set_x(-20);
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(false);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(false);
 
         // Moving the same vertice of the other polygon makes them the same again.
-        sprite1.getCustomCollisionMask().at(0).getVertices().at(1).set_x(-20);
+        sprite1
+          .getCustomCollisionMask()
+          .at(0)
+          .getVertices()
+          .at(1)
+          .set_x(-20);
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(true);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
       }
@@ -240,9 +250,12 @@ describe('SpriteObjectHelper', () => {
     });
 
     expect(animation1.getDirection(0).getSpritesCount()).toBe(1);
-    expect(animation1.getDirection(0).getSprite(0).getImageName()).toBe(
-      'sprite2.png'
-    );
+    expect(
+      animation1
+        .getDirection(0)
+        .getSprite(0)
+        .getImageName()
+    ).toBe('sprite2.png');
     expect(animation1.getDirection(1).getSpritesCount()).toBe(2);
   });
 });

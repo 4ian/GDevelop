@@ -96,7 +96,7 @@ type ItemProps = {|
   onDelete: () => void,
   addLabel: string,
   onAdd: () => void,
-  onRename: (string) => void,
+  onRename: string => void,
   onEditName: () => void,
   onCopy: () => void,
   onCut: () => void,
@@ -110,7 +110,7 @@ type ItemProps = {|
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
   isLastItem: boolean,
   dragAndDropProps: {|
-    DragSourceAndDropTarget: (any) => React.Node,
+    DragSourceAndDropTarget: any => React.Node,
     onBeginDrag: () => void,
     onDrop: () => void,
   |},
@@ -146,15 +146,18 @@ export const Item = ({
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  React.useEffect(() => {
-    if (editingName) {
-      shouldDiscardChanges.current = false;
-      const timeoutId = setTimeout(() => {
-        if (textFieldRef.current) textFieldRef.current.focus();
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [editingName]);
+  React.useEffect(
+    () => {
+      if (editingName) {
+        shouldDiscardChanges.current = false;
+        const timeoutId = setTimeout(() => {
+          if (textFieldRef.current) textFieldRef.current.focus();
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
+    },
+    [editingName]
+  );
 
   const label = editingName ? (
     <TextField
@@ -162,17 +165,17 @@ export const Item = ({
       margin="none"
       ref={textFieldRef}
       defaultValue={primaryText}
-      onBlur={(e) =>
+      onBlur={e =>
         onRename(
           shouldDiscardChanges.current ? primaryText : e.currentTarget.value
         )
       }
-      onKeyPress={(event) => {
+      onKeyPress={event => {
         if (shouldValidate(event)) {
           if (textFieldRef.current) textFieldRef.current.blur();
         }
       }}
-      onKeyUp={(event) => {
+      onKeyUp={event => {
         if (shouldCloseOrCancel(event)) {
           const { current: currentTextField } = textFieldRef;
           if (currentTextField) {
@@ -181,7 +184,7 @@ export const Item = ({
           }
         }
       }}
-      onKeyDown={(event) => {
+      onKeyDown={event => {
         // Prevent project manager to be closed when pressing escape
         // to cancel name change.
         if (shouldCloseOrCancel(event)) {
@@ -239,7 +242,9 @@ export const Item = ({
                     isLastItem
                       ? undefined
                       : {
-                          borderBottom: `1px solid ${gdevelopTheme.listItem.separatorColor}`,
+                          borderBottom: `1px solid ${
+                            gdevelopTheme.listItem.separatorColor
+                          }`,
                         }
                   }
                   noPadding
@@ -320,7 +325,7 @@ export const Item = ({
 type EventFunctionExtensionItemProps = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onEdit: ({ [string]: ExtensionShortHeader }) => void,
-  onRename: (string) => void,
+  onRename: string => void,
   onEditName: () => void,
   isEditingName: boolean,
   onDelete: () => void,
@@ -336,7 +341,7 @@ type EventFunctionExtensionItemProps = {|
   onMoveDown: () => void,
   isLastItem: boolean,
   dragAndDropProps: {|
-    DragSourceAndDropTarget: (any) => React.Node,
+    DragSourceAndDropTarget: any => React.Node,
     onBeginDrag: () => void,
     onDrop: () => void,
   |},

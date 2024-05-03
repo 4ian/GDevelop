@@ -22,17 +22,24 @@ type Props = {|
 |};
 
 const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
-  const [isCancelingSubscription, setIsCancelingSubscription] =
-    React.useState(false);
-  const [hasCanceledSubscription, setHasCanceledSubscription] =
-    React.useState(false);
-  const [stoppedMakingGamesChecked, setStoppedMakingGamesChecked] =
-    React.useState(false);
+  const [isCancelingSubscription, setIsCancelingSubscription] = React.useState(
+    false
+  );
+  const [hasCanceledSubscription, setHasCanceledSubscription] = React.useState(
+    false
+  );
+  const [
+    stoppedMakingGamesChecked,
+    setStoppedMakingGamesChecked,
+  ] = React.useState(false);
   const [strugglingChecked, setStrugglingChecked] = React.useState(false);
-  const [preferFreeVersionChecked, setPreferFreeVersionChecked] =
-    React.useState(false);
-  const [missingFeatureChecked, setMissingFeatureChecked] =
-    React.useState(false);
+  const [
+    preferFreeVersionChecked,
+    setPreferFreeVersionChecked,
+  ] = React.useState(false);
+  const [missingFeatureChecked, setMissingFeatureChecked] = React.useState(
+    false
+  );
   const [qualityIssuesChecked, setQualityIssuesChecked] = React.useState(false);
   const [otherChecked, setOtherChecked] = React.useState(false);
   const [freeText, setFreeText] = React.useState('');
@@ -48,56 +55,63 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
       otherChecked) &&
     ((!missingFeatureChecked && !otherChecked) || freeText.trim().length > 0);
 
-  const cancelPlan = React.useCallback(async () => {
-    if (isCancelingSubscription || !canSubmit) return;
-    const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
-    if (!profile || !subscription) return;
-    setIsCancelingSubscription(true);
-    try {
-      await changeUserSubscription(
+  const cancelPlan = React.useCallback(
+    async () => {
+      if (isCancelingSubscription || !canSubmit) return;
+      const {
         getAuthorizationHeader,
-        profile.id,
-        {
-          planId: null,
-        },
-        {
-          cancelImmediately: false,
-          cancelReasons: {
-            'stopped-making-games': stoppedMakingGamesChecked,
-            'struggling-with-gdevelop': strugglingChecked,
-            'prefer-free-version': preferFreeVersionChecked,
-            'missing-feature': missingFeatureChecked,
-            'quality-issues': qualityIssuesChecked,
-            other: otherChecked,
-            freeText: freeText,
+        subscription,
+        profile,
+      } = authenticatedUser;
+      if (!profile || !subscription) return;
+      setIsCancelingSubscription(true);
+      try {
+        await changeUserSubscription(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            planId: null,
           },
-        }
-      );
-      await authenticatedUser.onRefreshSubscription();
-      setHasCanceledSubscription(true);
-    } catch (rawError) {
-      await authenticatedUser.onRefreshSubscription();
-      console.error('Error while canceling subscription:', rawError);
-      showAlert({
-        title: t`Could not cancel your subscription`,
-        message: t`There was an error while canceling your subscription. Verify your internet connection or try again later.`,
-      });
-    } finally {
-      setIsCancelingSubscription(false);
-    }
-  }, [
-    authenticatedUser,
-    showAlert,
-    isCancelingSubscription,
-    canSubmit,
-    freeText,
-    stoppedMakingGamesChecked,
-    strugglingChecked,
-    preferFreeVersionChecked,
-    qualityIssuesChecked,
-    missingFeatureChecked,
-    otherChecked,
-  ]);
+          {
+            cancelImmediately: false,
+            cancelReasons: {
+              'stopped-making-games': stoppedMakingGamesChecked,
+              'struggling-with-gdevelop': strugglingChecked,
+              'prefer-free-version': preferFreeVersionChecked,
+              'missing-feature': missingFeatureChecked,
+              'quality-issues': qualityIssuesChecked,
+              other: otherChecked,
+              freeText: freeText,
+            },
+          }
+        );
+        await authenticatedUser.onRefreshSubscription();
+        setHasCanceledSubscription(true);
+      } catch (rawError) {
+        await authenticatedUser.onRefreshSubscription();
+        console.error('Error while canceling subscription:', rawError);
+        showAlert({
+          title: t`Could not cancel your subscription`,
+          message: t`There was an error while canceling your subscription. Verify your internet connection or try again later.`,
+        });
+      } finally {
+        setIsCancelingSubscription(false);
+      }
+    },
+    [
+      authenticatedUser,
+      showAlert,
+      isCancelingSubscription,
+      canSubmit,
+      freeText,
+      stoppedMakingGamesChecked,
+      strugglingChecked,
+      preferFreeVersionChecked,
+      qualityIssuesChecked,
+      missingFeatureChecked,
+      otherChecked,
+    ]
+  );
 
   const isLoading =
     !authenticatedUser.subscription ||
@@ -245,7 +259,7 @@ const CancelReasonDialog = ({ onClose, onCloseAfterSuccess }: Props) => {
                     onChange={(e, value) => {
                       setFreeText(value);
                     }}
-                    onBlur={(event) => {
+                    onBlur={event => {
                       setFreeText(event.currentTarget.value.trim());
                     }}
                     fullWidth

@@ -102,8 +102,8 @@ const ListItemLastModification = ({
   const lastModifiedAt = !!lastModifiedInfo
     ? lastModifiedInfo.lastModifiedAt
     : !!file.fileMetadata.lastModifiedDate
-      ? file.fileMetadata.lastModifiedDate
-      : null;
+    ? file.fileMetadata.lastModifiedDate
+    : null;
   if (!lastModifiedAt) return null;
 
   // Current user info
@@ -193,7 +193,7 @@ const getStorageProviderByInternalName = (
   internalName: string
 ): ?StorageProvider => {
   return storageProviders.find(
-    (storageProvider) => storageProvider.internalName === internalName
+    storageProvider => storageProvider.internalName === internalName
   );
 };
 
@@ -230,7 +230,7 @@ export const ProjectFileListItem = ({
 
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
-      (event) => {
+      event => {
         onOpenContextMenu(event, file);
       },
       [onOpenContextMenu, file]
@@ -247,7 +247,7 @@ export const ProjectFileListItem = ({
               onOpenRecentFile(file);
             }}
             style={styles.listItem}
-            onContextMenu={(event) => onOpenContextMenu(event, file)}
+            onContextMenu={event => onOpenContextMenu(event, file)}
             {...longTouchForContextMenuProps}
           >
             {isWindowSizeMediumOrLarger ? (
@@ -297,7 +297,7 @@ export const ProjectFileListItem = ({
                     size="small"
                     edge="end"
                     aria-label="menu"
-                    onClick={(event) => {
+                    onClick={event => {
                       // prevent triggering the click on the list item.
                       event.stopPropagation();
                       onOpenContextMenu(event, file);

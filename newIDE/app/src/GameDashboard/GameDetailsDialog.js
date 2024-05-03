@@ -41,15 +41,18 @@ export const GameDetailsDialog = ({
   const { profile, onOpenLoginDialog } = React.useContext(
     AuthenticatedUserContext
   );
-  const onClickShare = React.useCallback(() => {
-    if (!profile) {
-      onOpenLoginDialog();
-      return;
-    }
-    if (onShareProject) {
-      onShareProject();
-    }
-  }, [profile, onShareProject, onOpenLoginDialog]);
+  const onClickShare = React.useCallback(
+    () => {
+      if (!profile) {
+        onOpenLoginDialog();
+        return;
+      }
+      if (onShareProject) {
+        onShareProject();
+      }
+    },
+    [profile, onShareProject, onOpenLoginDialog]
+  );
 
   const gameName = game ? game.gameName : project ? project.getName() : '';
   return (

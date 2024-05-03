@@ -66,18 +66,20 @@ const CustomObjectPropertiesEditor = (props: Props) => {
 
   const { isMobile } = useResponsiveWindowSize();
 
-  const customObjectConfiguration =
-    gd.asCustomObjectConfiguration(objectConfiguration);
+  const customObjectConfiguration = gd.asCustomObjectConfiguration(
+    objectConfiguration
+  );
   const properties = customObjectConfiguration.getProperties();
 
   const propertiesSchema = propertiesMapToSchema(
     properties,
-    (object) => object.getProperties(),
+    object => object.getProperties(),
     (object, name, value) => object.updateProperty(name, value)
   );
 
-  const extraInformation =
-    getExtraObjectsInformation()[customObjectConfiguration.getType()];
+  const extraInformation = getExtraObjectsInformation()[
+    customObjectConfiguration.getType()
+  ];
 
   const { values } = React.useContext(PreferencesContext);
   const tutorialIds = getObjectTutorialIds(customObjectConfiguration.getType());
@@ -93,54 +95,64 @@ const CustomObjectPropertiesEditor = (props: Props) => {
   // The matching collision mask only takes the first sprite of the first
   // animation of the object. We consider this is enough to start with, and
   // the user can then edit the collision mask for further needs.
-  const onCreateMatchingSpriteCollisionMask = React.useCallback(async () => {
-    const firstSprite = getFirstAnimationFrame(animations);
-    if (!firstSprite) {
-      return;
-    }
-    const firstSpriteResourceName = firstSprite.getImageName();
-    const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
-      project,
-      firstSpriteResourceName,
-      {}
-    );
-    let matchingCollisionMask = null;
-    try {
-      matchingCollisionMask = await getMatchingCollisionMask(
-        firstAnimationResourceSource
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(
+    async () => {
+      const firstSprite = getFirstAnimationFrame(animations);
+      if (!firstSprite) {
+        return;
+      }
+      const firstSpriteResourceName = firstSprite.getImageName();
+      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+        project,
+        firstSpriteResourceName,
+        {}
       );
-    } catch (e) {
-      console.error(
-        'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
-        e
-      );
-    }
-    setCollisionMaskOnAllFrames(animations, matchingCollisionMask);
-    forceUpdate();
-  }, [animations, project, forceUpdate]);
+      let matchingCollisionMask = null;
+      try {
+        matchingCollisionMask = await getMatchingCollisionMask(
+          firstAnimationResourceSource
+        );
+      } catch (e) {
+        console.error(
+          'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
+          e
+        );
+      }
+      setCollisionMaskOnAllFrames(animations, matchingCollisionMask);
+      forceUpdate();
+    },
+    [animations, project, forceUpdate]
+  );
 
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const animationList = React.useRef<?AnimationListInterface>(null);
 
-  const [justAddedAnimationName, setJustAddedAnimationName] =
-    React.useState<?string>(null);
+  const [
+    justAddedAnimationName,
+    setJustAddedAnimationName,
+  ] = React.useState<?string>(null);
   const justAddedAnimationElement = React.useRef<?any>(null);
 
-  React.useEffect(() => {
-    if (
-      scrollView.current &&
-      justAddedAnimationElement.current &&
-      justAddedAnimationName
-    ) {
-      scrollView.current.scrollTo(justAddedAnimationElement.current);
-      setJustAddedAnimationName(null);
-      justAddedAnimationElement.current = null;
-    }
-  }, [justAddedAnimationName]);
+  React.useEffect(
+    () => {
+      if (
+        scrollView.current &&
+        justAddedAnimationElement.current &&
+        justAddedAnimationName
+      ) {
+        scrollView.current.scrollTo(justAddedAnimationElement.current);
+        setJustAddedAnimationName(null);
+        justAddedAnimationElement.current = null;
+      }
+    },
+    [justAddedAnimationName]
+  );
 
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
-  const [collisionMasksEditorOpen, setCollisionMasksEditorOpen] =
-    React.useState(false);
+  const [
+    collisionMasksEditorOpen,
+    setCollisionMasksEditorOpen,
+  ] = React.useState(false);
 
   return (
     <I18n>
@@ -149,7 +161,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
           <ScrollView ref={scrollView}>
             <ColumnStackLayout noMargin>
               {renderObjectNameField && renderObjectNameField()}
-              {tutorialIds.map((tutorialId) => (
+              {tutorialIds.map(tutorialId => (
                 <DismissableTutorialMessage
                   key={tutorialId}
                   tutorialId={tutorialId}
@@ -179,30 +191,27 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                     resourceManagementProps={resourceManagementProps}
                   />
                   {eventBasedObject &&
-                    mapFor(0, eventBasedObject.getObjectsCount(), (i) => {
+                    mapFor(0, eventBasedObject.getObjectsCount(), i => {
                       const childObject = eventBasedObject.getObjectAt(i);
-                      const childObjectConfiguration =
-                        customObjectConfiguration.getChildObjectConfiguration(
-                          childObject.getName()
-                        );
-                      const editorConfiguration =
-                        ObjectsEditorService.getEditorConfiguration(
-                          project,
-                          childObjectConfiguration.getType()
-                        );
+                      const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
+                        childObject.getName()
+                      );
+                      const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
+                        project,
+                        childObjectConfiguration.getType()
+                      );
                       const EditorComponent = editorConfiguration.component;
 
-                      const objectMetadata =
-                        gd.MetadataProvider.getObjectMetadata(
-                          gd.JsPlatform.get(),
-                          childObjectConfiguration.getType()
-                        );
+                      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+                        gd.JsPlatform.get(),
+                        childObjectConfiguration.getType()
+                      );
                       const iconUrl = objectMetadata.getIconFilename();
                       const tutorialIds = getObjectTutorialIds(
                         childObjectConfiguration.getType()
                       );
                       const enabledTutorialIds = tutorialIds.filter(
-                        (tutorialId) => !values.hiddenTutorialHints[tutorialId]
+                        tutorialId => !values.hiddenTutorialHints[tutorialId]
                       );
                       // TODO EBO: Add a protection against infinite loops in case
                       // of object cycles (thought it should be forbidden).
@@ -227,7 +236,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                               {enabledTutorialIds.length ? (
                                 <Line>
                                   <ColumnStackLayout expand>
-                                    {tutorialIds.map((tutorialId) => (
+                                    {tutorialIds.map(tutorialId => (
                                       <DismissableTutorialMessage
                                         key={tutorialId}
                                         tutorialId={tutorialId}
@@ -322,7 +331,7 @@ const CustomObjectPropertiesEditor = (props: Props) => {
                       label={<Trans>Edit collision masks</Trans>}
                       onClick={() => setCollisionMasksEditorOpen(true)}
                       disabled={!hasAnyFrame(animations)}
-                      buildMenuTemplate={(i18n) => [
+                      buildMenuTemplate={i18n => [
                         {
                           label: i18n._(t`Edit points`),
                           disabled: !hasAnyFrame(animations),

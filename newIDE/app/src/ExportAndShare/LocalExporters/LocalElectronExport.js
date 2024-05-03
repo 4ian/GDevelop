@@ -49,7 +49,7 @@ export const localElectronExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput,
+  CompressionOutput
 > = {
   name: exportPipelineName,
   packageNameWarningType: 'desktop',
@@ -58,7 +58,7 @@ export const localElectronExportPipeline: ExportPipeline<
     outputDir: project.getLastCompilationDirectory(),
   }),
 
-  canLaunchBuild: (exportState) => !!exportState.outputDir,
+  canLaunchBuild: exportState => !!exportState.outputDir,
 
   isNavigationDisabled: () => false,
 
@@ -75,7 +75,7 @@ export const localElectronExportPipeline: ExportPipeline<
             type="export"
             value={exportState.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
-            onChange={(outputDir) => {
+            onChange={outputDir => {
               updateExportState(() => ({ outputDir }));
               project.setLastCompilationDirectory(outputDir);
             }}

@@ -53,7 +53,7 @@ const styles = {
 // Forward ref to allow Scene editor to force update some editors
 const SwipeableDrawerEditorsDisplay = React.forwardRef<
   SceneEditorsDisplayProps,
-  SceneEditorsDisplayInterface,
+  SceneEditorsDisplayInterface
 >((props, ref) => {
   const {
     project,
@@ -66,19 +66,21 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   const { values } = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
-  const instancesPropertiesEditorRef =
-    React.useRef<?CompactInstancePropertiesEditorInterface>(null);
+  const instancesPropertiesEditorRef = React.useRef<?CompactInstancePropertiesEditorInterface>(
+    null
+  );
   const layersListRef = React.useRef<?LayersListInterface>(null);
   const instancesListRef = React.useRef<?InstancesListInterface>(null);
   const editorRef = React.useRef<?InstancesEditor>(null);
   const objectsListRef = React.useRef<?ObjectsListInterface>(null);
   const objectGroupsListRef = React.useRef<?ObjectGroupsListInterface>(null);
 
-  const [selectedEditorId, setSelectedEditorId] =
-    React.useState<?EditorId>(null);
+  const [selectedEditorId, setSelectedEditorId] = React.useState<?EditorId>(
+    null
+  );
 
   const [drawerOpeningState, setDrawerOpeningState] = React.useState<
-    'closed' | 'halfOpen' | 'open',
+    'closed' | 'halfOpen' | 'open'
   >('closed');
 
   const halfOpenOrCloseDrawerOnEditor = React.useCallback(
@@ -130,7 +132,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
     [selectedEditorId, drawerOpeningState]
   );
   const renameObjectFolderOrObjectWithContext = React.useCallback(
-    (objectWithContext) => {
+    objectWithContext => {
       if (objectsListRef.current)
         objectsListRef.current.renameObjectFolderOrObjectWithContext(
           objectWithContext
@@ -212,7 +214,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
   );
 
   const selectedObjectNames = props.selectedObjectFolderOrObjectsWithContext
-    .map((objectFolderOrObjectWithContext) => {
+    .map(objectFolderOrObjectWithContext => {
       const { objectFolderOrObject } = objectFolderOrObjectWithContext;
 
       if (!objectFolderOrObject) return null; // Protect ourselves from an unexpected null value.
@@ -307,11 +309,11 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                       onRenameObjectFolderOrObjectWithContextFinish={
                         props.onRenameObjectFolderOrObjectWithContextFinish
                       }
-                      onAddObjectInstance={(objectName) =>
+                      onAddObjectInstance={objectName =>
                         props.onAddObjectInstance(objectName, 'upperCenter')
                       }
                       onObjectPasted={props.updateBehaviorsSharedData}
-                      beforeSetAsGlobalObject={(objectName) =>
+                      beforeSetAsGlobalObject={objectName =>
                         props.canObjectOrGroupBeGlobal(i18n, objectName)
                       }
                       ref={objectsListRef}
@@ -359,7 +361,7 @@ const SwipeableDrawerEditorsDisplay = React.forwardRef<
                           i18n
                         )
                       }
-                      beforeSetAsGlobalGroup={(groupName) =>
+                      beforeSetAsGlobalGroup={groupName =>
                         props.canObjectOrGroupBeGlobal(i18n, groupName)
                       }
                       unsavedChanges={props.unsavedChanges}

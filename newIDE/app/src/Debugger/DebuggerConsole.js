@@ -55,14 +55,14 @@ export class LogsManager {
     this.logs.unshift(...this._pendingLogs);
     this._pendingLogs.length = 0;
     this._pendingCommit = false;
-    this._onNewLog.forEach((f) => f());
+    this._onNewLog.forEach(f => f());
   }
 
   addLog(log: Log) {
     this._pendingLogs.unshift(log);
     if (!this.groups.has(log.group)) {
       this.groups.add(log.group);
-      this._onNewGroup.forEach((f) => f());
+      this._onNewGroup.forEach(f => f());
     }
     if (!this._pendingCommit) {
       setTimeout(this._commitLogs.bind(this), 200);
@@ -131,16 +131,19 @@ export const DebuggerConsole = ({
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;
-  React.useEffect(() => {
-    // Rerender when the logs are updated
-    const onUpdate = () => {
-      forceUpdate();
-    };
-    logsManager.on('log', onUpdate);
-    return () => {
-      logsManager.off('log', onUpdate);
-    };
-  }, [forceUpdate, logsManager]);
+  React.useEffect(
+    () => {
+      // Rerender when the logs are updated
+      const onUpdate = () => {
+        forceUpdate();
+      };
+      logsManager.on('log', onUpdate);
+      return () => {
+        logsManager.off('log', onUpdate);
+      };
+    },
+    [forceUpdate, logsManager]
+  );
 
   const cachedHeightsForWidth = React.useRef(0);
   const cellMeasurerCache = React.useMemo(
@@ -152,7 +155,7 @@ export const DebuggerConsole = ({
         // Inverse index so that each log always
         // get assigned the same ID despite all indices
         // shifting when a log is added.
-        keyMapper: (index) => logs.length - index,
+        keyMapper: index => logs.length - index,
       }),
     [logs]
   );
@@ -167,17 +170,20 @@ export const DebuggerConsole = ({
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
   const hiddenGroups = React.useRef(new Set()).current;
-  React.useEffect(() => {
-    // Do not register for group updates to avoid rerendering when the groups are not displayed.
-    if (!editingHiddenGroups) return;
+  React.useEffect(
+    () => {
+      // Do not register for group updates to avoid rerendering when the groups are not displayed.
+      if (!editingHiddenGroups) return;
 
-    // Rerender when the groups are updated
-    const onUpdate = () => forceUpdate();
-    logsManager.on('group', onUpdate);
-    return () => {
-      logsManager.off('group', onUpdate);
-    };
-  }, [editingHiddenGroups, forceUpdate, logsManager]);
+      // Rerender when the groups are updated
+      const onUpdate = () => forceUpdate();
+      logsManager.on('group', onUpdate);
+      return () => {
+        logsManager.off('group', onUpdate);
+      };
+    },
+    [editingHiddenGroups, forceUpdate, logsManager]
+  );
 
   const filteredLogs = logs
     .filter(({ internal }) => !(hideInternal && internal))

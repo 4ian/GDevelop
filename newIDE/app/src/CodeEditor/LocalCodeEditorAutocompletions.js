@@ -15,7 +15,7 @@ export const setupAutocompletions = (monaco: any) => {
         return;
       }
 
-      filenames.forEach((filename) => {
+      filenames.forEach(filename => {
         if (filename.endsWith('.ts') || filename.endsWith('.js')) {
           const fullPath = path.join(folderPath, filename);
           fs.readFile(fullPath, 'utf8', (fileError, content) => {
@@ -85,13 +85,13 @@ export const setupAutocompletions = (monaco: any) => {
 
       folderNames
         .filter(
-          (folderName) =>
+          folderName =>
             !folderName.endsWith('.txt') &&
             !folderName.endsWith('.md') &&
             !folderName.endsWith('.flow.js') &&
             !folderName.endsWith('.gitignore')
         )
-        .forEach((folderName) =>
+        .forEach(folderName =>
           importAllJsFilesFromFolder(path.join(extensionsPath, folderName))
         );
     });

@@ -23,7 +23,7 @@ export type AnswerData = ChoiceAnswerData | FreeAnswerData;
 export type QuestionData = {|
   text: MessageDescriptor,
   nextQuestion?: string,
-  getNextQuestion?: (any) => string | null,
+  getNextQuestion?: any => string | null,
   multi?: boolean,
   answers: Array<AnswerData>,
 |};
@@ -257,7 +257,7 @@ const questionnaire: Questionnaire = {
       userAnswers: Array<{| questionId: string, answers: string[] |}>
     ) =>
       userAnswers.some(
-        (answer) =>
+        answer =>
           answer.questionId === 'targetDate' ||
           (answer.questionId === 'learningKindOfProjects' &&
             answer.answers.includes('interactiveService'))

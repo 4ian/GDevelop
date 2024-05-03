@@ -13,13 +13,13 @@ const makeMarkdownCustomComponents = (
   allowParagraphs: boolean
 ) => ({
   // Ensure link are opened in a new page
-  a: (props) =>
+  a: props =>
     props.href ? (
       <a
         href={props.href}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={(event) => {
+        onClick={event => {
           event.preventDefault(); // Avoid triggering the href (avoids a warning on mobile in case of unsaved changes).
           Window.openExternalURL(props.href);
         }}
@@ -30,7 +30,7 @@ const makeMarkdownCustomComponents = (
       props.children
     ),
   // Add paragraphs only if we explicitly opt in.
-  p: (props) =>
+  p: props =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (

@@ -32,27 +32,27 @@ type Props = {|
   platform: gdPlatform,
   instrsList: gdInstructionsList,
   areConditions: boolean,
-  onAddNewInstruction: (InstructionsListContext) => void,
-  onPasteInstructions: (InstructionsListContext) => void,
+  onAddNewInstruction: InstructionsListContext => void,
+  onPasteInstructions: InstructionsListContext => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: (InstructionContext) => void,
-  onInstructionDoubleClick: (InstructionContext) => void,
+  onInstructionClick: InstructionContext => void,
+  onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: (ParameterContext) => void,
+  onParameterClick: ParameterContext => void,
   selection: any,
   addButtonLabel?: React.Node,
   addButtonId?: string,
   className?: string,
   style?: Object,
   disabled: boolean,
-  renderObjectThumbnail: (string) => React.Node,
+  renderObjectThumbnail: string => React.Node,
 
   screenType: ScreenType,
   windowSize: WindowSizeType,
@@ -102,22 +102,28 @@ export default function InstructionsList({
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
-  const addNewInstruction = React.useCallback(() => {
-    if (onAddNewInstruction)
-      onAddNewInstruction({
+  const addNewInstruction = React.useCallback(
+    () => {
+      if (onAddNewInstruction)
+        onAddNewInstruction({
+          instrsList,
+          isCondition: areConditions,
+        });
+    },
+    [onAddNewInstruction, instrsList, areConditions]
+  );
+
+  const pasteInstructions = React.useCallback(
+    () => {
+      onPasteInstructions({
         instrsList,
         isCondition: areConditions,
       });
-  }, [onAddNewInstruction, instrsList, areConditions]);
+    },
+    [onPasteInstructions, instrsList, areConditions]
+  );
 
-  const pasteInstructions = React.useCallback(() => {
-    onPasteInstructions({
-      instrsList,
-      isCondition: areConditions,
-    });
-  }, [onPasteInstructions, instrsList, areConditions]);
-
-  const instructions = mapFor(0, instrsList.size(), (i) => {
+  const instructions = mapFor(0, instrsList.size(), i => {
     const instruction = instrsList.get(i);
     const instructionContext = {
       isCondition: areConditions,
@@ -192,7 +198,7 @@ export default function InstructionsList({
 
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
-      (event) => {
+      event => {
         addButton.current &&
           onAddInstructionContextMenu(
             addButton.current,
@@ -207,7 +213,7 @@ export default function InstructionsList({
     <I18n>
       {({ i18n }) => (
         <DropTarget
-          canDrop={(draggedItem) => draggedItem.isCondition === areConditions}
+          canDrop={draggedItem => draggedItem.isCondition === areConditions}
           drop={() => {
             onMoveToInstructionsList({
               isCondition: areConditions,
@@ -239,7 +245,7 @@ export default function InstructionsList({
                     style={styles.addButton}
                     className="add-link"
                     onClick={addNewInstruction}
-                    onContextMenu={(e) => {
+                    onContextMenu={e => {
                       e.stopPropagation();
                       onAddInstructionContextMenu(
                         e.currentTarget,

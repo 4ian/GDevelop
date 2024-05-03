@@ -141,7 +141,7 @@ const StatusChip = ({ status }: {| status: VersionRestoringStatus |}) => {
   );
 };
 
-const useClassesForRowContainer = makeStyles((theme) =>
+const useClassesForRowContainer = makeStyles(theme =>
   createStyles({
     root: {
       ...styles.sharedRowStyle,
@@ -199,11 +199,14 @@ const ProjectVersionRow = ({
     onRename(version, newLabel);
   };
 
-  const cancelRenaming = React.useCallback(() => {
-    setNewLabel(version.label || '');
-    onCancelRenaming();
-  }, [version, onCancelRenaming]);
-  const longTouchProps = useLongTouch((e) => onContextMenu(e, version));
+  const cancelRenaming = React.useCallback(
+    () => {
+      setNewLabel(version.label || '');
+      onCancelRenaming();
+    },
+    [version, onCancelRenaming]
+  );
+  const longTouchProps = useLongTouch(e => onContextMenu(e, version));
 
   const classes = useClassesForRowContainer();
   const borderStyle = useBorder(version, openedVersionStatus);
@@ -214,8 +217,8 @@ const ProjectVersionRow = ({
     openedVersionStatus.version.id === version.id
       ? openedVersionStatus.status
       : isLatest
-        ? 'latest'
-        : null;
+      ? 'latest'
+      : null;
 
   return (
     <I18n>
@@ -230,7 +233,7 @@ const ProjectVersionRow = ({
           style={borderStyle}
         >
           <div
-            onContextMenu={(e) => onContextMenu(e, version)}
+            onContextMenu={e => onContextMenu(e, version)}
             style={styles.rowContainer}
             {...longTouchProps}
           >
@@ -255,16 +258,16 @@ const ProjectVersionRow = ({
                   )
                 }
                 autoFocus="desktopAndMobileDevices"
-                onKeyPress={(event) => {
+                onKeyPress={event => {
                   if (shouldValidate(event)) {
                     validateNewLabel();
                   }
                 }}
-                onKeyDown={(event) => {
+                onKeyDown={event => {
                   // Prevent parent drawer to be closed when Esc is hit.
                   event.stopPropagation();
                 }}
-                onKeyUp={(event) => {
+                onKeyUp={event => {
                   if (shouldCloseOrCancel(event)) {
                     cancelRenaming();
                   }
@@ -375,7 +378,7 @@ const ProjectVersionRow = ({
           </div>
           <IconButton
             size="small"
-            onClick={(event) => {
+            onClick={event => {
               onContextMenu(event, version);
             }}
           >
@@ -387,7 +390,7 @@ const ProjectVersionRow = ({
   );
 };
 
-const useClassesForDayCollapse = makeStyles((theme) =>
+const useClassesForDayCollapse = makeStyles(theme =>
   createStyles({
     root: {
       ...styles.sharedRowStyle,
@@ -451,14 +454,14 @@ export const DayGroupRow = ({
   const [isOpen, setIsOpen] = React.useState<boolean>(isOpenedInitially);
   const displayYear = new Date(day).getFullYear() !== thisYear;
   const namedVersions = React.useMemo(
-    () => versions.filter((version) => version.label),
+    () => versions.filter(version => version.label),
     [versions]
   );
   const isLatestVersionInThisDayGroup = latestVersion
-    ? versions.find((version) => version.id === latestVersion.id)
+    ? versions.find(version => version.id === latestVersion.id)
     : false;
   const isOpenedVersionInThisDayGroup = openedVersionStatus
-    ? versions.find((version) => version.id === openedVersionStatus.version.id)
+    ? versions.find(version => version.id === openedVersionStatus.version.id)
     : false;
 
   const shouldHighlightDay =
@@ -513,7 +516,7 @@ export const DayGroupRow = ({
               {namedVersions && (
                 <Collapse in={!isOpen}>
                   <ColumnStackLayout noMargin>
-                    {namedVersions.map((version) => {
+                    {namedVersions.map(version => {
                       const shouldHighlightVersion =
                         openedVersionStatus &&
                         openedVersionStatus.version.id === version.id;
@@ -549,7 +552,7 @@ export const DayGroupRow = ({
           </ButtonBase>
           <Collapse in={isOpen}>
             <div style={styles.versionsContainer}>
-              {versions.map((version) => (
+              {versions.map(version => (
                 <ProjectVersionRow
                   key={version.id}
                   authenticatedUserId={authenticatedUserId}

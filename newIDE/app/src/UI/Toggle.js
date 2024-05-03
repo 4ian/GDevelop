@@ -28,15 +28,15 @@ const useSwitchStyles = ({
       backgroundColor: disabled
         ? theme.switch.thumbColor.disabled
         : toggled
-          ? theme.switch.thumbColor.toggled
-          : theme.switch.thumbColor.default,
+        ? theme.switch.thumbColor.toggled
+        : theme.switch.thumbColor.default,
     },
     track: {
       backgroundColor: disabled
         ? theme.switch.trackColor.disabled
         : toggled
-          ? theme.switch.trackColor.toggled
-          : theme.switch.trackColor.default,
+        ? theme.switch.trackColor.toggled
+        : theme.switch.trackColor.default,
       opacity: '1 !important', // MUI overrides the opacity to 0.5, prevent this.
     },
   })();
@@ -78,7 +78,7 @@ const Toggle = ({
       control={
         <Switch
           checked={toggled}
-          onChange={(event) => onToggle(event, event.target.checked)}
+          onChange={event => onToggle(event, event.target.checked)}
           classes={switchClasses}
           color="default"
         />

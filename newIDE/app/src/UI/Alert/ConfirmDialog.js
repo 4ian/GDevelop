@@ -73,8 +73,8 @@ function ConfirmDialog(props: Props) {
               props.level === 'warning'
                 ? 'warning'
                 : props.level === 'error'
-                  ? 'danger'
-                  : undefined
+                ? 'danger'
+                : undefined
             }
             title={i18n._(props.title)}
             open={props.open}

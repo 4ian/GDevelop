@@ -86,12 +86,13 @@ export default class InstancesMover {
     this.totalDeltaY += deltaY;
 
     const nonLockedInstances = instances.filter(
-      (instance) => !instance.isLocked()
+      instance => !instance.isLocked()
     );
 
     // It will magnet the corner nearest to the grabbing position
-    const initialSelectionAABB =
-      this._getOrCreateSelectionAABB(nonLockedInstances);
+    const initialSelectionAABB = this._getOrCreateSelectionAABB(
+      nonLockedInstances
+    );
     if (!initialSelectionAABB) return;
     const magnetLeft = this._startX < initialSelectionAABB.centerX();
     const magnetTop = this._startY < initialSelectionAABB.centerY();

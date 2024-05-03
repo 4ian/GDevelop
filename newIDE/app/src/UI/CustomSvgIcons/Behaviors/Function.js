@@ -2,7 +2,7 @@ import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default (props) => (
+export default props => (
   <SvgIcon {...props}>
     <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
       <g id="Function" fillRule="nonzero">

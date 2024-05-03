@@ -412,8 +412,8 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromNetworkSyncDataCode(
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::NamedPropertyDescriptor& property) {
   return gd::String(R"jscode_template(
-    if (networkSyncData.PROPERTY_NAME !== undefined)
-      this._behaviorData.PROPERTY_NAME = networkSyncData.PROPERTY_NAME;)jscode_template")
+    if (networkSyncData.props.PROPERTY_NAME !== undefined)
+      this._behaviorData.PROPERTY_NAME = networkSyncData.props.PROPERTY_NAME;)jscode_template")
       .FindAndReplace("PROPERTY_NAME", property.GetName());
 }
 

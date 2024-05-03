@@ -350,7 +350,6 @@ namespace gdjs {
               instanceNetworkId,
               instanceX: data.instanceX,
               instanceY: data.instanceY,
-              shouldCreateIfNotFound: true,
             });
 
             if (!instance) {
@@ -375,15 +374,18 @@ namespace gdjs {
               gdjs.multiplayer.playerPositionInLobby === 1;
             const currentPlayerObjectOwnership =
               behavior.getPlayerObjectOwnership();
-            if (
-              isPlayerTheServer &&
-              currentPlayerObjectOwnership !== previousOwner
-            ) {
-              // We received an ownership change message for an object which thought the previous owner was different.
+            // Change is coherent if:
+            const ownershipChangeIsCoherent =
+              // the object is changing ownership from the same owner the server knew about,
+              currentPlayerObjectOwnership === previousOwner ||
+              // the object is already owned by the new owner. (may have been changed by another player faster)
+              currentPlayerObjectOwnership === newOwner;
+            if (isPlayerTheServer && !ownershipChangeIsCoherent) {
+              // We received an ownership change message for an object which is in an unexpected state.
               // There may be some lag, and multiple ownership changes may have been sent by the other players.
               // As the server, let's not change the ownership and let the player revert it.
               logger.warn(
-                `Object ${objectName} with instance network ID ${instanceNetworkId} does not have the expected previous owner. Expected ${previousOwner}, got ${currentPlayerObjectOwnership}.`
+                `Object ${objectName} with instance network ID ${instanceNetworkId} does not have the expected owner. Wanted to change from ${previousOwner} to ${newOwner}, but object has owner ${currentPlayerObjectOwnership}.`
               );
               return;
             }
@@ -400,7 +402,7 @@ namespace gdjs {
               );
 
             logger.info(
-              `Sending acknowledgment of ownership change of object ${objectName} with instance network ID ${instanceNetworkId} to ${messageSender}.`
+              `Sending acknowledgment of ownership change of object ${objectName} from ${previousOwner} to ${newOwner} with instance network ID ${instanceNetworkId} to ${messageSender}.`
             );
             // Once the object ownership has changed, we need to acknowledge it to the player who sent this message.
             sendDataTo(messageSender, ownerChangedMessageName, {});
@@ -483,7 +485,7 @@ namespace gdjs {
             const ownerPlayerNumber = parseInt(matches[1], 10);
             if (ownerPlayerNumber === gdjs.multiplayer.playerPositionInLobby) {
               // Do not update the object if we receive an message from ourselves.
-              // Should not happen but be safe.
+              // Should not happen but let's be safe.
               return;
             }
             const objectName = matches[2];
@@ -512,8 +514,6 @@ namespace gdjs {
               return;
             }
 
-            // If the instance update is not done by the owner of the object, then something is wrong.
-            // We should not update the object until we've received the ownership change message.
             const behavior = instance.getBehavior(
               'MultiplayerObject'
             ) as MultiplayerObjectRuntimeBehavior | null;
@@ -525,14 +525,27 @@ namespace gdjs {
               return;
             }
 
-            if (behavior.getPlayerObjectOwnership() !== ownerPlayerNumber) {
-              // The object is not owned by the player who sent the update message.
-              // This can happen if the ownership change message has not arrived yet, and the player is trying to update the object.
-              // Ignore the update message until the ownership change message arrives.
+            // If we receive an update for this object for a different owner than the one we know about,
+            // then 2 cases:
+            // - If we are the owner of the object, then ignore the message, we assume it's a late update message or a wrong one,
+            //   we are confident that we own this object. (it may be reverted if we don't receive an acknowledgment in time)
+            // - If we are not the owner of the object, then assume that we missed the ownership change message, so update the object's
+            //   ownership and then update the object.
+            if (
+              behavior.getPlayerObjectOwnership() ===
+              gdjs.multiplayer.playerPositionInLobby
+            ) {
               logger.info(
-                `Object ${objectName} with instance network ID ${instanceNetworkId} is not owned by the player who sent the update event. Expected ${behavior.getPlayerObjectOwnership()}, got ${ownerPlayerNumber}.`
+                `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by us ${gdjs.multiplayer.playerPositionInLobby}, ignoring update message from ${ownerPlayerNumber}.`
               );
               return;
+            }
+
+            if (behavior.getPlayerObjectOwnership() !== ownerPlayerNumber) {
+              logger.info(
+                `Object ${objectName} with instance network ID ${instanceNetworkId} is owned by ${behavior.getPlayerObjectOwnership()} on our game, changing ownership to ${ownerPlayerNumber} as part of the update event.`
+              );
+              behavior._playerNumber = ownerPlayerNumber;
             }
 
             instance.updateFromObjectNetworkSyncData(data);

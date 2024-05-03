@@ -472,11 +472,16 @@ namespace gdjs {
         ].getNetworkSyncData();
       }
 
+      if (this.getName() === 'BlueBunny') {
+        console.log('sending hidden ' + this.hidden);
+      }
+
       return {
         x: this.x,
         y: this.y,
         z: this.zOrder,
         a: this.angle,
+        hid: this.hidden,
         if: this._instantForces.map((force) => force.getNetworkSyncData()),
         pfx: this._permanentForceX,
         pfy: this._permanentForceY,
@@ -494,9 +499,15 @@ namespace gdjs {
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
     updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
+      if (this.getName() === 'BlueBunny') {
+        console.log('received hidden ' + networkSyncData.hid);
+      }
       this.setPosition(networkSyncData.x, networkSyncData.y);
       this.setZOrder(networkSyncData.z);
       this.setAngle(networkSyncData.a);
+      if (this.hidden !== networkSyncData.hid) {
+        this.hide(networkSyncData.hid);
+      }
 
       // Force clear all forces and reapply them, using the garbage collector to recycle forces.
       // Is that efficient?

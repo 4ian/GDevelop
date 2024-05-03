@@ -49,6 +49,8 @@ declare type ObjectNetworkSyncData = {
   z: number;
   /** The angle of the object. */
   a: number;
+  /** If the object is hidden */
+  hid: boolean;
   /** All the instant forces */
   if: Array<ForceNetworkSyncData>;
   /** Permanent force on X */
@@ -112,7 +114,7 @@ declare type BehaviorData = {
 
 declare type BehaviorSyncData = {
   act: boolean;
-  props: Object;
+  props: any;
 };
 
 declare interface GdVersionData {

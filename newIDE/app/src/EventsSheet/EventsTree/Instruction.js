@@ -303,7 +303,8 @@ const Instruction = (props: Props) => {
               const expressionValidator = new gd.ExpressionValidator(
                 gd.JsPlatform.get(),
                 projectScopedContainers,
-                parameterType
+                parameterType,
+                parameterMetadata.getExtraInfo()
               );
               expressionNode.visit(expressionValidator);
               expressionIsValid =

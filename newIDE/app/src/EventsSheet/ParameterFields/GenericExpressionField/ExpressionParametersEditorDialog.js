@@ -7,6 +7,7 @@ import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 import HelpButton from '../../../UI/HelpButton';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
 
 export type ParameterValues = Array<string>;
 
@@ -25,6 +26,7 @@ type Props = {
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionMetadata: gdExpressionMetadata,
   onDone: ParameterValues => void,
   onRequestClose: () => void,
@@ -41,6 +43,7 @@ const ExpressionParametersEditorDialog = ({
   onRequestClose,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainersAccessor,
   expressionMetadata,
   parameterRenderingService,
 }: Props) => {
@@ -83,6 +86,7 @@ const ExpressionParametersEditorDialog = ({
             scope={scope}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
+            projectScopedContainersAccessor={projectScopedContainersAccessor}
             expressionMetadata={expressionMetadata}
             parameterValues={parameterValues}
             onChangeParameter={(editedIndex, value) => {

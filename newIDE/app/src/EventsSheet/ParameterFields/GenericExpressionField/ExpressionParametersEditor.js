@@ -5,6 +5,7 @@ import * as React from 'react';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import { ColumnStackLayout } from '../../../UI/Layout';
+import { ProjectScopedContainersAccessor } from '../../../InstructionOrExpression/EventsScope.flow';
 
 export type ParameterValues = Array<string>;
 
@@ -13,6 +14,7 @@ type Props = {|
   scope: EventsScope,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+  projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionMetadata: gdExpressionMetadata,
   parameterValues: ParameterValues,
   onChangeParameter: (index: number, value: string) => void,
@@ -37,6 +39,7 @@ const ExpressionParametersEditor = ({
   scope,
   globalObjectsContainer,
   objectsContainer,
+  projectScopedContainersAccessor,
   parameterRenderingService,
   onChangeParameter,
 }: Props) => {
@@ -79,6 +82,7 @@ const ExpressionParametersEditor = ({
               scope={scope}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
+              projectScopedContainersAccessor={projectScopedContainersAccessor}
               parameterRenderingService={parameterRenderingService}
             />
           </React.Fragment>

@@ -129,6 +129,7 @@ const extractErrors = (
   project: gdProject,
   projectScopedContainersAccessor: ProjectScopedContainersAccessor,
   expressionType: string,
+  parameterMetadata: ?gdParameterMetadata,
   expressionNode: gdExpressionNode
 ): {|
   errorText: ?string,
@@ -137,7 +138,8 @@ const extractErrors = (
   const expressionValidator = new gd.ExpressionValidator(
     gd.JsPlatform.get(),
     projectScopedContainersAccessor.get(),
-    expressionType
+    expressionType,
+    parameterMetadata ? parameterMetadata.getExtraInfo() : ''
   );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getAllErrors();
@@ -426,6 +428,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       project,
       projectScopedContainersAccessor,
       expressionType,
+      parameterMetadata,
       scope,
       onGetAdditionalAutocompletions,
       onExtractAdditionalErrors,
@@ -445,6 +448,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       project,
       projectScopedContainersAccessor,
       expressionType,
+      parameterMetadata,
       expressionNode
     );
     const extraErrorText = onExtractAdditionalErrors
@@ -516,6 +520,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       scope,
       globalObjectsContainer,
       objectsContainer,
+      projectScopedContainersAccessor,
       parameterRenderingService,
     } = this.props;
     const description = parameterMetadata
@@ -711,6 +716,9 @@ export default class ExpressionField extends React.Component<Props, State> {
                   scope={scope}
                   globalObjectsContainer={globalObjectsContainer}
                   objectsContainer={objectsContainer}
+                  projectScopedContainersAccessor={
+                    projectScopedContainersAccessor
+                  }
                   expressionMetadata={
                     this.state.selectedExpressionInfo.metadata
                   }

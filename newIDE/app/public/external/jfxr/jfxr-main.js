@@ -4,7 +4,7 @@ import {
   sendMessageToParentEditor,
   setTitle,
 } from '../utils/parent-editor-interface.js';
-import { createPathEditorHeader } from '../utils/path-editor.js';
+import { createExternalEditorHeader } from '../utils/external-editor-header.js';
 
 let jfxr = null;
 
@@ -32,12 +32,11 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
 
   // Jfxr only reads a single resource (a single audio file).
   const resource = externalEditorInput.resources[0] || null;
-  const hasExistingResource = resource && resource.name && resource.dataUrl;
 
-  const saveSoundEffect = async pathEditor => {
+  const saveSoundEffect = async () => {
     const externalEditorData = {
       data: jfxr.getSound().serialize(),
-      name: pathEditor.state.name,
+      name: externalEditorHeader.state.name,
     };
 
     const data = await jfxr.synth.run();
@@ -49,13 +48,17 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
       sendMessageToParentEditor('save-external-editor-output', {
         resources: [
           {
-            name: hasExistingResource ? pathEditor.state.name : undefined,
-            localFilePath: resource.localFilePath,
+            name: externalEditorHeader.state.isOverwritingExistingResource
+              ? externalEditorHeader.state.name
+              : undefined,
+            localFilePath: externalEditorHeader.state.isOverwritingExistingResource
+              ? resource.localFilePath
+              : undefined,
             extension: '.wav',
             dataUrl: this.result,
           },
         ],
-        baseNameForNewResources: pathEditor.state.name,
+        baseNameForNewResources: externalEditorHeader.state.name,
         externalEditorData,
       });
       closeWindow();
@@ -64,11 +67,11 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
   };
 
   // Load a custom save file(s) header
-  const pathEditorHeaderDiv = document.getElementById('path-editor-header');
-  const pathEditor = createPathEditorHeader({
+  const pathEditorHeaderDiv = document.getElementById('external-editor-header');
+  const externalEditorHeader = createExternalEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
-    onSaveToGd: saveSoundEffect,
+    onSaveChanges: saveSoundEffect,
     onCancelChanges: closeWindow,
     name: externalEditorInput.name,
   });
@@ -77,7 +80,8 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     'GDevelop Sound Effects Editor (Jfxr) - ' + externalEditorInput.name
   );
 
-  if (hasExistingResource) pathEditor.disableNameInput();
+  const isOverwritingExistingResource = resource && resource.name && resource.dataUrl;
+  if (isOverwritingExistingResource) externalEditorHeader.setOverwriteExistingResource();
 
   // Disable google analytics from collecting personal information.
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);

@@ -41,7 +41,9 @@ export const TutorialStateProvider = ({
         try {
           const allTutorials: Array<Tutorial> = await listAllTutorials();
 
-          console.info(`Loaded ${allTutorials.length} tutorials.`);
+          console.info(
+            `Loaded ${allTutorials ? allTutorials.length : 0} tutorials.`
+          );
           setTutorials(allTutorials);
         } catch (error) {
           console.error(`Unable to load the tutorials:`, error);

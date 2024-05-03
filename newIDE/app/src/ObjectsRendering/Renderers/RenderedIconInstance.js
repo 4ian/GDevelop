@@ -30,10 +30,15 @@ export default function makeRenderer(iconPath: string) {
       this._pixiContainer.addChild(this._pixiObject);
     }
 
+    onRemovedFromScene(): void {
+      super.onRemovedFromScene();
+      this._pixiObject.destroy(false);
+    }
+
     update() {
       this._pixiObject.position.x = this._instance.getX();
       this._pixiObject.position.y = this._instance.getY();
-      this._pixiObject.rotation = (this._instance.getAngle() * Math.PI) / 180.0;
+      this._pixiObject.angle = this._instance.getAngle();
     }
 
     static getThumbnail(

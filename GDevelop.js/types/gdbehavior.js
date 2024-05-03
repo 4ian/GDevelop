@@ -8,6 +8,11 @@ declare class gdBehavior {
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   initializeContent(): void;
+  serializeTo(element: gdSerializerElement): void;
+  unserializeFrom(element: gdSerializerElement): void;
+  isFolded(): boolean;
+  setFolded(folded: boolean): void;
+  isDefaultBehavior(): boolean;
   delete(): void;
   ptr: number;
 };

@@ -4,13 +4,14 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef ARBITRARYRESOURCEWORKER_H
-#define ARBITRARYRESOURCEWORKER_H
+#pragma once
 
 #include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 namespace gd {
 class BaseEvent;
 }
@@ -36,13 +37,14 @@ namespace gd {
  * \see ResourcesMergingHelper
  * \see gd::ResourcesInUseHelper
  *
- * \see gd::LaunchResourceWorkerOnEvents
+ * \see gd::GetResourceWorkerOnEvents
  *
  * \ingroup IDE
  */
 class GD_CORE_API ArbitraryResourceWorker {
- public:
-  ArbitraryResourceWorker(){};
+public:
+  ArbitraryResourceWorker(gd::ResourcesManager &resourcesManager_)
+      : resourcesManager(&resourcesManager_){};
   virtual ~ArbitraryResourceWorker();
 
   /**
@@ -51,7 +53,12 @@ class GD_CORE_API ArbitraryResourceWorker {
    * first to ensure that resources are known so that images, shaders & audio
    * can make reference to them.
    */
-  void ExposeResources(gd::ResourcesManager *resourcesManager);
+  void ExposeResources();
+
+  /**
+   * \brief Expose a resource from a given type.
+   */
+  void ExposeResourceWithType(const gd::String& resourceType, gd::String& resourceName);
 
   /**
    * \brief Expose an image, which is always a reference to a "image" resource.
@@ -86,6 +93,21 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeTileset(gd::String &tilesetName);
 
   /**
+   * \brief Expose a 3D model, which is always a reference to a "model3D" resource.
+   */
+  virtual void ExposeModel3D(gd::String &resourceName);
+  
+  /**
+   * \brief Expose an atlas, which is always a reference to a "atlas" resource.
+   */
+  virtual void ExposeAtlas(gd::String &resourceName);
+
+  /**
+   * \brief Expose an spine, which is always a reference to a "spine" resource.
+   */
+  virtual void ExposeSpine(gd::String &resourceName);
+
+  /**
    * \brief Expose a video, which is always a reference to a "video" resource.
    */
   virtual void ExposeVideo(gd::String &videoName);
@@ -111,10 +133,8 @@ class GD_CORE_API ArbitraryResourceWorker {
    */
   virtual void ExposeEmbeddeds(gd::String &resourceName);
 
- protected:
-  const std::vector<gd::ResourcesManager *> &GetResources() {
-    return resourcesManagers;
-  };
+protected:
+  gd::ResourcesManager * resourcesManager;
 
  private:
   /**
@@ -122,23 +142,50 @@ class GD_CORE_API ArbitraryResourceWorker {
    * exposed as file (see ExposeFile).
    */
   void ExposeResource(gd::Resource &resource);
-
-  std::vector<gd::ResourcesManager *> resourcesManagers;
 };
 
 /**
- * Tool function iterating over each event and calling
- * Expose(Actions/Conditions)Resources for each actions and conditions with the
- * ArbitraryResourceWorker passed as argument.
- *
- * \see gd::ArbitraryResourceWorker
- * \ingroup IDE
+ * Launch the specified resource worker on every resource referenced in the
+ * events.
  */
-void GD_CORE_API
-LaunchResourceWorkerOnEvents(const gd::Project &project,
-                             gd::EventsList &events,
-                             gd::ArbitraryResourceWorker &worker);
+class ResourceWorkerInEventsWorker : public gd::ArbitraryEventsWorker {
+public:
+  ResourceWorkerInEventsWorker(const gd::Project &project_,
+                               gd::ArbitraryResourceWorker &worker_)
+      : project(project_), worker(worker_){};
+  virtual ~ResourceWorkerInEventsWorker(){};
+
+private:
+  bool DoVisitInstruction(gd::Instruction &instruction,
+                          bool isCondition) override;
+
+  const gd::Project &project;
+  gd::ArbitraryResourceWorker &worker;
+};
+
+ResourceWorkerInEventsWorker GD_CORE_API GetResourceWorkerOnEvents(
+    const gd::Project &project, gd::ArbitraryResourceWorker &worker);
+
+/**
+ * Launch the specified resource worker on every resource referenced in the
+ * objects.
+ */
+class GD_CORE_API ResourceWorkerInObjectsWorker
+    : public gd::ArbitraryObjectsWorker {
+public:
+  ResourceWorkerInObjectsWorker(const gd::Project &project_, gd::ArbitraryResourceWorker &worker_)
+      : project(project_), worker(worker_){};
+  ~ResourceWorkerInObjectsWorker() {}
+
+private:
+  void DoVisitObject(gd::Object &object) override;
+  void DoVisitBehavior(gd::Behavior &behavior) override;
+
+  const gd::Project &project;
+  gd::ArbitraryResourceWorker &worker;
+};
+
+gd::ResourceWorkerInObjectsWorker GD_CORE_API
+GetResourceWorkerOnObjects(const gd::Project &project, gd::ArbitraryResourceWorker &worker);
 
 }  // namespace gd
-
-#endif  // ARBITRARYRESOURCEWORKER_H

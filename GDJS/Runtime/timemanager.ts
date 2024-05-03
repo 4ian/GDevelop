@@ -68,7 +68,7 @@ namespace gdjs {
     }
 
     /**
-     * Get the time since the instanciation of the manager (i.e: since
+     * Get the time since the instantiation of the manager (i.e: since
      * the beginning of the scene most of the time), in milliseconds.
      */
     getTimeFromStart(): float {

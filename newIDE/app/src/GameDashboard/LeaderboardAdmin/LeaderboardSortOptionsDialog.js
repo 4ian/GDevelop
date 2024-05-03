@@ -147,12 +147,12 @@ function LeaderboardSortOptionsDialog({
               <SelectOption
                 key={'ASC'}
                 value={'ASC'}
-                primaryText={t`Lower is better`}
+                label={t`Lower is better`}
               />
               <SelectOption
                 key={'DESC'}
                 value={'DESC'}
-                primaryText={t`Higher is better`}
+                label={t`Higher is better`}
               />
             </SelectField>
             <Checkbox

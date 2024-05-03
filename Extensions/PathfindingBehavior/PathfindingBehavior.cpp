@@ -37,6 +37,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetGroup(_("Path smoothing"))
+      .SetAdvanced()
       .SetType("Boolean");
   properties["Acceleration"]
       .SetLabel(_("Acceleration"))
@@ -99,6 +100,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
   properties["ExtraBorder"]
       .SetDescription(_("Extra border size"))
       .SetGroup(_("Collision"))
+      .SetAdvanced()
       .SetType("Number")
       .SetMeasurementUnit(gd::MeasurementUnit::GetPixel())
       .SetValue(
@@ -108,6 +110,7 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("smoothingMaxCellGap")))
       .SetGroup(_("Path smoothing"))
+      .SetAdvanced()
       .SetDescription(_("It's recommended to leave a max gap of 1 cell. "
                         "Setting it to 0 disable the smoothing."));
 

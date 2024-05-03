@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
@@ -11,22 +11,21 @@ import ImagePreview, {
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
-  allSpritesHaveSamePointsAs,
+  allAnimationSpritesHaveSamePointsAs,
   copyAnimationsSpritePoints,
+  allObjectSpritesHaveSamePointsAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import Window from '../../../../Utils/Window';
-import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import ScrollView from '../../../../UI/ScrollView';
 import Paper from '../../../../UI/Paper';
-const gd: libGDevelop = global.gd;
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
 
 const styles = {
   leftContainer: {
@@ -54,17 +53,19 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  objectConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onPointsUpdated?: () => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
 |};
 
 const PointsEditor = ({
-  objectConfiguration,
+  animations,
   resourcesLoader,
   project,
   onPointsUpdated,
+  onRenamedPoint,
 }: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
@@ -77,30 +78,37 @@ const PointsEditor = ({
     setHighlightedPointName,
   ] = React.useState<?string>(null);
 
-  // Note: these two booleans are set to false to avoid erasing points of other
-  // animations/frames (and they will be updated by updateSamePointsToggles). In
-  // theory, they should be set to the appropriate value at their initialization,
-  // for consistency of the state.
-  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
-    false
-  );
-  const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
-  const forceUpdate = useForceUpdate();
+  const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
+    [number, number]
+  >([0, 0]);
 
-  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const forceUpdate = useForceUpdate();
+  const { showConfirmation } = useAlertDialog();
+
   const { animation, sprite } = getCurrentElements(
-    spriteConfiguration,
+    animations,
     animationIndex,
     directionIndex,
     spriteIndex
   );
 
+  // Note: sprite should always be defined so this value will be correctly initialised.
+  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
+    sprite ? allObjectSpritesHaveSamePointsAs(sprite, animations) : false
+  );
+  // Note: sprite & animation should always be defined so this value will be correctly initialised.
+  const [samePointsForSprites, setSamePointsForSprites] = React.useState(
+    sprite && animation
+      ? allAnimationSpritesHaveSamePointsAs(sprite, animation)
+      : false
+  );
+
   const updatePoints = React.useCallback(
-    () => {
+    (samePointsForAnimations: boolean, samePointsForSprites: boolean) => {
       if (animation && sprite) {
         if (samePointsForAnimations) {
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
+          mapFor(0, animations.getAnimationsCount(), i => {
+            const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpritePoints(sprite, otherAnimation);
           });
         } else if (samePointsForSprites) {
@@ -111,15 +119,7 @@ const PointsEditor = ({
       forceUpdate(); // Refresh the preview
       if (onPointsUpdated) onPointsUpdated();
     },
-    [
-      animation,
-      sprite,
-      spriteConfiguration,
-      samePointsForAnimations,
-      samePointsForSprites,
-      forceUpdate,
-      onPointsUpdated,
-    ]
+    [animation, sprite, animations, forceUpdate, onPointsUpdated]
   );
 
   const chooseAnimation = index => {
@@ -137,67 +137,79 @@ const PointsEditor = ({
     setSpriteIndex(index);
   };
 
-  const updateSamePointsToggles = () => {
-    if (!animation || !sprite) return;
-
-    setSamePointsForAnimations(
-      every(
-        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const otherAnimation = spriteConfiguration.getAnimation(i);
-          return allSpritesHaveSamePointsAs(sprite, otherAnimation);
-        })
-      )
-    );
-
-    setSamePointsForSprites(allSpritesHaveSamePointsAs(sprite, animation));
-  };
-
-  const setSamePointsForAllAnimations = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?"
+  // When an animation or sprite is changed, recompute if all points are the same
+  // to enable the toggle.
+  // Note: we do not recompute if all animations have the same points, as we consider
+  // that if the user has enabled/disabled this, they want to keep it that way.
+  React.useEffect(
+    () => {
+      if (!sprite || !animation) {
+        return;
+      }
+      setSamePointsForSprites(
+        allAnimationSpritesHaveSamePointsAs(sprite, animation)
       );
-      if (!answer) return;
-    }
+    },
+    [animation, sprite]
+  );
 
-    setSamePointsForAnimations(enable);
-    setSamePointsForSprites(enable || samePointsForSprites);
-  };
+  const setSamePointsForAllAnimations = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same points for all animations?`,
+          message: t`
+          Having the same points for all animations will erase and reset all the other animations points. This can't be undone. Are you sure you want to share these points amongst all the animations of the object?`,
+          confirmButtonLabel: t`Use same points`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-  const setSamePointsForAllSprites = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?"
-      );
-      if (!answer) return;
-    }
+      const newSamePointsForAnimations = enable;
+      const newSamePointsForSprites = enable || samePointsForSprites;
 
-    setSamePointsForAnimations(enable && samePointsForAnimations);
-    setSamePointsForSprites(enable);
-  };
+      setSamePointsForAnimations(newSamePointsForAnimations);
+      setSamePointsForSprites(newSamePointsForSprites);
+      updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
+    },
+    [samePointsForSprites, updatePoints, showConfirmation]
+  );
 
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateSamePointsToggles, [animationIndex]);
+  const setSamePointsForAllSprites = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same points for all frames?`,
+          message: t`Having the same points for all frames will erase and reset all the other frames points. This can't be undone. Are you sure you want to share these points amongst all the frames of the animation?`,
+          confirmButtonLabel: t`Use same points`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updatePoints, [
-    samePointsForAnimations,
-    samePointsForSprites,
-  ]);
+      const newSamePointsForAnimations = enable && samePointsForAnimations;
+      const newSamePointsForSprites = enable;
+
+      setSamePointsForAnimations(newSamePointsForAnimations);
+      setSamePointsForSprites(newSamePointsForSprites);
+      updatePoints(newSamePointsForAnimations, newSamePointsForSprites);
+    },
+    [samePointsForAnimations, updatePoints, showConfirmation]
+  );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const screenSize = useResponsiveWindowWidth();
-  const editorNodes =
-    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+  const { isMobile } = useResponsiveWindowSize();
+  const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!objectConfiguration.getAnimationsCount()) return null;
+  if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column noMargin expand useFullHeight>
@@ -212,12 +224,18 @@ const PointsEditor = ({
                 project,
                 resourceName
               )}
+              onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (
                   <PointsPreview
                     {...overlayProps}
                     pointsContainer={sprite}
-                    onPointsUpdated={updatePoints}
+                    onPointsUpdated={() =>
+                      updatePoints(
+                        samePointsForAnimations,
+                        samePointsForSprites
+                      )
+                    }
                     selectedPointName={selectedPointName}
                     highlightedPointName={highlightedPointName}
                     onClickPoint={setSelectedPointName}
@@ -232,13 +250,14 @@ const PointsEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column noMargin expand>
             <Line>
               <Column expand>
                 <SpriteSelector
-                  spriteConfiguration={spriteConfiguration}
+                  animations={animations}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}
@@ -264,10 +283,14 @@ const PointsEditor = ({
               {!!sprite && (
                 <PointsList
                   pointsContainer={sprite}
-                  onPointsUpdated={updatePoints}
+                  onPointsUpdated={() =>
+                    updatePoints(samePointsForAnimations, samePointsForSprites)
+                  }
                   selectedPointName={selectedPointName}
                   onHoverPoint={setHighlightedPointName}
                   onSelectPoint={setSelectedPointName}
+                  onRenamedPoint={onRenamedPoint}
+                  spriteSize={currentSpriteSize}
                 />
               )}
               {!sprite && (

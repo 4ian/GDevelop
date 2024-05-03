@@ -1,7 +1,9 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import SemiControlledAutoComplete, {
   type DataSource,
   type SemiControlledAutoCompleteInterface,
@@ -10,6 +12,10 @@ import ListIcon from '../UI/ListIcon';
 import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -20,14 +26,14 @@ type Props = {|
   /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
   /**
-   * If specified, an object without this required capability won't be selectable.
-   * Note that this does not work with groups - which are assumed to have all capabilities.
+   * If specified, an object without these behaviors won't be selectable.
+   * Note that groups with at least 1 incompatible object won't be shown.
    */
-  requiredObjectCapability?: ?string,
+  requiredBehaviorTypes?: Array<string>,
 
   noGroups?: boolean,
 
-  /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
+  /** A list of object names to exclude from the autocomplete list (for example if they have already been selected). */
   excludedObjectOrGroupNames?: Array<string>,
 
   onChoose?: string => void,
@@ -55,6 +61,7 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  requiredBehaviorTypes,
   excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
@@ -62,14 +69,16 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  requiredBehaviorTypes?: Array<string>,
   excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
-  const list = enumerateObjectsAndGroups(
+  const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     globalObjectsContainer,
     objectsContainer,
-    allowedObjectType || undefined
+    allowedObjectType || undefined,
+    requiredBehaviorTypes || []
   );
-  const objects = list.allObjectsList.map(({ object }) => {
+  const objects = allObjectsList.map(({ object }) => {
     return {
       text: object.getName(),
       value: object.getName(),
@@ -88,14 +97,18 @@ const getObjectsAndGroupsDataSource = ({
   });
   const groups = noGroups
     ? []
-    : list.allGroupsList.map(({ group }) => {
+    : allGroupsList.map(({ group }) => {
         return {
           text: group.getName(),
           value: group.getName(),
         };
       });
 
-  const fullList = [...objects, { type: 'separator' }, ...groups];
+  const fullList =
+    groups.length === 0
+      ? objects
+      : [...objects, { type: 'separator' }, ...groups];
+
   return excludedObjectOrGroupNames
     ? fullList.filter(
         //$FlowFixMe
@@ -104,21 +117,18 @@ const getObjectsAndGroupsDataSource = ({
     : fullList;
 };
 
-const checkHasRequiredCapability = ({
-  project,
+export const checkHasRequiredCapability = ({
   globalObjectsContainer,
   objectsContainer,
-  requiredObjectCapability,
+  requiredBehaviorTypes,
   objectName,
 }: {|
-  project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  requiredObjectCapability: ?string,
   objectName: string,
+  requiredBehaviorTypes?: Array<string>,
 |}) => {
-  if (!requiredObjectCapability) return true;
-  if (!project) return true;
+  if (!requiredBehaviorTypes || requiredBehaviorTypes.length === 0) return true;
 
   const object = getObjectByName(
     globalObjectsContainer,
@@ -132,26 +142,33 @@ const checkHasRequiredCapability = ({
     return true;
   }
 
-  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-    project.getCurrentPlatform(),
-    object.getType()
-  );
-  return !objectMetadata.isUnsupportedBaseObjectCapability(
-    requiredObjectCapability
+  return requiredBehaviorTypes.every(
+    behaviorType =>
+      gd
+        .getBehaviorNamesInObjectOrGroup(
+          globalObjectsContainer,
+          objectsContainer,
+          objectName,
+          behaviorType,
+          false
+        )
+        .size() > 0
   );
 };
 
-export default class ObjectSelector extends React.Component<Props, {||}> {
-  _field: ?SemiControlledAutoCompleteInterface;
+export type ObjectSelectorInterface = {| focus: FieldFocusFunction |};
 
-  // Don't add a componentWillUnmount that would call onChange. This can lead to
-  // calling callbacks that would then update a deleted instruction parameters.
+const ObjectSelector = React.forwardRef<Props, ObjectSelectorInterface>(
+  (props, ref) => {
+    const fieldRef = React.useRef<?SemiControlledAutoCompleteInterface>(null);
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
+    const focus: FieldFocusFunction = options => {
+      if (fieldRef.current) fieldRef.current.focus(options);
+    };
+    const shouldAutofocusInput = useShouldAutofocusInput();
 
-  render() {
+    React.useImperativeHandle(ref, () => ({ focus }));
+
     const {
       value,
       onChange,
@@ -160,7 +177,6 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
-      requiredObjectCapability,
       noGroups,
       errorTextIfInvalid,
       margin,
@@ -168,8 +184,10 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onApply,
       id,
       excludedObjectOrGroupNames,
-      ...rest
-    } = this.props;
+      hintText,
+      requiredBehaviorTypes,
+      ...otherProps
+    } = props;
 
     const objectAndGroups = getObjectsAndGroupsDataSource({
       project,
@@ -177,20 +195,21 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       objectsContainer,
       noGroups,
       allowedObjectType,
+      requiredBehaviorTypes,
       excludedObjectOrGroupNames,
     });
+
     const hasValidChoice =
       objectAndGroups.filter(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
+
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
-      project,
-      requiredObjectCapability,
       globalObjectsContainer,
       objectsContainer,
       objectName: value,
+      requiredBehaviorTypes,
     });
-
     const errorText = !hasObjectWithRequiredCapability ? (
       <Trans>This object exists, but can't be used here.</Trans>
     ) : !hasValidChoice ? (
@@ -199,10 +218,10 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       undefined
     );
 
-    return (
+    return shouldAutofocusInput ? (
       <SemiControlledAutoComplete
         margin={margin}
-        hintText={t`Choose an object`}
+        hintText={hintText || t`Choose an object`}
         value={value}
         onChange={onChange}
         onChoose={onChoose}
@@ -210,10 +229,45 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onApply={onApply}
         dataSource={objectAndGroups}
         errorText={errorText}
-        ref={field => (this._field = field)}
+        ref={fieldRef}
         id={id}
-        {...rest}
+        {...otherProps}
       />
+    ) : (
+      <I18n>
+        {({ i18n }) => (
+          <SelectField
+            margin={margin}
+            value={value}
+            onChange={(e, i, newValue) => {
+              onChange(newValue);
+              if (onChoose) onChoose(newValue);
+              if (onApply) onApply();
+            }}
+            translatableHintText={hintText || t`Choose an object`}
+            style={{ flex: otherProps.fullWidth ? 1 : undefined }}
+            errorText={errorText}
+            helperMarkdownText={otherProps.helperMarkdownText}
+            floatingLabelText={otherProps.floatingLabelText}
+            id={id}
+          >
+            {objectAndGroups.map((option, index) =>
+              option.type === 'separator' ? (
+                <optgroup key={`group-divider`} label={i18n._(t`Groups`)} />
+              ) : (
+                <SelectOption
+                  key={option.value}
+                  label={option.value}
+                  value={option.value}
+                  shouldNotTranslate
+                />
+              )
+            )}
+          </SelectField>
+        )}
+      </I18n>
     );
   }
-}
+);
+
+export default ObjectSelector;

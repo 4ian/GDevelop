@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { notarize } = require('electron-notarize');
+const { notarize } = require('@electron/notarize');
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
@@ -11,6 +11,7 @@ exports.default = async function notarizing(context) {
 
   const appleId = process.env.APPLEID;
   const appleIdPassword = process.env.APPLEIDPASS;
+  const appleTeamId = process.env.APPLETEAMID;
   const appBundleId = 'com.gdevelop-app.ide';
   const appName = context.packager.appInfo.productFilename;
   const appPath = path.join(appOutDir, `${appName}.app`);
@@ -29,6 +30,9 @@ exports.default = async function notarizing(context) {
   if (!appleIdPassword) {
     throw new Error(`APPLEIDPASS environment variable is not defined`);
   }
+  if (!appleTeamId) {
+    throw new Error(`APPLETEAMID environment variable is not defined`);
+  }
 
   // Launch notarization
   const startTime = Date.now();
@@ -42,6 +46,7 @@ exports.default = async function notarizing(context) {
       appPath,
       appleId,
       appleIdPassword,
+      teamId: appleTeamId,
     });
 
     const duration = (Date.now() - startTime) / 1000;

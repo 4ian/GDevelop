@@ -1,70 +1,26 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.memo(props => (
-  <SvgIcon {...props} width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path
-      d="M8.00004 10.1666C9.19666 10.1666 10.1667 9.1966 10.1667 7.99998C10.1667 6.80336 9.19666 5.83331 8.00004 5.83331C6.80342 5.83331 5.83337 6.80336 5.83337 7.99998C5.83337 9.1966 6.80342 10.1666 8.00004 10.1666Z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M8 1.83331V2.83331"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M11.5 4.5L10.7106 5.28944"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M14.1666 8.00006H13.1666"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M11.5 11.5001L10.7106 10.7107"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M8 13.1667V14.1667"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M5.28943 10.7106L4.5 11.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M2.83337 8.00006H1.83337"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M5.28943 5.28947L4.5 4.5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </SvgIcon>
-));
+export default React.memo(
+  React.forwardRef((props, ref) => (
+    <SvgIcon {...props} ref={ref} width="24" height="24" viewBox="0 0 24 24">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      >
+        <circle cx="12" cy="12" r="3.25" />
+        <path d="M12 2.75V4.25" />
+        <path d="M17.25 6.75L16.0659 7.93416" />
+        <path d="M21.25 12L19.75 12" />
+        <path d="M17.25 17.25L16.0659 16.066" />
+        <path d="M12 19.75V21.25" />
+        <path d="M7.9341 16.0659L6.75 17.25" />
+        <path d="M4.25 12L2.75 12" />
+        <path d="M7.93405 7.93423L6.75 6.75" />
+      </g>
+    </SvgIcon>
+  ))
+);

@@ -5,6 +5,7 @@ import { type HomeTab } from '../HomePageMenu';
 import {
   type TutorialCategory,
   type Tutorial,
+  canAccessTutorial,
 } from '../../../../Utils/GDevelopServices/Tutorial';
 import MainPage from './MainPage';
 import TutorialsCategoryPage from './TutorialsCategoryPage';
@@ -12,13 +13,14 @@ import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
-import { type ExampleShortHeader } from '../../../../Utils/GDevelopServices/Example';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { secondsToMinutesAndSeconds } from '../../../../Utils/DateDisplay';
 import { type ImageTileComponent } from '../../../../UI/ImageTileGrid';
 import Paper from '../../../../UI/Paper';
 import { selectMessageByLocale } from '../../../../Utils/i18n/MessageByLocale';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { type Limits } from '../../../../Utils/GDevelopServices/Usage';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -47,29 +49,65 @@ export const TUTORIAL_CATEGORY_TEXTS = {
     title: <Trans>Advanced course</Trans>,
     description: <Trans>The icing on the cake</Trans>,
   },
+  'education-curriculum': {
+    title: <Trans>Education curriculum and resources</Trans>,
+    description: (
+      <Trans>
+        For teachers and educators having the GDevelop Education subscription.
+        Ready to use resources for teaching.
+      </Trans>
+    ),
+  },
+  recommendations: {
+    title: <Trans>Recommendations</Trans>,
+    description: null,
+  },
 };
 
-export const formatTutorialToImageTileComponent = (
+type FormatTutorialToImageTileComponentProps = {|
   i18n: I18nType,
-  tutorial: Tutorial
-): ImageTileComponent => ({
-  title: selectMessageByLocale(i18n, tutorial.titleByLocale) || tutorial.title,
-  description:
-    selectMessageByLocale(i18n, tutorial.descriptionByLocale) ||
-    tutorial.description,
-  onClick: () => {
-    sendTutorialOpened(tutorial.id);
-    Window.openExternalURL(
-      selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
-    );
-  },
-  imageUrl:
-    selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
-    tutorial.thumbnailUrl,
-  overlayText: tutorial.duration
-    ? secondsToMinutesAndSeconds(tutorial.duration)
-    : '\u{1F4D8}',
-});
+  limits: ?Limits,
+  tutorial: Tutorial,
+  onSelectTutorial: (tutorial: Tutorial) => void,
+|};
+
+export const formatTutorialToImageTileComponent = ({
+  i18n,
+  tutorial,
+  limits,
+  onSelectTutorial,
+}: FormatTutorialToImageTileComponentProps): ImageTileComponent => {
+  const isLocked = !canAccessTutorial(
+    tutorial,
+    limits ? limits.capabilities : null
+  );
+  return {
+    title:
+      selectMessageByLocale(i18n, tutorial.titleByLocale) || tutorial.title,
+    description:
+      selectMessageByLocale(i18n, tutorial.descriptionByLocale) ||
+      tutorial.description,
+    isLocked,
+    onClick: () => {
+      if (tutorial.isPrivateTutorial) {
+        onSelectTutorial(tutorial);
+        return;
+      }
+
+      sendTutorialOpened(tutorial.id);
+      Window.openExternalURL(
+        selectMessageByLocale(i18n, tutorial.linkByLocale) || tutorial.link
+      );
+    },
+    imageUrl:
+      selectMessageByLocale(i18n, tutorial.thumbnailUrlByLocale) ||
+      tutorial.thumbnailUrl,
+    overlayText: tutorial.duration
+      ? secondsToMinutesAndSeconds(tutorial.duration)
+      : '\u{1F4D8}',
+    overlayTextPosition: 'bottomRight',
+  };
+};
 
 const styles = {
   paper: {
@@ -79,15 +117,17 @@ const styles = {
 };
 
 type Props = {|
-  onCreateProject: (?ExampleShortHeader) => void,
+  onOpenExampleStore: () => void,
   onTabChange: (tab: HomeTab) => void,
-  onOpenHelpFinder: () => void,
+  selectInAppTutorial: (tutorialId: string) => void,
+  initialCategory: TutorialCategory | null,
 |};
 
 const LearnSection = ({
-  onCreateProject,
+  onOpenExampleStore,
   onTabChange,
-  onOpenHelpFinder,
+  selectInAppTutorial,
+  initialCategory,
 }: Props) => {
   const {
     tutorials,
@@ -105,7 +145,16 @@ const LearnSection = ({
   const [
     selectedCategory,
     setSelectedCategory,
-  ] = React.useState<?TutorialCategory>(null);
+  ] = React.useState<?TutorialCategory>(initialCategory || null);
+
+  React.useEffect(
+    () => {
+      if (initialCategory) {
+        setSelectedCategory(initialCategory);
+      }
+    },
+    [initialCategory]
+  );
 
   if (tutorialLoadingError)
     return (
@@ -123,12 +172,11 @@ const LearnSection = ({
 
   return !selectedCategory ? (
     <MainPage
-      onCreateProject={onCreateProject}
-      onOpenHelpFinder={onOpenHelpFinder}
-      onStartTutorial={() => onTabChange('get-started')}
+      onOpenExampleStore={onOpenExampleStore}
       onTabChange={onTabChange}
       onSelectCategory={setSelectedCategory}
       tutorials={tutorials}
+      selectInAppTutorial={selectInAppTutorial}
     />
   ) : (
     <TutorialsCategoryPage
@@ -139,4 +187,13 @@ const LearnSection = ({
   );
 };
 
-export default LearnSection;
+const LearnSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Learn section</Trans>}
+    scope="start-page-learn"
+  >
+    <LearnSection {...props} />
+  </ErrorBoundary>
+);
+
+export default LearnSectionWithErrorBoundary;

@@ -5,14 +5,11 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckCircleIcon from '@material-ui/icons//CheckCircle';
-
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import Card from '../../UI/Card';
 import BackgroundText from '../../UI/BackgroundText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -24,11 +21,18 @@ import {
   updateComment,
   type Comment,
   type GameRatings,
+  canCommentBeRatedByOwner,
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 import Link from '../../UI/Link';
 import PublicProfileDialog from '../../Profile/PublicProfileDialog';
+import CheckCircleFilled from '../../UI/CustomSvgIcons/CheckCircleFilled';
+import CheckCircle from '../../UI/CustomSvgIcons/CheckCircle';
+import Dislike from '../../UI/CustomSvgIcons/Dislike';
+import Like from '../../UI/CustomSvgIcons/Like';
+import Danger from '../../UI/CustomSvgIcons/Danger';
+import Heart from '../../UI/CustomSvgIcons/Heart';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' },
@@ -116,6 +120,37 @@ const FeedbackCard = ({
     !!comment.processedAt,
     processComment
   );
+  const canRateComment = canCommentBeRatedByOwner(comment);
+
+  const [ownerQualityRating, setOwnerQualityRating] = useOptimisticState(
+    (comment.qualityRatingPerRole && comment.qualityRatingPerRole.owner) ||
+      null,
+    async (qualityRating, i18n) => {
+      if (!profile) return;
+      try {
+        const updatedComment: Comment = await updateComment(
+          getAuthorizationHeader,
+          profile.id,
+          {
+            gameId: comment.gameId,
+            commentId: comment.id,
+            qualityRating,
+          }
+        );
+        onCommentUpdated(updatedComment);
+      } catch (error) {
+        console.error(`Unable to update comment: `, error);
+        showErrorBox({
+          message:
+            i18n._(t`Unable to change quality rating of feedback.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'feedback-card-set-quality-rating-error',
+        });
+      }
+    }
+  );
 
   return (
     <I18n>
@@ -124,17 +159,75 @@ const FeedbackCard = ({
           <Card
             disabled={processed}
             cardCornerAction={
-              <IconButton
-                size="small"
-                tooltip={processed ? t`Mark as unread` : t`Mark as read`}
-                onClick={() => setProcessed(!processed, i18n)}
-              >
-                {processed ? (
-                  <CheckCircleIcon htmlColor={theme.message.valid} />
-                ) : (
-                  <CheckCircleOutlineIcon />
+              <LineStackLayout noMargin>
+                {canRateComment && (
+                  <LineStackLayout noMargin>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as great`}
+                      onClick={() => setOwnerQualityRating('great', i18n)}
+                    >
+                      <Heart
+                        htmlColor={
+                          ownerQualityRating === 'great'
+                            ? theme.message.valid
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as good`}
+                      onClick={() => setOwnerQualityRating('good', i18n)}
+                    >
+                      <Like
+                        htmlColor={
+                          ownerQualityRating === 'good'
+                            ? theme.message.valid
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Rank this comment as bad`}
+                      onClick={() => setOwnerQualityRating('bad', i18n)}
+                    >
+                      <Dislike
+                        htmlColor={
+                          ownerQualityRating === 'bad'
+                            ? theme.message.warning
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      tooltip={t`Report this comment as abusive, harmful or spam`}
+                      onClick={() => setOwnerQualityRating('harmful', i18n)}
+                    >
+                      <Danger
+                        htmlColor={
+                          ownerQualityRating === 'harmful'
+                            ? theme.message.error
+                            : undefined
+                        }
+                      />
+                    </IconButton>
+                  </LineStackLayout>
                 )}
-              </IconButton>
+                <IconButton
+                  size="small"
+                  tooltip={processed ? t`Mark as unread` : t`Mark as read`}
+                  onClick={() => setProcessed(!processed, i18n)}
+                >
+                  {processed ? (
+                    <CheckCircleFilled htmlColor={theme.message.valid} />
+                  ) : (
+                    <CheckCircle />
+                  )}
+                </IconButton>
+              </LineStackLayout>
             }
             header={
               <BackgroundText style={styles.backgroundText}>

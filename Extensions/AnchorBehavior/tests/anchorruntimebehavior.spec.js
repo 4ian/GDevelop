@@ -1,10 +1,7 @@
 // @ts-check
 describe('gdjs.AnchorRuntimeBehavior', function () {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: { resources: [] },
-    // @ts-ignore
-    properties: { windowWidth: 1000, windowHeight: 1000 },
+  const runtimeGame = gdjs.getPixiRuntimeGame({
+    propertiesOverrides: { windowHeight: 1000, windowWidth: 1000 },
   });
   const anchorBehaviorName = 'Anchor';
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
@@ -33,6 +30,7 @@ describe('gdjs.AnchorRuntimeBehavior', function () {
     behaviorsSharedData: [],
     objects: [],
     instances: [],
+    usedResources: [],
   });
 
   function createObject(behaviorProperties) {

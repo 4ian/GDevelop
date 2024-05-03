@@ -523,6 +523,11 @@ public:
     String LowerCase() const;
 
     /**
+     * \brief Returns the string with the first letter in upper case.
+     */
+    String CapitalizeFirstLetter() const;
+
+    /**
      * \brief Searches a string for a specified substring and returns a new string where all occurrences of this substring is replaced.
      * \param search The string that will be replaced by the new string.
      * \param replacement The value to replace the old substring with.
@@ -584,32 +589,32 @@ public:
     String substr( size_type start = 0, size_type length = npos ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const String &search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const char *search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      */
     size_type find( const value_type search, size_type pos = 0 ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const char *search, size_type pos = npos ) const;
 
     /**
-     * \return the position of the last occurence of **search** starting before **pos**.
+     * \return the position of the last occurrence of **search** starting before **pos**.
      */
     size_type rfind( const value_type &search, size_type pos = npos ) const;
 
@@ -658,7 +663,7 @@ public:
 
     /**
      * \brief Do a case-insensitive search
-     * \return the position of the first occurence of **search** starting from **pos**.
+     * \return the position of the first occurrence of **search** starting from **pos**.
      *
      * \note This method isn't very efficient as it is linear on the string size times the
      * search string size
@@ -698,6 +703,10 @@ String GD_CORE_API operator+(String lhs, const char *rhs);
  * converted to gd::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(const char *lhs, const String &rhs);
+
+const String& GD_CORE_API operator||(const String &lhs, const String &rhs);
+
+String GD_CORE_API operator||(String lhs, const char *rhs);
 
 /**
  * \}

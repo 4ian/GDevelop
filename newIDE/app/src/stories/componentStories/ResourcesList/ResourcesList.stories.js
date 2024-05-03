@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ResourcesList from '../../../ResourcesList';
 import ValueStateHolder from '../../ValueStateHolder';
@@ -11,7 +10,7 @@ import DragAndDropContextProvider from '../../../UI/DragAndDrop/DragAndDropConte
 export default {
   title: 'ResourcesList/ResourcesList',
   component: ResourcesList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (
@@ -30,6 +29,7 @@ export const Default = () => (
             onRemoveAllResourcesWithInvalidPath={action(
               'onRemoveAllResourcesWithInvalidPath'
             )}
+            fileMetadata={null}
           />
         )}
       />

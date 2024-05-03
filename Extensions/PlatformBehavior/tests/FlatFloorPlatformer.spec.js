@@ -125,7 +125,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Jumpthru that are ignored had a side effects on the search context.
         // It made jumpthru appear solid when a platform was tested after them.
 
-        // Add the jumptru 1st to make RBrush gives it 1st.
+        // Add the jumpthru 1st to make RBrush gives it 1st.
         // There is no causality but it does in the current implementation.
         const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
         jumpThroughPlatform.setPosition(30, -15);
@@ -435,7 +435,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       });
 
       it('can track platform angle changes', function () {
-        // The initial pltaforms AABB are put in RBush.
+        // The initial platforms AABB are put in RBush.
         runtimeScene.renderAndStep(1000 / 60);
 
         // Now change the angle to check that the AABB is updated in RBush.

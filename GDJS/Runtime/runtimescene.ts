@@ -32,6 +32,10 @@ namespace gdjs {
     _requestedChange: SceneChangeRequest;
     /** Black background by default. */
     _backgroundColor: integer = 0;
+
+    /** Should the canvas be cleared before this scene rendering. */
+    _clearCanvas: boolean = true;
+
     _onceTriggers: OnceTriggers;
     _profiler: gdjs.Profiler | null = null;
 
@@ -71,6 +75,12 @@ namespace gdjs {
       this.onGameResolutionResized();
     }
 
+    addLayer(layerData: LayerData) {
+      const layer = new gdjs.Layer(layerData, this);
+      this._layers.put(layerData.name, layer);
+      this._orderedLayers.push(layer);
+    }
+
     /**
      * Should be called when the canvas where the scene is rendered has been resized.
      * See gdjs.RuntimeGame.startGameLoop in particular.
@@ -86,8 +96,7 @@ namespace gdjs {
         : 0;
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
-          /** @type gdjs.Layer */
-          const theLayer: gdjs.Layer = this._layers.items[name];
+          const theLayer: gdjs.RuntimeLayer = this._layers.items[name];
           theLayer.onGameResolutionResized(
             oldGameResolutionOriginX,
             oldGameResolutionOriginY
@@ -156,6 +165,7 @@ namespace gdjs {
         sceneData.instances,
         0,
         0,
+        0,
         /*trackByPersistentUuid=*/
         true
       );
@@ -191,13 +201,6 @@ namespace gdjs {
         logger.error("Can't find shared data for behavior with name: " + name);
       }
       return behaviorSharedData;
-    }
-
-    addLayer(layerData: LayerData) {
-      this._layers.put(
-        layerData.name,
-        new gdjs.RuntimeSceneLayer(layerData, this)
-      );
     }
 
     /**
@@ -260,7 +263,8 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDestroyFromScene(this);
+        object.onDeletedFromScene(this);
+        object.onDestroyed();
       }
 
       // Notify the renderer
@@ -456,6 +460,8 @@ namespace gdjs {
         // (so we have a "safety margin") but these objects should be fixed
         // instead.
         // - objects having effects rendering outside of their visibility AABB.
+
+        // TODO (3D) culling - add support for 3D object culling?
         this._updateLayersCameraCoordinates(2);
         const allInstancesList = this.getAdhocListOfAllInstances();
         for (let i = 0, len = allInstancesList.length; i < len; ++i) {
@@ -522,6 +528,22 @@ namespace gdjs {
      */
     getBackgroundColor(): number {
       return this._backgroundColor;
+    }
+
+    /**
+     * Set whether the canvas should be cleared before this scene rendering.
+     * This is experimental: if possible, try to avoid relying on this and use
+     * custom objects to build complex scenes.
+     */
+    setClearCanvas(shouldClearCanvas: boolean): void {
+      this._clearCanvas = shouldClearCanvas;
+    }
+
+    /**
+     * Get whether the canvas should be cleared before this scene rendering.
+     */
+    getClearCanvas(): boolean {
+      return this._clearCanvas;
     }
 
     /**

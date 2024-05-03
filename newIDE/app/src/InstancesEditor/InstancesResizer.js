@@ -138,7 +138,8 @@ export default class InstancesResizer {
     deltaX: number,
     deltaY: number,
     grabbingLocation: ResizeGrabbingLocation,
-    proportional: boolean
+    proportional: boolean,
+    noGridSnap: boolean
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
@@ -166,7 +167,8 @@ export default class InstancesResizer {
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
     if (
       this.instancesEditorSettings.snap &&
-      this.instancesEditorSettings.grid
+      this.instancesEditorSettings.grid &&
+      !noGridSnap
     ) {
       roundPositionForResizing(
         grabbingPosition,
@@ -218,6 +220,7 @@ export default class InstancesResizer {
         ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
           initialSelectionAABB.height()
         : flippedTotalDeltaY;
+    let scaleZ = 1;
 
     const hasRotatedInstance = areAnyInstancesNotStraight(nonLockedInstances);
 
@@ -235,8 +238,10 @@ export default class InstancesResizer {
             flippedTotalDeltaY * initialSelectionAABB.width())
       ) {
         scaleY = scaleX;
+        scaleZ = scaleX;
       } else {
         scaleX = scaleY;
+        scaleZ = scaleY;
       }
     }
 
@@ -254,6 +259,12 @@ export default class InstancesResizer {
         ? 1 / initialSelectionAABB.height()
         : 0.00001,
       scaleY
+    );
+    scaleZ = Math.max(
+      initialSelectionAABB.depth() !== 0
+        ? 1 / initialSelectionAABB.depth()
+        : 0.00001,
+      scaleZ
     );
 
     const fixedPointX =
@@ -285,6 +296,10 @@ export default class InstancesResizer {
         initialUnrotatedInstanceAABB.height() !== 0
           ? initialUnrotatedInstanceAABB.height()
           : 1;
+      const initialDepth =
+        initialUnrotatedInstanceAABB.depth() !== 0
+          ? initialUnrotatedInstanceAABB.depth()
+          : 1;
 
       // The position and size of an instance describe the shape
       // before the rotation is applied.
@@ -297,6 +312,7 @@ export default class InstancesResizer {
       let newY = initialInstanceOriginPosition.y;
       let newWidth = initialWidth;
       let newHeight = initialHeight;
+      let newDepth = initialDepth;
       if (
         !proportional &&
         !hasRotatedInstance &&
@@ -304,6 +320,7 @@ export default class InstancesResizer {
       ) {
         newWidth = scaleY * initialWidth;
         newHeight = scaleX * initialHeight;
+        newDepth = scaleZ * initialDepth;
 
         // These 4 variables are the positions and vector after the scaling.
         // It's easier to scale the instance center
@@ -330,6 +347,7 @@ export default class InstancesResizer {
       } else {
         newWidth = scaleX * initialWidth;
         newHeight = scaleY * initialHeight;
+        newDepth = scaleZ * initialDepth;
         newX =
           (initialInstanceOriginPosition.x - fixedPointX) * scaleX +
           fixedPointX;
@@ -343,9 +361,13 @@ export default class InstancesResizer {
       // prevent the user from modifying them manually in the inline fields.
       selectedInstance.setX(Math.round(newX));
       selectedInstance.setY(Math.round(newY));
+
+      // Also round the size.
+      selectedInstance.setHasCustomDepth(true);
+      selectedInstance.setHasCustomSize(true);
       selectedInstance.setCustomWidth(Math.round(newWidth));
       selectedInstance.setCustomHeight(Math.round(newHeight));
-      selectedInstance.setHasCustomSize(true);
+      selectedInstance.setCustomDepth(Math.round(newDepth));
     }
   }
 

@@ -54,7 +54,7 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
         />
       </ResponsiveLineStackLayout>
       <Changelog
-        onUpdated={forceUpdate} // Force update to ensure dialog is properly positionned
+        onUpdated={forceUpdate} // Force update to ensure dialog is properly positioned
       />
     </Dialog>
   );

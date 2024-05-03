@@ -1,6 +1,6 @@
 # GDevelop IDE
 
-This is the GDevelop 5 editor. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
+This is the GDevelop 5 editor. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/) for the desktop app.
 It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4ian/GDevelop.js) to work with GDevelop games.
 
 ![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20screenshot.png "GDevelop editor")
@@ -79,7 +79,7 @@ npm run format # or yarn format
 
 It's pretty easy to create new themes. Check the [README about themes](./README-themes.md)
 
-### Development of the game engine or extensions.
+### Development of the game engine or extensions
 
 Make sure to have the standalone app running with Electron.
 

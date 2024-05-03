@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { UrlChooser } from '../../ResourcesList/BrowserResourceSources';
@@ -12,7 +11,7 @@ const gd: libGDevelop = global.gd;
 export default {
   title: 'BrowserResourceSources/UrlChooser',
   component: UrlChooser,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 export const Default = () => (
   <UrlChooser

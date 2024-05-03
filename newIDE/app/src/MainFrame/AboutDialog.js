@@ -26,6 +26,7 @@ import {
 } from '../Version';
 import { ColumnStackLayout } from '../UI/Layout';
 import optionalRequire from '../Utils/OptionalRequire';
+import ErrorBoundary from '../UI/ErrorBoundary';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -109,7 +110,7 @@ const contributors = [
     name: 'Arthur Pacaud (arthuro555)',
     description:
       'Numerous code contributions to GDevelop and community moderation',
-    link: 'https://forum.gdevelop-app.com/u/arthuro555/summary',
+    link: 'https://forum.gdevelop.io/u/arthuro555/summary',
   },
   {
     name: 'The Gem Dev',
@@ -248,7 +249,7 @@ const contributors = [
   },
 ];
 
-export default function AboutDialog({ onClose, updateStatus }: Props) {
+const AboutDialog = ({ onClose, updateStatus }: Props) => {
   const openContributePage = React.useCallback(() => {
     Window.openExternalURL('https://gdevelop.io/page/contribute/');
   }, []);
@@ -416,4 +417,16 @@ export default function AboutDialog({ onClose, updateStatus }: Props) {
       )}
     </Dialog>
   );
-}
+};
+
+const AboutDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>About dialog</Trans>}
+    scope="about"
+    onClose={props.onClose}
+  >
+    <AboutDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default AboutDialogWithErrorBoundary;

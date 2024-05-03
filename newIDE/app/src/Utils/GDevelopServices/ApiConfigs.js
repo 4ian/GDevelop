@@ -10,20 +10,20 @@ export const GDevelopGamePreviews = {
 export const GDevelopGamesPlatform = {
   getInstantBuildUrl: (buildId: string) =>
     isDev
-      ? `https://liluo.io/instant-builds/${buildId}?dev=true`
-      : `https://liluo.io/instant-builds/${buildId}`,
+      ? `https://gd.games/instant-builds/${buildId}?dev=true`
+      : `https://gd.games/instant-builds/${buildId}`,
   getGameUrl: (gameId: string) =>
     isDev
-      ? `https://liluo.io/games/${gameId}?dev=true`
-      : `https://liluo.io/games/${gameId}`,
+      ? `https://gd.games/games/${gameId}?dev=true`
+      : `https://gd.games/games/${gameId}`,
   getGameUrlWithSlug: (userSlug: string, gameSlug: string) =>
     isDev
-      ? `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
-      : `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
+      ? `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
+      : `https://gd.games/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
   getUserPublicProfileUrl: (userId: string, username: ?string) =>
     username
-      ? `https://liluo.io/${username}${isDev ? '?dev=true' : ''}`
-      : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`,
+      ? `https://gd.games/${username}${isDev ? '?dev=true' : ''}`
+      : `https://gd.games/user/${userId}${isDev ? '?dev=true' : ''}`,
 };
 
 export const GDevelopFirebaseConfig = {
@@ -33,6 +33,12 @@ export const GDevelopFirebaseConfig = {
   projectId: 'gdevelop-services',
   storageBucket: 'gdevelop-services.appspot.com',
   messagingSenderId: '44882707384',
+};
+
+export const GDevelopAuthorizationWebSocketApi = {
+  baseUrl: isDev
+    ? 'wss://api-ws-dev.gdevelop.io/authorization'
+    : 'wss://api-ws.gdevelop.io/authorization',
 };
 
 export const GDevelopBuildApi = {
@@ -95,6 +101,12 @@ export const GDevelopProjectApi = {
     : 'https://api.gdevelop.io/project',
 };
 
+export const GDevelopGenerationApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/generation'
+    : 'https://api.gdevelop.io/generation',
+};
+
 export const GDevelopProjectResourcesStorage = {
   baseUrl: isDev
     ? 'https://project-resources-dev.gdevelop.io'
@@ -105,6 +117,12 @@ export const GDevelopPrivateAssetsStorage = {
   baseUrl: isDev
     ? 'https://private-assets-dev.gdevelop.io'
     : 'https://private-assets.gdevelop.io',
+};
+
+export const GDevelopPrivateGameTemplatesStorage = {
+  baseUrl: isDev
+    ? 'https://private-game-templates-dev.gdevelop.io'
+    : 'https://private-game-templates.gdevelop.io',
 };
 
 export const GDevelopPublicAssetResourcesStorageBaseUrl =

@@ -1,22 +1,21 @@
 // @flow
 import * as React from 'react';
-import withMock from 'storybook-addon-mock';
-
-import muiDecorator from '../../../ThemeDecorator';
+import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../../PaperDecorator';
 import FixedHeightFlexContainer from '../../../FixedHeightFlexContainer';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
 import { AssetStore } from '../../../../AssetStore';
 import {
   fakeAssetPacks,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore',
   component: AssetStore,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {
@@ -41,26 +40,39 @@ const apiDataFakePacks = {
   ],
 };
 
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
+  return (
+    <FixedHeightFlexContainer height={500}>
+      <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+        <AssetStoreStateProvider shopNavigationState={navigationState}>
+          {children}
+        </AssetStoreStateProvider>
+      </AuthenticatedUserContext.Provider>
+    </FixedHeightFlexContainer>
+  );
+};
+
 export const Default = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <AssetStoreStateProvider>
-        <AssetStore />
-      </AssetStoreStateProvider>
-    </AuthenticatedUserContext.Provider>
-  </FixedHeightFlexContainer>
+  <Wrapper>
+    <AssetStore onOpenProfile={action('onOpenProfile')} displayPromotions />
+  </Wrapper>
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakePacks;
 
-export const LoadingError = () => (
-  <FixedHeightFlexContainer height={500}>
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-      <AssetStoreStateProvider>
-        <AssetStore />
-      </AssetStoreStateProvider>
-    </AuthenticatedUserContext.Provider>
-  </FixedHeightFlexContainer>
+export const WithoutPromotions = () => (
+  <Wrapper>
+    <AssetStore
+      onOpenProfile={action('onOpenProfile')}
+      displayPromotions={false}
+    />
+  </Wrapper>
 );
-LoadingError.decorators = [withMock];
+WithoutPromotions.parameters = apiDataFakePacks;
+
+export const LoadingError = () => (
+  <Wrapper>
+    <AssetStore onOpenProfile={action('onOpenProfile')} />
+  </Wrapper>
+);
 LoadingError.parameters = apiDataServerSideError;

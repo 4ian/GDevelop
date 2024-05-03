@@ -103,6 +103,8 @@ export const UsernameField = ({
     }
 
     try {
+      onAvailabilityCheckLoading(true);
+
       const usernameAvailability = await getUsernameAvailability(username);
 
       if (!usernameAvailability) {
@@ -122,6 +124,8 @@ export const UsernameField = ({
         usernameAvailability: null,
         error: null,
       });
+    } finally {
+      onAvailabilityCheckLoading(false);
     }
   }, 500);
 
@@ -138,12 +142,7 @@ export const UsernameField = ({
       value={value}
       floatingLabelText={<Trans>Username</Trans>}
       fullWidth
-      onChange={(event, value) => {
-        onChange(event, value);
-        if (value) {
-          onAvailabilityCheckLoading(true);
-        }
-      }}
+      onChange={onChange}
       errorText={
         usernameFormattingError || usernameAvailabilityError || errorText
       }
@@ -153,6 +152,7 @@ export const UsernameField = ({
         )
       }
       disabled={disabled}
+      maxLength={50}
     />
   );
 };

@@ -8,7 +8,9 @@ import {
   type ShowAlertDialogOptionsWithCallback,
   type ShowConfirmDeleteDialogOptionsWithCallback,
   type ShowConfirmDialogOptionsWithCallback,
+  type ShowYesNoCancelDialogOptionsWithCallback,
 } from './AlertContext';
+import YesNoCancelDialog from './YesNoCancelDialog';
 
 type Props = {| children: React.Node |};
 
@@ -60,12 +62,30 @@ function ConfirmProvider({ children }: Props) {
     []
   );
 
+  // Confirm
+  const [
+    yesNoCancelDialogOpen,
+    setYesNoCancelDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    yesNoCancelDialogConfig,
+    setYesNoCancelDialogConfig,
+  ] = React.useState<?ShowYesNoCancelDialogOptionsWithCallback>(null);
+  const openYesNoCancelDialog = React.useCallback(
+    (options: ShowYesNoCancelDialogOptionsWithCallback) => {
+      setYesNoCancelDialogOpen(true);
+      setYesNoCancelDialogConfig(options);
+    },
+    []
+  );
+
   return (
     <AlertContext.Provider
       value={{
         showAlertDialog: openAlertDialog,
         showConfirmDialog: openConfirmDialog,
         showConfirmDeleteDialog: openConfirmDeleteDialog,
+        showYesNoCancelDialog: openYesNoCancelDialog,
       }}
     >
       {children}
@@ -96,6 +116,11 @@ function ConfirmProvider({ children }: Props) {
           dismissButtonLabel={confirmDialogConfig.dismissButtonLabel}
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
+          level={confirmDialogConfig.level || 'info'}
+          maxWidth={confirmDialogConfig.maxWidth}
+          makeDismissButtonPrimary={
+            confirmDialogConfig.makeDismissButtonPrimary
+          }
         />
       )}
       {confirmDeleteDialogConfig && (
@@ -115,6 +140,28 @@ function ConfirmProvider({ children }: Props) {
           message={confirmDeleteDialogConfig.message}
           fieldMessage={confirmDeleteDialogConfig.fieldMessage}
           confirmText={confirmDeleteDialogConfig.confirmText}
+        />
+      )}
+      {yesNoCancelDialogConfig && (
+        <YesNoCancelDialog
+          open={yesNoCancelDialogOpen}
+          onClickYes={() => {
+            setYesNoCancelDialogOpen(false);
+            yesNoCancelDialogConfig.callback(0);
+          }}
+          yesButtonLabel={yesNoCancelDialogConfig.yesButtonLabel}
+          onClickNo={() => {
+            setYesNoCancelDialogOpen(false);
+            yesNoCancelDialogConfig.callback(1);
+          }}
+          noButtonLabel={yesNoCancelDialogConfig.noButtonLabel}
+          onClickCancel={() => {
+            setYesNoCancelDialogOpen(false);
+            yesNoCancelDialogConfig.callback(2);
+          }}
+          cancelButtonLabel={yesNoCancelDialogConfig.cancelButtonLabel}
+          title={yesNoCancelDialogConfig.title}
+          message={yesNoCancelDialogConfig.message}
         />
       )}
     </AlertContext.Provider>

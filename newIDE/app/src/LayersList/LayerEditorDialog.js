@@ -1,10 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import React from 'react';
+import { t, Trans } from '@lingui/macro';
+import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import {
   rgbColorToRGBString,
@@ -22,11 +22,15 @@ import HelpButton from '../UI/HelpButton';
 import { Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
 import { Spacer } from '../UI/Grid';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
   resourceManagementProps: ResourceManagementProps,
+  layout: gdLayout,
   layer: gdLayer,
   initialInstances: gdInitialInstancesContainer,
 
@@ -54,6 +58,18 @@ const LayerEditorDialog = (props: Props) => {
     serializableObject: layer,
     onCancel: onClose,
   });
+  const [
+    camera3DFieldOfViewError,
+    setCamera3DFieldOfViewError,
+  ] = React.useState<?React.Node>(null);
+  const [
+    camera3DFarPlaneDistanceError,
+    setCamera3DFarPlaneDistanceError,
+  ] = React.useState<?React.Node>(null);
+  const [
+    camera3DNearPlaneDistanceError,
+    setCamera3DNearPlaneDistanceError,
+  ] = React.useState<?React.Node>(null);
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const { instancesCount, highestZOrder } = React.useMemo(
     () => {
@@ -67,6 +83,81 @@ const LayerEditorDialog = (props: Props) => {
       return { instancesCount, highestZOrder };
     },
     [layer, initialInstances]
+  );
+
+  const onChangeCamera3DFieldOfView = React.useCallback(
+    value => {
+      setCamera3DFieldOfViewError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= 0 || newValue > 180) {
+        setCamera3DFieldOfViewError(
+          <Trans>
+            The field of view cannot be lower than 0° or greater than 180°.
+          </Trans>
+        );
+        return;
+      }
+      if (newValue === layer.getCamera3DFieldOfView()) return;
+      layer.setCamera3DFieldOfView(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
+  );
+
+  const checkNearPlaneDistanceError = React.useCallback(
+    value => {
+      setCamera3DNearPlaneDistanceError(null);
+      const hasError =
+        (value <= 0 && layer.getCameraType() !== 'orthographic') ||
+        value >= layer.getCamera3DFarPlaneDistance();
+      if (hasError) {
+        setCamera3DNearPlaneDistanceError(
+          <Trans>
+            The near plane distance must be strictly greater than 0 and lower
+            than the far plan distance.
+          </Trans>
+        );
+      }
+      return hasError;
+    },
+    [layer]
+  );
+
+  const onChangeCamera3DNearPlaneDistance = React.useCallback(
+    value => {
+      const newValue = parseFloat(value) || 0;
+      const hasError = checkNearPlaneDistanceError(newValue);
+      if (hasError) {
+        return;
+      }
+      if (newValue === layer.getCamera3DNearPlaneDistance()) return;
+      layer.setCamera3DNearPlaneDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [checkNearPlaneDistanceError, forceUpdate, layer, notifyOfChange]
+  );
+
+  const onChangeCamera3DFarPlaneDistance = React.useCallback(
+    value => {
+      setCamera3DFarPlaneDistanceError(null);
+      const newValue = parseFloat(value) || 0;
+      if (newValue <= layer.getCamera3DNearPlaneDistance()) {
+        setCamera3DFarPlaneDistanceError(
+          <Trans>
+            The far plane distance must be greater than the near plan distance.
+          </Trans>
+        );
+
+        return;
+      }
+      if (newValue === layer.getCamera3DFarPlaneDistance()) return;
+      layer.setCamera3DFarPlaneDistance(newValue);
+      forceUpdate();
+      notifyOfChange();
+    },
+    [forceUpdate, layer, notifyOfChange]
   );
 
   return (
@@ -140,14 +231,18 @@ const LayerEditorDialog = (props: Props) => {
             </DismissableAlertMessage>
           ) : null}
           <Text>
-            There are {instancesCount} instances of objects on this layer.
+            <Trans>
+              There are {instancesCount} instances of objects on this layer.
+            </Trans>
           </Text>
           {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
             <Text>
-              Objects created using events on this layer will be given a "Z
-              order" of {highestZOrder + 1}, so that they appear in front of all
-              objects of this layer. You can change this using the action to
-              change an object Z order, after using an action to create it.
+              <Trans>
+                Objects created using events on this layer will be given a "Z
+                order" of {highestZOrder + 1}, so that they appear in front of
+                all objects of this layer. You can change this using the action
+                to change an object Z order, after using an action to create it.
+              </Trans>
             </Text>
           )}
           <InlineCheckbox
@@ -166,6 +261,100 @@ const LayerEditorDialog = (props: Props) => {
               </Trans>
             }
           />
+          {!layer.isLightingLayer() && (
+            <ColumnStackLayout noMargin>
+              <Text size="block-title">
+                <Trans>3D settings</Trans>
+              </Text>
+              <SelectField
+                fullWidth
+                floatingLabelText={<Trans>Rendering type</Trans>}
+                value={layer.getRenderingType()}
+                onChange={(e, i, newValue: string) => {
+                  layer.setRenderingType(newValue);
+                  forceUpdate();
+                }}
+              >
+                <SelectOption
+                  value={''}
+                  label={t`Display both 2D and 3D objects (default)`}
+                />
+                <SelectOption
+                  value={'2d'}
+                  label={t`Force display only 2D objects`}
+                />
+                <SelectOption
+                  value={'3d'}
+                  label={t`Force display only 3D objects`}
+                  disabled={layer.isLightingLayer()}
+                />
+                <SelectOption
+                  value={'2d+3d'}
+                  label={t`Force display both 2D and 3D objects`}
+                  disabled={layer.isLightingLayer()}
+                />
+              </SelectField>
+              {layer.getRenderingType() !== '2d' && (
+                <ColumnStackLayout noMargin>
+                  <ResponsiveLineStackLayout noMargin>
+                    <SelectField
+                      fullWidth
+                      floatingLabelText={<Trans>Camera type</Trans>}
+                      value={layer.getCameraType()}
+                      onChange={(e, i, newValue: string) => {
+                        layer.setCameraType(newValue);
+                        checkNearPlaneDistanceError(
+                          layer.getCamera3DNearPlaneDistance()
+                        );
+                        forceUpdate();
+                      }}
+                    >
+                      <SelectOption
+                        value={'perspective'}
+                        label={t`Perspective camera`}
+                      />
+                      <SelectOption
+                        value={'orthographic'}
+                        label={t`Orthographic camera`}
+                      />
+                    </SelectField>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFieldOfViewError}
+                      onChange={onChangeCamera3DFieldOfView}
+                      value={layer.getCamera3DFieldOfView().toString(10)}
+                      floatingLabelText={
+                        <Trans>Field of view (in degrees)</Trans>
+                      }
+                      floatingLabelFixed
+                      disabled={layer.getCameraType() !== 'perspective'}
+                    />
+                  </ResponsiveLineStackLayout>
+                  <ResponsiveLineStackLayout noMargin>
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DNearPlaneDistanceError}
+                      onChange={onChangeCamera3DNearPlaneDistance}
+                      value={layer.getCamera3DNearPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Near plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                    <SemiControlledTextField
+                      commitOnBlur
+                      fullWidth
+                      errorText={camera3DFarPlaneDistanceError}
+                      onChange={onChangeCamera3DFarPlaneDistance}
+                      value={layer.getCamera3DFarPlaneDistance().toString(10)}
+                      floatingLabelText={<Trans>Far plane distance</Trans>}
+                      floatingLabelFixed
+                    />
+                  </ResponsiveLineStackLayout>
+                </ColumnStackLayout>
+              )}
+            </ColumnStackLayout>
+          )}
           {layer.isLightingLayer() ? (
             <React.Fragment>
               <Text size="block-title">
@@ -196,14 +385,19 @@ const LayerEditorDialog = (props: Props) => {
                     b: layer.getAmbientLightColorBlue(),
                   };
                   const newRgbColor = rgbStringAndAlphaToRGBColor(newColor);
-                  if (newRgbColor) {
+                  if (
+                    newRgbColor &&
+                    (newRgbColor.r !== currentRgbColor.r ||
+                      newRgbColor.g !== currentRgbColor.g ||
+                      newRgbColor.b !== currentRgbColor.b)
+                  ) {
                     layer.setAmbientLightColor(
                       newRgbColor.r,
                       newRgbColor.g,
                       newRgbColor.b
                     );
                     forceUpdate();
-                    if (currentRgbColor !== newRgbColor) notifyOfChange();
+                    notifyOfChange();
                   }
                 }}
               />
@@ -220,9 +414,19 @@ const LayerEditorDialog = (props: Props) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="layer"
+          layerRenderingType={layer.getRenderingType()}
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={layer.getEffects()}
+          onEffectsRenamed={(oldName, newName) =>
+            gd.WholeProjectRefactorer.renameLayerEffect(
+              props.project,
+              props.layout,
+              props.layer,
+              oldName,
+              newName
+            )
+          }
           onEffectsUpdated={() => {
             forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();

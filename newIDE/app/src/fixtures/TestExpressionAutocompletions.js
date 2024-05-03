@@ -32,6 +32,10 @@ const makeFakeEnumeratedExpressionMetadata = (
   ),
   scope: { extension },
   isPrivate: false,
+  isRelevantForLayoutEvents: true,
+  isRelevantForFunctionEvents: true,
+  isRelevantForAsynchronousFunctionEvents: true,
+  isRelevantForCustomObjectEvents: true,
 });
 
 export const makeFakeExactExpressionAutocompletion = () => {
@@ -101,32 +105,37 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
     {
       kind: 'Object',
       completion: 'SomeObject',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },
     {
       kind: 'Object',
       completion: 'SomeOtherObject',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },
     {
       kind: 'Object',
       completion: 'SomeOtherObjectWithALoooooooooooongLoooooooooooongName',
+      objectConfiguration: null,
       addDot: true,
       isExact: false,
     },
     {
       kind: 'Behavior',
-      completion: 'PlatformerObject',
+      completion: 'PlatformBehavior::PlatformerObjectBehavior',
       addNamespaceSeparator: true,
       isExact: false,
+      behaviorType: '',
     },
     {
       kind: 'Behavior',
       completion: 'Physics2',
       addNamespaceSeparator: true,
       isExact: false,
+      behaviorType: 'Physics2::Physics2Behavior',
     },
     {
       kind: 'Expression',

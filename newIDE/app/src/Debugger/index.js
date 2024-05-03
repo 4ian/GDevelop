@@ -14,7 +14,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import {
   type PreviewDebuggerServer,
   type DebuggerId,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import { type Log, LogsManager } from './DebuggerConsole';
 
 export type ProfilerMeasuresSection = {|
@@ -60,7 +60,6 @@ type State = {|
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
- * This is only supported on Electron runtime for now.
  */
 export default class Debugger extends React.Component<Props, State> {
   state = {
@@ -79,8 +78,12 @@ export default class Debugger extends React.Component<Props, State> {
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
   _debuggerLogs: Map<number, LogsManager> = new Map();
 
-  updateToolbar() {
+  updateToolbar = () => {
     const { selectedId, gameIsPaused } = this.state;
+
+    const selectedDebuggerContents = this._debuggerContents[
+      this.state.selectedId
+    ];
 
     this.props.setToolbar(
       <Toolbar
@@ -89,18 +92,26 @@ export default class Debugger extends React.Component<Props, State> {
         canPlay={this._hasSelectedDebugger() && gameIsPaused[selectedId]}
         canPause={this._hasSelectedDebugger() && !gameIsPaused[selectedId]}
         canOpenProfiler={this._hasSelectedDebugger()}
-        onOpenProfiler={() => {
+        isProfilerShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isProfilerShown()
+        }
+        onToggleProfiler={() => {
           if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].openProfiler();
+            this._debuggerContents[this.state.selectedId].toggleProfiler();
         }}
         canOpenConsole={this._hasSelectedDebugger()}
-        onOpenConsole={() => {
+        isConsoleShown={
+          !!selectedDebuggerContents &&
+          selectedDebuggerContents.isConsoleShown()
+        }
+        onToggleConsole={() => {
           if (this._debuggerContents[this.state.selectedId])
-            this._debuggerContents[this.state.selectedId].openConsole();
+            this._debuggerContents[this.state.selectedId].toggleConsole();
         }}
       />
     );
-  }
+  };
 
   componentDidMount() {
     this._registerServerCallbacks();
@@ -184,6 +195,14 @@ export default class Debugger extends React.Component<Props, State> {
           },
           () => this.updateToolbar()
         );
+      },
+      onConnectionErrored: ({ id, errorMessage }) => {
+        this._getLogsManager(id).addLog({
+          type: 'error',
+          timestamp: performance.now(),
+          group: 'Debugger connection',
+          message: 'The debugger connection errored: ' + errorMessage,
+        });
       },
       onServerStateChanged: () => {
         this.setState(
@@ -382,6 +401,7 @@ export default class Debugger extends React.Component<Props, State> {
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
                 logsManager={this._getLogsManager(selectedId)}
+                onOpenedEditorsChanged={this.updateToolbar}
               />
             )}
             {!this._hasSelectedDebugger() && (

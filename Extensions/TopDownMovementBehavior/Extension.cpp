@@ -21,6 +21,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetCategory("Movement")
+      .SetTags("top-down")
       .SetExtensionHelpPath("/behaviors/topdown");
   extension.AddInstructionOrExpressionGroupMetadata(_("Top-down movement"))
       .SetIcon("CppPlatform/Extensions/topdownmovementicon16.png");
@@ -37,12 +38,11 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       std::make_shared<TopDownMovementBehavior>(),
       std::make_shared<gd::BehaviorsSharedData>());
 
-#if defined(GD_IDE_ONLY)
   aut.AddAction("SimulateLeftKey",
                 _("Simulate left key press"),
                 _("Simulate a press of left key."),
                 _("Simulate pressing Left for _PARAM0_"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -54,7 +54,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Simulate right key press"),
                 _("Simulate a press of right key."),
                 _("Simulate pressing Right for _PARAM0_"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -66,7 +66,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Simulate up key press"),
                 _("Simulate a press of up key."),
                 _("Simulate pressing Up for _PARAM0_"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -78,7 +78,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Simulate down key press"),
                 _("Simulate a press of down key."),
                 _("Simulate pressing Down for _PARAM0_"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -91,7 +91,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          _("Simulate control"),
          _("Simulate a press of a key.\nValid keys are Left, Right, Up, Down."),
          _("Simulate pressing _PARAM2_ key for _PARAM0_"),
-         _("Controls"),
+         _("Top-down controls"),
          "res/conditions/keyboard24.png",
          "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -107,7 +107,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("De/activate the use of default controls.\nIf deactivated, "
                   "use the simulated actions to move the object."),
                 _("Ignore default controls for _PARAM0_: _PARAM2_"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -120,7 +120,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Simulate stick control"),
                 _("Simulate a stick control."),
                 _("Simulate a stick control for _PARAM0_ with a _PARAM2_ angle and a _PARAM3_ force"),
-                _("Controls"),
+                _("Top-down controls"),
                 "res/conditions/keyboard24.png",
                 "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
@@ -134,7 +134,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Control pressed or simulated"),
                   _("A control was applied from a default control or simulated by an action."),
                   _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
-                  _("Controls"),
+                  _("Top-down state"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
@@ -147,7 +147,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("StickAngle",
                     _("Stick angle"),
                     _("Return the angle of the simulated stick input (in degrees)"),
-                    _("Controls"),
+                    _("Top-down controls"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior");
@@ -156,7 +156,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Is moving"),
                    _("Check if the object is moving."),
                    _("_PARAM0_ is moving"),
-                   "",
+                   _("Top-down state"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -167,7 +167,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Acceleration"),
                 _("Change the acceleration of the object"),
                 _("the acceleration"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -184,7 +184,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Acceleration"),
                    _("Compare the acceleration of the object"),
                    _("the acceleration"),
-                   _("Movement"),
+                   _("Top-down configuration"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -200,7 +200,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Deceleration"),
                 _("Change the deceleration of the object"),
                 _("the deceleration"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -217,7 +217,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Deceleration"),
                    _("Compare the deceleration of the object"),
                    _("the deceleration"),
-                   _("Movement"),
+                   _("Top-down configuration"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -233,7 +233,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Maximum speed"),
                 _("Change the maximum speed of the object"),
                 _("the max. speed"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -249,7 +249,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Maximum speed"),
                    _("Compare the maximum speed of the object"),
                    _("the max. speed"),
-                   _("Movement"),
+                   _("Top-down configuration"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -265,7 +265,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Speed"),
                    _("Compare the speed of the object"),
                    _("the speed"),
-                   _("Movement"),
+                   _("Top-down state"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -280,7 +280,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Angular maximum speed"),
                 _("Change the maximum angular speed of the object"),
                 _("the max. angular speed"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -297,7 +297,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Angular maximum speed"),
                    _("Compare the maximum angular speed of the object"),
                    _("the max. angular speed"),
-                   _("Movement"),
+                   _("Top-down configuration"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -313,7 +313,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Rotation offset"),
                 _("Change the rotation offset applied when moving the object"),
                 _("the rotation offset"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -331,7 +331,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          _("Rotation offset"),
          _("Compare the rotation offset applied when moving the object"),
          _("the rotation offset"),
-         _("Movement"),
+         _("Top-down configuration"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -343,12 +343,13 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetAngleOffset");
 
+  // Deprecated
   aut.AddCondition(
          "Angle",
          _("Angle of movement"),
          _("Compare the angle of the top-down movement of the object."),
          _("the angle of movement"),
-         _("Movement"),
+         _("Top-down state"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -365,9 +366,8 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
            "IsMovementAngleAround",
            _("Angle of movement"),
            _("Compare the angle of the top-down movement of the object."),
-           _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
-             ": _PARAM3_ degrees)"),
-         _("Movement"),
+           _("Angle of movement of _PARAM0_ is _PARAM2_ ± _PARAM3_°"),
+         _("Top-down state"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", _("Object"))
@@ -380,7 +380,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Compare the velocity of the top-down movement of the "
                      "object on the X axis."),
                    _("the speed of movement on X axis"),
-                   _("Movement"),
+                   _("Top-down state"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -396,7 +396,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Speed on the X axis"),
                       _("Change the speed on the X axis of the movement"),
                       _("the speed on the X axis of the movement"),
-                      _("Movement"),
+                      _("Top-down state"),
                       "CppPlatform/Extensions/topdownmovementicon24.png",
                       "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -412,7 +412,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Compare the velocity of the top-down movement of the "
                      "object on the Y axis."),
                    _("the speed of movement on Y axis"),
-                   _("Movement"),
+                   _("Top-down state"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -428,7 +428,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Speed on the Y axis"),
                       _("Change the speed on the Y axis of the movement"),
                       _("the speed on the Y axis of the movement"),
-                      _("Movement"),
+                      _("Top-down state"),
                       "CppPlatform/Extensions/topdownmovementicon24.png",
                       "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -441,9 +441,9 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
   aut.AddAction("AllowDiagonals",
                 _("Diagonal movement"),
-                _("Allow or restrict diagonal movemment"),
+                _("Allow or restrict diagonal movement"),
                 _("Allow diagonal moves for _PARAM0_: _PARAM2_"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -455,7 +455,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Diagonal movement"),
                    _("Check if the object is allowed to move diagonally"),
                    _("Allow diagonal moves for _PARAM0_"),
-                   _("Movement"),
+                   _("Top-down configuration"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -467,7 +467,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                 _("Rotate the object"),
                 _("Enable or disable rotation of the object"),
                 _("Enable rotation of _PARAM0_: _PARAM2_"),
-                _("Movement"),
+                _("Top-down configuration"),
                 "CppPlatform/Extensions/topdownmovementicon24.png",
                 "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -481,7 +481,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          _("Object rotated"),
          _("Check if the object is rotated while traveling on its path."),
          _("_PARAM0_ is rotated when moving"),
-         _("Movement"),
+         _("Top-down configuration"),
          "CppPlatform/Extensions/topdownmovementicon24.png",
          "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
@@ -492,7 +492,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("Acceleration",
                     _("Acceleration"),
                     _("Acceleration of the object"),
-                    _("Movement"),
+                    _("Top-down configuration"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -501,7 +501,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("Deceleration",
                     _("Deceleration"),
                     _("Deceleration of the object"),
-                    _("Movement"),
+                    _("Top-down configuration"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -510,7 +510,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("MaxSpeed",
                     _("Maximum speed"),
                     _("Maximum speed of the object"),
-                    _("Movement"),
+                    _("Top-down configuration"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -519,7 +519,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("Speed",
                     _("Speed"),
                     _("Speed of the object"),
-                    _("Movement"),
+                    _("Top-down state"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -528,7 +528,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("AngularMaxSpeed",
                     _("Angular maximum speed"),
                     _("Angular maximum speed of the object"),
-                    _("Movement"),
+                    _("Top-down configuration"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -537,7 +537,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("AngleOffset",
                     _("Rotation offset"),
                     _("Rotation offset applied to the object"),
-                    _("Movement"),
+                    _("Top-down configuration"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -546,7 +546,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("Angle",
                     _("Angle of the movement"),
                     _("Angle, in degrees, of the movement"),
-                    _("Movement"),
+                    _("Top-down state"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -555,7 +555,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("XVelocity",
                     _("Speed on the X axis"),
                     _("Speed on the X axis of the movement"),
-                    _("Movement"),
+                    _("Top-down state"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -564,7 +564,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   aut.AddExpression("YVelocity",
                     _("Speed on the Y axis"),
                     _("Speed on the Y axis of the movement"),
-                    _("Movement"),
+                    _("Top-down state"),
                     "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -576,7 +576,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          _("Movement angle offset"),
          _("the movement angle offset"),
          _("the movement angle offset"),
-         _("Movement"),
+         _("Top-down configuration"),
          "CppPlatform/Extensions/topdownmovementicon24.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
@@ -584,5 +584,4 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
           "number",
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Angle (in degrees)")));
-#endif
 }

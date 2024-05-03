@@ -2,17 +2,53 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import { AnnouncementsFeed } from '../../../AnnouncementsFeed';
 import { AnnouncementsFeedContext } from '../../../AnnouncementsFeed/AnnouncementsFeedContext';
-import { fakeAnnouncements } from '../../../fixtures/GDevelopServicesTestData';
+import {
+  fakeAnnouncements,
+  fakePromotions,
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'AnnouncementsFeed',
   component: AnnouncementsFeed,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
+};
+
+export const Default = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        promotions: fakePromotions,
+        error: null,
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
+      }}
+    >
+      <AnnouncementsFeed />
+    </AnnouncementsFeedContext.Provider>
+  );
+};
+
+export const WithClosableItems = () => {
+  return (
+    <AnnouncementsFeedContext.Provider
+      value={{
+        announcements: fakeAnnouncements,
+        promotions: fakePromotions,
+        error: null,
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
+      }}
+    >
+      <AnnouncementsFeed canClose />
+    </AnnouncementsFeedContext.Provider>
+  );
 };
 
 export const ErrorLoadingAnnouncements = () => {
@@ -20,8 +56,11 @@ export const ErrorLoadingAnnouncements = () => {
     <AnnouncementsFeedContext.Provider
       value={{
         announcements: null,
+        promotions: null,
         error: new Error('Fake error'),
-        fetchAnnouncements: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed />
@@ -34,22 +73,11 @@ export const LoadingAnnouncements = () => {
     <AnnouncementsFeedContext.Provider
       value={{
         announcements: null,
+        promotions: null,
         error: null,
-        fetchAnnouncements: action('fetchAnnouncements'),
-      }}
-    >
-      <AnnouncementsFeed />
-    </AnnouncementsFeedContext.Provider>
-  );
-};
-
-export const Default = () => {
-  return (
-    <AnnouncementsFeedContext.Provider
-      value={{
-        announcements: fakeAnnouncements,
-        error: null,
-        fetchAnnouncements: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed />
@@ -62,8 +90,11 @@ export const DefaultWithMargins = () => {
     <AnnouncementsFeedContext.Provider
       value={{
         announcements: fakeAnnouncements,
+        promotions: fakePromotions,
         error: null,
-        fetchAnnouncements: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed addMargins />
@@ -76,8 +107,11 @@ export const OnlyUrgent = () => {
     <AnnouncementsFeedContext.Provider
       value={{
         announcements: fakeAnnouncements,
+        promotions: fakePromotions,
         error: null,
-        fetchAnnouncements: action('fetchAnnouncements'),
+        fetchAnnouncementsAndPromotions: action(
+          'fetchAnnouncementsAndPromotions'
+        ),
       }}
     >
       <AnnouncementsFeed level="urgent" />

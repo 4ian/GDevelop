@@ -1,7 +1,6 @@
 import { TileTextureCache } from "../TileTextureCache";
 import { TiledTileMap } from "../../load/tiled/TiledFormat";
 import { getTileIdFromTiledGUI } from "../../load/tiled/TiledTileMapLoaderHelper";
-import PIXI = GlobalPIXIModule.PIXI;
 
 export namespace TiledPixiHelper {
   /**
@@ -54,34 +53,37 @@ export namespace TiledPixiHelper {
       tilewidth * columns + spacing * (columns - 1) + margin * 2;
     const expectedAtlasHeight =
       tileheight * rows + spacing * (rows - 1) + margin * 2;
-    // When users use an atlas images that are not divisible by the tile width,
-    // Tiled automatically chooses a number of column that fit in the atlas for
-    // a given tile size.
-    // So the atlas images can have unused pixels at the right and bottom.
+
     if (
-      (atlasTexture.width !== 1 && atlasTexture.width < expectedAtlasWidth) ||
-      atlasTexture.width >= expectedAtlasWidth + spacing + tilewidth ||
-      (atlasTexture.height !== 1 &&
-        atlasTexture.height < expectedAtlasHeight) ||
-      atlasTexture.height >= expectedAtlasHeight + spacing + tileheight
+      atlasTexture.width < expectedAtlasWidth ||
+      atlasTexture.height < expectedAtlasHeight
     ) {
       console.error(
         "It seems the atlas file was resized, which is not supported. " +
           `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
-          `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
+          `but it's actually ${atlasTexture.width}x${atlasTexture.height} px.`
       );
       return null;
     }
+    // Atlas can be bigger for some valid reasons:
+    // - When users use an atlas images that are not divisible by the tile width,
+    // Tiled automatically chooses a number of column that fit in the atlas for
+    // a given tile size.
+    // So the atlas images can have unused pixels at the right and bottom.
+    // - Artists also sometimes add a banner.
+    //
+    // It can also be that users rescaled the atlas without adapting the tile set
+    // In this case, having a broken visual can help understand the issue.
+    // Especially since the error can only be found in the logs.
     if (
-      (atlasTexture.width !== 1 && atlasTexture.width !== expectedAtlasWidth) ||
-      (atlasTexture.height !== 1 && atlasTexture.height !== expectedAtlasHeight)
+      atlasTexture.width !== expectedAtlasWidth ||
+      atlasTexture.height !== expectedAtlasHeight
     ) {
       console.warn(
         "It seems the atlas file has unused pixels. " +
           `It should be ${expectedAtlasWidth}x${expectedAtlasHeight} px, ` +
-          `but it's ${atlasTexture.width}x${atlasTexture.height} px.`
+          `but it's actually ${atlasTexture.width}x${atlasTexture.height} px.`
       );
-      return null;
     }
 
     // Prepare the textures pointing to the base "Atlas" Texture for each tile.

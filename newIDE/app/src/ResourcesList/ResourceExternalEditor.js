@@ -88,6 +88,7 @@ export type EditWithExternalEditorOptions = {|
   i18n: I18nType,
   getStorageProvider: () => StorageProvider,
   resourceManagementProps: ResourceManagementProps,
+  signal: AbortSignal,
 
   resourceNames: Array<string>,
   extraOptions: {

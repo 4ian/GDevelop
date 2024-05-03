@@ -2,13 +2,14 @@
 import * as React from 'react';
 
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
-import { ScreenTypeMeasurer } from '../../UI/Reponsive/ScreenTypeMeasurer';
+import { ScreenTypeMeasurer } from '../../UI/Responsive/ScreenTypeMeasurer';
 import { ColumnDropIndicator } from './DropIndicator';
 import {
   type EditorTabsState,
   type EditorTab,
   getEditors,
   getCurrentTabIndex,
+  getCurrentTab,
 } from './EditorTabsHandler';
 import {
   ClosableTabs,
@@ -31,6 +32,9 @@ type DraggableEditorTabsProps = {|
   onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
 |};
 
+const getTabId = (editorTab: EditorTab) =>
+  `tab-${editorTab.key.replace(/\s/g, '-')}`;
+
 export function DraggableEditorTabs({
   hideLabels,
   editorTabs,
@@ -43,6 +47,19 @@ export function DraggableEditorTabs({
 }: DraggableEditorTabsProps) {
   let draggedTabIndex: ?number = null;
 
+  const currentTab = getCurrentTab(editorTabs);
+
+  React.useEffect(
+    () => {
+      if (!currentTab) return;
+      const tabElement = document.getElementById(getTabId(currentTab));
+      if (tabElement) {
+        tabElement.scrollIntoView();
+      }
+    },
+    [currentTab]
+  );
+
   return (
     <ClosableTabs hideLabels={hideLabels}>
       {getEditors(editorTabs).map((editorTab, id) => {
@@ -53,7 +70,7 @@ export function DraggableEditorTabs({
             label={editorTab.label}
             icon={editorTab.icon}
             key={editorTab.key}
-            id={`tab-${editorTab.key.replace(/\s/g, '-')}`}
+            id={getTabId(editorTab)}
             data={editorTab.tabOptions ? editorTab.tabOptions.data : undefined}
             active={isCurrentTab}
             onClick={() => onClickTab(id)}

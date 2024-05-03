@@ -1,22 +1,22 @@
 // @flow
 import { mapVector, mapFor } from '../../../../Utils/MapFor';
 import every from 'lodash/every';
-const gd = global.gd;
+
+const gd: libGDevelop = global.gd;
 
 /**
  * Return the specified animation, direction and sprite for a SpriteObject.
  * Returns null for these elements if the specified choice is not valid.
  */
 export const getCurrentElements = (
-  objectConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   animationIndex: number,
   directionIndex: number,
   spriteIndex: number
 ) => {
-  const hasValidAnimation =
-    animationIndex < objectConfiguration.getAnimationsCount();
+  const hasValidAnimation = animationIndex < animations.getAnimationsCount();
   const animation = hasValidAnimation
-    ? objectConfiguration.getAnimation(animationIndex)
+    ? animations.getAnimation(animationIndex)
     : null;
   if (!animation) {
     return {
@@ -48,17 +48,38 @@ export const getCurrentElements = (
   };
 };
 
+export const getTotalSpritesCount = (animations: gdSpriteAnimationList) => {
+  let totalSpritesCount = 0;
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = animations.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      totalSpritesCount += direction.getSpritesCount();
+    }
+  }
+
+  return totalSpritesCount;
+};
+
 /**
  * Return all the point names
  */
-export const getAllPointNames = (objectConfiguration: gdSpriteObject) => {
+export const getAllPointNames = (animations: gdSpriteAnimationList) => {
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
-    animationIndex < objectConfiguration.getAnimationsCount();
+    animationIndex < animations.getAnimationsCount();
     animationIndex++
   ) {
-    const animation = objectConfiguration.getAnimation(animationIndex);
+    const animation = animations.getAnimation(animationIndex);
     for (
       let directionIndex = 0;
       directionIndex < animation.getDirectionsCount();
@@ -168,7 +189,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
   );
 };
 
-export const allSpritesHaveSamePointsAs = (
+export const allAnimationSpritesHaveSamePointsAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -180,14 +201,26 @@ export const allSpritesHaveSamePointsAs = (
   );
 };
 
+export const allObjectSpritesHaveSamePointsAs = (
+  originalSprite: gdSprite,
+  animations: gdSpriteAnimationList
+) => {
+  return every(
+    mapFor(0, animations.getAnimationsCount(), i => {
+      const animation = animations.getAnimation(i);
+      return allAnimationSpritesHaveSamePointsAs(originalSprite, animation);
+    })
+  );
+};
+
 export const copySpritePolygons = (
   originalSprite: gdSprite,
   destinationSprite: gdSprite
 ) => {
   if (originalSprite.ptr === destinationSprite.ptr) return;
 
-  destinationSprite.setCollisionMaskAutomatic(
-    originalSprite.isCollisionMaskAutomatic()
+  destinationSprite.setFullImageCollisionMask(
+    originalSprite.isFullImageCollisionMask()
   );
 
   destinationSprite.getCustomCollisionMask().clear();
@@ -230,10 +263,10 @@ export const haveSameCollisionMasks = (
   sprite1: gdSprite,
   sprite2: gdSprite
 ) => {
-  if (sprite1.isCollisionMaskAutomatic() !== sprite2.isCollisionMaskAutomatic())
+  if (sprite1.isFullImageCollisionMask() !== sprite2.isFullImageCollisionMask())
     return false;
 
-  if (sprite1.isCollisionMaskAutomatic() && sprite2.isCollisionMaskAutomatic())
+  if (sprite1.isFullImageCollisionMask() && sprite2.isFullImageCollisionMask())
     return true;
 
   const sprite1CollisionMask = sprite1.getCustomCollisionMask();
@@ -260,7 +293,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
   );
 };
 
-export const allSpritesHaveSameCollisionMasksAs = (
+export const allAnimationSpritesHaveSameCollisionMasksAs = (
   originalSprite: gdSprite,
   animation: gdAnimation
 ) => {
@@ -273,6 +306,28 @@ export const allSpritesHaveSameCollisionMasksAs = (
       );
     })
   );
+};
+
+export const allObjectSpritesHaveSameCollisionMaskAs = (
+  originalSprite: gdSprite,
+  animations: gdSpriteAnimationList
+) => {
+  return every(
+    mapFor(0, animations.getAnimationsCount(), i => {
+      const animation = animations.getAnimation(i);
+      return allAnimationSpritesHaveSameCollisionMasksAs(
+        originalSprite,
+        animation
+      );
+    })
+  );
+};
+
+export const isFirstSpriteUsingFullImageCollisionMask = (
+  animations: gdSpriteAnimationList
+) => {
+  const firstSprite = getCurrentElements(animations, 0, 0, 0).sprite;
+  return firstSprite ? firstSprite.isFullImageCollisionMask() : false;
 };
 
 export const deleteSpritesFromAnimation = (
@@ -335,4 +390,69 @@ export const duplicateSpritesInAnimation = (
       }
     }
   });
+};
+
+export const hasAnyFrame = (animations: gdSpriteAnimationList): boolean => {
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = animations.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      if (direction.getSpritesCount() > 0) return true;
+    }
+  }
+  return false;
+};
+
+export const getFirstAnimationFrame = (
+  animations: gdSpriteAnimationList
+): gdSprite | null => {
+  if (animations.getAnimationsCount() === 0) {
+    return null;
+  }
+  const firstAnimation = animations.getAnimation(0);
+  if (firstAnimation.getDirectionsCount() === 0) {
+    return null;
+  }
+  const firstDirection = firstAnimation.getDirection(0);
+  if (firstDirection.getSpritesCount() === 0) {
+    return null;
+  }
+  return firstDirection.getSprite(0);
+};
+
+export const setCollisionMaskOnAllFrames = (
+  animations: gdSpriteAnimationList,
+  collisionMask: gdVectorPolygon2d | null
+) => {
+  for (
+    let animationIndex = 0;
+    animationIndex < animations.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = animations.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      for (
+        let spriteIndex = 0;
+        spriteIndex < direction.getSpritesCount();
+        spriteIndex++
+      ) {
+        const sprite = direction.getSprite(spriteIndex);
+        sprite.setFullImageCollisionMask(!collisionMask);
+        if (collisionMask) sprite.setCustomCollisionMask(collisionMask);
+      }
+    }
+  }
 };

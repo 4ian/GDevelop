@@ -5,12 +5,7 @@
  */
 
 describe('gdjs.RuntimeObject.separateFromObjects', () => {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    // @ts-ignore TODO: make a function to create an empty game and use it across tests.
-    properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] },
-  });
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
   const object = new gdjs.TestRuntimeObject(runtimeScene, {

@@ -11,9 +11,15 @@ import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
 const gd: libGDevelop = global.gd;
 
+// $FlowExpectedError
+const makeFakeI18n = (fakeI18n): I18nType => ({
+  ...fakeI18n,
+  _: message => message.id,
+});
+
 describe('EnumerateExpressions', () => {
   it('can enumerate and filter free expressions (number only)', () => {
-    const freeExpressions = enumerateFreeExpressions('number');
+    const freeExpressions = enumerateFreeExpressions('number', makeFakeI18n());
 
     // Should find atan, atan2, atanh math function
     expect(filterExpressions(freeExpressions, 'atan')).toHaveLength(3);
@@ -26,7 +32,7 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can enumerate and filter free expressions', () => {
-    const freeExpressions = enumerateFreeExpressions('string');
+    const freeExpressions = enumerateFreeExpressions('string', makeFakeI18n());
 
     // Should find ToString and LargeNumberToString:
     expect(filterExpressions(freeExpressions, 'ToString')).toHaveLength(2);
@@ -67,8 +73,9 @@ describe('EnumerateExpressions', () => {
     expect(filterExpressions(spriteObjectExpressions, 'PointX')).toHaveLength(
       1
     );
+    expect(filterExpressions(spriteObjectExpressions, 'Layer')).toHaveLength(1);
     expect(
-      filterExpressions(spriteObjectExpressions, 'AnimationName')
+      filterExpressions(spriteObjectExpressions, 'AnimationFrameCount')
     ).toHaveLength(1);
 
     const objectExpressions = enumerateObjectExpressions('string', '');
@@ -137,7 +144,7 @@ describe('EnumerateExpressions', () => {
         },
       },
       'Movement using forces': {
-        'X coordinate of the sum of forces': {
+        ForceX: {
           displayedName: 'X coordinate of the sum of forces',
           fullGroupName: 'Movement using forces',
           name: 'ForceX',
@@ -150,7 +157,8 @@ describe('EnumerateExpressions', () => {
   it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
     const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
+      'number',
+      makeFakeI18n()
     );
     // Check a free expression:
     expect(allNumberExpressions).toContainEqual(
@@ -178,7 +186,8 @@ describe('EnumerateExpressions', () => {
   it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string'
+      'string',
+      makeFakeI18n()
     );
     // Check a free expression:
     expect(allExpressions).toContainEqual(
@@ -206,7 +215,8 @@ describe('EnumerateExpressions', () => {
 
   it('can create the tree of all expressions', () => {
     const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
+      'number',
+      makeFakeI18n()
     );
     const allExpressionsTree = createTree(allExpressions);
 
@@ -217,7 +227,7 @@ describe('EnumerateExpressions', () => {
       allExpressionsTree['General'];
     expect(generalTreeNode).toMatchObject({
       'Timers and time': {
-        'Current time': {
+        Time: {
           displayedName: 'Current time',
           fullGroupName: 'General/Timers and time',
           iconFilename: 'res/actions/time.png',
@@ -258,7 +268,7 @@ describe('EnumerateExpressions', () => {
     // $FlowFixMe
     expect(generalTreeNode['Sprite']).toMatchObject({
       Position: {
-        'X position of a point': {
+        PointX: {
           displayedName: 'X position of a point',
           fullGroupName: 'General/Sprite/Position',
           iconFilename: 'res/actions/position_black.png',
@@ -279,10 +289,10 @@ describe('EnumerateExpressions', () => {
     expect(movementTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
     expect(movementTreeNode['Platform behavior']).toMatchObject({
-      Options: {
-        'Maximum horizontal speed': {
+      'Platformer configuration': {
+        MaxSpeed: {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'Movement/Platform behavior/Options',
+          fullGroupName: 'Movement/Platform behavior/Platformer configuration',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',

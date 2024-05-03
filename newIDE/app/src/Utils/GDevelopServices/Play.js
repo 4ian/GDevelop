@@ -47,6 +47,8 @@ export type LeaderboardCustomizationSettings = {|
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
   theme?: LeaderboardTheme,
+  useCustomCss?: boolean,
+  customCss?: string,
 |};
 
 export type Leaderboard = {|
@@ -62,6 +64,8 @@ export type Leaderboard = {|
   primary?: boolean,
   resetLaunchedAt?: string,
   extremeAllowedScore?: number,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -72,6 +76,8 @@ export type LeaderboardUpdatePayload = {|
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
   extremeAllowedScore?: number | null,
+  ignoreCustomPlayerNames?: boolean,
+  autoPlayerNamePrefix?: string,
 |};
 
 export type LeaderboardEntry = {|
@@ -81,49 +87,7 @@ export type LeaderboardEntry = {|
   playerName: string,
   createdAt: string,
   score: number,
-  deletedAt?: string,
-  outdatedAt?: string,
 |};
-
-export type LeaderboardDisplayData = {|
-  +id: string,
-  +playerName: string,
-  +createdAt: string,
-  +score: number,
-|};
-
-export type LeaderboardExtremePlayerScore = {|
-  leaderboardId: string,
-  playerId?: string,
-  playerName: string,
-  relatedEntryCreatedAt: string,
-  score: number,
-  relatedEntryId: string,
-|};
-
-export const extractEntryDisplayData = ({
-  playerName,
-  id,
-  score,
-  createdAt,
-}: LeaderboardEntry): LeaderboardDisplayData => ({
-  id,
-  createdAt,
-  playerName,
-  score,
-});
-
-export const extractExtremeScoreDisplayData = ({
-  playerName,
-  relatedEntryId,
-  score,
-  relatedEntryCreatedAt,
-}: LeaderboardExtremePlayerScore): LeaderboardDisplayData => ({
-  id: relatedEntryId,
-  createdAt: relatedEntryCreatedAt,
-  playerName,
-  score,
-});
 
 export const shortenUuidForDisplay = (uuid: string): string =>
   `${uuid.split('-')[0]}-...`;
@@ -170,7 +134,7 @@ export const listLeaderboardEntries = async (
   leaderboardId: string,
   options: {| pageSize: number, onlyBestEntry: boolean, forceUri: ?string |}
 ): Promise<{|
-  entries: LeaderboardEntry[] | LeaderboardExtremePlayerScore[],
+  entries: LeaderboardEntry[],
   nextPageUri: ?string,
 |}> => {
   const uri =
@@ -355,6 +319,9 @@ export type Comment = {
   createdAt: number,
   processedAt?: number,
   updatedAt: number,
+  qualityRatingPerRole?: {
+    owner?: string,
+  },
 };
 
 export const listComments = async (
@@ -383,6 +350,12 @@ export const listComments = async (
     .then(response => response.data);
 };
 
+export const canCommentBeRatedByOwner = (comment: Comment): boolean => {
+  if (!comment.text) return false;
+
+  return true;
+};
+
 export const updateComment = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -390,17 +363,19 @@ export const updateComment = async (
     gameId,
     commentId,
     processed,
+    qualityRating,
   }: {|
     gameId: string,
     commentId: string,
-    processed: boolean,
+    processed?: boolean,
+    qualityRating?: string,
   |}
 ) => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.patch(
         `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
-        { processed },
+        { processed, qualityRating },
         {
           params: { userId },
           headers: {
@@ -414,16 +389,24 @@ export const updateComment = async (
 
 export const canUserCustomizeLeaderboardTheme = (
   authenticatedUser: AuthenticatedUser
-): boolean => {
+): {|
+  canUseTheme: boolean,
+  canUseCustomCss: boolean,
+|} => {
   const { limits } = authenticatedUser;
-  return (
-    !!limits &&
-    !!limits.capabilities.leaderboards &&
-    (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-      'BASIC' ||
-      limits.capabilities.leaderboards.themeCustomizationCapabilities ===
-        'FULL')
-  );
+  return {
+    canUseTheme:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      (limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+        'BASIC' ||
+        limits.capabilities.leaderboards.themeCustomizationCapabilities ===
+          'FULL'),
+    canUseCustomCss:
+      !!limits &&
+      !!limits.capabilities.leaderboards &&
+      !!limits.capabilities.leaderboards.canUseCustomCss,
+  };
 };
 
 export const getRGBLeaderboardTheme = (

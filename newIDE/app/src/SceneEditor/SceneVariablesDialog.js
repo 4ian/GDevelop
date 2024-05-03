@@ -17,6 +17,7 @@ type Props = {|
 const SceneVariablesDialog = (props: Props) => {
   return (
     <VariablesEditorDialog
+      project={props.project}
       open={props.open}
       variablesContainer={props.layout.getVariables()}
       onCancel={props.onClose}
@@ -35,6 +36,7 @@ const SceneVariablesDialog = (props: Props) => {
           props.layout
         )
       }
+      id="scene-variables-dialog"
     />
   );
 };

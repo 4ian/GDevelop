@@ -1,10 +1,10 @@
 // @flow
+import * as React from 'react';
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import { type Field } from '.';
 import MeasurementUnitDocumentation from './MeasurementUnitDocumentation';
-import * as React from 'react';
 
 const createField = (
   name: string,
@@ -213,11 +213,12 @@ const createField = (
   }
 };
 
-const propertyKeywordCouples: Array<[string, string]> = [
-  ['X', 'Y'],
-  ['Width', 'Height'],
+const propertyKeywordCouples: Array<Array<string>> = [
+  ['X', 'Y', 'Z'],
+  ['Width', 'Height', 'Depth'],
   ['Top', 'Bottom'],
   ['Left', 'Right'],
+  ['Front', 'Back'],
   ['Up', 'Down'],
   ['Min', 'Max'],
   ['Low', 'High'],
@@ -225,14 +226,59 @@ const propertyKeywordCouples: Array<[string, string]> = [
   ['Horizontal', 'Vertical'],
   ['Acceleration', 'Deceleration'],
   ['Duration', 'Easing'],
+  ['EffectName', 'EffectProperty'],
+  ['Gravity', 'MaxFallingSpeed'],
+  ['JumpSpeed', 'JumpSustainTime'],
+  ['XGrabTolerance', 'YGrabOffset'],
+  ['MaxSpeed', 'SlopeMaxAngle'],
 ];
+
+const uncapitalize = str => {
+  if (!str) return str;
+  return str[0].toLowerCase() + str.substr(1);
+};
+
+/**
+ * Return true when the property exists and should be displayed.
+ *
+ * @param properties The properties
+ * @param name The property name
+ * @param visibility `true` when only deprecated properties must be displayed
+ * and `false` when only not deprecated ones must be displayed
+ */
+const isPropertyVisible = (
+  properties: gdMapStringPropertyDescriptor,
+  name: string,
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated'
+): boolean => {
+  if (!properties.has(name)) {
+    return false;
+  }
+  const property = properties.get(name);
+  if (property.isHidden()) {
+    return false;
+  }
+  if (visibility === 'All') {
+    return true;
+  }
+  if (visibility === 'Deprecated') {
+    return property.isDeprecated();
+  }
+  if (visibility === 'Advanced') {
+    return property.isAdvanced();
+  }
+  if (visibility === 'Basic') {
+    return !property.isAdvanced() && !property.isDeprecated();
+  }
+  return true;
+};
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
  *
- * @param {gdMapStringPropertyDescriptor} properties The properties to use
- * @param {*} getProperties The function called to read again the properties
- * @param {*} onUpdateProperty The function called to update a property of an object
+ * @param properties The properties to use
+ * @param getProperties The function called to read again the properties
+ * @param onUpdateProperty The function called to update a property of an object
  */
 const propertiesMapToSchema = (
   properties: gdMapStringPropertyDescriptor,
@@ -242,7 +288,8 @@ const propertiesMapToSchema = (
     propertyName: string,
     newValue: string
   ) => void,
-  object: ?gdObject
+  object: ?gdObject,
+  visibility: 'All' | 'Basic' | 'Advanced' | 'Deprecated' = 'All'
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
@@ -251,7 +298,9 @@ const propertiesMapToSchema = (
   mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
-    if (property.isHidden()) return null;
+    if (!isPropertyVisible(properties, name, visibility)) {
+      return null;
+    }
     if (alreadyHandledProperties.has(name)) return null;
 
     const groupName = property.getGroup() || '';
@@ -264,51 +313,71 @@ const propertiesMapToSchema = (
     // Search a property couple that can be put in a row.
     let field: ?Field = null;
     for (const propertyKeywords of propertyKeywordCouples) {
-      const firstKeyword = propertyKeywords[0];
-      const secondKeyword = propertyKeywords[1];
+      const rowPropertyNames: string[] = [];
+      for (let index = 0; index < propertyKeywords.length; index++) {
+        const keyword = propertyKeywords[index];
 
-      let firstName: ?string = null;
-      let secondName: ?string = null;
-      if (name.includes(firstKeyword)) {
-        const otherPropertyName = name.replace(firstKeyword, secondKeyword);
-        if (properties.has(otherPropertyName)) {
-          firstName = name;
-          secondName = otherPropertyName;
+        if (name.includes(keyword)) {
+          const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
+            name.replace(keyword, otherKeyword)
+          );
+          for (const rowPropertyName of rowAllPropertyNames) {
+            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+              rowPropertyNames.push(rowPropertyName);
+            }
+          }
         }
-      } else if (name.includes(secondKeyword)) {
-        const otherPropertyName = name.replace(secondKeyword, firstKeyword);
-        if (properties.has(otherPropertyName)) {
-          firstName = otherPropertyName;
-          secondName = name;
+        const uncapitalizeKeyword = uncapitalize(keyword);
+        if (name.startsWith(uncapitalizeKeyword)) {
+          const rowAllPropertyNames = propertyKeywords.map(otherKeyword =>
+            name.replace(uncapitalizeKeyword, uncapitalize(otherKeyword))
+          );
+          for (const rowPropertyName of rowAllPropertyNames) {
+            if (isPropertyVisible(properties, rowPropertyName, visibility)) {
+              rowPropertyNames.push(rowPropertyName);
+            }
+          }
         }
       }
+      if (rowPropertyNames.length > 1) {
+        const rowProperties = rowPropertyNames.map(name =>
+          properties.get(name)
+        );
+        if (
+          rowProperties.every(
+            property => property.getGroup() === rowProperties[0].getGroup()
+          )
+        ) {
+          const rowFields: Field[] = [];
+          for (
+            let index = 0;
+            index < rowProperties.length && index < rowPropertyNames.length;
+            index++
+          ) {
+            const rowProperty = rowProperties[index];
+            const rowPropertyName = rowPropertyNames[index];
 
-      if (firstName && secondName) {
-        const firstProperty = properties.get(firstName);
-        const secondProperty = properties.get(secondName);
-        if (firstProperty.getGroup() === secondProperty.getGroup()) {
-          const firstField = createField(
-            firstName,
-            firstProperty,
-            getProperties,
-            onUpdateProperty,
-            object
-          );
-          const secondField = createField(
-            secondName,
-            secondProperty,
-            getProperties,
-            onUpdateProperty,
-            object
-          );
-          if (firstField && secondField) {
+            const field = createField(
+              rowPropertyName,
+              rowProperty,
+              getProperties,
+              onUpdateProperty,
+              object
+            );
+
+            if (field) {
+              rowFields.push(field);
+            }
+          }
+          if (rowFields.length === rowProperties.length) {
             field = {
-              name: firstName + '-' + secondName,
+              name: rowPropertyNames.join('-'),
               type: 'row',
-              children: [firstField, secondField],
+              children: rowFields,
             };
-            alreadyHandledProperties.add(firstName);
-            alreadyHandledProperties.add(secondName);
+            rowPropertyNames.forEach(propertyName => {
+              alreadyHandledProperties.add(propertyName);
+            });
           }
         }
       }

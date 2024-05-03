@@ -120,6 +120,7 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`Read the wiki page for more info about the dataloss mode.`,
+      identifier: 'p2p-dataloss',
     };
   }
   if (type === 'PlatformBehavior::IsObjectOnGivenFloor') {
@@ -131,14 +132,16 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   if (type === 'P2P::OverrideID') {
     return {
       kind: 'warning',
-      message: t`Overriding the ID may have unwanted consequences. Do not use this feature unless you really know what you are doing.`,
+      message: t`Overriding the ID may have unwanted consequences, such as blocking the ability to connect to any peer. Do not use this feature unless you really know what you are doing.`,
     };
   }
   if (type.indexOf('P2P::') === 0) {
     return {
       kind: 'warning',
-      message: t`It is recommended to use your own custom broker server. Read the wiki page for more info.`,
-      identifier: 'p2p-broker-recommendation',
+      message: t`P2P is merely a peer-to-peer networking solution. It only handles the connection to another player, and the exchange of messages. Higher-level tasks, such as synchronizing the game state, are left to by implemented by you. 
+
+Use the THNK Framework if you seek an easy, performant and flexible higher-level solution.`,
+      identifier: 'p2p-is-networking',
     };
   }
   if (type === 'SystemInfo::IsMobile') {
@@ -163,6 +166,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`If the parameter is a string or a number, you probably want to use the expressions "GetArgumentAsString" or "GetArgumentAsNumber", along with the conditions "Compare two strings" or "Compare two numbers".`,
+    };
+  }
+  if (type === 'PrioritizeLoadingOfScene') {
+    return {
+      kind: 'info',
+      message: t`For most games, the default automatic loading of resources will be fine. This action should only be used when trying to avoid loading screens from appearing between scenes.`,
     };
   }
 

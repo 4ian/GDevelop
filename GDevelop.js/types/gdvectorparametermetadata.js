@@ -6,6 +6,7 @@ declare class gdVectorParameterMetadata {
   at(index: number): gdParameterMetadata;
   set(index: number, parameterMetadata: gdParameterMetadata): void;
   removeFromVectorParameterMetadata(index: number): void;
+  insertIntoVectorParameterMetadata(index: number, parameterMetadata: gdParameterMetadata): void;
   swapInVectorParameterMetadata(oldIndex: number, newIndex: number): void;
   clear(): void;
   delete(): void;

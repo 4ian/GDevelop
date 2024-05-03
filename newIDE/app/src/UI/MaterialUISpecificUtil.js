@@ -1,9 +1,21 @@
 // @flow
 export const aboveMaterialUiMaxZIndex = 1501; // highest z-index used by MaterialUI is 1500
 
-export const isNoDialogOpened = (): boolean => {
-  return !document.querySelector(
+export const classNameToStillAllowRenderingInstancesEditor =
+  'allow-rendering-instances';
+
+export const shouldPreventRenderingInstanceEditors = (): boolean => {
+  // Fast check: if no dialog is opened, rendering is not prevented.
+  const dialogElement = document.querySelector(
     'body > div[role="presentation"].MuiDialog-root'
+  );
+  if (!dialogElement) {
+    return false;
+  }
+
+  // A dialog is opened. Prevent rendering, unless the dialog exceptionally allows it.
+  return !dialogElement.classList.contains(
+    classNameToStillAllowRenderingInstancesEditor
   );
 };
 
@@ -64,4 +76,8 @@ export const doesPathContainDialog = (path: Array<Element>): boolean => {
     );
     return false;
   }
+};
+
+export const isElementAMuiInput = (element: Element): boolean => {
+  return element.classList.contains('MuiInputBase-root');
 };

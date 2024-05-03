@@ -5,32 +5,14 @@
  */
 namespace gdjs {
   const logger = new gdjs.Logger('JSON Manager');
-  type JsonManagerOnProgressCallback = (
-    loadedCount: integer,
-    totalCount: integer
-  ) => void;
-  type JsonManagerOnCompleteCallback = (totalCount: integer) => void;
 
-  /** The callback called when a json that was requested is loaded (or an error occured). */
+  /** The callback called when a json that was requested is loaded (or an error occurred). */
   export type JsonManagerRequestCallback = (
     error: Error | null,
     content: Object | null
   ) => void;
 
-  const checkIfCredentialsRequired = (url: string) => {
-    // Any resource stored on the GDevelop Cloud buckets needs the "credentials" of the user,
-    // i.e: its gdevelop.io cookie, to be passed.
-    // Note that this is only useful during previews.
-    if (
-      url.startsWith('https://project-resources.gdevelop.io/') ||
-      url.startsWith('https://project-resources-dev.gdevelop.io/')
-    )
-      return true;
-
-    // For other resources, use the default way of loading resources ("anonymous" or "same-site").
-    return false;
-  };
-
+  const resourceKinds: Array<ResourceKind> = ['json', 'tilemap', 'tileset'];
   /**
    * JsonManager loads json files (using `XMLHttpRequest`), using the "json" resources
    * registered in the game resources.
@@ -39,26 +21,22 @@ namespace gdjs {
    * You should properly handle errors, and give the developer/player a way to know
    * that loading failed.
    */
-  export class JsonManager {
-    _resources: ResourceData[];
+  export class JsonManager implements gdjs.ResourceManager {
+    _resourceLoader: ResourceLoader;
 
-    _loadedJsons: { [key: string]: Object } = {};
-    _callbacks: { [key: string]: Array<JsonManagerRequestCallback> } = {};
+    _loadedJsons = new gdjs.ResourceCache<Object>();
+    _callbacks = new gdjs.ResourceCache<Array<JsonManagerRequestCallback>>();
 
     /**
-     * @param resources The resources data of the game.
+     * @param resourceDataArray The resources data of the game.
+     * @param resourceLoader The resources loader of the game.
      */
-    constructor(resources: ResourceData[]) {
-      this._resources = resources;
+    constructor(resourceLoader: gdjs.ResourceLoader) {
+      this._resourceLoader = resourceLoader;
     }
 
-    /**
-     * Update the resources data of the game. Useful for hot-reloading, should not be used otherwise.
-     *
-     * @param resources The resources data of the game.
-     */
-    setResources(resources: ResourceData[]): void {
-      this._resources = resources;
+    getResourceKinds(): ResourceKind[] {
+      return resourceKinds;
     }
 
     /**
@@ -66,42 +44,48 @@ namespace gdjs {
      *
      * Note that even if a JSON is already loaded, it will be reloaded (useful for hot-reloading,
      * as JSON files can have been modified without the editor knowing).
-     *
-     * @param onProgress The function called after each json is loaded.
-     * @param onComplete The function called when all jsons are loaded.
      */
-    preloadJsons(
-      onProgress: JsonManagerOnProgressCallback,
-      onComplete: JsonManagerOnCompleteCallback
-    ): void {
-      const resources = this._resources;
-      const jsonResources = resources.filter(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          !resource.disablePreload
-        );
-      });
-      if (jsonResources.length === 0) {
-        return onComplete(jsonResources.length);
+    async loadResource(resourceName: string): Promise<void> {
+      const resource = this._resourceLoader.getResource(resourceName);
+      if (!resource) {
+        logger.warn('Unable to find json for resource "' + resourceName + '".');
+        return;
       }
-      let loaded = 0;
+      if (resource.disablePreload) {
+        return;
+      }
 
-      const onLoad: JsonManagerRequestCallback = function (error) {
-        if (error) {
-          logger.error('Error while preloading a json resource:' + error);
-        }
-        loaded++;
-        if (loaded === jsonResources.length) {
-          onComplete(jsonResources.length);
-        } else {
-          onProgress(loaded, jsonResources.length);
-        }
-      };
-      for (let i = 0; i < jsonResources.length; ++i) {
-        this.loadJson(jsonResources[i].name, onLoad);
+      try {
+        await this.loadJsonAsync(resource.name);
+      } catch (error) {
+        logger.error(
+          `Error while preloading json resource ${resource.name}:`,
+          error
+        );
       }
+    }
+
+    loadJsonAsync(resourceName: string): Promise<Object | null> {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.loadJson(resourceName, (error, content) => {
+          if (error) {
+            reject(error.message);
+          }
+          resolve(content);
+        });
+      });
+    }
+
+    private _getJsonResource = (resourceName: string): ResourceData | null => {
+      const resource = this._resourceLoader.getResource(resourceName);
+      return resource && this.getResourceKinds().includes(resource.kind)
+        ? resource
+        : null;
+    };
+
+    async processResource(resourceName: string): Promise<void> {
+      // Do nothing because json are light enough to be parsed in background.
     }
 
     /**
@@ -110,17 +94,10 @@ namespace gdjs {
      * (null if none) and the loaded json (a JS Object).
      *
      * @param resourceName The resource pointing to the json file to load.
-     * @param callback The callback function called when json is loaded (or an error occured).
+     * @param callback The callback function called when json is loaded (or an error occurred).
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
-      const resource = this._resources.find(function (resource) {
-        return (
-          (resource.kind === 'json' ||
-            resource.kind === 'tilemap' ||
-            resource.kind === 'tileset') &&
-          resource.name === resourceName
-        );
-      });
+      const resource = this._getJsonResource(resourceName);
       if (!resource) {
         callback(
           new Error(
@@ -134,27 +111,30 @@ namespace gdjs {
       }
 
       // Don't fetch again an object that is already in memory
-      if (this._loadedJsons[resourceName]) {
-        callback(null, this._loadedJsons[resourceName]);
+      if (this._loadedJsons.get(resource)) {
+        callback(null, this._loadedJsons.get(resource));
         return;
       }
       // Don't fetch again an object that is already being fetched.
       {
-        const callbacks = this._callbacks[resourceName];
+        const callbacks = this._callbacks.get(resource);
         if (callbacks) {
           callbacks.push(callback);
           return;
         } else {
-          this._callbacks[resourceName] = [callback];
+          this._callbacks.set(resource, [callback]);
         }
       }
+
       const that = this;
       const xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
-      xhr.withCredentials = checkIfCredentialsRequired(resource.file);
-      xhr.open('GET', resource.file);
+      xhr.withCredentials = this._resourceLoader.checkIfCredentialsRequired(
+        resource.file
+      );
+      xhr.open('GET', this._resourceLoader.getFullUrl(resource.file));
       xhr.onload = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
@@ -167,36 +147,36 @@ namespace gdjs {
               null
             );
           }
-          delete that._callbacks[resourceName];
+          that._callbacks.delete(resource);
           return;
         }
 
         // Cache the result
-        that._loadedJsons[resourceName] = xhr.response;
+        that._loadedJsons.set(resource, xhr.response);
         for (const callback of callbacks) {
           callback(null, xhr.response);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.onerror = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
         for (const callback of callbacks) {
           callback(new Error('Network error'), null);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.onabort = function () {
-        const callbacks = that._callbacks[resourceName];
+        const callbacks = that._callbacks.get(resource);
         if (!callbacks) {
           return;
         }
         for (const callback of callbacks) {
           callback(new Error('Request aborted'), null);
         }
-        delete that._callbacks[resourceName];
+        that._callbacks.delete(resource);
       };
       xhr.send();
     }
@@ -207,7 +187,7 @@ namespace gdjs {
      * @returns true if the content of the json resource is loaded. false otherwise.
      */
     isJsonLoaded(resourceName: string): boolean {
-      return !!this._loadedJsons[resourceName];
+      return !!this._loadedJsons.getFromName(resourceName);
     }
 
     /**
@@ -218,7 +198,7 @@ namespace gdjs {
      * @returns the content of the json resource, if loaded. `null` otherwise.
      */
     getLoadedJson(resourceName: string): Object | null {
-      return this._loadedJsons[resourceName] || null;
+      return this._loadedJsons.getFromName(resourceName) || null;
     }
   }
 }

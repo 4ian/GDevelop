@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../ThemeDecorator';
 import {
   ClosableTabs,
   ClosableTab,
@@ -10,20 +9,19 @@ import {
 import ValueStateHolder from '../ValueStateHolder';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 import { Column } from '../../UI/Grid';
-import HomeIcon from '@material-ui/icons/Home';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import ObjectsList from '../../ObjectsList';
-import fakeResourceExternalEditors from '../FakeResourceExternalEditors';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
-import { emptyStorageProvider } from '../../ProjectsStorage/ProjectStorageProviders';
+import Home from '../../UI/CustomSvgIcons/Home';
+import fakeResourceManagementProps from '../FakeResourceManagement';
 
 export default {
   title: 'UI Building Blocks/ClosableTabs',
   component: ClosableTabs,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [GDevelopJsInitializerDecorator],
 };
 
 export const ThreeTabs = () => (
@@ -39,7 +37,7 @@ export const ThreeTabs = () => (
               active={value === 0}
               onClick={() => onChange(0)}
               label={null}
-              icon={<HomeIcon />}
+              icon={<Home />}
               onClose={action('Close tab 1')}
               onCloseAll={action('Close all')}
               onCloseOthers={action('Close others')}
@@ -265,29 +263,20 @@ export const WithObjectsList = () => (
                   project={testProject.project}
                   objectsContainer={testProject.testLayout}
                   layout={testProject.testLayout}
-                  resourceManagementProps={{
-                    getStorageProvider: () => emptyStorageProvider,
-                    onFetchNewlyAddedResources: async () => {},
-                    resourceSources: [],
-                    onChooseResource: () => Promise.reject('Unimplemented'),
-                    resourceExternalEditors: fakeResourceExternalEditors,
-                  }}
+                  resourceManagementProps={fakeResourceManagementProps}
                   onEditObject={action('On edit object')}
-                  onExportObject={action('On export object')}
+                  onExportAssets={action('On export assets')}
                   onAddObjectInstance={action('On add instance to the scene')}
-                  selectedObjectNames={[]}
-                  selectedObjectTags={[]}
-                  onChangeSelectedObjectTags={() => {}}
-                  getAllObjectTags={() => []}
-                  canRenameObject={() => true}
-                  onDeleteObject={(objectWithContext, cb) => cb(true)}
-                  onRenameObjectStart={() => {}}
-                  onRenameObjectFinish={(objectWithContext, newName, cb) =>
-                    cb(true)
-                  }
+                  selectedObjectFolderOrObjectsWithContext={[]}
+                  getValidatedObjectOrGroupName={newName => newName}
+                  onDeleteObjects={(objectsWithContext, cb) => cb(true)}
+                  onRenameObjectFolderOrObjectWithContextFinish={(
+                    objectFolderOrObjectWithContext,
+                    newName,
+                    cb
+                  ) => cb(true)}
                   onObjectCreated={() => {}}
-                  onObjectSelected={() => {}}
-                  renamedObjectWithContext={null}
+                  onObjectFolderOrObjectWithContextSelected={() => {}}
                   hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
                   canInstallPrivateAsset={() => false}
                 />

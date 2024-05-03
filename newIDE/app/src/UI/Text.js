@@ -9,7 +9,8 @@ type TextSize =
   | 'block-title'
   | 'sub-title'
   | 'body'
-  | 'body2';
+  | 'body2'
+  | 'body-small';
 
 type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
@@ -45,13 +46,22 @@ type Props = {|
     overflowWrap?: 'break-word' | 'anywhere',
     whiteSpace?: 'nowrap' | 'pre-wrap',
     textOverflow?: 'ellipsis',
+    textWrap?: 'wrap',
+
+    // Allow user to select text
+    userSelect?: 'text',
 
     // Allow to expand the text
     flex?: 1,
 
     // Allow to change color to easily simulate disabled text
     opacity?: number,
+
+    // Allow to set maxHeight to limit number of lines displayed
+    lineHeight?: string,
+    maxHeight?: number,
   |},
+  tooltip?: string,
 |};
 
 type Interface = {||};
@@ -70,6 +80,8 @@ const getVariantFromSize = (size: ?TextSize) => {
       return 'h5';
     case 'body2':
       return 'body2';
+    case 'body-small':
+      return 'caption';
     case 'body':
     default:
       return 'body1';
@@ -108,6 +120,7 @@ const Text = React.forwardRef<Props, Interface>(
       allowBrowserAutoTranslate = true,
       displayInlineAsSpan,
       displayAsListItem,
+      tooltip,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
@@ -115,11 +128,12 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={getVariantFromSize(size)}
       ref={ref}
-      translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
+      translate={allowBrowserAutoTranslate ? undefined : 'no'}
       color={getTextColorFromColor(color)}
       component={
         displayInlineAsSpan ? 'span' : displayAsListItem ? 'li' : undefined
       }
+      title={tooltip}
       style={{
         ...style,
         display: displayInlineAsSpan

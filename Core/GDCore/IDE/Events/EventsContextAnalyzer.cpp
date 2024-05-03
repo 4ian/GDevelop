@@ -19,6 +19,8 @@
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ObjectsContainersList.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 
 namespace gd {
@@ -33,13 +35,11 @@ class GD_CORE_API ExpressionObjectsAnalyzer
  public:
   ExpressionObjectsAnalyzer(
         const gd::Platform &platform_,
-        const gd::ObjectsContainer &globalObjectsContainer_,
-        const gd::ObjectsContainer &objectsContainer_,
+        const gd::ProjectScopedContainers &projectScopedContainers_,
         const gd::String &rootType_,
         EventsContext& context_) :
         platform(platform_),
-        globalObjectsContainer(globalObjectsContainer_),
-        objectsContainer(objectsContainer_),
+        projectScopedContainers(projectScopedContainers_),
         rootType(rootType_),
         context(context_){};
   virtual ~ExpressionObjectsAnalyzer(){};
@@ -58,6 +58,25 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
+
+    if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (this can't reference an object)
+    } else {
+      projectScopedContainers.MatchIdentifierWithName<void>(node.name, [&]() {
+          // This is an object variable.
+          context.AddObjectName(projectScopedContainers, node.name);
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is a parameter.
+        }, [&]() {
+          // This is something else.
+        });
+    }
+
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
@@ -69,26 +88,41 @@ class GD_CORE_API ExpressionObjectsAnalyzer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, projectScopedContainers, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
-      context.AddObjectName(node.identifierName);
+      context.AddObjectName(projectScopedContainers, node.identifierName);
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // Nothing to do (identifier is a variable but not an object).
+    } else {
+      projectScopedContainers.MatchIdentifierWithName<void>(node.identifierName, [&]() {
+          // This is an object variable.
+          context.AddObjectName(projectScopedContainers, node.identifierName);
+        }, [&]() {
+          // This is a variable.
+        }, [&]() {
+          // This is a property.
+        }, [&]() {
+          // This is a parameter.
+        }, [&]() {
+          // This is something else.
+        });
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.objectName.empty()) {
-      context.AddObjectName(node.objectName);
+      context.AddObjectName(projectScopedContainers, node.objectName);
 
       if (!node.behaviorFunctionName.empty()) {
-        context.AddBehaviorName(node.objectName, node.objectFunctionOrBehaviorName);
+        context.AddBehaviorName(projectScopedContainers, node.objectName, node.objectFunctionOrBehaviorName);
       }
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (!node.objectName.empty()) {
-      context.AddObjectName(node.objectName);
+      context.AddObjectName(projectScopedContainers, node.objectName);
 
       if (!node.behaviorName.empty()) {
-        context.AddBehaviorName(node.objectName, node.behaviorName);
+        context.AddBehaviorName(projectScopedContainers, node.objectName, node.behaviorName);
       }
     }
     for (auto& parameter : node.parameters) {
@@ -99,8 +133,7 @@ class GD_CORE_API ExpressionObjectsAnalyzer
 
  private:
   const gd::Platform &platform;
-  const gd::ObjectsContainer &globalObjectsContainer;
-  const gd::ObjectsContainer &objectsContainer;
+  const gd::ProjectScopedContainers &projectScopedContainers;
   const gd::String rootType;
 
   EventsContext& context;
@@ -121,8 +154,7 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
              const gd::Expression& parameterValue,
              const gd::String& lastObjectName) {
         AnalyzeParameter(platform,
-                         project,
-                         layout,
+                         GetProjectScopedContainers(),
                          parameterMetadata,
                          parameterValue,
                          context,
@@ -134,8 +166,7 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
 
 void EventsContextAnalyzer::AnalyzeParameter(
     const gd::Platform& platform,
-    const gd::ObjectsContainer& project,
-    const gd::ObjectsContainer& layout,
+    const gd::ProjectScopedContainers& projectScopedContainers,
     const gd::ParameterMetadata& metadata,
     const gd::Expression& parameter,
     EventsContext& context,
@@ -143,59 +174,39 @@ void EventsContextAnalyzer::AnalyzeParameter(
   const auto& value = parameter.GetPlainString();
   const auto& type = metadata.GetType();
   if (ParameterMetadata::IsObject(type)) {
-    context.AddObjectName(value);
+    context.AddObjectName(projectScopedContainers, value);
   } else if (ParameterMetadata::IsExpression("number", type)) {
     auto node = parameter.GetRootNode();
 
-    ExpressionObjectsAnalyzer analyzer(platform, project, layout, "number", context);
+    ExpressionObjectsAnalyzer analyzer(platform, projectScopedContainers, "number", context);
     node->Visit(analyzer);
   } else if (ParameterMetadata::IsExpression("string", type)) {
     auto node = parameter.GetRootNode();
 
-    ExpressionObjectsAnalyzer analyzer(platform, project, layout, "string", context);
+    ExpressionObjectsAnalyzer analyzer(platform, projectScopedContainers, "string", context);
     node->Visit(analyzer);
   } else if (ParameterMetadata::IsBehavior(type)) {
-    context.AddBehaviorName(lastObjectName, value);
+    context.AddBehaviorName(projectScopedContainers, lastObjectName, value);
   }
 }
 
-void EventsContext::AddObjectName(const gd::String& objectOrGroupName) {
-  for (auto& realObjectName : ExpandObjectsName(objectOrGroupName)) {
+void EventsContext::AddObjectName(const gd::ProjectScopedContainers& projectScopedContainers,
+                                  const gd::String& objectOrGroupName) {
+  auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+  for (auto& realObjectName : objectsContainersList.ExpandObjectName(objectOrGroupName)) {
     objectNames.insert(realObjectName);
   }
   referencedObjectOrGroupNames.insert(objectOrGroupName);
 }
 
-void EventsContext::AddBehaviorName(const gd::String& objectOrGroupName,
+void EventsContext::AddBehaviorName(const gd::ProjectScopedContainers& projectScopedContainers,
+                                    const gd::String& objectOrGroupName,
                                     const gd::String& behaviorName) {
-  for (auto& realObjectName : ExpandObjectsName(objectOrGroupName)) {
+                                      auto& objectsContainersList = projectScopedContainers.GetObjectsContainersList();
+  for (auto& realObjectName : objectsContainersList.ExpandObjectName(objectOrGroupName)) {
     objectOrGroupBehaviorNames[realObjectName].insert(behaviorName);
   }
   objectOrGroupBehaviorNames[objectOrGroupName].insert(behaviorName);
-}
-
-std::vector<gd::String> EventsContext::ExpandObjectsName(
-    const gd::String& objectName) {
-  // Note: this logic is duplicated in EventsCodeGenerator::ExpandObjectsName
-  std::vector<gd::String> realObjects;
-  if (project.GetObjectGroups().Has(objectName))
-    realObjects =
-        project.GetObjectGroups().Get(objectName).GetAllObjectsNames();
-  else if (layout.GetObjectGroups().Has(objectName))
-    realObjects = layout.GetObjectGroups().Get(objectName).GetAllObjectsNames();
-  else
-    realObjects.push_back(objectName);
-
-  // Ensure that all returned objects actually exists.
-  for (std::size_t i = 0; i < realObjects.size();) {
-    if (!layout.HasObjectNamed(realObjects[i]) &&
-        !project.HasObjectNamed(realObjects[i]))
-      realObjects.erase(realObjects.begin() + i);
-    else
-      ++i;
-  }
-
-  return realObjects;
 }
 
 }  // namespace gd

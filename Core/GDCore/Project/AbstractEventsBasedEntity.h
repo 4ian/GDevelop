@@ -8,7 +8,7 @@
 
 #include <vector>
 #include "GDCore/Project/NamedPropertyDescriptor.h"
-#include "GDCore/Tools/SerializableWithNameList.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -98,15 +98,14 @@ class GD_CORE_API AbstractEventsBasedEntity {
   /**
    * \brief Return a reference to the list of the properties.
    */
-  SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors() {
+  gd::PropertiesContainer& GetPropertyDescriptors() {
     return propertyDescriptors;
   }
 
   /**
    * \brief Return a const reference to the list of the properties.
    */
-  const SerializableWithNameList<NamedPropertyDescriptor>& GetPropertyDescriptors()
-      const {
+  const gd::PropertiesContainer& GetPropertyDescriptors() const {
     return propertyDescriptors;
   }
 
@@ -150,7 +149,8 @@ class GD_CORE_API AbstractEventsBasedEntity {
   gd::String fullName;
   gd::String description;
   gd::EventsFunctionsContainer eventsFunctionsContainer;
-  SerializableWithNameList<NamedPropertyDescriptor> propertyDescriptors;
+  gd::PropertiesContainer propertyDescriptors;
+  gd::String extensionName;
 };
 
 }  // namespace gd

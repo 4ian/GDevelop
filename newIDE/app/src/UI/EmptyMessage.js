@@ -20,7 +20,7 @@ type Props = {|
 
 /**
  * Show a message when there is no content to display.
- * Also take a look at EmptyPlaceholder for a more visible placerholder.
+ * Also take a look at EmptyPlaceholder for a more visible placeholder.
  */
 const EmptyMessage = (props: Props) => (
   <div style={{ ...styles.containerStyle, ...props.style }}>

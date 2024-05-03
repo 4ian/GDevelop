@@ -5,16 +5,20 @@ import { type StorageProviderOperations, type StorageProvider } from '../index';
 import { type FileMetadata } from '..';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
-export type FetchAllProjectResourcesOptionsWithoutProgress = {|
-  project: gdProject,
-  fileMetadata: FileMetadata,
+export type EnsureResourcesAreFetchedOptions = {|
+  project: ?gdProject,
+  fileMetadata: ?FileMetadata,
   storageProvider: StorageProvider,
   storageProviderOperations: StorageProviderOperations,
   authenticatedUser?: AuthenticatedUser,
 |};
 
 export type FetchAllProjectResourcesOptions = {|
-  ...FetchAllProjectResourcesOptionsWithoutProgress,
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  storageProvider: StorageProvider,
+  storageProviderOperations: StorageProviderOperations,
+  authenticatedUser?: AuthenticatedUser,
   onProgress: (number, number) => void,
 |};
 
@@ -39,7 +43,7 @@ type UseResourceFetcherOutput = {|
    * and must optionally be fetched by the storage provider (e.g: a URL to be downloaded).
    */
   ensureResourcesAreFetched: (
-    options: FetchAllProjectResourcesOptionsWithoutProgress
+    getOptions: () => EnsureResourcesAreFetchedOptions
   ) => Promise<void>,
   /**
    * Render, if needed, the dialog that will show the progress of resources fetching.
@@ -59,18 +63,41 @@ export const useResourceFetcher = ({
   const {
     ensureProcessIsDone,
     renderProcessDialog,
-  } = useGenericRetryableProcessWithProgress<FetchAllProjectResourcesOptionsWithoutProgress>(
-    {
-      onDoProcess: React.useCallback(
-        (options, onProgress) =>
-          resourceFetcher.fetchAllProjectResources({
-            ...options,
-            onProgress,
-          }),
-        [resourceFetcher]
-      ),
-    }
-  );
+  } = useGenericRetryableProcessWithProgress<
+    () => EnsureResourcesAreFetchedOptions
+  >({
+    onDoProcess: React.useCallback(
+      (getOptions, onProgress) => {
+        // Get the latest options. Calling `getOptions` ensure we always
+        // get the latest up-to-date `project` and `fileMetadata`.
+        const {
+          project,
+          fileMetadata,
+          storageProvider,
+          storageProviderOperations,
+          authenticatedUser,
+        } = getOptions();
+
+        if (!project || !fileMetadata) {
+          // The project or fileMetadata are not valid anymore (the project
+          // was closed for example), abort the process.
+          return Promise.resolve({
+            erroredResources: [],
+          });
+        }
+
+        return resourceFetcher.fetchAllProjectResources({
+          project,
+          fileMetadata,
+          storageProvider,
+          storageProviderOperations,
+          authenticatedUser,
+          onProgress,
+        });
+      },
+      [resourceFetcher]
+    ),
+  });
 
   return React.useMemo(
     () => ({

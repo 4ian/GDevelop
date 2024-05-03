@@ -1,13 +1,18 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource';
+import type {
+  ResourceKind,
+  ResourceImportationBehavior,
+} from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { findDefaultFolder } from '../../ProjectsStorage/LocalFileStorageProvider/LocalPathFinder';
+import { isWebGLSupported } from '../../Utils/WebGL';
 
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
@@ -31,19 +36,15 @@ export type AlertMessageIdentifier =
   | 'effects-usage'
   | 'lighting-layer-usage'
   | 'resource-properties-panel-explanation'
-  | 'instance-drag-n-drop-explanation'
-  | 'objects-panel-explanation'
-  | 'instance-properties-panel-explanation'
-  | 'layers-panel-explanation'
-  | 'instances-panel-explanation'
   | 'physics2-shape-collisions'
-  | 'edit-instruction-explanation'
   | 'lifecycle-events-function-included-only-if-extension-used'
-  | 'p2p-broker-recommendation'
+  | 'p2p-is-networking'
+  | 'p2p-dataloss'
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'new-generate-project-from-prompt';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -56,7 +57,7 @@ export type InAppTutorialUserProgress = {|
   step: number,
   /** Rounded progress in percentage */
   progress: Array<number>,
-  fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
+  fileMetadataAndStorageProviderName?: FileMetadataAndStorageProviderName,
   projectData: {| [key: string]: string |},
 |};
 
@@ -135,40 +136,22 @@ export const allAlertMessages: Array<{
     label: <Trans>Using the resource properties panel</Trans>,
   },
   {
-    key: 'instance-drag-n-drop-explanation',
-    label: <Trans>Using instance drag'n'drop</Trans>,
-  },
-  {
-    key: 'objects-panel-explanation',
-    label: <Trans>Using the objects panel</Trans>,
-  },
-  {
-    key: 'instance-properties-panel-explanation',
-    label: <Trans>Using the instance properties panel</Trans>,
-  },
-  {
-    key: 'layers-panel-explanation',
-    label: <Trans>Using the layers panel</Trans>,
-  },
-  {
-    key: 'instances-panel-explanation',
-    label: <Trans>Using the instances panel</Trans>,
-  },
-  {
     key: 'physics2-shape-collisions',
     label: <Trans>Collisions handling with the Physics engine</Trans>,
-  },
-  {
-    key: 'edit-instruction-explanation',
-    label: <Trans>How to edit instructions</Trans>,
   },
   {
     key: 'lifecycle-events-function-included-only-if-extension-used',
     label: <Trans>Lifecycle functions only included when extension used</Trans>,
   },
   {
-    key: 'p2p-broker-recommendation',
-    label: <Trans>Peer to peer broker server recommendation</Trans>,
+    key: 'p2p-is-networking',
+    label: (
+      <Trans>Peer to peer IP address leak warning/THNK recommendation</Trans>
+    ),
+  },
+  {
+    key: 'p2p-dataloss',
+    label: <Trans>Peer to peer data-loss notice</Trans>,
   },
   {
     key: 'command-palette-shortcut',
@@ -185,6 +168,10 @@ export const allAlertMessages: Array<{
     label: (
       <Trans>Project package names should not begin with com.example</Trans>
     ),
+  },
+  {
+    key: 'new-generate-project-from-prompt',
+    label: <Trans>New project generation from prompt warning</Trans>,
   },
 ];
 
@@ -205,7 +192,6 @@ export type PreferencesValues = {|
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
-  useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   eventsSheetZoomLevel: number,
@@ -217,16 +203,26 @@ export type PreferencesValues = {|
   hasProjectOpened: boolean,
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
+  shareDialogDefaultTab: 'invite' | 'publish',
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
+  resourcesImporationBehavior: ResourceImportationBehavior,
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
-  showGetStartedSection: boolean,
+  showGetStartedSectionByDefault: boolean,
   showEventBasedObjectsEditor: boolean,
+  showDeprecatedInstructionWarning: boolean,
+  use3DEditor: boolean,
   inAppTutorialsProgress: InAppTutorialProgressDatabase,
   newProjectsDefaultFolder: string,
   newProjectsDefaultStorageProviderName: string,
+  useShortcutToClosePreviewWindow: boolean,
+  watchProjectFolderFilesForLocalProjects: boolean,
+  newFeaturesAcknowledgements: {
+    [featureId: string]: {| dates: [number] |},
+  },
+  editorStateByProject: { [string]: { editorTabs: EditorTabsPersistedState } },
 |};
 
 /**
@@ -249,7 +245,6 @@ export type Preferences = {|
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setEventsSheetZoomLevel: (zoomLevel: number) => void,
@@ -280,16 +275,23 @@ export type Preferences = {|
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => void,
   getNewObjectDialogDefaultTab: () => 'asset-store' | 'new-object',
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
+  getShareDialogDefaultTab: () => 'invite' | 'publish',
+  setShareDialogDefaultTab: ('invite' | 'publish') => void,
   getIsMenuBarHiddenInPreview: () => boolean,
   setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
   setBackdropClickBehavior: (value: string) => void,
+  setResourcesImporationBehavior: (value: string) => void,
   getIsAlwaysOnTopInPreview: () => boolean,
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowCommunityExtensions: (enabled: boolean) => void,
-  setShowGetStartedSection: (enabled: boolean) => void,
+  setShowGetStartedSectionByDefault: (enabled: boolean) => void,
   setShowEventBasedObjectsEditor: (enabled: boolean) => void,
   getShowEventBasedObjectsEditor: () => boolean,
+  setShowDeprecatedInstructionWarning: (enabled: boolean) => void,
+  getShowDeprecatedInstructionWarning: () => boolean,
+  setUse3DEditor: (enabled: boolean) => void,
+  getUse3DEditor: () => boolean,
   setNewProjectsDefaultStorageProviderName: (name: string) => void,
   saveTutorialProgress: ({|
     tutorialId: string,
@@ -301,6 +303,18 @@ export type Preferences = {|
     userId: ?string,
   |}) => ?InAppTutorialUserProgress,
   setNewProjectsDefaultFolder: (newProjectsDefaultFolder: string) => void,
+  setUseShortcutToClosePreviewWindow: (enabled: boolean) => void,
+  setWatchProjectFolderFilesForLocalProjects: (enabled: boolean) => void,
+  setNewFeaturesAcknowledgements: ({
+    [featureId: string]: {| dates: [number] |},
+  }) => void,
+  getEditorStateForProject: (
+    projectId: string
+  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  setEditorStateForProject: (
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) => void,
 |};
 
 export const initialPreferences = {
@@ -321,7 +335,6 @@ export const initialPreferences = {
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
-    useUndefinedVariablesInAutocompletion: true,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     eventsSheetZoomLevel: 14,
@@ -333,16 +346,24 @@ export const initialPreferences = {
     hasProjectOpened: false,
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
+    shareDialogDefaultTab: 'publish',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
+    resourcesImporationBehavior: 'ask',
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
-    showGetStartedSection: true,
+    showGetStartedSectionByDefault: true,
     showEventBasedObjectsEditor: false,
+    showDeprecatedInstructionWarning: false,
+    use3DEditor: isWebGLSupported(),
     inAppTutorialsProgress: {},
     newProjectsDefaultFolder: app ? findDefaultFolder(app) : '',
     newProjectsDefaultStorageProviderName: 'Cloud',
+    useShortcutToClosePreviewWindow: true,
+    watchProjectFolderFilesForLocalProjects: true,
+    newFeaturesAcknowledgements: {},
+    editorStateByProject: {},
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -359,7 +380,6 @@ export const initialPreferences = {
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
-  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setEventsSheetZoomLevel: (zoomLevel: number) => {},
@@ -382,20 +402,32 @@ export const initialPreferences = {
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
   getNewObjectDialogDefaultTab: () => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
+  getShareDialogDefaultTab: () => 'invite',
+  setShareDialogDefaultTab: () => {},
   getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
+  setResourcesImporationBehavior: () => {},
   getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowCommunityExtensions: () => {},
-  setShowGetStartedSection: (enabled: boolean) => {},
+  setShowGetStartedSectionByDefault: (enabled: boolean) => {},
   setShowEventBasedObjectsEditor: (enabled: boolean) => {},
   getShowEventBasedObjectsEditor: () => false,
+  setShowDeprecatedInstructionWarning: (enabled: boolean) => {},
+  getShowDeprecatedInstructionWarning: () => false,
+  setUse3DEditor: (enabled: boolean) => {},
+  getUse3DEditor: () => false,
   saveTutorialProgress: () => {},
   getTutorialProgress: () => {},
   setNewProjectsDefaultFolder: () => {},
   setNewProjectsDefaultStorageProviderName: () => {},
+  setUseShortcutToClosePreviewWindow: () => {},
+  setWatchProjectFolderFilesForLocalProjects: () => {},
+  setNewFeaturesAcknowledgements: () => {},
+  getEditorStateForProject: projectId => {},
+  setEditorStateForProject: (projectId, editorState) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

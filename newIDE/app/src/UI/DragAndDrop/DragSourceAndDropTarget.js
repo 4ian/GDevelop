@@ -9,25 +9,31 @@ import {
   type DropTargetMonitor,
   type DropTargetConnector,
   type ConnectDropTarget,
+  type ConnectDragPreview,
 } from 'react-dnd';
+import { hapticFeedback } from '../../Utils/Haptic';
 
 type Props<DraggedItemType> = {|
-  children: ({
+  children: ({|
     connectDragSource: ConnectDragSource,
     connectDropTarget: ConnectDropTarget,
+    connectDragPreview: ConnectDragPreview,
     isOver: boolean,
     isOverLazy: boolean,
     canDrop: boolean,
-  }) => ?React.Node,
+  |}) => ?React.Node,
   beginDrag: () => DraggedItemType,
   canDrag?: (item: DraggedItemType) => boolean,
   canDrop: (item: DraggedItemType) => boolean,
   drop: () => void,
   endDrag?: () => void,
+  hover?: (monitor: DropTargetMonitor) => void,
 |};
 
 type DragSourceProps = {|
   connectDragSource: ConnectDragSource,
+  connectDragPreview: ConnectDragPreview,
+  isDragging: boolean,
 |};
 
 type DropTargetProps = {|
@@ -43,8 +49,18 @@ type InnerDragSourceAndDropTargetProps<DraggedItemType> = {|
   ...DropTargetProps,
 |};
 
+// For some reason, defining this type in the `CustomDragLayer` component
+// creates a circular dependency, so we define it here instead.
+export type DraggedItem = {|
+  name: string,
+  thumbnail?: string,
+|};
+
+type Options = {| vibrate?: number |};
+
 export const makeDragSourceAndDropTarget = <DraggedItemType>(
-  reactDndType: string
+  reactDndType: string,
+  options: ?Options
 ): ((Props<DraggedItemType>) => React.Node) => {
   const sourceSpec = {
     canDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
@@ -54,6 +70,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
       return true;
     },
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
+      if (hapticFeedback && options && options.vibrate) {
+        hapticFeedback({ durationInMs: options.vibrate });
+      }
       return props.beginDrag();
     },
     endDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
@@ -67,6 +86,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
   ): DragSourceProps {
     return {
       connectDragSource: connect.dragSource(),
+      connectDragPreview: connect.dragPreview(),
+      isDragging: monitor.isDragging(),
     };
   }
 
@@ -80,6 +101,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return; // Drop already handled by another target
       }
       props.drop();
+    },
+    hover(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
+      if (props.hover) props.hover(monitor);
     },
   };
 
@@ -105,6 +129,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         children,
         connectDragSource,
         connectDropTarget,
+        connectDragPreview,
+        isDragging,
         isOver,
         isOverLazy,
         canDrop,
@@ -112,6 +138,8 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
         return children({
           connectDragSource,
           connectDropTarget,
+          connectDragPreview,
+          isDragging,
           isOver,
           isOverLazy,
           canDrop,

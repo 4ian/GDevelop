@@ -4,72 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  /** Represents a point in a coordinate system. */
-  export type SpritePoint = {
-    /** X position of the point. */
-    x: number;
-    /** Y position of the point. */
-    y: number;
-  };
-
-  /** Represents a custom point in a frame. */
-  export type SpriteCustomPointData = {
-    /** Name of the point. */
-    name: string;
-    /** X position of the point. */
-    x: number;
-    /** Y position of the point. */
-    y: number;
-  };
-
-  /** Represents the center point in a frame. */
-  export type SpriteCenterPointData = {
-    /** Name of the point. */
-    name: string;
-    /** Is the center automatically computed? */
-    automatic: boolean;
-    /** X position of the point. */
-    x: number;
-    /** Y position of the point. */
-    y: number;
-  };
-
-  /** Represents a {@link gdjs.SpriteAnimationFrame}. */
-  export type SpriteFrameData = {
-    /** The resource name of the image used in this frame. */
-    image: string;
-    /** The points of the frame. */
-    points: Array<SpriteCustomPointData>;
-    /** The origin point. */
-    originPoint: SpriteCustomPointData;
-    /** The center of the frame. */
-    centerPoint: SpriteCenterPointData;
-    /** Is The collision mask custom? */
-    hasCustomCollisionMask: boolean;
-    /** The collision mask if it is custom. */
-    customCollisionMask: Array<Array<SpritePoint>>;
-  };
-
-  /** Represents the data of a {@link gdjs.SpriteAnimationDirection}. */
-  export type SpriteDirectionData = {
-    /** Time between each frame, in seconds. */
-    timeBetweenFrames: number;
-    /** Is the animation looping? */
-    looping: boolean;
-    /** The list of frames. */
-    sprites: Array<SpriteFrameData>;
-  };
-
-  /** Represents the data of a {@link gdjs.SpriteAnimation}. */
-  export type SpriteAnimationData = {
-    /** The name of the animation. */
-    name: string;
-    /** Does the animation use multiple {@link gdjs.SpriteAnimationDirection}? */
-    useMultipleDirections: boolean;
-    /** The list of {@link SpriteDirectionData} representing {@link gdjs.SpriteAnimationDirection} instances. */
-    directions: Array<SpriteDirectionData>;
-  };
-
   /** Represents the data of a {@link gdjs.SpriteRuntimeObject}. */
   export type SpriteObjectDataType = {
     /** Update the object even if he is not visible?. */
@@ -81,241 +15,27 @@ namespace gdjs {
   export type SpriteObjectData = ObjectData & SpriteObjectDataType;
 
   /**
-   * A frame used by a SpriteAnimation in a {@link gdjs.SpriteRuntimeObject}.
-   *
-   * It contains the texture displayed as well as information like the points position
-   * or the collision mask.
-   */
-  export class SpriteAnimationFrame {
-    image: string;
-
-    //TODO: Rename in imageName, and do not store it in the object?
-    texture: any;
-    center: SpritePoint = { x: 0, y: 0 };
-    origin: SpritePoint = { x: 0, y: 0 };
-    hasCustomHitBoxes: boolean = false;
-    customHitBoxes: gdjs.Polygon[] = [];
-    points: Hashtable<SpritePoint>;
-
-    /**
-     * @param imageManager The game image manager
-     * @param frameData The frame data used to initialize the frame
-     */
-    constructor(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
-      this.image = frameData ? frameData.image : '';
-      this.texture = gdjs.SpriteRuntimeObjectRenderer.getAnimationFrame(
-        imageManager,
-        this.image
-      );
-      this.points = new Hashtable();
-      this.reinitialize(imageManager, frameData);
-    }
-
-    /**
-     * @param imageManager The game image manager
-     * @param frameData The frame data used to initialize the frame
-     */
-    reinitialize(imageManager: gdjs.ImageManager, frameData: SpriteFrameData) {
-      this.points.clear();
-      for (let i = 0, len = frameData.points.length; i < len; ++i) {
-        const ptData = frameData.points[i];
-        const point = { x: ptData.x, y: ptData.y };
-        this.points.put(ptData.name, point);
-      }
-      const origin = frameData.originPoint;
-      this.origin.x = origin.x;
-      this.origin.y = origin.y;
-      const center = frameData.centerPoint;
-      if (center.automatic !== true) {
-        this.center.x = center.x;
-        this.center.y = center.y;
-      } else {
-        this.center.x =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameWidth(
-            this.texture
-          ) / 2;
-        this.center.y =
-          gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameHeight(
-            this.texture
-          ) / 2;
-      }
-
-      //Load the custom collision mask, if any:
-      if (frameData.hasCustomCollisionMask) {
-        this.hasCustomHitBoxes = true;
-        let i = 0;
-        for (let len = frameData.customCollisionMask.length; i < len; ++i) {
-          const polygonData: SpritePoint[] = frameData.customCollisionMask[i];
-
-          //Add a polygon, if necessary (Avoid recreating a polygon if it already exists).
-          if (i >= this.customHitBoxes.length) {
-            this.customHitBoxes.push(new gdjs.Polygon());
-          }
-          let j = 0;
-          for (const len2 = polygonData.length; j < len2; ++j) {
-            const pointData: SpritePoint = polygonData[j];
-
-            //Add a point, if necessary (Avoid recreating a point if it already exists).
-            if (j >= this.customHitBoxes[i].vertices.length) {
-              this.customHitBoxes[i].vertices.push([0, 0]);
-            }
-            this.customHitBoxes[i].vertices[j][0] = pointData.x;
-            this.customHitBoxes[i].vertices[j][1] = pointData.y;
-          }
-          this.customHitBoxes[i].vertices.length = j;
-        }
-        this.customHitBoxes.length = i;
-      } else {
-        this.customHitBoxes.length = 0;
-      }
-    }
-
-    /**
-     * Get a point of the frame.<br>
-     * If the point does not exist, the origin is returned.
-     * @param name The point's name
-     * @return The requested point. If it doesn't exists returns the origin point.
-     */
-    getPoint(name: string): SpritePoint {
-      if (name === 'Centre' || name === 'Center') {
-        return this.center;
-      } else {
-        if (name === 'Origin') {
-          return this.origin;
-        }
-      }
-      return this.points.containsKey(name)
-        ? this.points.get(name)
-        : this.origin;
-    }
-  }
-
-  /**
-   * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
-   *
-   * @param imageManager The game image manager
-   * @param directionData The direction data used to initialize the direction
-   */
-  export class SpriteAnimationDirection {
-    timeBetweenFrames: number;
-    loop: boolean;
-    frames: SpriteAnimationFrame[] = [];
-
-    constructor(
-      imageManager: gdjs.PixiImageManager,
-      directionData: SpriteDirectionData
-    ) {
-      this.timeBetweenFrames = directionData
-        ? directionData.timeBetweenFrames
-        : 1.0;
-      this.loop = !!directionData.looping;
-      this.reinitialize(imageManager, directionData);
-    }
-
-    /**
-     * @param imageManager The game image manager
-     * @param directionData The direction data used to initialize the direction
-     */
-    reinitialize(
-      imageManager: gdjs.ImageManager,
-      directionData: SpriteDirectionData
-    ) {
-      this.timeBetweenFrames = directionData
-        ? directionData.timeBetweenFrames
-        : 1.0;
-      this.loop = !!directionData.looping;
-      let i = 0;
-      for (const len = directionData.sprites.length; i < len; ++i) {
-        const frameData = directionData.sprites[i];
-        if (i < this.frames.length) {
-          this.frames[i].reinitialize(imageManager, frameData);
-        } else {
-          this.frames.push(
-            new gdjs.SpriteAnimationFrame(imageManager, frameData)
-          );
-        }
-      }
-      this.frames.length = i;
-    }
-  }
-
-  /**
-   * Represents an animation of a {@link SpriteRuntimeObject}.
-   *
-   * @param imageManager The game image manager
-   * @param animData The animation data used to initialize the animation
-   */
-  export class SpriteAnimation {
-    hasMultipleDirections: boolean;
-    name: string;
-    directions: gdjs.SpriteAnimationDirection[] = [];
-
-    constructor(
-      imageManager: gdjs.PixiImageManager,
-      animData: SpriteAnimationData
-    ) {
-      this.hasMultipleDirections = !!animData.useMultipleDirections;
-      this.name = animData.name || '';
-      this.reinitialize(imageManager, animData);
-    }
-
-    /**
-     * @param imageManager The game image manager
-     * @param animData The animation data used to initialize the animation
-     */
-    reinitialize(
-      imageManager: gdjs.ImageManager,
-      animData: SpriteAnimationData
-    ) {
-      this.hasMultipleDirections = !!animData.useMultipleDirections;
-      this.name = animData.name || '';
-      let i = 0;
-      for (const len = animData.directions.length; i < len; ++i) {
-        const directionData = animData.directions[i];
-        if (i < this.directions.length) {
-          this.directions[i].reinitialize(imageManager, directionData);
-        } else {
-          this.directions.push(
-            new gdjs.SpriteAnimationDirection(imageManager, directionData)
-          );
-        }
-      }
-      // Make sure to delete already existing directions which are not used anymore.
-      this.directions.length = i;
-    }
-  }
-
-  /**
    * The SpriteRuntimeObject represents an object that can display images.
    */
-  export class SpriteRuntimeObject extends gdjs.RuntimeObject {
-    _currentAnimation: number = 0;
-    _currentDirection: number = 0;
-    _currentFrame: number = 0;
-    /** In seconds */
-    _frameElapsedTime: float = 0;
-    _animationSpeedScale: number = 1;
-    _animationPaused: boolean = false;
-    _scaleX: number = 1;
-    _scaleY: number = 1;
-    _blendMode: number = 0;
+  export class SpriteRuntimeObject
+    extends gdjs.RuntimeObject
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable,
+      gdjs.Animatable,
+      gdjs.OpacityHandler {
+    _animator: gdjs.SpriteAnimator<any>;
+    _scaleX: float = 1;
+    _scaleY: float = 1;
+    _blendMode: integer = 0;
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     opacity: float = 255;
     _updateIfNotVisible: boolean;
 
-    //Animations:
-    _animations: gdjs.SpriteAnimation[] = [];
-
-    /**
-     * Reference to the current SpriteAnimationFrame that is displayed.
-     * Verify is `this._animationFrameDirty === true` before using it, and if so
-     * call `this._updateAnimationFrame()`.
-     * Can be null, so ensure that this case is handled properly.
-     */
-    _animationFrame: gdjs.SpriteAnimationFrame | null = null;
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
-    _animationFrameDirty: boolean = true;
+    _animationFrameDirty = true;
 
     /**
      * @param instanceContainer The container the object belongs to
@@ -327,17 +47,15 @@ namespace gdjs {
     ) {
       super(instanceContainer, spriteObjectData);
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
-      for (let i = 0, len = spriteObjectData.animations.length; i < len; ++i) {
-        this._animations.push(
-          new gdjs.SpriteAnimation(
-            instanceContainer.getGame().getImageManager(),
-            spriteObjectData.animations[i]
-          )
-        );
-      }
       this._renderer = new gdjs.SpriteRuntimeObjectRenderer(
         this,
         instanceContainer
+      );
+      this._animator = new gdjs.SpriteAnimator(
+        spriteObjectData.animations,
+        gdjs.SpriteRuntimeObjectRenderer.getAnimationFrameTextureManager(
+          instanceContainer.getGame().getImageManager()
+        )
       );
       this._updateAnimationFrame();
 
@@ -348,12 +66,7 @@ namespace gdjs {
     reinitialize(spriteObjectData: SpriteObjectData) {
       super.reinitialize(spriteObjectData);
       const instanceContainer = this.getInstanceContainer();
-      this._currentAnimation = 0;
-      this._currentDirection = 0;
-      this._currentFrame = 0;
-      this._frameElapsedTime = 0;
-      this._animationSpeedScale = 1;
-      this._animationPaused = false;
+      this._animator.reinitialize(spriteObjectData.animations);
       this._scaleX = 1;
       this._scaleY = 1;
       this._blendMode = 0;
@@ -361,27 +74,6 @@ namespace gdjs {
       this._flippedY = false;
       this.opacity = 255;
       this._updateIfNotVisible = !!spriteObjectData.updateIfNotVisible;
-      let i = 0;
-      for (const len = spriteObjectData.animations.length; i < len; ++i) {
-        const animData = spriteObjectData.animations[i];
-        if (i < this._animations.length) {
-          this._animations[i].reinitialize(
-            instanceContainer.getGame().getImageManager(),
-            animData
-          );
-        } else {
-          this._animations.push(
-            new gdjs.SpriteAnimation(
-              instanceContainer.getGame().getImageManager(),
-              animData
-            )
-          );
-        }
-      }
-      this._animations.length = i;
-
-      //Make sure to delete already existing animations which are not used anymore.
-      this._animationFrame = null;
       this._renderer.reinitialize(this, instanceContainer);
       this._updateAnimationFrame();
 
@@ -393,31 +85,11 @@ namespace gdjs {
       oldObjectData: SpriteObjectData,
       newObjectData: SpriteObjectData
     ): boolean {
-      const instanceContainer = this.getInstanceContainer();
-      let i = 0;
-      for (const len = newObjectData.animations.length; i < len; ++i) {
-        const animData = newObjectData.animations[i];
-        if (i < this._animations.length) {
-          this._animations[i].reinitialize(
-            instanceContainer.getGame().getImageManager(),
-            animData
-          );
-        } else {
-          this._animations.push(
-            new gdjs.SpriteAnimation(
-              instanceContainer.getGame().getImageManager(),
-              animData
-            )
-          );
-        }
-      }
-      this._animations.length = i;
-
-      //Make sure to delete already existing animations which are not used anymore.
-      this._updateAnimationFrame();
-      if (!this._animationFrame) {
-        this.setAnimation(0);
-      }
+      this._animator.updateFromObjectData(
+        oldObjectData.animations,
+        newObjectData.animations
+      );
+      this._updateIfNotVisible = !!newObjectData.updateIfNotVisible;
       this.invalidateHitboxes();
       return true;
     }
@@ -435,7 +107,7 @@ namespace gdjs {
         ) {
           const extraData = initialInstanceData.numberProperties[i];
           if (extraData.name === 'animation') {
-            this.setAnimation(extraData.value);
+            this.setAnimationIndex(extraData.value);
           }
         }
       }
@@ -458,57 +130,10 @@ namespace gdjs {
       ) {
         return;
       }
-      if (
-        this._currentAnimation >= this._animations.length ||
-        this._currentDirection >=
-          this._animations[this._currentAnimation].directions.length
-      ) {
-        return;
-      }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
-      const oldFrame = this._currentFrame;
-
-      const elapsedTime = this.getElapsedTime() / 1000;
-      this._frameElapsedTime += this._animationPaused
-        ? 0
-        : elapsedTime * this._animationSpeedScale;
-
-      if (
-        !direction.loop &&
-        this._currentFrame >= direction.frames.length - 1 &&
-        this._frameElapsedTime > direction.timeBetweenFrames
-      ) {
-        // *Optimization*: Animation is finished, don't change the current frame
-        // and compute nothing more.
-      } else {
-        if (this._frameElapsedTime > direction.timeBetweenFrames) {
-          const count = Math.floor(
-            this._frameElapsedTime / direction.timeBetweenFrames
-          );
-          this._currentFrame += count;
-          this._frameElapsedTime =
-            this._frameElapsedTime - count * direction.timeBetweenFrames;
-          if (this._frameElapsedTime < 0) {
-            this._frameElapsedTime = 0;
-          }
-        }
-        if (this._currentFrame >= direction.frames.length) {
-          this._currentFrame = direction.loop
-            ? this._currentFrame % direction.frames.length
-            : direction.frames.length - 1;
-        }
-        if (this._currentFrame < 0) {
-          this._currentFrame = 0;
-        }
-      }
-
-      //May happen if there is no frame.
-      if (oldFrame !== this._currentFrame || this._animationFrameDirty) {
+      const hasFrameChanged = this._animator.step(this.getElapsedTime() / 1000);
+      if (hasFrameChanged) {
         this._updateAnimationFrame();
-      }
-      if (oldFrame !== this._currentFrame) {
+        // TODO: Hitboxes may not need an update if every frames has the same ones.
         this.invalidateHitboxes();
       }
       this._renderer.ensureUpToDate();
@@ -536,25 +161,10 @@ namespace gdjs {
      */
     _updateAnimationFrame() {
       this._animationFrameDirty = false;
-      if (
-        this._currentAnimation < this._animations.length &&
-        this._currentDirection <
-          this._animations[this._currentAnimation].directions.length
-      ) {
-        const direction = this._animations[this._currentAnimation].directions[
-          this._currentDirection
-        ];
-        if (this._currentFrame < direction.frames.length) {
-          this._animationFrame = direction.frames[this._currentFrame];
-          if (this._animationFrame !== null) {
-            this._renderer.updateFrame(this._animationFrame);
-          }
-          return;
-        }
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame) {
+        this._renderer.updateFrame(animationFrame);
       }
-
-      //Invalid animation/direction/frame:
-      this._animationFrame = null;
     }
 
     getRendererObject() {
@@ -567,15 +177,12 @@ namespace gdjs {
      * hitboxes defined for the current animation frame.
      */
     updateHitBoxes(): void {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      //Beware, `this._animationFrame` can still be null.
-      if (this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (!animationFrame) {
         return;
       }
 
-      if (!this._animationFrame.hasCustomHitBoxes) {
+      if (!animationFrame.hasCustomHitBoxes) {
         return super.updateHitBoxes();
       }
 
@@ -584,29 +191,28 @@ namespace gdjs {
 
       //Update the current hitboxes with the frame custom hit boxes
       //and apply transformations.
-      for (let i = 0; i < this._animationFrame.customHitBoxes.length; ++i) {
+      for (let i = 0; i < animationFrame.customHitBoxes.length; ++i) {
         if (i >= this.hitBoxes.length) {
           this.hitBoxes.push(new gdjs.Polygon());
         }
         for (
           let j = 0;
-          j < this._animationFrame.customHitBoxes[i].vertices.length;
+          j < animationFrame.customHitBoxes[i].vertices.length;
           ++j
         ) {
           if (j >= this.hitBoxes[i].vertices.length) {
             this.hitBoxes[i].vertices.push([0, 0]);
           }
           this._transformToGlobal(
-            this._animationFrame.customHitBoxes[i].vertices[j][0],
-            this._animationFrame.customHitBoxes[i].vertices[j][1],
+            animationFrame.customHitBoxes[i].vertices[j][0],
+            animationFrame.customHitBoxes[i].vertices[j][1],
             this.hitBoxes[i].vertices[j]
           );
         }
-        this.hitBoxes[i].vertices.length = this._animationFrame.customHitBoxes[
-          i
-        ].vertices.length;
+        this.hitBoxes[i].vertices.length =
+          animationFrame.customHitBoxes[i].vertices.length;
       }
-      this.hitBoxes.length = this._animationFrame.customHitBoxes.length;
+      this.hitBoxes.length = animationFrame.customHitBoxes.length;
     }
 
     //Rotate and scale and flipping have already been applied to the point by _transformToGlobal.
@@ -614,18 +220,29 @@ namespace gdjs {
     /**
      * Change the animation being played.
      * @param newAnimation The index of the new animation to be played
+     * @deprecated Use `setAnimationIndex` instead
      */
-    setAnimation(newAnimation: number): void {
-      newAnimation = newAnimation | 0;
-      if (
-        newAnimation < this._animations.length &&
-        this._currentAnimation !== newAnimation &&
-        newAnimation >= 0
-      ) {
-        this._currentAnimation = newAnimation;
-        this._currentFrame = 0;
-        this._frameElapsedTime = 0;
+    setAnimation(newAnimation: integer): void {
+      this.setAnimationIndex(newAnimation);
+    }
 
+    setAnimationIndex(newAnimation: integer): void {
+      const hasAnimationChanged = this._animator.setAnimationIndex(
+        newAnimation
+      );
+      if (hasAnimationChanged) {
+        //TODO: This may be unnecessary.
+        this._renderer.update();
+        this._animationFrameDirty = true;
+        this.invalidateHitboxes();
+      }
+    }
+
+    setAnimationName(newAnimationName: string): void {
+      const hasAnimationChanged = this._animator.setAnimationName(
+        newAnimationName
+      );
+      if (hasAnimationChanged) {
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
@@ -634,40 +251,23 @@ namespace gdjs {
     }
 
     /**
-     * Change the animation being played.
-     * @param newAnimationName The name of the new animation to be played
-     */
-    setAnimationName(newAnimationName: string): void {
-      if (!newAnimationName) {
-        return;
-      }
-      for (let i = 0; i < this._animations.length; ++i) {
-        if (this._animations[i].name === newAnimationName) {
-          return this.setAnimation(i);
-        }
-      }
-    }
-
-    /**
      * Get the index of the animation being played.
      * @return The index of the new animation being played
+     * @deprecated Use `getAnimationIndex` instead
      */
-    getAnimation(): number {
-      return this._currentAnimation;
+    getAnimation(): integer {
+      return this.getAnimationIndex();
     }
 
-    /**
-     * Get the name of the animation being played.
-     * @return The name of the new animation being played
-     */
+    getAnimationIndex(): integer {
+      return this._animator.getAnimationIndex();
+    }
+
     getAnimationName(): string {
-      if (this._currentAnimation >= this._animations.length) {
-        return '';
-      }
-      return this._animations[this._currentAnimation].name;
+      return this._animator.getAnimationName();
     }
 
-    isCurrentAnimationName(name): boolean {
+    isCurrentAnimationName(name: string): boolean {
       return this.getAnimationName() === name;
     }
 
@@ -675,72 +275,32 @@ namespace gdjs {
      * Change the angle (or direction index) of the object
      * @param The new angle (or direction index) to be applied
      */
-    setDirectionOrAngle(newValue): void {
-      if (this._currentAnimation >= this._animations.length) {
-        return;
-      }
-      const anim = this._animations[this._currentAnimation];
-      if (!anim.hasMultipleDirections) {
-        if (this.angle === newValue) {
-          return;
-        }
-        this.angle = newValue;
-        this.invalidateHitboxes();
-        this._renderer.updateAngle();
-      } else {
-        newValue = newValue | 0;
-        if (
-          newValue === this._currentDirection ||
-          newValue >= anim.directions.length ||
-          anim.directions[newValue].frames.length === 0
-        ) {
-          return;
-        }
-        this._currentDirection = newValue;
-        this._currentFrame = 0;
-        this._frameElapsedTime = 0;
-        this.angle = 0;
-
+    setDirectionOrAngle(newValue: float): void {
+      const actualValue = this._animator.setDirectionOrAngle(
+        this.angle,
+        newValue
+      );
+      if (actualValue !== null) {
+        this.angle = actualValue;
         //TODO: This may be unnecessary.
         this._renderer.update();
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
+        this._renderer.updateAngle();
       }
     }
 
     getDirectionOrAngle(): float {
-      if (this._currentAnimation >= this._animations.length) {
-        return 0;
-      }
-      if (!this._animations[this._currentAnimation].hasMultipleDirections) {
-        return this.angle;
-      } else {
-        return this._currentDirection;
-      }
+      return this._animator.getDirectionOrAngle(this.angle);
     }
 
     /**
      * Change the current frame displayed by the animation
      * @param newFrame The index of the frame to be displayed
      */
-    setAnimationFrame(newFrame: number): void {
-      if (
-        this._currentAnimation >= this._animations.length ||
-        this._currentDirection >=
-          this._animations[this._currentAnimation].directions.length
-      ) {
-        return;
-      }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
-      if (
-        newFrame >= 0 &&
-        newFrame < direction.frames.length &&
-        newFrame !== this._currentFrame
-      ) {
-        this._currentFrame = newFrame;
-        this._frameElapsedTime = 0;
+    setAnimationFrame(newFrame: integer): void {
+      const hasFrameChanged = this._animator.setAnimationFrameIndex(newFrame);
+      if (hasFrameChanged) {
         this._animationFrameDirty = true;
         this.invalidateHitboxes();
       }
@@ -750,42 +310,38 @@ namespace gdjs {
      * Get the index of the current frame displayed by the animation
      * @return newFrame The index of the frame being displayed
      */
-    getAnimationFrame(): number {
-      return this._currentFrame;
+    getAnimationFrame(): integer {
+      return this._animator.getAnimationFrameIndex();
     }
 
-    getAnimationFrameCount(): number {
-      if (this._currentAnimation >= this._animations.length) {
-        return 0;
+    getAnimationElapsedTime(): float {
+      return this._animator.getAnimationElapsedTime();
+    }
+
+    setAnimationElapsedTime(time: float): void {
+      const hasFrameChanged = this._animator.getAnimationElapsedTime();
+      if (hasFrameChanged) {
+        this._animationFrameDirty = true;
+        this.invalidateHitboxes();
       }
-      const currentAnimation = this._animations[this._currentAnimation];
-      if (this._currentDirection >= currentAnimation.directions.length) {
-        return 0;
-      }
-      return currentAnimation.directions[this._currentDirection].frames.length;
+    }
+
+    getAnimationDuration(): float {
+      return this._animator.getAnimationDuration();
+    }
+
+    getAnimationFrameCount(): integer {
+      return this._animator.getAnimationFrameCount();
     }
 
     /**
      * @deprecated
      * Return true if animation has ended.
-     * Prefer using hasAnimationEnded2. This method returns true as soon as
+     * Prefer using `hasAnimationEnded2`. This method returns true as soon as
      * the animation enters the last frame, not at the end of the last frame.
      */
-    hasAnimationEnded(): boolean {
-      if (
-        this._currentAnimation >= this._animations.length ||
-        this._currentDirection >=
-          this._animations[this._currentAnimation].directions.length
-      ) {
-        return true;
-      }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
-      if (direction.loop) {
-        return false;
-      }
-      return this._currentFrame === direction.frames.length - 1;
+    hasAnimationEndedLegacy(): boolean {
+      return this._animator.hasAnimationEndedLegacy();
     }
 
     /**
@@ -794,45 +350,49 @@ namespace gdjs {
      * - it's not configured as a loop;
      * - the current frame is the last frame;
      * - the last frame has been displayed long enough.
+     *
+     * @deprecated Use `hasAnimationEnded` instead.
      */
     hasAnimationEnded2(): boolean {
-      if (
-        this._currentAnimation >= this._animations.length ||
-        this._currentDirection >=
-          this._animations[this._currentAnimation].directions.length
-      ) {
-        return true;
-      }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
-      if (direction.loop) {
-        return false;
-      }
-      return (
-        this._currentFrame === direction.frames.length - 1 &&
-        this._frameElapsedTime > direction.timeBetweenFrames
-      );
+      return this._animator.hasAnimationEnded();
     }
 
-    animationPaused() {
-      return this._animationPaused;
+    hasAnimationEnded(): boolean {
+      return this._animator.hasAnimationEnded();
     }
 
-    pauseAnimation() {
-      this._animationPaused = true;
+    /**
+     * @deprecated Use `isAnimationPaused` instead.
+     */
+    animationPaused(): boolean {
+      return this._animator.isAnimationPaused();
     }
 
-    playAnimation() {
-      this._animationPaused = false;
+    isAnimationPaused(): boolean {
+      return this._animator.isAnimationPaused();
     }
 
-    getAnimationSpeedScale() {
-      return this._animationSpeedScale;
+    pauseAnimation(): void {
+      this._animator.pauseAnimation();
     }
 
-    setAnimationSpeedScale(ratio): void {
-      this._animationSpeedScale = ratio;
+    /**
+     * @deprecated Use `resumeAnimation` instead.
+     */
+    playAnimation(): void {
+      this._animator.resumeAnimation();
+    }
+
+    resumeAnimation(): void {
+      this._animator.resumeAnimation();
+    }
+
+    getAnimationSpeedScale(): float {
+      return this._animator.getAnimationSpeedScale();
+    }
+
+    setAnimationSpeedScale(ratio: float): void {
+      this._animator.setAnimationSpeedScale(ratio);
     }
 
     //Position :
@@ -842,13 +402,11 @@ namespace gdjs {
      * @return the position on X axis on the scene of the given point.
      */
     getPointX(name: string): float {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      if (name.length === 0 || this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (name.length === 0 || animationFrame === null) {
         return this.getX();
       }
-      const pt = this._animationFrame.getPoint(name);
+      const pt = animationFrame.getPoint(name);
       const pos = gdjs.staticArray(SpriteRuntimeObject.prototype.getPointX);
       this._transformToGlobal(pt.x, pt.y, pos);
       return pos[0];
@@ -860,13 +418,11 @@ namespace gdjs {
      * @return the position on Y axis on the scene of the given point.
      */
     getPointY(name: string): float {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      if (name.length === 0 || this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (name.length === 0 || animationFrame === null) {
         return this.getY();
       }
-      const pt = this._animationFrame.getPoint(name);
+      const pt = animationFrame.getPoint(name);
       const pos = gdjs.staticArray(SpriteRuntimeObject.prototype.getPointY);
       this._transformToGlobal(pt.x, pt.y, pos);
       return pos[1];
@@ -877,13 +433,11 @@ namespace gdjs {
      * @return An array of the position on X and Y axis on the scene of the given point.
      */
     getPointPosition(name: string): [x: float, y: float] {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      if (name.length === 0 || this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (name.length === 0 || animationFrame === null) {
         return [this.getX(), this.getY()];
       }
-      const pt = this._animationFrame.getPoint(name);
+      const pt = animationFrame.getPoint(name);
       const pos = gdjs.staticArray(SpriteRuntimeObject.prototype.getPointX);
       this._transformToGlobal(pt.x, pt.y, pos);
       return [pos[0], pos[1]];
@@ -902,8 +456,10 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in global coordinates).
      */
-    private _transformToGlobal(x: float, y: float, result: number[]) {
-      const animationFrame = this._animationFrame as SpriteAnimationFrame;
+    private _transformToGlobal(x: float, y: float, result: float[]) {
+      const animationFrame = this._animator.getCurrentFrame() as SpriteAnimationFrame<
+        any
+      >;
       let cx = animationFrame.center.x;
       let cy = animationFrame.center.y;
 
@@ -944,18 +500,19 @@ namespace gdjs {
      * @return the X position, on the scene, of the origin of the texture of the object.
      */
     getDrawableX(): float {
-      if (this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame === null) {
         return this.x;
       }
       const absScaleX = Math.abs(this._scaleX);
       if (!this._flippedX) {
-        return this.x - this._animationFrame.origin.x * absScaleX;
+        return this.x - animationFrame.origin.x * absScaleX;
       } else {
         return (
           this.x +
-          (-this._animationFrame.origin.x -
+          (-animationFrame.origin.x -
             this._renderer.getUnscaledWidth() +
-            2 * this._animationFrame.center.x) *
+            2 * animationFrame.center.x) *
             absScaleX
         );
       }
@@ -966,18 +523,19 @@ namespace gdjs {
      * @return the Y position, on the scene, of the origin of the texture of the object.
      */
     getDrawableY(): float {
-      if (this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame === null) {
         return this.y;
       }
       const absScaleY = Math.abs(this._scaleY);
       if (!this._flippedY) {
-        return this.y - this._animationFrame.origin.y * absScaleY;
+        return this.y - animationFrame.origin.y * absScaleY;
       } else {
         return (
           this.y +
-          (-this._animationFrame.origin.y -
+          (-animationFrame.origin.y -
             this._renderer.getUnscaledHeight() +
-            2 * this._animationFrame.center.y) *
+            2 * animationFrame.center.y) *
             absScaleY
         );
       }
@@ -988,18 +546,16 @@ namespace gdjs {
      * @return X position of the center of the object, relative to `getDrawableX()`.
      */
     getCenterX(): float {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      if (this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame === null) {
         return 0;
       }
       if (!this._flippedX) {
         //Just need to multiply by the scale as it is the center.
-        return this._animationFrame.center.x * Math.abs(this._scaleX);
+        return animationFrame.center.x * Math.abs(this._scaleX);
       } else {
         return (
-          (this._renderer.getUnscaledWidth() - this._animationFrame.center.x) *
+          (this._renderer.getUnscaledWidth() - animationFrame.center.x) *
           Math.abs(this._scaleX)
         );
       }
@@ -1010,18 +566,16 @@ namespace gdjs {
      * @return Y position of the center of the object, relative to `getDrawableY()`.
      */
     getCenterY(): float {
-      if (this._animationFrameDirty) {
-        this._updateAnimationFrame();
-      }
-      if (this._animationFrame === null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame === null) {
         return 0;
       }
       if (!this._flippedY) {
         //Just need to multiply by the scale as it is the center.
-        return this._animationFrame.center.y * Math.abs(this._scaleY);
+        return animationFrame.center.y * Math.abs(this._scaleY);
       } else {
         return (
-          (this._renderer.getUnscaledHeight() - this._animationFrame.center.y) *
+          (this._renderer.getUnscaledHeight() - animationFrame.center.y) *
           Math.abs(this._scaleY)
         );
       }
@@ -1036,7 +590,8 @@ namespace gdjs {
         return;
       }
       this.x = x;
-      if (this._animationFrame !== null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame !== null) {
         this.invalidateHitboxes();
         this._renderer.updateX();
       }
@@ -1051,7 +606,8 @@ namespace gdjs {
         return;
       }
       this.y = y;
-      if (this._animationFrame !== null) {
+      const animationFrame = this._animator.getCurrentFrame();
+      if (animationFrame !== null) {
         this.invalidateHitboxes();
         this._renderer.updateY();
       }
@@ -1062,22 +618,11 @@ namespace gdjs {
      * @param angle The new angle, in degrees.
      */
     setAngle(angle: float): void {
-      if (this._currentAnimation >= this._animations.length) {
-        return;
-      }
-      if (!this._animations[this._currentAnimation].hasMultipleDirections) {
-        if (this.angle === angle) {
-          return;
-        }
-        this.angle = angle;
-        this._renderer.updateAngle();
+      const actualValue = this._animator.setAngle(this.angle, angle);
+      if (actualValue !== null) {
+        this.angle = actualValue;
         this.invalidateHitboxes();
-      } else {
-        angle = angle % 360;
-        if (angle < 0) {
-          angle += 360;
-        }
-        this.setDirectionOrAngle(Math.round(angle / 45) % 8);
+        this._renderer.updateAngle();
       }
     }
 
@@ -1086,14 +631,7 @@ namespace gdjs {
      * @return The angle, in degrees.
      */
     getAngle(): float {
-      if (this._currentAnimation >= this._animations.length) {
-        return 0;
-      }
-      if (!this._animations[this._currentAnimation].hasMultipleDirections) {
-        return this.angle;
-      } else {
-        return this._currentDirection * 45;
-      }
+      return this._animator.getAngle(this.angle);
     }
 
     //Visibility and display :
@@ -1109,10 +647,6 @@ namespace gdjs {
       return this._blendMode;
     }
 
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -1124,11 +658,7 @@ namespace gdjs {
       this._renderer.updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
-    getOpacity(): number {
+    getOpacity(): float {
       return this.opacity;
     }
 
@@ -1213,11 +743,6 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     */
     setWidth(newWidth: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
@@ -1228,11 +753,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param newHeight The new height of the object, in pixels.
-     */
     setHeight(newHeight: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
@@ -1243,12 +763,6 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the size of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     * @param newHeight The new height of the object, in pixels.
-     */
     setSize(newWidth: float, newHeight: float): void {
       this.setWidth(newWidth);
       this.setHeight(newHeight);
@@ -1259,7 +773,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1280,7 +794,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1297,7 +811,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -1310,12 +824,24 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
      */
-    getScale(): number {
+    getScaleMean(): float {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -1342,7 +868,7 @@ namespace gdjs {
      * @param scene The scene containing the object
      * @deprecated
      */
-    turnTowardObject(obj: gdjs.RuntimeObject, scene: gdjs.RuntimeScene) {
+    turnTowardObject(obj: gdjs.RuntimeObject | null, scene: gdjs.RuntimeScene) {
       if (obj === null) {
         return;
       }

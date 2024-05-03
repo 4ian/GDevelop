@@ -1,0 +1,147 @@
+.fullHeightFlexContainer {
+  display: flex;
+  height: 100%;
+}
+.fullHeightFlexContainer.withDivider {
+  border-top: 1px solid var(--theme-list-item-separator-color);
+}
+.fullSpaceContainer {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.rowContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.rowContentSide {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: relative;
+
+  --horizontal-padding: 21px;
+}
+
+.rowContentSide.rowContentExtraPadding {
+  /* Used for a better dragging preview. */
+  padding: 0 var(--horizontal-padding);
+}
+.rowContentSide.rowContentSideLeft {
+  /* Necessary for itemName to be overflown. */
+  width: calc(100% - 2 * var(--horizontal-padding));
+}
+.rowContentSide.rowContentSideRight {
+  /* Used for a better dragging preview. */
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+.rowContainer {
+  display: flex;
+  flex: 1;
+  border-radius: 6px;
+  width: 100%;
+}
+.itemName.animate {
+  animation-name: wiggle;
+  animation-duration: 0.4s;
+}
+.treeView:focus-visible {
+  /**
+   * Remove browser-specific style around focused element when hitting an arrow key.
+   */
+  outline: none;
+}
+.rowContainer.withCanDropInsideIndicator {
+  outline: 1px solid var(--theme-drop-indicator-can-drop-color);
+}
+.rowContainer.withCannotDropInsideIndicator {
+  outline: 1px solid var(--theme-drop-indicator-cannot-drop-color);
+}
+.rowContainer.selected {
+  background-color: var(--theme-selection-background-color);
+}
+.rowContainer:hover:not(.selected) {
+  background-color: var(--theme-list-item-hover-background-color);
+}
+
+.itemName,
+.itemNameInput {
+  font-family: var(--gdevelop-modern-font-family) !important;
+  font-size: 14px;
+}
+.itemName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.itemName.placeholder {
+  color: var(--theme-text-secondary-color);
+  font-size: 14px;
+}
+
+.itemName.rootFolder {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.folderIcon {
+  margin-right: 4px;
+  width: 20px;
+}
+.thumbnail {
+  margin-right: 6px;
+}
+
+.itemNameInput {
+  outline: none;
+  border: none;
+  padding: 0;
+  background-image: none;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  color: inherit;
+  width: 100%;
+}
+
+.itemNameInputContainer:before {
+  bottom: -1px;
+  left: 0;
+  content: '\00a0';
+  width: 100%;
+  border-bottom: 1px solid var(--theme-text-default-color);
+  display: block;
+  position: absolute;
+  height: 1px;
+}
+
+.itemNameInputContainer {
+  position: relative;
+  flex: 1;
+}
+
+@keyframes wiggle {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  35% {
+    transform: translate(8px, 0px);
+  }
+  80% {
+    transform: translate(-5px, 0px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}

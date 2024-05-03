@@ -2,14 +2,8 @@
  * Tests for gdjs.InputManager and related.
  */
 
-describe.only('gdjs.InputManager', () => {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: {
-      resources: [],
-    },
-    properties: { windowWidth: 800, windowHeight: 600 },
-  });
+describe('gdjs.InputManager', () => {
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [{ name: '', visibility: true, effects: [] }],
@@ -217,7 +211,7 @@ describe.only('gdjs.InputManager', () => {
     expect(inputManager.getCursorY()).to.be(600);
     expect(inputManager.getMouseX()).to.be(500);
     expect(inputManager.getMouseY()).to.be(600);
-    
+
     // Touch events only move the cursor.
     inputManager.onTouchStart(46, 510, 610);
     inputManager.onTouchMove(46, 520, 620);
@@ -355,11 +349,7 @@ describe.only('gdjs.InputManager', () => {
 });
 
 describe('gdjs.RuntimeObject.cursorOnObject', () => {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    properties: { windowWidth: 800, windowHeight: 600 },
-    resources: { resources: [] },
-  });
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [{ name: '', visibility: true, effects: [] }],

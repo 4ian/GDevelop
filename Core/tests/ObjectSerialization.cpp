@@ -35,7 +35,7 @@ void SetupSpriteConfiguration(gd::ObjectConfiguration &configuration) {
   REQUIRE(spriteConfiguration != nullptr);
   gd::Animation animation;
   animation.SetName("Idle");
-  spriteConfiguration->AddAnimation(animation);
+  spriteConfiguration->GetAnimations().AddAnimation(animation);
 };
 
 gd::Object &SetupProjectWithSprite(gd::Project &project,
@@ -83,9 +83,9 @@ void CheckSpriteConfigurationInProjectElement(
 void CheckSpriteConfiguration(gd::ObjectConfiguration &configuration) {
   auto *spriteConfiguration = dynamic_cast<gd::SpriteObject *>(&configuration);
   REQUIRE(spriteConfiguration);
-  REQUIRE(spriteConfiguration->GetAnimationsCount() == 1);
+  REQUIRE(spriteConfiguration->GetAnimations().GetAnimationsCount() == 1);
 
-  auto &animation = spriteConfiguration->GetAnimation(0);
+  auto &animation = spriteConfiguration->GetAnimations().GetAnimation(0);
   REQUIRE(animation.GetName() == "Idle");
 };
 
@@ -224,5 +224,42 @@ TEST_CASE("ObjectSerialization", "[common]") {
 
     auto clonedObject = object.Clone();
     CheckCustomObjectConfiguration(*(clonedObject.get()));
+  }
+
+  SECTION("Exclude default behaviors from serialization") {
+    gd::Platform platform;
+    gd::Project project;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    gd::Layout &layout = project.InsertNewLayout("Scene", 0);
+    gd::Object &object = layout.InsertNewObject(
+        project, "MyExtension::FakeObjectWithDefaultBehavior", "MyObject", 0);
+    REQUIRE(object.HasBehaviorNamed("Effect"));
+
+    object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+
+    SerializerElement projectElement;
+    project.SerializeTo(projectElement);
+
+    // Check serialized behaviors.
+    auto &layoutsElement = projectElement.GetChild("layouts");
+    layoutsElement.ConsiderAsArrayOf("layout");
+    REQUIRE(layoutsElement.GetChildrenCount() == 1);
+    auto &layoutElement = layoutsElement.GetChild(0);
+
+    REQUIRE(layoutElement.GetStringAttribute("name") == "Scene");
+    REQUIRE(layoutElement.HasChild("objects"));
+
+    auto &objectsElement = layoutElement.GetChild("objects");
+    objectsElement.ConsiderAsArrayOf("object");
+    REQUIRE(objectsElement.GetChildrenCount() == 1);
+    auto &objectElement = objectsElement.GetChild(0);
+
+    auto &behaviorsElement = objectElement.GetChild("behaviors");
+    behaviorsElement.ConsiderAsArrayOf("behavior");
+    REQUIRE(behaviorsElement.GetChildrenCount() == 1);
+    auto &behaviorElement = behaviorsElement.GetChild(0);
+    REQUIRE(behaviorElement.GetStringAttribute("name") == "MyBehavior");
   }
 }

@@ -6,7 +6,6 @@ import { mapReverseFor } from '../Utils/MapFor';
 import LayerRow, { styles } from './LayerRow';
 import BackgroundColorRow from './BackgroundColorRow';
 import { Column, Line } from '../UI/Grid';
-import Add from '@material-ui/icons/Add';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import ScrollView from '../UI/ScrollView';
 import { FullSizeMeasurer } from '../UI/FullSizeMeasurer';
@@ -15,23 +14,37 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { makeDropTarget } from '../UI/DragAndDrop/DropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+import Add from '../UI/CustomSvgIcons/Add';
+import { addDefaultLightToLayer } from '../ProjectCreation/CreateProject';
+import { getEffects2DCount, getEffects3DCount } from '../EffectsList';
+import ErrorBoundary from '../UI/ErrorBoundary';
+
+const gd: libGDevelop = global.gd;
 
 const DropTarget = makeDropTarget('layers-list');
 
 type LayersListBodyProps = {|
+  project: gdProject,
   layersContainer: gdLayout,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   unsavedChanges?: ?UnsavedChanges,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
-  onRenameLayer: (
-    oldName: string,
-    newName: string,
-    cb: (done: boolean) => void
-  ) => void,
+  onLayerRenamed: () => void,
   onEditEffects: (layer: ?gdLayer) => void,
   onEdit: (layer: ?gdLayer) => void,
   width: number,
 |};
+
+const getEffectsCount = (platform: gdPlatform, layer: gdLayer) => {
+  const effectsContainer = layer.getEffects();
+  return layer.getRenderingType() === '2d'
+    ? getEffects2DCount(platform, effectsContainer)
+    : layer.getRenderingType() === '3d'
+    ? getEffects3DCount(platform, effectsContainer)
+    : effectsContainer.getEffectsCount();
+};
 
 const LayersListBody = (props: LayersListBodyProps) => {
   const forceUpdate = useForceUpdate();
@@ -42,33 +55,40 @@ const LayersListBody = (props: LayersListBodyProps) => {
   const draggedLayerIndexRef = React.useRef<number | null>(null);
 
   const {
+    project,
     layersContainer,
     onEditEffects,
     onEdit,
     width,
-    onRenameLayer,
+    onLayerRenamed,
     onRemoveLayer,
     unsavedChanges,
   } = props;
 
-  const onLayerModified = () => {
-    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-    forceUpdate();
-  };
+  const onLayerModified = React.useCallback(
+    () => {
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
-  const onDropLayer = (targetIndex: number) => {
-    const { current: draggedLayerIndex } = draggedLayerIndexRef;
-    if (draggedLayerIndex === null) return;
+  const onDropLayer = React.useCallback(
+    (targetIndex: number) => {
+      const { current: draggedLayerIndex } = draggedLayerIndexRef;
+      if (draggedLayerIndex === null) return;
 
-    if (targetIndex !== draggedLayerIndex) {
-      layersContainer.moveLayer(
-        draggedLayerIndex,
-        targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
-      );
-      onLayerModified();
-    }
-    draggedLayerIndexRef.current = null;
-  };
+      if (targetIndex !== draggedLayerIndex) {
+        layersContainer.moveLayer(
+          draggedLayerIndex,
+          targetIndex < draggedLayerIndex ? targetIndex + 1 : targetIndex
+        );
+        onLayerModified();
+      }
+      draggedLayerIndexRef.current = null;
+    },
+    [layersContainer, onLayerModified]
+  );
 
   const layersCount = layersContainer.getLayersCount();
   const containerLayersList = mapReverseFor(0, layersCount, i => {
@@ -80,8 +100,10 @@ const LayersListBody = (props: LayersListBodyProps) => {
         key={`layer-${layer.ptr}`}
         id={`layer-${i}`}
         layer={layer}
+        isSelected={props.selectedLayer === layerName}
+        onSelect={() => props.onSelectLayer(layerName)}
         nameError={nameErrors[layerName]}
-        effectsCount={layer.getEffects().getEffectsCount()}
+        effectsCount={getEffectsCount(project.getCurrentPlatform(), layer)}
         onEditEffects={() => onEditEffects(layer)}
         onEdit={() => onEdit(layer)}
         onBeginDrag={() => {
@@ -103,10 +125,15 @@ const LayersListBody = (props: LayersListBodyProps) => {
               [layerName]: <Trans>The name {newName} is already taken</Trans>,
             }));
           } else {
-            onRenameLayer(layerName, newName, doRename => {
-              if (doRename)
-                layersContainer.getLayer(layerName).setName(newName);
-            });
+            layersContainer.getLayer(layerName).setName(newName);
+            gd.WholeProjectRefactorer.renameLayer(
+              project,
+              layersContainer,
+              layerName,
+              newName
+            );
+            onLayerRenamed();
+            onLayerModified();
           }
         }}
         onRemove={() => {
@@ -120,6 +147,11 @@ const LayersListBody = (props: LayersListBodyProps) => {
         isVisible={layer.getVisibility()}
         onChangeVisibility={visible => {
           layer.setVisibility(visible);
+          onLayerModified();
+        }}
+        isLocked={layer.isLocked()}
+        onChangeLockState={isLocked => {
+          layer.setLocked(isLocked);
           onLayerModified();
         }}
         width={width}
@@ -161,15 +193,13 @@ const LayersListBody = (props: LayersListBodyProps) => {
 
 type Props = {|
   project: gdProject,
+  selectedLayer: string,
+  onSelectLayer: string => void,
   layersContainer: gdLayout,
   onEditLayerEffects: (layer: ?gdLayer) => void,
   onEditLayer: (layer: ?gdLayer) => void,
   onRemoveLayer: (layerName: string, cb: (done: boolean) => void) => void,
-  onRenameLayer: (
-    oldName: string,
-    newName: string,
-    cb: (done: boolean) => void
-  ) => void,
+  onLayerRenamed: () => void,
   onCreateLayer: () => void,
   unsavedChanges?: ?UnsavedChanges,
 
@@ -177,9 +207,9 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-export type LayersListInterface = {
+export type LayersListInterface = {|
   forceUpdate: () => void,
-};
+|};
 
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
@@ -204,6 +234,9 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
         layersContainer.hasLayerNamed(name)
       );
       layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
+      const newLayer = layersContainer.getLayer(name);
+      addDefaultLightToLayer(newLayer);
+
       onLayerModified();
       props.onCreateLayer();
     };
@@ -242,11 +275,14 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
               // using SortableVirtualizedItemList.
               <LayersListBody
                 key={listKey}
+                selectedLayer={props.selectedLayer}
+                onSelectLayer={props.onSelectLayer}
+                project={props.project}
                 layersContainer={props.layersContainer}
                 onEditEffects={props.onEditLayerEffects}
                 onEdit={props.onEditLayer}
                 onRemoveLayer={props.onRemoveLayer}
-                onRenameLayer={props.onRenameLayer}
+                onLayerRenamed={props.onLayerRenamed}
                 unsavedChanges={props.unsavedChanges}
                 width={width}
               />
@@ -276,4 +312,16 @@ const LayersList = React.forwardRef<Props, LayersListInterface>(
   }
 );
 
-export default LayersList;
+const LayersListWithErrorBoundary = React.forwardRef<
+  Props,
+  LayersListInterface
+>((props, ref) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Layers list</Trans>}
+    scope="scene-editor-layers-list"
+  >
+    <LayersList ref={ref} {...props} />
+  </ErrorBoundary>
+));
+
+export default LayersListWithErrorBoundary;

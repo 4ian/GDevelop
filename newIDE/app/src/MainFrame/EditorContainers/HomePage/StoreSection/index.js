@@ -9,35 +9,54 @@ import { Trans } from '@lingui/macro';
 import { AssetStoreContext } from '../../../../AssetStore/AssetStoreContext';
 import AssetPackInstallDialog from '../../../../AssetStore/AssetPackInstallDialog';
 import { enumerateAssetStoreIds } from '../../../../AssetStore/EnumerateAssetStoreIds';
+import { type PrivateGameTemplateListingData } from '../../../../Utils/GDevelopServices/Shop';
+import ErrorBoundary from '../../../../UI/ErrorBoundary';
+import { getAssetShortHeadersToDisplay } from '../../../../AssetStore/AssetsList';
 
 type Props = {|
   project: ?gdProject,
   resourceManagementProps: ResourceManagementProps,
   canInstallPrivateAsset: () => boolean,
+  onOpenPrivateGameTemplateListingData: (
+    privateGameTemplateListingData: PrivateGameTemplateListingData
+  ) => void,
+  onOpenProfile: () => void,
 |};
 
 const StoreSection = ({
   project,
   resourceManagementProps,
   canInstallPrivateAsset,
+  onOpenPrivateGameTemplateListingData,
+  onOpenProfile,
 }: Props) => {
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const { searchResults, navigationState } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    assetShortHeadersSearchResults,
+    shopNavigationState,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
-  } = navigationState.getCurrentPage();
+    selectedFolders,
+  } = shopNavigationState.getCurrentPage();
 
-  const assetShortHeadersToInstall = openedAssetShortHeader
-    ? [openedAssetShortHeader]
-    : openedAssetPack
-    ? searchResults
-    : [];
+  const displayedAssetShortHeaders = React.useMemo(
+    () => {
+      return openedAssetShortHeader
+        ? [openedAssetShortHeader]
+        : assetShortHeadersSearchResults
+        ? getAssetShortHeadersToDisplay(
+            assetShortHeadersSearchResults,
+            selectedFolders
+          )
+        : [];
+    },
+    [openedAssetShortHeader, assetShortHeadersSearchResults, selectedFolders]
+  );
 
   const existingAssetStoreIds = React.useMemo(
     () => {
@@ -60,42 +79,53 @@ const StoreSection = ({
     <SectionContainer
       title={null /* Give the asset store the full space to display */}
       flexBody
+      noScroll
     >
-      <AssetStore />
-      <Line justifyContent="flex-end">
-        <RaisedButton
-          primary
-          onClick={() => {
-            if (!project) {
-              return; // TODO: create a project, await, and then show dialog.
-            }
+      <AssetStore
+        onOpenPrivateGameTemplateListingData={
+          onOpenPrivateGameTemplateListingData
+        }
+        displayPromotions
+        onOpenProfile={onOpenProfile}
+      />
+      {(openedAssetPack || openedAssetShortHeader) && (
+        <Line justifyContent="flex-end">
+          <RaisedButton
+            primary
+            onClick={() => {
+              if (!project) {
+                return; // TODO: create a project, await, and then show dialog.
+              }
 
-            setIsAssetPackDialogInstallOpen(true);
-          }}
-          disabled={!project || !assetShortHeadersToInstall.length}
-          label={
-            project ? (
-              openedAssetPack ? (
-                <Trans>Add assets from this pack to the project</Trans>
-              ) : assetShortHeadersToInstall.length === 1 ? (
-                <Trans>Add this asset to the project</Trans>
+              setIsAssetPackDialogInstallOpen(true);
+            }}
+            disabled={!project || !displayedAssetShortHeaders.length}
+            label={
+              project ? (
+                openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                  <Trans>Add this asset to the project</Trans>
+                ) : (
+                  <Trans>Add these assets to the project</Trans>
+                )
+              ) : openedAssetShortHeader ||
+                displayedAssetShortHeaders.length === 1 ? (
+                <Trans>Create a project first to add this asset</Trans>
               ) : (
-                <Trans>Add these assets to the project</Trans>
+                <Trans>
+                  Create a project first to add assets from the asset store
+                </Trans>
               )
-            ) : (
-              <Trans>
-                Create a project first to add assets from the asset store
-              </Trans>
-            )
-          }
-        />
-      </Line>
+            }
+          />
+        </Line>
+      )}
       {project &&
         isAssetPackDialogInstallOpen &&
-        !!assetShortHeadersToInstall.length && (
+        !!displayedAssetShortHeaders.length && (
           <AssetPackInstallDialog
             assetPack={openedAssetPack}
-            assetShortHeaders={assetShortHeadersToInstall}
+            assetShortHeaders={displayedAssetShortHeaders}
             addedAssetIds={existingAssetStoreIds}
             onClose={() => setIsAssetPackDialogInstallOpen(false)}
             onAssetsAdded={() => {
@@ -112,4 +142,13 @@ const StoreSection = ({
   );
 };
 
-export default StoreSection;
+const StoreSectionWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Shop section</Trans>}
+    scope="start-page-shop"
+  >
+    <StoreSection {...props} />
+  </ErrorBoundary>
+);
+
+export default StoreSectionWithErrorBoundary;

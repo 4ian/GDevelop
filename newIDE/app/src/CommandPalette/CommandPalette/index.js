@@ -7,11 +7,27 @@ import { makeStyles } from '@material-ui/core/styles';
 import CommandsContext from '../CommandsContext';
 import {
   type NamedCommand,
+  type GoToWikiCommand,
   type NamedCommandWithOptions,
   type CommandOption,
 } from '../CommandManager';
 import AutocompletePicker from './AutocompletePicker';
 import commandsList, { type CommandName } from '../CommandsList';
+import Window from '../../Utils/Window';
+import Command from '../../UI/CustomSvgIcons/Command';
+import {
+  searchClient,
+  type AlgoliaSearchHit,
+  indexName,
+} from '../../Utils/AlgoliaSearch';
+
+import {
+  InstantSearch,
+  useInstantSearch,
+  useSearchBox,
+} from 'react-instantsearch-hooks';
+import { useDebounce } from '../../Utils/UseDebounce';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
 
 // Show the command palette dialog at the top of the screen
 const useStyles = makeStyles({
@@ -38,17 +54,39 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
   (props, ref) => {
     const classes = useStyles();
     const paperClasses = useStylesForPaper();
+    const { isMobile } = useResponsiveWindowSize();
+    const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
     const [
       selectedCommand,
       selectCommand,
     ] = React.useState<null | NamedCommandWithOptions>(null);
+    const { results, status } = useInstantSearch();
+    const { refine } = useSearchBox();
+    const [
+      algoliaSearchStableStatus,
+      setAlgoliaSearchStableStatus,
+    ] = React.useState<'error' | 'ok'>('ok');
 
-    // Takes a command and if simple command, executes handler
-    // If command with options, opens options of the palette
+    React.useEffect(
+      () => {
+        if (algoliaSearchStableStatus === 'ok' && status === 'error') {
+          setAlgoliaSearchStableStatus('error');
+        } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
+          setAlgoliaSearchStableStatus('ok');
+        }
+      },
+      [status, algoliaSearchStableStatus]
+    );
+    const shouldHideAlgoliaSearchResults =
+      !searchText || algoliaSearchStableStatus === 'error';
+    /**
+     * Takes a command and if simple command, executes handler.
+     * If command with options, opens options of the palette.
+     */
     const handleCommandChoose = React.useCallback(
-      (command: NamedCommand) => {
+      (command: NamedCommand | GoToWikiCommand) => {
         if (command.handler) {
           // Simple command
           command.handler();
@@ -65,20 +103,23 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       [selectCommand, setMode]
     );
 
-    // Executes handler of a command option and closes palette
+    /**
+     * Executes handler of a command option and closes palette
+     */
     const handleOptionChoose = (option: CommandOption) => {
       option.handler();
       setMode('closed');
     };
 
-    // Opens the palette in command mode
     const openPalette = React.useCallback((open? = true) => {
       if (open) setMode('command');
       else setMode('closed');
     }, []);
 
-    // Takes command name, gets command object from
-    // manager and launches command accordingly
+    /**
+     * Takes command name, gets command object from
+     * manager and launches command accordingly
+     */
     const launchCommand = React.useCallback(
       commandName => {
         const command = commandManager.getNamedCommand(commandName);
@@ -93,11 +134,45 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
       launchCommand,
     }));
 
+    const launchSearch = useDebounce(() => {
+      if (searchText) {
+        refine(searchText);
+      }
+    }, 200);
+
+    React.useEffect(launchSearch, [searchText, launchSearch]);
+
+    const allCommands: Array<NamedCommand | GoToWikiCommand> = React.useMemo(
+      () => {
+        const namedCommands = commandManager
+          .getAllNamedCommands()
+          .filter(command => !commandsList[command.name].ghost)
+          // $FlowFixMe[incompatible-type]
+          .map(command => ({ ...command, icon: <Command /> }));
+        if (shouldHideAlgoliaSearchResults) return namedCommands;
+
+        const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
+          (hit: AlgoliaSearchHit) => {
+            return {
+              hit,
+              handler: () => Window.openExternalURL(hit.url),
+            };
+          }
+        );
+        return namedCommands.concat(algoliaCommands);
+      },
+      [commandManager, results.hits, shouldHideAlgoliaSearchResults]
+    );
+
+    const closeDialog = React.useCallback(() => {
+      setMode('closed');
+    }, []);
+
     return (
       <I18n>
         {({ i18n }) => (
           <Dialog
-            onClose={() => setMode('closed')}
+            onClose={closeDialog}
             aria-label="command-palette"
             open={mode !== 'closed'}
             fullWidth
@@ -111,15 +186,14 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
               // Command picker
               <AutocompletePicker
                 i18n={i18n}
-                items={
-                  (commandManager
-                    .getAllNamedCommands()
-                    .filter(
-                      command => !commandsList[command.name].ghost
-                    ): Array<NamedCommand>)
+                onInputChange={setSearchText}
+                items={allCommands}
+                placeholder={
+                  isMobile
+                    ? t`Search`
+                    : t`Start typing a command or searching something...`
                 }
-                placeholder={t`Start typing a command...`}
-                onClose={() => setMode('closed')}
+                onClose={closeDialog}
                 onSelect={handleCommandChoose}
               />
             )}
@@ -129,7 +203,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                 i18n={i18n}
                 items={selectedCommand.generateOptions()}
                 placeholder={commandsList[selectedCommand.name]}
-                onClose={() => setMode('closed')}
+                onClose={closeDialog}
                 onSelect={handleOptionChoose}
               />
             )}
@@ -139,5 +213,14 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     );
   }
 );
+
+export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
+  {},
+  CommandPaletteInterface
+>((props, ref) => (
+  <InstantSearch searchClient={searchClient} indexName={indexName}>
+    <CommandPalette ref={ref} />
+  </InstantSearch>
+));
 
 export default CommandPalette;

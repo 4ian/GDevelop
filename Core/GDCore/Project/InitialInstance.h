@@ -73,22 +73,52 @@ class GD_CORE_API InitialInstance {
   void SetY(double y_) { y = y_; }
 
   /**
-   * \brief Get the rotation of the instance, in radians.
+   * \brief Get the Z position of the instance
+   */
+  double GetZ() const { return z; }
+
+  /**
+   * \brief Set the Z position of the instance
+   */
+  void SetZ(double z_) { z = z_; }
+
+  /**
+   * \brief Get the rotation of the instance on Z axis, in radians.
    */
   double GetAngle() const { return angle; }
 
   /**
-   * \brief Set the rotation of the instance, in radians.
+   * \brief Set the rotation of the instance on Z axis, in radians.
    */
   void SetAngle(double angle_) { angle = angle_; }
 
   /**
-   * \brief Get the Z order of the instance.
+   * \brief Get the rotation of the instance on X axis, in radians.
+   */
+  double GetRotationX() const { return rotationX; }
+
+  /**
+   * \brief Set the rotation of the instance on X axis, in radians.
+   */
+  void SetRotationX(double rotationX_) { rotationX = rotationX_; }
+
+  /**
+   * \brief Get the rotation of the instance on Y axis, in radians.
+   */
+  double GetRotationY() const { return rotationY; }
+
+  /**
+   * \brief Set the rotation of the instance on Y axis, in radians.
+   */
+  void SetRotationY(double rotationY_) { rotationY = rotationY_; }
+
+  /**
+   * \brief Get the Z order of the instance (for a 2D object).
    */
   int GetZOrder() const { return zOrder; }
 
   /**
-   * \brief Set the Z order of the instance.
+   * \brief Set the Z order of the instance (for a 2D object).
    */
   void SetZOrder(int zOrder_) { zOrder = zOrder_; }
 
@@ -103,29 +133,51 @@ class GD_CORE_API InitialInstance {
   void SetLayer(const gd::String& layer_) { layer = layer_; }
 
   /**
-   * \brief Return true if the instance has a size which is different from its
-   * object default size.
+   * \brief Return true if the instance has a width/height which is different from its
+   * object default width/height. This is independent from `HasCustomDepth`.
    *
    * \see gd::Object
    */
-  bool HasCustomSize() const { return personalizedSize; }
+  bool HasCustomSize() const { return customSize; }
 
   /**
-   * \brief Set whether the instance has a size which is different from its
-   * object default size or not.
+   * \brief Return true if the instance has a depth which is different from its
+   * object default depth. This is independent from `HasCustomSize`.
    *
-   * \param hasCustomSize true if the size is different from the object's
-   * default size. \see gd::Object
+   * \see gd::Object
+   */
+  bool HasCustomDepth() const { return customDepth; }
+
+  /**
+   * \brief Set whether the instance has a width/height which is different from its
+   * object default width/height or not.
+   * This is independent from `SetHasCustomDepth`.
+   *
+   * \see gd::Object
    */
   void SetHasCustomSize(bool hasCustomSize_) {
-    personalizedSize = hasCustomSize_;
+    customSize = hasCustomSize_;
+  }
+
+  /**
+   * \brief Set whether the instance has a depth which is different from its
+   * object default depth or not.
+   * This is independent from `SetHasCustomSize`.
+   *
+   * \param hasCustomSize true if the depth is different from the object's
+   * default depth.
+   * \see gd::Object
+   */
+  void SetHasCustomDepth(bool hasCustomDepth_) {
+    customDepth = hasCustomDepth_;
   }
 
   double GetCustomWidth() const { return width; }
   void SetCustomWidth(double width_) { width = width_; }
-
   double GetCustomHeight() const { return height; }
   void SetCustomHeight(double height_) { height = height_; }
+  double GetCustomDepth() const { return depth; }
+  void SetCustomDepth(double depth_) { depth = depth_; }
 
   /**
    * \brief Return true if the instance is locked and cannot be moved in the
@@ -153,6 +205,17 @@ class GD_CORE_API InitialInstance {
    * layout editor canvas.
    */
   void SetSealed(bool enable = true) { sealed = enable; }
+
+  /**
+   * \brief Return true if the dimensions (width, height and depth) should keep
+   * the same ratio.
+   */
+  bool ShouldKeepRatio() const { return keepRatio; };
+
+  /**
+   * \brief Define if instance's dimensions should keep the same ratio.
+   */
+  void SetShouldKeepRatio(bool enable = true) { keepRatio = enable; }
 
   ///@}
 
@@ -193,7 +256,6 @@ class GD_CORE_API InitialInstance {
    * \see gd::Object
    */
   ///@{
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a map containing the properties names (as keys) and their
    * values.
@@ -213,7 +275,6 @@ class GD_CORE_API InitialInstance {
                             const gd::String& value,
                             gd::Project& project,
                             gd::Layout& layout);
-#endif
 
   /**
    * \brief Get the value of a double property stored in the instance.
@@ -274,22 +335,29 @@ class GD_CORE_API InitialInstance {
       stringProperties;  ///< More data which can be used by the object
 
   gd::String objectName;  ///< Object name
-  double x;               ///< Object initial X position
-  double y;               ///< Object initial Y position
-  double angle;           ///< Object initial angle
-  int zOrder;             ///< Object initial Z order
-  gd::String layer;       ///< Object initial layer
-  bool personalizedSize;  ///< True if object has a custom size
-  double width;           ///< Object custom width
-  double height;          ///< Object custom height
+  double x;               ///< Instance X position
+  double y;               ///< Instance Y position
+  double z;               ///< Instance Z position (for a 3D object)
+  double angle;           ///< Instance angle on Z axis
+  double rotationX;       ///< Instance angle on X axis (for a 3D object)
+  double rotationY;       ///< Instance angle on Y axis (for a 3D object)
+  int zOrder;             ///< Instance Z order (for a 2D object)
+  gd::String layer;       ///< Instance layer
+  bool customSize;        ///< True if object has a custom width and height
+  bool customDepth;       ///< True if object has a custom depth
+  double width;           ///< Instance custom width
+  double height;          ///< Instance custom height
+  double depth;           ///< Instance custom depth
   gd::VariablesContainer initialVariables;  ///< Instance specific variables
   bool locked;                              ///< True if the instance is locked
   bool sealed;                              ///< True if the instance is sealed
+  bool keepRatio;                           ///< True if the instance's dimensions
+                                            ///  should keep the same ratio.
   mutable gd::String persistentUuid;  ///< A persistent random version 4 UUID,
-                                      ///< useful for hot reloading.
+                                      ///  useful for hot reloading.
 
   static gd::String*
-      badStringProperyValue;  ///< Empty string returned by GetRawStringProperty
+      badStringPropertyValue;  ///< Empty string returned by GetRawStringProperty
 };
 
 }  // namespace gd

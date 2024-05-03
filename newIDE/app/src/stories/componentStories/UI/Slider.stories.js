@@ -2,16 +2,15 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import Slider from '../../../UI/Slider';
 import ValueStateHolder from '../../ValueStateHolder';
 
 export default {
-  title: 'Slider',
+  title: 'UI Building Blocks/Slider',
   component: Slider,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => (

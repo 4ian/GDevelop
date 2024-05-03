@@ -1,10 +1,23 @@
 // @flow
 import axios from 'axios';
+import capitalize from 'lodash/capitalize';
 import { type I18n as I18nType } from '@lingui/core';
 import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
 import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 import { t } from '@lingui/macro';
+
+export type CachedGameSlug = {
+  username: string,
+  gameSlug: string,
+};
+
+export type GameSlug = {
+  username: string,
+  gameSlug: string,
+  createdAt: number,
+};
 
 export type PublicGame = {
   id: string,
@@ -40,17 +53,12 @@ export type Game = {
   acceptsBuildComments?: boolean,
   acceptsGameComments?: boolean,
   displayAdsOnGamePage?: boolean,
+  cachedCurrentSlug?: CachedGameSlug,
 };
 
 export type GameCategory = {
   name: string,
   type: 'user-defined' | 'admin-only',
-};
-
-export type GameSlug = {
-  username: string,
-  gameSlug: string,
-  createdAt: number,
 };
 
 export type ShowcasedGameLink = {
@@ -90,9 +98,57 @@ export type GameApiError = {|
   code: 'game-deletion/leaderboards-exist',
 |};
 
-const capitalize = (str: string) => {
-  return str ? str[0].toUpperCase() + str.substr(1) : '';
+export type FeaturingType =
+  | 'games-platform-home'
+  | 'games-platform-game-page'
+  | 'games-platform-listing'
+  | 'socials-newsletter'
+  | 'gdevelop-banner';
+
+export type GameFeaturing = {|
+  gameId: string,
+  featuring: FeaturingType,
+  createdAt: number, // in seconds.
+  updatedAt: number, // in seconds.
+  expiresAt: number, // in seconds.
+|};
+
+export type GameUsageType =
+  | 'featuring-basic'
+  | 'featuring-pro'
+  | 'featuring-premium';
+
+export type MarketingPlan = {|
+  id: GameUsageType,
+  icon: string,
+  canExtend: boolean,
+  requiresManualContact: boolean,
+  includedFeaturings: FeaturingType[],
+  gameRequirements: {
+    hasThumbnail?: boolean,
+    isPublished?: boolean,
+    isDiscoverable?: boolean,
+  },
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
+  additionalSuccessMessageByLocale: MessageByLocale,
+|};
+
+export type GameLeaderboardEntry = {
+  count: number | null,
+  publicGame: PublicGame | null,
 };
+
+export type GameLeaderboard = {
+  name: string,
+  displayNameByLocale: MessageByLocale,
+  topGameCommentQualityRatings: GameLeaderboardEntry[],
+};
+
+export const client = axios.create({
+  baseURL: GDevelopGameApi.baseUrl,
+});
 
 export const getCategoryName = (category: string, i18n: I18nType) => {
   switch (category) {
@@ -135,11 +191,23 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
+export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
+  const slug = game.cachedCurrentSlug;
   return slug
     ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
     : GDevelopGamesPlatform.getGameUrl(game.id);
+};
+
+export const getPublicGameUrl = (publicGame: ?PublicGame) => {
+  if (!publicGame) return null;
+
+  return publicGame.gameSlug && publicGame.userSlug
+    ? GDevelopGamesPlatform.getGameUrlWithSlug(
+        publicGame.userSlug,
+        publicGame.gameSlug
+      )
+    : GDevelopGamesPlatform.getGameUrl(publicGame.id);
 };
 
 export const getAclsFromUserIds = (
@@ -150,25 +218,38 @@ export const getAclsFromUserIds = (
     level: 'owner',
   }));
 
-export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
-  return axios
-    .get(`${GDevelopGameApi.baseUrl}/showcased-game`)
-    .then(response => response.data)
-    .then(({ gamesShowcaseUrl, filtersUrl }) => {
-      if (!gamesShowcaseUrl || !filtersUrl) {
-        throw new Error('Unexpected response from the resource endpoint.');
-      }
-      return Promise.all([
-        axios.get(gamesShowcaseUrl).then(response => response.data),
-        axios.get(filtersUrl).then(response => response.data),
-      ]).then(([showcasedGames, filters]) => ({
-        showcasedGames,
-        filters,
-      }));
-    });
+export const listAllShowcasedGames = async (): Promise<AllShowcasedGames> => {
+  const response = await client.get('/showcased-game');
+  const { gamesShowcaseUrl, filtersUrl } = response.data;
+  if (!gamesShowcaseUrl || !filtersUrl) {
+    throw new Error('Unexpected response from the resource endpoint.');
+  }
+
+  const responsesData = await Promise.all([
+    axios
+      .get(gamesShowcaseUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    axios
+      .get(filtersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+  ]);
+
+  if (responsesData.some(data => !data || data instanceof Error)) {
+    throw new Error('Unexpected response from the assets endpoints.');
+  }
+
+  const showcasedGames = responsesData[0];
+  const filters = responsesData[1];
+
+  return {
+    showcasedGames,
+    filters,
+  };
 };
 
-export const registerGame = (
+export const registerGame = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   {
@@ -183,29 +264,29 @@ export const registerGame = (
     templateSlug: string,
   |}
 ): Promise<Game> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopGameApi.baseUrl}/game/${gameId}`,
-        {
-          gameName,
-          authorName,
-          templateSlug,
-        },
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.post(
+    `/game/${gameId}`,
+    {
+      gameName,
+      authorName,
+      templateSlug,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
-export const updateGame = (
+export const updateGame = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string,
@@ -241,40 +322,39 @@ export const updateGame = (
     displayAdsOnGamePage?: boolean,
   |}
 ): Promise<Game> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.patch(
-        `${GDevelopGameApi.baseUrl}/game/${gameId}`,
-        {
-          gameName,
-          categories,
-          authorName,
-          publicWebBuildId,
-          description,
-          playWithKeyboard,
-          playWithGamepad,
-          playWithMobile,
-          orientation,
-          thumbnailUrl,
-          discoverable,
-          acceptsBuildComments,
-          acceptsGameComments,
-          displayAdsOnGamePage,
-        },
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.patch(
+    `/game/${gameId}`,
+    {
+      gameName,
+      categories,
+      authorName,
+      publicWebBuildId,
+      description,
+      playWithKeyboard,
+      playWithGamepad,
+      playWithMobile,
+      orientation,
+      thumbnailUrl,
+      discoverable,
+      acceptsBuildComments,
+      acceptsGameComments,
+      displayAdsOnGamePage,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
-export const setGameUserAcls = (
+export const setGameUserAcls = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string,
@@ -283,140 +363,175 @@ export const setGameUserAcls = (
     author?: Array<{| userId: string, level: string |}>,
   |}
 ): Promise<void> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopGameApi.baseUrl}/game/action/set-acls`,
-        {
-          gameId,
-          newAcls: acls,
-        },
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    '/game/action/set-acls',
+    {
+      gameId,
+      newAcls: acls,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
-export const setGameSlug = (
+export const setGameSlug = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string,
   userSlug: string,
   gameSlug: string
 ): Promise<void> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopGameApi.baseUrl}/game/action/set-slug`,
-        {
-          gameId,
-          userSlug,
-          gameSlug,
-        },
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.post(
+    '/game/action/set-slug',
+    {
+      gameId,
+      userSlug,
+      gameSlug,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
-export const getGame = (
+export const getGame = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string
 ): Promise<Game> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopGameApi.baseUrl}/game/${gameId}`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/game/${gameId}`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return response.data;
 };
 
-export const deleteGame = (
+export const deleteGame = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string
 ): Promise<Game> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.delete(`${GDevelopGameApi.baseUrl}/game/${gameId}`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.delete(`/game/${gameId}`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getGames = (
+export const getGames = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Array<Game>> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopGameApi.baseUrl}/game`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await client.get('/game', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return response.data;
 };
 
-export const getPublicGame = (gameId: string): Promise<PublicGame> => {
-  return axios
-    .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
-    .then(response => response.data);
+export const getPublicGame = async (gameId: string): Promise<PublicGame> => {
+  const response = await client.get(`/public-game/${gameId}`);
+  return response.data;
 };
 
-export const getGameSlugs = (
+export const getGameCategories = async (): Promise<GameCategory[]> => {
+  const response = await client.get('/game-category');
+  return response.data;
+};
+
+export const buyGameFeaturing = async (
   getAuthorizationHeader: () => Promise<string>,
-  userId: string,
-  gameId: string
-): Promise<Array<GameSlug>> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
-        params: {
-          userId,
-          gameId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  {
+    gameId,
+    userId,
+    usageType,
+  }: {| gameId: string, userId: string, usageType: GameUsageType |}
+): Promise<void> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  await client.post(
+    '/game/action/buy-with-credits',
+    {},
+    {
+      params: {
+        userId,
+        gameId,
+        usageType,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
 };
 
-export const getGameCategories = (): Promise<GameCategory[]> => {
-  return axios
-    .get(`${GDevelopGameApi.baseUrl}/game-category`)
-    .then(response => response.data);
+export const listGameFeaturings = async (
+  getAuthorizationHeader: () => Promise<string>,
+  { gameId, userId }: {| gameId: string, userId: string |}
+): Promise<GameFeaturing[]> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/game-featuring', {
+    params: {
+      userId,
+      gameId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+
+  return response.data;
+};
+
+export const listMarketingPlans = async (): Promise<MarketingPlan[]> => {
+  const response = await client.get('/marketing-plan');
+  return response.data;
+};
+
+export const getGameCommentQualityRatingsLeaderboards = async (): Promise<
+  Array<GameLeaderboard>
+> => {
+  const response = await client.get(
+    '/game-comment-quality-ratings-leaderboard?leaderboardRegionName=global'
+  );
+
+  if (!Array.isArray(response.data)) {
+    throw new Error('Invalid response from the game leaderboard API');
+  }
+
+  return response.data;
 };

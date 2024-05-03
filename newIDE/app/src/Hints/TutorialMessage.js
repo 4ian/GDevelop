@@ -6,9 +6,9 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import AlertMessage from '../UI/AlertMessage';
 import Window from '../Utils/Window';
 import RaisedButton from '../UI/RaisedButton';
-import YouTubeIcon from '@material-ui/icons/YouTube';
-import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
+import Video from '../UI/CustomSvgIcons/Video';
+import Book from '../UI/CustomSvgIcons/Book';
 
 type Props = {|
   tutorial: Tutorial,
@@ -39,14 +39,12 @@ const TutorialMessage = ({ tutorial }: Props) => {
           )}
           renderRightButton={() => (
             <RaisedButton
-              icon={
-                tutorial.type === 'video' ? <YouTubeIcon /> : <MenuBookIcon />
-              }
+              icon={tutorial.type === 'video' ? <Video /> : <Book />}
               label={
                 tutorial.type === 'video' ? (
-                  <Trans>Watch the tutorial</Trans>
+                  <Trans>Watch tutorial</Trans>
                 ) : (
-                  <Trans>Read the tutorial</Trans>
+                  <Trans>Read tutorial</Trans>
                 )
               }
               onClick={() => {

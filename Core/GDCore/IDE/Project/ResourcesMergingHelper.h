@@ -28,11 +28,11 @@ namespace gd {
  * \ingroup IDE
  */
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
- public:
-  ResourcesMergingHelper(gd::AbstractFileSystem& fileSystem)
-      : ArbitraryResourceWorker(),
-        preserveDirectoriesStructure(false),
-        preserveAbsoluteFilenames(false),
+public:
+  ResourcesMergingHelper(gd::ResourcesManager &resourcesManager,
+                         gd::AbstractFileSystem &fileSystem)
+      : ArbitraryResourceWorker(resourcesManager),
+        preserveDirectoriesStructure(false), preserveAbsoluteFilenames(false),
         fs(fileSystem){};
   virtual ~ResourcesMergingHelper(){};
 
@@ -64,19 +64,25 @@ class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
    * the Base Directory.
    */
   std::map<gd::String, gd::String>& GetAllResourcesOldAndNewFilename() {
-    return oldFilenames;
+    return newFilenames;
   };
 
   /**
    * Resources merging helper collects all resources filenames and update these
    * filenames.
    */
-  virtual void ExposeFile(gd::String& resource) override;
+  void ExposeFile(gd::String& resource) override;
 
  protected:
   void SetNewFilename(gd::String oldFilename, gd::String newFilename);
 
+  /**
+   * Original file names that can be accessed by their new name.
+   */
   std::map<gd::String, gd::String> oldFilenames;
+  /**
+   * New file names that can be accessed by their original name.
+   */
   std::map<gd::String, gd::String> newFilenames;
   gd::String baseDirectory;
   bool preserveDirectoriesStructure;  ///< If set to true, the directory

@@ -1,26 +1,26 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 
 import ImageTileRow from '../../../../UI/ImageTileRow';
-import { type WidthType } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { type WindowSizeType } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Add from '../../../../UI/CustomSvgIcons/Add';
 import {
   itemsWithJustImage,
   itemsWithOverlay,
   itemsWithTitleAndDescription,
+  itemsWithLocks,
 } from './data';
 
 export default {
-  title: 'ImageTile/ImageTileRow',
+  title: 'UI Building Blocks/ImageTile/ImageTileRow',
   component: ImageTileRow,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
+const getColumnsFromWindowSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
     case 'small':
       return 1;
     case 'medium':
@@ -37,8 +37,8 @@ export const Default = () => (
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
@@ -49,8 +49,8 @@ export const Loading = () => (
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
@@ -61,8 +61,8 @@ export const WithDescription = () => (
     description="This is a description for the templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
@@ -72,8 +72,8 @@ export const WithTitleAndDescription = () => (
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
@@ -83,8 +83,19 @@ export const WithOverlay = () => (
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={getColumnsFromWidth}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
+  />
+);
+
+export const WithLocks = () => (
+  <ImageTileRow
+    items={itemsWithLocks}
+    title="Recommended templates"
+    onShowAll={() => {}}
+    showAllIcon={<Add fontSize="small" />}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={getColumnsFromWindowSize}
   />
 );
 
@@ -94,7 +105,7 @@ export const WithNoCroppingOnMobile = () => (
     title="Recommended templates"
     onShowAll={() => {}}
     showAllIcon={<Add fontSize="small" />}
-    getColumnsFromWidth={getColumnsFromWidth}
-    getLimitFromWidth={() => 5}
+    getColumnsFromWindowSize={getColumnsFromWindowSize}
+    getLimitFromWindowSize={() => 5}
   />
 );

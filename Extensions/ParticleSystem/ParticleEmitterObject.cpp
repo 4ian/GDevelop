@@ -52,7 +52,8 @@ ParticleEmitterBase::ParticleEmitterBase()
       particleAngleRandomness1(0),
       particleAngleRandomness2(0),
       maxParticleNb(300),
-      destroyWhenNoParticles(true) {}
+      destroyWhenNoParticles(true),
+      jumpForwardInTimeOnCreation(0.0f) {}
 
 ParticleEmitterObject::ParticleEmitterObject() {}
 
@@ -105,6 +106,7 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
       element.GetBoolAttribute("destroyWhenNoParticles", false);
   textureParticleName = element.GetStringAttribute("textureParticleName");
   maxParticleNb = element.GetIntAttribute("maxParticleNb", 5000);
+  jumpForwardInTimeOnCreation = element.GetDoubleAttribute("jumpForwardInTimeOnCreation");
 
   {
     gd::String result = element.GetStringAttribute("rendererType");
@@ -159,6 +161,7 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("destroyWhenNoParticles", destroyWhenNoParticles);
   element.SetAttribute("textureParticleName", textureParticleName);
   element.SetAttribute("maxParticleNb", (int)maxParticleNb);
+  element.SetAttribute("jumpForwardInTimeOnCreation", jumpForwardInTimeOnCreation);
 
   gd::String rendererTypeStr = "Point";
   if (rendererType == Line)
@@ -286,4 +289,5 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   particleAngleRandomness2 = other.particleAngleRandomness2;
   maxParticleNb = other.maxParticleNb;
   destroyWhenNoParticles = other.destroyWhenNoParticles;
+  jumpForwardInTimeOnCreation = other.jumpForwardInTimeOnCreation;
 }

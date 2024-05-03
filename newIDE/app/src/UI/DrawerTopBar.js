@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import Close from '@material-ui/icons/Close';
+import Cross from './CustomSvgIcons/Cross';
 import Tooltip from '@material-ui/core/Tooltip';
 import { tooltipEnterDelay } from './Tooltip';
 import { DialogTitleBar } from '../UI/Dialog';
@@ -14,6 +14,7 @@ const appBarHeight = 32;
 type Props = {|
   title: React.Node,
   onClose: () => void,
+  id: string,
 |};
 
 const styles = {
@@ -62,8 +63,9 @@ const DrawerTopBar = (props: Props) => {
             edge="end"
             color="inherit"
             size="small"
+            id={`${props.id}-close`}
           >
-            <Close />
+            <Cross />
           </IconButton>
         </Toolbar>
       </AppBar>

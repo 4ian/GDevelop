@@ -4,13 +4,11 @@
  * reserved. This project is released under the MIT License.
  */
 
-#ifndef GDCORE_ANIMATION_H
-#define GDCORE_ANIMATION_H
+#pragma once
+
 #include <vector>
 #include "GDCore/String.h"
-namespace gd {
-class Direction;
-}
+#include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
 
 namespace gd {
 
@@ -93,4 +91,3 @@ class GD_CORE_API Animation {
 };
 
 }  // namespace gd
-#endif  // GDCORE_ANIMATION_H

@@ -1,0 +1,17 @@
+diff --git a/node_modules/js-worker-search/.DS_Store b/node_modules/js-worker-search/.DS_Store
+new file mode 100644
+index 0000000..c88a062
+Binary files /dev/null and b/node_modules/js-worker-search/.DS_Store differ
+diff --git a/node_modules/js-worker-search/dist/js-worker-search.js b/node_modules/js-worker-search/dist/js-worker-search.js
+index 5e7ec51..e807e1c 100644
+--- a/node_modules/js-worker-search/dist/js-worker-search.js
++++ b/node_modules/js-worker-search/dist/js-worker-search.js
+@@ -1046,7 +1046,7 @@ module.exports =
+ 	/* WEBPACK VAR INJECTION */(function(global) {
+ 	var rng;
+ 	
+-	var crypto = global.crypto || global.msCrypto; // for IE 11
++	var crypto = global ? (global.crypto || global.msCrypto) : undefined; // for IE 11
+ 	if (crypto && crypto.getRandomValues) {
+ 	  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
+ 	  // Moderately fast, high quality

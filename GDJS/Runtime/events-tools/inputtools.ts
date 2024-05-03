@@ -141,6 +141,18 @@ namespace gdjs {
       }
 
       /**
+       * A hashmap associates each name of a mouse button with its respective code.
+       * @memberof gdjs.evtTools
+       */
+      export const mouseButtonsNameToCode = {
+        Left: gdjs.InputManager.MOUSE_LEFT_BUTTON,
+        Right: gdjs.InputManager.MOUSE_RIGHT_BUTTON,
+        Middle: gdjs.InputManager.MOUSE_MIDDLE_BUTTON,
+        Back: gdjs.InputManager.MOUSE_BACK_BUTTON,
+        Forward: gdjs.InputManager.MOUSE_FORWARD_BUTTON,
+      };
+
+      /**
        * Return true if the specified key is pressed
        *
        */
@@ -206,23 +218,13 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonPressed(0);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(1);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonPressed(2);
+            .isMouseButtonPressed(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };
@@ -231,23 +233,13 @@ namespace gdjs {
         instanceContainer: gdjs.RuntimeInstanceContainer,
         button: string
       ) {
-        if (button === 'Left') {
+        if (gdjs.evtTools.input.mouseButtonsNameToCode.hasOwnProperty(button)) {
           return instanceContainer
             .getGame()
             .getInputManager()
-            .isMouseButtonReleased(0);
-        }
-        if (button === 'Right') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(1);
-        }
-        if (button === 'Middle') {
-          return instanceContainer
-            .getGame()
-            .getInputManager()
-            .isMouseButtonReleased(2);
+            .isMouseButtonReleased(
+              gdjs.evtTools.input.mouseButtonsNameToCode[button]
+            );
         }
         return false;
       };
@@ -388,7 +380,7 @@ namespace gdjs {
           .isMouseInsideCanvas();
       };
 
-      export const _cursorIsOnObject = function (
+      const _cursorIsOnObject = function (
         obj: gdjs.RuntimeObject,
         instanceContainer: gdjs.RuntimeInstanceContainer
       ) {
@@ -402,7 +394,7 @@ namespace gdjs {
         inverted: boolean
       ) {
         return gdjs.evtTools.object.pickObjectsIf(
-          gdjs.evtTools.input._cursorIsOnObject,
+          _cursorIsOnObject,
           objectsLists,
           inverted,
           instanceContainer

@@ -34,16 +34,18 @@
 /* Separator draggable background (horizontal split) */
 .mosaic-gd-theme .mosaic-split.-column .mosaic-split-line {
   height: 2px;
-  background-color: var(--mosaic-layout-border-color);
-  width: 100px;
+  background-color: var(--mosaic-toolbar-border-color-hover);
+  opacity: 0;
+  border-radius: 2px;
+  width: 50px;
   margin: auto;
   top: 2px;
-  transition: all 0.1s ease-in-out;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .mosaic-gd-theme .mosaic-split.-column:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleY(2.5);
+  opacity: 1;
   box-shadow: none !important;
   cursor: ns-resize;
   z-index: 5;
@@ -52,16 +54,18 @@
 /* Separator draggable background (vertical split) */
 .mosaic-gd-theme .mosaic-split.-row .mosaic-split-line {
   width: 2px;
-  background-color: var(--mosaic-layout-border-color);
-  height: 100px;
+  background-color: var(--mosaic-toolbar-border-color-hover);
+  opacity: 0;
+  border-radius: 2px;
+  height: 50px;
   margin: auto;
   left: 2px;
-  transition: all 0.1s ease-in-out;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .mosaic-gd-theme .mosaic-split.-row:hover .mosaic-split-line {
   background-color: var(--mosaic-toolbar-border-color-hover);
-  transform: scaleX(2.5);
+  opacity: 1;
   box-shadow: none !important;
   cursor: ew-resize;
   z-index: 5;

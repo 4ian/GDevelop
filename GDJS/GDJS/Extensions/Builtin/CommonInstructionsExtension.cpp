@@ -46,10 +46,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   GetAllConditions()["BuiltinCommonInstructions::Always"].SetFunctionName(
       "gdjs.evtTools.common.logicalNegation");
 
-  GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(
-      [](gd::Instruction& instruction,
-         gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsCodeGenerationContext& context) {
+  GetAllConditions()["Egal"].SetCustomCodeGenerator(
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
         gd::String value1Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
                 codeGenerator,
@@ -57,8 +56,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 "number",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -68,16 +66,18 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
-               " " + value2Code + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString, value1Code, value2Code) +
+               ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
       .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
 
-  GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
+  GetAllConditions()["StrEqual"].SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
@@ -88,8 +88,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String value2Code =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -99,11 +98,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = (" + value1Code + " " + operatorCode +
-               " " + value2Code + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") + "(" +
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString, value1Code, value2Code) +
+               ");\n";
       });
   GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
       .codeExtraInformation =
@@ -135,15 +136,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
-        gd::String ifPredicat =
+        gd::String ifPredicate =
             event.GetConditions().empty()
                 ? ""
                 : codeGenerator.GenerateBooleanFullName(
-                      "condition" +
-                          gd::String::From(event.GetConditions().size() - 1) +
-                          "IsTrue",
-                      context) +
-                      ".val";
+                      "isConditionTrue",
+                      context);
 
         gd::EventsCodeGenerationContext actionsContext;
         actionsContext.Reuse(context);
@@ -161,7 +159,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String outputCode;
         outputCode += conditionsCode;
-        if (!ifPredicat.empty()) outputCode += "if (" + ifPredicat + ") ";
+        if (!ifPredicate.empty()) outputCode += "if (" + ifPredicate + ") ";
         outputCode += "{\n";
         outputCode += actionsDeclarationsCode;
         outputCode += actionsCode;
@@ -181,7 +179,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       });
 
   GetAllConditions()["BuiltinCommonInstructions::Or"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
@@ -189,6 +187,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String conditionsCode;
             gd::InstructionsList& conditions = instruction.GetSubInstructions();
 
+            // The Or "return" true by setting the upper boolean to true.
+            // So, it needs to be initialized to false.
+            conditionsCode += codeGenerator.GenerateUpperScopeBooleanFullName(
+                                    "isConditionTrue", parentContext) +
+                                " = false;\n";
             //"OR" condition must declare objects list, but without picking the
             // objects from the scene. Lists are either empty or come from a
             // parent event.
@@ -203,7 +206,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
               gd::String conditionCode = codeGenerator.GenerateConditionCode(
                   conditions[cId],
-                  "condition" + gd::String::From(cId) + "IsTrue",
+                  "isConditionTrue",
                   context);
 
               conditionsCode += "{\n";
@@ -217,14 +220,14 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               // If the condition is true : merge all objects picked in the
               // final object lists.
               conditionsCode +=
-                  "if( " +
+                  "if(" +
                   codeGenerator.GenerateBooleanFullName(
-                      "condition" + gd::String::From(cId) + "IsTrue", context) +
-                  ".val ) {\n";
+                      "isConditionTrue", context) +
+                  ") {\n";
               conditionsCode += "    " +
-                                codeGenerator.GenerateBooleanFullName(
-                                    "conditionTrue", context) +
-                                ".val = true;\n";
+                                codeGenerator.GenerateUpperScopeBooleanFullName(
+                                    "isConditionTrue", context) +
+                                " = true;\n";
               std::set<gd::String> objectsListsToBeDeclared =
                   context.GetAllObjectsToBeDeclared();
               for (set<gd::String>::iterator it =
@@ -240,8 +243,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                     gd::String::From(parentContext.GetContextDepth()) + "_" +
                     gd::String::From(parentContext.GetCurrentConditionDepth()) +
                     "final";
-                conditionsCode += "    for(var j = 0, jLen = " + objList +
-                                  ".length;j<jLen;++j) {\n";
+                conditionsCode += "    for (let j = 0, jLen = " + objList +
+                                  ".length; j < jLen ; ++j) {\n";
                 conditionsCode += "        if ( " + finalObjList + ".indexOf(" +
                                   objList + "[j]) === -1 )\n";
                 conditionsCode += "            " + finalObjList + ".push(" +
@@ -274,14 +277,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                   gd::String::From(parentContext.GetCurrentConditionDepth()) +
                   "final";
               codeGenerator.AddGlobalDeclaration(finalObjList + " = [];\n");
-              declarationsCode += finalObjList + ".length = 0;";
+              declarationsCode += finalObjList + ".length = 0;\n";
             }
-            for (unsigned int i = 0; i < conditions.size(); ++i)
-              declarationsCode +=
-                  codeGenerator.GenerateBooleanFullName(
-                      "condition" + gd::String::From(i) + "IsTrue",
-                      parentContext) +
-                  ".val = false;\n";
+            declarationsCode += "let " +
+                                codeGenerator.GenerateBooleanFullName(
+                                    "isConditionTrue", parentContext) +
+                                " = false;\n";
 
             // Generate code
             gd::String code;
@@ -309,7 +310,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           });
 
   GetAllConditions()["BuiltinCommonInstructions::And"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
@@ -318,91 +319,47 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             outputCode += codeGenerator.GenerateConditionsListCode(
                 instruction.GetSubInstructions(), parentContext);
 
-            gd::String predicat = "true";
-            for (unsigned int i = 0;
-                 i < instruction.GetSubInstructions().size();
-                 ++i)
-              predicat += " && " +
+            outputCode += codeGenerator.GenerateUpperScopeBooleanFullName(
+                              "isConditionTrue", parentContext) +
+                          " = " +
                           codeGenerator.GenerateBooleanFullName(
-                              "condition" + gd::String::From(i) + "IsTrue",
-                              parentContext) +
-                          ".val";
-
-            outputCode += codeGenerator.GenerateBooleanFullName("conditionTrue",
-                                                                parentContext) +
-                          ".val = " + predicat + ";\n";
+                              "isConditionTrue", parentContext) +
+                          ";\n";
 
             return outputCode;
           });
 
   GetAllConditions()["BuiltinCommonInstructions::Not"]
-      .codeExtraInformation.SetCustomCodeGenerator(
-          [](gd::Instruction& instruction,
-             gd::EventsCodeGenerator& codeGenerator,
-             gd::EventsCodeGenerationContext& context) {
-            gd::InstructionsList& conditions = instruction.GetSubInstructions();
+      .SetCustomCodeGenerator(
+          [](gd::Instruction &instruction,
+             gd::EventsCodeGenerator &codeGenerator,
+             gd::EventsCodeGenerationContext &parentContext) {
             gd::String outputCode;
 
-            for (unsigned int i = 0; i < conditions.size(); ++i) {
-              outputCode +=
-                  codeGenerator.GenerateBooleanFullName(
-                      "condition" + gd::String::From(i) + "IsTrue", context) +
-                  ".val = false;\n";
-            }
+            outputCode += codeGenerator.GenerateConditionsListCode(
+                instruction.GetSubInstructions(), parentContext);
 
-            for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
-              if (cId != 0)
-                outputCode +=
-                    "if ( !" +
-                    codeGenerator.GenerateBooleanFullName(
-                        "condition" + gd::String::From(cId - 1) + "IsTrue",
-                        context) +
-                    ".val ) {\n";
-
-              const gd::InstructionMetadata& instrInfos =
-                  gd::MetadataProvider::GetConditionMetadata(
-                      codeGenerator.GetPlatform(), conditions[cId].GetType());
-
-              gd::String conditionCode = codeGenerator.GenerateConditionCode(
-                  conditions[cId],
-                  "condition" + gd::String::From(cId) + "IsTrue",
-                  context);
-              if (!conditions[cId].GetType().empty()) {
-                outputCode += "{\n";
-                outputCode += conditionCode;
-                outputCode += "}";
-              }
-            }
-
-            for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
-              if (cId != 0) outputCode += "}\n";
-            }
-
-            if (!conditions.empty()) {
-              outputCode += codeGenerator.GenerateBooleanFullName(
-                                "conditionTrue", context) +
-                            ".val = !";
-              outputCode +=
-                  codeGenerator.GenerateBooleanFullName(
-                      "condition" + gd::String::From(conditions.size() - 1) +
-                          "IsTrue",
-                      context) +
-                  ".val;\n";
-            }
+            outputCode += codeGenerator.GenerateUpperScopeBooleanFullName(
+                              "isConditionTrue", parentContext) +
+                          " = !" +
+                          codeGenerator.GenerateBooleanFullName(
+                              "isConditionTrue", parentContext) +
+                          ";\n";
+            ;
 
             return outputCode;
           });
 
   GetAllConditions()["BuiltinCommonInstructions::Once"]
-      .codeExtraInformation.SetCustomCodeGenerator(
+      .SetCustomCodeGenerator(
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& context) {
             size_t uniqueId = codeGenerator.GenerateSingleUsageUniqueIdFor(
                 instruction.GetOriginalInstruction().lock().get());
-            gd::String outputCode = codeGenerator.GenerateBooleanFullName(
-                                        "conditionTrue", context) +
-                                    ".val = ";
+            gd::String outputCode = codeGenerator.GenerateUpperScopeBooleanFullName(
+                                        "isConditionTrue", context) +
+                                    " = ";
             gd::String contextObjectName = codeGenerator.HasProjectAndLayout()
                                                ? "runtimeScene"
                                                : "eventsFunctionContext";
@@ -437,42 +394,30 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String whileConditionsStr =
             codeGenerator.GenerateConditionsListCode(event.GetWhileConditions(),
                                                      context);
-        gd::String whileIfPredicat = "true";
+        gd::String whileIfPredicate = "true";
         if (!event.GetWhileConditions().empty())
-          whileIfPredicat =
-              codeGenerator.GenerateBooleanFullName(
-                  "condition" +
-                      gd::String::From(event.GetWhileConditions().size() - 1) +
-                      "IsTrue",
-                  context) +
-              ".val";
+          whileIfPredicate =
+              codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicat = "true";
+        gd::String ifPredicate = "true";
         if (!event.GetConditions().empty())
-          ifPredicat =
-              codeGenerator.GenerateBooleanFullName(
-                  "condition" +
-                      gd::String::From(event.GetConditions().size() - 1) +
-                      "IsTrue",
-                  context) +
-              ".val";
+          ifPredicate =
+              codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
         // Write final code
-        gd::String whileBoolean = codeGenerator.GetCodeNamespaceAccessor() +
-                                  "stopDoWhile" +
-                                  gd::String::From(context.GetContextDepth());
-        codeGenerator.AddGlobalDeclaration(whileBoolean + " = false;\n");
-        outputCode += whileBoolean + " = false;\n";
-        outputCode += "do {";
+        gd::String whileBoolean =
+            codeGenerator.GenerateBooleanFullName("stopDoWhile", context);
+        outputCode += "let " + whileBoolean + " = false;\n";
+        outputCode += "do {\n";
         outputCode += codeGenerator.GenerateObjectsDeclarationCode(context);
         outputCode += whileConditionsStr;
-        outputCode += "if (" + whileIfPredicat + ") {\n";
+        outputCode += "if (" + whileIfPredicate + ") {\n";
         outputCode += conditionsCode;
-        outputCode += "if (" + ifPredicat + ") {\n";
+        outputCode += "if (" + ifPredicate + ") {\n";
         outputCode += actionsCode;
         outputCode += "\n{ //Subevents: \n";
         // TODO: check (and heavily test) if sub events should be generated before
@@ -483,7 +428,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
         outputCode += "} else " + whileBoolean + " = true; \n";
 
-        outputCode += "} while ( !" + whileBoolean + " );\n";
+        outputCode += "} while (!" + whileBoolean + ");\n";
 
         return outputCode;
       });
@@ -506,15 +451,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicat =
-            event.GetConditions().empty()
-                ? "true"
-                : codeGenerator.GenerateBooleanFullName(
-                      "condition" +
-                          gd::String::From(event.GetConditions().size() - 1) +
-                          "IsTrue",
-                      context) +
-                      ".val";
+        gd::String ifPredicate = event.GetConditions().empty()
+                                    ? "true"
+                                    : codeGenerator.GenerateBooleanFullName(
+                                          "isConditionTrue", context);
 
         // Prepare object declaration and sub events
         gd::String subevents =
@@ -587,7 +527,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;
         outputCode += conditionsCode;
-        outputCode += "if (" + ifPredicat + ")\n";
+        outputCode += "if (" + ifPredicate + ")\n";
         outputCode += "{\n";
         outputCode += actionsCode;
         if (event.HasSubEvents()) {
@@ -676,15 +616,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicat = "true";
+        gd::String ifPredicate = "true";
         if (!event.GetConditions().empty())
-          ifPredicat =
-              codeGenerator.GenerateBooleanFullName(
-                  "condition" +
-                      gd::String::From(event.GetConditions().size() - 1) +
-                      "IsTrue",
-                  context) +
-              ".val";
+          ifPredicate =
+              codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
         // Prepare object declaration and sub events
         gd::String subevents =
@@ -693,20 +628,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateObjectsDeclarationCode(context) + "\n";
 
         // Write final code
-        gd::String repeatCountVar = codeGenerator.GetCodeNamespaceAccessor() +
-                                    "repeatCount" +
-                                    gd::String::From(context.GetContextDepth());
-        codeGenerator.AddGlobalDeclaration(repeatCountVar + " = 0;\n");
-        gd::String repeatIndexVar = codeGenerator.GetCodeNamespaceAccessor() +
-                                    "repeatIndex" +
-                                    gd::String::From(context.GetContextDepth());
-        codeGenerator.AddGlobalDeclaration(repeatIndexVar + " = 0;\n");
-        outputCode += repeatCountVar + " = " + repeatCountCode + ";\n";
-        outputCode += "for(" + repeatIndexVar + " = 0;" + repeatIndexVar +
+        gd::String repeatCountVar =
+            "repeatCount" + gd::String::From(context.GetContextDepth());
+        gd::String repeatIndexVar =
+            "repeatIndex" + gd::String::From(context.GetContextDepth());
+        outputCode += "const " + repeatCountVar + " = " + repeatCountCode + ";\n";
+        outputCode += "for (let " + repeatIndexVar + " = 0;" + repeatIndexVar +
                       " < " + repeatCountVar + ";++" + repeatIndexVar + ") {\n";
         outputCode += objectDeclaration;
         outputCode += conditionsCode;
-        outputCode += "if (" + ifPredicat + ")\n";
+        outputCode += "if (" + ifPredicate + ")\n";
         outputCode += "{\n";
         outputCode += actionsCode;
         if (event.HasSubEvents()) {
@@ -728,8 +659,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::ForEachEvent& event = dynamic_cast<gd::ForEachEvent&>(event_);
 
-        std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
-            event.GetObjectToPick(), parentContext);
+        std::vector<gd::String> realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+            event.GetObjectToPick(), parentContext.GetCurrentObject());
 
         if (realObjects.empty()) return gd::String("");
         for (unsigned int i = 0; i < realObjects.size(); ++i)
@@ -749,15 +680,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.GetConditions(), context);
         gd::String actionsCode =
             codeGenerator.GenerateActionsListCode(event.GetActions(), context);
-        gd::String ifPredicat = "true";
+        gd::String ifPredicate = "true";
         if (!event.GetConditions().empty())
-          ifPredicat =
-              codeGenerator.GenerateBooleanFullName(
-                  "condition" +
-                      gd::String::From(event.GetConditions().size() - 1) +
-                      "IsTrue",
-                  context) +
-              ".val";
+          ifPredicate =
+              codeGenerator.GenerateBooleanFullName("isConditionTrue", context);
 
         // Prepare object declaration and sub events
         gd::String subevents =
@@ -780,7 +706,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         codeGenerator.AddGlobalDeclaration(forEachObjectsList + " = [];\n");
 
         if (realObjects.size() !=
-            1)  //(We write a slighty more simple ( and optimized ) output code
+            1)  //(We write a slightly more simple ( and optimized ) output code
                 // when only one object list is used.)
         {
           outputCode += forEachTotalCountVar + " = 0;\n";
@@ -809,14 +735,14 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // For loop declaration
         if (realObjects.size() ==
-            1)  // We write a slighty more simple ( and optimized ) output code
+            1)  // We write a slightly more simple ( and optimized ) output code
                 // when only one object list is used.
           outputCode +=
-              "for(" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
+              "for (" + forEachIndexVar + " = 0;" + forEachIndexVar + " < " +
               codeGenerator.GetObjectListName(realObjects[0], parentContext) +
               ".length;++" + forEachIndexVar + ") {\n";
         else
-          outputCode += "for(" + forEachIndexVar + " = 0;" + forEachIndexVar +
+          outputCode += "for (" + forEachIndexVar + " = 0;" + forEachIndexVar +
                         " < " + forEachTotalCountVar + ";++" + forEachIndexVar +
                         ") {\n";
 
@@ -825,7 +751,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Pick one object
         if (realObjects.size() == 1) {
-          // We write a slighty more simple ( and optimized ) output code
+          // We write a slightly more simple ( and optimized ) output code
           // when only one object list is used.
           gd::String temporary = codeGenerator.GetCodeNamespaceAccessor() +
                                  "forEachTemporary" +
@@ -864,7 +790,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         }
 
         outputCode += conditionsCode;
-        outputCode += "if (" + ifPredicat + ") {\n";
+        outputCode += "if (" + ifPredicate + ") {\n";
         outputCode += actionsCode;
         if (event.HasSubEvents()) {
           outputCode += "\n{ //Subevents: \n";
@@ -923,7 +849,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Generate the function code
         gd::String functionCode;
         functionCode +=
-            functionName + " = function(" + functionParameters + ") {\n";
+            functionName + " = function GDJSInlineCode(" + functionParameters + ") {\n";
         functionCode += event.IsUseStrict() ? "\"use strict\";\n" : "";
         functionCode += event.GetInlineCode();
         functionCode += "\n};\n";
@@ -932,8 +858,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Generate the code to call the function
         gd::String callingCode;
         if (!event.GetParameterObjects().empty()) {
-          std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
-              event.GetParameterObjects(), parentContext);
+          std::vector<gd::String> realObjects = codeGenerator.GetObjectsContainersList().ExpandObjectName(
+              event.GetParameterObjects(), parentContext.GetCurrentObject());
 
           callingCode += "var objects = [];\n";
           for (unsigned int i = 0; i < realObjects.size(); ++i) {

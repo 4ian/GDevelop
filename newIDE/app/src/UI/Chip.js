@@ -24,6 +24,7 @@ type Props = {|
   onBlur?: (() => void) | null,
   onFocus?: (() => void) | null,
   onDelete?: ((event: any) => void) | null,
+  disableAutoTranslate?: boolean,
 |};
 
 type ChipInterface = {|
@@ -54,7 +55,9 @@ const Chip = React.forwardRef<Props, ChipInterface>((props, ref) => {
       onFocus={props.onFocus}
       onDelete={props.onDelete}
       classes={useStyles()}
+      className={props.disableAutoTranslate ? 'notranslate' : ''}
       ref={chipRef}
+      color={props.color}
     />
   );
 });

@@ -12,10 +12,33 @@
  * used to build the complete changelog.
  */
 
+const crypto = require('crypto');
 const shell = require('shelljs');
 const child = require('child_process');
 const { default: axios } = require('axios');
 const args = require('minimist')(process.argv.slice(2));
+
+const gdevelopTeamEmailHashes = [
+  'f653a53047057692be0951d839b7394357b398deebf9731c7b7fe106f3644e1062c08860a65a89f218d6ad3ad6b5c7876c5088a4fba92b5e801a198d5dbc7158',
+  '5e17262c55afd148038ee9e4b469dbc923422adfd768e717c6326a39cf29415163e15f85960cdbda2aeb3d751d610e25d594a7783f6801aec24403421deaf815',
+];
+
+const isMemberOfGDevelopTeam = ({ email, nickname }) => {
+  if (['4ian', 'AlexandreSi', 'ClementPasteau', 'D8H'].includes(nickname)) {
+    return true;
+  }
+  if (
+    gdevelopTeamEmailHashes.includes(
+      crypto
+        .createHash('sha512')
+        .update(email)
+        .digest('hex')
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
 
 if (!args['extensionsGitPath']) {
   shell.echo(
@@ -37,6 +60,13 @@ if (!args['examplesGitPath']) {
   );
 }
 const examplesGitPath = args['examplesGitPath'];
+
+if (!args['templatesGitPath']) {
+  shell.echo(
+    '⚠️ You should pass --templatesGitPath pointing to the git directory of GDevelop-game-templates.'
+  );
+}
+const templatesGitPath = args['templatesGitPath'];
 
 /** @typedef {{sha: string, message: string, authorEmail: string}} GitRawCommitInfo */
 /** @typedef {{
@@ -237,9 +267,10 @@ const findAuthorNicknameInCommits = async commits => {
 const formatCommitMessage = ({ commit, includeAuthor }) => {
   const author =
     includeAuthor &&
-    !['4ian', 'AlexandreSi', 'ClementPasteau, D8H'].includes(
-      commit.authorNickname
-    )
+    !isMemberOfGDevelopTeam({
+      email: commit.authorEmail,
+      nickname: commit.authorNickname,
+    })
       ? `(Thanks ${
           commit.authorNickname
             ? '@' + commit.authorNickname
@@ -297,6 +328,7 @@ const formatHiddenCommitMessage = commit => {
  *   extensionsCommits: GitEnrichedCommitInfo[] | null,
  *   assetsCommits: GitEnrichedCommitInfo[] | null,
  *   examplesCommits: GitEnrichedCommitInfo[] | null,
+ *   templatesCommits: GitEnrichedCommitInfo[] | null
  * }} commits
  */
 const outputChangelog = ({
@@ -307,6 +339,7 @@ const outputChangelog = ({
   extensionsCommits,
   assetsCommits,
   examplesCommits,
+  templatesCommits,
 }) => {
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
@@ -323,7 +356,14 @@ const outputChangelog = ({
       .join('\n')
   );
 
-  shell.echo(`\n## ⚙️ Extensions, 🎨 assets and 🕹 examples\n`);
+  shell.echo(`\n## 🐛 Bug fixes\n`);
+  shell.echo(
+    fixCommits
+      .map(commit => formatCommitMessage({ commit, includeAuthor: true }))
+      .join('\n')
+  );
+
+  shell.echo('\n## ⚙️ Extensions\n');
   shell.echo(
     extensionsCommits
       ? extensionsCommits
@@ -331,6 +371,7 @@ const outputChangelog = ({
           .join('\n')
       : 'TODO: Add extensions commits here.'
   );
+  shell.echo('\n## 🎨 Assets\n');
   shell.echo(
     assetsCommits
       ? assetsCommits
@@ -338,6 +379,7 @@ const outputChangelog = ({
           .join('\n')
       : 'TODO: Add assets commits here.'
   );
+  shell.echo('\n## 🕹 Examples\n');
   shell.echo(
     examplesCommits
       ? examplesCommits
@@ -345,12 +387,13 @@ const outputChangelog = ({
           .join('\n')
       : 'TODO: Add examples commits here.'
   );
-
-  shell.echo(`\n## 🐛 Bug fixes\n`);
+  shell.echo('\n## 🕹 Premium Game Templates\n');
   shell.echo(
-    fixCommits
-      .map(commit => formatCommitMessage({ commit, includeAuthor: true }))
-      .join('\n')
+    templatesCommits
+      ? templatesCommits
+          .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
+          .join('\n')
+      : 'TODO: Add game templates commits here.'
   );
 
   if (devCommits.length > 0) {
@@ -420,6 +463,17 @@ const outputChangelog = ({
     );
   }
 
+  let templatesCommits = null;
+  if (templatesGitPath) {
+    const templatesRepoGitTools = getGitTools(templatesGitPath);
+    const templatesRawCommits = templatesRepoGitTools.extractCommitsSinceDate(
+      lastTagDate
+    );
+    templatesCommits = enrichCommits(templatesRawCommits).filter(
+      commit => !commit.hidden
+    );
+  }
+
   outputChangelog({
     hiddenCommits,
     improvementsCommits,
@@ -428,5 +482,6 @@ const outputChangelog = ({
     extensionsCommits,
     assetsCommits,
     examplesCommits,
+    templatesCommits,
   });
 })();

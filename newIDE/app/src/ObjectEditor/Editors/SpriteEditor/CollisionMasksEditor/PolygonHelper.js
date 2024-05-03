@@ -3,6 +3,11 @@ import { mapFor, mapVector } from '../../../../Utils/MapFor';
 
 const gd = global.gd;
 
+export const roundVertexToHalfPixel = (vertex: gdVector2f) => {
+  vertex.set_x(Math.round(vertex.get_x() * 2) / 2);
+  vertex.set_y(Math.round(vertex.get_y() * 2) / 2);
+};
+
 export const addVertexOnLongestEdge = (vertices: gdVectorVector2f) => {
   const verticesSize = vertices.size();
   if (verticesSize > 0) {

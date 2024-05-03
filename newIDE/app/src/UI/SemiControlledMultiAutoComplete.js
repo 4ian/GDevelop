@@ -28,6 +28,13 @@ const renderItem = (option: AutocompleteOption, state: Object): React.Node => (
   </ListItem>
 );
 
+const styles = {
+  listbox: {
+    maxHeight: 250,
+    overflowY: 'scroll',
+  },
+};
+
 export type AutocompleteOption = {|
   text: string, // The text displayed
   value: string, // The internal value selected
@@ -60,10 +67,28 @@ type Props = {|
   loading?: boolean,
   disabled?: boolean,
   optionsLimit?: number, // Allow limiting the number of options by disabling the autocomplete.
+  disableAutoTranslate?: boolean,
 |};
 
-export default function SemiControlledMultiAutoComplete(props: Props) {
+export type SemiControlledMultiAutoCompleteInterface = {|
+  focusInput: () => void,
+|};
+
+const SemiControlledMultiAutoComplete = React.forwardRef<
+  Props,
+  SemiControlledMultiAutoCompleteInterface
+>((props, ref) => {
   const chipStyles = useChipStyles();
+  const inputRef = React.useRef<?TextField>(null);
+
+  React.useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    },
+  }));
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -86,6 +111,13 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           }
           getOptionSelected={(option, value) => option.value === value.value}
           loading={props.loading}
+          ListboxProps={{
+            className: props.disableAutoTranslate ? 'notranslate' : '',
+            style: {
+              ...autocompleteStyles.listbox,
+              ...styles.listbox,
+            },
+          }}
           renderInput={params => (
             <TextField
               {...params}
@@ -98,26 +130,30 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
               helperText={props.error || props.helperText}
               variant="filled"
               error={!!props.error}
+              inputRef={inputRef}
               disabled={props.disabled || props.loading}
             />
           )}
           fullWidth={props.fullWidth}
           disabled={props.disabled || props.loading}
           noOptionsText={
-            <Text>
+            <Text noMargin>
               <Trans>No options</Trans>
             </Text>
           }
           loadingText={
-            <Text>
+            <Text noMargin>
               <Trans>Loading...</Trans>
             </Text>
           }
           ChipProps={{
             classes: chipStyles,
+            className: props.disableAutoTranslate ? 'notranslate' : '',
           }}
         />
       )}
     </I18n>
   );
-}
+});
+
+export default SemiControlledMultiAutoComplete;

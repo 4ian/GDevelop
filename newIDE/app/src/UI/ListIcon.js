@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { CorsAwareImage } from './CorsAwareImage';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 // No i18n in this file
 
 type SizeProps =

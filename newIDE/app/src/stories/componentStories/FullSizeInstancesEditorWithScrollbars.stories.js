@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
@@ -30,7 +29,7 @@ const instancesEditorSettings: InstancesEditorSettings = {
 export default {
   title: 'Editor/FullSizeInstancesEditorWithScrollbars',
   component: FullSizeInstancesEditorWithScrollbars,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const Default = () => (
@@ -39,9 +38,11 @@ export const Default = () => (
       <FullSizeInstancesEditorWithScrollbars
         project={testProject.project}
         layout={testProject.testLayout}
+        selectedLayer={''}
         initialInstances={testProject.testLayout.getInitialInstances()}
         instancesEditorSettings={instancesEditorSettings}
-        onChangeInstancesEditorSettings={() => {}}
+        onInstancesEditorSettingsMutated={() => {}}
+        isInstanceOf3DObject={() => false}
         instancesSelection={instancesSelection}
         onInstancesAdded={() => {}}
         onInstancesSelected={() => {}}
@@ -55,6 +56,7 @@ export const Default = () => (
           onCopy: () => {},
           onCut: () => {},
           onPaste: () => {},
+          onDuplicate: () => {},
           onDelete: () => {},
           onUndo: () => {},
           onRedo: () => {},

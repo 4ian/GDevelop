@@ -12,69 +12,147 @@ branches:
   only:
     - master
     - /experimental-build.*/
+skip_tags: true # Don't rebuild on tags.
 init:
-- ps: ''
+  - ps: Install-Product node 16
+  - cmd: set NODE_OPTIONS=--max-old-space-size=8192
+cache:
+  - '%APPDATA%\npm-cache'               # npm cache
+  - newIDE\app\node_modules -> newIDE\app\package-lock.json
+  - newIDE\electron-app\node_modules -> newIDE\electron-app\package-lock.json
+  - GDevelop.js\node_modules -> GDevelop.js\package-lock.json
 install:
-- ps: Install-Product node 16
-# Build GDevelop.js (and run tests to ensure it works).
-# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
-- cmd: >-
-    cd GDevelop.js
+  # Download and install SSL.com eSigner CKA. 
+  # See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/.
+  #
+  # This is necessary because of "signing to be FIPS-140 compliant". See 
+  # https://github.com/electron-userland/electron-builder/issues/6158
+  # 
+  # Make sure to DISABLE "malware blocker" in SSL.com to avoid errors like:
+  # Error information: "Error: SignerSign() failed." (-2146893821/0x80090003)
+  - ps: >-
+      # Download and Unzip eSignerCKA Setup
 
-    npm -v && npm install
+      Set-StrictMode -Version 'Latest'
 
-    git clone https://github.com/juj/emsdk.git
+      Invoke-WebRequest -OutFile eSigner_CKA_Setup.zip "https://github.com/SSLcom/eSignerCKA/releases/download/v1.0.6/SSL.COM-eSigner-CKA_1.0.6.zip"
 
-    cd emsdk
+      Expand-Archive -Force eSigner_CKA_Setup.zip
 
-    emsdk install 1.39.6
+      Remove-Item eSigner_CKA_Setup.zip
 
-    CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
+      Move-Item -Destination "eSigner_CKA_Installer.exe" -Path "eSigner_CKA_*\*.exe"
+      
+      # Install it. See https://www.ssl.com/how-to/how-to-integrate-esigner-cka-with-ci-cd-tools-for-automated-code-signing/
 
-    cd ..\..
+      New-Item -ItemType Directory -Force -Path "C:\projects\gdevelop\eSignerCKA"
 
-# Build GDevelop IDE
-- cmd: >-
-    cd newIDE\app
+      ./eSigner_CKA_Installer.exe /CURRENTUSER /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\projects\gdevelop\eSignerCKA" | Out-Null
+      
+      # Disable logger.
 
-    npm -v && npm install
+      # $LogConfig = Get-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
 
-    cd ..\electron-app
+      # $LogConfig[0] = '<log4net threshold="OFF">'
 
-    npm -v && npm install
+      # $LogConfig | Set-Content -Path C:\projects\gdevelop\eSignerCKA/log4net.config
 
-    cd ..\..
+  # Build GDevelop.js (and run tests to ensure it works).
+  # (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  - cmd: >-
+      cd GDevelop.js
 
-# Package the app for Windows (and sign it with the certificate set in environment variables).
+      npm -v && npm install
+
+      git clone https://github.com/juj/emsdk.git
+
+      cd emsdk
+
+      emsdk install 3.1.21
+
+      CMD /C "emsdk activate 3.1.21 && cd .. && npm run build"
+
+      cd ..\..
+
+  # Build GDevelop IDE.
+  # Also install setuptools as something requires distutils in electron-app, and it was removed in Python 3.12.
+  # setuptools will make distutils available again (but we should migrate our packages probably).
+  - cmd: >-
+      pip install setuptools
+
+      cd newIDE\app
+
+      npm -v && npm install
+
+      cd ..\electron-app
+
+      npm -v && npm install
+
+      cd ..\..
+
+# Package the app for Windows (and sign it).
 # Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
-- ps: >-
-    cd newIDE\electron-app
+  - ps: >-
+      cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
+      # Prepare certificate. See https://www.ssl.com/how-to/automate-ev-code-signing-with-signtool-or-certutil-esigner/?_gl=1*vuybcy*_gcl_au*MTEwODg1NDM2Mi4xNzA1ODU1NjM4#automated-code-signing
 
-    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe config -mode product -user "$Env:ESIGNER_USER_NAME" -pass "$Env:ESIGNER_USER_PASSWORD" -totp "$Env:ESIGNER_USER_TOTP" -key "C:\projects\gdevelop\eSignerCKA\master.key" -r
 
-    cd ..\..
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe unload
 
-# Clean dist folder to keep only installers/binaries.
-- cmd: >-
-    DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
+      C:\projects\gdevelop\eSignerCKA/eSignerCKATool.exe load
+
+      # Find certificate so we can tell electron-builder which one to use.
+
+      $CodeSigningCert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Select-Object -First 1
+
+      echo Certificate: $CodeSigningCert
+
+      # Use a custom signtool path because of the signtool.exe bundled withy electron-builder not working for some reason.
+      # Can also be found in versioned folders like "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22000.0/x86/signtool.exe".
+
+      $Env:SIGNTOOL_PATH = "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe"
+
+      # Extract thumbprint and subject name of the certificate (will be passed to electron-builder).
+
+      $Env:GD_SIGNTOOL_THUMBPRINT = $CodeSigningCert.Thumbprint
+
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ($CodeSigningCert.Subject -replace ", ?", "`n" | ConvertFrom-StringData).CN
+
+      # Build the nsis installer (signed: electron-builder will use SignTool.exe with the certificate)
+
+      node scripts/build.js --win nsis --publish=never
+
+      # Build the appx (not signed).
+
+      $Env:GD_SIGNTOOL_THUMBPRINT = ''
+
+      $Env:GD_SIGNTOOL_SUBJECT_NAME = ''
+
+      node scripts/build.js --skip-app-build --win appx --publish=never
+
+      cd ..\..
+
+  # Clean dist folder to keep only installers/binaries.
+  - cmd: >-
+      rmdir /s /q newIDE\electron-app\dist\win-unpacked
 
 # Run a few tests on Windows.
 test_script:
-- cmd: >-
-    cd GDevelop.js
+  - cmd: >-
+      cd GDevelop.js
 
-    npm test
+      npm test
 
-    cd ..
+      cd ..
 
-    cd newIDE\app
+      cd newIDE\app
 
-    npm test
+      npm test
 
-    cd ..\..
+      cd ..\..
 
 artifacts:
   - path: newIDE\electron-app\dist

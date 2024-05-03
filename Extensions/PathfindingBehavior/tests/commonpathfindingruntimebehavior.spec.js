@@ -9,12 +9,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     const pathFindingName = 'auto1';
 
     const createScene = (framePerSecond = 60) => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-ignore - missing properties.
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [
@@ -42,6 +37,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         behaviorsSharedData: [],
         objects: [],
         instances: [],
+        usedResources: [],
       });
       setFramePerSecond(runtimeScene, framePerSecond);
       return runtimeScene;

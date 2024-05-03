@@ -2,19 +2,19 @@
 import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
-import ExportDialog from './Export/ExportDialog';
+import ShareDialog from './ExportAndShare/ShareDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for Electron powered IDE.
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
-import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
+import LocalPreviewLauncher from './ExportAndShare/LocalExporters/LocalPreviewLauncher';
 import {
   localAutomatedExporters,
   localManualExporters,
   localOnlineWebExporter,
-} from './Export/LocalExporters';
+} from './ExportAndShare/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
@@ -30,11 +30,14 @@ import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import LocalResourceMover from './ProjectsStorage/ResourceMover/LocalResourceMover';
 import LocalResourceFetcher from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import LocalLoginProvider from './LoginProvider/LocalLoginProvider';
 
 const gd: libGDevelop = global.gd;
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
+  const loginProvider = new LocalLoginProvider(authentication.auth);
+  authentication.setLoginProvider(loginProvider);
 
   const appArguments = Window.getArguments();
   const isDev = Window.isDev();
@@ -59,27 +62,36 @@ export const create = (authentication: Authentication) => {
         >
           {({
             getStorageProviderOperations,
+            getStorageProviderResourceOperations,
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
           }) => (
             <MainFrame
               i18n={i18n}
-              renderMainMenu={(props, callbacks) => (
-                <ElectronMainMenu props={props} callbacks={callbacks} />
+              renderMainMenu={(props, callbacks, extraCallbacks) => (
+                <ElectronMainMenu
+                  props={props}
+                  callbacks={callbacks}
+                  extraCallbacks={extraCallbacks}
+                />
               )}
               renderPreviewLauncher={(props, ref) => (
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
-              renderExportDialog={props => (
-                <ExportDialog
+              renderShareDialog={props => (
+                <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
+                  isSavingProject={props.isSavingProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={localAutomatedExporters}
                   manualExporters={localManualExporters}
                   onlineWebExporter={localOnlineWebExporter}
+                  fileMetadata={props.fileMetadata}
+                  storageProvider={props.storageProvider}
+                  initialTab={props.initialTab}
                 />
               )}
               renderGDJSDevelopmentWatcher={
@@ -89,6 +101,9 @@ export const create = (authentication: Authentication) => {
               resourceMover={LocalResourceMover}
               resourceFetcher={LocalResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProviderResourceOperations={
+                getStorageProviderResourceOperations
+              }
               getStorageProvider={getStorageProvider}
               resourceSources={localResourceSources}
               resourceExternalEditors={localResourceExternalEditors}

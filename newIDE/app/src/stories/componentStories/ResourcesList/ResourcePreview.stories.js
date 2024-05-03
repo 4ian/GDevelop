@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import { testProject } from '../../GDevelopJsInitializerDecorator';
 import ResourcesLoader from '../../../ResourcesLoader';
 import ResourcePreview from '../../../ResourcesList/ResourcePreview';
@@ -10,7 +9,7 @@ import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 export default {
   title: 'ResourcesList/ResourcePreview',
   component: ResourcePreview,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Image = () => (

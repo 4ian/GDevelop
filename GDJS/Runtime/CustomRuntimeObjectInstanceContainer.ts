@@ -12,7 +12,6 @@ namespace gdjs {
    * @see gdjs.CustomRuntimeObject
    */
   export class CustomRuntimeObjectInstanceContainer extends gdjs.RuntimeInstanceContainer {
-    _renderer: gdjs.CustomObjectRenderer;
     _debuggerRenderer: gdjs.DebuggerRenderer;
     _runtimeScene: gdjs.RuntimeScene;
     /** The parent container that contains the object associated with this container. */
@@ -35,12 +34,13 @@ namespace gdjs {
       this._parent = parent;
       this._customObject = customObject;
       this._runtimeScene = parent.getScene();
-      this._renderer = new gdjs.CustomObjectRenderer(
-        customObject,
-        this,
-        parent
-      );
       this._debuggerRenderer = new gdjs.DebuggerRenderer(this);
+    }
+
+    addLayer(layerData: LayerData) {
+      const layer = new gdjs.RuntimeCustomObjectLayer(layerData, this);
+      this._layers.put(layerData.name, layer);
+      this._orderedLayers.push(layer);
     }
 
     createObject(objectName: string): gdjs.RuntimeObject | null {
@@ -171,7 +171,7 @@ namespace gdjs {
       const allInstancesList = this.getAdhocListOfAllInstances();
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
-        object.onDestroyFromScene(this);
+        object.onDeletedFromScene(this);
       }
 
       this._destroy();
@@ -197,6 +197,7 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       const allInstancesList = this.getAdhocListOfAllInstances();
+      // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();
@@ -257,8 +258,10 @@ namespace gdjs {
     /**
      * Get the renderer associated to the RuntimeScene.
      */
-    getRenderer(): gdjs.CustomObjectRenderer {
-      return this._renderer;
+    getRenderer():
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer {
+      return this._customObject.getRenderer();
     }
 
     getDebuggerRenderer() {
@@ -291,21 +294,6 @@ namespace gdjs {
 
     onChildrenLocationChanged(): void {
       this._customObject.onChildrenLocationChanged();
-    }
-
-    /**
-     * Triggered when the object dimensions are changed.
-     *
-     * It adapts the layers camera positions.
-     */
-    onObjectUnscaledCenterChanged(oldOriginX: float, oldOriginY: float): void {
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          /** @type gdjs.Layer */
-          const theLayer: gdjs.Layer = this._layers.items[name];
-          theLayer.onGameResolutionResized(oldOriginX, oldOriginY);
-        }
-      }
     }
 
     convertCoords(x: float, y: float, result: FloatPoint): FloatPoint {

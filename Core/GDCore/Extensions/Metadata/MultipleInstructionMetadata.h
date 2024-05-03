@@ -3,8 +3,8 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef MULTIPLEINSTRUCTIONSMETADATA_H
-#define MULTIPLEINSTRUCTIONSMETADATA_H
+#pragma once
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
@@ -21,7 +21,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API MultipleInstructionMetadata {
+class GD_CORE_API MultipleInstructionMetadata : public AbstractFunctionMetadata {
  public:
   static MultipleInstructionMetadata WithExpressionAndCondition(
       gd::ExpressionMetadata &expression, gd::InstructionMetadata &condition) {
@@ -45,7 +45,7 @@ class GD_CORE_API MultipleInstructionMetadata {
       const gd::String &type,
       const gd::String &label,
       const gd::String &supplementaryInformation = "",
-      bool parameterIsOptional = false) {
+      bool parameterIsOptional = false) override {
     if (expression)
       expression->AddParameter(
           type, label, supplementaryInformation, parameterIsOptional);
@@ -62,7 +62,7 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::AddCodeOnlyParameter
    */
   MultipleInstructionMetadata &AddCodeOnlyParameter(
-      const gd::String &type, const gd::String &supplementaryInformation) {
+      const gd::String &type, const gd::String &supplementaryInformation) override {
     if (expression)
       expression->AddCodeOnlyParameter(type, supplementaryInformation);
     if (condition)
@@ -74,7 +74,7 @@ class GD_CORE_API MultipleInstructionMetadata {
   /**
    * \see gd::InstructionMetadata::SetDefaultValue
    */
-  MultipleInstructionMetadata &SetDefaultValue(const gd::String &defaultValue) {
+  MultipleInstructionMetadata &SetDefaultValue(const gd::String &defaultValue) override {
     if (expression) expression->SetDefaultValue(defaultValue);
     if (condition) condition->SetDefaultValue(defaultValue);
     if (action) action->SetDefaultValue(defaultValue);
@@ -85,7 +85,7 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::SetParameterExtraInfo
    */
   MultipleInstructionMetadata &SetParameterExtraInfo(
-      const gd::String &defaultValue) {
+      const gd::String &defaultValue) override {
     if (expression) expression->SetParameterExtraInfo(defaultValue);
     if (condition) condition->SetParameterExtraInfo(defaultValue);
     if (action) action->SetParameterExtraInfo(defaultValue);
@@ -96,7 +96,7 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::SetParameterLongDescription
    */
   MultipleInstructionMetadata &SetParameterLongDescription(
-      const gd::String &longDescription) {
+      const gd::String &longDescription) override {
     if (expression) expression->SetParameterLongDescription(longDescription);
     if (condition) condition->SetParameterLongDescription(longDescription);
     if (action) action->SetParameterLongDescription(longDescription);
@@ -106,7 +106,7 @@ class GD_CORE_API MultipleInstructionMetadata {
   /**
    * \see gd::InstructionMetadata::SetHidden
    */
-  MultipleInstructionMetadata &SetHidden() {
+  MultipleInstructionMetadata &SetHidden() override {
     if (expression) expression->SetHidden();
     if (condition) condition->SetHidden();
     if (action) action->SetHidden();
@@ -136,47 +136,51 @@ class GD_CORE_API MultipleInstructionMetadata {
     return *this;
   }
 
-  MultipleInstructionMetadata &SetFunctionName(const gd::String &functionName) {
+  MultipleInstructionMetadata &SetFunctionName(const gd::String &functionName) override {
     if (expression) expression->SetFunctionName(functionName);
     if (condition) condition->SetFunctionName(functionName);
-    if (action) action->GetCodeExtraInformation().SetFunctionName(functionName);
+    if (action) action->SetFunctionName(functionName);
     return *this;
   }
 
   MultipleInstructionMetadata &SetGetter(const gd::String &getter) {
     if (expression) expression->SetFunctionName(getter);
     if (condition) condition->SetFunctionName(getter);
-    if (action) action->GetCodeExtraInformation().SetGetter(getter);
+    if (action) action->SetGetter(getter);
     return *this;
   }
 
-  MultipleInstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
+  /**
+   * \deprecated Use `AddIncludeFile` instead as clearing the list is more
+   * error prone.
+   */
+  MultipleInstructionMetadata &SetIncludeFile(const gd::String &includeFile) override {
     if (expression)
-      expression->GetCodeExtraInformation().SetIncludeFile(includeFile);
+      expression->SetIncludeFile(includeFile);
     if (condition)
-      condition->GetCodeExtraInformation().SetIncludeFile(includeFile);
-    if (action) action->GetCodeExtraInformation().SetIncludeFile(includeFile);
+      condition->SetIncludeFile(includeFile);
+    if (action) action->SetIncludeFile(includeFile);
     return *this;
   }
 
-  MultipleInstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
+  MultipleInstructionMetadata &AddIncludeFile(const gd::String &includeFile) override {
     if (expression)
       expression->GetCodeExtraInformation().AddIncludeFile(includeFile);
     if (condition)
-      condition->GetCodeExtraInformation().AddIncludeFile(includeFile);
-    if (action) action->GetCodeExtraInformation().AddIncludeFile(includeFile);
+      condition->AddIncludeFile(includeFile);
+    if (action) action->AddIncludeFile(includeFile);
     return *this;
   }
 
   /**
    * \brief Get the files that must be included to use the instruction.
    */
-  const std::vector<gd::String> &GetIncludeFiles() const {
+  const std::vector<gd::String> &GetIncludeFiles() const override {
     if (expression)
       return expression->GetCodeExtraInformation().GetIncludeFiles();
     if (condition)
-      return condition->GetCodeExtraInformation().GetIncludeFiles();
-    if (action) return action->GetCodeExtraInformation().GetIncludeFiles();
+      return condition->GetIncludeFiles();
+    if (action) return action->GetIncludeFiles();
     // It can't actually happen.
     throw std::logic_error("no instruction metadata");
   }
@@ -184,10 +188,20 @@ class GD_CORE_API MultipleInstructionMetadata {
   /**
    * \see gd::InstructionMetadata::SetPrivate
    */
-  MultipleInstructionMetadata &SetPrivate() {
+  MultipleInstructionMetadata &SetPrivate() override {
     if (expression) expression->SetPrivate();
     if (condition) condition->SetPrivate();
     if (action) action->SetPrivate();
+    return *this;
+  }
+
+  /**
+   * \see gd::InstructionMetadata::SetHelpPath
+   */
+  MultipleInstructionMetadata &SetHelpPath(const gd::String &path) {
+    if (expression) expression->SetHelpPath(path);
+    if (condition) condition->SetHelpPath(path);
+    if (action) action->SetHelpPath(path);
     return *this;
   }
 
@@ -219,6 +233,42 @@ class GD_CORE_API MultipleInstructionMetadata {
   }
 
   /**
+   * Set that the instruction can be used in layouts or external events.
+   */
+  MultipleInstructionMetadata &SetRelevantForLayoutEventsOnly() override {
+    if (condition) condition->SetRelevantForLayoutEventsOnly();
+    if (action) action->SetRelevantForLayoutEventsOnly();
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in function events.
+   */
+  MultipleInstructionMetadata &SetRelevantForFunctionEventsOnly() override {
+    if (condition) condition->SetRelevantForFunctionEventsOnly();
+    if (action) action->SetRelevantForFunctionEventsOnly();
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in asynchronous function events.
+   */
+  MultipleInstructionMetadata &SetRelevantForAsynchronousFunctionEventsOnly() override {
+    if (condition) condition->SetRelevantForAsynchronousFunctionEventsOnly();
+    if (action) action->SetRelevantForAsynchronousFunctionEventsOnly();
+    return *this;
+  }
+
+  /**
+   * Set that the instruction can be used in custom object events.
+   */
+  MultipleInstructionMetadata &SetRelevantForCustomObjectEventsOnly() override {
+    if (condition) condition->SetRelevantForCustomObjectEventsOnly();
+    if (action) action->SetRelevantForCustomObjectEventsOnly();
+    return *this;
+  }
+
+  /**
    * \brief Don't use, only here to fulfill Emscripten bindings requirements.
    */
   MultipleInstructionMetadata()
@@ -242,5 +292,3 @@ class GD_CORE_API MultipleInstructionMetadata {
 };
 
 }  // namespace gd
-
-#endif  // MULTIPLEINSTRUCTIONSMETADATA_H

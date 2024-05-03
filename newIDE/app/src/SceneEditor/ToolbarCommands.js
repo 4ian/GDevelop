@@ -2,9 +2,9 @@
 import { useCommand } from '../CommandPalette/CommandHooks';
 
 type Props = {|
-  openObjectsList: () => void,
-  openObjectGroupsList: () => void,
-  openPropertiesPanel: () => void,
+  toggleObjectsList: () => void,
+  toggleObjectGroupsList: () => void,
+  togglePropertiesPanel: () => void,
   toggleInstancesList: () => void,
   toggleLayersList: () => void,
   undo: () => void,
@@ -22,15 +22,15 @@ type Props = {|
 
 const ToolbarCommands = (props: Props) => {
   useCommand('OPEN_OBJECTS_PANEL', true, {
-    handler: props.openObjectsList,
+    handler: props.toggleObjectsList,
   });
 
   useCommand('OPEN_OBJECT_GROUPS_PANEL', true, {
-    handler: props.openObjectGroupsList,
+    handler: props.toggleObjectGroupsList,
   });
 
   useCommand('OPEN_PROPERTIES_PANEL', true, {
-    handler: props.openPropertiesPanel,
+    handler: props.togglePropertiesPanel,
   });
 
   useCommand('TOGGLE_INSTANCES_PANEL', true, {

@@ -4,7 +4,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import {
+  useResponsiveWindowSize,
+  type WindowSizeType,
+} from './Responsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import {
@@ -17,10 +20,16 @@ import Text from './Text';
 import Cross from './CustomSvgIcons/Cross';
 import IconButton from './IconButton';
 import { Line } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import optionalRequire from '../Utils/OptionalRequire';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { useWindowControlsOverlayWatcher } from '../Utils/Window';
+import { classNameToStillAllowRenderingInstancesEditor } from './MaterialUISpecificUtil';
+import {
+  getAvoidSoftKeyboardStyle,
+  useSoftKeyboardBottomOffset,
+} from './MobileSoftKeyboard';
+
 const electron = optionalRequire('electron');
 
 const DRAGGABLE_PART_CLASS_NAME = 'title-bar-draggable-part';
@@ -63,6 +72,20 @@ const dialogActionPadding = 24;
 // Mobile.
 const dialogSmallPadding = 8;
 
+const getDefaultMaxWidthFromSize = (windowSize: WindowSizeType) => {
+  switch (windowSize) {
+    case 'small':
+      return false; // Full width
+    case 'medium':
+    case 'large':
+      return 'md';
+    case 'xlarge':
+      return 'lg';
+    default:
+      return 'md';
+  }
+};
+
 const styles = {
   dialogContainer: {
     display: 'flex',
@@ -83,8 +106,9 @@ const styles = {
     display: 'flex',
   },
   titleContainer: {
-    paddingBottom: dialogTitlePadding,
     textAlign: 'left',
+    // Ensure the title can break on any character, to ensure it's visible on mobile. Especially useful for long emails.
+    overflowWrap: 'anywhere',
   },
   fixedContentContainer: {
     paddingBottom: 8,
@@ -99,24 +123,28 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
   },
-  fullHeightModal: {
-    minHeight: 'calc(100% - 64px)',
-  },
+  minHeightForFullHeightModal: 'calc(100% - 64px)',
+  minHeightForSmallHeightModal: 'min(100% - 64px, 350px)',
+  minHeightForLargeHeightModal: 'min(100% - 64px, 800px)',
 };
 
-const useDangerousStylesForDialog = makeStyles(theme => ({
-  paper: {
-    '&:before': {
-      content: '""',
-      height: 60,
-      background: `repeating-linear-gradient(110deg, ${
-        theme.palette.error.dark
-      }, ${theme.palette.error.dark} 25px, ${theme.palette.error.main} 25px, ${
-        theme.palette.error.main
-      } 40px)`,
-    },
-  },
-}));
+const useDangerousStylesForDialog = (dangerLevel?: 'warning' | 'danger') =>
+  makeStyles(theme => {
+    if (!dangerLevel) return {};
+    const color =
+      dangerLevel === 'warning' ? theme.palette.warning : theme.palette.error;
+    return {
+      paper: {
+        '&:before': {
+          content: '""',
+          height: 60,
+          background: `repeating-linear-gradient(110deg, ${color.dark}, ${
+            color.dark
+          } 25px, ${color.main} 25px, ${color.main} 40px)`,
+        },
+      },
+    };
+  })();
 
 // Customize scrollbar inside Dialog so that it gives a bit of space
 // to the content.
@@ -145,13 +173,13 @@ type DialogProps = {|
   fixedContent?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
-  isDangerous?: boolean,
+  dangerLevel?: 'warning' | 'danger',
 
   /**
    * Callback called when the dialog is asking to be closed
    * (either by Escape key or a click outside, according to preferences).
    * This is the default way of closing a dialog and should almost always be
-   * specified - unless your dialog is representing an uninteruptible process.
+   * specified - unless your dialog is representing an uninterruptible process.
    *
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.
@@ -173,6 +201,12 @@ type DialogProps = {|
    */
   cannotBeDismissed?: boolean,
 
+  /**
+   * Indicates that even when this dialog is opened, the instances editor should still continue to render.
+   * Useful to see changes in realtime.
+   */
+  exceptionallyStillAllowRenderingInstancesEditors?: boolean,
+
   children: React.Node, // The content of the dialog
 
   // Display:
@@ -181,6 +215,7 @@ type DialogProps = {|
 
   // Size
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false,
+  minHeight?: 'sm' | 'lg',
   fullHeight?: boolean,
   noMobileFullScreen?: boolean,
 
@@ -196,11 +231,12 @@ export const DialogPrimaryButton = RaisedButton;
 const Dialog = ({
   onApply,
   secondaryActions,
-  isDangerous,
+  dangerLevel,
   actions,
   open,
   onRequestClose,
   maxWidth,
+  minHeight,
   title,
   fixedContent,
   children,
@@ -209,18 +245,19 @@ const Dialog = ({
   fullHeight,
   id,
   cannotBeDismissed,
+  exceptionallyStillAllowRenderingInstancesEditors,
   noMobileFullScreen,
 }: DialogProps) => {
   const preferences = React.useContext(PreferencesContext);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
-  const size = useResponsiveWindowWidth();
+  const { windowSize, isMobile } = useResponsiveWindowSize();
   const hasActions =
     (actions && actions.filter(Boolean).length > 0) ||
     (secondaryActions && secondaryActions.filter(Boolean).length > 0);
-  const isFullScreen = size === 'small' && !noMobileFullScreen;
+  const isFullScreen = isMobile && !noMobileFullScreen;
 
-  const classesForDangerousDialog = useDangerousStylesForDialog();
+  const classesForDangerousDialog = useDangerousStylesForDialog(dangerLevel);
   const classesForDialogContent = useStylesForDialogContent();
 
   const dialogActions = React.useMemo(
@@ -304,24 +341,38 @@ const Dialog = ({
     [onCloseDialog, onApply]
   );
 
+  const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
+
   return (
     <MuiDialog
-      classes={isDangerous ? classesForDangerousDialog : undefined}
+      classes={classesForDangerousDialog}
       open={open}
       onClose={onCloseDialog}
       fullWidth
       fullScreen={isFullScreen}
       className={classNames({
         'safe-area-aware-container': isFullScreen,
+        [classNameToStillAllowRenderingInstancesEditor]: exceptionallyStillAllowRenderingInstancesEditors,
       })}
       PaperProps={{
         id,
         style: {
           backgroundColor: gdevelopTheme.dialog.backgroundColor,
-          ...(fullHeight ? styles.fullHeightModal : {}),
+          minHeight: fullHeight
+            ? styles.minHeightForFullHeightModal
+            : minHeight === 'lg'
+            ? styles.minHeightForLargeHeightModal
+            : minHeight === 'sm'
+            ? styles.minHeightForSmallHeightModal
+            : undefined,
+          ...getAvoidSoftKeyboardStyle(softKeyboardBottomOffset),
         },
       }}
-      maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
+      maxWidth={
+        maxWidth !== undefined
+          ? maxWidth
+          : getDefaultMaxWidthFromSize(windowSize)
+      }
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
     >
@@ -331,24 +382,27 @@ const Dialog = ({
         />
       )}
       <div style={dialogContainerStyle}>
-        {title && (
-          <div style={styles.titleContainer}>
-            <Line noMargin justifyContent="space-between">
-              <Text noMargin size="section-title">
-                {title}
-              </Text>
-              {onRequestClose && !cannotBeDismissed && (
-                <IconButton
-                  onClick={onRequestClose}
-                  size="small"
-                  disabled={cannotBeDismissed}
-                >
-                  <Cross />
-                </IconButton>
-              )}
-            </Line>
-          </div>
-        )}
+        <div
+          style={{
+            ...styles.titleContainer,
+            paddingBottom: title ? dialogTitlePadding : 0, // Keep the title container if there is no title, for the close button to be visible, but don't add padding.
+          }}
+        >
+          <Line noMargin justifyContent="space-between" alignItems="flex-start">
+            <Text noMargin size="section-title">
+              {title}
+            </Text>
+            {onRequestClose && !cannotBeDismissed && (
+              <IconButton
+                onClick={onRequestClose}
+                size="small"
+                disabled={cannotBeDismissed}
+              >
+                <Cross />
+              </IconButton>
+            )}
+          </Line>
+        </div>
         {fixedContent && (
           <div style={styles.fixedContentContainer}>{fixedContent}</div>
         )}

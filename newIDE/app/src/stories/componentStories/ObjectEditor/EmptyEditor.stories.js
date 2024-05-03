@@ -2,14 +2,13 @@
 
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import EmptyEditor from '../../../ObjectEditor/Editors/EmptyEditor';
 
 export default {
   title: 'ObjectEditor/EmptyEditor',
   component: EmptyEditor,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
-export const Default = () => <EmptyEditor />;
+export const Default = () => <EmptyEditor renderObjectNameField={() => null} />;

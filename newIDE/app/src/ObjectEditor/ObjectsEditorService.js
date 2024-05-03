@@ -2,12 +2,15 @@
 import TextEditor from './Editors/TextEditor';
 import TiledSpriteEditor from './Editors/TiledSpriteEditor';
 import PanelSpriteEditor from './Editors/PanelSpriteEditor';
-import SpriteEditor, { LockedSpriteEditor } from './Editors/SpriteEditor';
+import SpriteEditor from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
 import CustomObjectPropertiesEditor from './Editors/CustomObjectPropertiesEditor';
+import Cube3DEditor from './Editors/Cube3DEditor';
+import Model3DEditor from './Editors/Model3DEditor';
+import SpineEditor from './Editors/SpineEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -34,15 +37,6 @@ const ObjectsEditorService = {
     return this.getDefaultObjectJsImplementationPropertiesEditor({
       helpPagePath: '',
     });
-  },
-  getEditorConfigurationForCustomObject(
-    project: gdProject,
-    objectType: string
-  ) {
-    if (this.editorConfigurationsSpecificToCustomObject[objectType]) {
-      return this.editorConfigurationsSpecificToCustomObject[objectType];
-    }
-    return this.getEditorConfiguration(project, objectType);
   },
   registerEditorConfiguration: function(
     objectType: string,
@@ -114,16 +108,6 @@ const ObjectsEditorService = {
       helpPagePath: options.helpPagePath,
     };
   },
-  editorConfigurationsSpecificToCustomObject: {
-    Sprite: {
-      component: LockedSpriteEditor,
-      createNewObject: (): gdSpriteObject => new gd.SpriteObject(),
-      castToObjectType: (
-        objectConfiguration: gdObjectConfiguration
-      ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
-      helpPagePath: '/objects/sprite',
-    },
-  },
   editorConfigurations: {
     Sprite: {
       component: SpriteEditor,
@@ -132,6 +116,51 @@ const ObjectsEditorService = {
         objectConfiguration: gdObjectConfiguration
       ): gdSpriteObject => gd.asSpriteConfiguration(objectConfiguration),
       helpPagePath: '/objects/sprite',
+    },
+    'Scene3D::Cube3DObject': {
+      component: Cube3DEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/3d-box',
+    },
+    'Scene3D::Model3DObject': {
+      component: Model3DEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/3d-model',
+    },
+    'SpineObject::SpineObject': {
+      component: SpineEditor,
+      createNewObject: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectConfiguration =>
+        gd
+          .asObjectJsImplementation(objectConfiguration)
+          .clone()
+          .release(),
+      castToObjectType: (
+        objectConfiguration: gdObjectConfiguration
+      ): gdObjectJsImplementation =>
+        gd.asObjectJsImplementation(objectConfiguration),
+      helpPagePath: '/objects/spine',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,

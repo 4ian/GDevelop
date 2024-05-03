@@ -11,6 +11,7 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    "skipLibCheck": true,
     // Not used (as we don't compile with tsc), but necessary for iterating on Map/Set.
     "downlevelIteration": true,
     // Required by PixiJS, for importing 3rd-party dependencies like EventEmitter3.
@@ -23,9 +24,14 @@
     },
     "baseUrl": "./",
     "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"],
-    "typeRoots": ["GDJS/node_modules/@types/"]
+    "typeRoots": ["GDJS/node_modules/@types/"],
+    // JSX syntax for lightweight rendering in the game engine:
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "include": [
+    "GDevelop.js/types.d.ts",
     "GDJS/Runtime/**/*",
     "Extensions/**/*.js",
     "Extensions/**/*.ts",
@@ -40,8 +46,9 @@
     "GDJS/Runtime/Electron",
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
-    "Extensions/**/JsExtension.js",
     "Extensions/Effects/pixi-filters/filter-alpha.js",
+    "SharedLibs/TileMapHelper/**/*",
+    "Extensions/Spine/pixi-spine/pixi-spine.js",
     "Extensions/P2P/A_peer.js"
   ]
 }

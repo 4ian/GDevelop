@@ -52,7 +52,9 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
         onRenameResource={this.props.onRenameResource}
         resourceManagementProps={this.props.resourceManagementProps}
         ref={editor => (this.editor = editor)}
+        fileMetadata={this.props.fileMetadata}
         project={project}
+        storageProvider={this.props.storageProvider}
       />
     );
   }

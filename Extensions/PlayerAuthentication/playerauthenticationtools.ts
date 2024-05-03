@@ -18,6 +18,7 @@ namespace gdjs {
     let _authenticationInAppWindow: Window | null = null; // For Cordova.
     let _authenticationRootContainer: HTMLDivElement | null = null;
     let _authenticationLoaderContainer: HTMLDivElement | null = null;
+    let _authenticationIframeContainer: HTMLDivElement | null = null;
     let _authenticationTextContainer: HTMLDivElement | null = null;
     let _authenticationBanner: HTMLDivElement | null = null;
     let _initialAuthenticationTimeoutId: NodeJS.Timeout | null = null;
@@ -38,12 +39,12 @@ namespace gdjs {
     });
 
     // If the extension is used, register an eventlistener to know if the user is
-    // logged in while playing the game on Liluo.io.
+    // logged in while playing the game on GDevelop games platform.
     // Then send a message to the parent iframe to say that the player auth is ready.
     gdjs.registerFirstRuntimeSceneLoadedCallback(
       (runtimeScene: RuntimeScene) => {
         if (getPlatform(runtimeScene) !== 'web') {
-          // Automatic authentication is only valid when the game is hosted in Liluo.io.
+          // Automatic authentication is only valid when the game is hosted on GDevelop games platform.
           return;
         }
         removeAuthenticationCallbacks(); // Remove any callback that could have been registered before.
@@ -64,9 +65,9 @@ namespace gdjs {
           {
             id: 'playerAuthReady',
           },
-          '*' // We could restrict to liluo.io but it's not necessary as the message is not sensitive, and it allows easy debugging.
+          '*' // We could restrict to GDevelop games platform but it's not necessary as the message is not sensitive, and it allows easy debugging.
         );
-        // If no answer after 3 seconds, assume that the game is not embedded in Liluo.io, and remove the listener.
+        // If no answer after 3 seconds, assume that the game is not embedded in GDevelop games platform, and remove the listener.
         _initialAuthenticationTimeoutId = setTimeout(() => {
           logger.info('Removing initial authentication listener.');
           removeAuthenticationCallbacks();
@@ -85,12 +86,16 @@ namespace gdjs {
       runtimeGame: gdjs.RuntimeGame;
       gameId: string;
       connectionId?: string;
-    }) =>
-      `https://liluo.io/auth?gameId=${gameId}${
+    }) => {
+      // Uncomment to test the case of a failing loading:
+      // return 'https://gd.games.wronglink';
+
+      return `https://gd.games/auth?gameId=${gameId}${
         connectionId ? `&connectionId=${connectionId}` : ''
       }${
         runtimeGame.isUsingGDevelopDevelopmentEnvironment() ? '&dev=true' : ''
       }`;
+    };
 
     /**
      * Helper returning the platform.
@@ -98,12 +103,29 @@ namespace gdjs {
     const getPlatform = (
       runtimeScene: RuntimeScene
     ): 'electron' | 'cordova' | 'web' => {
-      const electron = runtimeScene.getGame().getRenderer().getElectron();
+      const runtimeGame = runtimeScene.getGame();
+      const electron = runtimeGame.getRenderer().getElectron();
       if (electron) {
         return 'electron';
       }
       if (typeof cordova !== 'undefined') return 'cordova';
+
       return 'web';
+    };
+
+    /**
+     * Check if, in some exceptional cases, we allow authentication
+     * to be done through a iframe.
+     * This is usually discouraged as the user can't verify that the authentication
+     * window is a genuine one. It's only to be used in trusted contexts.
+     */
+    const shouldAuthenticationUseIframe = (runtimeScene: RuntimeScene) => {
+      const runtimeGameOptions = runtimeScene.getGame().getAdditionalOptions();
+      return (
+        runtimeGameOptions &&
+        runtimeGameOptions.isPreview &&
+        runtimeGameOptions.allowAuthenticationUsingIframeForPreview
+      );
     };
 
     /**
@@ -149,7 +171,7 @@ namespace gdjs {
       if (!_checkedLocalStorage) {
         readAuthenticatedUserFromLocalStorage();
       }
-      return _userId || null;
+      return _userId || '';
     };
 
     /**
@@ -357,7 +379,8 @@ namespace gdjs {
 
       // Check origin of message.
       if (checkOrigin && !allowedOrigins.includes(event.origin)) {
-        throw new Error(`Unexpected origin: ${event.origin}`);
+        // Automatic authentication message ignored: wrong origin. Return silently.
+        return;
       }
       // Check that message is not malformed.
       if (!event.data.id) {
@@ -509,7 +532,7 @@ namespace gdjs {
 
     /**
      * Helper to recompute the authentication banner.
-     * This is useful if the user is already logged in on Liluo.io
+     * This is useful if the user is already logged on GDevelop games platform
      * and we want to display the banner with the username.
      */
     const refreshAuthenticationBannerIfAny = function (
@@ -576,8 +599,8 @@ namespace gdjs {
               break;
             }
             case 'connectionId': {
-              const messagegeData = messageContent.data;
-              const connectionId = messagegeData.connectionId;
+              const messageData = messageContent.data;
+              const connectionId = messageData.connectionId;
               if (!connectionId) {
                 logger.error('No connectionId received');
                 return;
@@ -686,6 +709,47 @@ namespace gdjs {
     };
 
     /**
+     * Helper to handle authentication iframe on web.
+     * We open an iframe, and listen to messages posted back to the game window.
+     */
+    const openAuthenticationIframeForWeb = (
+      runtimeScene: gdjs.RuntimeScene,
+      gameId: string
+    ) => {
+      if (
+        !_authenticationIframeContainer ||
+        !_authenticationLoaderContainer ||
+        !_authenticationTextContainer
+      ) {
+        console.error(
+          "Can't open an authentication iframe - no iframe container, loader container or text container was opened for it."
+        );
+        return;
+      }
+
+      const targetUrl = getAuthWindowUrl({
+        runtimeGame: runtimeScene.getGame(),
+        gameId,
+      });
+
+      // Listen to messages posted by the authentication window, so that we can
+      // know when the user is authenticated.
+      _authenticationMessageCallback = (event: MessageEvent) => {
+        receiveAuthenticationMessage(runtimeScene, event, {
+          checkOrigin: true,
+        });
+      };
+      window.addEventListener('message', _authenticationMessageCallback, true);
+
+      authComponents.displayIframeInsideAuthenticationContainer(
+        _authenticationIframeContainer,
+        _authenticationLoaderContainer,
+        _authenticationTextContainer,
+        targetUrl
+      );
+    };
+
+    /**
      * Action to display the authentication window to the user.
      */
     export const openAuthenticationWindow = function (
@@ -725,11 +789,13 @@ namespace gdjs {
       const {
         rootContainer,
         loaderContainer,
+        iframeContainer,
       } = authComponents.computeAuthenticationContainer(
         onAuthenticationContainerDismissed
       );
       _authenticationRootContainer = rootContainer;
       _authenticationLoaderContainer = loaderContainer;
+      _authenticationIframeContainer = iframeContainer;
 
       // Display the authentication window right away, to show a loader
       // while the call for game registration is happening.
@@ -769,7 +835,11 @@ namespace gdjs {
                 break;
               case 'web':
               default:
-                openAuthenticationWindowForWeb(runtimeScene, _gameId);
+                if (shouldAuthenticationUseIframe(runtimeScene)) {
+                  openAuthenticationIframeForWeb(runtimeScene, _gameId);
+                } else {
+                  openAuthenticationWindowForWeb(runtimeScene, _gameId);
+                }
                 break;
             }
           }
@@ -815,6 +885,7 @@ namespace gdjs {
 
       _authenticationRootContainer = null;
       _authenticationLoaderContainer = null;
+      _authenticationIframeContainer = null;
       _authenticationTextContainer = null;
     };
 
@@ -838,7 +909,7 @@ namespace gdjs {
     /**
      * Remove the banner displaying the authentication status.
      */
-    const removeAuthenticationBanner = function (
+    export const removeAuthenticationBanner = function (
       runtimeScene: gdjs.RuntimeScene
     ) {
       if (!_authenticationBanner) {

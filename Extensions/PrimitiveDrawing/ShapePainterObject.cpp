@@ -14,10 +14,6 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 
-#if defined(GD_IDE_ONLY)
-#include "GDCore/CommonTools.h"
-#endif
-
 using namespace std;
 
 ShapePainterObjectBase::ShapePainterObjectBase()
@@ -31,7 +27,8 @@ ShapePainterObjectBase::ShapePainterObjectBase()
       outlineColorB(0),
       outlineOpacity(255),
       clearBetweenFrames(true),
-      absoluteCoordinates(false) {}
+      absoluteCoordinates(false),
+      antialiasing("none") {}
 
 ShapePainterObject::ShapePainterObject() {}
 
@@ -67,6 +64,10 @@ void ShapePainterObjectBase::DoUnserializeFrom(
       element.HasChild("clearBetweenFrames")
           ? element.GetChild("clearBetweenFrames").GetValue().GetBool()
           : true;
+
+  antialiasing = element.HasChild("antialiasing")
+                     ? element.GetChild("antialiasing").GetValue().GetString()
+                     : "none";
 }
 
 void ShapePainterObject::DoUnserializeFrom(
@@ -74,7 +75,6 @@ void ShapePainterObject::DoUnserializeFrom(
   ShapePainterObjectBase::DoUnserializeFrom(project, element);
 }
 
-#if defined(GD_IDE_ONLY)
 void ShapePainterObjectBase::DoSerializeTo(
     gd::SerializerElement& element) const {
   element.AddChild("fillOpacity").SetValue(fillOpacity);
@@ -90,12 +90,12 @@ void ShapePainterObjectBase::DoSerializeTo(
       .SetAttribute("b", (int)outlineColorB);
   element.AddChild("absoluteCoordinates").SetValue(absoluteCoordinates);
   element.AddChild("clearBetweenFrames").SetValue(clearBetweenFrames);
+  element.AddChild("antialiasing").SetValue(antialiasing);
 }
 
 void ShapePainterObject::DoSerializeTo(gd::SerializerElement& element) const {
   ShapePainterObjectBase::DoSerializeTo(element);
 }
-#endif
 
 /**
  * Change the color filter of the sprite object

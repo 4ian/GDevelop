@@ -22,6 +22,8 @@ import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import useAlertDialog from '../UI/Alert/useAlertDialog';
+import ErrorBoundary from '../UI/ErrorBoundary';
 
 const gd: libGDevelop = global.gd;
 
@@ -40,10 +42,11 @@ type Props = {|
 
   // Object renaming:
   onRename: string => void,
-  canRenameObject: string => boolean,
+  getValidatedObjectOrGroupName: string => string,
 
   // Passed down to object editors:
   project: gdProject,
+  layout?: gdLayout,
   onComputeAllVariableNames: () => Array<string>,
   resourceManagementProps: ResourceManagementProps,
   unsavedChanges?: UnsavedChanges,
@@ -55,6 +58,7 @@ type Props = {|
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
+  openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
 |};
 
 type InnerDialogProps = {|
@@ -66,6 +70,8 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
+  const { showConfirmation } = useAlertDialog();
+  const { openBehaviorEvents } = props;
   const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
@@ -74,26 +80,49 @@ const InnerDialog = (props: InnerDialogProps) => {
   const {
     onCancelChanges,
     notifyOfChange,
+    hasUnsavedChanges,
+    getOriginalContentSerializedElement,
   } = useSerializableObjectCancelableEditor({
     serializableObject: props.object,
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
+    resetThenClearPersistentUuid: true,
   });
 
-  const objectMetadata = React.useMemo(
-    () =>
-      gd.MetadataProvider.getObjectMetadata(
-        props.project.getCurrentPlatform(),
-        props.object.getType()
-      ),
-    [props.project, props.object]
+  // Don't use a memo for this because metadata from custom objects are built
+  // from event-based object when extensions are refreshed after an extension
+  // installation.
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    props.project.getCurrentPlatform(),
+    props.object.getType()
   );
 
   const EditorComponent: ?React.ComponentType<EditorProps> =
     props.editorComponent;
 
-  const onApply = () => {
+  const onApply = async () => {
     props.onApply();
+
+    const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+      props.project,
+      getOriginalContentSerializedElement().getChild('variables'),
+      props.object.getVariables()
+    );
+    if (changeset.hasRemovedVariables()) {
+      // While we support refactoring that would remove all references (actions, conditions...)
+      // it's both a bit dangerous for the user and we would need to show the user what
+      // will be removed before doing so. For now, just clear the removed variables so they don't
+      // trigger any refactoring.
+      changeset.clearRemovedVariables();
+    }
+
+    gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+      props.project,
+      props.object.getVariables(),
+      changeset
+    );
+    props.object.clearPersistentUuid();
+
     // Do the renaming *after* applying changes, as "withSerializableObject"
     // HOC will unserialize the object to apply modifications, which will
     // override the name.
@@ -111,6 +140,23 @@ const InnerDialog = (props: InnerDialogProps) => {
       }
     },
     [currentTab]
+  );
+
+  const askConfirmationAndOpenBehaviorEvents = React.useCallback(
+    async (extensionName, behaviorName) => {
+      if (hasUnsavedChanges()) {
+        const answer = await showConfirmation({
+          title: t`Discard changes and open events`,
+          message: t`You've made some changes here. Are you sure you want to discard them and open the behavior events?`,
+          confirmButtonLabel: t`Yes, discard my changes`,
+          dismissButtonLabel: t`Stay there`,
+        });
+        if (!answer) return;
+      }
+      onCancelChanges();
+      openBehaviorEvents(extensionName, behaviorName);
+    },
+    [hasUnsavedChanges, onCancelChanges, openBehaviorEvents, showConfirmation]
   );
 
   return (
@@ -161,12 +207,14 @@ const InnerDialog = (props: InnerDialogProps) => {
               label: <Trans>Variables</Trans>,
               value: 'variables',
             },
-            objectMetadata.isUnsupportedBaseObjectCapability('effect')
-              ? null
-              : {
+            objectMetadata.hasDefaultBehavior(
+              'EffectCapability::EffectBehavior'
+            )
+              ? {
                   label: <Trans>Effects</Trans>,
                   value: 'effects',
-                },
+                }
+              : null,
           ].filter(Boolean)}
         />
       }
@@ -183,8 +231,18 @@ const InnerDialog = (props: InnerDialogProps) => {
             true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
           }
         >
-          <Line>
-            <Column expand noMargin>
+          <EditorComponent
+            objectConfiguration={props.object.getConfiguration()}
+            project={props.project}
+            layout={props.layout}
+            object={props.object}
+            resourceManagementProps={props.resourceManagementProps}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            objectName={props.objectName}
+            onObjectUpdated={notifyOfChange}
+            renderObjectNameField={() => (
               <SemiControlledTextField
                 fullWidth
                 id="object-name"
@@ -196,24 +254,14 @@ const InnerDialog = (props: InnerDialogProps) => {
                 onChange={newObjectName => {
                   if (newObjectName === objectName) return;
 
-                  if (props.canRenameObject(newObjectName)) {
-                    setObjectName(newObjectName);
-                    notifyOfChange();
-                  }
+                  setObjectName(
+                    props.getValidatedObjectOrGroupName(newObjectName)
+                  );
+                  notifyOfChange();
                 }}
                 autoFocus="desktop"
               />
-            </Column>
-          </Line>
-          <EditorComponent
-            objectConfiguration={props.object.getConfiguration()}
-            project={props.project}
-            resourceManagementProps={props.resourceManagementProps}
-            onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positionned*/
-            }
-            objectName={props.objectName}
-            onObjectUpdated={notifyOfChange}
+            )}
           />
         </Column>
       ) : null}
@@ -224,10 +272,11 @@ const InnerDialog = (props: InnerDialogProps) => {
           eventsFunctionsExtension={props.eventsFunctionsExtension}
           resourceManagementProps={props.resourceManagementProps}
           onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
           onBehaviorsUpdated={notifyOfChange}
+          openBehaviorEvents={askConfirmationAndOpenBehaviorEvents}
         />
       )}
       {currentTab === 'variables' && (
@@ -241,7 +290,6 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
-            commitChangesOnBlur
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>
@@ -260,11 +308,24 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'effects' && (
         <EffectsList
           target="object"
+          // TODO (3D): declare the renderer type in object metadata.
+          layerRenderingType="2d"
           project={props.project}
           resourceManagementProps={props.resourceManagementProps}
           effectsContainer={props.object.getEffects()}
+          onEffectsRenamed={(oldName, newName) =>
+            // TODO EBO Refactor event-based object events when an effect is renamed.
+            props.layout &&
+            gd.WholeProjectRefactorer.renameObjectEffect(
+              props.project,
+              props.layout,
+              props.object,
+              oldName,
+              newName
+            )
+          }
           onEffectsUpdated={() => {
-            forceUpdate(); /*Force update to ensure dialog is properly positionned*/
+            forceUpdate(); /*Force update to ensure dialog is properly positioned*/
             notifyOfChange();
           }}
         />
@@ -282,7 +343,7 @@ type State = {|
   objectName: string,
 |};
 
-export default class ObjectEditorDialog extends React.Component<Props, State> {
+class ObjectEditorDialog extends React.Component<Props, State> {
   state = {
     editorComponent: null,
     castToObjectType: null,
@@ -346,3 +407,16 @@ export default class ObjectEditorDialog extends React.Component<Props, State> {
     );
   }
 }
+
+const ObjectEditorWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Object editor</Trans>}
+    scope="object-details"
+    onClose={props.onCancel}
+    showOnTop
+  >
+    <ObjectEditorDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ObjectEditorWithErrorBoundary;

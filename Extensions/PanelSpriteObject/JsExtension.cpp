@@ -61,6 +61,9 @@ class PanelSpriteObjectJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::Image"]
         .SetFunctionName("setTexture");
+    GetAllActionsForObject(
+        "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetImageFromResource"]
+        .SetFunctionName("setTexture");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

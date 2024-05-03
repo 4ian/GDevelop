@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import Delete from '@material-ui/icons/Delete';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import styles from './styles';
 import { roundTo } from '../../../../Utils/Mathematics';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
 
 const VERTEX_COORDINATE_PRECISION = 4;
 
@@ -53,6 +53,7 @@ const VerticeRow = ({
           }
           value={roundTo(verticeX, VERTEX_COORDINATE_PRECISION).toString()}
           type="number"
+          step={0.5}
           id="vertice-x"
           onChange={value => {
             const valueAsNumber = parseFloat(value);
@@ -73,6 +74,7 @@ const VerticeRow = ({
           }
           value={roundTo(verticeY, VERTEX_COORDINATE_PRECISION).toString()}
           type="number"
+          step={0.5}
           id="vertice-y"
           onChange={value => {
             const valueAsNumber = parseFloat(value);
@@ -90,7 +92,7 @@ const VerticeRow = ({
             onClick={props.onRemove}
             disabled={!props.canRemove}
           >
-            <Delete />
+            <Trash />
           </IconButton>
         )}
       </TableRowColumn>

@@ -14,26 +14,60 @@ import Text from '../UI/Text';
 import { Line } from '../UI/Grid';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { MarkdownText } from '../UI/MarkdownText';
+import Paper from '../UI/Paper';
+import { getAnnouncementContent } from './AnnouncementFormatting';
+import RouterContext from '../MainFrame/RouterContext';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+
+const styles = {
+  markdownContainer: {
+    transition: 'transform 0.3s ease-in-out',
+  },
+};
+
+const useStylesForClickableContainer = () =>
+  makeStyles(theme =>
+    createStyles({
+      root: {
+        '&:hover': {
+          transform: 'scale(1.02)',
+        },
+        '&:focus': {
+          transform: 'scale(1.02)',
+          outline: 'none',
+        },
+      },
+    })
+  )();
 
 type AnnouncementsFeedProps = {|
   level?: 'urgent' | 'normal',
   canClose?: boolean,
   addMargins?: boolean,
+  hideLoader?: boolean,
 |};
 
 export const AnnouncementsFeed = ({
   level,
   canClose,
   addMargins,
+  hideLoader,
 }: AnnouncementsFeedProps) => {
-  const { announcements, error, fetchAnnouncements } = React.useContext(
-    AnnouncementsFeedContext
-  );
+  const {
+    announcements,
+    error,
+    fetchAnnouncementsAndPromotions,
+  } = React.useContext(AnnouncementsFeedContext);
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
+  const { navigateToRoute } = React.useContext(RouterContext);
+  const { isMobile } = useResponsiveWindowSize();
+
+  const classesForClickableContainer = useStylesForClickableContainer();
 
   if (error) {
     return (
-      <PlaceholderError onRetry={fetchAnnouncements}>
+      <PlaceholderError onRetry={fetchAnnouncementsAndPromotions}>
         <Trans>
           Can't load the announcements. Verify your internet connection or try
           again later.
@@ -41,7 +75,7 @@ export const AnnouncementsFeed = ({
       </PlaceholderError>
     );
   } else if (!announcements) {
-    return <PlaceholderLoader />;
+    return hideLoader ? null : <PlaceholderLoader />;
   }
 
   const properLevelAnnouncements = level
@@ -59,53 +93,90 @@ export const AnnouncementsFeed = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Line noMargin={!addMargins}>
-          <ColumnStackLayout noMargin={!addMargins} expand>
-            {displayedAnnouncements.map(announcement => {
-              const { buttonLabelByLocale, buttonUrl } = announcement;
+        <Paper square background="dark">
+          <Line noMargin={!addMargins}>
+            <ColumnStackLayout noMargin={!addMargins} expand>
+              {displayedAnnouncements.map((announcement, index) => {
+                const { buttonLabelByLocale, buttonUrl } = announcement;
+                const {
+                  title,
+                  desktopMessage,
+                  mobileMessage,
+                  desktopRouteNavigationParams,
+                  mobileRouteNavigationParams,
+                  isClickableContent,
+                } = getAnnouncementContent(i18n, announcement);
 
-              return (
-                <AlertMessage
-                  kind={announcement.type === 'warning' ? 'warning' : 'info'}
-                  renderRightButton={
-                    buttonLabelByLocale && buttonUrl
-                      ? () => (
-                          <RaisedButton
-                            label={selectMessageByLocale(
-                              i18n,
-                              buttonLabelByLocale
-                            )}
-                            onClick={() => Window.openExternalURL(buttonUrl)}
-                          />
+                const onClick =
+                  desktopRouteNavigationParams && !isMobile
+                    ? () =>
+                        navigateToRoute(
+                          desktopRouteNavigationParams.route,
+                          desktopRouteNavigationParams.params
                         )
-                      : null
-                  }
-                  onHide={
-                    canClose
-                      ? () => {
-                          showAnnouncement(announcement.id, false);
-                        }
-                      : null
-                  }
-                  key={announcement.id}
-                >
-                  <Text size="block-title">
-                    <Trans>
-                      {selectMessageByLocale(i18n, announcement.titleByLocale)}
-                    </Trans>
-                  </Text>
-                  <MarkdownText
-                    source={selectMessageByLocale(
-                      i18n,
-                      announcement.markdownMessageByLocale
-                    )}
-                    allowParagraphs={false}
-                  />
-                </AlertMessage>
-              );
-            })}
-          </ColumnStackLayout>
-        </Line>
+                    : mobileRouteNavigationParams && isMobile
+                    ? () =>
+                        navigateToRoute(
+                          mobileRouteNavigationParams.route,
+                          mobileRouteNavigationParams.params
+                        )
+                    : undefined;
+
+                return (
+                  <AlertMessage
+                    kind={announcement.type}
+                    renderRightButton={
+                      buttonLabelByLocale && buttonUrl
+                        ? () => (
+                            <RaisedButton
+                              label={selectMessageByLocale(
+                                i18n,
+                                buttonLabelByLocale
+                              )}
+                              onClick={() => Window.openExternalURL(buttonUrl)}
+                            />
+                          )
+                        : null
+                    }
+                    onHide={
+                      canClose
+                        ? () => {
+                            showAnnouncement(announcement.id, false);
+                          }
+                        : null
+                    }
+                    hideButtonSize="small"
+                    key={announcement.id}
+                    markdownImageOnly={!title}
+                  >
+                    {title ? <Text size="block-title">{title}</Text> : null}
+                    <div
+                      onClick={onClick}
+                      className={
+                        isClickableContent
+                          ? classesForClickableContainer.root
+                          : undefined
+                      }
+                      style={styles.markdownContainer}
+                    >
+                      {isMobile ? (
+                        <MarkdownText
+                          source={mobileMessage}
+                          allowParagraphs={false}
+                        />
+                      ) : (
+                        <MarkdownText
+                          source={desktopMessage}
+                          allowParagraphs={false}
+                        />
+                      )}
+                    </div>
+                  </AlertMessage>
+                );
+              })}
+            </ColumnStackLayout>
+          </Line>
+        </Paper>
       )}
     </I18n>
   );

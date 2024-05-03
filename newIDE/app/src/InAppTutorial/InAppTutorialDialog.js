@@ -5,7 +5,7 @@ import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { MarkdownText } from '../UI/MarkdownText';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
-import { type InAppTutorialDialog as InAppTutorialDialogType } from './InAppTutorialContext';
+import { type InAppTutorialDialog as InAppTutorialDialogType } from '../Utils/GDevelopServices/InAppTutorial';
 import Window from '../Utils/Window';
 import Link from '../UI/Link';
 import { ColumnStackLayout } from '../UI/Layout';

@@ -20,6 +20,9 @@ export type PrivateAssetsState = {|
   installPrivateAsset: (
     options: InstallAssetArgs
   ) => Promise<?InstallAssetOutput>,
+  getPrivateAssetPackAudioArchiveUrl: (
+    privateAssetPackId: string
+  ) => Promise<string | null>,
 |};
 
 const initialPrivateAssetsState = {
@@ -27,6 +30,7 @@ const initialPrivateAssetsState = {
   updateAuthorizationToken: async () => {},
   fetchPrivateAsset: async (assetShortHeader, options) => null,
   installPrivateAsset: async options => null,
+  getPrivateAssetPackAudioArchiveUrl: async id => null,
 };
 
 const PrivateAssetsAuthorizationContext = React.createContext<PrivateAssetsState>(

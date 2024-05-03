@@ -4,9 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
-#ifndef GDCORE_RESOURCESRENAMER_H
-#define GDCORE_RESOURCESRENAMER_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -24,13 +22,16 @@ namespace gd {
  */
 class ResourcesRenamer : public gd::ArbitraryResourceWorker {
  public:
-  /**
-   * @brief Constructor taking the map from old name to new name.
-   * @param oldToNewNames_ A map associating to a resource name the new name to
-   * use.
-   */
-  ResourcesRenamer(const std::map<gd::String, gd::String>& oldToNewNames_)
-      : gd::ArbitraryResourceWorker(), oldToNewNames(oldToNewNames_){};
+   /**
+    * @brief Constructor taking the map from old name to new name.
+    * @param oldToNewNames_ A map associating to a resource name the new name to
+    * use.
+    */
+   ResourcesRenamer(gd::ResourcesManager &resourcesManager,
+                    const std::map<gd::String, gd::String> &oldToNewNames_)
+       : gd::ArbitraryResourceWorker(resourcesManager),
+         oldToNewNames(oldToNewNames_){};
+
   virtual ~ResourcesRenamer(){};
 
   virtual void ExposeFile(gd::String& resourceFileName) override{
@@ -61,6 +62,15 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeBitmapFont(gd::String& bitmapFontName) override {
     RenameIfNeeded(bitmapFontName);
   };
+  virtual void ExposeModel3D(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
+  virtual void ExposeAtlas(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
+  virtual void ExposeSpine(gd::String& resourceName) override {
+    RenameIfNeeded(resourceName);
+  };
 
  private:
   void RenameIfNeeded(gd::String& resourceName) {
@@ -72,6 +82,3 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_RESOURCESRENAMER_H
-#endif

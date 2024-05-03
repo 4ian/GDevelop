@@ -15,7 +15,7 @@ import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   project: gdProject,
@@ -38,7 +38,7 @@ export const NewResourceDialog = ({
   onClose,
   onChooseResources,
 }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const storageProvider = React.useMemo(() => getStorageProvider(), [
     getStorageProvider,
   ]);
@@ -64,6 +64,7 @@ export const NewResourceDialog = ({
   );
   const isInitialSourceHeadless =
     initialSource && initialSource.selectResourcesHeadless;
+
   const [currentTab, setCurrentTab] = React.useState(() => {
     if (!initialSource) return 'import';
 
@@ -74,7 +75,15 @@ export const NewResourceDialog = ({
 
     return 'import';
   });
+  const [hasChangedTabs, setHasChangedTabs] = React.useState(false);
   const [isShowingAdvanced, setIsShowingAdvanced] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      return () => setHasChangedTabs(true);
+    },
+    [currentTab]
+  );
 
   React.useEffect(
     () => {
@@ -92,6 +101,8 @@ export const NewResourceDialog = ({
             getStorageProvider,
             getLastUsedPath: preferences.getLastUsedPath,
             setLastUsedPath: preferences.setLastUsedPath,
+            resourcesImporationBehavior:
+              preferences.values.resourcesImporationBehavior,
           });
           onChooseResources(resources);
         } catch (error) {
@@ -122,9 +133,8 @@ export const NewResourceDialog = ({
       ]}
       secondaryActions={[
         importTabAdvancedResourceSources.length > 0 ? (
-          <Column>
+          <Column key="show-advanced-toggle">
             <Toggle
-              key="show-advanced-toggle"
               onToggle={(e, check) => setIsShowingAdvanced(check)}
               toggled={isShowingAdvanced}
               labelPosition="right"
@@ -145,8 +155,8 @@ export const NewResourceDialog = ({
             })),
             { label: <Trans>Choose a file</Trans>, value: 'import' },
           ]}
-          // Enforce scroll on small screen, because the tabs have long names.
-          variant={windowWidth === 'small' ? 'scrollable' : undefined}
+          // Enforce scroll on very small screens, because the tabs have long names.
+          variant={isMobile ? 'scrollable' : undefined}
         />
       }
     >
@@ -162,6 +172,8 @@ export const NewResourceDialog = ({
           getLastUsedPath: preferences.getLastUsedPath,
           setLastUsedPath: preferences.setLastUsedPath,
           onChooseResources,
+          resourcesImporationBehavior:
+            preferences.values.resourcesImporationBehavior,
         });
       })}
       {currentTab === 'import' ? (
@@ -179,6 +191,14 @@ export const NewResourceDialog = ({
                   getLastUsedPath: preferences.getLastUsedPath,
                   setLastUsedPath: preferences.setLastUsedPath,
                   onChooseResources,
+                  resourcesImporationBehavior:
+                    preferences.values.resourcesImporationBehavior,
+
+                  // Ask the component to try to automatically open the dialog to import file(s),
+                  // but only if tabs were not changed, meaning the user navigated out of it already.
+                  // In other words, only do this at the dialog opening.
+                  automaticallyOpenIfPossible:
+                    initialSource === source && !hasChangedTabs,
                 })}
               </React.Fragment>
             ))}
@@ -195,6 +215,8 @@ export const NewResourceDialog = ({
                     getLastUsedPath: preferences.getLastUsedPath,
                     setLastUsedPath: preferences.setLastUsedPath,
                     onChooseResources,
+                    resourcesImporationBehavior:
+                      preferences.values.resourcesImporationBehavior,
                   })}
                 </React.Fragment>
               ))}

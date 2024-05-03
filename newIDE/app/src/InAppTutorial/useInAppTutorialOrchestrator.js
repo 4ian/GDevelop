@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import InAppTutorialOrchestrator from './InAppTutorialOrchestrator';
-import { type EditorIdentifier } from './InAppTutorialContext';
+import { type EditorIdentifier } from '../Utils/GDevelopServices/InAppTutorial';
 import { type EditorTabsState } from '../MainFrame/EditorTabs/EditorTabsHandler';
 import { getCurrentTab } from '../MainFrame/EditorTabs/EditorTabsHandler';
 

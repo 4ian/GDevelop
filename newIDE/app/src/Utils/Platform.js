@@ -45,3 +45,4 @@ export const getPlatformName = (): string => {
 export const isWindows = () => _isWindows;
 export const isMacLike = () => _isMacLike;
 export const isMobile = () => _isMobile;
+export const isNativeMobileApp = () => false;

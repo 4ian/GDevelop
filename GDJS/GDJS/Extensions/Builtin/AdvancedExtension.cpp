@@ -18,7 +18,6 @@ AdvancedExtension::AdvancedExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
   GetAllActions()["SetReturnNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -35,7 +34,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -52,7 +50,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllActions()["SetReturnBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -66,8 +63,43 @@ AdvancedExtension::AdvancedExtension() {
                booleanCode + "; }";
       });
 
+  GetAllActions()["CopyArgumentToVariable"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(eventsFunctionContext.getArgument(" +
+               parameter + "), " + variable +
+               ", false);\n"
+               "}\n";
+      });
+
+  GetAllActions()["CopyVariableToArgument"]
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
+        // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
+        gd::String parameter = instruction.GetParameter(0).GetPlainString();
+        gd::String variable =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, context, "scenevar", instruction.GetParameter(1),
+                "");
+
+        return "if (typeof eventsFunctionContext !== 'undefined') {\n"
+               "gdjs.Variable.copy(" +
+               variable + ", eventsFunctionContext.getArgument(" + parameter +
+               "), false);\n"
+               "}\n";
+      });
+
   GetAllConditions()["GetArgumentAsBoolean"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
@@ -83,8 +115,8 @@ AdvancedExtension::AdvancedExtension() {
             "!!eventsFunctionContext.getArgument(" +
             parameterNameCode + ") : false)";
         gd::String outputCode =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val = " + valueCode + ";\n";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context) +
+            " = " + valueCode + ";\n";
         return outputCode;
       });
 
@@ -123,7 +155,6 @@ AdvancedExtension::AdvancedExtension() {
       });
 
   GetAllConditions()["CompareArgumentAsNumber"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -132,8 +163,7 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String operandCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -141,17 +171,20 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
-               "Number(eventsFunctionContext.getArgument(" +
-               parameterNameCode + ")) || 0 : 0) " + operatorCode + " " +
-               operandCode + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") +
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString,
+                   "((typeof eventsFunctionContext !== 'undefined' ? "
+                   "Number(eventsFunctionContext.getArgument(" +
+                       parameterNameCode + ")) || 0 : 0)",
+                   operandCode) +
+               ");\n";
       });
 
   GetAllConditions()["CompareArgumentAsString"]
-      .GetCodeExtraInformation()
       .SetCustomCodeGenerator([](gd::Instruction &instruction,
                                  gd::EventsCodeGenerator &codeGenerator,
                                  gd::EventsCodeGenerationContext &context) {
@@ -160,8 +193,7 @@ AdvancedExtension::AdvancedExtension() {
                 codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
 
-        gd::String operatorCode = codeGenerator.GenerateRelationalOperatorCodes(
-            instruction.GetParameter(1).GetPlainString());
+        gd::String operatorString = instruction.GetParameter(1).GetPlainString();
 
         gd::String operandCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
@@ -169,13 +201,17 @@ AdvancedExtension::AdvancedExtension() {
                 instruction.GetParameter(2).GetPlainString());
 
         gd::String resultingBoolean =
-            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
-            ".val";
+            codeGenerator.GenerateUpperScopeBooleanFullName("isConditionTrue", context);
 
-        return resultingBoolean + " = ((typeof eventsFunctionContext !== 'undefined' ? "
-               "\"\" + eventsFunctionContext.getArgument(" +
-               parameterNameCode + ") : \"\") " + operatorCode + " " +
-               operandCode + ");\n";
+        return resultingBoolean + " = " +
+               gd::String(instruction.IsInverted() ? "!" : "") +
+               codeGenerator.GenerateRelationalOperation(
+                   operatorString,
+                   "((typeof eventsFunctionContext !== 'undefined' ? "
+                   "\"\" + eventsFunctionContext.getArgument(" +
+                       parameterNameCode + ") : \"\")",
+                   operandCode) +
+               ");\n";
       });
 }
 

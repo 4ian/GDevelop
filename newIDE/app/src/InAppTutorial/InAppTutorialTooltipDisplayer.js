@@ -10,16 +10,18 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 
 import { Column, Spacer } from '../UI/Grid';
 import { getDisplayZIndexForHighlighter } from './HTMLUtils';
-import { type InAppTutorialFormattedTooltip } from './InAppTutorialContext';
+import { type InAppTutorialFormattedTooltip } from '../Utils/GDevelopServices/InAppTutorial';
 import ChevronArrowBottom from '../UI/CustomSvgIcons/ChevronArrowBottom';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { MarkdownText } from '../UI/MarkdownText';
 import RaisedButton from '../UI/RaisedButton';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 import Cross from '../UI/CustomSvgIcons/Cross';
 import { LineStackLayout } from '../UI/Layout';
 import ChevronArrowTop from '../UI/CustomSvgIcons/ChevronArrowTop';
 import { textEllipsisStyle } from '../UI/TextEllipsis';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import TextButton from '../UI/TextButton';
 
 const themeColors = {
   grey10: '#EBEBED',
@@ -128,43 +130,74 @@ type TooltipBodyProps = {|
   tooltip: InAppTutorialFormattedTooltip,
   buttonLabel?: string,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const TooltipBody = ({
   tooltip,
   buttonLabel,
   goToNextStep,
+  fillAutomatically,
 }: TooltipBodyProps) => {
-  return (
-    <>
+  const { isMobile } = useResponsiveWindowSize();
+  const titleAndDescription = (
+    <Column noMargin>
       {tooltip.title && (
-        <Typography style={styles.title} variant="subtitle">
+        <Typography style={styles.title} variant="subtitle1" translate="no">
           <MarkdownText source={tooltip.title} allowParagraphs />
         </Typography>
       )}
       {tooltip.title && tooltip.description && <span style={styles.divider} />}
       {tooltip.description && (
-        <Typography style={styles.description}>
+        <Typography style={styles.description} translate="no">
           <MarkdownText source={tooltip.description} allowParagraphs />
         </Typography>
       )}
-      {tooltip.image && (
-        <img
-          src={tooltip.image.dataUrl}
-          alt="Tutorial helper"
-          style={{
-            ...styles.descriptionImage,
-            width: tooltip.image.width || '100%',
-          }}
-        />
-      )}
-      {buttonLabel && (
-        <>
-          {tooltip.image ? <Spacer /> : null}
-          <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
-        </>
-      )}
-    </>
+    </Column>
+  );
+  const image = tooltip.image && (
+    <img
+      src={tooltip.image.dataUrl}
+      alt="Tutorial helper"
+      style={{
+        ...styles.descriptionImage,
+        width: tooltip.image.width || '100%',
+        maxWidth: isMobile ? 150 : '100%',
+        maxHeight: isMobile ? 150 : '100%',
+      }}
+    />
+  );
+  const button = buttonLabel && (
+    <Column noMargin expand>
+      {tooltip.image ? <Spacer /> : null}
+      <RaisedButton primary label={buttonLabel} onClick={goToNextStep} />
+    </Column>
+  );
+  const imageAndButton = isMobile ? (
+    <LineStackLayout noMargin alignItems="center">
+      {image}
+      {button}
+    </LineStackLayout>
+  ) : (
+    <Column noMargin alignItems="center">
+      {image}
+      {button}
+    </Column>
+  );
+
+  const fillAutomaticallyButton = fillAutomatically && (
+    <TextButton
+      onClick={fillAutomatically}
+      label={<Trans>Fill automatically</Trans>}
+      primary
+    />
+  );
+  return (
+    <Column noMargin>
+      {titleAndDescription}
+      {imageAndButton}
+      {fillAutomaticallyButton}
+    </Column>
   );
 };
 
@@ -205,7 +238,10 @@ const TooltipHeader = ({
       noMargin
       justifyContent={tooltipContent ? undefined : 'space-between'}
     >
-      <Typography style={{ ...styles.headerText, color: progressColor }}>
+      <Typography
+        style={{ ...styles.headerText, color: progressColor }}
+        translate="no"
+      >
         {progress}%
       </Typography>
       <LineStackLayout noMargin alignItems="center" overflow="hidden">
@@ -222,7 +258,7 @@ const TooltipHeader = ({
               }}
             >
               <Cross />
-              <Typography style={styles.headerText}>
+              <Typography style={styles.headerText} translate="no">
                 <Trans>Quit tutorial</Trans>
               </Typography>
             </div>
@@ -232,6 +268,7 @@ const TooltipHeader = ({
           <Typography
             variant="body2"
             style={{ ...styles.headerContentPreview, ...textEllipsisStyle }}
+            translate="no"
           >
             {tooltipContent}
           </Typography>
@@ -261,6 +298,7 @@ type Props = {|
   progress: number,
   endTutorial: () => void,
   goToNextStep: () => void,
+  fillAutomatically?: () => void,
 |};
 
 const InAppTutorialTooltipDisplayer = ({
@@ -271,7 +309,9 @@ const InAppTutorialTooltipDisplayer = ({
   progress,
   endTutorial,
   goToNextStep,
+  fillAutomatically,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const {
     palette: { type: paletteType },
   } = React.useContext(GDevelopThemeContext);
@@ -297,74 +337,83 @@ const InAppTutorialTooltipDisplayer = ({
 
   useIsElementVisibleInScroll(anchorElement, updateVisibility);
 
-  const arrowRef = React.useRef<?HTMLSpanElement>(null);
   const classes = useClasses();
-  const placement = tooltip.placement || 'bottom';
+  const placement =
+    isMobile && tooltip.mobilePlacement
+      ? tooltip.mobilePlacement
+      : tooltip.placement || 'bottom';
   const backgroundColor =
     paletteType === 'light'
       ? '#EBEBED' // Grey10
       : '#FAFAFA'; // Grey00
 
   return (
-    <>
-      <Popper
-        id="in-app-tutorial-tooltip-displayer"
-        open={show}
-        className={classes.popper}
-        anchorEl={anchorElement}
-        transition
-        placement={placement}
-        popperOptions={{
-          modifiers: {
-            arrow: { enabled: true, element: '#arrow-popper' },
-            offset: {
-              enabled: true,
-              offset: '0,10',
-            },
+    <Popper
+      id="in-app-tutorial-tooltip-displayer"
+      open={show}
+      className={classes.popper}
+      anchorEl={anchorElement}
+      transition
+      placement={placement}
+      popperOptions={{
+        modifiers: {
+          arrow: { enabled: true, element: '#arrow-popper' },
+          offset: {
+            enabled: true,
+            offset: '0,10',
           },
-        }}
-        style={{
-          zIndex: getDisplayZIndexForHighlighter(anchorElement),
-          maxWidth: 300,
-        }}
-      >
-        {({ TransitionProps }) => (
-          <>
-            <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
-              <Paper style={{ ...styles.paper, backgroundColor }} elevation={4}>
-                <Column noMargin>
-                  <TooltipHeader
-                    paletteType={paletteType}
-                    // Display the hide button when standalone only
-                    showFoldButton={!!tooltip.standalone}
-                    showQuitButton={showQuitButton}
-                    progress={progress}
-                    tooltipContent={
-                      folded ? tooltip.title || tooltip.description : undefined
-                    }
-                    onClickFoldButton={() => setFolded(!folded)}
-                    endTutorial={endTutorial}
-                  />
-                  {!folded && (
-                    <TooltipBody
-                      tooltip={tooltip}
-                      buttonLabel={buttonLabel}
-                      goToNextStep={goToNextStep}
-                    />
-                  )}
-                </Column>
-                <span
-                  id="arrow-popper"
-                  className={classes.arrow}
-                  ref={arrowRef}
-                  style={{ color: backgroundColor }}
+          preventOverflow: {
+            enabled: true,
+            boundariesElement: document.querySelector('.main-frame'),
+          },
+        },
+      }}
+      style={{
+        zIndex: getDisplayZIndexForHighlighter(anchorElement),
+        maxWidth: 'min(90%, 300px)',
+        width: isMobile ? '100%' : undefined,
+      }}
+    >
+      {({ TransitionProps }) => (
+        <Fade {...TransitionProps} timeout={{ enter: 350, exit: 0 }}>
+          <Paper
+            style={{
+              ...styles.paper,
+              backgroundColor,
+            }}
+            elevation={4}
+          >
+            <Column noMargin>
+              <TooltipHeader
+                paletteType={paletteType}
+                // Display the hide button when standalone only
+                showFoldButton={!!tooltip.standalone}
+                showQuitButton={showQuitButton}
+                progress={progress}
+                tooltipContent={
+                  folded ? tooltip.title || tooltip.description : undefined
+                }
+                onClickFoldButton={() => setFolded(!folded)}
+                endTutorial={endTutorial}
+              />
+              {!folded && (
+                <TooltipBody
+                  tooltip={tooltip}
+                  buttonLabel={buttonLabel}
+                  goToNextStep={goToNextStep}
+                  fillAutomatically={fillAutomatically}
                 />
-              </Paper>
-            </Fade>
-          </>
-        )}
-      </Popper>
-    </>
+              )}
+            </Column>
+            <span
+              id="arrow-popper"
+              className={classes.arrow}
+              style={{ color: backgroundColor }}
+            />
+          </Paper>
+        </Fade>
+      )}
+    </Popper>
   );
 };
 

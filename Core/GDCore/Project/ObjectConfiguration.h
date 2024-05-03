@@ -61,7 +61,9 @@ class GD_CORE_API ObjectConfiguration {
 
   /** \brief Change the type of the object.
    */
-  void SetType(const gd::String& type_) { type = type_; }
+  void SetType(const gd::String& type_) {
+    type = type_;
+  }
 
   /** \brief Return the type of the object.
    */

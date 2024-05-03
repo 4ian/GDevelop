@@ -47,3 +47,15 @@
   margin-block-start: 10px;
   margin-block-end: 10px;
 }
+
+.gd-markdown table {
+  border-collapse: collapse;
+}
+.gd-markdown th,
+.gd-markdown td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid currentColor;
+}

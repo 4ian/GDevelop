@@ -6,7 +6,7 @@
  * @internal
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
-gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
+gdjs.getPixiRuntimeGameWithAssets = () => {
   if (gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise) {
     return gdjs.getPixiRuntimeGameWithAssets._pixiRuntimeGameWithAssetsPromise;
   }
@@ -22,6 +22,8 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
       scaleMode: 'linear',
       pixelsRounding: false,
       sizeOnStartupMode: 'adaptWidth',
+      antialiasingMode: 'MSAA',
+      antialisingEnabledOnMobile: false,
       useExternalSourceFiles: true,
       version: '1.0.0',
       name: 'Test game with real assets',
@@ -45,8 +47,11 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
         progressBarMaxWidth: 300,
         progressBarWidthPercent: 40,
         progressBarHeight: 20,
-        progressBarColor: 0xFFFFFF,
+        progressBarColor: 0xffffff,
       },
+      authorIds: [],
+      authorUsernames: [],
+      watermark: { showWatermark: true, placement: 'bottom' },
       currentPlatform: '',
       extensionProperties: [],
     },
@@ -58,7 +63,23 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
       revision: 0,
     },
     objects: [],
-    layouts: [],
+    layouts: [
+      {
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: '',
+        name: '',
+        objects: [],
+        layers: [],
+        instances: [],
+        behaviorsSharedData: [],
+        stopSoundsOnStartup: false,
+        title: '',
+        variables: [],
+        usedResources: [],
+      },
+    ],
     externalLayouts: [],
     resources: {
       resources: [
@@ -71,6 +92,7 @@ gdjs.getPixiRuntimeGameWithAssets = (customOptions = {}) => {
         },
       ],
     },
+    usedResources: [{ name: 'base/tests-utils/assets/64x64.jpg' }],
     // Used in CustomRuntimeObjects.js
     eventsFunctionsExtensions: [
       {

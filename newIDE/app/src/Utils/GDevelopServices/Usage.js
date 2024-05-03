@@ -1,8 +1,9 @@
 // @flow
-import { t } from '@lingui/macro';
 import axios from 'axios';
 import { GDevelopUsageApi } from './ApiConfigs';
 import { type MessageDescriptor } from '../i18n/MessageDescriptor.flow';
+import { type MessageByLocale } from '../i18n/MessageByLocale';
+import { extractGDevelopApiErrorStatusAndCode } from './Errors';
 
 export type Usage = {
   id: string,
@@ -12,31 +13,45 @@ export type Usage = {
 };
 export type Usages = Array<Usage>;
 
+export type CancelReasons = {
+  [key: string]: boolean | string,
+};
+
 export type Subscription = {|
   userId: string,
   planId: string | null,
   createdAt: number,
   updatedAt: number,
+  /**
+   * Id of the pricing system.
+   * null when subscription is empty.
+   */
+  pricingSystemId:
+    | 'REDEMPTION_CODE'
+    | 'MANUALLY_ADDED'
+    | 'TEAM_MEMBER'
+    | string
+    | null,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
   paypalSubscriptionId?: string,
   paypalPayerId?: string,
-|};
 
-/**
- * The current usage values made by a user of something.
- * Typically: the number of remaining builds for a user.
- */
-export type CurrentUsage = {|
-  limitReached: boolean,
-  current: number,
-  max: number,
+  cancelAtPeriodEnd?: boolean,
+  cancelReasons?: CancelReasons,
+
+  purchaselyPlan?: string,
+
+  redemptionCode?: string | null,
+  redemptionCodeValidUntil?: number | null,
+
+  benefitsFromEducationPlan?: boolean,
 |};
 
 /**
  * This describes what a user can do on our online services.
  */
-export type Capabilities = {
+export type Capabilities = {|
   analytics: {
     sessions: boolean,
     players: boolean,
@@ -47,283 +62,382 @@ export type Capabilities = {
   cloudProjects: {
     maximumCount: number,
     canMaximumCountBeIncreased: boolean,
+    maximumGuestCollaboratorsPerProject: number,
   },
-  /**
-   * leaderboards is marked as optional to prevent bugs at the moment
-   * the limit is enforced (endpoint deployed after the new version is released)
-   */
-  leaderboards?: {
+  leaderboards: {
     maximumCountPerGame: number,
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
+    canUseCustomCss: boolean,
   },
-};
+  privateTutorials?: {
+    allowedIdPrefixes: Array<string>,
+  },
+  classrooms?: {
+    hidePlayTab: boolean,
+    hideUpgradeNotice: boolean,
+    showClassroomTab: boolean,
+  },
+|};
 
-export type CurrentUsages = {
-  [string]: CurrentUsage,
+export type UsagePrice = {|
+  priceInCredits: number,
+|};
+
+export type UsagePrices = {|
+  [key: string]: UsagePrice,
+|};
+
+export type UsagePurchasableQuantities = {|
+  [key: string]: {|
+    purchasableQuantity: number,
+  |},
+|};
+
+export type UserBalance = {|
+  amount: number,
+|};
+
+/**
+ * The current Quota values made by a user of something.
+ * Typically: the number of remaining builds for a user.
+ */
+export type Quota = {|
+  limitReached: boolean,
+  current: number,
+  max: number,
+  period?: '1day' | '30days',
+|};
+
+export type Quotas = {
+  [string]: Quota,
 };
 
 /**
  * The limits communicated by the API for a user.
  */
-export type Limits = {
-  limits: CurrentUsages,
+export type Limits = {|
+  quotas: Quotas,
   capabilities: Capabilities,
+  credits: {
+    userBalance: UserBalance,
+    prices: UsagePrices,
+    purchasableQuantities: UsagePurchasableQuantities,
+  },
   message: string | typeof undefined,
-};
+|};
 
-export type PlanDetails = {
+export type PlanDetails = {|
   planId: string | null,
+  legacyPlanId?: string,
   name: string,
   monthlyPriceInEuros: number | null,
+  yearlyPriceInEuros?: number | null,
+  isPerUser?: true,
   smallDescription?: MessageDescriptor,
+  hideInSubscriptionDialog?: boolean,
   descriptionBullets: Array<{|
     message: MessageDescriptor,
   |}>,
+|};
+
+export type SubscriptionPlanPricingSystem = {|
+  id: string,
+  planId: string,
+  period: 'week' | 'month' | 'year',
+  isPerUser?: true,
+  currency: 'EUR' | 'USD',
+  region: string,
+  amountInCents: number,
+  periodCount: number,
+|};
+
+export type SubscriptionPlan = {|
+  id: string,
+  isLegacy: boolean,
+  nameByLocale: MessageByLocale,
+  descriptionByLocale: MessageByLocale,
+  bulletPointsByLocale: Array<MessageByLocale>,
+  specificRequirementByLocale?: MessageByLocale,
+  targetAudiences: Array<'CASUAL' | 'PRO' | 'EDUCATION'>,
+  fullFeatures: Array<{|
+    featureName: string,
+    pillarName: string,
+    descriptionByLocale?: MessageByLocale,
+    tooltipByLocale?: MessageByLocale,
+    enabled?: 'yes' | 'no',
+    unlimited?: true,
+    upcoming?: true,
+    trialLike?: true,
+  |}>,
+
+  pillarNamesPerLocale: { [key: string]: MessageByLocale },
+  featureNamesByLocale: { [key: string]: MessageByLocale },
+|};
+
+export type SubscriptionPlanWithPricingSystems = {|
+  ...SubscriptionPlan,
+  pricingSystems: SubscriptionPlanPricingSystem[],
+|};
+
+export const EDUCATION_PLAN_MIN_SEATS = 5;
+export const EDUCATION_PLAN_MAX_SEATS = 300;
+export const apiClient = axios.create({
+  baseURL: GDevelopUsageApi.baseUrl,
+});
+
+export const canPriceBeFoundInGDevelopPrices = (
+  pricingSystemId: string
+): boolean => {
+  if (
+    ['REDEMPTION_CODE', 'MANUALLY_ADDED', 'TEAM_MEMBER'].includes(
+      pricingSystemId
+    )
+  ) {
+    return false;
+  }
+  if (pricingSystemId.startsWith('PURCHASELY_')) return false;
+  return true;
 };
 
-export const getSubscriptionPlans = (): Array<PlanDetails> => [
-  {
-    planId: null,
-    name: 'GDevelop Free & Open-source',
-    monthlyPriceInEuros: 0,
-    smallDescription: t`Use GDevelop for free, forever. We also give you access to these additional online services for free.`,
-    descriptionBullets: [
-      {
-        message: t`10 cloud projects with 50MB of resources per project and 2-days version history.`,
-      },
-      {
-        message: t`2 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`3 leaderboards per game and 10 player feedback responses per game.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_silver',
-    name: 'GDevelop Silver',
-    monthlyPriceInEuros: 4.99,
-    smallDescription: t`Build more and faster.`,
-    descriptionBullets: [
-      {
-        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
-      },
-      {
-        message: t`10 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_gold',
-    name: 'GDevelop Gold',
-    monthlyPriceInEuros: 9.99,
-    smallDescription: t`Experimented creators, ambitious games.`,
-    descriptionBullets: [
-      {
-        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
-      },
-      {
-        message: t`100 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
-      },
-    ],
-  },
-];
-
-export const getFormerSubscriptionPlans = (): Array<PlanDetails> => [
-  {
-    planId: 'gdevelop_indie',
-    name: 'GDevelop Indie (Legacy)',
-    monthlyPriceInEuros: 2.0,
-    smallDescription: t`Build more and faster.`,
-    descriptionBullets: [
-      {
-        message: t`50 cloud projects with 250MB of resources per project and 3-month version history.`,
-      },
-      {
-        message: t`10 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-    ],
-  },
-  {
-    planId: 'gdevelop_pro',
-    name: 'GDevelop Pro (Legacy)',
-    monthlyPriceInEuros: 7.0,
-    smallDescription: t`Experimented creators, ambitious games.`,
-    descriptionBullets: [
-      {
-        message: t`100 cloud projects with 500MB of resources per project and one-year version history.`,
-      },
-      {
-        message: t`70 packagings per day for Android and for desktop.`,
-      },
-      {
-        message: t`Unlimited leaderboards and unlimited player feedback responses.`,
-      },
-      {
-        message: t`Immerse your players by removing GDevelop logo when the game loads.`,
-      },
-    ],
-  },
-];
-
-export const businessPlan: PlanDetails = {
-  planId: null,
-  monthlyPriceInEuros: null,
-  name: 'GDevelop for businesses, game studios and professionals',
-  smallDescription: t`Dedicated support, branding and solutions for engaging your players.`,
-  descriptionBullets: [],
+export const listSubscriptionPlans = async (options: {|
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlan[]> => {
+  const response = await apiClient.get('/subscription-plan', {
+    params: { includeLegacy: options.includeLegacy ? 'true' : 'false' },
+  });
+  return response.data;
 };
 
-export const getUserUsages = (
+export const getSubscriptionPlanPricingSystem = async (
+  pricingSystemId: string
+): Promise<?SubscriptionPlanPricingSystem> => {
+  try {
+    const response = await apiClient.get(
+      `/subscription-plan-pricing-system/${pricingSystemId}`
+    );
+    return response.data;
+  } catch (error) {
+    const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(error);
+    if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+export const listSubscriptionPlanPricingSystems = async (options: {|
+  subscriptionPlanIds?: ?(string[]),
+  includeLegacy: boolean,
+|}): Promise<SubscriptionPlanPricingSystem[]> => {
+  const params: {| includeLegacy: string, subscriptionPlanIds?: string |} = {
+    includeLegacy: options.includeLegacy ? 'true' : 'false',
+  };
+  if (options.subscriptionPlanIds && options.subscriptionPlanIds.length > 0) {
+    params.subscriptionPlanIds = options.subscriptionPlanIds.join(',');
+  }
+  const response = await apiClient.get('/subscription-plan-pricing-system', {
+    params,
+  });
+  return response.data;
+};
+
+export const getUserUsages = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Usages> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/usage', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserLimits = (
+export const getUserLimits = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Limits> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/limits', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const getUserSubscription = (
+export const getUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
-        params: {
-          userId,
-        },
-        headers: {
-          Authorization: authorizationHeader,
-        },
-      })
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.get('/subscription-v2', {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
 };
 
-export const changeUserSubscription = (
+export const changeUserSubscription = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  newSubscriptionDetails: { planId: string | null, stripeToken?: any }
+  newSubscriptionDetails: {| planId: string | null |},
+  options: {| cancelImmediately: boolean, cancelReasons: CancelReasons |}
 ): Promise<Subscription> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2`,
-        newSubscriptionDetails,
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data);
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await apiClient.post(
+    '/subscription-v2',
+    {
+      ...newSubscriptionDetails,
+      prohibitSeamlessUpdate: true,
+      cancelImmediately: options.cancelImmediately,
+      cancelReasons: options.cancelReasons,
+    },
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  return response.data;
 };
 
-export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
-  // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
-  // Otherwise (Paypal), it needs to be cancelled first.
+export const canSeamlesslyChangeSubscription = (
+  subscription: Subscription,
+  planId: string
+) => {
+  // Bringing prices with different currencies prevents subscriptions to be changed seamlessly
+  // on Stripe.
+  // TODO: When the backend allows it, make it possible to seamlessly change subscription
+  // if the currencies of the current and requested subscriptions match.
+  return false;
+};
+
+export const canCancelAtEndOfPeriod = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be set as cancelled and only removed at the
+  // end of the period already paid.
+  // Otherwise (Paypal), it will be cancelled immediately.
+  // TODO: When the backend allows it, remove this payment provider condition.
   return !!subscription.stripeSubscriptionId;
+};
+
+export const hasMobileAppStoreSubscriptionPlan = (
+  subscription: ?Subscription
+): boolean => {
+  return !!subscription && !!subscription.purchaselyPlan;
+};
+
+export const hasSubscriptionBeenManuallyAdded = (
+  subscription: ?Subscription
+): boolean => {
+  return !!subscription && subscription.pricingSystemId === 'MANUALLY_ADDED';
+};
+
+export const hasValidSubscriptionPlan = (subscription: ?Subscription) => {
+  const hasValidSubscription =
+    !!subscription &&
+    !!subscription.planId &&
+    (!subscription.redemptionCodeValidUntil || // No redemption code
+      subscription.redemptionCodeValidUntil > Date.now()); // Redemption code is still valid
+
+  if (hasValidSubscription) {
+    // The user has a subscription registered in the backend (classic "Registered" user).
+    return true;
+  }
+
+  return false;
 };
 
 type UploadType = 'build' | 'preview';
 
-export const getSignedUrl = (params: {|
+export const getSignedUrl = async (params: {|
   uploadType: UploadType,
   key: string,
   contentType: string,
 |}): Promise<{
   signedUrl: string,
 }> => {
-  return axios
-    .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
-    .then(response => response.data);
+  const response = await apiClient.post('/upload-options/signed-url', params);
+  return response.data;
 };
 
-export const getRedirectToSubscriptionPortalUrl = (
+export const getRedirectToSubscriptionPortalUrl = async (
   getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<string> => {
-  return getAuthorizationHeader()
-    .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-portal`,
-        {},
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-    )
-    .then(response => response.data)
-    .then(({ sessionPortalUrl }) => {
-      if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
-        throw new Error('Could not find the session portal url.');
+  const authorizationHeader = await getAuthorizationHeader();
 
-      return sessionPortalUrl;
-    });
+  const response = await apiClient.post(
+    '/subscription-v2/action/redirect-to-portal',
+    {},
+    {
+      params: {
+        userId,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  const { sessionPortalUrl } = response.data;
+  if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
+    throw new Error('Could not find the session portal url.');
+
+  return sessionPortalUrl;
 };
 
-export const getRedirectToCheckoutUrl = (
-  planId: string,
+export const getRedirectToCheckoutUrl = ({
+  pricingSystemId,
+  userId,
+  userEmail,
+  quantity,
+}: {|
+  pricingSystemId: string,
   userId: string,
-  userEmail: string
-): string => {
-  return `${
-    GDevelopUsageApi.baseUrl
-  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
-    planId
-  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
-    userEmail
-  )}`;
+  userEmail: string,
+  quantity?: number,
+|}): string => {
+  const url = new URL(
+    `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-checkout-v2`
+  );
+  url.searchParams.set('pricingSystemId', pricingSystemId);
+  url.searchParams.set('userId', userId);
+  url.searchParams.set('customerEmail', userEmail);
+  if (quantity !== undefined && quantity > 1)
+    url.searchParams.set('quantity', quantity.toString());
+  return url.toString();
+};
+
+export const canUseCloudProjectHistory = (
+  subscription: ?Subscription
+): boolean => {
+  if (!subscription) return false;
+  return (
+    ['gdevelop_startup', 'gdevelop_education'].includes(subscription.planId) ||
+    (subscription.planId === 'gdevelop_gold' &&
+      !!subscription.benefitsFromEducationPlan)
+  );
 };
 
 export const redeemCode = async (
@@ -333,8 +447,8 @@ export const redeemCode = async (
 ): Promise<void> => {
   const authorizationHeader = await getAuthorizationHeader();
 
-  await axios.post(
-    `${GDevelopUsageApi.baseUrl}/redemption-code/action/redeem-code`,
+  await apiClient.post(
+    '/redemption-code/action/redeem-code',
     {
       code,
     },
@@ -346,5 +460,23 @@ export const redeemCode = async (
         Authorization: authorizationHeader,
       },
     }
+  );
+};
+
+export const canBenefitFromDiscordRole = (subscription: ?Subscription) => {
+  return (
+    !!subscription &&
+    ['gdevelop_education', 'gdevelop_startup', 'gdevelop_gold'].includes(
+      subscription.planId
+    ) &&
+    !subscription.benefitsFromEducationPlan
+  );
+};
+
+export const canUpgradeSubscription = (subscription: ?Subscription) => {
+  return (
+    !!subscription &&
+    !['gdevelop_education', 'gdevelop_startup'].includes(subscription.planId) &&
+    !subscription.benefitsFromEducationPlan
   );
 };

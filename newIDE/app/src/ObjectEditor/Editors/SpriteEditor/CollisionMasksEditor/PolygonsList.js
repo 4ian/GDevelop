@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
-import DeleteIcon from '@material-ui/icons/Delete';
-import WarningIcon from '@material-ui/icons/Warning';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -26,9 +23,12 @@ import FlatButton from '../../../../UI/FlatButton';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
-import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 import { addVertexOnLongestEdge } from './PolygonHelper';
+import Add from '../../../../UI/CustomSvgIcons/Add';
+import Trash from '../../../../UI/CustomSvgIcons/Trash';
+import Warning from '../../../../UI/CustomSvgIcons/Warning';
 
 const gd = global.gd;
 
@@ -106,7 +106,7 @@ const VerticesTable = (props: VerticesTableProps) => {
       )}
       <Line justifyContent="center">
         <FlatButton
-          leftIcon={<AddIcon size="small" />}
+          leftIcon={<Add />}
           label={<Trans>Add a vertex</Trans>}
           onClick={() => {
             addVertexOnLongestEdge(props.vertices);
@@ -147,7 +147,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
         size="small"
         tooltip={t`Polygon is not convex!`}
       >
-        <WarningIcon style={{ color: warningColor }} />
+        <Warning style={{ color: warningColor }} />
       </IconButton>
     ),
     <IconButton
@@ -159,7 +159,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
       }}
       tooltip={t`Delete collision mask`}
     >
-      <DeleteIcon />
+      <Trash />
     </IconButton>,
   ];
 
@@ -167,9 +167,11 @@ const PolygonSection = (props: PolygonSectionProps) => {
     <Accordion defaultExpanded>
       <AccordionHeader actions={polygonActions}>
         <Text displayInlineAsSpan>
-          {verticesCount === 3 && `Triangle`}
-          {verticesCount === 4 && `Quadrilateral`}
-          {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
+          {verticesCount === 3 && <Trans>Triangle</Trans>}
+          {verticesCount === 4 && <Trans>Quadrilateral</Trans>}
+          {verticesCount >= 5 && (
+            <Trans>Polygon with {verticesCount} vertices</Trans>
+          )}
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
@@ -191,29 +193,30 @@ const PolygonSection = (props: PolygonSectionProps) => {
 type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
-  restoreCollisionMask: () => void,
+  onSetFullImageCollisionMask: () => Promise<void>,
+  onSetAutomaticallyAdaptCollisionMasks: () => Promise<void>,
   onHoverVertice: (ptr: ?number) => void,
   onClickVertice: (ptr: ?number) => void,
   selectedVerticePtr: ?number,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
-  spriteWidth: number,
-  spriteHeight: number,
+  spriteSize: [number, number],
 |};
 
 const PolygonsList = (props: PolygonsListProps) => {
   const {
     polygons,
-    spriteHeight,
-    spriteWidth,
+    spriteSize,
     onPolygonsUpdated,
-    restoreCollisionMask,
+    onSetFullImageCollisionMask,
+    onSetAutomaticallyAdaptCollisionMasks,
     onHoverVertice,
     onClickVertice,
     selectedVerticePtr,
   } = props;
 
+  const [spriteWidth, spriteHeight] = spriteSize;
   const addCollisionMask = React.useCallback(
     () => {
       const newPolygon = gd.Polygon2d.createRectangle(
@@ -225,6 +228,17 @@ const PolygonsList = (props: PolygonsListProps) => {
       onPolygonsUpdated();
     },
     [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]
+  );
+
+  const onRemovePolygon = React.useCallback(
+    (index: number) => {
+      gd.removeFromVectorPolygon2d(polygons, index);
+      if (polygons.size() === 0) {
+        onSetFullImageCollisionMask();
+      }
+      onPolygonsUpdated();
+    },
+    [polygons, onPolygonsUpdated, onSetFullImageCollisionMask]
   );
 
   React.useEffect(
@@ -245,13 +259,7 @@ const PolygonsList = (props: PolygonsListProps) => {
               key={`polygon-${i}`}
               polygon={polygon}
               onUpdated={onPolygonsUpdated}
-              onRemove={() => {
-                gd.removeFromVectorPolygon2d(polygons, i);
-                if (polygons.size() === 0) {
-                  restoreCollisionMask();
-                }
-                onPolygonsUpdated();
-              }}
+              onRemove={() => onRemovePolygon(i)}
               onHoverVertice={onHoverVertice}
               onClickVertice={onClickVertice}
               selectedVerticePtr={selectedVerticePtr}
@@ -264,15 +272,17 @@ const PolygonsList = (props: PolygonsListProps) => {
           <Line alignItems="center" justifyContent="center">
             <RaisedButtonWithSplitMenu
               primary
-              icon={<AddIcon />}
+              icon={<Add />}
               label={<Trans>Add collision mask</Trans>}
-              onClick={() => {
-                addCollisionMask();
-              }}
+              onClick={addCollisionMask}
               buildMenuTemplate={i18n => [
                 {
-                  label: i18n._(t`Restore the default collision mask`),
-                  click: restoreCollisionMask,
+                  label: i18n._(t`Reset to automatic collision mask`),
+                  click: onSetAutomaticallyAdaptCollisionMasks,
+                },
+                {
+                  label: i18n._(t`Use full image as collision mask`),
+                  click: onSetFullImageCollisionMask,
                 },
               ]}
             />

@@ -5,8 +5,6 @@ import * as React from 'react';
 import Background from '../UI/Background';
 import TextField, { type TextFieldInterface } from '../UI/TextField';
 import { Column, Line } from '../UI/Grid';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
 import IconButton from '../UI/IconButton';
 import FlatButton from '../UI/FlatButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -27,7 +25,11 @@ import {
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Tabs } from '../UI/Tabs';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import Cross from '../UI/CustomSvgIcons/Cross';
+import { useShouldAutofocusInput } from '../UI/Responsive/ScreenTypeMeasurer';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -59,8 +61,9 @@ const SearchPanel = (
   }: Props,
   ref
 ) => {
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const searchTextField = React.useRef<?TextFieldInterface>(null);
+  const replaceTextField = React.useRef<?TextFieldInterface>(null);
 
   const [searchText, setSearchText] = React.useState<string>('');
   const [replaceText, setReplaceText] = React.useState<string>('');
@@ -91,8 +94,13 @@ const SearchPanel = (
     [searchText, searchResultsDirty]
   );
 
+  const shouldAutofocusInput = useShouldAutofocusInput();
+
   const focusSearchField = React.useCallback((): void => {
     if (searchTextField.current) searchTextField.current.focus();
+  }, []);
+  const focusReplaceField = React.useCallback((): void => {
+    if (replaceTextField.current) replaceTextField.current.focus();
   }, []);
 
   const markSearchResultsDirty = React.useCallback((): void => {
@@ -118,11 +126,13 @@ const SearchPanel = (
     ]
   );
 
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(focusSearchField, [currentTab]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(markSearchResultsDirty, [currentTab]);
+  React.useEffect(
+    () => {
+      if (shouldAutofocusInput) focusSearchField();
+    },
+    [currentTab, focusSearchField, shouldAutofocusInput]
+  );
+  React.useEffect(markSearchResultsDirty, [currentTab, markSearchResultsDirty]);
 
   const launchSearch = () => {
     onSearchInEvents({
@@ -182,8 +192,8 @@ const SearchPanel = (
                   label: <Trans>Search in event sentences</Trans>,
                 },
               ]}
-              // Enforce scroll on small screen, because the tabs have long names.
-              variant={windowWidth === 'small' ? 'scrollable' : undefined}
+              // Enforce scroll on very small screens, because the tabs have long names.
+              variant={isMobile ? 'scrollable' : undefined}
             />
           </Column>
         </Line>
@@ -192,8 +202,20 @@ const SearchPanel = (
             <LineStackLayout alignItems="baseline" noMargin>
               <TextField
                 ref={searchTextField}
-                type="search"
                 margin="dense"
+                endAdornment={
+                  searchText ? (
+                    <IconButton
+                      onClick={() => {
+                        setSearchText('');
+                        if (shouldAutofocusInput) focusSearchField();
+                      }}
+                      edge="end"
+                    >
+                      <Cross fontSize="small" />
+                    </IconButton>
+                  ) : null
+                }
                 translatableHintText={
                   isSearchAndReplaceTab()
                     ? t`Text to search in parameters`
@@ -237,8 +259,21 @@ const SearchPanel = (
             {isSearchAndReplaceTab() && (
               <LineStackLayout alignItems="baseline" noMargin>
                 <TextField
-                  type="search"
                   margin="dense"
+                  ref={replaceTextField}
+                  endAdornment={
+                    replaceText ? (
+                      <IconButton
+                        onClick={() => {
+                          setReplaceText('');
+                          if (shouldAutofocusInput) focusReplaceField();
+                        }}
+                        edge="end"
+                      >
+                        <Cross fontSize="small" />
+                      </IconButton>
+                    ) : null
+                  }
                   translatableHintText={t`Text to replace in parameters`}
                   onChange={(e, replaceText) => {
                     setReplaceText(replaceText);
@@ -277,7 +312,7 @@ const SearchPanel = (
                       setMatchCase(!checked);
                     }}
                   />
-                  {windowWidth !== 'small' && (
+                  {!isMobile && (
                     <Text>
                       <Trans>Search in:</Trans>
                     </Text>
@@ -334,7 +369,7 @@ const SearchPanel = (
                     onGoToPreviousSearchResult();
                   }}
                 >
-                  <ChevronLeft />
+                  <ChevronArrowLeft />
                 </IconButton>
                 <IconButton
                   disabled={!resultsCount}
@@ -342,7 +377,7 @@ const SearchPanel = (
                     onGoToNextSearchResult();
                   }}
                 >
-                  <ChevronRight />
+                  <ChevronArrowRight />
                 </IconButton>
                 <FlatButton
                   key="close"

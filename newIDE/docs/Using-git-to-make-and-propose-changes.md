@@ -8,8 +8,8 @@ GDevelop source code is hosted on GitHub, which is based on the Git version cont
 
 If it's the first time and you have just "forked" GDevelop on GitHub, clone your repository: `git clone git@github.com:your-username/GDevelop.git`. This will download your copy of the repository on your local computer.
 
-* Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
-* The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
+- Your own repository is usually called, in git jargon, a "remote" repository, named `origin`. When you do a `git push`, `git pull`, your usually, unless specified otherwise, getting or sending code to your repository.
+- The [GDevelop "official repository"](https://github.com/4ian/GDevelop) is also a remote, usually called `upstream`.
 
 By default, when you have just "cloned" your repository, there is only the single remote `origin`. It will be useful later to have the `upstream` remote (to get the latest code from GDevelop). You can do it by entering: `git remote add upstream https://github.com/4ian/GDevelop.git`.
 
@@ -20,17 +20,18 @@ By default, when you have just "cloned" your repository, there is only the singl
 In git, all the code is stored in the repository, and changes are stored in *commits*. The latest version of the source code is in a "branch", which is called `master` (it's an arbitrary convention).
 
 When you'll make new additions to GDevelop, you'll make a new "branch". Imagine a branch like the branch of a tree:
+
 - The source code is in master, which is the trunk of the tree, with tons of commits.
 - Your branch will grow from master, adding a few commits.
 - You can open a [Pull Request](https://help.github.com/en/articles/creating-a-pull-request) to propose the changes made on your branch.
-- If your changes are accepted, they will get *merged* into `master`. 
+- If your changes are accepted, they will get *merged* into `master`.
 
 At this point, you can discard your branch and go back to master: `git checkout master`.
 
 ## 3. Step by step commands for making changes
 
 - Always start from your master branch (`git checkout master`). When you start a new branch (using `git checkout -b branch-name`), you will start this branch **from the previous branch you were on** (read more about this - but most of the time you want to do this when you're on master, not when you're already on a branch).
-- Get the latest commits from the "upstream", which is [this repository](https://github.com/4ian/GDevelop). 
+- Get the latest commits from the "upstream", which is [this repository](https://github.com/4ian/GDevelop).
   - To add the "upstream" as a remote repository, if needed, you can do: `git remote add upstream https://github.com/4ian/GDevelop.git`.
   - Then, get the latest commits (make sure you're on your master): `git pull upstream master` ("pull the latest commits from master branch of the upstream repository"). If there is a merge, it's fine.
 - Then from now, always start branch from master:
@@ -54,7 +55,7 @@ Forget this branch and go back to master (`git checkout master`). Get the latest
 
 ⚠️ In other words, don't **stay on your branch once you're done**. Go back to master and get the latest changes from GDevelop "official" repository.
 
-> If you want to, you can delete the branch you made, as it is not useful: `git branch -D my-branch`. **Make sure that your commits are merged into GDevelop before doing so**. Don't do it before a pull request is merged. 
+> If you want to, you can delete the branch you made, as it is not useful: `git branch -D my-branch`. **Make sure that your commits are merged into GDevelop before doing so**. Don't do it before a pull request is merged.
 
 ## Afraid of doing something? 🚩Checkpoint! Make a new branch from your existing branch
 

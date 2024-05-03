@@ -27,10 +27,7 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends React.Component<
-  EventRendererProps,
-  *
-> {
+export default class WhileEvent extends React.Component<EventRendererProps, *> {
   render() {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
@@ -51,6 +48,7 @@ export default class ForEachEvent extends React.Component<
           <Trans>While these conditions are true:</Trans>
         </div>
         <InstructionsList
+          platform={this.props.project.getCurrentPlatform()}
           instrsList={whileEvent.getWhileConditions()}
           style={
             {} /* TODO: Use a new object to force update - somehow updates are not always propagated otherwise */
@@ -70,9 +68,12 @@ export default class ForEachEvent extends React.Component<
           disabled={this.props.disabled}
           renderObjectThumbnail={this.props.renderObjectThumbnail}
           screenType={this.props.screenType}
-          windowWidth={this.props.windowWidth}
+          windowSize={this.props.windowSize}
+          scope={this.props.scope}
+          resourcesManager={this.props.project.getResourcesManager()}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
+          idPrefix={this.props.idPrefix}
         />
         <div
           className={classNames({
@@ -83,9 +84,10 @@ export default class ForEachEvent extends React.Component<
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
-          windowWidth={this.props.windowWidth}
+          windowSize={this.props.windowSize}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={whileEvent.getConditions()}
               style={style}
               className={className}
@@ -105,13 +107,17 @@ export default class ForEachEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={whileEvent.getActions()}
               style={
                 {
@@ -135,9 +141,12 @@ export default class ForEachEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
         />

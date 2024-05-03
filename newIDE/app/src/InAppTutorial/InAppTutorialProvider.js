@@ -1,19 +1,16 @@
 // @flow
 import * as React from 'react';
-import InAppTutorialContext, {
-  type InAppTutorial,
-} from './InAppTutorialContext';
-import onboardingTutorial from './Tutorials/OnboardingTutorial';
+import InAppTutorialContext from './InAppTutorialContext';
 import { setCurrentlyRunningInAppTutorial } from '../Utils/Analytics/EventSender';
 import {
   fetchInAppTutorial,
   fetchInAppTutorialShortHeaders,
   type InAppTutorialShortHeader,
+  type InAppTutorial,
 } from '../Utils/GDevelopServices/InAppTutorial';
+import { IN_APP_TUTORIALS_FETCH_TIMEOUT } from '../Utils/GlobalFetchTimeouts';
 
 type Props = {| children: React.Node |};
-
-export const FLING_GAME_IN_APP_TUTORIAL_ID = 'flingGame';
 
 const InAppTutorialProvider = (props: Props) => {
   const [tutorial, setTutorial] = React.useState<InAppTutorial | null>(null);
@@ -27,6 +24,17 @@ const InAppTutorialProvider = (props: Props) => {
     setInAppTutorialShortHeaders,
   ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
 
+  const getInAppTutorialShortHeader = React.useCallback(
+    (tutorialId: string) => {
+      if (!inAppTutorialShortHeaders) return null;
+      const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
+        shortHeader => shortHeader.id === tutorialId
+      );
+      return inAppTutorialShortHeader;
+    },
+    [inAppTutorialShortHeaders]
+  );
+
   const startTutorial = async ({
     tutorialId,
     initialStepIndex,
@@ -36,19 +44,9 @@ const InAppTutorialProvider = (props: Props) => {
     initialStepIndex: number,
     initialProjectData: { [key: string]: string },
   |}) => {
-    if (tutorialId === onboardingTutorial.id) {
-      setStartStepIndex(initialStepIndex);
-      setStartProjectData(initialProjectData);
-      setTutorial(onboardingTutorial);
-      setCurrentlyRunningInAppTutorial(tutorialId);
-      return;
-    }
-
     if (!inAppTutorialShortHeaders) return;
 
-    const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
-      shortHeader => shortHeader.id === tutorialId
-    );
+    const inAppTutorialShortHeader = getInAppTutorialShortHeader(tutorialId);
 
     if (!inAppTutorialShortHeader) return;
 
@@ -81,7 +79,7 @@ const InAppTutorialProvider = (props: Props) => {
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching in-app tutorials...');
         loadInAppTutorials();
-      }, 1000);
+      }, IN_APP_TUTORIALS_FETCH_TIMEOUT);
       return () => clearTimeout(timeoutId);
     },
     [loadInAppTutorials]
@@ -91,6 +89,7 @@ const InAppTutorialProvider = (props: Props) => {
     <InAppTutorialContext.Provider
       value={{
         inAppTutorialShortHeaders,
+        getInAppTutorialShortHeader,
         currentlyRunningInAppTutorial: tutorial,
         startTutorial,
         startProjectData,

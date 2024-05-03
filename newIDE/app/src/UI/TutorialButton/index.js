@@ -5,11 +5,11 @@ import Window from '../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../Tutorial/TutorialContext';
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
-import YouTube from '@material-ui/icons/YouTube';
+import Video from '../CustomSvgIcons/Video';
 
 type PropsType = {|
   tutorialId: ?string,
-  label?: React.Node,
+  label: React.Node,
   renderIfNotFound?: React.Node,
 |};
 
@@ -34,8 +34,8 @@ const TutorialButton = (props: PropsType) => {
         }
       }}
       target="_blank"
-      label={<Trans>{props.label || 'Tutorial'}</Trans>}
-      icon={<YouTube />}
+      label={props.label || <Trans>Tutorial</Trans>}
+      icon={<Video />}
     />
   );
 };

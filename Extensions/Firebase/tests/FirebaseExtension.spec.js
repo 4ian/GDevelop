@@ -1,18 +1,4 @@
 /**
- * A firebase configuaration of a project made only for those tests.
- */
-const firebaseConfig = {
-  apiKey: 'AIzaSyBwPnGpfEBXDjwQrWfU0wqgp4m9qEt7YM8',
-  authDomain: 'gdtest-e11a5.firebaseapp.com',
-  databaseURL: 'https://gdtest-e11a5.firebaseio.com',
-  projectId: 'gdtest-e11a5',
-  storageBucket: 'gdtest-e11a5.appspot.com',
-  messagingSenderId: '254035412678',
-  appId: '1:254035412678:web:2ddd6b83019b7f259b79c7',
-  measurementId: 'G-4REML26L59',
-};
-
-/**
  * Turns a callback variable into a promise.
  * @param {(callbackVariable: {setString: (result: "ok" | string) => void}, result: gdjs.Variable) => any} executor
  * @returns {Promise<gdjs.Variable>}
@@ -38,6 +24,20 @@ const variable = new gdjs.Variable().fromJSObject({
   it: ['is', true],
 });
 
+/**
+ * A firebase configuration of a project made only for those tests.
+ */
+const firebaseConfig = {
+  apiKey: 'AIzaSyBwPnGpfEBXDjwQrWfU0wqgp4m9qEt7YM8',
+  authDomain: 'gdtest-e11a5.firebaseapp.com',
+  databaseURL: 'https://gdtest-e11a5.firebaseio.com',
+  projectId: 'gdtest-e11a5',
+  storageBucket: 'gdtest-e11a5.appspot.com',
+  messagingSenderId: '254035412678',
+  appId: '1:254035412678:web:2ddd6b83019b7f259b79c7',
+  measurementId: 'G-4REML26L59',
+};
+
 // The tests require an internet connection, as a real Firebase instance is used.
 const describeIfOnline = navigator.onLine ? describe : describe.skip;
 describeIfOnline('Firebase extension end-to-end tests', function () {
@@ -48,8 +48,8 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     .toString()
     .replace('.', '-')}-${Date.now()}`;
 
-  before(function setupFirebase() {
-    gdjs.evtTools.firebaseTools._setupFirebase({
+  before(async function setupFirebase() {
+    await gdjs.evtTools.firebaseTools._setupFirebase({
       getGame: () => ({
         getExtensionProperty: () => JSON.stringify(firebaseConfig),
       }),
@@ -448,7 +448,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           ],
         });
 
-        // Query with selector fitler
+        // Query with selector filter
         gdjs.evtTools.firebaseTools.firestore.startQueryFrom(
           'selector',
           'main'
@@ -533,7 +533,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     const password2 = `myNewPass${Math.random().toString(16)}${Date.now()}!`;
 
     const expectToNotLogin = async (password) => {
-      if (gdjs.evtTools.firebaseTools.auth.isAuthentified())
+      if (gdjs.evtTools.firebaseTools.auth.isAuthenticated())
         await firebase.auth().signOut();
 
       let errors = false;
@@ -549,15 +549,15 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         errors = true;
       }
 
-      // No error was throwm, there is an issue
+      // No error was thrown, there is an issue
       if (!errors)
         throw new Error('Expected wrong credentials to prevent login');
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
     };
 
     const expectToLogin = async (password) => {
-      if (gdjs.evtTools.firebaseTools.auth.isAuthentified())
+      if (gdjs.evtTools.firebaseTools.auth.isAuthenticated())
         await firebase.auth().signOut();
 
       await promisifyCallbackVariables((callback) =>
@@ -568,13 +568,13 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         )
       );
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
     };
 
     before(async () => firebase.auth().signOut());
 
     it('let users create accounts', async () => {
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.auth.createAccountWithEmail(
@@ -584,13 +584,13 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         )
       );
 
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
     });
 
     it('let users log out', async () => {
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.be.ok();
       await firebase.auth().signOut();
-      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthenticated()).to.not.be.ok();
     });
 
     it('prevents logging in with invalid credentials', async () =>

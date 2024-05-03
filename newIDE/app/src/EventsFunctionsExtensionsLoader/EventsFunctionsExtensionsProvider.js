@@ -11,6 +11,7 @@ import {
   type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
   unloadProjectEventsFunctionsExtension,
+  reloadProjectEventsFunctionsExtensionMetadata,
 } from '.';
 import {
   type EventsFunctionsExtensionWriter,
@@ -60,6 +61,9 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       this
     ),
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
+      this
+    ),
+    reloadProjectEventsFunctionsExtensionMetadata: this._reloadProjectEventsFunctionsExtensionMetadata.bind(
       this
     ),
     ensureLoadFinished: this._ensureLoadFinished.bind(this),
@@ -118,7 +122,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
         });
         showErrorBox({
           message: i18n._(
-            t`An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+            t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
           ),
           rawError: eventsFunctionsExtensionsError,
           errorId: 'events-functions-extensions-load-error',
@@ -129,6 +133,35 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
       });
 
     return this._lastLoadPromise;
+  }
+
+  _reloadProjectEventsFunctionsExtensionMetadata(
+    project: ?gdProject,
+    extension: gdEventsFunctionsExtension
+  ): void {
+    const { i18n } = this.props;
+    const eventsFunctionCodeWriter = this._eventsFunctionCodeWriter;
+    if (!project || !eventsFunctionCodeWriter) return;
+
+    try {
+      reloadProjectEventsFunctionsExtensionMetadata(
+        project,
+        extension,
+        eventsFunctionCodeWriter,
+        i18n
+      );
+    } catch (eventsFunctionsExtensionsError) {
+      this.setState({
+        eventsFunctionsExtensionsError,
+      });
+      showErrorBox({
+        message: i18n._(
+          t`An error has occurred during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+        ),
+        rawError: eventsFunctionsExtensionsError,
+        errorId: 'events-functions-extensions-load-error',
+      });
+    }
   }
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {

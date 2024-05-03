@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -59,11 +51,17 @@ module.exports = {
         false
       )
       .addParameter('string', _('Name to register for the player'), '', false)
+      .setParameterLongDescription(
+        _(
+          'Let this empty to let the leaderboard auto-generate a player name (e.g: "Player23464"). You can configure this in the leaderboard administration.'
+        )
+      )
       .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
+      .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore')
+      .setAsyncFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
     extension
       .addAction(
@@ -89,7 +87,10 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')
       .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore');
+      .setFunctionName('gdjs.evtTools.leaderboards.saveConnectedPlayerScore')
+      .setAsyncFunctionName(
+        'gdjs.evtTools.leaderboards.saveConnectedPlayerScore'
+      );
 
     extension
       .addCondition(
@@ -153,6 +154,23 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
+
+    extension
+      .addCondition(
+        'HasPlayerJustClosedLeaderboardView',
+        _('Closed by player'),
+        _('Check if the player has just closed the leaderboard view.'),
+        _('Player has just closed the leaderboard view'),
+        _('Display leaderboard'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .setHelpPath('/all-features/leaderboards')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName(
+        'gdjs.evtTools.leaderboards.hasPlayerJustClosedLeaderboardView'
+      );
 
     extension
       .addStrExpression(
@@ -275,10 +293,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

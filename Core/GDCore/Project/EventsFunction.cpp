@@ -72,6 +72,9 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   if (isPrivate) {
     element.SetBoolAttribute("private", isPrivate);
   }
+  if (isAsync) {
+    element.SetBoolAttribute("async", isAsync);
+  }
   events.SerializeTo(element.AddChild("events"));
 
   gd::String functionTypeStr = "Action";
@@ -115,6 +118,7 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   group = element.GetStringAttribute("group");
   getterName = element.GetStringAttribute("getterName");
   isPrivate = element.GetBoolAttribute("private");
+  isAsync = element.GetBoolAttribute("async");
   events.UnserializeFrom(project, element.GetChild("events"));
 
   gd::String functionTypeStr = element.GetStringAttribute("functionType");

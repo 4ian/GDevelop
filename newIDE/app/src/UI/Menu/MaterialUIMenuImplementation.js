@@ -2,7 +2,6 @@
 import * as React from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -15,6 +14,7 @@ import {
   type MenuItemTemplate,
   type ContextMenuImplementation,
 } from './Menu.flow';
+import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
 
 const useStyles = makeStyles({
   backdropRootForMouse: {
@@ -37,6 +37,8 @@ const styles = {
     // Force every menu item to have the same height, even if it's a submenu
     // or if it has an icon.
     height: 32,
+    paddingLeft: 16, // Increase the default padding from 8 to 16 to be easier to read and match the electron menu.
+    paddingRight: 16,
   },
 };
 
@@ -136,7 +138,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         onPointerLeave={handleLeave}
       >
         {item.label}
-        <ArrowRightIcon />
+        <ChevronArrowRight />
       </MenuItem>
       <Menu
         open={!!anchorElement}
@@ -222,7 +224,8 @@ export default class MaterialUIMenuImplementation
                 // $FlowFixMe - existence should be inferred by Flow.
                 item.enabled === false
               }
-              onClick={async () => {
+              onClick={async e => {
+                e.stopPropagation();
                 if (item.enabled === false) {
                   return;
                 }
@@ -242,7 +245,11 @@ export default class MaterialUIMenuImplementation
               style={styles.menuItem}
             >
               <ListItemIcon>
-                {item.checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+                {item.checked ? (
+                  <CheckBoxIcon fontSize="small" />
+                ) : (
+                  <CheckBoxOutlineBlankIcon fontSize="small" />
+                )}
               </ListItemIcon>
               <ListItemText primary={item.label} />
             </MenuItem>
@@ -263,7 +270,8 @@ export default class MaterialUIMenuImplementation
               dense
               key={'item' + item.label}
               disabled={item.enabled === false}
-              onClick={() => {
+              onClick={e => {
+                e.stopPropagation();
                 if (item.enabled === false) {
                   return;
                 }

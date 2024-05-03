@@ -30,7 +30,7 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
         includeEnd(gd::String::npos),
         linkWasInvalid(false){};
   virtual ~LinkEvent();
-  virtual gd::LinkEvent* Clone() const { return new LinkEvent(*this); }
+  virtual gd::LinkEvent* Clone() const override { return new LinkEvent(*this); }
 
   /**
    * Get the link target (i.e. the scene or external events the link refers to).
@@ -86,7 +86,7 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
   /**
    * The link event must always be preprocessed.
    */
-  virtual bool MustBePreprocessed() { return true; }
+  virtual bool MustBePreprocessed() override { return true; }
 
   /**
    * \brief Get a pointer to the list of events that are targeted by the link.
@@ -107,11 +107,14 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
                                  EventsList& eventList,
                                  std::size_t indexOfTheEventInThisList);
 
-  virtual bool IsExecutable() const { return true; };
+  virtual bool IsExecutable() const override { return true; };
 
-  virtual void SerializeTo(SerializerElement& element) const;
+  virtual void SerializeTo(SerializerElement& element) const override;
   virtual void UnserializeFrom(gd::Project& project,
-                               const SerializerElement& element);
+                               const SerializerElement& element) override;
+
+  bool AcceptVisitor(gd::EventVisitor& eventVisitor) override;
+  void AcceptVisitor(gd::ReadOnlyEventVisitor& eventVisitor) const override;
 
  private:
   gd::String

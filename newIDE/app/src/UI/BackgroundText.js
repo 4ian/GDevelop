@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 // No i18n in this file
 
 type Props = {|

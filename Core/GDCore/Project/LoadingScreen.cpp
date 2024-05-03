@@ -5,20 +5,19 @@
  */
 
 #include "LoadingScreen.h"
-
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
 
 LoadingScreen::LoadingScreen()
-    : showGDevelopSplash(true),
+    : showGDevelopLogoDuringLoadingScreen(true),
       gdevelopLogoStyle("light"),
       backgroundImageResourceName(""),
       backgroundColor(0),
       backgroundFadeInDuration(0.2),
       minDuration(1.5),
       logoAndProgressFadeInDuration(0.2),
-      logoAndProgressLogoFadeInDelay(0.2),
+      logoAndProgressLogoFadeInDelay(0),
       showProgressBar(true),
       progressBarMinWidth(40),
       progressBarMaxWidth(200),
@@ -27,16 +26,18 @@ LoadingScreen::LoadingScreen()
       progressBarColor(0xFFFFFF){};
 
 void LoadingScreen::SerializeTo(SerializerElement& element) const {
-  element.SetAttribute("showGDevelopSplash", showGDevelopSplash);
-  element.SetAttribute("gdevelopLogoStyle",
-                       gdevelopLogoStyle);
+  element.SetAttribute("showGDevelopSplash",
+                       showGDevelopLogoDuringLoadingScreen);
+  element.SetAttribute("gdevelopLogoStyle", gdevelopLogoStyle);
   element.SetAttribute("backgroundImageResourceName",
                        backgroundImageResourceName);
   element.SetAttribute("backgroundColor", backgroundColor);
   element.SetAttribute("backgroundFadeInDuration", backgroundFadeInDuration);
   element.SetAttribute("minDuration", minDuration);
-  element.SetAttribute("logoAndProgressFadeInDuration", logoAndProgressFadeInDuration);
-  element.SetAttribute("logoAndProgressLogoFadeInDelay", logoAndProgressLogoFadeInDelay);
+  element.SetAttribute("logoAndProgressFadeInDuration",
+                       logoAndProgressFadeInDuration);
+  element.SetAttribute("logoAndProgressLogoFadeInDelay",
+                       logoAndProgressLogoFadeInDelay);
   element.SetAttribute("showProgressBar", showProgressBar);
   element.SetAttribute("progressBarMinWidth", progressBarMinWidth);
   element.SetAttribute("progressBarMaxWidth", progressBarMaxWidth);
@@ -46,21 +47,24 @@ void LoadingScreen::SerializeTo(SerializerElement& element) const {
 }
 
 void LoadingScreen::UnserializeFrom(const SerializerElement& element) {
-  showGDevelopSplash = element.GetBoolAttribute("showGDevelopSplash", true);
-  gdevelopLogoStyle =
-      element.GetStringAttribute("gdevelopLogoStyle", "light");
+  showGDevelopLogoDuringLoadingScreen =
+      element.GetBoolAttribute("showGDevelopSplash", true);
+  gdevelopLogoStyle = element.GetStringAttribute("gdevelopLogoStyle", "light");
   backgroundImageResourceName =
       element.GetStringAttribute("backgroundImageResourceName");
   backgroundColor = element.GetIntAttribute("backgroundColor", 0);
   backgroundFadeInDuration =
       element.GetDoubleAttribute("backgroundFadeInDuration", 0.2);
   minDuration = element.GetDoubleAttribute("minDuration", 1.5);
-  logoAndProgressFadeInDuration = element.GetDoubleAttribute("logoAndProgressFadeInDuration", 0.2);
-  logoAndProgressLogoFadeInDelay = element.GetDoubleAttribute("logoAndProgressLogoFadeInDelay", 0.2);
+  logoAndProgressFadeInDuration =
+      element.GetDoubleAttribute("logoAndProgressFadeInDuration", 0.2);
+  logoAndProgressLogoFadeInDelay =
+      element.GetDoubleAttribute("logoAndProgressLogoFadeInDelay", 0.2);
   showProgressBar = element.GetBoolAttribute("showProgressBar", true);
   progressBarMinWidth = element.GetDoubleAttribute("progressBarMinWidth", 40);
   progressBarMaxWidth = element.GetDoubleAttribute("progressBarMaxWidth", 200);
-  progressBarWidthPercent = element.GetDoubleAttribute("progressBarWidthPercent", 30);
+  progressBarWidthPercent =
+      element.GetDoubleAttribute("progressBarWidthPercent", 30);
   progressBarHeight = element.GetDoubleAttribute("progressBarHeight", 20);
   progressBarColor = element.GetIntAttribute("progressBarColor", 0xFFFFFF);
 }

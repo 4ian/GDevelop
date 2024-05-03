@@ -28,6 +28,8 @@ export default class ParticleEmitterEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      objectName,
+      renderObjectNameField,
     } = this.props;
     const particleEmitterConfiguration = gd.asParticleEmitterConfiguration(
       objectConfiguration
@@ -36,6 +38,7 @@ export default class ParticleEmitterEditor extends React.Component<
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         {tutorialIds.map(tutorialId => (
           <DismissableTutorialMessage
             key={tutorialId}
@@ -57,15 +60,12 @@ export default class ParticleEmitterEditor extends React.Component<
         >
           <SelectOption
             value={gd.ParticleEmitterObject.Point}
-            primaryText={t`Circle`}
+            label={t`Circle`}
           />
-          <SelectOption
-            value={gd.ParticleEmitterObject.Line}
-            primaryText={t`Line`}
-          />
+          <SelectOption value={gd.ParticleEmitterObject.Line} label={t`Line`} />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}
-            primaryText={t`Image`}
+            label={t`Image`}
           />
         </SelectField>
         {particleEmitterConfiguration.getRendererType() ===
@@ -120,6 +120,7 @@ export default class ParticleEmitterEditor extends React.Component<
             resourceManagementProps={resourceManagementProps}
             resourceKind="image"
             resourceName={particleEmitterConfiguration.getParticleTexture()}
+            defaultNewResourceName={objectName}
             onChange={resourceName => {
               particleEmitterConfiguration.setParticleTexture(resourceName);
               this.forceUpdate();
@@ -285,7 +286,7 @@ export default class ParticleEmitterEditor extends React.Component<
             type="number"
             value={particleEmitterConfiguration.getFlow()}
             onChange={value => {
-              particleEmitterConfiguration.setFlow(parseInt(value, 10) || 0);
+              particleEmitterConfiguration.setFlow(parseFloat(value) || 0);
               this.forceUpdate();
             }}
           />
@@ -301,7 +302,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getEmitterForceMin()}
             onChange={value => {
               particleEmitterConfiguration.setEmitterForceMin(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -316,7 +317,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getEmitterForceMax()}
             onChange={value => {
               particleEmitterConfiguration.setEmitterForceMax(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -331,7 +332,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getConeSprayAngle()}
             onChange={value => {
               particleEmitterConfiguration.setConeSprayAngle(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -344,7 +345,7 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getZoneRadius()}
             onChange={value => {
               particleEmitterConfiguration.setZoneRadius(
-                parseInt(value, 10) || 0
+                parseFloat(value) || 0
               );
               this.forceUpdate();
             }}
@@ -458,6 +459,23 @@ export default class ParticleEmitterEditor extends React.Component<
             value={particleEmitterConfiguration.getParticleAngle2()}
             onChange={value => {
               particleEmitterConfiguration.setParticleAngle2(parseFloat(value));
+              this.forceUpdate();
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin>
+          <SemiControlledTextField
+            commitOnBlur
+            floatingLabelText={
+              <Trans>Jump forward in time on creation (in seconds)</Trans>
+            }
+            fullWidth
+            type="number"
+            value={particleEmitterConfiguration.getJumpForwardInTimeOnCreation()}
+            onChange={value => {
+              particleEmitterConfiguration.setJumpForwardInTimeOnCreation(
+                parseFloat(value)
+              );
               this.forceUpdate();
             }}
           />

@@ -24,7 +24,9 @@ namespace gdjs {
    * video will have the same state for this video (paused/playing, current time,
    * volume, etc...).
    */
-  export class VideoRuntimeObject extends gdjs.RuntimeObject {
+  export class VideoRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     _opacity: float;
     _loop: boolean;
     _volume: float;
@@ -95,8 +97,8 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
+    onDestroyed(): void {
+      super.onDestroyed();
       this._renderer.onDestroy();
     }
 
@@ -240,7 +242,7 @@ namespace gdjs {
 
     /**
      * Get the volume of the video object.
-     * @returns The current video's volume, betwenn 0 and 100.
+     * @returns The current video's volume, between 0 and 100.
      */
     getVolume(): number {
       return (

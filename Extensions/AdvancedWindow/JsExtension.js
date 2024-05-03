@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,11 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -36,7 +35,7 @@ module.exports = {
     extension
       .addAction(
         'Focus',
-        _('Change focus of the window'),
+        _('Window focus'),
         _('Make the window gain or lose focus.'),
         _('Focus the window: _PARAM0_'),
         _('Windows, Linux, macOS'),
@@ -72,7 +71,7 @@ module.exports = {
     extension
       .addAction(
         'Show',
-        _('Change visibility of the window'),
+        _('Window visibility'),
         _('Make the window visible or invisible.'),
         _('Window visible: _PARAM0_'),
         _('Windows, Linux, macOS'),
@@ -443,7 +442,7 @@ module.exports = {
     extension
       .addAction(
         'SetAlwaysOnTop',
-        _('Make the windows always on top'),
+        _('Make the window always on top'),
         _('Puts the window constantly above all other windows.'),
         _('Make window always on top: _PARAM0_, level: _PARAM1_'),
         _('Windows, Linux, macOS'),
@@ -624,7 +623,7 @@ module.exports = {
     extension
       .addAction(
         'SetOpacity',
-        _('Set window opacity'),
+        _('Window opacity'),
         _('Changes the window opacity.'),
         _('Set the window opacity to _PARAM0_'),
         _('Windows, Linux, macOS'),
@@ -645,7 +644,7 @@ module.exports = {
     extension
       .addAction(
         'SetWindowPosition',
-        _('Set window position'),
+        _('Window position'),
         _('Changes the window position.'),
         _('Set the window position to _PARAM0_;_PARAM1_'),
         _('Windows, Linux, macOS'),
@@ -710,10 +709,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

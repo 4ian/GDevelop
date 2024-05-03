@@ -7,6 +7,9 @@ declare class libGDevelop {
   getTypeOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getTypeOfBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): string;
   getBehaviorsOfObject(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, searchInGroups: boolean): gdVectorString;
+  isDefaultBehavior(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): boolean;
+  getTypeOfBehaviorInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): string;
+  getBehaviorNamesInObjectOrGroup(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer, objectName: string, behaviorName: string, searchInGroups: boolean): gdVectorString;
 
   removeFromVectorParameterMetadata(gdVectorParameterMetadata, index: number): void;
   swapInVectorParameterMetadata(gdVectorParameterMetadata, oldIndex: number, newIndex: number): void;
@@ -32,6 +35,8 @@ declare class libGDevelop {
   asParticleEmitterConfiguration(gdObjectConfiguration): gdParticleEmitterObject;
   asObjectJsImplementation(gdObjectConfiguration): gdObjectJsImplementation;
   asCustomObjectConfiguration(gdObjectConfiguration): gdCustomObjectConfiguration;
+  asModel3DConfiguration(gdObjectConfiguration): gdModel3DObjectConfiguration;
+  asSpineConfiguration(gdObjectConfiguration): gdSpineObjectConfiguration;
 
   asImageResource(gdResource): gdImageResource;
 
@@ -40,6 +45,7 @@ declare class libGDevelop {
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
   VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
+  VectorObjectFolderOrObject: Class<gdVectorObjectFolderOrObject>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
   MapStringDouble: Class<gdMapStringDouble>;
@@ -52,6 +58,7 @@ declare class libGDevelop {
   ProjectHelper: Class<gdProjectHelper>;
   EventsVariablesFinder: Class<gdEventsVariablesFinder>;
   EventsIdentifiersFinder: Class<gdEventsIdentifiersFinder>;
+  EventsFunctionSelfCallChecker: Class<gdEventsFunctionSelfCallChecker>;
   InstructionOrExpressionGroupMetadata: Class<gdInstructionOrExpressionGroupMetadata>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;
@@ -60,12 +67,17 @@ declare class libGDevelop {
   Variable_Type: Class<Variable_Type>;
   Variable: Class<gdVariable>;
   VariablesContainer: Class<gdVariablesContainer>;
+  VariablesContainersList: Class<gdVariablesContainersList>;
   ObjectGroup: Class<gdObjectGroup>;
   ObjectGroupsContainer: Class<gdObjectGroupsContainer>;
   PlatformSpecificAssets: Class<gdPlatformSpecificAssets>;
   LoadingScreen: Class<gdLoadingScreen>;
+  Watermark: Class<gdWatermark>;
+  ObjectFolderOrObject: Class<gdObjectFolderOrObject>;
   ObjectsContainer: Class<gdObjectsContainer>;
   Project: Class<gdProject>;
+  ObjectsContainersList: Class<gdObjectsContainersList>;
+  ProjectScopedContainers: Class<gdProjectScopedContainers>;
   ExtensionProperties: Class<gdExtensionProperties>;
   Behavior: Class<gdBehavior>;
   BehaviorJsImplementation: Class<gdBehaviorJsImplementation>;
@@ -98,8 +110,11 @@ declare class libGDevelop {
   BitmapFontResource: Class<gdBitmapFontResource>;
   VideoResource: Class<gdVideoResource>;
   JsonResource: Class<gdJsonResource>;
+  SpineResource: Class<gdSpineResource>;
   TilemapResource: Class<gdTilemapResource>;
   TilesetResource: Class<gdTilesetResource>;
+  Model3DResource: Class<gdModel3DResource>;
+  AtlasResource: Class<gdAtlasResource>;
   InitialInstance: Class<gdInitialInstance>;
   InitialInstancesContainer: Class<gdInitialInstancesContainer>;
   HighestZOrderFinder: Class<gdHighestZOrderFinder>;
@@ -110,15 +125,15 @@ declare class libGDevelop {
   SerializerElement: Class<gdSerializerElement>;
   SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
+  ObjectAssetSerializer: Class<gdObjectAssetSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
   Expression: Class<gdExpression>;
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
-  ExtraInformation: Class<gdExtraInformation>;
-  ExpressionCodeGenerationInformation: Class<gdExpressionCodeGenerationInformation>;
   ParameterOptions: Class<gdParameterOptions>;
+  AbstractFunctionMetadata: Class<gdAbstractFunctionMetadata>;
   InstructionMetadata: Class<gdInstructionMetadata>;
   ExpressionMetadata: Class<gdExpressionMetadata>;
   MultipleInstructionMetadata: Class<gdMultipleInstructionMetadata>;
@@ -150,10 +165,14 @@ declare class libGDevelop {
   EventsRefactorer: Class<gdEventsRefactorer>;
   UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
   VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
+  ProjectBrowserHelper: Class<gdProjectBrowserHelper>;
+  ResourceExposer: Class<gdResourceExposer>;
+  VariablesChangeset: Class<gdVariablesChangeset>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   PropertyFunctionGenerator: Class<gdPropertyFunctionGenerator>;
   UsedExtensionsResult: Class<gdUsedExtensionsResult>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
+  InstructionsCountEvaluator: Class<gdInstructionsCountEvaluator>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;
   ExtensionAndObjectMetadata: Class<gdExtensionAndObjectMetadata>;
   ExtensionAndEffectMetadata: Class<gdExtensionAndEffectMetadata>;
@@ -175,18 +194,20 @@ declare class libGDevelop {
   ExpressionParser2: Class<gdExpressionParser2>;
   EventsFunction_FunctionType: Class<EventsFunction_FunctionType>;
   EventsFunction: Class<gdEventsFunction>;
+  EventsFunctionsContainer_FunctionOwner: Class<EventsFunctionsContainer_FunctionOwner>;
   EventsFunctionsContainer: Class<gdEventsFunctionsContainer>;
   AbstractEventsBasedEntity: Class<gdAbstractEventsBasedEntity>;
   EventsBasedBehavior: Class<gdEventsBasedBehavior>;
   EventsBasedBehaviorsList: Class<gdEventsBasedBehaviorsList>;
   EventsBasedObject: Class<gdEventsBasedObject>;
   EventsBasedObjectsList: Class<gdEventsBasedObjectsList>;
-  NamedPropertyDescriptorsList: Class<gdNamedPropertyDescriptorsList>;
+  PropertiesContainer: Class<gdPropertiesContainer>;
   EventsFunctionsExtension: Class<gdEventsFunctionsExtension>;
   AbstractFileSystem: Class<gdAbstractFileSystem>;
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
+  ArbitraryObjectsWorker: Class<gdArbitraryObjectsWorker>;
   EventsLeaderboardsLister: Class<gdEventsLeaderboardsLister>;
   EventsLeaderboardsRenamer: Class<gdEventsLeaderboardsRenamer>;
   EventsParametersLister: Class<gdEventsParametersLister>;
@@ -200,6 +221,7 @@ declare class libGDevelop {
   ResourcesMergingHelper: Class<gdResourcesMergingHelper>;
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
+  ObjectsUsingResourceCollector: Class<gdObjectsUsingResourceCollector>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
   EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;
@@ -209,7 +231,12 @@ declare class libGDevelop {
   Sprite: Class<gdSprite>;
   Direction: Class<gdDirection>;
   Animation: Class<gdAnimation>;
+  SpriteAnimationList: Class<gdSpriteAnimationList>;
   SpriteObject: Class<gdSpriteObject>;
+  Model3DAnimation: Class<gdModel3DAnimation>;
+  Model3DObjectConfiguration: Class<gdModel3DObjectConfiguration>;
+  SpineAnimation: Class<gdSpineAnimation>;
+  SpineObjectConfiguration: Class<gdSpineObjectConfiguration>;
   Vector2f: Class<gdVector2f>;
   VectorVector2f: Class<gdVectorVector2f>;
   TextObject: Class<gdTextObject>;
@@ -224,6 +251,8 @@ declare class libGDevelop {
   ObjectCodeGenerator: Class<gdObjectCodeGenerator>;
   EventsFunctionsExtensionCodeGenerator: Class<gdEventsFunctionsExtensionCodeGenerator>;
   PreviewExportOptions: Class<gdPreviewExportOptions>;
+  ExportOptions: Class<gdExportOptions>;
   Exporter: Class<gdExporter>;
   JsCodeEvent: Class<gdJsCodeEvent>;
+  MetadataDeclarationHelper: Class<gdMetadataDeclarationHelper>;
 };

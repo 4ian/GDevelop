@@ -235,7 +235,9 @@ const ScenePropertiesDialog = ({
         />
         <Checkbox
           checked={shouldStopSoundsOnStartup}
-          label={<Trans>Stop music and sounds on startup</Trans>}
+          label={
+            <Trans>Stop music and sounds at the beginning of this scene</Trans>
+          }
           onCheck={(e, check) => setShouldStopSoundsOnStartup(check)}
         />
         <ColorField

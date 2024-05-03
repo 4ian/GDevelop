@@ -23,83 +23,20 @@
 
 namespace gd {
 
-Animation SpriteObject::badAnimation;
-
-SpriteObject::SpriteObject() : updateIfNotVisible(false) {}
+SpriteObject::SpriteObject()
+    : updateIfNotVisible(false) {}
 
 SpriteObject::~SpriteObject(){};
 
 void SpriteObject::DoUnserializeFrom(gd::Project& project,
                                      const gd::SerializerElement& element) {
   updateIfNotVisible = element.GetBoolAttribute("updateIfNotVisible", true);
-
-  RemoveAllAnimations();
-  const gd::SerializerElement& animationsElement =
-      element.GetChild("animations", 0, "Animations");
-  animationsElement.ConsiderAsArrayOf("animation", "Animation");
-  for (std::size_t i = 0; i < animationsElement.GetChildrenCount(); ++i) {
-    const gd::SerializerElement& animationElement =
-        animationsElement.GetChild(i);
-    Animation newAnimation;
-
-    newAnimation.useMultipleDirections = animationElement.GetBoolAttribute(
-        "useMultipleDirections", false, "typeNormal");
-    newAnimation.SetName(animationElement.GetStringAttribute("name", ""));
-
-    // Compatibility with GD <= 3.3
-    if (animationElement.HasChild("Direction")) {
-      for (std::size_t j = 0;
-           j < animationElement.GetChildrenCount("Direction");
-           ++j) {
-        Direction direction;
-        direction.UnserializeFrom(animationElement.GetChild("Direction", j));
-
-        newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount() + 1);
-        newAnimation.SetDirection(direction,
-                                  newAnimation.GetDirectionsCount() - 1);
-      }
-    }
-    // End of compatibility code
-    else {
-      const gd::SerializerElement& directionsElement =
-          animationElement.GetChild("directions");
-      directionsElement.ConsiderAsArrayOf("direction");
-      for (std::size_t j = 0; j < directionsElement.GetChildrenCount(); ++j) {
-        Direction direction;
-        direction.UnserializeFrom(directionsElement.GetChild(j));
-
-        newAnimation.SetDirectionsCount(newAnimation.GetDirectionsCount() + 1);
-        newAnimation.SetDirection(direction,
-                                  newAnimation.GetDirectionsCount() - 1);
-      }
-    }
-
-    AddAnimation(newAnimation);
-  }
+  animations.UnserializeFrom(element);
 }
 
 void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("updateIfNotVisible", updateIfNotVisible);
-
-  // Animations
-  gd::SerializerElement& animationsElement = element.AddChild("animations");
-  animationsElement.ConsiderAsArrayOf("animation");
-  for (std::size_t k = 0; k < GetAnimationsCount(); k++) {
-    gd::SerializerElement& animationElement =
-        animationsElement.AddChild("animation");
-
-    animationElement.SetAttribute("useMultipleDirections",
-                                  GetAnimation(k).useMultipleDirections);
-    animationElement.SetAttribute("name", GetAnimation(k).GetName());
-
-    gd::SerializerElement& directionsElement =
-        animationElement.AddChild("directions");
-    directionsElement.ConsiderAsArrayOf("direction");
-    for (std::size_t l = 0; l < GetAnimation(k).GetDirectionsCount(); l++) {
-      GetAnimation(k).GetDirection(l).SerializeTo(
-          directionsElement.AddChild("direction"));
-    }
-  }
+  animations.SerializeTo(element);
 }
 
 std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetProperties()
@@ -122,16 +59,7 @@ bool SpriteObject::UpdateProperty(const gd::String& name,
 }
 
 void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  for (std::size_t j = 0; j < GetAnimationsCount(); j++) {
-    for (std::size_t k = 0; k < GetAnimation(j).GetDirectionsCount(); k++) {
-      for (std::size_t l = 0;
-           l < GetAnimation(j).GetDirection(k).GetSpritesCount();
-           l++) {
-        worker.ExposeImage(
-            GetAnimation(j).GetDirection(k).GetSprite(l).GetImageName());
-      }
-    }
-  }
+  animations.ExposeResources(worker);
 }
 
 std::map<gd::String, gd::PropertyDescriptor>
@@ -163,42 +91,12 @@ bool SpriteObject::UpdateInitialInstanceProperty(
   return true;
 }
 
-const Animation& SpriteObject::GetAnimation(std::size_t nb) const {
-  if (nb >= animations.size()) return badAnimation;
-
-  return animations[nb];
+const SpriteAnimationList& SpriteObject::GetAnimations() const {
+  return animations;
 }
 
-Animation& SpriteObject::GetAnimation(std::size_t nb) {
-  if (nb >= animations.size()) return badAnimation;
-
-  return animations[nb];
-}
-
-void SpriteObject::AddAnimation(const Animation& animation) {
-  animations.push_back(animation);
-}
-
-bool SpriteObject::RemoveAnimation(std::size_t nb) {
-  if (nb >= GetAnimationsCount()) return false;
-
-  animations.erase(animations.begin() + nb);
-  return true;
-}
-
-void SpriteObject::SwapAnimations(std::size_t firstIndex,
-                                  std::size_t secondIndex) {
-  if (firstIndex < animations.size() && secondIndex < animations.size() &&
-      firstIndex != secondIndex)
-    std::swap(animations[firstIndex], animations[secondIndex]);
-}
-
-void SpriteObject::MoveAnimation(std::size_t oldIndex, std::size_t newIndex) {
-  if (oldIndex >= animations.size() || newIndex >= animations.size()) return;
-
-  auto animation = animations[oldIndex];
-  animations.erase(animations.begin() + oldIndex);
-  animations.insert(animations.begin() + newIndex, animation);
+SpriteAnimationList& SpriteObject::GetAnimations() {
+  return animations;
 }
 
 }  // namespace gd

@@ -2,10 +2,8 @@ import { ResourceCache } from "./ResourceCache";
 import { EditableTileMap } from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./TileMapPixiHelper";
-
-import PIXI = GlobalPIXIModule.PIXI;
 import { TileMapLoader } from "../load/TileMapLoader";
-import { TileMap } from "../types";
+import { TileMapFileContent } from "../load/TileMapFileContent";
 
 /**
  * A holder to share tile maps across the 2 extension objects.
@@ -43,7 +41,7 @@ export class TileMapManager {
    * @param data JSON data.
    * @returns The data enclosed with its detected kind.
    */
-  static identify(data: any): TileMap | null {
+  static identify(data: any): TileMapFileContent | null {
     if (data.tiledversion) {
       console.info("Detected the json file was created in Tiled");
       return {
@@ -63,7 +61,6 @@ export class TileMapManager {
     console.warn(
       "The loaded Tile Map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
     );
-    console.log("The data that failed Tile Map identification is: ", data);
 
     return null;
   }
@@ -80,7 +77,7 @@ export class TileMapManager {
     loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tileMap: TileMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,
@@ -101,14 +98,14 @@ export class TileMapManager {
         loadTileMap(
           tileMapJsonResourceName,
           tileSetJsonResourceName,
-          (tileMap: TileMap | null) => {
-            if (!tileMap) {
+          (tileMapFileContent: TileMapFileContent | null) => {
+            if (!tileMapFileContent) {
               callback(null);
               return;
             }
 
             const editableTileMap = TileMapLoader.load(
-              tileMap,
+              tileMapFileContent,
               levelIndex,
               pako
             );
@@ -133,7 +130,7 @@ export class TileMapManager {
     loadTileMap: (
       tileMapJsonResourceName: string,
       tileSetJsonResourceName: string,
-      callback: (tileMap: TileMap | null) => void
+      callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
     atlasImageResourceName: string,
@@ -157,8 +154,8 @@ export class TileMapManager {
         loadTileMap(
           tileMapJsonResourceName,
           tileSetJsonResourceName,
-          (tileMap: TileMap | null) => {
-            if (!tileMap) {
+          (tileMapFileContent: TileMapFileContent | null) => {
+            if (!tileMapFileContent) {
               // loadTileMap already log errors.
               callback(null);
               return;
@@ -168,7 +165,7 @@ export class TileMapManager {
               ? getTexture(atlasImageResourceName)
               : null;
             const textureCache = PixiTileMapHelper.parseAtlas(
-              tileMap,
+              tileMapFileContent,
               levelIndex,
               atlasTexture,
               getTexture
@@ -179,5 +176,10 @@ export class TileMapManager {
       },
       callback
     );
+  }
+
+  clearCaches(): void {
+    this._tileMapCache = new ResourceCache<EditableTileMap>();
+    this._textureCacheCaches = new ResourceCache<TileTextureCache>();
   }
 }

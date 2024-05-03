@@ -1,10 +1,12 @@
 // @flow
+import { type Node } from 'react';
 import { type CommandName } from './CommandsList';
-
+import { type AlgoliaSearchHit } from '../Utils/AlgoliaSearch';
 type CommandHandler = () => void | Promise<void>;
 
 export type SimpleCommand = {|
   handler: CommandHandler,
+  icon?: Node,
 |};
 
 export type CommandOption = {|
@@ -18,6 +20,11 @@ export type CommandWithOptions = {|
 |};
 
 export type Command = SimpleCommand | CommandWithOptions;
+
+export type GoToWikiCommand = {|
+  hit: AlgoliaSearchHit,
+  handler: CommandHandler,
+|};
 
 export type NamedCommand = {|
   name: CommandName,

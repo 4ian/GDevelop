@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import NewProjectSetupDialog from '../../../ProjectCreation/NewProjectSetupDialog';
 import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
@@ -10,22 +9,23 @@ import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider'
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects,
+  fakeNotAuthenticatedUser,
+  geometryMonsterExampleShortHeader,
+  fakePrivateGameTemplateListingData,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Project Creation/NewProjectSetupDialog',
   component: NewProjectSetupDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
-export const OpenAndAuthenticated = () => {
+export const OpenAndNotAuthenticated = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeNotAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -33,17 +33,73 @@ export const OpenAndAuthenticated = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
 
-export const TooManyCloudProjects = () => {
+export const OpenAndAuthenticated = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+
+export const Opening = () => {
+  return (
+    <NewProjectSetupDialog
+      authenticatedUser={fakeSilverAuthenticatedUser}
+      isOpeningProject
+      storageProviders={[
+        UrlStorageProvider,
+        CloudStorageProvider,
+        GoogleDriveStorageProvider,
+        DownloadFileStorageProvider,
+      ]}
+      onClose={() => action('click on close')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
+    />
+  );
+};
+
+export const LimitsReached = () => {
+  return (
+    <NewProjectSetupDialog
       authenticatedUser={
-        fakeNoSubscriptionAndTooManyCloudProjectsAuthenticatedUser
+        fakeAuthenticatedUserWithNoSubscriptionAndTooManyCloudProjects
       }
       storageProviders={[
         CloudStorageProvider,
@@ -52,7 +108,15 @@ export const TooManyCloudProjects = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedExampleShortHeader={null}
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
@@ -60,9 +124,7 @@ export const TooManyCloudProjects = () => {
 export const FromExample = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample
-      sourceExampleName="RPG story"
-      authenticatedUser={fakeIndieAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -70,16 +132,23 @@ export const FromExample = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={geometryMonsterExampleShortHeader}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedPrivateGameTemplateListingData={null}
     />
   );
 };
 
-export const OpenAndNotAuthenticated = () => {
+export const FromPrivateGameTemplate = () => {
   return (
     <NewProjectSetupDialog
-      isFromExample={false}
-      authenticatedUser={fakeNotAuthenticatedAuthenticatedUser}
+      authenticatedUser={fakeSilverAuthenticatedUser}
       storageProviders={[
         UrlStorageProvider,
         CloudStorageProvider,
@@ -87,25 +156,17 @@ export const OpenAndNotAuthenticated = () => {
         DownloadFileStorageProvider,
       ]}
       onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
-    />
-  );
-};
-
-export const Opening = () => {
-  return (
-    <NewProjectSetupDialog
-      isFromExample={false}
-      authenticatedUser={fakeIndieAuthenticatedUser}
-      isOpening
-      storageProviders={[
-        UrlStorageProvider,
-        CloudStorageProvider,
-        GoogleDriveStorageProvider,
-        DownloadFileStorageProvider,
-      ]}
-      onClose={() => action('click on close')()}
-      onCreate={() => action('click on create')()}
+      onCreateEmptyProject={() => action('create empty')()}
+      onCreateFromExample={() => action('create from example')()}
+      onCreateWithLogin={() => action('create with login')()}
+      onCreateFromAIGeneration={() => action('create from AI generation')()}
+      selectedExampleShortHeader={null}
+      onCreateProjectFromPrivateGameTemplate={() =>
+        action('create project from private game template')()
+      }
+      selectedPrivateGameTemplateListingData={
+        fakePrivateGameTemplateListingData
+      }
     />
   );
 };

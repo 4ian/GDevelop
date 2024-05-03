@@ -111,7 +111,9 @@ export type TiledChunk = {
   y: integer;
 };
 export type TiledObject = {
-  /** The class of the object (renamed from type since 1.9, optional) */
+  /** The class of the object (was saved as class in 1.9, optional) */
+  type?: string;
+  /** The class of the object (used only in 1.9, optional) */
   class?: string;
   /** Used to mark an object as an ellipse */
   ellipse?: boolean;
@@ -251,7 +253,9 @@ export type TiledTransformations = {
 export type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
   animation?: Array<TiledTileDefinition>;
-  /** The class of the tile (renamed from type since 1.9, optional) */
+  /** The class of the object (was saved as class in 1.9, optional) */
+  type?: string;
+  /** The class of the object (used only in 1.9, optional) */
   class?: string;
   /** Local ID of the tile */
   id: integer;

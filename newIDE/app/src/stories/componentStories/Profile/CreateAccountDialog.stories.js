@@ -1,20 +1,21 @@
 // @flow
 import * as React from 'react';
-import muiDecorator from '../../ThemeDecorator';
+import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
 import CreateAccountDialog from '../../../Profile/CreateAccountDialog';
 
 export default {
   title: 'Profile/CreateAccountDialog',
   component: CreateAccountDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const defaultProps = {
-  onClose: () => {},
-  onGoToLogin: () => {},
+  onClose: () => action('onClose')(),
+  onGoToLogin: action('onGoToLogin'),
+  onCreateAccount: action('onCreateAccount'),
+  onLoginWithProvider: action('onLoginWithProvider'),
   createAccountInProgress: false,
-  onCreateAccount: async () => {},
   error: null,
 };
 export const Default = () => <CreateAccountDialog {...defaultProps} />;

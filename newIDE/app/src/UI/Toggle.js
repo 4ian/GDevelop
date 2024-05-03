@@ -3,7 +3,7 @@ import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core';
-import GDevelopThemeContext from './Theme/ThemeContext';
+import GDevelopThemeContext from './Theme/GDevelopThemeContext';
 import { type GDevelopTheme } from './Theme';
 
 const useFormStyles = makeStyles({
@@ -46,7 +46,7 @@ const useSwitchStyles = ({
 type Props = {|
   label: React.Node,
   toggled: boolean,
-  onToggle: (e: {||}, toggled: boolean) => void,
+  onToggle: (e: {||}, toggled: boolean) => void | Promise<void>,
   disabled?: boolean,
   labelPosition: 'right' | 'left',
 
@@ -56,7 +56,7 @@ type Props = {|
 |};
 
 /**
- * A text field based on Material-UI text field.
+ * A toggle based on Material-UI Toggle.
  */
 const Toggle = ({
   label,

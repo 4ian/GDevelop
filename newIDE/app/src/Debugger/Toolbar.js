@@ -15,9 +15,11 @@ type Props = {|
   canPlay: boolean,
   onPause: () => void,
   canPause: boolean,
-  onOpenProfiler: () => void,
+  isProfilerShown: boolean,
+  onToggleProfiler: () => void,
   canOpenProfiler: boolean,
-  onOpenConsole: () => void,
+  isConsoleShown: boolean,
+  onToggleConsole: () => void,
   canOpenConsole: boolean,
 |};
 
@@ -28,10 +30,12 @@ export class Toolbar extends React.PureComponent<Props> {
       onPause,
       canPlay,
       canPause,
-      onOpenProfiler,
+      onToggleProfiler,
       canOpenProfiler,
-      onOpenConsole,
+      onToggleConsole,
       canOpenConsole,
+      isProfilerShown,
+      isConsoleShown,
     } = this.props;
 
     return (
@@ -39,8 +43,9 @@ export class Toolbar extends React.PureComponent<Props> {
         <IconButton
           size="small"
           color="default"
-          onClick={onOpenProfiler}
+          onClick={onToggleProfiler}
           disabled={!canOpenProfiler}
+          selected={isProfilerShown}
           tooltip={t`Open the performance profiler`}
         >
           <ProfilerIcon />
@@ -48,8 +53,9 @@ export class Toolbar extends React.PureComponent<Props> {
         <IconButton
           size="small"
           color="default"
-          onClick={onOpenConsole}
+          onClick={onToggleConsole}
           disabled={!canOpenConsole}
+          selected={isConsoleShown}
           tooltip={t`Open the console`}
         >
           <ConsoleIcon />

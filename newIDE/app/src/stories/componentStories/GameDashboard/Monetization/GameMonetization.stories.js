@@ -3,14 +3,13 @@
 import * as React from 'react';
 
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../../ThemeDecorator';
 
 import paperDecorator from '../../../PaperDecorator';
-import { GameMonetization } from '../../../../GameDashboard/Monetization/GameMonetization';
+import GameMonetization from '../../../../GameDashboard/Monetization/GameMonetization';
 import AuthenticatedUserContext from '../../../../Profile/AuthenticatedUserContext';
 
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   gameWithDisplayAdsOnGamePageEnabled,
   gameWithDisplayAdsOnGamePageDisabled,
 } from '../../../../fixtures/GDevelopServicesTestData';
@@ -21,7 +20,7 @@ import MockAdapter from 'axios-mock-adapter';
 export default {
   title: 'GameDashboard/Monetization/GameMonetization',
   component: GameMonetization,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const AdsEnabled = () => {
@@ -37,7 +36,7 @@ export const AdsEnabled = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );
@@ -56,7 +55,7 @@ export const AdsDisabled = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );
@@ -75,7 +74,7 @@ export const ErrorWhenUpdatingGame = () => {
     });
 
   return (
-    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
       <GameMonetization game={game} onGameUpdated={action('onGameUpdated')} />
     </AuthenticatedUserContext.Provider>
   );

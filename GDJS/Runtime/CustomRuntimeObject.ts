@@ -9,6 +9,7 @@ namespace gdjs {
   };
 
   export type CustomObjectConfiguration = ObjectConfiguration & {
+    animatable?: SpriteAnimationData[];
     childrenContent: { [objectName: string]: ObjectConfiguration & any };
   };
 
@@ -19,19 +20,32 @@ namespace gdjs {
    *
    * @see gdjs.CustomRuntimeObjectInstanceContainer
    */
-  export class CustomRuntimeObject extends gdjs.RuntimeObject {
+  export abstract class CustomRuntimeObject
+    extends gdjs.RuntimeObject
+    implements
+      gdjs.Resizable,
+      gdjs.Scalable,
+      gdjs.Flippable,
+      gdjs.OpacityHandler {
+    _renderer:
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer;
     /** It contains the children of this object. */
     _instanceContainer: gdjs.CustomRuntimeObjectInstanceContainer;
     _isUntransformedHitBoxesDirty: boolean = true;
     /** It contains shallow copies of the children hitboxes */
-    _untransformedHitBoxes: gdjs.Polygon[] = [];
+    private _untransformedHitBoxes: gdjs.Polygon[] = [];
     /** The dimension of this object is calculated from its children AABBs. */
-    _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
-    _scaleX: number = 1;
-    _scaleY: number = 1;
-    _flippedX: boolean = false;
-    _flippedY: boolean = false;
-    opacity: float = 255;
+    private _unrotatedAABB: AABB = { min: [0, 0], max: [0, 0] };
+    private _scaleX: float = 1;
+    private _scaleY: float = 1;
+    private _flippedX: boolean = false;
+    private _flippedY: boolean = false;
+    private opacity: float = 255;
+    private _customCenter: FloatPoint | null = null;
+    private _localTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    private _localInverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    private _isLocalTransformationDirty: boolean = true;
 
     /**
      * @param parent The container the object belongs to
@@ -46,19 +60,24 @@ namespace gdjs {
         parent,
         this
       );
+      this._renderer = this._createRender();
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, parent);
 
       // The generated code calls onCreated at the constructor end
       // and onCreated calls its super implementation at its end.
     }
 
+    protected abstract _createRender():
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer;
+    protected abstract _reinitializeRenderer(): void;
+
     reinitialize(objectData: ObjectData & CustomObjectConfiguration) {
       super.reinitialize(objectData);
 
       this._instanceContainer.loadFrom(objectData);
-      this.getRenderer().reinitialize(this, this.getParent());
+      this._reinitializeRenderer();
 
       // The generated code calls the onCreated super implementation at the end.
       this.onCreated();
@@ -68,21 +87,41 @@ namespace gdjs {
       oldObjectData: ObjectData & CustomObjectConfiguration,
       newObjectData: ObjectData & CustomObjectConfiguration
     ): boolean {
+      const animator = this.getAnimator();
+      if (animator) {
+        animator.updateFromObjectData(
+          oldObjectData.animatable || [],
+          newObjectData.animatable || []
+        );
+      }
       return this._instanceContainer.updateFrom(oldObjectData, newObjectData);
     }
 
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
+      const animator = this.getAnimator();
+      if (initialInstanceData.numberProperties) {
+        for (
+          let i = 0, len = initialInstanceData.numberProperties.length;
+          i < len;
+          ++i
+        ) {
+          const extraData = initialInstanceData.numberProperties[i];
+          if (animator && extraData.name === 'animation') {
+            animator.setAnimationIndex(extraData.value);
+          }
+        }
+      }
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
       }
     }
 
-    onDestroyFromScene(parent: gdjs.RuntimeInstanceContainer): void {
+    onDeletedFromScene(parent: gdjs.RuntimeInstanceContainer): void {
       // Let subclasses do something before the object is destroyed.
       this.onDestroy(parent);
       // Let behaviors do something before the object is destroyed.
-      super.onDestroyFromScene(parent);
+      super.onDeletedFromScene(parent);
       // Destroy the children.
       this._instanceContainer.onDestroyFromScene(parent);
     }
@@ -90,14 +129,14 @@ namespace gdjs {
     update(parent: gdjs.RuntimeInstanceContainer): void {
       this._instanceContainer._updateObjectsPreEvents();
 
-      this.doStepPreEvents(parent);
+      this.doStepPreEvents(this._instanceContainer);
 
       const profiler = this.getRuntimeScene().getProfiler();
       if (profiler) {
         profiler.begin(this.type);
       }
       // This is a bit like the "scene" events for custom objects.
-      this.doStepPostEvents(parent);
+      this.doStepPostEvents(this._instanceContainer);
       if (profiler) {
         profiler.end(this.type);
       }
@@ -130,12 +169,10 @@ namespace gdjs {
       this.getRenderer().ensureUpToDate();
     }
 
-    getRendererObject() {
-      return this.getRenderer().getRendererObject();
-    }
-
-    getRenderer() {
-      return this._instanceContainer.getRenderer();
+    getRenderer():
+      | gdjs.CustomRuntimeObject2DRenderer
+      | gdjs.CustomRuntimeObject3DRenderer {
+      return this._renderer;
     }
 
     onChildrenLocationChanged() {
@@ -149,8 +186,9 @@ namespace gdjs {
         this._updateUntransformedHitBoxes();
       }
 
-      //Update the current hitboxes with the frame custom hit boxes
-      //and apply transformations.
+      // Update the current hitboxes with the frame custom hit boxes
+      // and apply transformations.
+      const localTransformation = this.getLocalTransformation();
       for (let i = 0; i < this._untransformedHitBoxes.length; ++i) {
         if (i >= this.hitBoxes.length) {
           this.hitBoxes.push(new gdjs.Polygon());
@@ -163,9 +201,8 @@ namespace gdjs {
           if (j >= this.hitBoxes[i].vertices.length) {
             this.hitBoxes[i].vertices.push([0, 0]);
           }
-          this.applyObjectTransformation(
-            this._untransformedHitBoxes[i].vertices[j][0],
-            this._untransformedHitBoxes[i].vertices[j][1],
+          localTransformation.transform(
+            this._untransformedHitBoxes[i].vertices[j],
             this.hitBoxes[i].vertices[j]
           );
         }
@@ -181,57 +218,42 @@ namespace gdjs {
     _updateUntransformedHitBoxes() {
       this._isUntransformedHitBoxesDirty = false;
 
-      const oldUnrotatedMinX = this._unrotatedAABB.min[0];
-      const oldUnrotatedMinY = this._unrotatedAABB.min[1];
-      const oldUnrotatedMaxX = this._unrotatedAABB.max[0];
-      const oldUnrotatedMaxY = this._unrotatedAABB.max[1];
-
       this._untransformedHitBoxes.length = 0;
-      if (this._instanceContainer.getAdhocListOfAllInstances().length === 0) {
-        this._unrotatedAABB.min[0] = 0;
-        this._unrotatedAABB.min[1] = 0;
-        this._unrotatedAABB.max[0] = 0;
-        this._unrotatedAABB.max[1] = 0;
-      } else {
-        let minX = Number.MAX_VALUE;
-        let minY = Number.MAX_VALUE;
-        let maxX = -Number.MAX_VALUE;
-        let maxY = -Number.MAX_VALUE;
-        for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
-          Array.prototype.push.apply(
-            this._untransformedHitBoxes,
-            childInstance.getHitBoxes()
-          );
-          const childAABB = childInstance.getAABB();
-          minX = Math.min(minX, childAABB.min[0]);
-          minY = Math.min(minY, childAABB.min[1]);
-          maxX = Math.max(maxX, childAABB.max[0]);
-          maxY = Math.max(maxY, childAABB.max[1]);
+      let minX = Number.MAX_VALUE;
+      let minY = Number.MAX_VALUE;
+      let maxX = -Number.MAX_VALUE;
+      let maxY = -Number.MAX_VALUE;
+      for (const childInstance of this._instanceContainer.getAdhocListOfAllInstances()) {
+        if (!childInstance.isIncludedInParentCollisionMask()) {
+          continue;
         }
-        this._unrotatedAABB.min[0] = minX;
-        this._unrotatedAABB.min[1] = minY;
-        this._unrotatedAABB.max[0] = maxX;
-        this._unrotatedAABB.max[1] = maxY;
-
-        while (this.hitBoxes.length < this._untransformedHitBoxes.length) {
-          this.hitBoxes.push(new gdjs.Polygon());
-        }
-        this.hitBoxes.length = this._untransformedHitBoxes.length;
-      }
-
-      // The default camera center depends on the object dimensions so checking
-      // the AABB center is not enough.
-      if (
-        this._unrotatedAABB.min[0] !== oldUnrotatedMinX ||
-        this._unrotatedAABB.min[1] !== oldUnrotatedMinY ||
-        this._unrotatedAABB.max[0] !== oldUnrotatedMaxX ||
-        this._unrotatedAABB.max[1] !== oldUnrotatedMaxY
-      ) {
-        this._instanceContainer.onObjectUnscaledCenterChanged(
-          (oldUnrotatedMinX + oldUnrotatedMaxX) / 2,
-          (oldUnrotatedMinY + oldUnrotatedMaxY) / 2
+        Array.prototype.push.apply(
+          this._untransformedHitBoxes,
+          childInstance.getHitBoxes()
         );
+        const childAABB = childInstance.getAABB();
+        minX = Math.min(minX, childAABB.min[0]);
+        minY = Math.min(minY, childAABB.min[1]);
+        maxX = Math.max(maxX, childAABB.max[0]);
+        maxY = Math.max(maxY, childAABB.max[1]);
       }
+      if (minX === Number.MAX_VALUE) {
+        // The unscaled size can't be 0 because setWidth and setHeight wouldn't
+        // have any effect.
+        minX = 0;
+        minY = 0;
+        maxX = 1;
+        maxY = 1;
+      }
+      this._unrotatedAABB.min[0] = minX;
+      this._unrotatedAABB.min[1] = minY;
+      this._unrotatedAABB.max[0] = maxX;
+      this._unrotatedAABB.max[1] = maxY;
+
+      while (this.hitBoxes.length < this._untransformedHitBoxes.length) {
+        this.hitBoxes.push(new gdjs.Polygon());
+      }
+      this.hitBoxes.length = this._untransformedHitBoxes.length;
     }
 
     // Position:
@@ -246,37 +268,52 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in parent coordinates).
      */
-    applyObjectTransformation(x: float, y: float, result: number[]) {
-      let cx = this.getCenterX();
-      let cy = this.getCenterY();
+    applyObjectTransformation(x: float, y: float, destination: FloatPoint) {
+      const source = destination;
+      source[0] = x;
+      source[1] = y;
+      this.getLocalTransformation().transform(source, destination);
+    }
 
-      // Flipping
-      if (this._flippedX) {
-        x = x + (cx - x) * 2;
+    /**
+     * Return the affine transformation that represents
+     * flipping, scale, rotation and translation of the object.
+     * @returns the affine transformation.
+     */
+    getLocalTransformation(): gdjs.AffineTransformation {
+      if (this._isLocalTransformationDirty) {
+        this._updateLocalTransformation();
       }
-      if (this._flippedY) {
-        y = y + (cy - y) * 2;
-      }
+      return this._localTransformation;
+    }
 
-      // Scale
+    getLocalInverseTransformation(): gdjs.AffineTransformation {
+      if (this._isLocalTransformationDirty) {
+        this._updateLocalTransformation();
+      }
+      return this._localInverseTransformation;
+    }
+
+    _updateLocalTransformation() {
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
-      x *= absScaleX;
-      y *= absScaleY;
-      cx *= absScaleX;
-      cy *= absScaleY;
+      const centerX = this.getUnscaledCenterX() * absScaleX;
+      const centerY = this.getUnscaledCenterY() * absScaleY;
+      const angleInRadians = (this.angle * Math.PI) / 180;
 
-      // Rotation
-      const angleInRadians = (this.angle / 180) * Math.PI;
-      const cosValue = Math.cos(angleInRadians);
-      const sinValue = Math.sin(angleInRadians);
-      const xToCenterXDelta = x - cx;
-      const yToCenterYDelta = y - cy;
-      x = cx + cosValue * xToCenterXDelta - sinValue * yToCenterYDelta;
-      y = cy + sinValue * xToCenterXDelta + cosValue * yToCenterYDelta;
-      result.length = 2;
-      result[0] = x + this.x;
-      result[1] = y + this.y;
+      this._localTransformation.setToTranslation(this.x, this.y);
+      this._localTransformation.rotateAround(angleInRadians, centerX, centerY);
+      if (this._flippedX) {
+        this._localTransformation.flipX(centerX);
+      }
+      if (this._flippedY) {
+        this._localTransformation.flipY(centerY);
+      }
+      this._localTransformation.scale(absScaleX, absScaleY);
+
+      this._localInverseTransformation.copyFrom(this._localTransformation);
+      this._localInverseTransformation.invert();
+      this._isLocalTransformationDirty = false;
     }
 
     /**
@@ -290,53 +327,51 @@ namespace gdjs {
      * @param result Array that will be updated with the result
      * (x and y position of the point in object coordinates).
      */
-    applyObjectInverseTransformation(x: float, y: float, result: number[]) {
-      x -= this.getCenterXInScene();
-      y -= this.getCenterYInScene();
-
-      const absScaleX = Math.abs(this._scaleX);
-      const absScaleY = Math.abs(this._scaleY);
-
-      // Rotation
-      const angleInRadians = (this.angle / 180) * Math.PI;
-      const cosValue = Math.cos(-angleInRadians);
-      const sinValue = Math.sin(-angleInRadians);
-      const oldX = x;
-      x = cosValue * x - sinValue * y;
-      y = sinValue * oldX + cosValue * y;
-
-      // Scale
-      x /= absScaleX;
-      y /= absScaleY;
-
-      // Flipping
-      if (this._flippedX) {
-        x = -x;
-      }
-      if (this._flippedY) {
-        y = -y;
-      }
-
-      const positionToCenterX =
-        this.getUnscaledWidth() / 2 + this._unrotatedAABB.min[0];
-      const positionToCenterY =
-        this.getUnscaledHeight() / 2 + this._unrotatedAABB.min[1];
-      result[0] = x + positionToCenterX;
-      result[1] = y + positionToCenterY;
+    applyObjectInverseTransformation(
+      x: float,
+      y: float,
+      destination: FloatPoint
+    ) {
+      const source = destination;
+      source[0] = x;
+      source[1] = y;
+      this.getLocalInverseTransformation().transform(source, destination);
     }
 
     getDrawableX(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.x + this._unrotatedAABB.min[0] * this._scaleX;
+      const absScaleX = this.getScaleX();
+      if (!this._flippedX) {
+        return this.x + this._unrotatedAABB.min[0] * absScaleX;
+      } else {
+        return (
+          this.x +
+          (-this._unrotatedAABB.min[0] -
+            this.getUnscaledWidth() +
+            2 * this.getUnscaledCenterX()) *
+            absScaleX
+        );
+      }
     }
 
     getDrawableY(): float {
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
-      return this.y + this._unrotatedAABB.min[1] * this._scaleY;
+      const absScaleY = this.getScaleY();
+      if (!this._flippedY) {
+        return this.y + this._unrotatedAABB.min[1] * absScaleY;
+      } else {
+        return (
+          this.y +
+          (-this._unrotatedAABB.min[1] -
+            this.getUnscaledHeight() +
+            2 * this.getUnscaledCenterY()) *
+            absScaleY
+        );
+      }
     }
 
     /**
@@ -363,6 +398,9 @@ namespace gdjs {
      * @returns the center X from the local origin (0;0).
      */
     getUnscaledCenterX(): float {
+      if (this._customCenter) {
+        return this._customCenter[0];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
@@ -373,10 +411,59 @@ namespace gdjs {
      * @returns the center Y from the local origin (0;0).
      */
     getUnscaledCenterY(): float {
+      if (this._customCenter) {
+        return this._customCenter[1];
+      }
       if (this._isUntransformedHitBoxesDirty) {
         this._updateUntransformedHitBoxes();
       }
       return (this._unrotatedAABB.min[1] + this._unrotatedAABB.max[1]) / 2;
+    }
+
+    /**
+     * The center of rotation is defined relatively to the origin (the object
+     * position).
+     * This avoids the center to move when children push the bounds.
+     *
+     * When no custom center is defined, it will move
+     * to stay at the center of the children bounds.
+     *
+     * @param x coordinate of the custom center
+     * @param y coordinate of the custom center
+     */
+    setRotationCenter(x: float, y: float) {
+      if (!this._customCenter) {
+        this._customCenter = [0, 0];
+      }
+      this._customCenter[0] = x;
+      this._customCenter[1] = y;
+
+      this._isLocalTransformationDirty = true;
+      this.invalidateHitboxes();
+    }
+
+    hasCustomRotationCenter(): boolean {
+      return !!this._customCenter;
+    }
+
+    getCenterX(): float {
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return (
+        (this.getUnscaledCenterX() - this._unrotatedAABB.min[0]) *
+        this.getScaleX()
+      );
+    }
+
+    getCenterY(): float {
+      if (this._isUntransformedHitBoxesDirty) {
+        this._updateUntransformedHitBoxes();
+      }
+      return (
+        (this.getUnscaledCenterY() - this._unrotatedAABB.min[1]) *
+        this.getScaleY()
+      );
     }
 
     getWidth(): float {
@@ -417,6 +504,7 @@ namespace gdjs {
         return;
       }
       this.x = x;
+      this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateX();
     }
@@ -426,6 +514,7 @@ namespace gdjs {
         return;
       }
       this.y = y;
+      this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateY();
     }
@@ -435,6 +524,7 @@ namespace gdjs {
         return;
       }
       this.angle = angle;
+      this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().updateAngle();
     }
@@ -444,7 +534,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScale(newScale: number): void {
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -456,6 +546,7 @@ namespace gdjs {
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().update();
     }
@@ -465,7 +556,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleX(newScale: number): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -473,6 +564,7 @@ namespace gdjs {
         return;
       }
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._isLocalTransformationDirty = true;
       this.invalidateHitboxes();
       this.getRenderer().update();
     }
@@ -482,7 +574,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-    setScaleY(newScale: number): void {
+    setScaleY(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -495,14 +587,24 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case
-     * they are different).
+     * Get the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in
-     * case they are different).
+     * @return the scale of the object (or the arithmetic mean of the X and Y scale in case they are different).
+     * @deprecated Use `getScale` instead.
      */
-    getScale(): number {
+    getScaleMean(): float {
       return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
+     */
+    getScale(): float {
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -524,10 +626,7 @@ namespace gdjs {
     }
 
     // Visibility and display :
-    /**
-     * Change the transparency of the object.
-     * @param opacity The new opacity, between 0 (transparent) and 255 (opaque).
-     */
+
     setOpacity(opacity: float): void {
       if (opacity < 0) {
         opacity = 0;
@@ -539,10 +638,6 @@ namespace gdjs {
       this.getRenderer().updateOpacity();
     }
 
-    /**
-     * Get the transparency of the object.
-     * @return The opacity, between 0 (transparent) and 255 (opaque).
-     */
     getOpacity(): number {
       return this.opacity;
     }
@@ -583,6 +678,15 @@ namespace gdjs {
 
     isFlippedY(): boolean {
       return this._flippedY;
+    }
+
+    /**
+     * Return the sprite animator.
+     *
+     * It returns `null` when custom objects don't have the Animatable capability.
+     */
+    getAnimator(): gdjs.SpriteAnimator<any> | null {
+      return null;
     }
   }
 

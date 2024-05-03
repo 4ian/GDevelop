@@ -6,12 +6,7 @@ describe('gdjs.LinksManager', function () {
     object3Names,
     eventsFunctionContext
   ) => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore - missing properties.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: { resources: [] },
-    });
+    const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
       layers: [
@@ -38,6 +33,7 @@ describe('gdjs.LinksManager', function () {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
+      usedResources: [],
     });
 
     const manager = gdjs.LinksManager.getManager(runtimeScene);

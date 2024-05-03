@@ -2,11 +2,10 @@
 const gd: libGDevelop = global.gd;
 
 export const getInstancesInLayoutForObject = (
-  layout: gdLayout,
+  initialInstancesContainer: gdInitialInstancesContainer,
   objectName: string
 ): Array<gdInitialInstance> => {
-  const instances = layout.getInitialInstances();
-  if (instances.getInstancesCount() === 0) return [];
+  if (initialInstancesContainer.getInstancesCount() === 0) return [];
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
@@ -21,14 +20,39 @@ export const getInstancesInLayoutForObject = (
     }
   };
   // $FlowFixMe - JSFunctor is incompatible with Functor
-  instances.iterateOverInstances(instanceGetter);
+  initialInstancesContainer.iterateOverInstances(instanceGetter);
+  instanceGetter.delete();
+  return objectInstances;
+};
+
+export const getInstancesInLayoutForLayer = (
+  initialInstancesContainer: gdInitialInstancesContainer,
+  layerName: string
+): Array<gdInitialInstance> => {
+  if (initialInstancesContainer.getInstancesCount() === 0) return [];
+  const objectInstances = [];
+  const instanceGetter = new gd.InitialInstanceJSFunctor();
+  // $FlowFixMe - invoke is not writable
+  instanceGetter.invoke = instancePtr => {
+    // $FlowFixMe - wrapPointer is not exposed
+    const instance: gdInitialInstance = gd.wrapPointer(
+      instancePtr,
+      gd.InitialInstance
+    );
+    if (instance.getLayer() === layerName) {
+      objectInstances.push(instance);
+    }
+  };
+  // $FlowFixMe - JSFunctor is incompatible with Functor
+  initialInstancesContainer.iterateOverInstances(instanceGetter);
   instanceGetter.delete();
   return objectInstances;
 };
 
 export const getInstanceCountInLayoutForObject = (
-  layout: gdLayout,
+  initialInstancesContainer: gdInitialInstancesContainer,
   objectName: string
 ): number => {
-  return getInstancesInLayoutForObject(layout, objectName).length;
+  return getInstancesInLayoutForObject(initialInstancesContainer, objectName)
+    .length;
 };

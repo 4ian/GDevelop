@@ -1,5 +1,6 @@
 // @flow
 import RenderedInstance from './RenderedInstance';
+import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
@@ -13,22 +14,29 @@ import {
   LayoutedParent,
   getProportionalPositionX,
   getProportionalPositionY,
+  getProportionalPositionZ,
 } from './CustomObjectLayoutingModel';
 import * as PIXI from 'pixi.js-legacy';
+import * as THREE from 'three';
 
 const gd: libGDevelop = global.gd;
 
 /**
  * Renderer for gd.CustomObject (the class is not exposed to newIDE)
  */
-export default class RenderedCustomObjectInstance extends RenderedInstance
-  implements LayoutedParent<RenderedInstance> {
+export default class RenderedCustomObjectInstance extends Rendered3DInstance
+  implements LayoutedParent<RenderedInstance | Rendered3DInstance> {
   childrenInstances: ChildInstance[];
   childrenLayouts: ChildLayout[];
-  childrenRenderedInstances: RenderedInstance[];
-  childrenRenderedInstanceByNames: Map<string, RenderedInstance>;
+  childrenRenderedInstances: Array<RenderedInstance | Rendered3DInstance>;
+  childrenRenderedInstanceByNames: Map<
+    string,
+    RenderedInstance | Rendered3DInstance
+  >;
   _proportionalOriginX: number;
   _proportionalOriginY: number;
+  _proportionalOriginZ: number;
+  _threeObjectPivot: THREE.Group | null;
 
   constructor(
     project: gdProject,
@@ -36,6 +44,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     instance: gdInitialInstance,
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
+    threeGroup: THREE.Group,
     pixiResourcesLoader: Class<PixiResourcesLoader>
   ) {
     super(
@@ -44,12 +53,25 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       instance,
       associatedObjectConfiguration,
       pixiContainer,
+      threeGroup,
       pixiResourcesLoader
     );
 
-    //Setup the PIXI object:
+    // Setup the PIXI object:
     this._pixiObject = new PIXI.Container();
     this._pixiContainer.addChild(this._pixiObject);
+
+    if (this._threeGroup) {
+      // No Three group means the instance should only be rendered in 2D.
+      const threeObject = new THREE.Group();
+      threeObject.rotation.order = 'ZYX';
+      this._threeGroup.add(threeObject);
+
+      this._threeObjectPivot = new THREE.Group();
+      this._threeObjectPivot.rotation.order = 'ZYX';
+      threeObject.add(this._threeObjectPivot);
+      this._threeObject = threeObject;
+    }
 
     const customObjectConfiguration = gd.asCustomObjectConfiguration(
       associatedObjectConfiguration
@@ -65,6 +87,9 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     const parentOriginYPositionName =
       properties.has('ParentOriginY') &&
       properties.get('ParentOriginY').getValue();
+    const parentOriginZPositionName =
+      properties.has('ParentOriginZ') &&
+      properties.get('ParentOriginZ').getValue();
     this._proportionalOriginX =
       (parentOriginPositionName &&
         getProportionalPositionX(parentOriginPositionName)) ||
@@ -77,6 +102,12 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       (parentOriginYPositionName &&
         getProportionalPositionY(parentOriginYPositionName)) ||
       0;
+    this._proportionalOriginZ =
+      (parentOriginPositionName &&
+        getProportionalPositionZ(parentOriginPositionName)) ||
+      (parentOriginZPositionName &&
+        getProportionalPositionZ(parentOriginZPositionName)) ||
+      0;
 
     const eventBasedObject = project.hasEventsBasedObject(
       customObjectConfiguration.getType()
@@ -87,7 +118,10 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     this.childrenInstances = [];
     this.childrenLayouts = [];
     this.childrenRenderedInstances = [];
-    this.childrenRenderedInstanceByNames = new Map<string, RenderedInstance>();
+    this.childrenRenderedInstanceByNames = new Map<
+      string,
+      RenderedInstance | Rendered3DInstance
+    >();
 
     if (!eventBasedObject) {
       return;
@@ -105,6 +139,7 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         isShown: true,
         horizontalLayout: {},
         verticalLayout: {},
+        depthLayout: {},
       };
 
       const childObjectConfiguration = customObjectConfiguration.getChildObjectConfiguration(
@@ -117,10 +152,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
         // $FlowFixMe Use real object instances.
         childInstance,
         childObjectConfiguration,
-        this._pixiObject
+        this._pixiObject,
+        this._threeObjectPivot
       );
       if (!childLayout.isShown) {
         this._pixiObject.removeChild(renderer._pixiObject);
+        if (this._threeObjectPivot && renderer instanceof Rendered3DInstance) {
+          this._threeObjectPivot.remove(renderer._threeObject);
+        }
       }
 
       if (renderer instanceof RenderedTextInstance) {
@@ -140,6 +179,14 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       );
       this._pixiContainer.addChild(this._pixiObject);
     }
+  }
+
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    for (const childrenInstance of this.childrenRenderedInstances) {
+      childrenInstance.onRemovedFromScene();
+    }
+    this._pixiObject.destroy(false);
   }
 
   /**
@@ -162,6 +209,26 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
     if (!eventBasedObject) {
       return 'res/unknown32.png';
     }
+    if (eventBasedObject.isAnimatable()) {
+      const animations = customObjectConfiguration.getAnimations();
+
+      if (
+        animations.getAnimationsCount() > 0 &&
+        animations.getAnimation(0).getDirectionsCount() > 0 &&
+        animations
+          .getAnimation(0)
+          .getDirection(0)
+          .getSpritesCount() > 0
+      ) {
+        const imageName = animations
+          .getAnimation(0)
+          .getDirection(0)
+          .getSprite(0)
+          .getImageName();
+        return resourcesLoader.getResourceFullUrl(project, imageName, {});
+      }
+      return 'res/unknown32.png';
+    }
 
     for (let i = 0; i < eventBasedObject.getObjectsCount(); i++) {
       const childObject = eventBasedObject.getObjectAt(i);
@@ -172,52 +239,68 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       if (
         childType === 'Sprite' ||
         childType === 'TiledSpriteObject::TiledSprite' ||
-        childType === 'PanelSpriteObject::PanelSprite'
+        childType === 'PanelSpriteObject::PanelSprite' ||
+        childType === 'Scene3D::Cube3DObject'
       ) {
-        return ObjectsRenderingService.getThumbnail(
+        const thumbnail = ObjectsRenderingService.getThumbnail(
           project,
           childObjectConfiguration
         );
+        if (thumbnail) return thumbnail;
       }
     }
     return 'res/unknown32.png';
   }
 
   update() {
+    // TODO For animatable custom objects, change the texture used by the child
+    // according to the current animation.
+
     applyChildLayouts(this);
 
-    const defaultWidth = this.getDefaultWidth();
-    const defaultHeight = this.getDefaultHeight();
-    const originX = this._proportionalOriginX * defaultWidth;
-    const originY = this._proportionalOriginY * defaultHeight;
-    const centerX = defaultWidth / 2;
-    const centerY = defaultHeight / 2;
+    const originX = this.getOriginX();
+    const originY = this.getOriginY();
+    const originZ = this.getOriginZ();
+    const centerX = this.getCenterX();
+    const centerY = this.getCenterY();
+    const centerZ = this.getCenterZ();
 
-    this._pixiObject.pivot.x = centerX;
-    this._pixiObject.pivot.y = centerY;
+    const firstInstance = this.childrenRenderedInstances[0];
+    const is3D = firstInstance && firstInstance instanceof Rendered3DInstance;
+
+    const threeObject = this._threeObject;
+    const threeObjectPivot = this._threeObjectPivot;
+    if (threeObject && threeObjectPivot && is3D) {
+      threeObject.position.set(
+        this._instance.getX() + centerX - originX,
+        this._instance.getY() + centerY - originY,
+        this._instance.getZ() + centerZ - originZ
+      );
+      threeObjectPivot.position.set(
+        -centerX + originX,
+        -centerY + originY,
+        -centerZ + originZ
+      );
+      threeObject.rotation.set(
+        RenderedInstance.toRad(this._instance.getRotationX()),
+        RenderedInstance.toRad(this._instance.getRotationY()),
+        RenderedInstance.toRad(this._instance.getAngle())
+      );
+
+      this._pixiObject.pivot.x = centerX - originX;
+      this._pixiObject.pivot.y = centerY - originY;
+    } else {
+      this._pixiObject.pivot.x = centerX;
+      this._pixiObject.pivot.y = centerY;
+    }
+    this._pixiObject.position.x = this._instance.getX() + centerX - originX;
+    this._pixiObject.position.y = this._instance.getY() + centerY - originY;
+
     this._pixiObject.rotation = RenderedInstance.toRad(
       this._instance.getAngle()
     );
     this._pixiObject.scale.x = 1;
     this._pixiObject.scale.y = 1;
-    this._pixiObject.position.x =
-      this._instance.getX() +
-      (centerX - originX) * Math.abs(this._pixiObject.scale.x);
-    this._pixiObject.position.y =
-      this._instance.getY() +
-      (centerY - originY) * Math.abs(this._pixiObject.scale.y);
-  }
-
-  getWidth() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomWidth()
-      : this.getDefaultWidth();
-  }
-
-  getHeight() {
-    return this._instance.hasCustomSize()
-      ? this._instance.getCustomHeight()
-      : this.getDefaultHeight();
   }
 
   getDefaultWidth() {
@@ -232,19 +315,34 @@ export default class RenderedCustomObjectInstance extends RenderedInstance
       : 48;
   }
 
+  getDefaultDepth() {
+    const firstInstance = this.childrenRenderedInstances[0];
+    return firstInstance && firstInstance instanceof Rendered3DInstance
+      ? firstInstance.getDefaultDepth()
+      : 48;
+  }
+
   getOriginX(): number {
-    return (
-      this._proportionalOriginX *
-      this.getDefaultWidth() *
-      this._pixiObject.scale.x
-    );
+    return this._proportionalOriginX * this.getWidth();
   }
 
   getOriginY(): number {
-    return (
-      this._proportionalOriginY *
-      this.getDefaultHeight() *
-      this._pixiObject.scale.y
-    );
+    return this._proportionalOriginY * this.getHeight();
+  }
+
+  getOriginZ(): number {
+    return this._proportionalOriginZ * this.getDepth();
+  }
+
+  getCenterX() {
+    return this.getWidth() / 2;
+  }
+
+  getCenterY() {
+    return this.getHeight() / 2;
+  }
+
+  getCenterZ() {
+    return this.getDepth() / 2;
   }
 }

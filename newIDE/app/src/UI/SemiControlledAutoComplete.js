@@ -13,6 +13,7 @@ import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
 import {
@@ -69,7 +70,7 @@ type Props = {|
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
-  focus: (selectAll?: boolean) => void,
+  focus: FieldFocusFunction,
   forceInputValueTo: (newValue: string) => void,
 |};
 
@@ -83,6 +84,7 @@ export const autocompleteStyles = {
     padding: 0,
     margin: 0,
   },
+  listbox: { padding: 0, margin: 0 },
   listItemText: {
     margin: '1px 0',
   },
@@ -92,10 +94,7 @@ const useStyles = makeStyles({
   option: {
     cursor: 'default',
   },
-  listbox: {
-    padding: 0,
-    margin: 0,
-  },
+  listbox: autocompleteStyles.listbox,
   input: {
     width: 'auto',
     flexGrow: 1,
@@ -250,20 +249,24 @@ const getOptionLabel = (option: Option, value: string): string =>
   option.value ? option.value : value;
 
 export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
-  function SemiControlledAutoComplete(props: Props, ref) {
+  function SemiControlledAutoComplete(props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
 
-    React.useImperativeHandle(ref, () => ({
-      focus: (selectAll: boolean = false) => {
-        const { current } = input;
-        if (current) {
-          current.focus();
-          current.setSelectionRange(0, props.value.toString().length);
+    const focus: FieldFocusFunction = options => {
+      const inputElement = input.current;
+      if (inputElement) {
+        inputElement.focus();
+        if (options && options.selectAll) {
+          inputElement.select();
         }
-      },
+      }
+    };
+
+    React.useImperativeHandle(ref, () => ({
+      focus,
       forceInputValueTo: (newValue: string) => {
         if (inputValue !== null) setInputValue(newValue);
       },

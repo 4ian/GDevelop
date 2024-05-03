@@ -202,4 +202,15 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .SetFunctionName("InventoryTools::Count");
+
+  extension
+	  .AddExpression("Maximum",
+		  _("Item maximum"),
+		  _("Get the maximum of an item in the inventory, or 0 if it is unlimited"),
+		  "",
+		  "CppPlatform/Extensions/Inventoryicon.png")
+	  .AddCodeOnlyParameter("currentScene", "")
+	  .AddParameter("string", _("Inventory name"))
+	  .AddParameter("string", _("Item name"))
+	  .SetFunctionName("InventoryTools::Maximum");
 }

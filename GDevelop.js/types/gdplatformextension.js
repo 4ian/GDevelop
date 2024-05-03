@@ -7,6 +7,8 @@ declare class gdPlatformExtension {
   setCategory(category: string): gdPlatformExtension;
   addInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
+  getTags(): gdVectorString;
+  setTags(csvTags: string): gdPlatformExtension;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addCondition(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
@@ -15,9 +17,7 @@ declare class gdPlatformExtension {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addDependency(): gdDependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
-  addEventsBasedBehavior(name: string, fullname: string, description: string, group: string, icon24x24: string): gdBehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObjectConfiguration): gdObjectMetadata;
-  addEventsBasedObject(name: string, fullname: string, description: string, icon24x24: string): gdObjectMetadata;
   addEffect(name: string): gdEffectMetadata;
   registerProperty(name: string): gdPropertyDescriptor;
   getFullName(): string;
@@ -56,6 +56,7 @@ declare class gdPlatformExtension {
   getAllProperties(): gdMapStringPropertyDescriptor;
   getAllDependencies(): gdVectorDependencyMetadata;
   static getNamespaceSeparator(): string;
+  static getBehaviorFullType(extensionName: string, behaviorName: string): string;
   delete(): void;
   ptr: number;
 };

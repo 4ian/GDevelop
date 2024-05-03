@@ -4,12 +4,16 @@ import { List } from 'react-virtualized';
 import ItemRow from './ItemRow';
 import { AddListItem } from '../ListCommonItem';
 import { listItemWith32PxIconHeight, listItemWithoutIconHeight } from '../List';
-import { makeDragSourceAndDropTarget } from '../DragAndDrop/DragSourceAndDropTarget';
+import {
+  makeDragSourceAndDropTarget,
+  type DraggedItem,
+} from '../DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from './DropIndicator';
-import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
-import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
-import type { WidthType } from '../Reponsive/ResponsiveWindowMeasurer';
+import { ResponsiveWindowMeasurer } from '../Responsive/ResponsiveWindowMeasurer';
+import { ScreenTypeMeasurer } from '../Responsive/ScreenTypeMeasurer';
 import { type HTMLDataset } from '../../Utils/HTMLDataset';
+
+const OVERSCAN_CELLS_COUNT = 20;
 
 type Props<Item> = {|
   height: number,
@@ -49,12 +53,17 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     if (this._list) this._list.forceUpdateGrid();
   }
 
-  _renderItemRow(
-    item: Item,
-    index: number,
-    windowWidth: WidthType,
-    connectIconDragSource?: ?(React.Element<any>) => ?React.Node
-  ) {
+  scrollToItem(item: Item) {
+    const index = this.props.fullList.findIndex(
+      listItem =>
+        this.props.getItemName(listItem) === this.props.getItemName(item)
+    );
+    if (this._list && index !== -1) {
+      this._list.scrollToRow(index);
+    }
+  }
+
+  _renderItemRow(item: Item, index: number, isMobile: boolean) {
     const {
       selectedItems,
       getItemThumbnail,
@@ -72,6 +81,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     const nameBeingEdited = renamedItem === item;
     const itemName = getItemName(item);
 
+    const selected =
+      selectedItems.findIndex(item => getItemName(item) === itemName) !== -1;
+
     return (
       <ItemRow
         item={item}
@@ -87,14 +99,13 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
-        selected={selectedItems.indexOf(item) !== -1}
+        selected={selected}
         onItemSelected={this.props.onItemSelected}
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}
         buildMenuTemplate={() => this.props.buildMenuTemplate(item, index)}
         onEdit={onEditItem}
-        hideMenuButton={windowWidth === 'small'}
+        hideMenuButton={isMobile}
         scaleUpItemIconWhenSelected={scaleUpItemIconWhenSelected}
-        connectIconDragSource={connectIconDragSource || null}
       />
     );
   }
@@ -108,6 +119,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       addNewItemId,
       renamedItem,
       getItemThumbnail,
+      getItemName,
       onAddNewItem,
       onMoveSelectionToItem,
       canMoveSelectionToItem,
@@ -115,13 +127,36 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     } = this.props;
     const { DragSourceAndDropTarget } = this;
 
+    // Create an empty pixel image once to override the default drag preview of all items.
+    const emptyImage = new Image();
+    emptyImage.src =
+      'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {({ isMobile }) => (
           <ScreenTypeMeasurer>
             {screenType => (
               <List
                 ref={list => (this._list = list)}
+                // We override this function to avoid a bug in react-virtualized
+                // where the overscanCellsCount is not taken into account after a scroll
+                // see https://github.com/bvaughn/react-virtualized/issues/1582#issuecomment-785073746
+                overscanIndicesGetter={({
+                  cellCount,
+                  overscanCellsCount,
+                  startIndex,
+                  stopIndex,
+                }) => ({
+                  overscanStartIndex: Math.max(
+                    0,
+                    startIndex - OVERSCAN_CELLS_COUNT
+                  ),
+                  overscanStopIndex: Math.min(
+                    cellCount - 1,
+                    stopIndex + OVERSCAN_CELLS_COUNT
+                  ),
+                })}
                 height={height}
                 rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
                 rowHeight={
@@ -143,7 +178,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                       <div style={style} key={key}>
                         <AddListItem
                           onClick={onAddNewItem}
-                          primaryText={addNewItemLabel}
+                          primaryText={width < 200 ? '' : addNewItemLabel}
                           id={addNewItemId}
                         />
                       </div>
@@ -152,18 +187,50 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   const item = fullList[index];
                   const nameBeingEdited = renamedItem === item;
-                  const isSelected = selectedItems.indexOf(item) !== -1;
+                  const isSelected =
+                    selectedItems.findIndex(
+                      selectedItem =>
+                        getItemName(selectedItem) === getItemName(item)
+                    ) !== -1;
+                  // If on a touch screen, we only allow dragging if the item is selected.
+                  const canDrag =
+                    !nameBeingEdited && (screenType !== 'touch' || isSelected);
 
                   return (
                     <div style={style} key={key}>
                       <DragSourceAndDropTarget
                         beginDrag={() => {
-                          if (!isSelected) this.props.onItemSelected(item);
+                          // This is a hack for touch screens. We need to prevent the react-dnd list from scrolling
+                          // at the same time as the drag is happening.
+                          // react-dnd does not work well with react-virtualized.
+                          // Find the React-Virtualized list and prevent it from scrolling whilst dragging
+                          // by setting the overflow to 'hidden' and then back to 'auto' when the drag is finished.
+                          if (screenType === 'touch') {
+                            if (this._list) {
+                              this._list.props.style.overflow = 'hidden';
+                            }
+                          }
 
+                          // Ensure we reselect the item even if it's already selected.
+                          // This prevents a bug where the connected preview is not
+                          // updated when the item is already selected.
+                          this.props.onItemSelected(item);
+
+                          // We return the item name and thumbnail to be used by the
+                          // drag preview. We can't use the item itself because it's
+                          // not serializable and breaks react-dnd.
+                          const draggedItem: DraggedItem = {
+                            name: getItemName(item),
+                            thumbnail:
+                              this.props.reactDndType ===
+                                'GD_OBJECT_WITH_CONTEXT' && getItemThumbnail
+                                ? getItemThumbnail(item)
+                                : undefined,
+                          };
                           // $FlowFixMe
-                          return {};
+                          return draggedItem;
                         }}
-                        canDrag={() => !nameBeingEdited}
+                        canDrag={() => canDrag}
                         canDrop={() =>
                           canMoveSelectionToItem
                             ? canMoveSelectionToItem(item)
@@ -172,41 +239,38 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                         drop={() => {
                           onMoveSelectionToItem(item);
                         }}
+                        endDrag={() => {
+                          // Re-enable scrolling on touch screens.
+                          if (screenType !== 'touch') return;
+                          if (this._list) {
+                            this._list.props.style.overflow = 'auto';
+                            this.forceUpdate();
+                          }
+                        }}
                       >
                         {({
                           connectDragSource,
                           connectDropTarget,
+                          connectDragPreview,
                           isOver,
                           canDrop,
                         }) => {
-                          // If on a touch screen, setting the whole item to be
-                          // draggable would prevent scroll. Set the icon only to be
-                          // draggable if the item is not selected. When selected,
-                          // set the whole item to be draggable.
-                          const canDragOnlyIcon =
-                            screenType === 'touch' && !isSelected;
+                          // Connect the drag preview with an empty image to override the default
+                          // drag preview.
+                          connectDragPreview(emptyImage);
 
                           // Add an extra div because connectDropTarget/connectDragSource can
                           // only be used on native elements
                           const dropTarget = connectDropTarget(
                             <div>
                               {isOver && <DropIndicator canDrop={canDrop} />}
-                              {this._renderItemRow(
-                                item,
-                                index,
-                                windowWidth,
-                                // Only mark the icon as draggable if needed
-                                // (touchscreens).
-                                canDragOnlyIcon ? connectDragSource : null
-                              )}
+                              {this._renderItemRow(item, index, isMobile)}
                             </div>
                           );
 
                           if (!dropTarget) return null;
 
-                          return canDragOnlyIcon
-                            ? dropTarget
-                            : connectDragSource(dropTarget);
+                          return connectDragSource(dropTarget);
                         }}
                       </DragSourceAndDropTarget>
                     </div>

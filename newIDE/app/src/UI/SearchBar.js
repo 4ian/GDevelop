@@ -2,28 +2,19 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import { makeStyles } from '@material-ui/styles';
-import IconButton from './IconButton';
 import TextField, { type TextFieldInterface } from './TextField';
 import Collapse from '@material-ui/core/Collapse';
 import MuiTextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
 import Text from './Text';
-import FilterList from '@material-ui/icons/FilterList';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import ElementWithMenu from './Menu/ElementWithMenu';
-import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
-import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
-import Search from './CustomSvgIcons/Search';
-import Cross from './CustomSvgIcons/Cross';
-import GDevelopThemeContext from './Theme/ThemeContext';
-import { type GDevelopTheme } from './Theme';
 import { useDebounce } from '../Utils/UseDebounce';
+import SearchBarContainer from './SearchBarContainer';
+import { useResponsiveWindowSize } from './Responsive/ResponsiveWindowMeasurer';
 
 type TagsHandler = {|
   remove: string => void,
@@ -55,108 +46,6 @@ type Props = {|
   helpPagePath?: ?string,
   autoFocus?: 'desktop' | 'desktopAndMobileDevices',
 |};
-
-// Defines the space an icon takes with a button, to place the popper accordingly.
-const leftIconSpace = 43;
-const rightIconSpace = 33;
-
-const getStyles = ({
-  nonEmpty,
-  disabled,
-  theme,
-  aspect,
-  focused,
-  hasHelpPage,
-}: {
-  nonEmpty: boolean,
-  disabled: boolean,
-  theme: GDevelopTheme,
-  aspect?: 'integrated-search-bar',
-  focused: boolean,
-  hasHelpPage: boolean,
-}) => {
-  const iconOpacity = !disabled ? 1 : 0.38;
-  const iconSize = 30;
-  return {
-    root: {
-      height: 30,
-      display: 'flex',
-      flex: 1,
-      justifyContent: 'space-between',
-      backgroundColor: disabled
-        ? theme.searchBar.backgroundColor.disabled
-        : theme.searchBar.backgroundColor.default,
-      borderRadius: aspect === 'integrated-search-bar' ? 0 : 4,
-    },
-    iconButtonClose: {
-      style: {
-        opacity: iconOpacity,
-        visibility: nonEmpty && !disabled ? 'visible' : 'hidden',
-        transition: 'visibility 0s linear 0.1s',
-      },
-    },
-    iconButtonSearch: {
-      container: {
-        padding: '5px 10px',
-      },
-      iconStyle: {
-        fontSize: 18,
-        opacity: focused ? 1 : 0.5,
-        transition: 'opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-    },
-    iconButtonFilter: {
-      style: {
-        opacity: iconOpacity,
-        transform: nonEmpty ? 'translateX(0)' : `translateX(${iconSize}px)`,
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-    },
-    iconButtonHelp: {
-      style: {
-        opacity: iconOpacity,
-        transform: nonEmpty ? 'translateX(0)' : `translateX(${iconSize}px)`,
-        transition: 'transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
-    },
-    inputStyle: {
-      padding: 0,
-      color: disabled
-        ? theme.searchBar.textColor.disabled
-        : nonEmpty && focused
-        ? theme.searchBar.textColor.focused
-        : theme.searchBar.textColor.default,
-    },
-    searchContainer: {
-      position: 'relative',
-      margin: 'auto 4px',
-      width: '100%',
-    },
-    popperContainer: {
-      left: `-${leftIconSpace}px`,
-      right: hasHelpPage ? `-${2 * rightIconSpace}px` : `-${rightIconSpace}px`,
-      position: 'absolute',
-      zIndex: 1, // Make sure the Popper is above the search bar.
-    },
-  };
-};
-
-// We override the style of paper for the border, as we need access
-// to the hover/focus status of the paper to change the border color.
-const usePaperStyles = ({ theme, disabled, nonEmpty, focused }) =>
-  makeStyles({
-    root: {
-      border: `1px solid ${
-        focused ? theme.searchBar.borderColor.focused : 'transparent'
-      }`,
-      '&:hover': {
-        border:
-          !focused &&
-          !disabled &&
-          `1px solid ${theme.searchBar.borderColor.hovered}`,
-      },
-    },
-  })();
 
 export type SearchBarInterface = {|
   focus: () => void,
@@ -203,10 +92,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         textField.current.blur();
       }
     };
+    const { isMobile } = useResponsiveWindowSize();
 
     const [isInputFocused, setIsInputFocused] = React.useState(false);
-
-    const GDevelopTheme = React.useContext(GDevelopThemeContext);
 
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
@@ -220,21 +108,6 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     const textField = React.useRef<?TextFieldInterface>(null);
 
     const nonEmpty = !!value && value.length > 0;
-    const styles = getStyles({
-      nonEmpty,
-      disabled: !!disabled,
-      theme: GDevelopTheme,
-      aspect,
-      focused: isInputFocused,
-      hasHelpPage: !!helpPagePath,
-    });
-    const paperStyles = usePaperStyles({
-      theme: GDevelopTheme,
-      disabled: !!disabled,
-      nonEmpty,
-      focused: isInputFocused,
-    });
-
     const debouncedOnChange = useDebounce(onChange ? onChange : noop, 250);
 
     const changeValueDebounced = React.useCallback(
@@ -304,7 +177,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     const handleCancel = () => {
       changeValueImmediately('');
-      focus();
+      if (!isMobile) focus();
     };
 
     const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
@@ -362,122 +235,95 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
-            <Line noMargin>
-              <Paper classes={paperStyles} style={styles.root}>
-                <div style={styles.iconButtonSearch.container}>
-                  <Search style={styles.iconButtonSearch.iconStyle} />
-                </div>
-                <div style={styles.searchContainer}>
-                  {tags ? (
-                    <Autocomplete
-                      id={id}
-                      options={tags}
-                      freeSolo
-                      fullWidth
-                      defaultValue=""
-                      inputValue={value}
-                      value={autocompleteValue}
-                      onChange={handleAutocompleteInput}
-                      onInputChange={handleAutocompleteInputChange}
-                      onKeyPress={handleKeyPressed}
-                      onBlur={handleBlur}
-                      onFocus={handleFocus}
-                      getOptionDisabled={option =>
-                        option.disabled ||
-                        (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
-                      }
-                      getOptionSelected={(option, _) =>
-                        !!tagsHandler && tagsHandler.chosenTags.has(option)
-                      }
-                      PopperComponent={props => (
-                        <div style={styles.popperContainer}>
-                          {props.children}
-                        </div>
-                      )}
-                      renderOption={option => <Text noMargin>{option}</Text>}
-                      renderInput={params => (
-                        <MuiTextField
-                          margin="none"
-                          {...params}
-                          autoFocus={shouldAutoFocusTextField}
-                          inputRef={textField}
-                          InputProps={{
-                            ...params.InputProps,
-                            disableUnderline: true,
-                            endAdornment: null,
-                            placeholder: i18n._(placeholder || t`Search`),
-                            style: styles.inputStyle,
-                          }}
-                        />
-                      )}
-                    />
-                  ) : (
-                    <TextField
-                      id={id}
+          <SearchBarContainer
+            onCancel={handleCancel}
+            isFocused={isInputFocused}
+            disabled={disabled}
+            isSearchBarEmpty={!nonEmpty}
+            helpPagePath={helpPagePath}
+            aspect={aspect}
+            buildMenuTemplate={buildMenuTemplate}
+            renderSubLine={
+              tagsHandler
+                ? () => (
+                    <Collapse in={tagsHandler.chosenTags.size > 0}>
+                      <TagChips
+                        tags={Array.from(tagsHandler.chosenTags)}
+                        onRemove={tag => {
+                          if (tagsHandler.chosenTags.size === 1) {
+                            // If the last tag is removed, focus the search bar.
+                            focus();
+                          }
+                          tagsHandler.remove(tag);
+                        }}
+                      />
+                    </Collapse>
+                  )
+                : null
+            }
+            renderContent={({ inputStyle, popperContainerStyle }) =>
+              tags ? (
+                <Autocomplete
+                  id={id}
+                  options={tags}
+                  freeSolo
+                  fullWidth
+                  defaultValue=""
+                  inputValue={value}
+                  value={autocompleteValue}
+                  onChange={handleAutocompleteInput}
+                  onInputChange={handleAutocompleteInputChange}
+                  onKeyPress={handleKeyPressed}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
+                  getOptionDisabled={option =>
+                    option.disabled ||
+                    (!!tagsHandler && !!tagsHandler.chosenTags.has(option))
+                  }
+                  getOptionSelected={(option, _) =>
+                    !!tagsHandler && tagsHandler.chosenTags.has(option)
+                  }
+                  PopperComponent={props => (
+                    <div style={popperContainerStyle}>{props.children}</div>
+                  )}
+                  renderOption={option => <Text noMargin>{option}</Text>}
+                  renderInput={params => (
+                    <MuiTextField
                       margin="none"
-                      translatableHintText={placeholder || t`Search`}
-                      onBlur={handleBlur}
-                      value={value}
-                      onChange={handleInput}
-                      onKeyUp={handleKeyPressed}
-                      fullWidth
-                      underlineShow={false}
-                      disabled={disabled}
-                      ref={textField}
-                      inputStyle={styles.inputStyle}
-                      onFocus={handleFocus}
-                      autoFocus={autoFocus}
+                      {...params}
+                      autoFocus={shouldAutoFocusTextField}
+                      inputRef={textField}
+                      InputProps={{
+                        ...params.InputProps,
+                        disableUnderline: true,
+                        endAdornment: null,
+                        placeholder: i18n._(placeholder || t`Search`),
+                        style: inputStyle,
+                      }}
                     />
                   )}
-                </div>
-                {buildMenuTemplate && (
-                  <ElementWithMenu
-                    element={
-                      <IconButton
-                        style={styles.iconButtonFilter.style}
-                        disabled={disabled}
-                        size="small"
-                      >
-                        <FilterList />
-                      </IconButton>
-                    }
-                    buildMenuTemplate={buildMenuTemplate}
-                  />
-                )}
-                {helpPagePath && (
-                  <HelpIcon
-                    disabled={disabled}
-                    helpPagePath={helpPagePath}
-                    style={styles.iconButtonHelp.style}
-                    size="small"
-                  />
-                )}
-                <IconButton
-                  onClick={handleCancel}
-                  style={styles.iconButtonClose.style}
-                  disabled={disabled}
-                  size="small"
-                >
-                  <Cross />
-                </IconButton>
-              </Paper>
-            </Line>
-            {tagsHandler && (
-              <Collapse in={tagsHandler.chosenTags.size > 0}>
-                <TagChips
-                  tags={Array.from(tagsHandler.chosenTags)}
-                  onRemove={tag => {
-                    if (tagsHandler.chosenTags.size === 1) {
-                      // If the last tag is removed, focus the search bar.
-                      focus();
-                    }
-                    tagsHandler.remove(tag);
-                  }}
                 />
-              </Collapse>
-            )}
-          </Column>
+              ) : (
+                <TextField
+                  id={id}
+                  margin="none"
+                  dataset={{ searchBar: 'true' }}
+                  translatableHintText={placeholder || t`Search`}
+                  onBlur={handleBlur}
+                  value={value}
+                  onChange={handleInput}
+                  onKeyUp={handleKeyPressed}
+                  fullWidth
+                  underlineShow={false}
+                  disabled={disabled}
+                  ref={textField}
+                  inputStyle={inputStyle}
+                  onFocus={handleFocus}
+                  autoFocus={autoFocus}
+                />
+              )
+            }
+          />
         )}
       </I18n>
     );

@@ -56,7 +56,7 @@ const importGDJSRuntime = () => {
 
 /**
  * Callback for fs.watch, so that  whenever a source file is changed,
- * it relaunchs automatically the script to import.
+ * it relaunches automatically the script to import.
  */
 const onWatchEvent = debounce(
   /**

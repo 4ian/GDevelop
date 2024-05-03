@@ -27,6 +27,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .addEffect('FakeSepia')
       .setFullName('Fake Sepia Effect')
       .setDescription('A fake sepia effect')
+      .markAsOnlyWorkingFor2D()
       .addIncludeFile('Extensions/Effects/fake-sepia.js');
     const sepiaProperties = sepiaEffect.getProperties();
     sepiaProperties
@@ -40,6 +41,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setFullName('Fake Sepia Effect only for layers')
       .setDescription('A fake sepia effect only for layers')
       .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
+      .markAsOnlyWorkingFor2D()
       .markAsNotWorkingForObjects();
     const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
     layerOnlySepiaProperties
@@ -52,6 +54,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .addEffect('FakeNight')
       .setFullName('Fake Night Effect')
       .setDescription('A fake night effect')
+      .markAsOnlyWorkingFor2D()
       .addIncludeFile('Extensions/Effects/fake-night.js');
     const nightProperties = nightEffect.getProperties();
     nightProperties
@@ -69,6 +72,7 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .addEffect('FakeEffectWithVariousParameters')
       .setFullName('Fake Effect With Various Parameters')
       .setDescription('A fake effect using different parameters')
+      .markAsOnlyWorkingFor2D()
       .addIncludeFile(
         'Extensions/Effects/fake-effect-with-various-parameters.js'
       );
@@ -104,7 +108,47 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setLabel('Some setting to enable or not for the effect')
       .setType('boolean')
       .setDescription('And some *optional* description.');
-
+    {
+      const effect3D = extension
+        .addEffect('FakeDirectionalLight')
+        .setFullName('Fake directional light')
+        .setDescription('An effect for 3D layers')
+        .markAsNotWorkingForObjects()
+        .markAsOnlyWorkingFor3D()
+        .addIncludeFile('Extensions/3D/fake-DirectionalLight.js');
+      const properties = effect3D.getProperties();
+      properties
+        .getOrCreate('color')
+        .setValue('255;255;255')
+        .setLabel('Light color')
+        .setType('color');
+      properties
+        .getOrCreate('intensity')
+        .setValue('0.5')
+        .setLabel('Intensity')
+        .setType('number');
+      properties
+        .getOrCreate('top')
+        .setValue('Y-')
+        .setLabel('3D world top')
+        .setType('choice')
+        .addExtraInfo('Y-')
+        .addExtraInfo('Z+')
+        .setGroup('Orientation');
+      properties
+        .getOrCreate('elevation')
+        .setValue('45')
+        .setLabel('Elevation (in degrees)')
+        .setType('number')
+        .setGroup('Orientation')
+        .setDescription('Maximal elevation is reached at 90°.');
+      properties
+        .getOrCreate('rotation')
+        .setValue('0')
+        .setLabel('Rotation (in degrees)')
+        .setType('number')
+        .setGroup('Orientation');
+    }
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
@@ -292,16 +336,6 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       return instanceProperties;
     };
 
-    const object = extension
-      .addObject(
-        'FakeObjectWithUnsupportedCapability',
-        'FakeObjectWithUnsupportedCapability',
-        'This is FakeObjectWithUnsupportedCapability',
-        '',
-        fakeObject
-      )
-      .addUnsupportedBaseObjectCapability('effect');
-
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }
@@ -314,6 +348,129 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       '',
       'MIT'
     );
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension
+      .setExtensionInformation(
+        'FakeScene3D',
+        'Fake 3D',
+        'Fake support for 3D in GDevelop.',
+        '',
+        'MIT'
+      )
+      .setCategory('General');
+    extension
+      .addInstructionOrExpressionGroupMetadata('3D')
+      .setIcon('res/conditions/3d_box.svg');
+    const Cube3DObject = new gd.ObjectJsImplementation();
+    // $FlowExpectedError
+    Cube3DObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+    // $FlowExpectedError
+    Cube3DObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+      return instanceProperties;
+    };
+
+    extension
+      .addObject(
+        'Cube3DObject',
+        '3D Box',
+        'A box with images for each face',
+        'JsPlatform/Extensions/3d_box.svg',
+        Cube3DObject
+      )
+      .setCategoryFullName('General')
+      .markAsRenderedIn3D();
+    platform.addNewExtension(extension);
+    extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+  }
+  {
+    const extension = new gd.PlatformExtension();
+    extension
+      .setExtensionInformation(
+        'FakeTextInput',
+        'Fake Text Input',
+        'A fake text field the player can type text into.',
+        '',
+        'MIT'
+      )
+      .setCategory('User interface');
+    extension
+      .addInstructionOrExpressionGroupMetadata('Text Input')
+      .setIcon('JsPlatform/Extensions/text_input.svg');
+
+    const textInputObject = new gd.ObjectJsImplementation();
+    // $FlowExpectedError
+    textInputObject.getProperties = function(objectContent) {
+      const objectProperties = new gd.MapStringPropertyDescriptor();
+      return objectProperties;
+    };
+
+    // $FlowExpectedError
+    textInputObject.getInitialInstanceProperties = function(
+      content,
+      instance,
+      project,
+      layout
+    ) {
+      const instanceProperties = new gd.MapStringPropertyDescriptor();
+
+      instanceProperties
+        .getOrCreate('initialValue')
+        .setValue(instance.getRawStringProperty('initialValue'))
+        .setType('string')
+        .setLabel('Initial value')
+        .setDescription('Value that the input will take **initially**');
+      instanceProperties
+        .getOrCreate('placeholder')
+        .setValue(instance.getRawStringProperty('placeholder'))
+        .setType('string')
+        .setLabel('Placeholder');
+
+      return instanceProperties;
+    };
+
+    // $FlowExpectedError
+    textInputObject.updateInitialInstanceProperty = function(
+      objectContent,
+      instance,
+      propertyName,
+      newValue,
+      project,
+      layout
+    ) {
+      if (propertyName === 'initialValue') {
+        instance.setRawStringProperty('initialValue', newValue);
+        return true;
+      } else if (propertyName === 'placeholder') {
+        instance.setRawStringProperty('placeholder', newValue);
+        return true;
+      }
+
+      return false;
+    };
+
+    extension
+      .addObject(
+        'TextInput',
+        'Text input',
+        'A text field the player can type text into.',
+        'JsPlatform/Extensions/text_input.svg',
+        textInputObject
+      )
+      .setCategoryFullName('User interface');
+
     platform.addNewExtension(extension);
     extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
   }

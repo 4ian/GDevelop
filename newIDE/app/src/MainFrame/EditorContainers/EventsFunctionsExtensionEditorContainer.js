@@ -10,6 +10,11 @@ const styles = {
   container: {
     display: 'flex',
     flex: 1,
+    // In some cases, if some flex children cannot contract to
+    // within the div, it is possible for the div to overflow
+    // outside its parent. Setting min-width to 0 avoids this.
+    // See: https://stackoverflow.com/a/36247448/6199068
+    minWidth: 0,
   },
 };
 
@@ -57,12 +62,15 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  _onBehaviorEdited = async () => {
-    // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of a behavior can create changes
-    // in actions/conditions/expressions to manipulate these properties.
+  _reloadExtensionMetadata = () => {
+    // Immediately trigger the reload/regeneration of the extension
+    // as a change in function declaration must be seen in the instructions
+    // especially to avoid to show "unsupported instructions".
     try {
-      await this.props.onLoadEventsFunctionsExtensions();
+      const extension = this.getEventsFunctionsExtension();
+      if (extension) {
+        this.props.onReloadEventsFunctionsExtensionMetadata(extension);
+      }
     } catch (error) {
       console.warn(
         'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
@@ -71,26 +79,11 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   };
 
-  // TODO EBO factorize?
-  _onObjectEdited = async () => {
-    // Immediately trigger the reload/regeneration of extensions
-    // as a change in the properties of an object can create changes
-    // in actions/conditions/expressions to manipulate these properties.
-    try {
-      await this.props.onLoadEventsFunctionsExtensions();
-    } catch (error) {
-      console.warn(
-        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
-        error
-      );
-    }
-  };
-
-  previewWillStart = () => {
+  previewOrExportWillStart = () => {
     // Immediately trigger the reload/regeneration of extensions
     // if a preview is about to start, as changes chan have been made
-    // inside. The preview is responsible for waiting for extensions
-    // to be loaded before starting.
+    // inside. The preview or export is responsible for waiting
+    // for extensions to be loaded before starting.
     if (this.props.isActive) {
       this.props.onLoadEventsFunctionsExtensions();
     }
@@ -106,12 +99,23 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     return project.getEventsFunctionsExtension(projectItemName);
   }
 
+  getEventsFunctionsExtensionName(): ?string {
+    const { project, projectItemName } = this.props;
+    if (!project || !projectItemName) return null;
+
+    return projectItemName;
+  }
+
   selectEventsFunctionByName(
     eventsFunctionName: string,
     behaviorName: ?string
   ) {
     if (this.editor)
       this.editor.selectEventsFunctionByName(eventsFunctionName, behaviorName);
+  }
+
+  selectEventsBasedBehaviorByName(behaviorName: string) {
+    if (this.editor) this.editor.selectEventsBasedBehaviorByName(behaviorName);
   }
 
   render() {
@@ -138,8 +142,9 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
-          onBehaviorEdited={this._onBehaviorEdited}
-          onObjectEdited={this._onObjectEdited}
+          onBehaviorEdited={this._reloadExtensionMetadata}
+          onObjectEdited={this._reloadExtensionMetadata}
+          onFunctionEdited={this._reloadExtensionMetadata}
           ref={editor => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />

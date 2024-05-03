@@ -8,6 +8,7 @@ type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
   primary?: boolean,
+  secondary?: boolean,
   allowBrowserAutoTranslate?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,
@@ -33,6 +34,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
     {
       label,
       primary,
+      secondary,
       icon,
       keyboardFocused,
       disabled,
@@ -52,8 +54,8 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="text"
         size="small"
-        translate={allowBrowserAutoTranslate ? 'yes' : 'no'}
-        color={primary ? 'secondary' : 'default'}
+        translate={allowBrowserAutoTranslate ? undefined : 'no'}
+        color={primary ? 'primary' : secondary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
@@ -63,7 +65,8 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       >
         {icon}
         {icon && <Spacer />}
-        {label}
+        {/* span element is required to prevent browser auto translators to crash the app - See https://github.com/4ian/GDevelop/issues/3453 */}
+        {label ? <span>{label}</span> : null}
       </Button>
     );
   }

@@ -4,7 +4,7 @@ import {
   sendMessageToParentEditor,
   setTitle,
 } from '../utils/parent-editor-interface.js';
-import { createPathEditorHeader } from '../utils/path-editor.js';
+import { createExternalEditorHeader } from '../utils/external-editor-header.js';
 
 // Repeatedly try to gain access to piskel's control element and its methods
 // When succeeded, stop trying.
@@ -23,24 +23,31 @@ editorFrameEl.onload = () => {
 };
 editorFrameEl.src = 'piskel-editor/index.html';
 
-const saveToGD = async pathEditor => {
+const saveToGDevelop = async externalEditorHeader => {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getLayerAt(0);
+  const { state } = externalEditorHeader;
 
-  // In all cases, save the images to resource using data URLs to
+  // Save the images to resource using data URLs to
   // send them back to GDevelop.
   const resources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
     const frame = layer.getFrameAt(i);
-    const name = frame.originalResourceName;
-    const localFilePath = frame.originalLocalFilePath;
+
+    // If a frame was made in piskel, `name` and `localFilePath` will be undefined.
+    // If the user chose to create a new resource, they will also be undefined.
+    const name = state.isOverwritingExistingResource
+      ? frame.originalResourceName
+      : undefined;
+    const localFilePath = state.isOverwritingExistingResource
+      ? frame.originalLocalFilePath
+      : undefined;
     const originalIndex = frame.originalIndex;
 
     const canvas = pskl.app.piskelController.renderFrameAt(i, true);
     const dataUrl = canvas.toDataURL('image/png');
 
-    // If a frame was made in piskel, "name" will be undefined.
     resources.push({
       name,
       dataUrl,
@@ -61,13 +68,13 @@ const saveToGD = async pathEditor => {
       // Also save the ordered resource names to be able to restore them later.
       // (by keeping the resource names, we know if resources were moved/added/deleted).
       resourceNames: resources.map(({ name }) => name),
-      name: pathEditor.state.name,
+      name: state.name,
     };
   }
 
   sendMessageToParentEditor('save-external-editor-output', {
     resources,
-    baseNameForNewResources: pathEditor.state.name,
+    baseNameForNewResources: state.name,
     externalEditorData,
   });
 
@@ -238,13 +245,13 @@ const loadPiskelDataFromGd = externalEditorInput => {
       });
 
       // Compare the imported frames - so as to make the layered Piskel Document
-      // the same as the changes done in Gdevelop without flattening any layers
+      // the same as the changes done in GDevelop without flattening any layers
       let flattenedResourceNames = [];
       externalEditorInput.resources.forEach((resource, frameIndex) => {
         const resourceName = resource.name;
         flattenedResourceNames.push(resourceName);
 
-        // Import any frames that were added in Gdevelop (i.e: frames which can't be found
+        // Import any frames that were added in GDevelop (i.e: frames which can't be found
         // in the saved resource names).
         if (!savedResourceNames.includes(resourceName)) {
           pskl.utils.BlobUtils.dataToBlob(
@@ -359,11 +366,11 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
   piskelAppHeader.style.display = 'none';
 
   // Load a custom save file(s) header
-  const pathEditorHeaderDiv = document.getElementById('path-editor-header');
-  const savePathEditor = createPathEditorHeader({
+  const pathEditorHeaderDiv = document.getElementById('external-editor-header');
+  const externalEditorHeader = createExternalEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
-    onSaveToGd: saveToGD,
+    onSaveChanges: () => saveToGDevelop(externalEditorHeader),
     onCancelChanges: () => {
       // Tell Piskel we saved the changes so that it does not try to prevent closing the window.
       // We could override the "Unload service" private functions - but it seems even more hacky.
@@ -389,14 +396,12 @@ onMessageFromParentEditor('open-external-editor-input', externalEditorInput => {
     // Note that metadata will be saved only if the user has more than one layers
     loadPiskelDataFromGd(externalEditorInput);
 
-    // Disable changing path and naming convention by user - on animations imported from gdevelop
-    savePathEditor.disableNameInput();
+    externalEditorHeader.setOverwriteExistingResource();
   } else {
     // If there are resources, but no metadata, load the images that were received from GD
     loadImagesIntoPiskel(externalEditorInput);
 
-    // Disable changing path and naming convention by user - on animations imported from gdevelop
-    savePathEditor.disableNameInput();
+    externalEditorHeader.setOverwriteExistingResource();
   }
 
   // Remove the list of frames in case we're editing a single frame and not an animation.

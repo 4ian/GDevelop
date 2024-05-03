@@ -5,10 +5,9 @@ function(gd_add_clang_utils target_name source_files)
 		add_custom_target(
 			${target_name}_clang-format
 			COMMAND ${CLANG_FORMAT}
-			-i 
+			-i
 			-style=\"{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}\"
-			${source_files}
-			)
+			${source_files})
 
 		add_dependencies(clang-format ${target_name}_clang-format)
 	endif()

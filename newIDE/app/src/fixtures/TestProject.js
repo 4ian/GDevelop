@@ -9,8 +9,12 @@ export type TestProject = {|
   tiledSpriteObjectConfiguration: gdObjectConfiguration,
   panelSpriteObject: gdObject,
   spriteObjectConfiguration: gdSpriteObject,
+  emptySpriteObjectConfiguration: gdSpriteObject,
+  cube3dObject: gdObject,
+  textInputObject: gdObject,
   customObject: gdObject,
   spriteObject: gdObject,
+  emptySpriteObject: gdObject,
   spriteObjectWithBehaviors: gdObject,
   spriteObjectWithoutBehaviors: gdObject,
   testSpriteObjectInstance: gdInitialInstance,
@@ -19,6 +23,8 @@ export type TestProject = {|
   group2: gdObjectGroup,
   group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
+  testLayoutInstance2: gdInitialInstance,
+  testLayoutInstance3: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
   testExternalEvents2: gdExternalEvents,
@@ -35,6 +41,8 @@ export type TestProject = {|
   testEventsBasedObject: gdEventsBasedObject,
   testObjectEventsFunction: gdEventsFunction,
   layerWithEffects: gdLayer,
+  layerWith3DEffects: gdLayer,
+  layerWith2DEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
   spriteObjectWithEffects: gdObject,
@@ -209,6 +217,18 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'MyTiledSpriteObject',
     0
   );
+  const cube3dObject = testLayout.insertNewObject(
+    project,
+    'FakeScene3D::Cube3DObject',
+    'CubeObject',
+    0
+  );
+  const textInputObject = testLayout.insertNewObject(
+    project,
+    'FakeTextInput::TextInput',
+    'TextInputObject',
+    0
+  );
   const panelSpriteObject = testLayout.insertNewObject(
     project,
     'PanelSpriteObject::PanelSprite',
@@ -219,6 +239,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     project,
     'Sprite',
     'MySpriteObject',
+    0
+  );
+  const emptySpriteObject = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MyEmptySpriteObject',
     0
   );
   const spriteObjectWithBehaviors = testLayout.insertNewObject(
@@ -259,6 +285,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   );
   const spriteObjectConfiguration = gd.asSpriteConfiguration(
     spriteObject.getConfiguration()
+  );
+  const animations = spriteObjectConfiguration.getAnimations();
+  const emptySpriteObjectConfiguration = gd.asSpriteConfiguration(
+    emptySpriteObject.getConfiguration()
   );
   {
     const variablesContainer = spriteObject.getVariables();
@@ -304,7 +334,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite1);
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -322,7 +352,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     animation.getDirection(0).addSprite(sprite2);
     animation.getDirection(0).addSprite(sprite3);
     animation.getDirection(0).addSprite(sprite4);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
   {
     const animation = new gd.Animation();
@@ -330,7 +360,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const sprite1 = new gd.Sprite();
     sprite1.setImageName('pixi');
     animation.getDirection(0).addSprite(sprite1);
-    spriteObjectConfiguration.addAnimation(animation);
+    animations.addAnimation(animation);
   }
 
   spriteObjectWithBehaviors.addNewBehavior(
@@ -343,10 +373,6 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     'DraggableBehavior::Draggable',
     'Draggable'
   );
-
-  // Add some tags
-  tiledSpriteObject.setTags('Tag1');
-  spriteObject.setTags('Tag1, Tag2');
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -375,6 +401,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewInitialInstance();
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
+
+  const testLayoutInstance2 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance2.setX(120);
+  testLayoutInstance2.setY(-15);
+  testLayoutInstance2.setZ(32);
+  testLayoutInstance2.setObjectName(cube3dObject.getName());
+
+  const testLayoutInstance3 = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testLayoutInstance3.setX(12);
+  testLayoutInstance3.setY(-15.5);
+  testLayoutInstance3.setZ(3.2);
+  testLayoutInstance3.setObjectName(textInputObject.getName());
 
   const testSpriteObjectInstance = testLayout
     .getInitialInstances()
@@ -612,6 +654,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   someAlreadyInstalledExtension.setFullName(
     'Some fake already installed extension'
   );
+  someAlreadyInstalledExtension.setVersion('1.2.3');
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -746,19 +789,61 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create a layer with some effects
   const layerWithEffects = new gd.Layer();
+  {
+    const effect1 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+    const effect4 = layerWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  const effect1 = layerWithEffects.getEffects().insertNewEffect('MyEffect1', 0);
-  const effect2 = layerWithEffects.getEffects().insertNewEffect('MyEffect2', 1);
-  const effect3 = layerWithEffects.getEffects().insertNewEffect('MyEffect3', 1);
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 3D effects
+  const layerWith3DEffects = new gd.Layer();
+  {
+    const effect4 = layerWith3DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect4', 1);
 
-  effect1.setEffectType('FakeSepia');
-  effect1.setDoubleParameter('opacity', 0.6);
-  effect2.setEffectType('FakeNight');
-  effect2.setDoubleParameter('intensity', 0.1);
-  effect2.setDoubleParameter('opacity', 0.2);
-  effect3.setEffectType('FakeEffectWithVariousParameters');
-  effect3.setDoubleParameter('intensity', 0.1);
-  effect3.setStringParameter('image', 'my-image');
+    effect4.setEffectType('FakeDirectionalLight');
+  }
+  // Create a layer with some 2D effects
+  const layerWith2DEffects = new gd.Layer();
+  {
+    const effect1 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = layerWith2DEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+  }
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
   layerWithEffectWithoutEffectType
@@ -827,8 +912,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     tiledSpriteObjectConfiguration: tiledSpriteObject.getConfiguration(),
     panelSpriteObject,
     customObject,
+    cube3dObject,
+    textInputObject,
     spriteObject,
     spriteObjectConfiguration,
+    emptySpriteObject,
+    emptySpriteObjectConfiguration,
     testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
@@ -837,6 +926,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     group2,
     group4WithLongsNames,
     testLayoutInstance1,
+    testLayoutInstance2,
+    testLayoutInstance3,
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,
@@ -853,6 +944,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testEventsBasedObject: buttonEventBasedObject,
     testObjectEventsFunction,
     layerWithEffects,
+    layerWith3DEffects,
+    layerWith2DEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
     spriteObjectWithEffects,

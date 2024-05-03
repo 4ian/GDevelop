@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
 import Chip from '../UI/Chip';
-import { type Tags, removeTag } from '../Utils/TagsHelper';
+
+type Tags = Array<string>;
 
 const styles = {
   chipContainer: {
@@ -18,11 +19,10 @@ const styles = {
 
 type Props = {|
   tags: Tags,
-  onChange?: Tags => void,
-  onRemove?: string => void,
+  onRemove: string => void,
 |};
 
-const TagChips = ({ tags, onChange, onRemove }: Props) => {
+const TagChips = ({ tags, onRemove }: Props) => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
   const tagsRefs = React.useRef([]);
 
@@ -50,8 +50,7 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
         newTagToFocus.current.focus();
       }
     }
-    if (onChange) onChange(removeTag(tags, tag));
-    else if (onRemove) onRemove(tag);
+    onRemove(tag);
   };
 
   if (!tags.length) return null;
@@ -68,7 +67,7 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
             style={getChipStyle(tag)}
             onBlur={() => setFocusedTag(null)}
             onFocus={() => setFocusedTag(tag)}
-            onDelete={onChange || onRemove ? handleDeleteTag(tag) : null}
+            onDelete={handleDeleteTag(tag)}
             label={tag}
             ref={newRef}
           />

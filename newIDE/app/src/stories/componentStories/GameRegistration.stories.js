@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -9,29 +8,26 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
 } from '../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
-import withMock from 'storybook-addon-mock';
 import { GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
 
 export default {
   title: 'GameDashboard/GameRegistration',
   component: GameRegistration,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const NoProjectLoaded = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration project={null} onGameRegistered={() => {}} />
   </AuthenticatedUserContext.Provider>
 );
 
 export const NotLoggedIn = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -39,15 +35,24 @@ export const NotLoggedIn = () => (
   </AuthenticatedUserContext.Provider>
 );
 
+export const NotLoggedInWithoutLogin = () => (
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+    <GameRegistration
+      project={testProject.project}
+      onGameRegistered={() => {}}
+      hideLogin
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
 export const NotAuthorized = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
     />
   </AuthenticatedUserContext.Provider>
 );
-NotAuthorized.decorators = [withMock];
 NotAuthorized.parameters = {
   mockData: [
     {
@@ -61,14 +66,13 @@ NotAuthorized.parameters = {
 };
 
 export const GameNotExisting = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
     />
   </AuthenticatedUserContext.Provider>
 );
-GameNotExisting.decorators = [withMock];
 GameNotExisting.parameters = {
   mockData: [
     {
@@ -82,14 +86,13 @@ GameNotExisting.parameters = {
 };
 
 export const ErrorLoadingGame = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
     />
   </AuthenticatedUserContext.Provider>
 );
-ErrorLoadingGame.decorators = [withMock];
 ErrorLoadingGame.parameters = {
   mockData: [
     {
@@ -102,17 +105,16 @@ ErrorLoadingGame.parameters = {
   ],
 };
 
-export const RegisteredWithGameStatsEmail = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+export const RegisteredWithAdditionalActions = () => (
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
-      suggestGameStatsEmail
+      suggestAdditionalActions
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithGameStatsEmail.decorators = [withMock];
-RegisteredWithGameStatsEmail.parameters = {
+RegisteredWithAdditionalActions.parameters = {
   mockData: [
     {
       url: `${GDevelopGameApi.baseUrl}/game/?userId=indie-user`,
@@ -128,14 +130,13 @@ RegisteredWithGameStatsEmail.parameters = {
 };
 
 export const RegisteredWithLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithLoader.decorators = [withMock];
 RegisteredWithLoader.parameters = {
   mockData: [
     {
@@ -152,7 +153,7 @@ RegisteredWithLoader.parameters = {
 };
 
 export const RegisteredWithoutLoader = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameRegistration
       project={testProject.project}
       onGameRegistered={() => {}}
@@ -160,7 +161,6 @@ export const RegisteredWithoutLoader = () => (
     />
   </AuthenticatedUserContext.Provider>
 );
-RegisteredWithoutLoader.decorators = [withMock];
 RegisteredWithoutLoader.parameters = {
   mockData: [
     {

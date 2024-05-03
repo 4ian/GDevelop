@@ -3,15 +3,13 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 
-import muiDecorator from '../../../ThemeDecorator';
-
 import GameFeedback from '../../../../GameDashboard/Feedbacks/GameFeedback';
 
 import {
   commentProcessed,
   commentUnprocessed,
   completeWebBuild,
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import MockAdapter from 'axios-mock-adapter';
@@ -25,7 +23,7 @@ import { getPaperDecorator } from '../../../PaperDecorator';
 export default {
   title: 'GameDashboard/Feedback/GameFeedback',
   component: GameFeedback,
-  decorators: [getPaperDecorator('medium'), muiDecorator],
+  decorators: [getPaperDecorator('medium')],
 };
 
 export const DefaultGameFeedback = () => {
@@ -45,7 +43,7 @@ export const DefaultGameFeedback = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -70,7 +68,7 @@ export const GameFeedbackOneSolvedComment = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -95,7 +93,7 @@ export const GameFeedbackWithError = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}
@@ -120,7 +118,7 @@ export const GameFeedbackEmpty = () => {
       {({ i18n }) => (
         <GameFeedback
           i18n={i18n}
-          authenticatedUser={fakeIndieAuthenticatedUser}
+          authenticatedUser={fakeSilverAuthenticatedUser}
           game={game1}
         />
       )}

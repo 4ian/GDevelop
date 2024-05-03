@@ -1,10 +1,9 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import BuildProgressAndActions from '../../../Export/Builds/BuildProgressAndActions';
+import BuildProgressAndActions from '../../../ExportAndShare/Builds/BuildProgressAndActions';
 import {
   erroredCordovaBuild,
   pendingCordovaBuild,
@@ -18,7 +17,7 @@ import {
 export default {
   title: 'Builds/BuildProgressAndActions',
   component: BuildProgressAndActions,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Errored = () => (

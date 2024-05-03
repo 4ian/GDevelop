@@ -1,3 +1,4 @@
+// @flow
 const styles = {
   coordinateColumn: {
     width: 96,

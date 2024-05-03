@@ -6,12 +6,7 @@
 describe('gdjs.RuntimeScene integration tests', function () {
   describe('Object and behavior lifecycles (using TestObject and TestBehavior)', function () {
     it('should properly create and destroy object, including the behaviors', function () {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [
@@ -51,6 +46,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           },
         ],
         instances: [],
+        usedResources: [],
       });
 
       const object = runtimeScene.createObject('Object1');
@@ -84,12 +80,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
 
   describe('Layers (using a Sprite object)', function () {
     it('should handle objects on layers', () => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
+      const runtimeGame = gdjs.getPixiRuntimeGame();
       const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
       runtimeScene.loadFromScene({
         layers: [

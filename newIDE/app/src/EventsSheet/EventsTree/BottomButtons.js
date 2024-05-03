@@ -1,5 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { Line, Column } from '../../UI/Grid';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
@@ -7,7 +9,8 @@ import { enumerateEventsMetadata } from '../EnumerateEventsMetadata';
 import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 import { type SortableTreeNode } from '.';
 import { moveEventToEventsList } from './helpers';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
+import { useScreenType } from '../../UI/Responsive/ScreenTypeMeasurer';
 
 const styles = {
   addButton: {
@@ -38,12 +41,16 @@ const makeMenuTemplateBuilderForEvents = (
     };
   });
 
+const addButtonTooltipLabelMouse = t`Right-click for more events`;
+const addButtonTooltipLabelTouch = t`Long press for more events`;
+
 export default function BottomButtons({
   onAddEvent,
   DnDComponent,
   draggedNode,
   rootEventsList,
 }: Props) {
+  const screenType = useScreenType();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const onDrop = () => {
     draggedNode &&
@@ -56,53 +63,62 @@ export default function BottomButtons({
       });
   };
   return (
-    <DnDComponent canDrop={() => true} drop={onDrop}>
-      {({ connectDropTarget, isOver }) =>
-        connectDropTarget(
-          <div>
-            {isOver && (
-              <div
-                style={{
-                  ...styles.dropIndicator,
-                  borderColor: gdevelopTheme.dropIndicator.canDrop,
-                  outlineColor: gdevelopTheme.dropIndicator.border,
-                }}
-              />
-            )}
-            <Column>
-              <Line justifyContent="space-between">
-                <ElementWithMenu
-                  openMenuWithSecondaryClick
-                  element={
-                    <button
-                      style={styles.addButton}
-                      className="add-link"
-                      onClick={() =>
-                        onAddEvent('BuiltinCommonInstructions::Standard')
+    <I18n>
+      {({ i18n }) => (
+        <DnDComponent canDrop={() => true} drop={onDrop}>
+          {({ connectDropTarget, isOver }) =>
+            connectDropTarget(
+              <div>
+                {isOver && (
+                  <div
+                    style={{
+                      ...styles.dropIndicator,
+                      borderColor: gdevelopTheme.dropIndicator.canDrop,
+                      outlineColor: gdevelopTheme.dropIndicator.border,
+                    }}
+                  />
+                )}
+                <Column>
+                  <Line justifyContent="space-between">
+                    <ElementWithMenu
+                      openMenuWithSecondaryClick
+                      element={
+                        <button
+                          style={styles.addButton}
+                          className="add-link"
+                          onClick={() =>
+                            onAddEvent('BuiltinCommonInstructions::Standard')
+                          }
+                          title={i18n._(
+                            screenType === 'touch'
+                              ? addButtonTooltipLabelTouch
+                              : addButtonTooltipLabelMouse
+                          )}
+                        >
+                          <Trans>Add a new event</Trans>
+                        </button>
                       }
-                    >
-                      <Trans>Add a new event</Trans>
-                    </button>
-                  }
-                  buildMenuTemplate={makeMenuTemplateBuilderForEvents(
-                    onAddEvent
-                  )}
-                />
-                <ElementWithMenu
-                  element={
-                    <button style={styles.addButton} className="add-link">
-                      <Trans>Add...</Trans>
-                    </button>
-                  }
-                  buildMenuTemplate={makeMenuTemplateBuilderForEvents(
-                    onAddEvent
-                  )}
-                />
-              </Line>
-            </Column>
-          </div>
-        )
-      }
-    </DnDComponent>
+                      buildMenuTemplate={makeMenuTemplateBuilderForEvents(
+                        onAddEvent
+                      )}
+                    />
+                    <ElementWithMenu
+                      element={
+                        <button style={styles.addButton} className="add-link">
+                          <Trans>Add...</Trans>
+                        </button>
+                      }
+                      buildMenuTemplate={makeMenuTemplateBuilderForEvents(
+                        onAddEvent
+                      )}
+                    />
+                  </Line>
+                </Column>
+              </div>
+            )
+          }
+        </DnDComponent>
+      )}
+    </I18n>
   );
 }

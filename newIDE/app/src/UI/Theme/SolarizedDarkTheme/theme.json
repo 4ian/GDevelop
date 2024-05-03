@@ -4,6 +4,9 @@
       "color": {
         "value": "#047AA6"
       },
+      "light": {
+        "value": "#3694b7"
+      },
       "text-contrast-color": {
         "value": "#fff"
       }
@@ -14,6 +17,48 @@
       },
       "text-contrast-color": {
         "value": "#fff"
+      }
+    },
+    "success": {
+      "dark": {
+        "value": "#16CF89",
+        "comment": "Palette/Green/50"
+      },
+      "color": {
+        "value": "#45D9A1",
+        "comment": "Palette/Green/40"
+      },
+      "light": {
+        "value": "#8BE7C4",
+        "comment": "Palette/Green/30"
+      }
+    },
+    "warning": {
+      "dark": {
+        "value": "#FFA929",
+        "comment": "Palette/Yellow/50"
+      },
+      "color": {
+        "value": "#FFBC57",
+        "comment": "Palette/Yellow/40"
+      },
+      "light": {
+        "value": "#FFD28F",
+        "comment": "Palette/Yellow/30"
+      }
+    },
+    "error": {
+      "dark": {
+        "value": "#FF5E3B",
+        "comment": "Palette/Red/50"
+      },
+      "color": {
+        "value": "#FF8569",
+        "comment": "Palette/Red/40"
+      },
+      "light": {
+        "value": "#FFA38F",
+        "comment": "Palette/Red/30"
       }
     },
     "surface": {
@@ -57,6 +102,23 @@
         "color": {
           "value": "#494952",
           "comment": "Palette/Grey/70"
+        }
+      }
+    },
+    "swipeable-drawer": {
+      "top-bar": {
+        "pill-color": {
+          "value": "#001419"
+        }
+      }
+    },
+    "icon-button": {
+      "color": {
+        "value": "#002B36"
+      },
+      "selected": {
+        "background-color": {
+          "value": "#2799b9"
         }
       }
     },
@@ -138,7 +200,7 @@
     },
     "selection": {
       "background-color": {
-        "value": "#047AA6"
+        "value": "#025574"
       },
       "color": {
         "value": "#FFFFFF"
@@ -191,6 +253,14 @@
         "color": {
           "value": "#000"
         }
+      },
+      "hot": {
+        "background-color": {
+          "value": "#FF5E3B"
+        },
+        "color": {
+          "value": "#1D1D26"
+        }
       }
     },
     "toolbar-separator": {
@@ -223,6 +293,11 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#01445c"
+        }
+      },
       "group": {
         "text": {
           "color": {
@@ -311,6 +386,21 @@
         }
       }
     },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#8BE7C4"
+          },
+          "advanced": {
+            "value": "#FFD28F"
+          },
+          "expert": {
+            "value": "#FFA38F"
+          }
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85",
@@ -335,6 +425,57 @@
         "background-color": {
           "value": "#494952",
           "comment": "Palette/Grey/70"
+        }
+      }
+    },
+    "notification": {
+      "badge-color": {
+        "value": "#6BAFFF"
+      }
+    },
+    "text-field": {
+      "active": {
+        "error": {
+          "value": "#FFC2B4",
+          "comment": "Palette/Red/20"
+        },
+        "border-color": {
+          "value": "#444444"
+        },
+        "caret-color": {
+          "value": "#9ac9db"
+        }
+      },
+      "disabled": {
+        "color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "placeholder": {
+        "color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "default": {
+        "background-color": {
+          "value": "rgba(255, 255, 255, 0.09)"
+        },
+        "error": {
+          "value": "#FF8569",
+          "comment": "Palette/Red/40"
+        }
+      },
+      "hover": {
+        "border-color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "endAdornmentIcon": {
+        "background-color": {
+          "value": "rgba(221, 209, 255, 0.16)"
         }
       }
     }
@@ -434,13 +575,19 @@
         "value": "1px solid {event-sheet.sub-instructions.border-color.value}"
       }
     },
+    "warning-instruction": {
+      "background-color": {
+        "value": "rgba(255, 188, 87, 0.125)",
+        "comment": "Palette/Yellow/40 and alpha"
+      }
+    },
     "instruction-parameter": {
       "base": {
         "color": {
           "value": "#219186"
         }
       },
-      "expression": {
+      "number": {
         "color": {
           "value": "#859900"
         }
@@ -537,7 +684,7 @@
     },
     "toolbar": {
       "background-color": {
-        "value": "#2799b9"
+        "value": "#2750B9"
       },
       "border-color-hover": {
         "value": "rgb(92, 118, 126)"

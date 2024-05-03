@@ -22,7 +22,7 @@ import {
 import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { UsersAutocomplete } from '../../Utils/UsersAutocomplete';
+import { UsersAutocomplete } from '../../Profile/UsersAutocomplete';
 import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
@@ -296,10 +296,12 @@ export const ExtensionOptionsEditor = ({
           />
           <UsersAutocomplete
             userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}
-            onChange={userIds => {
+            onChange={userIdAndUsernames => {
               const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
               projectAuthorIds.clear();
-              userIds.forEach(userId => projectAuthorIds.push_back(userId));
+              userIdAndUsernames.forEach(userIdAndUsername =>
+                projectAuthorIds.push_back(userIdAndUsername.userId)
+              );
             }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
@@ -323,6 +325,8 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
+              flexColumnBody
+              fullHeight
               open
               onRequestClose={() => {
                 setResourceStoreOpen(false);

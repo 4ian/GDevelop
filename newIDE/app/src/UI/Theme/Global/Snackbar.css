@@ -1,0 +1,12 @@
+@media (orientation: portrait) {
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginBottomCenter,
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginBottomLeft,
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginBottomRight {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginTopCenter,
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginTopLeft,
+  .MuiSnackbar-root.MuiSnackbar-anchorOriginTopRight {
+    padding-top: env(safe-area-inset-top);
+  }
+}

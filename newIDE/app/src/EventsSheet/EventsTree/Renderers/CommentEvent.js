@@ -15,7 +15,9 @@ import { type EventRendererProps } from './EventRenderer';
 import {
   shouldActivate,
   shouldCloseOrCancel,
+  shouldSubmit,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import { dataObjectToProps } from '../../../Utils/HTMLDataset';
 const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
@@ -30,15 +32,12 @@ const styles = {
     overflow: 'hidden',
     minHeight: '2.1em',
   },
-  commentTextField: commentTextStyle,
+  commentTextField: { ...commentTextStyle, fontSize: 'inherit' },
   commentSpan: {
     ...commentTextStyle,
-    boxSizing: 'border-box',
     alignItems: 'center',
     height: '100%',
     whiteSpace: 'pre-wrap',
-    lineHeight: 1.5,
-    border: 1,
   },
 };
 
@@ -60,6 +59,7 @@ export default class CommentEvent extends React.Component<
   _textField: ?TextFieldInterface;
 
   edit = () => {
+    if (this.state.editing) return;
     const commentEvent = gd.asCommentEvent(this.props.event);
     this.setState(
       {
@@ -67,12 +67,14 @@ export default class CommentEvent extends React.Component<
         editingPreviousValue: commentEvent.getComment(),
       },
       () => {
-        if (this._textField) this._textField.focus();
+        if (this._textField) {
+          this._textField.focus({ caretPosition: 'end' });
+        }
       }
     );
   };
 
-  onEvent = (e: any, text: string) => {
+  onChange = (e: any, text: string) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(text);
 
@@ -109,17 +111,17 @@ export default class CommentEvent extends React.Component<
   render() {
     const commentEvent = gd.asCommentEvent(this.props.event);
 
-    const backgroundColor = rgbToHex(
+    const backgroundColor = `#${rgbToHex(
       commentEvent.getBackgroundColorRed(),
       commentEvent.getBackgroundColorGreen(),
       commentEvent.getBackgroundColorBlue()
-    );
+    )}`;
 
-    const textColor = rgbToHex(
+    const textColor = `#${rgbToHex(
       commentEvent.getTextColorRed(),
       commentEvent.getTextColorGreen(),
       commentEvent.getTextColorBlue()
-    );
+    )}`;
 
     return (
       <div
@@ -129,15 +131,16 @@ export default class CommentEvent extends React.Component<
         })}
         style={{
           ...styles.container,
-          backgroundColor: `#${backgroundColor}`,
+          backgroundColor,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
-          if (shouldActivate(event)) {
+        onKeyUp={event => {
+          if (!this.state.editing && shouldActivate(event)) {
             this.edit();
           }
         }}
         tabIndex={0}
+        id={`${this.props.idPrefix}-comment`}
       >
         {this.state.editing ? (
           <TextField
@@ -147,24 +150,20 @@ export default class CommentEvent extends React.Component<
             value={commentEvent.getComment()}
             translatableHintText={t`<Enter comment>`}
             onBlur={this.endEditing}
-            onChange={this.onEvent}
+            onChange={this.onChange}
             style={styles.commentTextField}
             inputStyle={{
-              color: `#${textColor}`,
+              color: textColor,
               padding: 0,
-              lineHeight: 1.5,
-              fontSize: '1em',
-            }}
-            underlineFocusStyle={{
-              borderColor: `#${textColor}`,
             }}
             fullWidth
             id="comment-title"
-            onKeyUp={event => {
-              if (shouldCloseOrCancel(event)) {
+            onKeyDown={event => {
+              if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
                 this.endEditing();
               }
             }}
+            underlineShow={false}
           />
         ) : (
           <span
@@ -175,11 +174,12 @@ export default class CommentEvent extends React.Component<
             })}
             style={{
               ...styles.commentSpan,
-              color: `#${textColor}`,
+              color: textColor,
             }}
             dangerouslySetInnerHTML={{
               __html: this._getCommentHTML(),
             }}
+            {...dataObjectToProps({ editableText: 'true' })}
           />
         )}
       </div>

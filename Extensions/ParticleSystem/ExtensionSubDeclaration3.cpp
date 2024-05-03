@@ -148,8 +148,9 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
           gd::ParameterOptions::MakeNewOptions().SetDescription(
               _("Flow to compare to (in particles per second)")));
 
+  // Deprecated
   obj.AddAction("Texture",
-                _("Particle image (using an expression)"),
+                _("Particle image (deprecated)"),
                 _("Change the image of particles (if displayed)."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),
                 _("Advanced"),
@@ -157,7 +158,8 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .AddParameter("string", _("Image to use"))
-      .SetParameterLongDescription("Indicate the name of the resource");
+      .SetParameterLongDescription("Indicate the name of the resource")
+      .SetHidden();
 
   obj.AddAction("SetTextureFromResource",
                 _("Particle image"),
@@ -372,4 +374,15 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
+
+  obj.AddAction("JumpEmitterForwardInTime",
+                _("Jump emitter forward in time"),
+                _("Simulate the passage of time for an emitter, "
+                  "including creating and moving particles"),
+                _("Jump _PARAM0_ forward in time by _PARAM1_ seconds"),
+                _("Advanced"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .AddParameter("number", _("Seconds of time"));
 }

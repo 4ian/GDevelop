@@ -11,14 +11,14 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
+#include "GDCore/IDE/ResourceExposer.h"
 
 TEST_CASE("ResourcesRenamer", "[common]") {
   SECTION("It renames resources that are exposed") {
+    gd::Project project;
     std::map<gd::String, gd::String> renamings = {
         {"Resource1", "RenamedResource1"}};
-    gd::ResourcesRenamer resourcesRenamer(renamings);
-
-    gd::Project project;
+    gd::ResourcesRenamer resourcesRenamer(project.GetResourcesManager(), renamings);
 
     // Add "classic", plain resources.
     gd::ImageResource resource1;
@@ -34,7 +34,7 @@ TEST_CASE("ResourcesRenamer", "[common]") {
     project.GetPlatformSpecificAssets().Set(
         "android", "some-other-icon", "Resource2");
 
-    project.ExposeResources(resourcesRenamer);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesRenamer);
 
     // Check that resources were renamed were used.
     REQUIRE(project.GetPlatformSpecificAssets().Get("android", "some-icon") ==
@@ -44,11 +44,10 @@ TEST_CASE("ResourcesRenamer", "[common]") {
   }
 
   SECTION("It renames embedded resources") {
+    gd::Project project;
     std::map<gd::String, gd::String> renamings = {
         {"Resource1", "RenamedResource1"}};
-    gd::ResourcesRenamer resourcesRenamer(renamings);
-
-    gd::Project project;
+    gd::ResourcesRenamer resourcesRenamer(project.GetResourcesManager(), renamings);
 
     // Add "classic", plain resources.
     gd::ImageResource resource1;
@@ -72,7 +71,7 @@ TEST_CASE("ResourcesRenamer", "[common]") {
     project.GetPlatformSpecificAssets().Set(
         "android", "some-other-icon", "Resource2");
 
-    project.ExposeResources(resourcesRenamer);
+    gd::ResourceExposer::ExposeWholeProjectResources(project, resourcesRenamer);
 
     // TODO: This should not be necessary, but for now not all resources support embeddeds,
     // so we must call it manually:

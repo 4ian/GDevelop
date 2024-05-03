@@ -6,10 +6,10 @@ import {
 } from '../../Utils/GDevelopServices/Filters';
 import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import PlaceholderLoader from '../PlaceholderLoader';
 import { type FiltersState, type ChosenCategory } from './FiltersChooser';
+import ChevronArrowRight from '../CustomSvgIcons/ChevronArrowRight';
+import ChevronArrowBottom from '../CustomSvgIcons/ChevronArrowBottom';
 
 const nodeIdSeparator = ';-/>'; // A seemingly random string to ensure no clashes with tag names.
 const toNodeId = (nodes: Array<TagsTreeNode>) =>
@@ -34,8 +34,8 @@ const TagsTreeItems = ({
         label={node.name}
         key={node.name}
         onLabelClick={() => onChoose({ node, parentNodes })}
-        collapseIcon={node.children.length ? <ExpandMoreIcon /> : null}
-        expandIcon={node.children.length ? <ChevronRightIcon /> : null}
+        collapseIcon={node.children.length ? <ChevronArrowBottom /> : null}
+        expandIcon={node.children.length ? <ChevronArrowRight /> : null}
       >
         <TagsTreeItems
           tagsTreeNodes={node.children}

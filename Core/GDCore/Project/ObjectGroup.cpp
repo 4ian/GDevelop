@@ -5,8 +5,10 @@
  */
 
 #include "ObjectGroup.h"
+
 #include <algorithm>
 #include <vector>
+
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
 
@@ -41,8 +43,9 @@ void ObjectGroup::SerializeTo(SerializerElement& element) const {
 
   SerializerElement& objectsElement = element.AddChild("objects");
   objectsElement.ConsiderAsArrayOf("object");
-  for (auto& name : GetAllObjectsNames())
+  for (auto& name : GetAllObjectsNames()) {
     objectsElement.AddChild("object").SetAttribute("name", name);
+  }
 }
 
 void ObjectGroup::UnserializeFrom(const SerializerElement& element) {

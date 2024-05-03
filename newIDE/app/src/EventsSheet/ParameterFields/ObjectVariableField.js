@@ -2,39 +2,80 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
-import VariableField, { renderVariableWithIcon } from './VariableField';
+import VariableField, {
+  renderVariableWithIcon,
+  type VariableFieldInterface,
+} from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import getObjectByName from '../../Utils/GetObjectByName';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
+import ObjectIcon from '../../UI/CustomSvgIcons/Object';
 
-type State = {|
-  editorOpen: boolean,
-|};
-
-export default class ObjectVariableField extends React.Component<
-  ParameterFieldProps,
-  State
-> {
-  _field: ?VariableField;
-  state = {
-    editorOpen: false,
-  };
-
-  focus() {
-    if (this._field) this._field.focus();
+// TODO Move this function to the ObjectsContainersList class.
+const getObjectOrGroupVariablesContainers = (
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  objectName: string
+): Array<gdVariablesContainer> => {
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
+  const variablesContainers: Array<gdVariablesContainer> = [];
+  if (object) {
+    variablesContainers.push(object.getVariables());
+  } else {
+    const group = getObjectGroupByName(
+      globalObjectsContainer,
+      objectsContainer,
+      objectName
+    );
+    if (group) {
+      for (const subObjectName of group.getAllObjectsNames().toJSArray()) {
+        const subObject = getObjectByName(
+          globalObjectsContainer,
+          objectsContainer,
+          subObjectName
+        );
+        if (subObject) {
+          variablesContainers.push(subObject.getVariables());
+        }
+      }
+    }
   }
+  return variablesContainers;
+};
 
-  render() {
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function ObjectVariableField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?VariableFieldInterface>(null);
+    const [editorOpen, setEditorOpen] = React.useState(false);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const {
       project,
+      globalObjectsContainer,
+      objectsContainer,
       scope,
       instructionMetadata,
       instruction,
       expressionMetadata,
       expression,
       parameterIndex,
-    } = this.props;
+    } = props;
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -45,17 +86,20 @@ export default class ObjectVariableField extends React.Component<
     });
 
     const { layout } = scope;
-    let object = null;
-    let variablesContainer = null;
-    if (objectName) {
-      if (layout && layout.hasObjectNamed(objectName)) {
-        object = layout.getObject(objectName);
-        variablesContainer = object.getVariables();
-      } else if (project && project.hasObjectNamed(objectName)) {
-        object = project.getObject(objectName);
-        variablesContainer = object.getVariables();
-      }
-    }
+    const object = objectName
+      ? getObjectByName(globalObjectsContainer, objectsContainer, objectName)
+      : null;
+    const variablesContainers = React.useMemo<Array<gdVariablesContainer>>(
+      () =>
+        objectName
+          ? getObjectOrGroupVariablesContainers(
+              globalObjectsContainer,
+              objectsContainer,
+              objectName
+            )
+          : [],
+      [objectName, globalObjectsContainer, objectsContainer]
+    );
 
     const onComputeAllVariableNames = () =>
       project && layout && object
@@ -70,53 +114,56 @@ export default class ObjectVariableField extends React.Component<
     return (
       <React.Fragment>
         <VariableField
-          variablesContainer={variablesContainer}
-          onComputeAllVariableNames={onComputeAllVariableNames}
-          parameterMetadata={this.props.parameterMetadata}
-          value={this.props.value}
-          onChange={this.props.onChange}
-          isInline={this.props.isInline}
-          onRequestClose={this.props.onRequestClose}
-          onApply={this.props.onApply}
-          ref={field => (this._field = field)}
-          onOpenDialog={() => this.setState({ editorOpen: true })}
-          globalObjectsContainer={this.props.globalObjectsContainer}
-          objectsContainer={this.props.objectsContainer}
+          variablesContainers={variablesContainers}
+          parameterMetadata={props.parameterMetadata}
+          value={props.value}
+          onChange={props.onChange}
+          isInline={props.isInline}
+          onRequestClose={props.onRequestClose}
+          onApply={props.onApply}
+          ref={field}
+          onOpenDialog={() => setEditorOpen(true)}
+          globalObjectsContainer={props.globalObjectsContainer}
+          objectsContainer={props.objectsContainer}
           scope={scope}
+          id={
+            props.parameterIndex !== undefined
+              ? `parameter-${props.parameterIndex}-object-variable-field`
+              : undefined
+          }
         />
-        {this.state.editorOpen && variablesContainer && (
-          <VariablesEditorDialog
-            title={<Trans>Object Variables</Trans>}
-            open={this.state.editorOpen}
-            variablesContainer={variablesContainer}
-            emptyPlaceholderTitle={
-              <Trans>Add your first object variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                These variables hold additional information on an object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onComputeAllVariableNames={onComputeAllVariableNames}
-            onCancel={() => this.setState({ editorOpen: false })}
-            onApply={() => {
-              this.setState({ editorOpen: false });
-              if (this._field) this._field.updateAutocompletions();
-            }}
-          />
-        )}
+        {editorOpen &&
+          // There is no variable editor for groups.
+          variablesContainers.length === 1 &&
+          project && (
+            <VariablesEditorDialog
+              project={project}
+              title={<Trans>Object Variables</Trans>}
+              open={editorOpen}
+              variablesContainer={variablesContainers[0]}
+              emptyPlaceholderTitle={
+                <Trans>Add your first object variable</Trans>
+              }
+              emptyPlaceholderDescription={
+                <Trans>
+                  These variables hold additional information on an object.
+                </Trans>
+              }
+              helpPagePath={'/all-features/variables/object-variables'}
+              onComputeAllVariableNames={onComputeAllVariableNames}
+              onCancel={() => setEditorOpen(false)}
+              onApply={() => {
+                setEditorOpen(false);
+                if (field.current) field.current.updateAutocompletions();
+              }}
+              preventRefactoringToDeleteInstructions
+            />
+          )}
       </React.Fragment>
     );
   }
-}
+);
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => {
-  return renderVariableWithIcon(
-    props,
-    'res/types/objectvar.png',
-    'object variable'
-  );
-};
+) => renderVariableWithIcon(props, ObjectIcon, 'object variable');

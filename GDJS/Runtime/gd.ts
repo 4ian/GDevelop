@@ -68,12 +68,10 @@ namespace gdjs {
   export const hexToRGBColor = function (
     hexString: string
   ): [number, number, number] {
-    var hexNumber = parseInt(hexString.replace('#', ''), 16);
-    return [
-      (hexNumber >> 16) & 0xff,
-      (hexNumber >> 8) & 0xff,
-      hexNumber & 0xff,
-    ];
+    const hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return Number.isFinite(hexNumber)
+      ? [(hexNumber >> 16) & 0xff, (hexNumber >> 8) & 0xff, hexNumber & 0xff]
+      : [0, 0, 0];
   };
 
   /**
@@ -120,7 +118,7 @@ namespace gdjs {
   };
 
   /**
-   * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
+   * Convert a Hex number to a RGB color object ({r,g,b,a} with each component going from 0 to 255 and alpha set to 255).
    * @param hex Hex color
    */
   export const hexNumberToRGB = (
@@ -132,6 +130,20 @@ namespace gdjs {
       b: hexNumber & 0xff,
       a: 255,
     };
+  };
+
+  /**
+   * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
+   * @param hex Hex color
+   */
+  export const hexNumberToRGBArray = (
+    hexNumber: number
+  ): [integer, integer, integer] => {
+    return [
+      (hexNumber >> 16) & 0xff,
+      (hexNumber >> 8) & 0xff,
+      hexNumber & 0xff,
+    ];
   };
 
   /**

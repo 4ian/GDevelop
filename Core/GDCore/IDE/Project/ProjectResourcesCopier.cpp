@@ -12,6 +12,7 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/IDE/ResourceExposer.h"
 
 using namespace std;
 
@@ -24,33 +25,48 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
     bool updateOriginalProject,
     bool preserveAbsoluteFilenames,
     bool preserveDirectoryStructure) {
+  if (updateOriginalProject) {
+    gd::ProjectResourcesCopier::CopyAllResourcesTo(
+        originalProject, originalProject, fs, destinationDirectory,
+        preserveAbsoluteFilenames, preserveDirectoryStructure);
+  } else {
+    gd::Project clonedProject = originalProject;
+    gd::ProjectResourcesCopier::CopyAllResourcesTo(
+        originalProject, clonedProject, fs, destinationDirectory,
+        preserveAbsoluteFilenames, preserveDirectoryStructure);
+  }
+  return true;
+}
+
+bool ProjectResourcesCopier::CopyAllResourcesTo(
+    gd::Project& originalProject,
+    gd::Project& clonedProject,
+    AbstractFileSystem& fs,
+    gd::String destinationDirectory,
+    bool preserveAbsoluteFilenames,
+    bool preserveDirectoryStructure) {
+
   // Check if there are some resources with absolute filenames
-  gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
-  originalProject.ExposeResources(absolutePathChecker);
+  gd::ResourcesAbsolutePathChecker absolutePathChecker(originalProject.GetResourcesManager(), fs);
+  gd::ResourceExposer::ExposeWholeProjectResources(originalProject, absolutePathChecker);
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
-  std::cout << "Copying all ressources from " << projectDirectory << " to "
+  std::cout << "Copying all resources from " << projectDirectory << " to "
             << destinationDirectory << "..." << std::endl;
 
   // Get the resources to be copied
-  gd::ResourcesMergingHelper resourcesMergingHelper(fs);
+  gd::ResourcesMergingHelper resourcesMergingHelper(
+      clonedProject.GetResourcesManager(), fs);
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
-  resourcesMergingHelper.PreserveAbsoluteFilenames(
-      preserveAbsoluteFilenames);
-
-  if (updateOriginalProject) {
-    originalProject.ExposeResources(resourcesMergingHelper);
-  } else {
-    std::shared_ptr<gd::Project> project(new gd::Project(originalProject));
-    project->ExposeResources(resourcesMergingHelper);
-  }
+  resourcesMergingHelper.PreserveAbsoluteFilenames(preserveAbsoluteFilenames);
+  gd::ResourceExposer::ExposeWholeProjectResources(clonedProject,
+                                                    resourcesMergingHelper);
 
   // Copy resources
   map<gd::String, gd::String>& resourcesNewFilename =
       resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
-  unsigned int i = 0;
   for (map<gd::String, gd::String>::const_iterator it =
            resourcesNewFilename.begin();
        it != resourcesNewFilename.end();
@@ -70,8 +86,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
                        destinationFile + _("\"."));
       }
     }
-
-    ++i;
   }
 
   return true;

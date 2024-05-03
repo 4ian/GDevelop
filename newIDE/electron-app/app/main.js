@@ -26,11 +26,12 @@ const {
   downloadLocalFile,
   saveLocalFileFromArrayBuffer,
 } = require('./LocalFileDownloader');
-const { openPreviewWindow } = require('./PreviewWindow');
+const { openPreviewWindow, closePreviewWindow } = require('./PreviewWindow');
 const {
   setupLocalGDJSDevelopmentWatcher,
   closeLocalGDJSDevelopmentWatcher,
 } = require('./LocalGDJSDevelopmentWatcher');
+const { setupWatcher, disableWatcher } = require('./LocalFilesystemWatcher');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -181,6 +182,9 @@ app.on('ready', function() {
       hideMenuBar: options.hideMenuBar,
     });
   });
+  ipcMain.handle('preview-close', async (event, options) => {
+    return closePreviewWindow(options.windowId);
+  });
 
   // Piskel image editor
   ipcMain.handle('piskel-load', (event, externalEditorInput) => {
@@ -227,7 +231,7 @@ app.on('ready', function() {
       }, 300)
     ).then(
       () => {
-        log.info('Local file upload succesfully done');
+        log.info('Local file upload successfully done');
         event.sender.send('local-file-upload-done', null);
       },
       uploadError => {
@@ -262,6 +266,27 @@ app.on('ready', function() {
         outputPath
       );
       return result;
+    }
+  );
+
+  // LocalFilesystemWatcher events:
+  ipcMain.handle(
+    'local-filesystem-watcher-setup',
+    (event, folderPath, options) => {
+      const subscriptionId = setupWatcher(
+        folderPath,
+        changedFilePath => {
+          event.sender.send('project-file-changed', changedFilePath);
+        },
+        options
+      );
+      return subscriptionId;
+    }
+  );
+  ipcMain.handle(
+    'local-filesystem-watcher-disable',
+    (event, subscriptionId) => {
+      disableWatcher(subscriptionId);
     }
   );
 
@@ -307,6 +332,8 @@ app.on('ready', function() {
         event.sender.send('debugger-connection-closed', { id }),
       onConnectionOpen: ({ id }) =>
         event.sender.send('debugger-connection-opened', { id }),
+      onConnectionError: ({ id, errorMessage }) =>
+        event.sender.send('debugger-connection-errored', { id, errorMessage }),
       onListening: ({ address }) =>
         event.sender.send('debugger-start-server-done', { address }),
     });

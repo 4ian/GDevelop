@@ -1,58 +1,102 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
-import PlaceholderError from '../UI/PlaceholderError';
-import {
-  type Game,
-  getGames,
-  registerGame,
-} from '../Utils/GDevelopServices/Game';
+import { type Game, registerGame } from '../Utils/GDevelopServices/Game';
 import { GameCard } from './GameCard';
 import { ColumnStackLayout } from '../UI/Layout';
 import { GameRegistration } from './GameRegistration';
-import { GameDetailsDialog, type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import useAlertDialog from '../UI/Alert/useAlertDialog';
 import RouterContext from '../MainFrame/RouterContext';
 import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import SearchBar from '../UI/SearchBar';
+import { useDebounce } from '../Utils/UseDebounce';
+import Fuse from 'fuse.js';
+import {
+  getFuseSearchQueryForSimpleArray,
+  sharedFuseConfiguration,
+} from '../UI/Search/UseSearchStructuredItem';
+import IconButton from '../UI/IconButton';
+import ChevronArrowLeft from '../UI/CustomSvgIcons/ChevronArrowLeft';
+import ChevronArrowRight from '../UI/CustomSvgIcons/ChevronArrowRight';
+import { Column, Line } from '../UI/Grid';
+import Text from '../UI/Text';
+import Paper from '../UI/Paper';
+import BackgroundText from '../UI/BackgroundText';
+
+const pageSize = 10;
+
+const styles = { noGameMessageContainer: { padding: 10 } };
+
+const getGamesToDisplay = ({
+  project,
+  games,
+  searchText,
+  searchClient,
+  currentPage,
+}: {|
+  project: ?gdProject,
+  games: Array<Game>,
+  searchText: string,
+  searchClient: Fuse,
+  currentPage: number,
+|}): Array<Game> => {
+  if (searchText) {
+    const searchResults = searchClient.search(
+      getFuseSearchQueryForSimpleArray(searchText)
+    );
+    return searchResults.map(result => result.item);
+  }
+  const projectUuid = project ? project.getProjectUuid() : null;
+  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
+  const orderedGames = thisGame
+    ? [thisGame, ...games.filter(game => game.id !== thisGame.id)]
+    : games;
+  return orderedGames.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize
+  );
+};
 
 type Props = {|
   project: ?gdProject,
+  games: Array<Game>,
+  onRefreshGames: () => Promise<void>,
+  onOpenGame: (?Game) => void,
 |};
 
-export const GamesList = ({ project }: Props) => {
+const GamesList = ({ project, games, onRefreshGames, onOpenGame }: Props) => {
   const {
     routeArguments,
     addRouteArguments,
     removeRouteArguments,
   } = React.useContext(RouterContext);
-  const [error, setError] = React.useState<?Error>(null);
-  const [games, setGames] = React.useState<?Array<Game>>(null);
-  const {
-    authenticated,
-    firebaseUser,
-    getAuthorizationHeader,
-    profile,
-  } = React.useContext(AuthenticatedUserContext);
-  const [openedGame, setOpenedGame] = React.useState<?Game>(null);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const { showAlert, showConfirmation } = useAlertDialog();
   const [isGameRegistering, setIsGameRegistering] = React.useState(false);
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [currentPage, setCurrentPage] = React.useState<number>(0);
 
-  const loadGames = React.useCallback(
-    async () => {
-      if (!authenticated || !firebaseUser) return;
+  const searchClient = React.useMemo(
+    () =>
+      new Fuse(games, {
+        ...sharedFuseConfiguration,
+        keys: [{ name: 'gameName', weight: 1 }],
+      }),
+    [games]
+  );
 
-      try {
-        setError(null);
-        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
-        setGames(games);
-      } catch (error) {
-        console.error('Error while loading user games.', error);
-        setError(error);
-      }
-    },
-    [authenticated, firebaseUser, getAuthorizationHeader]
+  const [displayedGames, setDisplayedGames] = React.useState<Array<Game>>(
+    getGamesToDisplay({
+      project,
+      games,
+      searchText,
+      searchClient,
+      currentPage,
+    })
   );
 
   const onRegisterGame = React.useCallback(
@@ -68,7 +112,7 @@ export const GamesList = ({ project }: Props) => {
           gameName: project.getName() || 'Untitled game',
           templateSlug: project.getTemplateSlug(),
         });
-        await loadGames();
+        await onRefreshGames();
       } catch (error) {
         console.error('Unable to register the game.', error);
         const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
@@ -92,7 +136,7 @@ export const GamesList = ({ project }: Props) => {
         setIsGameRegistering(false);
       }
     },
-    [getAuthorizationHeader, profile, project, showAlert, loadGames]
+    [getAuthorizationHeader, profile, project, showAlert, onRefreshGames]
   );
 
   React.useEffect(
@@ -104,7 +148,7 @@ export const GamesList = ({ project }: Props) => {
           const game = games.find(game => game.id === initialGameId);
           removeRouteArguments(['game-id']);
           if (game) {
-            setOpenedGame(game);
+            onOpenGame(game);
           } else {
             // If the game is not in the list, then either
             // - allow to register it, if it's the current project.
@@ -139,44 +183,40 @@ export const GamesList = ({ project }: Props) => {
       showConfirmation,
       showAlert,
       project,
+      onOpenGame,
     ]
   );
 
-  React.useEffect(
+  const getGamesToDisplayDebounced = useDebounce(
     () => {
-      loadGames();
+      setDisplayedGames(
+        getGamesToDisplay({
+          project,
+          games,
+          searchText,
+          searchClient,
+          currentPage,
+        })
+      );
     },
-    [loadGames]
+    // Use debounce when searching for a game.
+    // Keep a lower debounce when changing pages so that the UI does not refresh until the
+    // user stops changing pages, giving a sense of rapidity.
+    searchText ? 250 : 150
   );
 
-  if (!authenticated) {
-    return null;
-  }
-
-  if (!games && error) {
-    return (
-      <PlaceholderError
-        onRetry={() => {
-          loadGames();
-        }}
-      >
-        <Trans>
-          Can't load the games. Verify your internet connection or retry later.
-        </Trans>
-      </PlaceholderError>
-    );
-  }
-
-  if (!games) {
-    return <PlaceholderLoader />;
-  }
+  // Refresh games to display when:
+  // - search text changes (user input)
+  // - games change (refresh following an update for instance)
+  // - user changes page
+  React.useEffect(getGamesToDisplayDebounced, [
+    getGamesToDisplayDebounced,
+    searchText,
+    games,
+    currentPage,
+  ]);
 
   const projectUuid = project ? project.getProjectUuid() : null;
-  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
-  const displayedGames = [
-    thisGame,
-    ...games.filter(game => game !== thisGame),
-  ].filter(Boolean);
 
   return (
     <ColumnStackLayout noMargin>
@@ -184,42 +224,68 @@ export const GamesList = ({ project }: Props) => {
         <GameRegistration
           project={project}
           hideLoader
-          onGameRegistered={loadGames}
+          onGameRegistered={onRefreshGames}
         />
       )}
-      {displayedGames.map(game => (
-        <GameCard
-          key={game.id}
-          isCurrentGame={!!projectUuid && game.id === projectUuid}
-          game={game}
-          onOpenGameManager={(tab: GameDetailsTab) => {
-            addRouteArguments({ 'games-dashboard-tab': tab });
-            setOpenedGame(game);
-          }}
-          onUpdateGame={loadGames}
-        />
-      ))}
-      {openedGame && (
-        <GameDetailsDialog
-          game={openedGame}
-          project={
-            !!projectUuid && openedGame.id === projectUuid ? project : null
+      <Line noMargin alignItems="center">
+        <Column noMargin expand>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            // Search is triggered on each search text change
+            onRequestSearch={() => {}}
+            placeholder={t`Search by name`}
+          />
+        </Column>
+        <IconButton
+          tooltip={t`Previous page`}
+          onClick={() => setCurrentPage(currentPage => currentPage - 1)}
+          disabled={!!searchText || currentPage === 0}
+        >
+          <ChevronArrowLeft />
+        </IconButton>
+        <Text noMargin style={{ opacity: searchText ? 0.6 : 1 }}>
+          {searchText ? 1 : currentPage + 1}
+        </Text>
+        <IconButton
+          tooltip={t`Next page`}
+          onClick={() => setCurrentPage(currentPage => currentPage + 1)}
+          disabled={
+            !!searchText || (currentPage + 1) * pageSize >= games.length
           }
-          onClose={() => {
-            setOpenedGame(null);
-          }}
-          onGameUpdated={updatedGame => {
-            setGames(
-              games.map(game => (game === openedGame ? updatedGame : game))
-            );
-            setOpenedGame(updatedGame);
-          }}
-          onGameDeleted={() => {
-            setOpenedGame(null);
-            loadGames();
-          }}
-        />
-      )}
+        >
+          <ChevronArrowRight />
+        </IconButton>
+      </Line>
+
+      {displayedGames.length > 0 ? (
+        displayedGames.map(game => (
+          <GameCard
+            key={game.id}
+            isCurrentGame={!!projectUuid && game.id === projectUuid}
+            game={game}
+            onOpenGameManager={(tab: GameDetailsTab) => {
+              addRouteArguments({ 'games-dashboard-tab': tab });
+              onOpenGame(game);
+            }}
+            onUpdateGame={onRefreshGames}
+          />
+        ))
+      ) : !!searchText ? (
+        <Column expand noMargin>
+          <Paper
+            variant="outlined"
+            background="dark"
+            style={styles.noGameMessageContainer}
+          >
+            <BackgroundText>
+              <Trans>No game matching your search.</Trans>
+            </BackgroundText>
+          </Paper>
+        </Column>
+      ) : null}
     </ColumnStackLayout>
   );
 };
+
+export default GamesList;

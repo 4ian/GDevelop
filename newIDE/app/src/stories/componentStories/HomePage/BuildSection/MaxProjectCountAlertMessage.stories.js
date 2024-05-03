@@ -1,30 +1,29 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import muiDecorator from '../../../ThemeDecorator';
 import { MaxProjectCountAlertMessage } from '../../../../MainFrame/EditorContainers/HomePage/BuildSection/MaxProjectCountAlertMessage';
 import paperDecorator from '../../../PaperDecorator';
 import {
-  limitsForIndieUser,
-  limitsForProUser,
+  limitsForSilverUser,
+  limitsForGoldUser,
 } from '../../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'HomePage/BuildSection/MaxProjectCountAlertMessage',
   component: MaxProjectCountAlertMessage,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const ForIndieUser = () => (
   <MaxProjectCountAlertMessage
-    limits={limitsForIndieUser}
+    limits={limitsForSilverUser}
     onUpgrade={() => action('onUpgrade')()}
   />
 );
 
 export const ForProUser = () => (
   <MaxProjectCountAlertMessage
-    limits={limitsForProUser}
+    limits={limitsForGoldUser}
     onUpgrade={() => action('onUpgrade')()}
   />
 );

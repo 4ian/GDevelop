@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import UpdateIcon from '../UI/CustomSvgIcons/Update';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 import IconButton from '../UI/IconButton';
 
 export type HotReloadPreviewButtonProps = {|
@@ -13,26 +13,20 @@ export type HotReloadPreviewButtonProps = {|
   launchProjectWithLoadingScreenPreview: () => void,
 |};
 
-export const NewPreviewIcon = PlayCircleFilledIcon;
-export const HotReloadPreviewIcon = OfflineBoltIcon;
-
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
 }: HotReloadPreviewButtonProps) {
-  const windowWidth = useResponsiveWindowWidth();
-  const icon = hasPreviewsRunning ? (
-    <HotReloadPreviewIcon />
-  ) : (
-    <NewPreviewIcon />
-  );
+  const { isMobile } = useResponsiveWindowSize();
+  const icon = hasPreviewsRunning ? <UpdateIcon /> : <PreviewIcon />;
   const label = hasPreviewsRunning ? (
     <Trans>Apply changes to preview</Trans>
   ) : (
     <Trans>Run a preview</Trans>
   );
 
-  return windowWidth !== 'small' ? (
+  // Hide the text on mobile, to avoid taking too much space.
+  return !isMobile ? (
     <FlatButton
       leftIcon={icon}
       label={label}

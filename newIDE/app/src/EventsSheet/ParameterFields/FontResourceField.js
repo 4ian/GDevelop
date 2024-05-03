@@ -1,23 +1,28 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
-import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import React from 'react';
+import ResourceSelector, {
+  type ResourceSelectorInterface,
+} from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+import {
+  type ParameterFieldProps,
+  type ParameterFieldInterface,
+  type FieldFocusFunction,
+} from './ParameterFieldCommons';
 
-export default class BitmapFontResourceField extends Component<
-  ParameterFieldProps,
-  void
-> {
-  _field: ?ResourceSelector;
+export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
+  function FontResourceField(props: ParameterFieldProps, ref) {
+    const field = React.useRef<?ResourceSelectorInterface>(null);
+    const focus: FieldFocusFunction = options => {
+      if (field.current) field.current.focus(options);
+    };
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
 
-  focus(selectAll: boolean = false) {
-    if (this._field) this._field.focus(selectAll);
-  }
-
-  render() {
-    if (!this.props.resourceManagementProps || !this.props.project) {
+    if (!props.resourceManagementProps || !props.project) {
       console.error(
         'Missing project or resourceManagementProps for FontResourceField'
       );
@@ -26,19 +31,19 @@ export default class BitmapFontResourceField extends Component<
 
     return (
       <ResourceSelector
-        margin={this.props.isInline ? 'none' : 'dense'}
-        project={this.props.project}
-        resourceManagementProps={this.props.resourceManagementProps}
+        margin={props.isInline ? 'none' : 'dense'}
+        project={props.project}
+        resourceManagementProps={props.resourceManagementProps}
         resourcesLoader={ResourcesLoader}
         resourceKind="font"
         fullWidth
-        initialResourceName={this.props.value}
-        onChange={this.props.onChange}
+        initialResourceName={props.value}
+        onChange={props.onChange}
         floatingLabelText={<Trans>Choose the font file to use</Trans>}
-        onRequestClose={this.props.onRequestClose}
-        onApply={this.props.onApply}
-        ref={field => (this._field = field)}
+        onRequestClose={props.onRequestClose}
+        onApply={props.onApply}
+        ref={field}
       />
     );
   }
-}
+);

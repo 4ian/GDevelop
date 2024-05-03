@@ -2,48 +2,43 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
-import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
+import {
+  indieUserProfile,
+  subscriptionForStartupUser,
+  subscriptionForSilverUser,
+} from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { type PrivateAssetPackListingData } from '../../Utils/GDevelopServices/Shop';
+import { fakeAchievements } from '../../fixtures/GDevelopServicesTestData/FakeAchievements';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
   username: null,
   description: null,
+  communityLinks: {},
 };
 
 export default {
   title: 'Profile/ProfileDetails',
   component: ProfileDetails,
-  decorators: [paperDecorator, muiDecorator],
-  argTypes: {
-    profile: {
-      control: { type: 'radio' },
-      options: ['Complete profile', 'Without username nor bio'],
-      defaultValue: 'Complete profile',
-      mapping: {
-        'Complete profile': indieUserProfile,
-        'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
-      },
-    },
-  },
+  decorators: [paperDecorator],
 };
 
-type ArgsTypes = {|
-  profile: Profile,
-|};
-
-const getAssetPacksListingData = userId => [
+const getAssetPacksListingData = (
+  userId
+): Array<PrivateAssetPackListingData> => [
   {
     id: 'assetPackId',
     sellerId: userId,
+    isSellerGDevelop: false,
     productType: 'ASSET_PACK',
     listing: 'ASSET_PACK',
     name: 'French food',
     description: 'The best asset pack about french food',
+    categories: ['props'],
     updatedAt: '2021-11-18T10:19:50.417Z',
     createdAt: '2021-11-18T10:19:50.417Z',
     thumbnailUrls: [
@@ -52,36 +47,66 @@ const getAssetPacksListingData = userId => [
     prices: [
       {
         value: 599,
-        name: 'default',
+        name: 'commercial_USD',
         stripePriceId: 'stripePriceId',
+        usageType: 'commercial',
+        currency: 'USD',
       },
     ],
+    creditPrices: [
+      {
+        amount: 600,
+        usageType: 'commercial',
+      },
+    ],
+    appStoreProductId: null,
+    sellerStripeAccountId: 'sellerStripeProductId',
+    stripeProductId: 'stripeProductId',
   },
 ];
 
-export const MyProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isAuthenticatedUserProfile />
+export const MyCompleteProfileWithoutSubscription = () => (
+  <ProfileDetails achievements={fakeAchievements} profile={indieUserProfile} />
 );
 
-export const OtherUserProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} assetPacksListingData={[]} />
-);
-
-export const OtherUserProfileWithPremiumAssetPacks = (args: ArgsTypes) => (
+export const MyCompleteProfileWithSilverSubscription = () => (
   <ProfileDetails
-    {...args}
-    assetPacksListingData={getAssetPacksListingData(args.profile.id)}
-    onAssetPackOpen={action('open asset pack')}
+    achievements={fakeAchievements}
+    profile={indieUserProfile}
+    subscription={subscriptionForSilverUser}
   />
 );
 
-export const Loading = (args: ArgsTypes) => (
-  <ProfileDetails {...args} profile={null} />
+export const MyCompleteProfileWithBusinessSubscription = () => (
+  <ProfileDetails
+    achievements={fakeAchievements}
+    profile={indieUserProfile}
+    subscription={subscriptionForStartupUser}
+  />
 );
 
-export const Errored = (args: ArgsTypes) => (
+export const MyProfileWithoutDiscordUsernameNorSubscription = () => (
   <ProfileDetails
-    {...args}
+    achievements={fakeAchievements}
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+  />
+);
+
+export const MyProfileWithoutDiscordUsernameWithStartupSubscription = () => (
+  <ProfileDetails
+    achievements={fakeAchievements}
+    profile={{ ...indieUserProfile, discordUsername: '' }}
+    subscription={subscriptionForStartupUser}
+  />
+);
+
+export const Loading = () => (
+  <ProfileDetails achievements={fakeAchievements} profile={null} />
+);
+
+export const Errored = () => (
+  <ProfileDetails
+    achievements={fakeAchievements}
     profile={null}
     error={new Error('Connectivity Problems')}
     onRetry={() => {
@@ -89,9 +114,3 @@ export const Errored = (args: ArgsTypes) => (
     }}
   />
 );
-Loading.argTypes = {
-  profile: { control: { disable: true } },
-};
-Errored.argTypes = {
-  profile: { control: { disable: true } },
-};

@@ -1,9 +1,5 @@
 // @flow
 import * as React from 'react';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
-import muiDecorator from '../../ThemeDecorator';
 
 import InlineCheckbox from '../../../UI/InlineCheckbox';
 import paperDecorator from '../../PaperDecorator';
@@ -11,11 +7,13 @@ import { Column, LargeSpacer } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
 import Checkbox from '../../../UI/Checkbox';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import Visibility from '../../../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../../../UI/CustomSvgIcons/VisibilityOff';
 
 export default {
   title: 'UI Building Blocks/Checkboxes',
   component: InlineCheckbox,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

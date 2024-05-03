@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
@@ -47,7 +48,8 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       usageComplexity(5),
       isPrivate(false),
       isObjectInstruction(false),
-      isBehaviorInstruction(false) {}
+      isBehaviorInstruction(false),
+      relevantContext("Any") {}
 
 InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& type,
@@ -63,17 +65,14 @@ InstructionMetadata& InstructionMetadata::AddParameter(
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
       ((gd::ParameterMetadata::IsObject(type) ||
-       gd::ParameterMetadata::IsBehavior(type))
-       // Prefix with the namespace if it's not already there.
-       && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
-          ? (supplementaryInformation.empty()
-                 ? ""
-                 : extensionNamespace +
-                       supplementaryInformation  //... so prefix it with the
-                                                 // extension
-                                                 // namespace.
-             )
-          : supplementaryInformation);  // Otherwise don't change anything
+        gd::ParameterMetadata::IsBehavior(type))
+               // Prefix with the namespace if it's not already there.
+               && (supplementaryInformation.find(
+                       PlatformExtension::GetNamespaceSeparator()) == gd::String::npos)
+           ? (supplementaryInformation.empty()
+                  ? ""
+                  : extensionNamespace + supplementaryInformation)
+           : supplementaryInformation));
 
   // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
@@ -189,7 +188,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
       gd::String templateSentence = _("<subject> of _PARAM0_ <operator> <value>");
 
       sentence =
-          templateSentence.FindAndReplace("<subject>", sentence)
+          templateSentence.FindAndReplace("<subject>", sentence.CapitalizeFirstLetter())
               .FindAndReplace(
                   "<operator>",
                   "_PARAM" + gd::String::From(operatorParamIndex) + "_")
@@ -199,7 +198,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
       gd::String templateSentence = _("<subject> <operator> <value>");
 
       sentence =
-          templateSentence.FindAndReplace("<subject>", sentence)
+          templateSentence.FindAndReplace("<subject>", sentence.CapitalizeFirstLetter())
               .FindAndReplace(
                   "<operator>",
                   "_PARAM" + gd::String::From(operatorParamIndex) + "_")

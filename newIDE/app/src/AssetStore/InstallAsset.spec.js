@@ -6,7 +6,7 @@ import {
   installRequiredExtensions,
   sanitizeObjectName,
   installPublicAsset,
-  checkRequiredExtensionUpdate,
+  checkRequiredExtensionsUpdateForAssets,
 } from './InstallAsset';
 import { makeTestProject } from '../fixtures/TestProject';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -228,7 +228,9 @@ describe('InstallAsset', () => {
       expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
       const object = layout.getObject('PlayerSpaceship');
 
-      const resourcesInUse = new gd.ResourcesInUseHelper();
+      const resourcesInUse = new gd.ResourcesInUseHelper(
+        project.getResourcesManager()
+      );
       object.getConfiguration().exposeResources(resourcesInUse);
       const objectResourceNames = resourcesInUse
         .getAllImages()
@@ -389,7 +391,7 @@ describe('InstallAsset', () => {
   //   });
   // });
 
-  describe('checkRequiredExtensionUpdate', () => {
+  describe('checkRequiredExtensionsUpdateForAssets', () => {
     it('can find an extension to install', async () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
@@ -403,16 +405,11 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
-        checkRequiredExtensionUpdate({
+        checkRequiredExtensionsUpdateForAssets({
           assets: [
             fakeAssetWithFlashExtensionDependency1,
             fakeAssetWithFlashExtensionDependency1,
@@ -420,9 +417,9 @@ describe('InstallAsset', () => {
           project,
         })
       ).resolves.toEqual({
-        requiredExtensions: [flashExtensionShortHeader],
-        missingExtensions: [flashExtensionShortHeader],
-        outOfDateExtensions: [],
+        requiredExtensionShortHeaders: [flashExtensionShortHeader],
+        missingExtensionShortHeaders: [flashExtensionShortHeader],
+        outOfDateExtensionShortHeaders: [],
       });
     });
 
@@ -439,9 +436,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
+        headers: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
           // The project contains the 1.0.0 of this extension.
@@ -450,14 +445,14 @@ describe('InstallAsset', () => {
       }));
 
       await expect(
-        checkRequiredExtensionUpdate({
+        checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
         })
       ).resolves.toEqual({
-        requiredExtensions: [buttonV1ExtensionShortHeader],
-        missingExtensions: [],
-        outOfDateExtensions: [],
+        requiredExtensionShortHeaders: [buttonV1ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [],
       });
     });
 
@@ -474,9 +469,7 @@ describe('InstallAsset', () => {
       // ...and this extension is in the registry
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
+        headers: [
           flashExtensionShortHeader,
           fireBulletExtensionShortHeader,
           // The project contains the 1.0.0 of this extension.
@@ -485,14 +478,14 @@ describe('InstallAsset', () => {
       }));
 
       await expect(
-        checkRequiredExtensionUpdate({
+        checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithCustomObject, fakeAssetWithCustomObject],
           project,
         })
       ).resolves.toEqual({
-        requiredExtensions: [buttonV2ExtensionShortHeader],
-        missingExtensions: [],
-        outOfDateExtensions: [buttonV2ExtensionShortHeader],
+        requiredExtensionShortHeaders: [buttonV2ExtensionShortHeader],
+        missingExtensionShortHeaders: [],
+        outOfDateExtensionShortHeaders: [buttonV2ExtensionShortHeader],
       });
     });
 
@@ -502,16 +495,11 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       await expect(
-        checkRequiredExtensionUpdate({
+        checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithUnknownExtension1],
           project,
         })
@@ -529,7 +517,7 @@ describe('InstallAsset', () => {
       });
 
       await expect(
-        checkRequiredExtensionUpdate({
+        checkRequiredExtensionsUpdateForAssets({
           assets: [fakeAssetWithUnknownExtension1],
           project,
         })
@@ -545,6 +533,7 @@ describe('InstallAsset', () => {
       loadProjectEventsFunctionsExtensions: () => Promise.resolve(),
       unloadProjectEventsFunctionsExtensions: () => {},
       reloadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      reloadProjectEventsFunctionsExtensionMetadata: () => {},
       unloadProjectEventsFunctionsExtension: () => {},
       getEventsFunctionsExtensionWriter: () => null,
       getEventsFunctionsExtensionOpener: () => null,
@@ -616,6 +605,7 @@ describe('InstallAsset', () => {
       loadProjectEventsFunctionsExtensions: () => Promise.resolve(),
       unloadProjectEventsFunctionsExtensions: () => {},
       reloadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      reloadProjectEventsFunctionsExtensionMetadata: () => {},
       unloadProjectEventsFunctionsExtension: () => {},
       getEventsFunctionsExtensionWriter: () => null,
       getEventsFunctionsExtensionOpener: () => null,
@@ -632,12 +622,7 @@ describe('InstallAsset', () => {
 
       mockFn(getExtensionsRegistry).mockImplementationOnce(() => ({
         version: '1.0.0',
-        allTags: [''],
-        allCategories: [''],
-        extensionShortHeaders: [
-          flashExtensionShortHeader,
-          fireBulletExtensionShortHeader,
-        ],
+        headers: [flashExtensionShortHeader, fireBulletExtensionShortHeader],
       }));
 
       mockFn(getExtension).mockImplementationOnce(
@@ -648,21 +633,21 @@ describe('InstallAsset', () => {
       await expect(
         installRequiredExtensions({
           requiredExtensionInstallation: {
-            requiredExtensions: [
+            requiredExtensionShortHeaders: [
               {
                 ...emptyExtensionShortHeader,
                 name: 'FireBullet',
                 version: '1.0.0',
               },
             ],
-            missingExtensions: [
+            missingExtensionShortHeaders: [
               {
                 ...emptyExtensionShortHeader,
                 name: 'FireBullet',
                 version: '1.0.0',
               },
             ],
-            outOfDateExtensions: [],
+            outOfDateExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -691,9 +676,9 @@ describe('InstallAsset', () => {
         installRequiredExtensions({
           // An asset that uses an extension
           requiredExtensionInstallation: {
-            requiredExtensions: [flashExtensionShortHeader],
-            missingExtensions: [flashExtensionShortHeader],
-            outOfDateExtensions: [],
+            requiredExtensionShortHeaders: [flashExtensionShortHeader],
+            missingExtensionShortHeaders: [flashExtensionShortHeader],
+            outOfDateExtensionShortHeaders: [],
           },
           shouldUpdateExtension: true,
           eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,
@@ -721,15 +706,15 @@ describe('InstallAsset', () => {
       // Install the extension
       await installRequiredExtensions({
         requiredExtensionInstallation: {
-          requiredExtensions: [
+          requiredExtensionShortHeaders: [
             {
               ...emptyExtensionShortHeader,
               name: 'Button',
               version: '1.0.0',
             },
           ],
-          missingExtensions: [],
-          outOfDateExtensions: [],
+          missingExtensionShortHeaders: [],
+          outOfDateExtensionShortHeaders: [],
         },
         shouldUpdateExtension: true,
         eventsFunctionsExtensionsState: mockEventsFunctionsExtensionsState,

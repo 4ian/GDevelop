@@ -30,7 +30,7 @@ The codebase is typed using **[TypeScript](https://www.typescriptlang.org/)**.
 
 It's good practice to type almost everything (i.e: avoid `any` as much as possible), so that the game engine and your extensions can have _documentation_ auto-generated, _auto-completion_ and _static type checking_ that will catch bugs and mistakes.
 
-Learn how to launch [manually the type checking in GJDS Readme](../../GDJS/README.md).
+Learn how to launch [manually the type checking in GJDS README](../../GDJS/README.md).
 
 ## For the editor (`newIDE/app`)
 

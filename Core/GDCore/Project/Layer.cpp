@@ -14,7 +14,17 @@ namespace gd {
 Camera Layer::badCamera;
 
 Layer::Layer()
-    : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}
+    : renderingType(""),
+      isVisible(true),
+      isLocked(false),
+      isLightingLayer(false),
+      followBaseLayerCamera(false),
+      camera3DNearPlaneDistance(3),
+      camera3DFarPlaneDistance(10000),
+      camera3DFieldOfView(45),
+      ambientLightColorR(200),
+      ambientLightColorG(200),
+      ambientLightColorB(200) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -26,15 +36,22 @@ void Layer::SetCameraCount(std::size_t n) {
     cameras.erase(cameras.begin() + cameras.size() - 1);
 }
 
-#if defined(GD_IDE_ONLY)
 void Layer::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
+  element.SetAttribute("renderingType", GetRenderingType());
+  element.SetAttribute("cameraType", GetCameraType());
   element.SetAttribute("visibility", GetVisibility());
+  element.SetAttribute("isLocked", IsLocked());
   element.SetAttribute("isLightingLayer", IsLightingLayer());
   element.SetAttribute("followBaseLayerCamera", IsFollowingBaseLayerCamera());
   element.SetAttribute("ambientLightColorR", (int)GetAmbientLightColorRed());
   element.SetAttribute("ambientLightColorG", (int)GetAmbientLightColorGreen());
   element.SetAttribute("ambientLightColorB", (int)GetAmbientLightColorBlue());
+  element.SetAttribute("camera3DNearPlaneDistance",
+                       GetCamera3DNearPlaneDistance());
+  element.SetAttribute("camera3DFarPlaneDistance",
+                       GetCamera3DFarPlaneDistance());
+  element.SetAttribute("camera3DFieldOfView", GetCamera3DFieldOfView());
 
   SerializerElement& camerasElement = element.AddChild("cameras");
   camerasElement.ConsiderAsArrayOf("camera");
@@ -55,20 +72,28 @@ void Layer::SerializeTo(SerializerElement& element) const {
   SerializerElement& effectsElement = element.AddChild("effects");
   effectsContainer.SerializeTo(effectsElement);
 }
-#endif
 
 /**
  * \brief Unserialize the layer.
  */
 void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
+  SetRenderingType(element.GetStringAttribute("renderingType", ""));
+  SetCameraType(element.GetStringAttribute("cameraType", "perspective"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
+  SetLocked(element.GetBoolAttribute("isLocked", false));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
   SetFollowBaseLayerCamera(
       element.GetBoolAttribute("followBaseLayerCamera", false));
   SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200),
                        element.GetIntAttribute("ambientLightColorG", 200),
                        element.GetIntAttribute("ambientLightColorB", 200));
+  SetCamera3DNearPlaneDistance(element.GetDoubleAttribute(
+      "camera3DNearPlaneDistance", 0.1, "threeDNearPlaneDistance"));
+  SetCamera3DFarPlaneDistance(element.GetDoubleAttribute(
+      "camera3DFarPlaneDistance", 10000, "threeDFarPlaneDistance"));
+  SetCamera3DFieldOfView(element.GetDoubleAttribute(
+      "camera3DFieldOfView", 45, "threeDFieldOfView"));
 
   cameras.clear();
   SerializerElement& camerasElement = element.GetChild("cameras");
@@ -80,24 +105,22 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
     camera.SetUseDefaultSize(
         cameraElement.GetBoolAttribute("defaultSize", true));
     camera.SetSize(cameraElement.GetDoubleAttribute("width"),
-                    cameraElement.GetDoubleAttribute("height"));
+                   cameraElement.GetDoubleAttribute("height"));
     camera.SetUseDefaultViewport(
         cameraElement.GetBoolAttribute("defaultViewport", true));
-    camera.SetViewport(
-        cameraElement.GetDoubleAttribute("viewportLeft"),
-        cameraElement.GetDoubleAttribute("viewportTop"),
-        cameraElement.GetDoubleAttribute("viewportRight"),
-        cameraElement.GetDoubleAttribute(
-            "viewportBottom"));
+    camera.SetViewport(cameraElement.GetDoubleAttribute("viewportLeft"),
+                       cameraElement.GetDoubleAttribute("viewportTop"),
+                       cameraElement.GetDoubleAttribute("viewportRight"),
+                       cameraElement.GetDoubleAttribute("viewportBottom"));
 
     cameras.push_back(camera);
   }
 
   if (camerasElement.GetChildrenCount() > 50) {
-    // Highly unlikely that we want as many cameras, as they were not even exposed in
-    // the editor nor used in the game engine. Must be because of a bug in the editor that
-    // duplicated cameras when cancelling changes on a layer.
-    // Reset to one camera.
+    // Highly unlikely that we want as many cameras, as they were not even
+    // exposed in the editor nor used in the game engine. Must be because of a
+    // bug in the editor that duplicated cameras when cancelling changes on a
+    // layer. Reset to one camera.
     SetCameraCount(1);
   }
 
@@ -105,9 +128,7 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   effectsContainer.UnserializeFrom(effectsElement);
 }
 
-gd::EffectsContainer& Layer::GetEffects() {
-  return effectsContainer;
-}
+gd::EffectsContainer& Layer::GetEffects() { return effectsContainer; }
 
 const gd::EffectsContainer& Layer::GetEffects() const {
   return effectsContainer;

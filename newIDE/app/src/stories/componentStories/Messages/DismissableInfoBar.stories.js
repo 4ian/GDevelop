@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import DismissableInfoBar from '../../../UI/Messages/DismissableInfoBar';
@@ -9,7 +8,7 @@ import DismissableInfoBar from '../../../UI/Messages/DismissableInfoBar';
 export default {
   title: 'UI Building Blocks/DismissableInfoBar',
   component: DismissableInfoBar,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

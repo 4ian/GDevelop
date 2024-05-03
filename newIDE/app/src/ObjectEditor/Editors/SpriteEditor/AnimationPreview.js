@@ -6,14 +6,15 @@ import { Column } from '../../../UI/Grid';
 import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
-import PlayArrow from '@material-ui/icons/PlayArrow';
-import Pause from '@material-ui/icons/Pause';
 import Timer from '@material-ui/icons/Timer';
-import TextField from '../../../UI/TextField';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import FlatButton from '../../../UI/FlatButton';
 import Text from '../../../UI/Text';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import PlaceholderLoader from '../../../UI/PlaceholderLoader';
+import Play from '../../../UI/CustomSvgIcons/Play';
+import Pause from '../../../UI/CustomSvgIcons/Pause';
+import { toFixedWithoutTrailingZeros } from '../../../Utils/Mathematics';
 
 const styles = {
   // This container is important to have the loader positioned on top of the image.
@@ -47,8 +48,8 @@ type Props = {|
   onChangeTimeBetweenFrames?: number => void,
   isLooping: boolean,
   hideCheckeredBackground?: boolean,
-  hideControls?: boolean,
-  initialZoom?: number,
+  deactivateControls?: boolean,
+  displaySpacedView?: boolean,
   fixedHeight?: number,
   fixedWidth?: number,
   isAssetPrivate?: boolean,
@@ -64,8 +65,8 @@ const AnimationPreview = ({
   onChangeTimeBetweenFrames,
   isLooping,
   hideCheckeredBackground,
-  hideControls,
-  initialZoom,
+  deactivateControls,
+  displaySpacedView,
   fixedHeight,
   fixedWidth,
   isAssetPrivate,
@@ -73,10 +74,7 @@ const AnimationPreview = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  // Use state for elements that don't need to be read from inside the animation callback.
-  const [fps, setFps] = React.useState<number>(
-    Math.round(1 / timeBetweenFrames)
-  );
+  const fps = Number.parseFloat((1 / timeBetweenFrames).toFixed(4));
 
   // Use useRef for mutable variables that we want to persist
   // to be readable from inside the animation callback.
@@ -101,10 +99,6 @@ const AnimationPreview = ({
   // When outside variables change, we need to update the animation callback.
   React.useEffect(
     () => {
-      if (timeBetweenFrames !== timeBetweenFramesRef.current) {
-        timeBetweenFramesRef.current = timeBetweenFrames;
-        setFps(Math.round(1 / timeBetweenFrames));
-      }
       if (isLooping !== isLoopingRef.current) {
         isLoopingRef.current = isLooping;
       }
@@ -243,9 +237,9 @@ const AnimationPreview = ({
           resourceName={resourceName}
           imageResourceSource={getImageResourceSource(resourceName)}
           isImageResourceSmooth={isImageResourceSmooth(resourceName)}
-          initialZoom={initialZoom}
+          displaySpacedView={displaySpacedView}
           hideCheckeredBackground={hideCheckeredBackground}
-          hideControls={hideControls}
+          deactivateControls={deactivateControls}
           fixedHeight={fixedHeight}
           fixedWidth={fixedWidth}
           onImageLoaded={onImageLoaded}
@@ -258,7 +252,7 @@ const AnimationPreview = ({
           </div>
         )}
       </div>
-      {!hideControls && (
+      {!deactivateControls && (
         // Column used to not have the expand behavior when responsive line stack layout is a column
         <Column noMargin>
           <ResponsiveLineStackLayout alignItems="center">
@@ -270,16 +264,15 @@ const AnimationPreview = ({
               <Text>
                 <Trans>FPS:</Trans>
               </Text>
-              <TextField
+              <SemiControlledTextField
+                commitOnBlur
                 margin="none"
-                value={fps}
-                onChange={(e, text) => {
-                  const fps = parseFloat(text);
-                  if (fps > 0) {
-                    setFps(fps);
-                    const newTimeBetweenFrames = parseFloat(
-                      (1 / fps).toFixed(4)
-                    );
+                value={fps.toString()}
+                onChange={text => {
+                  if (!text) return;
+                  const newFps = Number.parseFloat(text);
+                  if (newFps > 0) {
+                    const newTimeBetweenFrames = 1 / newFps;
                     timeBetweenFramesRef.current = newTimeBetweenFrames;
                     if (onChangeTimeBetweenFrames) {
                       onChangeTimeBetweenFrames(newTimeBetweenFrames);
@@ -289,20 +282,22 @@ const AnimationPreview = ({
                 }}
                 id="direction-time-between-frames"
                 type="number"
-                step={1}
-                min={1}
+                min={0}
                 max={100}
                 style={styles.timeField}
-                autoFocus="desktop"
               />
               <Timer style={styles.timeIcon} />
-              <TextField
+              <SemiControlledTextField
+                commitOnBlur
                 margin="none"
-                value={timeBetweenFramesRef.current}
-                onChange={(e, text) => {
-                  const time = parseFloat(text);
+                value={toFixedWithoutTrailingZeros(
+                  timeBetweenFramesRef.current,
+                  6
+                )}
+                onChange={text => {
+                  if (!text) return;
+                  const time = Number.parseFloat(text);
                   if (time > 0) {
-                    setFps(Math.round(1 / time));
                     timeBetweenFramesRef.current = time;
                     if (onChangeTimeBetweenFrames) {
                       onChangeTimeBetweenFrames(time);
@@ -330,7 +325,7 @@ const AnimationPreview = ({
                 onClick={replay}
               />
               <FlatButton
-                leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+                leftIcon={!!pausedRef.current ? <Play /> : <Pause />}
                 label={!!pausedRef.current ? 'Play' : 'Pause'}
                 onClick={() => {
                   pausedRef.current = !pausedRef.current;

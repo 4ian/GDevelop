@@ -41,7 +41,7 @@ namespace gdjs {
         /**
          * The current authentication status.
          */
-        export let authentified = false;
+        export let authenticated = false;
 
         /**
          * The logged-in users data.
@@ -120,9 +120,7 @@ namespace gdjs {
 
               currentUser
                 .reauthenticateWithCredential(credential)
-                .then(() =>
-                  (currentUser as firebase.User).updatePassword(newPassword)
-                )
+                .then(() => currentUser!.updatePassword(newPassword))
                 .then(() => {
                   if (typeof callbackStateVariable !== 'undefined')
                     callbackStateVariable.setString('ok');
@@ -154,7 +152,7 @@ namespace gdjs {
 
               currentUser
                 .reauthenticateWithCredential(credential)
-                .then(() => (currentUser as firebase.User).delete())
+                .then(() => currentUser!.delete())
                 .then(() => {
                   if (typeof callbackStateVariable !== 'undefined')
                     callbackStateVariable.setString('ok');
@@ -210,9 +208,7 @@ namespace gdjs {
               if (currentUser && _currentProvider)
                 currentUser
                   .reauthenticateWithPopup(_currentProvider)
-                  .then(() =>
-                    (currentUser as firebase.User).updatePassword(newPassword)
-                  )
+                  .then(() => currentUser!.updatePassword(newPassword))
                   .then(() => {
                     if (typeof callbackStateVariable !== 'undefined')
                       callbackStateVariable.setString('ok');
@@ -234,7 +230,7 @@ namespace gdjs {
               if (currentUser && _currentProvider)
                 currentUser
                   .reauthenticateWithPopup(_currentProvider)
-                  .then(() => (currentUser as firebase.User).delete())
+                  .then(() => currentUser!.delete())
                   .then(() => {
                     if (typeof callbackStateVariable !== 'undefined')
                       callbackStateVariable.setString('ok');
@@ -330,7 +326,7 @@ namespace gdjs {
           };
 
           /**
-           * Send an email to the users email adress to verify it.
+           * Send an email to the users email address to verify it.
            * @note Even though this function is redundant, we keep it for consistency.
            * @see currentUser.sendEmailVerification
            */
@@ -349,10 +345,13 @@ namespace gdjs {
         };
 
         /**
-         * Returns true if the user is currently authentified.
-         * @see authentified
+         * Returns true if the user is currently authenticated.
+         * @see authenticated
          */
-        export const isAuthentified = (): boolean => authentified;
+        export const isAuthenticated = (): boolean => authenticated;
+
+        /** @deprecated Use isAuthenticated instead. */
+        export const isAuthentified = isAuthenticated;
 
         /**
          * Signs the user in with basic email-password authentication.
@@ -446,14 +445,14 @@ namespace gdjs {
         firebaseTools.onAppCreated.push(() => {
           firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-              authentified = true;
+              authenticated = true;
               currentUser = user;
               user.getIdToken().then(
                 // Prefetch the token
                 (token) => (_token = token)
               );
             } else {
-              authentified = false;
+              authenticated = false;
               currentUser = null;
             }
           });

@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -67,6 +59,27 @@ module.exports = {
         'Extensions/PlayerAuthentication/playerauthenticationtools.js'
       )
       .setFunctionName('gdjs.playerAuthentication.displayAuthenticationBanner');
+
+    extension
+      .addAction(
+        'HideAuthenticationBanner',
+        _('Hide authentication banner'),
+        _('Hide the authentication banner from the top of the game screen.'),
+        _('Hide the authentication banner'),
+        '',
+        'JsPlatform/Extensions/authentication.svg',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/player-authentication')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.removeAuthenticationBanner');
 
     extension
       .addAction(
@@ -147,6 +160,23 @@ module.exports = {
       .setFunctionName('gdjs.playerAuthentication.getUsername');
 
     extension
+      .addStrExpression(
+        'UserID',
+        _('User ID'),
+        _('Get the unique user ID of the authenticated player.'),
+        '',
+        'JsPlatform/Extensions/authentication.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationcomponents.js'
+      )
+      .addIncludeFile(
+        'Extensions/PlayerAuthentication/playerauthenticationtools.js'
+      )
+      .setFunctionName('gdjs.playerAuthentication.getUserId');
+
+    extension
       .addCondition(
         'IsPlayerAuthenticated',
         _('Player is authenticated'),
@@ -186,10 +216,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

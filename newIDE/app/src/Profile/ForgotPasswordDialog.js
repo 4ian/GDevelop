@@ -9,6 +9,9 @@ import TextField from '../UI/TextField';
 import { type ForgotPasswordForm } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
+import Form from '../UI/Form';
+
+export const emailRegex = /^(.+)@(.+)$/;
 
 type Props = {|
   onClose: () => void,
@@ -19,10 +22,13 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
   const [email, setEmail] = React.useState('');
   const [resetDone, setResetDone] = React.useState(false);
   const [resetInProgress, setResetInProgress] = React.useState(false);
-  const emailRegex = /^(.+)@(.+)$/;
-  const isEmailValid = emailRegex.test(email);
+  const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
 
   const doResetPassword = async () => {
+    const trimmedEmail = email.trim();
+    setEmail(trimmedEmail);
+    setIsEmailValid(emailRegex.test(trimmedEmail));
+
     if (resetInProgress || !email || !isEmailValid) return;
     setResetInProgress(true);
 
@@ -61,8 +67,8 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
       maxWidth="xs"
       onApply={doResetPassword}
     >
-      <Column noMargin>
-        {resetDone ? (
+      {resetDone ? (
+        <Column noMargin>
           <Text>
             <Trans>
               You should have received an email containing instructions to reset
@@ -70,18 +76,36 @@ const ForgotPasswordDialog = ({ onClose, onForgotPassword }: Props) => {
               password in GDevelop.
             </Trans>
           </Text>
-        ) : (
-          <TextField
-            autoFocus="desktop"
-            value={email}
-            floatingLabelText={<Trans>Email</Trans>}
-            onChange={(e, value) => {
-              setEmail(value);
-            }}
-            fullWidth
-          />
-        )}
-      </Column>
+        </Column>
+      ) : (
+        <Form onSubmit={doResetPassword} autoComplete="on" name="resetPassword">
+          <Column noMargin>
+            <TextField
+              autoFocus="desktop"
+              value={email}
+              floatingLabelText={<Trans>Email</Trans>}
+              onChange={(e, value) => {
+                if (!isEmailValid) setIsEmailValid(true);
+                setEmail(value);
+              }}
+              errorText={
+                !isEmailValid ? (
+                  <Trans>Invalid email address.</Trans>
+                ) : (
+                  undefined
+                )
+              }
+              type="email"
+              fullWidth
+              onBlur={event => {
+                const trimmedEmail = event.currentTarget.value.trim();
+                setEmail(trimmedEmail);
+                setIsEmailValid(emailRegex.test(trimmedEmail));
+              }}
+            />
+          </Column>
+        </Form>
+      )}
     </Dialog>
   );
 };

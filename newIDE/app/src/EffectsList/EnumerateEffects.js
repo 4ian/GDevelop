@@ -12,6 +12,8 @@ export type EnumeratedEffectMetadata = {|
   description: string,
   parametersSchema: Schema,
   isMarkedAsNotWorkingForObjects: boolean,
+  isMarkedAsOnlyWorkingFor2D: boolean,
+  isMarkedAsOnlyWorkingFor3D: boolean,
 |};
 
 /**
@@ -101,6 +103,23 @@ export const enumerateEffectsMetadata = (
                   getDescription,
                   getExtraDescription,
                 };
+              } else if (valueType === 'choice') {
+                const choices = property
+                  .getExtraInfo()
+                  .toJSArray()
+                  .map(value => ({ value, label: value }));
+                return {
+                  name: parameterName,
+                  valueType: 'string',
+                  getChoices: () => choices,
+                  getValue: (effect: gdEffect) =>
+                    effect.getStringParameter(parameterName),
+                  setValue: (effect: gdEffect, newValue: string) =>
+                    effect.setStringParameter(parameterName, newValue),
+                  getLabel,
+                  getDescription,
+                  getExtraDescription,
+                };
               } else {
                 console.error(
                   `A property with type=${valueType} could not be mapped to a field for effect ${effectType}. Ensure that this type is correct.`
@@ -117,6 +136,8 @@ export const enumerateEffectsMetadata = (
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
             isMarkedAsNotWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
+            isMarkedAsOnlyWorkingFor2D: effectMetadata.isMarkedAsOnlyWorkingFor2D(),
+            isMarkedAsOnlyWorkingFor3D: effectMetadata.isMarkedAsOnlyWorkingFor3D(),
             parametersSchema,
           };
         });

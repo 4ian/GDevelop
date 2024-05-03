@@ -65,6 +65,7 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath,
         project,
         options,
+        resourcesImporationBehavior,
       }: ChooseResourceProps) => {
         if (!dialog)
           throw new Error('Electron dialog not supported in this environment.');
@@ -98,6 +99,28 @@ const localResourceSources: Array<ResourceSource> = [
         // as written inside the tilemap to the name of the resource that is representing this file.
         const filesWithEmbeddedResources = new Map<string, EmbeddedResources>();
         const parseEmbeddedResources = embeddedResourcesParsers[kind];
+        const recursivelyParseEmbeddedResources = async (
+          initialEmbeddedResources: EmbeddedResources
+        ) => {
+          for (const initialEmbeddedResource of initialEmbeddedResources.embeddedResources.values()) {
+            const embeddedResourseParser =
+              embeddedResourcesParsers[initialEmbeddedResource.resourceKind];
+
+            if (!embeddedResourseParser) continue;
+
+            const { fullPath } = initialEmbeddedResource;
+            const newDependentResources = await embeddedResourseParser(
+              project,
+              fullPath
+            );
+
+            if (newDependentResources) {
+              filesWithEmbeddedResources.set(fullPath, newDependentResources);
+
+              await recursivelyParseEmbeddedResources(newDependentResources);
+            }
+          }
+        };
         if (parseEmbeddedResources) {
           for (const filePath of filePaths) {
             const embeddedResources = await parseEmbeddedResources(
@@ -106,6 +129,8 @@ const localResourceSources: Array<ResourceSource> = [
             );
 
             if (embeddedResources) {
+              await recursivelyParseEmbeddedResources(embeddedResources);
+
               filesWithEmbeddedResources.set(filePath, embeddedResources);
 
               if (embeddedResources.hasAnyEmbeddedResourceOutsideProjectFolder)
@@ -118,11 +143,19 @@ const localResourceSources: Array<ResourceSource> = [
         const newToOldFilePaths = new Map<string, string>();
         let filesWithMappedResources = new Map<string, MappedResources>();
         if (hasFilesOutsideProjectFolder) {
-          const answer = Window.showConfirmDialog(
-            i18n._(
-              t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
-            )
-          );
+          let answer: boolean;
+
+          if (resourcesImporationBehavior === 'relative') {
+            answer = false;
+          } else if (resourcesImporationBehavior === 'import') {
+            answer = true;
+          } else {
+            answer = Window.showConfirmDialog(
+              i18n._(
+                t`This/these file(s) are outside the project folder. Would you like to make a copy of them in your project folder first (recommended)?`
+              )
+            );
+          }
 
           if (answer) {
             filePaths = await copyAllToProjectFolder(
@@ -201,6 +234,8 @@ const localResourceSources: Array<ResourceSource> = [
                   getLastUsedPath: props.getLastUsedPath,
                   setLastUsedPath: props.setLastUsedPath,
                   options: props.options,
+                  resourcesImporationBehavior:
+                    props.resourcesImporationBehavior,
                 });
 
                 props.onChooseResources(resources);
@@ -211,23 +246,6 @@ const localResourceSources: Array<ResourceSource> = [
       };
     }
   ),
-  // Have the "asset store" source before the "file(s) from your device" source,
-  // for cloud projects, so that the asset store is opened by default when clicking
-  // on a button without opening a menu showing all sources.
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `upload-${kind}`,
     displayName: t`File(s) from your device`,
@@ -242,6 +260,21 @@ const localResourceSources: Array<ResourceSource> = [
         fileMetadata={props.fileMetadata}
         getStorageProvider={props.getStorageProvider}
         key={`url-chooser-${kind}`}
+        automaticallyOpenInput={!!props.automaticallyOpenIfPossible}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `resource-store-${kind}`,
+    displayName: t`Choose from asset store`,
+    displayTab: 'standalone',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <ResourceStoreChooser
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        key={`resource-store-${kind}`}
       />
     ),
   })),

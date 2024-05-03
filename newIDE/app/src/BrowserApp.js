@@ -2,19 +2,19 @@
 import * as React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
-import ExportDialog from './Export/ExportDialog';
+import ShareDialog from './ExportAndShare/ShareDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for browser only IDE
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
-import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
+import BrowserS3PreviewLauncher from './ExportAndShare/BrowserExporters/BrowserS3PreviewLauncher';
 import {
   browserAutomatedExporters,
   browserManualExporters,
   browserOnlineWebExporter,
-} from './Export/BrowserExporters';
+} from './ExportAndShare/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
@@ -27,9 +27,14 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import BrowserResourceMover from './ProjectsStorage/ResourceMover/BrowserResourceMover';
 import BrowserResourceFetcher from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
+import BrowserEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionOpener';
+import BrowserEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/BrowserEventsFunctionsExtensionWriter';
+import BrowserLoginProvider from './LoginProvider/BrowserLoginProvider';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
+  const loginProvider = new BrowserLoginProvider(authentication.auth);
+  authentication.setLoginProvider(loginProvider);
 
   let app = null;
   const appArguments = Window.getArguments();
@@ -39,8 +44,8 @@ export const create = (authentication: Authentication) => {
       authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
-      eventsFunctionsExtensionWriter={null}
-      eventsFunctionsExtensionOpener={null}
+      eventsFunctionsExtensionWriter={BrowserEventsFunctionsExtensionWriter}
+      eventsFunctionsExtensionOpener={BrowserEventsFunctionsExtensionOpener}
     >
       {({ i18n }) => (
         <ProjectStorageProviders
@@ -55,6 +60,7 @@ export const create = (authentication: Authentication) => {
         >
           {({
             getStorageProviderOperations,
+            getStorageProviderResourceOperations,
             storageProviders,
             initialFileMetadataToOpen,
             getStorageProvider,
@@ -64,22 +70,29 @@ export const create = (authentication: Authentication) => {
               renderPreviewLauncher={(props, ref) => (
                 <BrowserS3PreviewLauncher {...props} ref={ref} />
               )}
-              renderExportDialog={props => (
-                <ExportDialog
+              renderShareDialog={props => (
+                <ShareDialog
                   project={props.project}
                   onSaveProject={props.onSaveProject}
+                  isSavingProject={props.isSavingProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={browserAutomatedExporters}
                   manualExporters={browserManualExporters}
                   onlineWebExporter={browserOnlineWebExporter}
                   allExportersRequireOnline
+                  fileMetadata={props.fileMetadata}
+                  storageProvider={props.storageProvider}
+                  initialTab={props.initialTab}
                 />
               )}
               storageProviders={storageProviders}
               resourceMover={BrowserResourceMover}
               resourceFetcher={BrowserResourceFetcher}
               getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProviderResourceOperations={
+                getStorageProviderResourceOperations
+              }
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}
               resourceExternalEditors={browserResourceExternalEditors}

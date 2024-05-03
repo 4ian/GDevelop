@@ -45,10 +45,39 @@ ForEachChildVariableEvent::GetAllActionsVectors() const {
   return allActions;
 }
 
+vector<pair<gd::Expression*, gd::ParameterMetadata> >
+    ForEachChildVariableEvent::GetAllExpressionsWithMetadata() {
+  vector<pair<gd::Expression*, gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("scenevar");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&iterableVariableName, metadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&valueIteratorVariableName, metadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&keyIteratorVariableName, metadata));
+
+  return allExpressionsWithMetadata;
+}
+vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+    ForEachChildVariableEvent::GetAllExpressionsWithMetadata() const {
+  vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
+      allExpressionsWithMetadata;
+  auto metadata = gd::ParameterMetadata().SetType("scenevar");
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&iterableVariableName, metadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&valueIteratorVariableName, metadata));
+  allExpressionsWithMetadata.push_back(
+      std::make_pair(&keyIteratorVariableName, metadata));
+
+  return allExpressionsWithMetadata;
+}
+
 void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
-  element.AddChild("iterableVariableName").SetValue(iterableVariableName);
-  element.AddChild("valueIteratorVariableName").SetValue(valueIteratorVariableName);
-  element.AddChild("keyIteratorVariableName").SetValue(keyIteratorVariableName);
+  element.AddChild("iterableVariableName").SetValue(iterableVariableName.GetPlainString());
+  element.AddChild("valueIteratorVariableName").SetValue(valueIteratorVariableName.GetPlainString());
+  element.AddChild("keyIteratorVariableName").SetValue(keyIteratorVariableName.GetPlainString());
   gd::EventsListSerialization::SerializeInstructionsTo(
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(

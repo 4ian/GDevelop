@@ -8,7 +8,7 @@ import {
   allResourceKindsAndMetadata,
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
-import path from 'path';
+import path from 'path-browserify';
 import { Line } from '../UI/Grid';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
@@ -18,7 +18,7 @@ import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
 import { FileToCloudProjectResourceUploader } from './FileToCloudProjectResourceUploader';
 import {
-  extractFilenameWithExtensionFromPublicAssetResourceUrl,
+  extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl,
   isPublicAssetResourceUrl,
 } from '../Utils/GDevelopServices/Asset';
 
@@ -40,7 +40,7 @@ const ResourceStoreChooser = ({
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
         const resourceCleanedName = isPublicAssetResourceUrl(chosenResourceUrl)
-          ? extractFilenameWithExtensionFromPublicAssetResourceUrl(
+          ? extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl(
               chosenResourceUrl
             )
           : path.basename(chosenResourceUrl);
@@ -180,23 +180,6 @@ export const UrlChooser = ({
 };
 
 const browserResourceSources: Array<ResourceSource> = [
-  // Have the "asset store" source before the "file(s) from your device" source,
-  // for cloud projects, so that the asset store is opened by default when clicking
-  // on a button without opening a menu showing all sources.
-  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
-    name: `resource-store-${kind}`,
-    displayName: t`Choose from asset store`,
-    displayTab: 'standalone',
-    kind,
-    renderComponent: (props: ResourceSourceComponentProps) => (
-      <ResourceStoreChooser
-        createNewResource={createNewResource}
-        onChooseResources={props.onChooseResources}
-        options={props.options}
-        key={`resource-store-${kind}`}
-      />
-    ),
-  })),
   ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
     name: `upload-${kind}`,
     displayName: t`File(s) from your device`,
@@ -210,6 +193,21 @@ const browserResourceSources: Array<ResourceSource> = [
         fileMetadata={props.fileMetadata}
         getStorageProvider={props.getStorageProvider}
         key={`url-chooser-${kind}`}
+        automaticallyOpenInput={!!props.automaticallyOpenIfPossible}
+      />
+    ),
+  })),
+  ...allResourceKindsAndMetadata.map(({ kind, createNewResource }) => ({
+    name: `resource-store-${kind}`,
+    displayName: t`Choose from asset store`,
+    displayTab: 'standalone',
+    kind,
+    renderComponent: (props: ResourceSourceComponentProps) => (
+      <ResourceStoreChooser
+        createNewResource={createNewResource}
+        onChooseResources={props.onChooseResources}
+        options={props.options}
+        key={`resource-store-${kind}`}
       />
     ),
   })),

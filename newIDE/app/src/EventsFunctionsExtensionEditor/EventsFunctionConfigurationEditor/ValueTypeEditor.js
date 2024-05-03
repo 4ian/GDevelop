@@ -73,58 +73,103 @@ export default function ValueTypeEditor({
                 fullWidth
               >
                 {!isExpressionType && (
-                  <SelectOption value="objectList" primaryText={t`Objects`} />
+                  <SelectOption value="objectList" label={t`Objects`} />
                 )}
                 {!isExpressionType && (
                   <SelectOption
                     value="behavior"
-                    primaryText={t`Behavior (for the previous object)`}
+                    label={t`Behavior (for the previous object)`}
                   />
                 )}
-                <SelectOption value="expression" primaryText={t`Number`} />
-                <SelectOption value="string" primaryText={t`String (text)`} />
+                <SelectOption value="expression" label={t`Number`} />
+                <SelectOption value="string" label={t`String (text)`} />
                 <SelectOption
                   value="stringWithSelector"
-                  primaryText={t`String from a list of options (text)`}
+                  label={t`String from a list of options (text)`}
                 />
-                <SelectOption
-                  value="key"
-                  primaryText={t`Keyboard Key (text)`}
-                />
-                <SelectOption
-                  value="mouse"
-                  primaryText={t`Mouse button (text)`}
-                />
-                <SelectOption value="color" primaryText={t`Color (text)`} />
-                <SelectOption value="layer" primaryText={t`Layer (text)`} />
-                <SelectOption
-                  value="sceneName"
-                  primaryText={t`Scene name (text)`}
-                />
+                <SelectOption value="key" label={t`Keyboard Key (text)`} />
+                <SelectOption value="mouse" label={t`Mouse button (text)`} />
+                <SelectOption value="color" label={t`Color (text)`} />
+                <SelectOption value="layer" label={t`Layer (text)`} />
+                <SelectOption value="sceneName" label={t`Scene name (text)`} />
                 {!isExpressionType && (
                   <SelectOption
                     value="yesorno"
-                    primaryText={t`Yes or No (boolean)`}
+                    label={t`Yes or No (boolean)`}
                   />
                 )}
                 {!isExpressionType && (
                   <SelectOption
                     value="trueorfalse"
-                    primaryText={t`True or False (boolean)`}
+                    label={t`True or False (boolean)`}
                   />
                 )}
                 <SelectOption
                   value="objectPointName"
-                  primaryText={t`Object point (text)`}
+                  label={t`Object point (text)`}
                 />
                 <SelectOption
                   value="objectAnimationName"
-                  primaryText={t`Object animation (text)`}
+                  label={t`Object animation (text)`}
                 />
                 <SelectOption
-                  value="identifier"
-                  primaryText={t`Identifier (text)`}
+                  value="layerEffectName"
+                  label={t`Layer effect (text)`}
                 />
+                <SelectOption
+                  value="layerEffectParameterName"
+                  label={t`Layer effect property (text)`}
+                />
+                <SelectOption
+                  value="objectEffectName"
+                  label={t`Object effect (text)`}
+                />
+                <SelectOption
+                  value="objectEffectParameterName"
+                  label={t`Object effect property (text)`}
+                />
+                <SelectOption
+                  value="leaderboardId"
+                  label={t`Leaderboard (text)`}
+                />
+                <SelectOption value="identifier" label={t`Identifier (text)`} />
+                <SelectOption value="scenevar" label={t`Scene variable`} />
+                {!isExpressionType && (
+                  <SelectOption
+                    value="objectListOrEmptyIfJustDeclared"
+                    label={t`Created objects`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="imageResource"
+                    label={t`Image resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="audioResource"
+                    label={t`Audio resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="jsonResource"
+                    label={t`JSON resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="fontResource"
+                    label={t`Font resource (JavaScript only)`}
+                  />
+                )}
+                {!isExpressionType && (
+                  <SelectOption
+                    value="bitmapFontResource"
+                    label={t`Bitmap font resource (JavaScript only)`}
+                  />
+                )}
               </SelectField>
             )}
             {valueTypeMetadata.isObject() && (
@@ -166,8 +211,8 @@ export default function ValueTypeEditor({
                 }}
                 fullWidth
               >
-                <SelectOption value="yes" primaryText={t`Yes`} />
-                <SelectOption value="no" primaryText={t`No`} />
+                <SelectOption value="yes" label={t`Yes`} />
+                <SelectOption value="no" label={t`No`} />
               </SelectField>
             )}
             {valueTypeMetadata.getName() === 'trueorfalse' && (
@@ -186,8 +231,8 @@ export default function ValueTypeEditor({
                 }}
                 fullWidth
               >
-                <SelectOption value="True" primaryText={t`True`} />
-                <SelectOption value="False" primaryText={t`False`} />
+                <SelectOption value="True" label={t`True`} />
+                <SelectOption value="False" label={t`False`} />
               </SelectField>
             )}
             {valueTypeMetadata.getName() === 'identifier' && (
@@ -204,8 +249,8 @@ export default function ValueTypeEditor({
                 }}
                 fullWidth
               >
-                <SelectOption value="scene" primaryText={t`Scene`} />
-                <SelectOption value="object" primaryText={t`Object`} />
+                <SelectOption value="scene" label={t`Scene`} />
+                <SelectOption value="object" label={t`Object`} />
               </SelectField>
             )}
             {valueTypeMetadata.getName() === 'identifier' && (

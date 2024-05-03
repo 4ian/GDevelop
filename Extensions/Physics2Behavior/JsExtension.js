@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -34,13 +26,13 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/behaviors/physics2')
-      .setCategory('Movement');
+      .setCategory('Movement')
+      .setTags('physics, gravity, obstacle, collision');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.updateProperty = function (
       behaviorContent,
       propertyName,
@@ -50,104 +42,138 @@ module.exports = {
         behaviorContent.getChild('bodyType').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'bullet') {
         behaviorContent.getChild('bullet').setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'fixedRotation') {
         behaviorContent
           .getChild('fixedRotation')
           .setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'canSleep') {
         behaviorContent.getChild('canSleep').setBoolValue(newValue === '1');
         return true;
       }
+
       if (propertyName === 'shape') {
         behaviorContent.getChild('shape').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'shapeDimensionA') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeDimensionA').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionA')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeDimensionB') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeDimensionB').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeDimensionB')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeOffsetX') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeOffsetX').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetX')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'shapeOffsetY') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('shapeOffsetY').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('shapeOffsetY')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'polygonOrigin') {
         behaviorContent.addChild('polygonOrigin').setStringValue(newValue);
         return true;
       }
+
       if (propertyName === 'vertices') {
         behaviorContent.addChild('vertices');
-        // $FlowFixMe
         behaviorContent.setChild('vertices', gd.Serializer.fromJSON(newValue));
         return true;
       }
+
       if (propertyName === 'density') {
         behaviorContent
           .getChild('density')
           .setDoubleValue(parseFloat(newValue));
         return true;
       }
+
       if (propertyName === 'friction') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('friction').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent.getChild('friction').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'restitution') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('restitution').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('restitution')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'linearDamping') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('linearDamping').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('linearDamping')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'angularDamping') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('angularDamping').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('angularDamping')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'gravityScale') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        behaviorContent.getChild('gravityScale').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        behaviorContent
+          .getChild('gravityScale')
+          .setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'layers') {
         behaviorContent.getChild('layers').setIntValue(parseInt(newValue, 10));
         return true;
       }
+
       if (propertyName === 'masks') {
         behaviorContent.getChild('masks').setIntValue(parseInt(newValue, 10));
         return true;
       }
+
+      return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
@@ -311,7 +337,6 @@ module.exports = {
       return behaviorProperties;
     };
 
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     physics2Behavior.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('bodyType').setStringValue('Dynamic');
       behaviorContent.addChild('bullet').setBoolValue(false);
@@ -335,40 +360,41 @@ module.exports = {
     };
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.updateProperty = function (
       sharedContent,
       propertyName,
       newValue
     ) {
       if (propertyName === 'gravityX') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('gravityX').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('gravityX').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'gravityY') {
-        newValue = parseFloat(newValue);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('gravityY').setDoubleValue(newValue);
+        const newValueAsNumber = parseFloat(newValue);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('gravityY').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'scaleX') {
-        newValue = parseInt(newValue, 10);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('scaleX').setDoubleValue(newValue);
+        const newValueAsNumber = parseInt(newValue, 10);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('scaleX').setDoubleValue(newValueAsNumber);
         return true;
       }
+
       if (propertyName === 'scaleY') {
-        newValue = parseInt(newValue, 10);
-        if (newValue !== newValue) return false;
-        sharedContent.getChild('scaleY').setDoubleValue(newValue);
+        const newValueAsNumber = parseInt(newValue, 10);
+        if (newValueAsNumber !== newValueAsNumber) return false;
+        sharedContent.getChild('scaleY').setDoubleValue(newValueAsNumber);
         return true;
       }
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.getProperties = function (sharedContent) {
       var sharedProperties = new gd.MapStringPropertyDescriptor();
 
@@ -401,7 +427,6 @@ module.exports = {
 
       return sharedProperties;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     sharedData.initializeContent = function (behaviorContent) {
       behaviorContent.addChild('gravityX').setDoubleValue(0);
       behaviorContent.addChild('gravityY').setDoubleValue(9.8);
@@ -421,6 +446,7 @@ module.exports = {
         '',
         'res/physics32.png',
         'Physics2Behavior',
+        //@ts-ignore The class hierarchy is incorrect leading to a type error, but this is valid.
         physics2Behavior,
         sharedData
       )
@@ -552,7 +578,7 @@ module.exports = {
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
         _('Set the world time scale of _PARAM0_ to _PARAM2_'),
-        '',
+        _('Global'),
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -560,7 +586,8 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Time scale (1 by default)'))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.setTimeScale');
 
     aut
@@ -758,7 +785,7 @@ module.exports = {
 
     aut
       .addAction(
-        'SetSleepingaAllowed',
+        'SetSleepingAllowed',
         _('Sleeping allowed'),
         _(
           'Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects.'
@@ -774,6 +801,11 @@ module.exports = {
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setFunctionName('setSleepingAllowed');
+
+    // Deprecated action (fixed typo):
+    aut
+      .addDuplicatedAction('SetSleepingaAllowed', 'SetSleepingAllowed')
+      .setHidden();
 
     aut
       .addCondition(
@@ -1385,6 +1417,26 @@ module.exports = {
       .setFunctionName('getLinearVelocityAngle');
 
     aut
+      .addAction(
+        'LinearVelocityAngle',
+        _('Linear velocity towards an angle'),
+        _('Set the linear velocity towards an angle.'),
+        _(
+          'Set the linear velocity of _PARAM0_ towards angle: _PARAM2_ degrees, speed: _PARAM3_ pixels per second'
+        ),
+        _('Velocity'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('expression', _('Angle'))
+      .addParameter('expression', _('Speed (in pixels per second)'))
+      .getCodeExtraInformation()
+      .setFunctionName('setLinearVelocityAngle')
+      .setGetter('getLinearVelocityAngle');
+
+    aut
       .addExpression(
         'LinearVelocityAngle',
         _('Linear velocity angle'),
@@ -1459,7 +1511,7 @@ module.exports = {
         'ApplyForce',
         _('Apply force'),
         _(
-          'Apply a force to the object. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a force of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1470,8 +1522,16 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('X component (N)'))
       .addParameter('expression', _('Y component (N)'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyForce');
 
@@ -1480,7 +1540,7 @@ module.exports = {
         'ApplyPolarForce',
         _('Apply force (angle)'),
         _(
-          'Apply a force to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time using polar coordinates. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a force of angle _PARAM2_ and length _PARAM3_'),
         _('Forces & impulses'),
@@ -1491,8 +1551,16 @@ module.exports = {
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
       .addParameter('expression', _('Length (N)'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyPolarForce');
 
@@ -1501,7 +1569,7 @@ module.exports = {
         'ApplyForceTowardPosition',
         _('Apply force toward position'),
         _(
-          'Apply a force to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply a force to the object over time to move it toward a position. It "accelerates" an object and must be used every frame during a time period.'
         ),
         _(
           'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_;_PARAM4_'
@@ -1513,10 +1581,18 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Length (N)'))
+      .setParameterLongDescription(
+        _('A force is like an acceleration but depends on the mass.')
+      )
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyForceTowardPosition');
 
@@ -1525,7 +1601,7 @@ module.exports = {
         'ApplyImpulse',
         _('Apply impulse'),
         _(
-          'Apply an impulse to the object. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _('Apply to _PARAM0_ an impulse of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1534,16 +1610,18 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter(
-        'expression',
-        _('X component (in Newton * seconds or kilogram * meter per second)')
+      .addParameter('expression', _('X component (N·s or kg·m·s⁻¹)'))
+      .addParameter('expression', _('Y component (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
-      .addParameter(
-        'expression',
-        _('Y component (in Newton * seconds or kilogram * meter per second)')
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
       )
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
       .getCodeExtraInformation()
       .setFunctionName('applyImpulse');
 
@@ -1552,7 +1630,7 @@ module.exports = {
         'ApplyPolarImpulse',
         _('Apply impulse (angle)'),
         _(
-          'Apply an impulse to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object using polar coordinates. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _(
           'Apply to _PARAM0_ an impulse of angle _PARAM2_ and length _PARAM3_ (applied at _PARAM4_;_PARAM5_)'
@@ -1564,12 +1642,17 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
       .addParameter('expression', _('Angle'))
-      .addParameter(
-        'expression',
-        _('Length (in Newton * seconds or kilogram * meter per second)')
+      .addParameter('expression', _('Length (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyPolarImpulse');
 
@@ -1578,7 +1661,7 @@ module.exports = {
         'ApplyImpulseTowardPosition',
         _('Apply impulse toward position'),
         _(
-          'Apply an impulse to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
+          'Apply an impulse to the object to move it toward a position. It instantly changes the speed, to give an initial speed for instance.'
         ),
         _(
           'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_;_PARAM4_ (applied at _PARAM5_;_PARAM6_)'
@@ -1589,14 +1672,19 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter(
-        'expression',
-        _('Length (in Newton * seconds or kilogram * meter per second)')
+      .addParameter('expression', _('Length (N·s or kg·m·s⁻¹)'))
+      .setParameterLongDescription(
+        _('An impulse is like a speed addition but depends on the mass.')
       )
       .addParameter('expression', _('X position'))
       .addParameter('expression', _('Y position'))
-      .addParameter('expression', _('Applying X position'))
-      .addParameter('expression', _('Applying Y position'))
+      .addParameter('expression', _('Application point on X axis'))
+      .addParameter('expression', _('Application point on Y axis'))
+      .setParameterLongDescription(
+        _(
+          'Use `MassCenterX` and `MassCenterY` expressions to avoid any rotation.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyImpulseTowardPosition');
 
@@ -1605,7 +1693,7 @@ module.exports = {
         'ApplyTorque',
         _('Apply torque (rotational force)'),
         _(
-          'Apply a torque (also called "rotational force") to the object. This will make the object rotate without moving it.'
+          'Apply a torque (also called "rotational force") to the object. It "accelerates" an object rotation and must be used every frame during a time period.'
         ),
         _('Apply to _PARAM0_ a torque of _PARAM2_'),
         _('Forces & impulses'),
@@ -1614,7 +1702,10 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Torque (N.m)'))
+      .addParameter('expression', _('Torque (N·m)'))
+      .setParameterLongDescription(
+        _('A torque is like a rotation acceleration but depends on the mass.')
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyTorque');
 
@@ -1623,7 +1714,7 @@ module.exports = {
         'ApplyAngularImpulse',
         _('Apply angular impulse (rotational impulse)'),
         _(
-          'Apply an angular impulse (also called a "rotational impulse") to the object. This will make the object rotate without moving it.'
+          'Apply an angular impulse (also called a "rotational impulse") to the object. It instantly changes the rotation speed, to give an initial speed for instance.'
         ),
         _('Apply to _PARAM0_ an angular impulse of _PARAM2_'),
         _('Forces & impulses'),
@@ -1632,7 +1723,12 @@ module.exports = {
       )
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
-      .addParameter('expression', _('Angular impulse (N.m.s'))
+      .addParameter('expression', _('Angular impulse (N·m·s'))
+      .setParameterLongDescription(
+        _(
+          'An impulse is like a rotation speed addition but depends on the mass.'
+        )
+      )
       .getCodeExtraInformation()
       .setFunctionName('applyAngularImpulse');
 
@@ -3999,7 +4095,8 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.objectsCollide');
 
     extension
@@ -4017,7 +4114,8 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
 
     extension
@@ -4035,16 +4133,14 @@ module.exports = {
       .addParameter('objectList', _('Object'), '', false)
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .addIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
 
     return extension;
   },
 
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     const dummyBehavior = extension
       .getBehaviorMetadata('Physics2::Physics2Behavior')
       .get();

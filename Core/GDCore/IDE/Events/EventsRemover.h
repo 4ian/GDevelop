@@ -22,7 +22,7 @@ class EventsList;
 namespace gd {
 
 /**
- * \brief List the values of the parameters of events and their type.
+ * \brief Allow to safely remove a bunch of events.
  *
  * \ingroup IDE
  */

@@ -63,7 +63,7 @@ namespace gdjs {
         }
 
         /**
-         * Deleted the last event data, to be called when it is sure the event was processed throughly.
+         * Deleted the last event data, to be called when it is sure the event was processed thoroughly.
          */
         popData() {
           this.data.shift();
@@ -116,7 +116,7 @@ namespace gdjs {
       let ready = false;
 
       /**
-       * True if an error occured.
+       * True if an error occurred.
        */
       let error = false;
 
@@ -420,6 +420,17 @@ namespace gdjs {
           username,
           credential,
         });
+      };
+
+      /**
+       * Forces the usage of a relay (TURN) server, to avoid sharing IP addresses with the other peers.
+       * @param shouldUseRelayServer Whether relay-only should be enabled or disabled.
+       */
+      export const forceUseRelayServer = (shouldUseRelayServer: boolean) => {
+        peerConfig.config = peerConfig.config || {};
+        peerConfig.config.iceTransportPolicy = shouldUseRelayServer
+          ? 'relay'
+          : 'all';
       };
 
       /**

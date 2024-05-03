@@ -33,6 +33,8 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "authorIds": [],
+    "authorUsernames": [],
     "extensions": [
       {
         "name": "BuiltinObject"

@@ -3,15 +3,27 @@ import axios from 'axios';
 import {
   GDevelopAssetApi,
   GDevelopPrivateAssetsStorage,
+  GDevelopPrivateGameTemplatesStorage,
   GDevelopPublicAssetResourcesStorageBaseUrl,
   GDevelopPublicAssetResourcesStorageStagingBaseUrl,
 } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type Filters } from './Filters';
 import {
+  type PrivateGameTemplateListingData,
   createProductAuthorizedUrl,
-  isProductAuthorizedResourceUrl,
+  isPrivateAssetResourceAuthorizedUrl,
 } from './Shop';
+
+export type License = {|
+  name: string,
+  website: string,
+|};
+
+export type Author = {|
+  name: string,
+  website: string,
+|};
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -74,6 +86,9 @@ export type PublicAssetPack = {|
   assetsCount: number,
   externalWebLink?: ?string,
   userFriendlyPrice?: ?string,
+  categories: Array<string>,
+  authors: Array<Author>,
+  licenses: Array<License>,
 |};
 
 export type PublicAssetPacks = {|
@@ -87,7 +102,8 @@ type PrivateAssetPackAssetType =
   | '9patch'
   | 'tiled'
   | 'partial'
-  | 'particleEmitter';
+  | 'particleEmitter'
+  | 'Scene3D::Model3DObject';
 
 export type PrivateAssetPackContent = { [PrivateAssetPackAssetType]: number };
 
@@ -95,11 +111,28 @@ export type PrivateAssetPack = {|
   id: string,
   name: string,
   previewImageUrls: Array<string>,
+  previewSoundUrls?: Array<string>,
   updatedAt: string,
   createdAt: string,
   tag: string,
   longDescription: string,
   content: PrivateAssetPackContent,
+|};
+
+export type PrivateGameTemplate = {|
+  id: string,
+  name: string,
+  previewImageUrls: Array<string>,
+  updatedAt: string,
+  createdAt: string,
+  tag: string,
+  longDescription: string,
+  gamePreviewLink: string,
+|};
+
+export type PrivatePdfTutorial = {|
+  id: string,
+  downloadUrl: string,
 |};
 
 export type AllPublicAssets = {|
@@ -121,23 +154,23 @@ export type AllResources = {|
   filters: Filters,
 |};
 
-export type License = {|
-  name: string,
-  website: string,
-|};
-
-export type Author = {|
-  name: string,
-  website: string,
-|};
-
 export type Environment = 'staging' | 'live';
 
 export const client = axios.create({
   baseURL: GDevelopAssetApi.baseUrl,
 });
 
-/** Check if the IDE version, passed as argument, satisfy the version required by the asset. */
+export const isAssetPackAudioOnly = (assetPack: PrivateAssetPack): boolean => {
+  const contentKeys = Object.keys(assetPack.content);
+  return contentKeys.length === 1 && contentKeys[0] === 'audio';
+};
+export const doesAssetPackContainAudio = (
+  assetPack: PrivateAssetPack
+): boolean => !!assetPack.content.audio && assetPack.content.audio > 0;
+
+/**
+ * Check if the IDE version, passed as argument, satisfy the version required by the asset.
+ */
 export const isCompatibleWithAsset = (
   ideVersion: string,
   assetHeader: { gdevelopVersion: string }
@@ -148,33 +181,53 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllPublicAssets = ({
+export const listAllPublicAssets = async ({
   environment,
 }: {|
   environment: Environment,
 |}): Promise<AllPublicAssets> => {
-  return client
-    .get(`/asset`, {
-      params: {
-        environment,
-      },
-    })
-    .then(response => response.data)
-    .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
-      if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
-        throw new Error('Unexpected response from the resource endpoint.');
-      }
+  const response = await client.get(`/asset`, {
+    params: {
+      environment,
+    },
+  });
 
-      return Promise.all([
-        client.get(assetShortHeadersUrl).then(response => response.data),
-        client.get(filtersUrl).then(response => response.data),
-        client.get(assetPacksUrl).then(response => response.data),
-      ]).then(([publicAssetShortHeaders, publicFilters, publicAssetPacks]) => ({
-        publicAssetShortHeaders,
-        publicFilters,
-        publicAssetPacks,
-      }));
-    });
+  const { assetShortHeadersUrl, filtersUrl, assetPacksUrl } = response.data;
+
+  const responsesData = await Promise.all([
+    client
+      .get(assetShortHeadersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(filtersUrl)
+      .then(response => response.data)
+      .catch(e => e),
+    client
+      .get(assetPacksUrl)
+      .then(response => response.data)
+      .catch(e => e),
+  ]);
+
+  if (responsesData.some(data => !data || data instanceof Error)) {
+    throw new Error('Unexpected response from the assets endpoints.');
+  }
+
+  const publicAssetShortHeaders = responsesData[0];
+  const publicFilters = responsesData[1];
+  const publicAssetPacks = responsesData[2];
+
+  if (!publicAssetPacks.starterPacks) {
+    throw new Error(
+      'Unexpected response from the public asset packs endpoint.'
+    );
+  }
+
+  return {
+    publicAssetShortHeaders,
+    publicFilters,
+    publicAssetPacks,
+  };
 };
 
 export const getPublicAsset = async (
@@ -214,6 +267,20 @@ export const getPrivateAsset = async (
   return assetResponse.data;
 };
 
+export const getPrivateAssetPackAudioFilesArchiveUrl = (
+  privateAssetPackId: string,
+  authorizationToken: string
+): string => {
+  const assetUrl = `${
+    GDevelopPrivateAssetsStorage.baseUrl
+  }/${privateAssetPackId}/resources/audio.zip`;
+  const authorizedUrl = createProductAuthorizedUrl(
+    assetUrl,
+    authorizationToken
+  );
+  return authorizedUrl;
+};
+
 export const listAllResources = ({
   environment,
 }: {|
@@ -233,10 +300,15 @@ export const listAllResources = ({
       return Promise.all([
         client.get(resourcesUrl).then(response => response.data),
         client.get(filtersUrl).then(response => response.data),
-      ]).then(([resources, filters]) => ({
-        resources,
-        filters,
-      }));
+      ]).then(([resources, filters]) => {
+        if (!resources || !filters) {
+          throw new Error('Unexpected response from the resources endpoints.');
+        }
+        return {
+          resources,
+          filters,
+        };
+      });
     });
 };
 
@@ -287,6 +359,49 @@ export const getPrivateAssetPack = async (
   return response.data;
 };
 
+export const getPrivateGameTemplate = async (
+  gameTemplateId: string
+): Promise<PrivateGameTemplate> => {
+  const response = await client.get(`/game-template/${gameTemplateId}`);
+  return response.data;
+};
+
+export const getPrivatePdfTutorial = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+    tutorialId,
+  }: {|
+    userId: string,
+    tutorialId: string,
+  |}
+): Promise<PrivatePdfTutorial> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get(`/pdf-tutorial/${tutorialId}`, {
+    params: {
+      userId,
+    },
+    headers: {
+      Authorization: authorizationHeader,
+    },
+  });
+  return response.data;
+};
+
+export const createPrivateGameTemplateUrl = async (
+  privateGameTemplateListingData: PrivateGameTemplateListingData,
+  authorizationToken: string
+): Promise<string> => {
+  const gameTemplateUrl = `${GDevelopPrivateGameTemplatesStorage.baseUrl}/${
+    privateGameTemplateListingData.id
+  }/game.json`;
+  const authorizedUrl = createProductAuthorizedUrl(
+    gameTemplateUrl,
+    authorizationToken
+  );
+  return authorizedUrl;
+};
+
 export const isPixelArt = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
@@ -299,7 +414,7 @@ export const isPrivateAsset = (
   assetOrAssetShortHeader: AssetShortHeader | Asset
 ): boolean => {
   const imageUrl = assetOrAssetShortHeader.previewImageUrls[0];
-  return !!imageUrl && isProductAuthorizedResourceUrl(imageUrl);
+  return !!imageUrl && isPrivateAssetResourceAuthorizedUrl(imageUrl);
 };
 
 export const listReceivedAssetShortHeaders = async (
@@ -334,6 +449,22 @@ export const listReceivedAssetPacks = async (
   return response.data;
 };
 
+export const listReceivedGameTemplates = async (
+  getAuthorizationHeader: () => Promise<string>,
+  {
+    userId,
+  }: {|
+    userId: string,
+  |}
+): Promise<Array<PrivateGameTemplate>> => {
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await client.get('/game-template', {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const isPublicAssetResourceUrl = (url: string) =>
   url.startsWith(GDevelopPublicAssetResourcesStorageBaseUrl) ||
   url.startsWith(GDevelopPublicAssetResourcesStorageStagingBaseUrl);
@@ -346,7 +477,7 @@ const resourceFilenameRegex = new RegExp(
     GDevelopPublicAssetResourcesStorageStagingBaseUrl
   )})\\/public-resources\\/(.*)\\/([a-z0-9]{64})_(.*)`
 );
-export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
+export const extractDecodedFilenameWithExtensionFromPublicAssetResourceUrl = (
   url: string
 ): string => {
   const matches = resourceFilenameRegex.exec(url);
@@ -354,5 +485,8 @@ export const extractFilenameWithExtensionFromPublicAssetResourceUrl = (
     throw new Error('The URL is not a valid public asset resource URL: ' + url);
   }
   const filenameWithExtension = matches[4];
-  return filenameWithExtension;
+  const decodedFilenameWithExtension = decodeURIComponent(
+    filenameWithExtension
+  );
+  return decodedFilenameWithExtension;
 };

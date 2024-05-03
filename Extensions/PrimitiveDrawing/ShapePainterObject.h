@@ -60,12 +60,13 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline void SetClearBetweenFrames(bool value) { clearBetweenFrames = value; }
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
+  inline gd::String GetAntialiasing() { return antialiasing; }
+  inline void SetAntialiasing(const gd::String& value) { antialiasing = value; }
+
  protected:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
-#endif
 
  private:
   // Fill color
@@ -83,6 +84,9 @@ class GD_EXTENSION_API ShapePainterObjectBase {
 
   bool absoluteCoordinates;
   bool clearBetweenFrames;
+
+  // Antialiasing
+  gd::String antialiasing;
 };
 
 /**
@@ -100,10 +104,7 @@ class GD_EXTENSION_API ShapePainterObject : public gd::ObjectConfiguration,
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
-
-#endif
 };
 
 #endif  // SHAPEPAINTEROBJECT_H

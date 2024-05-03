@@ -8,6 +8,7 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
+  resourceKind: ResourceKind,
   style?: Object,
   selectable?: boolean,
   selected?: boolean,
@@ -15,61 +16,39 @@ type Props = {|
   onContextMenu?: (number, number) => void,
 |};
 
-type State = {|
-  resourceKind: ?ResourceKind,
-|};
+export const resourcesKindsWithThumbnail = ['image'];
 
 /**
  * Display the right thumbnail for any given resource of a project
  */
-export default class ResourceThumbnail extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = this._loadFrom(props);
+const ResourceThumbnail = ({
+  project,
+  resourceName,
+  resourcesLoader,
+  resourceKind,
+  style,
+  selectable,
+  selected,
+  onSelect,
+  onContextMenu,
+}: Props) => {
+  switch (resourceKind) {
+    case 'image':
+      return (
+        <ImageThumbnail
+          project={project}
+          resourceName={resourceName}
+          resourcesLoader={resourcesLoader}
+          style={style}
+          selectable={selectable}
+          selected={selected}
+          onSelect={onSelect}
+          onContextMenu={onContextMenu}
+        />
+      );
+    default:
+      return null;
   }
+};
 
-  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
-  UNSAFE_componentWillReceiveProps(newProps: Props) {
-    if (
-      newProps.resourceName !== this.props.resourceName ||
-      newProps.project !== this.props.project
-    ) {
-      this.setState(this._loadFrom(newProps));
-    }
-  }
-
-  _loadFrom(props: Props): State {
-    const { project, resourceName } = props;
-    const resourcesManager = project.getResourcesManager();
-    const resourceKind = resourcesManager.hasResource(resourceName)
-      ? resourcesManager.getResource(resourceName).getKind()
-      : null;
-
-    return {
-      resourceKind,
-    };
-  }
-
-  render() {
-    const { resourceKind } = this.state;
-
-    switch (resourceKind) {
-      case 'image':
-        return (
-          <ImageThumbnail
-            project={this.props.project}
-            resourceName={this.props.resourceName}
-            resourcesLoader={this.props.resourcesLoader}
-            style={this.props.style}
-            selectable={this.props.selectable}
-            selected={this.props.selected}
-            onSelect={this.props.onSelect}
-            onContextMenu={this.props.onContextMenu}
-          />
-        );
-      default:
-        return null;
-    }
-  }
-}
+export default ResourceThumbnail;

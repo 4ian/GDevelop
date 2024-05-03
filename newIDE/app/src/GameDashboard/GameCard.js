@@ -6,7 +6,6 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import { Chip } from '@material-ui/core';
 import CardHeader from '@material-ui/core/CardHeader';
-import ShareIcon from '@material-ui/icons/Share';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -19,7 +18,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 
 import { GameThumbnail } from './GameThumbnail';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import ShareDialog from './ShareDialog';
+import ShareGameDialog from './ShareGameDialog';
 
 import {
   deleteGame,
@@ -28,11 +27,13 @@ import {
   type Game,
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
-import { type GameDetailsTab } from './GameDetailsDialog';
+import { type GameDetailsTab } from './GameDetails';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import BackgroundText from '../UI/BackgroundText';
 import Card from '../UI/Card';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import Share from '../UI/CustomSvgIcons/Share';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
 
 type Props = {|
   game: Game,
@@ -49,33 +50,33 @@ type TogglableProperties =
 const confirmationMessage = {
   discoverable: {
     true: t`
-        You are about to make this game discoverable on Liluo.io categories pages. 
+        You are about to make this game discoverable on gd.games categories pages.
         Do you want to continue?
       `,
     false: t`
-        You are about to hide this game from Liluo.io categories pages.
+        You are about to hide this game from gd.games categories pages.
         Do you want to continue?
       `,
   },
   acceptsBuildComments: {
     true: t`
         You are about to activate a feedback banner on all builds of this game.
-        By doing this you're allowing feedback from any player who has access to your Liluo.io build URLs.
+        By doing this you're allowing feedback from any player who has access to your gd.games build URLs.
         Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on all your Liluo.io build pages.
+        You are about to de-activate the feedback banner on all your gd.games build pages.
         Do you want to continue ?
       `,
   },
   acceptsGameComments: {
     true: t`
-        You are about to activate a feedback banner on your Liluo.io game page.
-        By doing this you will receive feedback from any Liluo.io visitor.
+        You are about to activate a feedback banner on your gd.games game page.
+        By doing this you will receive feedback from any gd.games visitor.
         Do you want to continue?
       `,
     false: t`
-        You are about to de-activate the feedback banner on your Liluo.io game page.
+        You are about to de-activate the feedback banner on your gd.games game page.
         Do you want to continue ?
       `,
   },
@@ -92,7 +93,7 @@ export const GameCard = ({
     if (!url) return;
     Window.openExternalURL(url);
   };
-  const [showShareDialog, setShowShareDialog] = React.useState(false);
+  const [showShareGameDialog, setShowShareGameDialog] = React.useState(false);
   const [
     editedProperty,
     setEditedProperty,
@@ -153,10 +154,12 @@ export const GameCard = ({
       await onUpdateGame();
     } catch (error) {
       console.error('Unable to delete the game:', error);
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
       if (
-        error.response &&
-        error.response.data &&
-        error.response.data.code === 'game-deletion/leaderboards-exist'
+        extractedStatusAndCode &&
+        extractedStatusAndCode.code === 'game-deletion/leaderboards-exist'
       ) {
         showErrorBox({
           message: i18n._(
@@ -230,9 +233,9 @@ export const GameCard = ({
                   <>
                     <Text size="body2" noMargin displayInlineAsSpan>
                       {game.discoverable ? (
-                        <Trans>Public on Liluo.io</Trans>
+                        <Trans>Public on gd.games</Trans>
                       ) : (
-                        <Trans>Not visible on Liluo.io</Trans>
+                        <Trans>Not visible on gd.games</Trans>
                       )}
                     </Text>
                     <Spacer />
@@ -289,10 +292,10 @@ export const GameCard = ({
                         <IconButton
                           size="small"
                           disabled={!game.publicWebBuildId || isDeletingGame}
-                          onClick={() => setShowShareDialog(true)}
+                          onClick={() => setShowShareGameDialog(true)}
                           tooltip={t`Share`}
                         >
-                          <ShareIcon />
+                          <Share />
                         </IconButton>
                       </LineStackLayout>
                     </ResponsiveLineStackLayout>
@@ -305,7 +308,7 @@ export const GameCard = ({
                       onToggle(i18n, 'discoverable', !game.discoverable);
                     }}
                     toggled={!!game.discoverable}
-                    label={<Trans>Make discoverable on Liluo.io</Trans>}
+                    label={<Trans>Make discoverable on gd.games</Trans>}
                     disabled={
                       editedProperty === 'discoverable' || isDeletingGame
                     }
@@ -321,7 +324,7 @@ export const GameCard = ({
                     }}
                     toggled={!!game.acceptsGameComments}
                     label={
-                      <Trans>Show feedback banner on Liluo.io game page</Trans>
+                      <Trans>Show feedback banner on gd.games game page</Trans>
                     }
                     disabled={
                       editedProperty === 'acceptsGameComments' || isDeletingGame
@@ -347,10 +350,10 @@ export const GameCard = ({
               </Column>
             </ResponsiveLineStackLayout>
           </Card>
-          {showShareDialog && (
-            <ShareDialog
+          {showShareGameDialog && (
+            <ShareGameDialog
               game={game}
-              onClose={() => setShowShareDialog(false)}
+              onClose={() => setShowShareGameDialog(false)}
             />
           )}
         </>

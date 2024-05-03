@@ -1,4 +1,5 @@
 // @flow
+import { addGDevelopResourceTokenIfRequired } from '../Utils/CrossOrigin';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -143,7 +144,7 @@ export default class ResourcesLoader {
       );
     }
 
-    let urlWithParameters = urlOrFilename;
+    let urlWithParameters = addGDevelopResourceTokenIfRequired(urlOrFilename);
     if (isResourceForPixi) {
       // To avoid strange/hard to understand CORS issues, we add a dummy parameter.
       // By doing so, we force browser to consider this URL as different than the one traditionally
@@ -182,7 +183,7 @@ export default class ResourcesLoader {
 
   /**
    * Get the fully qualified URL/filename associated with the given resource, with potential
-   * changes to accomodate browsers CORS/cache.
+   * changes to accommodate browsers CORS/cache.
    */
   static getResourceFullUrl(
     project: gdProject,

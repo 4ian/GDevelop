@@ -49,6 +49,16 @@ namespace gdjs {
         );
       };
 
+      export const maximum = function (
+        instanceContainer: gdjs.RuntimeInstanceContainer,
+        inventoryName: string,
+        name: string
+      ) {
+        return InventoryManager.get(instanceContainer, inventoryName).maximum(
+          name
+        );
+      };
+
       export const has = function (
         instanceContainer: gdjs.RuntimeInstanceContainer,
         inventoryName: string,

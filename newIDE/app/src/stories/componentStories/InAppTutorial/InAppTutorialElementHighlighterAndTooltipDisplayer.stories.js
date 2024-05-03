@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import InAppTutorialElementHighlighter from '../../../InAppTutorial/InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from '../../../InAppTutorial/InAppTutorialTooltipDisplayer';
 import RaisedButton from '../../../UI/RaisedButton';
@@ -19,11 +18,13 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 import { List, ListItem } from '../../../UI/List';
 import { Column } from '../../../UI/Grid';
+import { queryElementOrItsMostVisuallySignificantParent } from '../../../InAppTutorial/InAppTutorialStepDisplayer';
+import SearchBar from '../../../UI/SearchBar';
 
 export default {
   title: 'In-app tutorial/ElementHighlighterAndTooltipDisplayer',
   component: InAppTutorialElementHighlighter,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const elementIdToTooltip = {
@@ -39,6 +40,14 @@ const elementIdToTooltip = {
   '#input': {
     description: 'Description only (without quit button)',
     placement: 'left',
+  },
+  '#multiline-input': {
+    description: 'Description with `selectable [code]`.',
+    placement: 'left',
+  },
+  '#search-bar': {
+    description: 'Highlight a search bar.',
+    placement: 'top',
   },
   'element-in-list': {
     description:
@@ -59,6 +68,10 @@ export const Default = () => {
   const [textFieldValue, setTextFieldValue] = React.useState<string>(
     'Object.Variable'
   );
+  const [searchValue, setSearchValue] = React.useState<string>('Search me');
+  const [multilineInputValue, setMultilineInputValue] = React.useState<string>(
+    "First layout\nThis is what we're gonna do"
+  );
   const [
     elementToHighlightId,
     setElementToHighlightId,
@@ -77,13 +90,14 @@ export const Default = () => {
   React.useEffect(
     () => {
       if (elementToHighlightId.startsWith('#')) {
-        setElementToHighlight(document.querySelector(elementToHighlightId));
+        setElementToHighlight(
+          queryElementOrItsMostVisuallySignificantParent(elementToHighlightId)
+        );
       }
     },
     [elementToHighlightId]
   );
 
-  console.log(elementToHighlight);
   return (
     <>
       <ColumnStackLayout useLargeSpacer>
@@ -108,6 +122,16 @@ export const Default = () => {
             value="#input"
             control={<Radio />}
             label="Textfield"
+          />
+          <FormControlLabel
+            value="#multiline-input"
+            control={<Radio />}
+            label="Multiline textfield"
+          />
+          <FormControlLabel
+            value="#search-bar"
+            control={<Radio />}
+            label="Search bar"
           />
           <FormControlLabel
             value="element-in-list"
@@ -159,7 +183,21 @@ export const Default = () => {
               </ScrollView>
             </FixedHeightFlexContainer>
           </Column>
-          <Column expand />
+          <ColumnStackLayout expand>
+            <SemiControlledTextField
+              multiline
+              floatingLabelText="Multiline input"
+              id="multiline-input"
+              onChange={setMultilineInputValue}
+              value={multilineInputValue}
+            />
+            <SearchBar
+              id="search-bar"
+              onRequestSearch={() => action('search')()}
+              onChange={setSearchValue}
+              value={searchValue}
+            />
+          </ColumnStackLayout>
         </ResponsiveLineStackLayout>
       </ColumnStackLayout>
 

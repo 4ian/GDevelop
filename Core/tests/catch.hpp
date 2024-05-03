@@ -5398,12 +5398,10 @@ class Runner {
     getRegistryHub().getTestCaseRegistry().getFilteredTests(
         testSpec, *m_config, testCases);
 
-    int testsRunForGroup = 0;
     for (std::vector<TestCase>::const_iterator it = testCases.begin(),
                                                itEnd = testCases.end();
          it != itEnd;
          ++it) {
-      testsRunForGroup++;
       if (m_testsAlreadyRun.find(*it) == m_testsAlreadyRun.end()) {
         if (context.aborting()) break;
 

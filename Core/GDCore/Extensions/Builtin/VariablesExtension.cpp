@@ -27,9 +27,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarScene",
-                    _("Value of a scene variable"),
-                    _("Compare the value of a scene variable."),
-                    _("the scene variable _PARAM0_"),
+                    _("Number variable"),
+                    _("Compare the number value of a scene variable."),
+                    _("The number of scene variable _PARAM0_"),
                     _("Scene variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -39,9 +39,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarSceneTxt",
-                    _("Text of a scene variable"),
-                    _("Compare the text of a scene variable."),
-                    _("the text of scene variable _PARAM0_"),
+                    _("Text variable"),
+                    _("Compare the text (string) of a scene variable."),
+                    _("The text of scene variable _PARAM0_"),
                     _("Scene variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -52,7 +52,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition(
           "SceneVariableAsBoolean",
-          _("Boolean value of a scene variable"),
+          _("Boolean variable"),
           _("Compare the boolean value of a scene variable."),
           _("The boolean value of scene variable _PARAM0_ is _PARAM1_"),
           _("Scene variables"),
@@ -63,14 +63,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetDefaultValue("true");
 
   extension
-      .AddCondition(
-          "VariableChildExists",
-          _("Child existence"),
-          _("Check if the specified child of the scene variable exists."),
-          _("Child _PARAM1_ of scene variable _PARAM0_ exists"),
-          _("Scene variables/Collections/Structures"),
-          "res/conditions/var24.png",
-          "res/conditions/var.png")
+      .AddCondition("VariableChildExists",
+                    _("Child existence"),
+                    _("Check if the specified child of the scene structure "
+                      "variable exists."),
+                    _("Child _PARAM1_ of scene variable _PARAM0_ exists"),
+                    _("Scene variables/Arrays and structures"),
+                    "res/conditions/var24.png",
+                    "res/conditions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("string", _("Name of the child"))
       .MarkAsAdvanced();
@@ -78,10 +78,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("GlobalVariableChildExists",
                     _("Child existence"),
-                    _("Check if the specified child of the global "
+                    _("Check if the specified child of the global structure "
                       "variable exists."),
                     _("Child _PARAM1_ of global variable _PARAM0_ exists"),
-                    _("Global variables/Collections/Structures"),
+                    _("Global variables/Arrays and structures"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
       .AddParameter("globalvar", _("Variable"))
@@ -90,7 +90,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarSceneDef",
-                    "Test if a scene variable is defined",
+                    "Variable defined",
                     "Test if the scene variable exists.",
                     "Scene variable _PARAM0_ is defined",
                     _("Scene variables"),
@@ -98,12 +98,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                     "res/conditions/var.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Variable"))
-      .SetHidden();
+      .SetHidden();  // Deprecated.
 
   extension
       .AddCondition("VarGlobal",
-                    _("Value of a global variable"),
-                    _("Compare the value of a global variable."),
+                    _("Number variable"),
+                    _("Compare the number value of a global variable."),
                     _("the global variable _PARAM0_"),
                     _("Global variables"),
                     "res/conditions/var24.png",
@@ -115,8 +115,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarGlobalTxt",
-                    _("Text of a global variable"),
-                    _("Compare the text of a global variable."),
+                    _("Text variable"),
+                    _("Compare the text (string) of a global variable."),
                     _("the text of the global variable _PARAM0_"),
                     _("Global variables"),
                     "res/conditions/var24.png",
@@ -129,7 +129,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition(
           "GlobalVariableAsBoolean",
-          _("Boolean value of a global variable"),
+          _("Boolean variable"),
           _("Compare the boolean value of a global variable."),
           _("The boolean value of global variable _PARAM0_ is _PARAM1_"),
           _("Global variables"),
@@ -141,8 +141,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarGlobalDef",
-                    "Test if a global variable is defined",
-                    "Test if a global variable exists",
+                    "Variable defined",
+                    "Test if a global variable exists.",
                     "Global variable _PARAM0_ is defined",
                     _("Global variables"),
                     "res/conditions/var24.png",
@@ -150,12 +150,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Variable"))
       .MarkAsAdvanced()
-      .SetHidden();
+      .SetHidden();  // Deprecated.
 
   extension
       .AddAction("ModVarScene",
-                 _("Value of a scene variable"),
-                 _("Change the value of a scene variable."),
+                 _("Change number variable"),
+                 _("Modify the number value of a scene variable."),
                  _("the scene variable _PARAM0_"),
                  _("Scene variables"),
                  "res/actions/var24.png",
@@ -166,8 +166,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ModVarSceneTxt",
-                 _("String of a scene variable"),
-                 _("Modify the text of a scene variable."),
+                 _("Change text variable"),
+                 _("Modify the text (string) of a scene variable."),
                  _("the text of scene variable _PARAM0_"),
                  _("Scene variables"),
                  "res/actions/var24.png",
@@ -179,7 +179,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction(
           "SetSceneVariableAsBoolean",
-          _("Boolean value of a scene variable"),
+          _("Change boolean variable"),
           _("Modify the boolean value of a scene variable."),
           _("Set the boolean value of scene variable _PARAM0_ to _PARAM1_"),
           _("Scene variables"),
@@ -190,7 +190,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ToggleSceneVariableAsBoolean",
-                 _("Toggle boolean value of a scene variable"),
+                 _("Toggle boolean variable"),
                  _("Toggle the boolean value of a scene variable.") + "\n" +
                      _("If it was true, it will become false, and if it was "
                        "false it will become true."),
@@ -202,8 +202,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ModVarGlobal",
-                 _("Value of a global variable"),
-                 _("Change the value of a global variable"),
+                 _("Change number variable"),
+                 _("Modify the number value of a global variable."),
                  _("the global variable _PARAM0_"),
                  _("Global variables"),
                  "res/actions/var24.png",
@@ -215,8 +215,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ModVarGlobalTxt",
-                 _("String of a global variable"),
-                 _("Modify the text of a global variable."),
+                 _("Change text variable"),
+                 _("Modify the text (string) of a global variable."),
                  _("the text of global variable _PARAM0_"),
                  _("Global variables"),
                  "res/actions/var24.png",
@@ -229,7 +229,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction(
           "SetGlobalVariableAsBoolean",
-          _("Boolean value of a global variable"),
+          _("Change boolean variable"),
           _("Modify the boolean value of a global variable."),
           _("Set the boolean value of global variable _PARAM0_ to _PARAM1_"),
           _("Global variables"),
@@ -240,7 +240,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ToggleGlobalVariableAsBoolean",
-                 _("Toggle boolean value of a global variable"),
+                 _("Toggle boolean variable"),
                  _("Toggle the boolean value of a global variable.") + "\n" +
                      _("If it was true, it will become false, and if it was "
                        "false it will become true."),
@@ -251,202 +251,324 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("globalvar", _("Variable"));
 
   extension
-      .AddAction("VariableRemoveChild",
-                 _("Remove a child"),
-                 _("Remove a child from a scene variable."),
-                 _("Remove child _PARAM1_ from scene variable _PARAM0_"),
-                 _("Scene variables/Collections/Structures"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"))
+      .AddAction(
+          "VariableRemoveChild",
+          _("Remove a child"),
+          _("Remove a child from a scene structure variable."),
+          _("Remove child _PARAM1_ from scene structure variable _PARAM0_"),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("scenevar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
       .MarkAsAdvanced();
 
   extension
-      .AddAction("GlobalVariableRemoveChild",
-                 _("Remove a child"),
-                 _("Remove a child from a global variable."),
-                 _("Remove child _PARAM1_ from global variable _PARAM0_"),
-                 _("Global variables/Collections/Structures"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalvar", _("Variable"))
+      .AddAction(
+          "GlobalVariableRemoveChild",
+          _("Remove a child"),
+          _("Remove a child from a global structure variable."),
+          _("Remove child _PARAM1_ from global structure variable _PARAM0_"),
+          _("Global variables/Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
+      .AddParameter("globalvar", _("Structure variable"))
       .AddParameter("string", _("Child's name"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("VariableClearChildren",
-                 _("Clear scene variable"),
-                 _("Remove all the children from the scene variable."),
+                 _("Clear children"),
+                 _("Remove all the children from the scene structure or array "
+                   "variable."),
                  _("Clear children from scene variable _PARAM0_"),
-                 _("Scene variables/Collections"),
+                 _("Scene variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"))
+      .AddParameter("scenevar", _("Structure or array variable"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariableClearChildren",
-                 _("Clear global variable"),
-                 _("Remove all the children from the global variable."),
+                 _("Clear children"),
+                 _("Remove all the children from the global structure or array "
+                   "variable."),
                  _("Clear children from global variable _PARAM0_"),
-                 _("Global variables/Collections"),
+                 _("Global variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
-      .AddParameter("globalvar", _("Variable"))
+      .AddParameter("globalvar", _("Structure or array variable"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePush",
-                 _("Append variable to a scene array"),
-                 _("Appends a variable at the end of a scene array variable."),
-                 _("Append variable _PARAM1_ to array variable _PARAM0_"),
-                 _("Scene variables/Collections/Arrays"),
+                 _("Add existing variable"),
+                 _("Adds an existing variable at the end of a scene array "
+                   "variable."),
+                 _("Add variable _PARAM1_ to array variable _PARAM0_"),
+                 _("Scene variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
+      .AddParameter("scenevar", _("Scene variable with the content to add"))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and added at the "
+            "end of the array."))
       .MarkAsAdvanced();
 
   extension
-      .AddAction("SceneVariablePushString",
-                 _("Append a string to a scene array"),
-                 _("Appends a string at the end of a scene array variable."),
-                 _("Append string _PARAM1_ to array variable _PARAM0_"),
-                 _("Scene variables/Collections/Arrays"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
+      .AddAction(
+          "SceneVariablePushString",
+          _("Add text variable"),
+          _("Adds a text (string) at the end of a scene array variable."),
+          _("Add text _PARAM1_ to array variable _PARAM0_"),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("string", _("String to append"))
+      .AddParameter("string", _("Text to add"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePushNumber",
-                 _("Append a number to a scene array"),
-                 _("Appends a number at the end of a scene array variable."),
-                 _("Append number _PARAM1_ to array variable _PARAM0_"),
-                 _("Scene variables/Collections/Arrays"),
+                 _("Add number variable"),
+                 _("Adds a number at the end of a scene array variable."),
+                 _("Add number _PARAM1_ to array variable _PARAM0_"),
+                 _("Scene variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("expression", _("Number to append"))
+      .AddParameter("expression", _("Number to add"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("SceneVariablePushBool",
-                 _("Append a boolean to a scene array"),
-                 _("Appends a boolean at the end of a scene array variable."),
-                 _("Append boolean _PARAM1_ to array variable _PARAM0_"),
-                 _("Scene variables/Collections/Arrays"),
+                 _("Add boolean variable"),
+                 _("Adds a boolean at the end of a scene array variable."),
+                 _("Add boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Scene variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to append"))
+      .AddParameter("trueorfalse", _("Boolean to add"))
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "SceneVariableRemoveAt",
-          _("Remove variable from a scene array (by index)"),
-          _("Removes a variable at the specified index of a scene array variable."),
-          _("Remove variable at index _PARAM1_ from scene array variable _PARAM0_"),
-          _("Scene variables/Collections/Arrays"),
-          "res/actions/var24.png",
-          "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"))
+      .AddAction("SceneVariableRemoveAt",
+                 _("Remove variable by index"),
+                 _("Removes a variable at the specified index of a scene array "
+                   "variable."),
+                 _("Remove variable at index _PARAM1_ from scene array "
+                   "variable _PARAM0_"),
+                 _("Scene variables/Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
 
   extension
-      .AddAction("GlobalVariablePush",
-                 _("Append variable to a global array"),
-                 _("Appends a variable at the end of a global array variable."),
-                 _("Append variable _PARAM1_ to array variable _PARAM0_"),
-                 _("Global variables/Collections/Arrays"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
-      .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
+      .AddCondition(
+          "SceneVariableChildCount",
+          _("Number of children"),
+          _("Compare the number of children in a scene array variable."),
+          _("The number of children in the array variable _PARAM0_"),
+          _("Scene variables/Arrays and structures"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("scenevar", _("Array variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
       .MarkAsAdvanced();
 
   extension
+      .AddStrExpression(
+          "SceneVariableFirstString",
+          _("First text child"),
+          _("Get the value of the first element of a scene array variable, if "
+            "it is a text (string)."),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"));
+
+  extension
+      .AddExpression(
+          "SceneVariableFirstNumber",
+          _("First number child"),
+          _("Get the value of the first element of a scene array variable, if "
+            "it is a number."),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"));
+
+  extension
+      .AddStrExpression(
+          "SceneVariableLastString",
+          _("Last text child"),
+          _("Get the value of the last element of a scene array variable, if "
+            "it is a text (string)."),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"));
+
+  extension
+      .AddExpression(
+          "SceneVariableLastNumber",
+          _("Last number child"),
+          _("Get the value of the last element of a scene array variable, if "
+            "it is a number."),
+          _("Scene variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("scenevar", _("Array variable"));
+
+  extension
       .AddAction(
-          "GlobalVariableRemoveAt",
-          _("Remove variable from a global array (by index)"),
-          _("Removes a variable at the specified index of a global array variable."),
-          _("Remove variable at index _PARAM1_ from global array variable _PARAM0_"),
-          _("Global variables/Collections/Arrays"),
+          "GlobalVariablePush",
+          _("Add existing variable"),
+          _("Adds an existing variable at the end of a global array variable."),
+          _("Add variable _PARAM1_ to array variable _PARAM0_"),
+          _("Global variables/Arrays and structures"),
           "res/actions/var24.png",
           "res/actions/var.png")
-      .AddParameter("globalvar", _("Variable"))
+      .AddParameter("globalvar", _("Array variable"))
+      .AddParameter("scenevar", _("Scene variable with the content to add"))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and added at the "
+            "end of the array."))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("GlobalVariableRemoveAt",
+                 _("Remove variable by index"),
+                 _("Removes a variable at the specified index of a global "
+                   "array variable."),
+                 _("Remove variable at index _PARAM1_ from global array "
+                   "variable _PARAM0_"),
+                 _("Global variables/Arrays and structures"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"))
       .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
 
   extension
-      .AddAction("GlobalVariablePushString",
-                 _("Append a string to a global array"),
-                 _("Appends a string at the end of a global array variable."),
-                 _("Append string _PARAM1_ to array variable _PARAM0_"),
-                 _("Global variables/Collections/Arrays"),
-                 "res/actions/var24.png",
-                 "res/actions/var.png")
+      .AddAction(
+          "GlobalVariablePushString",
+          _("Add text variable"),
+          _("Adds a text (string) at the end of a global array variable."),
+          _("Add text _PARAM1_ to array variable _PARAM0_"),
+          _("Global variables/Arrays and structures"),
+          "res/actions/var24.png",
+          "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("string", _("String to append"))
+      .AddParameter("string", _("Text to add"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariablePushNumber",
-                 _("Append a number to a global array"),
-                 _("Appends a number at the end of a global array variable."),
-                 _("Append number _PARAM1_ to array variable _PARAM0_"),
-                 _("Global variables/Collections/Arrays"),
+                 _("Add number variable"),
+                 _("Adds a number at the end of a global array variable."),
+                 _("Add number _PARAM1_ to array variable _PARAM0_"),
+                 _("Global variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("expression", _("Number to append"))
+      .AddParameter("expression", _("Number to add"))
       .MarkAsAdvanced();
 
   extension
       .AddAction("GlobalVariablePushBool",
-                 _("Append a boolean to a global array"),
-                 _("Appends a boolean at the end of a global array variable."),
-                 _("Append boolean _PARAM1_ to array variable _PARAM0_"),
-                 _("Global variables/Collections/Arrays"),
+                 _("Add boolean variable"),
+                 _("Adds a boolean at the end of a global array variable."),
+                 _("Add boolean _PARAM1_ to array variable _PARAM0_"),
+                 _("Global variables/Arrays and structures"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
-      .AddParameter("trueorfalse", _("Boolean to append"))
+      .AddParameter("trueorfalse", _("Boolean to add"))
       .MarkAsAdvanced();
 
   extension
-      .AddExpression("GlobalVariableChildCount",
-                     _("Number of children of a global variable"),
-                     _("Number of children of a global variable"),
-                     _("Global variables"),
+      .AddCondition(
+          "GlobalVariableChildCount",
+          _("Number of children"),
+          _("Compare the number of children in a global array variable."),
+          _("The number of children of the array variable _PARAM0_"),
+          _("Global variables/Arrays and structures"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("globalvar", _("Array variable"))
+      .UseStandardRelationalOperatorParameters(
+          "number", ParameterOptions::MakeNewOptions())
+      .MarkAsAdvanced();
+
+  extension
+      .AddStrExpression("GlobalVariableFirstString",
+                        _("First text child"),
+                        _("Value of the first element of a global array "
+                          "variable, if it is a text (string) variable."),
+                        _("Global variables/Arrays and structures"),
+                        "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"));
+
+  extension
+      .AddExpression("GlobalVariableFirstNumber",
+                     _("First number child"),
+                     _("Value of the first element of a global array "
+                       "variable, if it is a number variable"),
+                     _("Global variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("globalvar", _("Variable"));
+      .AddParameter("globalvar", _("Array variable"));
+
+  extension
+      .AddStrExpression(
+          "GlobalVariableLastString",
+          _("Last text child"),
+          _("Value of the last element of a global array variable, if "
+            "it is a text (string) variable."),
+          _("Global variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"));
+
+  extension
+      .AddExpression(
+          "GlobalVariableLastNumber",
+          _("Last number child"),
+          _("Value of the last element of a global array variable, if "
+            "it is a number variable"),
+          _("Global variables/Arrays and structures"),
+          "res/actions/var.png")
+      .AddParameter("globalvar", _("Array variable"));
+
+  extension
+      .AddExpression("GlobalVariableChildCount",
+                     _("Number of children"),
+                     _("Number of children in a global array or "
+                       "structure variable"),
+                     _("Global variables/Arrays and structures"),
+                     "res/actions/var.png")
+      .AddParameter("globalvar", _("Array or structure variable"));
 
   extension
       .AddExpression("VariableChildCount",
-                     _("Number of children of a scene variable"),
-                     _("Number of children of a scene variable"),
-                     _("Scene variables"),
+                     _("Number of children"),
+                     _("Number of children in a scene array or "
+                       "structure variable"),
+                     _("Scene variables/Arrays and structures"),
                      "res/actions/var.png")
-      .AddParameter("scenevar", _("Variable"));
+      .AddParameter("scenevar", _("Array or structure variable"));
 
   extension
       .AddExpression("Variable",
-                     _("Value of a scene variable"),
-                     _("Value of a scene variable"),
+                     _("Number variable"),
+                     _("Number value of a scene variable"),
                      _("Scene variables"),
                      "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"));
 
   extension
       .AddStrExpression("VariableString",
-                        _("Text of a scene variable"),
+                        _("Text variable"),
                         _("Text of a scene variable"),
                         _("Scene variables"),
                         "res/actions/var.png")
@@ -454,15 +576,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddExpression("GlobalVariable",
-                     _("Value of a global variable"),
-                     _("Value of a global variable"),
+                     _("Number variable"),
+                     _("Number value of a global variable"),
                      _("Global variables"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Name of the global variable"));
 
   extension
       .AddStrExpression("GlobalVariableString",
-                        _("Text of a global variable"),
+                        _("Text variable"),
                         _("Text of a global variable"),
                         _("Global variables"),
                         "res/actions/var.png")

@@ -52,6 +52,7 @@ namespace gdjs {
     flow: number;
     /** Destroy the object when there is no particles? */
     destroyWhenNoParticles: boolean;
+    jumpForwardInTimeOnCreation: number;
   };
 
   export type ParticleEmitterObjectData = ObjectData &
@@ -94,6 +95,8 @@ namespace gdjs {
     particleRotationMaxSpeed: number;
     maxParticlesCount: number;
     additiveRendering: boolean;
+    jumpForwardInTimeOnCreation: number;
+    _jumpForwardInTimeCompleted: boolean = false;
     _posDirty: boolean = true;
     _angleDirty: boolean = true;
     _forceDirty: boolean = true;
@@ -110,6 +113,11 @@ namespace gdjs {
     _additiveRenderingDirty: boolean = true;
     // Don't mark texture as dirty if not using one.
     _textureDirty: boolean;
+    /**
+     * `true` only when the emission is paused by events.
+     * It allows to tell the end of emission apart from it.
+     */
+    _isEmissionPaused: boolean = false;
 
     // @ts-ignore
     _renderer: gdjs.ParticleEmitterObjectRenderer;
@@ -158,6 +166,8 @@ namespace gdjs {
       this.particleRotationMaxSpeed = particleObjectData.particleAngle2;
       this.maxParticlesCount = particleObjectData.maxParticleNb;
       this.additiveRendering = particleObjectData.additive;
+      this.jumpForwardInTimeOnCreation =
+        particleObjectData.jumpForwardInTimeOnCreation;
       this._textureDirty = this.texture !== '';
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -385,17 +395,26 @@ namespace gdjs {
       this._additiveRenderingDirty = this._maxParticlesCountDirty = this._particleRotationSpeedDirty = false;
       this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
-        this._renderer.hasStarted() &&
+        this.destroyWhenNoParticles &&
         this.getParticleCount() === 0 &&
-        this.destroyWhenNoParticles
+        this._renderer.hasStarted() &&
+        !this._isEmissionPaused &&
+        this._renderer._mayHaveEndedEmission()
       ) {
         this.deleteFromScene(instanceContainer);
       }
+      if (
+        this.jumpForwardInTimeOnCreation > 0 &&
+        this._jumpForwardInTimeCompleted === false
+      ) {
+        this._renderer.update(this.jumpForwardInTimeOnCreation);
+        this._jumpForwardInTimeCompleted = true;
+      }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
+    onDestroyed(): void {
       this._renderer.destroy();
-      super.onDestroyFromScene(instanceContainer);
+      super.onDestroyed();
     }
 
     getEmitterForceMin(): number {
@@ -791,10 +810,12 @@ namespace gdjs {
     }
 
     startEmission(): void {
+      this._isEmissionPaused = false;
       this._renderer.start();
     }
 
     stopEmission(): void {
+      this._isEmissionPaused = true;
       this._renderer.stop();
     }
 
@@ -848,6 +869,10 @@ namespace gdjs {
           this._textureDirty = true;
         }
       }
+    }
+
+    jumpEmitterForwardInTime(timeSkipped: number): void {
+      this._renderer.update(timeSkipped);
     }
   }
   gdjs.registerObject(

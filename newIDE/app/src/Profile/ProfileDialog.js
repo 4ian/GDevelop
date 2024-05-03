@@ -3,7 +3,6 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import { Tabs } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
@@ -12,46 +11,34 @@ import SubscriptionDetails from './Subscription/SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import UserAchievements from './Achievement/UserAchievements';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
-import { GamesList } from '../GameDashboard/GamesList';
 import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import CreateProfile from './CreateProfile';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import RouterContext from '../MainFrame/RouterContext';
 import useIsElementVisibleInScroll from '../Utils/UseIsElementVisibleInScroll';
 import { markBadgesAsSeen as doMarkBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
-
-export type ProfileTab = 'profile' | 'games-dashboard';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import useSubscriptionPlans from '../Utils/UseSubscriptionPlans';
+import Text from '../UI/Text';
+import Link from '../UI/Link';
+import CreditsStatusBanner from '../Credits/CreditsStatusBanner';
 
 type Props = {|
-  currentProject: ?gdProject,
   open: boolean,
   onClose: () => void,
 |};
 
-const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
-  const { routeArguments, removeRouteArguments } = React.useContext(
-    RouterContext
-  );
+const ProfileDialog = ({ open, onClose }: Props) => {
   const badgesSeenNotificationTimeoutRef = React.useRef<?TimeoutID>(null);
   const badgesSeenNotificationSentRef = React.useRef<boolean>(false);
+  const { subscriptionPlansWithPricingSystems } = useSubscriptionPlans({
+    includeLegacy: true,
+  });
 
-  const [currentTab, setCurrentTab] = React.useState<ProfileTab>('profile');
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const isUserLoading = authenticatedUser.loginState !== 'done';
   const userAchievementsContainerRef = React.useRef<?HTMLDivElement>(null);
-
-  React.useEffect(
-    () => {
-      if (routeArguments['initial-dialog'] === 'games-dashboard') {
-        setCurrentTab('games-dashboard');
-        removeRouteArguments(['initial-dialog']);
-      }
-    },
-    [routeArguments, removeRouteArguments]
-  );
-
   const markBadgesAsSeen = React.useCallback(
     (entries: IntersectionObserverEntry[]) => {
       if (!(authenticatedUser.authenticated && authenticatedUser.profile)) {
@@ -155,14 +142,7 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
         />,
       ]}
       secondaryActions={[
-        <HelpButton
-          key="help"
-          helpPagePath={
-            currentTab === 'games-dashboard'
-              ? '/interface/games-dashboard'
-              : '/interface/profile'
-          }
-        />,
+        <HelpButton key="help" helpPagePath="/interface/profile" />,
         isConnected && (
           <FlatButton
             label={<Trans>Logout</Trans>}
@@ -177,64 +157,79 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
       fullHeight={!!isConnected}
       maxWidth={isConnected ? 'md' : 'sm'}
       flexColumnBody
-      fixedContent={
-        isConnected ? (
-          <Tabs
-            value={currentTab}
-            onChange={setCurrentTab}
-            options={[
-              {
-                value: 'profile',
-                label: <Trans>My Profile</Trans>,
-              },
-              {
-                value: 'games-dashboard',
-                label: <Trans>Games Dashboard</Trans>,
-              },
-            ]}
-          />
-        ) : null
-      }
     >
-      {authenticatedUser.loginState === 'loggingIn' ? (
+      {!isConnected && authenticatedUser.loginState === 'loggingIn' ? (
         <PlaceholderLoader />
       ) : authenticatedUser.authenticated && authenticatedUser.profile ? (
-        <>
-          {currentTab === 'profile' && (
-            <Line>
-              <Column expand noMargin>
-                <AuthenticatedUserProfileDetails
-                  authenticatedUser={authenticatedUser}
-                  onEditProfile={authenticatedUser.onEdit}
-                  onChangeEmail={authenticatedUser.onChangeEmail}
+        <Line>
+          <Column expand noMargin>
+            <AuthenticatedUserProfileDetails
+              authenticatedUser={authenticatedUser}
+              onOpenEditProfileDialog={
+                authenticatedUser.onOpenEditProfileDialog
+              }
+              onOpenChangeEmailDialog={
+                authenticatedUser.onOpenChangeEmailDialog
+              }
+            />
+            {subscriptionPlansWithPricingSystems ? (
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                subscriptionPlansWithPricingSystems={
+                  subscriptionPlansWithPricingSystems
+                }
+                onManageSubscription={onManageSubscription}
+                isManageSubscriptionLoading={isManageSubscriptionLoading}
+              />
+            ) : (
+              <PlaceholderLoader />
+            )}
+            <Column noMargin>
+              <Line alignItems="center">
+                <Column noMargin>
+                  <Text size="block-title">
+                    <Trans>GDevelop credits</Trans>
+                  </Text>
+                  <Text size="body" noMargin>
+                    <Trans>
+                      Get perks and cloud benefits when getting closer to your
+                      game launch.{' '}
+                      <Link
+                        href="https://wiki.gdevelop.io/gdevelop5/interface/profile/credits"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://wiki.gdevelop.io/gdevelop5/interface/profile/credits'
+                          )
+                        }
+                      >
+                        Learn more
+                      </Link>
+                    </Trans>
+                  </Text>
+                </Column>
+              </Line>
+              <CreditsStatusBanner displayPurchaseAction />
+            </Column>
+            <ContributionsDetails userId={authenticatedUser.profile.id} />
+            {isConnected && (
+              <div ref={userAchievementsContainerRef}>
+                <UserAchievements
+                  achievements={authenticatedUser.achievements}
+                  badges={authenticatedUser.badges}
+                  displayUnclaimedAchievements
+                  displayNotifications
                 />
-                <SubscriptionDetails
-                  subscription={authenticatedUser.subscription}
-                  onManageSubscription={onManageSubscription}
-                  isManageSubscriptionLoading={isManageSubscriptionLoading}
-                />
-                <ContributionsDetails userId={authenticatedUser.profile.id} />
-                {isConnected && (
-                  <div ref={userAchievementsContainerRef}>
-                    <UserAchievements
-                      badges={authenticatedUser.badges}
-                      displayUnclaimedAchievements
-                      displayNotifications
-                    />
-                  </div>
-                )}
-              </Column>
-            </Line>
-          )}
-          {currentTab === 'games-dashboard' && (
-            <GamesList project={currentProject} />
-          )}
-        </>
+              </div>
+            )}
+          </Column>
+        </Line>
       ) : (
         <Column noMargin expand justifyContent="center">
           <CreateProfile
-            onLogin={authenticatedUser.onLogin}
-            onCreateAccount={authenticatedUser.onCreateAccount}
+            onOpenLoginDialog={authenticatedUser.onOpenLoginDialog}
+            onOpenCreateAccountDialog={
+              authenticatedUser.onOpenCreateAccountDialog
+            }
             message={
               <Trans>
                 Create an account to register your games and to get access to
@@ -249,4 +244,14 @@ const ProfileDialog = ({ currentProject, open, onClose }: Props) => {
   );
 };
 
-export default ProfileDialog;
+const ProfileDialogWithErrorBoundary = (props: Props) => (
+  <ErrorBoundary
+    componentTitle={<Trans>Profile</Trans>}
+    scope="profile"
+    onClose={props.onClose}
+  >
+    <ProfileDialog {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfileDialogWithErrorBoundary;

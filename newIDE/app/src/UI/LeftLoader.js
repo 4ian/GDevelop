@@ -14,7 +14,15 @@ const LeftLoader = ({
   isLoading: ?boolean,
 }) => (
   <span>
-    {isLoading && <CircularProgress size={20} style={styles.progress} />}
+    {isLoading && (
+      <CircularProgress
+        // From size 20, this component applied to a Dialog button triggers glitches
+        // when rotating: the scrollbar appears and disappears each time the diagonal
+        // of the square box containing the round SVG is vertical.
+        size={18}
+        style={styles.progress}
+      />
+    )}
     {children}
   </span>
 );

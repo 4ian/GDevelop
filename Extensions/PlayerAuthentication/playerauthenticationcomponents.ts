@@ -34,6 +34,7 @@ namespace gdjs {
     ): {
       rootContainer: HTMLDivElement;
       loaderContainer: HTMLDivElement;
+      iframeContainer: HTMLDivElement;
     } {
       const rootContainer = document.createElement('div');
       rootContainer.id = 'authentication-root-container';
@@ -45,17 +46,17 @@ namespace gdjs {
       rootContainer.style.zIndex = '2';
       rootContainer.style.pointerEvents = 'all';
 
-      const subContainer = document.createElement('div');
-      subContainer.id = 'authentication-sub-container';
-      subContainer.style.backgroundColor = '#FFFFFF';
-      subContainer.style.position = 'absolute';
-      subContainer.style.top = '16px';
-      subContainer.style.bottom = '16px';
-      subContainer.style.left = '16px';
-      subContainer.style.right = '16px';
-      subContainer.style.borderRadius = '8px';
-      subContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
-      subContainer.style.padding = '16px';
+      const frameContainer = document.createElement('div');
+      frameContainer.id = 'authentication-frame-container';
+      frameContainer.style.backgroundColor = '#FFFFFF';
+      frameContainer.style.position = 'absolute';
+      frameContainer.style.top = '16px';
+      frameContainer.style.bottom = '16px';
+      frameContainer.style.left = '16px';
+      frameContainer.style.right = '16px';
+      frameContainer.style.borderRadius = '8px';
+      frameContainer.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.25)';
+      frameContainer.style.padding = '16px';
 
       const _closeContainer: HTMLDivElement = document.createElement('div');
       _closeContainer.style.cursor = 'pointer';
@@ -106,11 +107,57 @@ namespace gdjs {
 
       loaderContainer.appendChild(_loader);
 
-      subContainer.appendChild(_closeContainer);
-      subContainer.appendChild(loaderContainer);
-      rootContainer.appendChild(subContainer);
+      const iframeContainer: HTMLDivElement = document.createElement('div');
+      iframeContainer.style.display = 'flex';
+      iframeContainer.style.flexDirection = 'column';
+      iframeContainer.style.height = '100%';
+      iframeContainer.style.width = '100%';
+      iframeContainer.style.justifyContent = 'stretch';
+      iframeContainer.style.alignItems = 'stretch';
+      iframeContainer.style.display = 'none';
 
-      return { rootContainer, loaderContainer };
+      frameContainer.appendChild(_closeContainer);
+      frameContainer.appendChild(loaderContainer);
+      frameContainer.appendChild(iframeContainer);
+      rootContainer.appendChild(frameContainer);
+
+      return { rootContainer, loaderContainer, iframeContainer };
+    };
+
+    export const displayIframeInsideAuthenticationContainer = (
+      iframeContainer: HTMLDivElement,
+      loaderContainer: HTMLDivElement,
+      textContainer: HTMLDivElement,
+      url: string
+    ) => {
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute(
+        'sandbox',
+        'allow-forms allow-modals allow-orientation-lock allow-popups allow-same-origin allow-scripts'
+      );
+      iframe.addEventListener('load', () => {
+        iframeContainer.style.display = 'flex';
+        loaderContainer.style.display = 'none';
+      });
+      iframe.addEventListener('loaderror', () => {
+        addAuthenticationUrlToTextsContainer(() => {
+          // Try again.
+          iframeContainer.removeChild(iframe);
+          iframeContainer.style.display = 'none';
+          loaderContainer.style.display = 'flex';
+          displayIframeInsideAuthenticationContainer(
+            iframeContainer,
+            loaderContainer,
+            textContainer,
+            url
+          );
+        }, textContainer);
+      });
+      iframe.src = url;
+      iframe.style.flex = '1';
+      iframe.style.border = '0';
+
+      iframeContainer.appendChild(iframe);
     };
 
     /**
@@ -445,7 +492,7 @@ namespace gdjs {
      * Helper to add event listeners on a pressable/clickable element
      * to work on both desktop and mobile.
      */
-    export const addTouchAndClickEventListeners = function (
+    const addTouchAndClickEventListeners = function (
       element: HTMLElement,
       action: () => void
     ) {

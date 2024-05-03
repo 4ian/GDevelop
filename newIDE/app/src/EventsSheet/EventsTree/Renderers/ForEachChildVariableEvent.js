@@ -14,6 +14,7 @@ import {
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import SceneVariableField from '../../ParameterFields/SceneVariableField';
+import { type ParameterFieldInterface } from '../../ParameterFields/ParameterFieldCommons';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Trans } from '@lingui/macro';
@@ -54,9 +55,9 @@ export default class ForEachChildVariableEvent extends React.Component<
   EventRendererProps,
   State
 > {
-  _valueIteratorField: ?SceneVariableField = null;
-  _keyIteratorField: ?SceneVariableField = null;
-  _iterableField: ?SceneVariableField = null;
+  _valueIteratorField: ?ParameterFieldInterface = null;
+  _keyIteratorField: ?ParameterFieldInterface = null;
+  _iterableField: ?ParameterFieldInterface = null;
 
   state = {
     editingValueIteratorVariableName: false,
@@ -276,9 +277,10 @@ export default class ForEachChildVariableEvent extends React.Component<
         </div>
         <ConditionsActionsColumns
           leftIndentWidth={this.props.leftIndentWidth}
-          windowWidth={this.props.windowWidth}
+          windowSize={this.props.windowSize}
           renderConditionsList={({ style, className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getConditions()}
               style={style}
               className={className}
@@ -298,13 +300,17 @@ export default class ForEachChildVariableEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
           renderActionsList={({ className }) => (
             <InstructionsList
+              platform={this.props.project.getCurrentPlatform()}
               instrsList={forEachChildVariableEvent.getActions()}
               style={
                 {
@@ -328,9 +334,12 @@ export default class ForEachChildVariableEvent extends React.Component<
               disabled={this.props.disabled}
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
-              windowWidth={this.props.windowWidth}
+              windowSize={this.props.windowSize}
+              scope={this.props.scope}
+              resourcesManager={this.props.project.getResourcesManager()}
               globalObjectsContainer={this.props.globalObjectsContainer}
               objectsContainer={this.props.objectsContainer}
+              idPrefix={this.props.idPrefix}
             />
           )}
         />

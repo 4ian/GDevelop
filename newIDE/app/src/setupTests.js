@@ -36,4 +36,4 @@ beforeAll(done => {
 });
 
 // We increase the timeout for CIs (the default 5s can be too low sometimes, as a real browser is involved).
-jest.setTimeout(10000)
+jest.setTimeout(10000);

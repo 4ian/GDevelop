@@ -12,16 +12,21 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
 } from './PreferencesContext';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource';
+import type {
+  ResourceKind,
+  ResourceImportationBehavior,
+} from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import { type EditorTabsPersistedState } from '../EditorTabs/EditorTabsHandler';
 import {
   getBrowserLanguageOrLocale,
   setLanguageInDOM,
   selectLanguageOrLocale,
 } from '../../Utils/Language';
+import { CHECK_APP_UPDATES_TIMEOUT } from '../../Utils/GlobalFetchTimeouts';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -106,9 +111,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -132,32 +134,58 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
     getNewObjectDialogDefaultTab: this._getNewObjectDialogDefaultTab.bind(this),
     setNewObjectDialogDefaultTab: this._setNewObjectDialogDefaultTab.bind(this),
+    getShareDialogDefaultTab: this._getShareDialogDefaultTab.bind(this),
+    setShareDialogDefaultTab: this._setShareDialogDefaultTab.bind(this),
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
+    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
+      this
+    ),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
+    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
+      this
+    ),
     setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
       this
     ),
     getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
       this
     ),
+    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
+      this
+    ),
+    setUse3DEditor: this._setUse3DEditor.bind(this),
+    getUse3DEditor: this._getUse3DEditor.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
     setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
       this
     ),
+    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
+      this
+    ),
+    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
+      this
+    ),
+    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
+      this
+    ),
+    getEditorStateForProject: this._getEditorStateForProject.bind(this),
+    setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
 
   componentDidMount() {
-    setTimeout(() => this._checkUpdates(), 10000);
+    setTimeout(() => this._checkUpdates(), CHECK_APP_UPDATES_TIMEOUT);
   }
 
   _setLanguage(language: string) {
@@ -246,20 +274,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return tutorialProgresses[userIdKey];
   }
 
-  _setUseUndefinedVariablesInAutocompletion(
-    useUndefinedVariablesInAutocompletion: boolean
-  ) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          useUndefinedVariablesInAutocompletion,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
     this.setState(
       state => ({
@@ -310,12 +324,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setShowGetStartedSection(showGetStartedSection: boolean) {
+  _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          showGetStartedSection,
+          showGetStartedSectionByDefault,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -384,6 +398,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setUseShortcutToClosePreviewWindow(
+    useShortcutToClosePreviewWindow: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useShortcutToClosePreviewWindow,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _setShowCommunityExtensions(showCommunityExtensions: boolean) {
     this.setState(
       state => ({
@@ -410,6 +438,40 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _getShowEventBasedObjectsEditor() {
     return this.state.values.showEventBasedObjectsEditor;
+  }
+
+  _setShowDeprecatedInstructionWarning(
+    showDeprecatedInstructionWarning: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showDeprecatedInstructionWarning,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowDeprecatedInstructionWarning() {
+    return this.state.values.showDeprecatedInstructionWarning;
+  }
+
+  _setUse3DEditor(use3DEditor: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          use3DEditor,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getUse3DEditor() {
+    return this.state.values.use3DEditor;
   }
 
   _checkUpdates(forceDownload?: boolean) {
@@ -717,6 +779,19 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _getShareDialogDefaultTab() {
+    return this.state.values.shareDialogDefaultTab;
+  }
+
+  _setShareDialogDefaultTab(shareDialogDefaultTab: 'invite' | 'publish') {
+    this.setState(
+      state => ({
+        values: { ...state.values, shareDialogDefaultTab },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _getIsMenuBarHiddenInPreview() {
     return this.state.values.isMenuBarHiddenInPreview;
   }
@@ -739,6 +814,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, backdropClickBehavior },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setResourcesImporationBehavior(
+    resourcesImporationBehavior: ResourceImportationBehavior
+  ) {
+    this.setState(
+      state => ({
+        values: { ...state.values, resourcesImporationBehavior },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
@@ -778,6 +864,54 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           newProjectsDefaultStorageProviderName: newStorageProviderName,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setWatchProjectFolderFilesForLocalProjects(enable: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          watchProjectFolderFilesForLocalProjects: enable,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setNewFeaturesAcknowledgements(newFeaturesAcknowledgements: {
+    [featureId: string]: {| dates: [number] |},
+  }) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          newFeaturesAcknowledgements,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getEditorStateForProject(projectId: string) {
+    return this.state.values.editorStateByProject[projectId];
+  }
+
+  _setEditorStateForProject(
+    projectId: string,
+    editorState?: {| editorTabs: EditorTabsPersistedState |}
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          editorStateByProject: {
+            ...state.values.editorStateByProject,
+            [projectId]: editorState,
+          },
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

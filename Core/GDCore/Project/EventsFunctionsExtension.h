@@ -207,6 +207,13 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return dependencies;
   };
 
+  /**
+   * \brief Returns the list of dependencies.
+   */
+  const std::vector<gd::DependencyMetadata>& GetAllDependencies() const {
+    return dependencies;
+  };
+
   ///@}
 
   /** \name Serialization

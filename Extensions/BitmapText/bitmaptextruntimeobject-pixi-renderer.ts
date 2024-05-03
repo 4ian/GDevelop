@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The PIXI.js renderer for the Bitmap Text runtime object.
    */
@@ -120,7 +118,10 @@ namespace gdjs {
     }
 
     updateScale(): void {
-      this._pixiObject.scale.set(Math.max(this._object._scale, 0));
+      this._pixiObject.scale.set(
+        Math.max(this._object._scaleX, 0),
+        Math.max(this._object._scaleY, 0)
+      );
       this.updatePosition();
     }
 
@@ -131,7 +132,7 @@ namespace gdjs {
     updateWrappingWidth(): void {
       if (this._object._wordWrap) {
         this._pixiObject.maxWidth =
-          this._object._wrappingWidth / this._object._scale;
+          this._object._wrappingWidth / this._object._scaleX;
         this._pixiObject.dirty = true;
       } else {
         this._pixiObject.maxWidth = 0;

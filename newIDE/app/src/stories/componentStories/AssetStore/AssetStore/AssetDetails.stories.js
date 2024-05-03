@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import { AssetDetails } from '../../../../AssetStore/AssetDetails';
 import {
@@ -9,28 +8,40 @@ import {
   fakeAssetWithCustomObject,
 } from '../../../../fixtures/GDevelopServicesTestData';
 import { AssetStoreStateProvider } from '../../../../AssetStore/AssetStoreContext';
-import withMock from 'storybook-addon-mock';
 import { GDevelopUserApi } from '../../../../Utils/GDevelopServices/ApiConfigs';
 import PublicProfileProvider from '../../../../Profile/PublicProfileProvider';
+import { useShopNavigation } from '../../../../AssetStore/AssetStoreNavigator';
 
 export default {
   title: 'AssetStore/AssetStore/AssetDetails',
   component: AssetDetails,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
+};
+
+const Wrapper = ({ children }: { children: React.Node }) => {
+  const navigationState = useShopNavigation();
+  return (
+    <PublicProfileProvider>
+      <AssetStoreStateProvider shopNavigationState={navigationState}>
+        {children}
+      </AssetStoreStateProvider>
+    </PublicProfileProvider>
+  );
 };
 
 export const PublicAsset = () => {
   return (
-    <AssetStoreStateProvider>
+    <Wrapper>
       <AssetDetails
         onTagSelection={() => {}}
         assetShortHeader={fakeAssetShortHeader1}
         onOpenDetails={assetShortHeader => {}}
+        onPrivateAssetPackSelection={() => {}}
+        onPrivateGameTemplateSelection={() => {}}
       />
-    </AssetStoreStateProvider>
+    </Wrapper>
   );
 };
-PublicAsset.decorators = [withMock];
 PublicAsset.parameters = {
   mockData: [
     {
@@ -45,17 +56,16 @@ PublicAsset.parameters = {
 };
 
 export const PrivateAsset = () => (
-  <PublicProfileProvider>
-    <AssetStoreStateProvider>
-      <AssetDetails
-        onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader1}
-        onOpenDetails={assetShortHeader => {}}
-      />
-    </AssetStoreStateProvider>
-  </PublicProfileProvider>
+  <Wrapper>
+    <AssetDetails
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onOpenDetails={assetShortHeader => {}}
+      onPrivateAssetPackSelection={() => {}}
+      onPrivateGameTemplateSelection={() => {}}
+    />
+  </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {
@@ -70,6 +80,17 @@ PrivateAsset.parameters = {
           username: 'Clem',
           description: "I'm Clement\n\ntada",
           donateLink: 'https://ko-fi/clem',
+          discordUsername: 'indie-user#1234',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
       },
     },
@@ -89,17 +110,16 @@ PrivateAsset.parameters = {
 };
 
 export const AssetWithMultipleAuthors = () => (
-  <PublicProfileProvider>
-    <AssetStoreStateProvider>
-      <AssetDetails
-        onTagSelection={() => {}}
-        assetShortHeader={fakeAssetShortHeader1}
-        onOpenDetails={assetShortHeader => {}}
-      />
-    </AssetStoreStateProvider>
-  </PublicProfileProvider>
+  <Wrapper>
+    <AssetDetails
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onOpenDetails={assetShortHeader => {}}
+      onPrivateAssetPackSelection={() => {}}
+      onPrivateGameTemplateSelection={() => {}}
+    />
+  </Wrapper>
 );
-PrivateAsset.decorators = [withMock];
 PrivateAsset.parameters = {
   mockData: [
     {
@@ -114,12 +134,34 @@ PrivateAsset.parameters = {
           username: 'Clem',
           description: "I'm Clement\n\ntada",
           donateLink: 'https://ko-fi/clem',
+          discordUsername: 'indie-user#1234',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
         ABCWdIDmJzUA5iAWryEItxINA7n1: {
           id: 'ABCWdIDmJzUA5iAWryEItxINA7n1',
           username: 'Clem2',
           description: "I'm Clement 2\n\ntada",
           donateLink: 'https://ko-fi/clem2',
+          discordUsername: 'indie-user#12345',
+          personalWebsiteLink: 'https://indie-user.com',
+          personalWebsite2Link: 'https://indie-user2.com',
+          twitterUsername: 'indie-user',
+          facebookUsername: 'indie-user',
+          youtubeUsername: 'indie-user',
+          tiktokUsername: 'indie-user',
+          instagramUsername: 'indie-user',
+          redditUsername: 'indie-user',
+          snapchatUsername: 'indie-user',
+          discordServerLink: 'https://discord.gg/indie-user',
         },
       },
     },

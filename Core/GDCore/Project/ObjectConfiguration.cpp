@@ -5,11 +5,8 @@
  */
 #include "GDCore/Project/ObjectConfiguration.h"
 
-#include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/CustomBehavior.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"

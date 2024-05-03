@@ -15,7 +15,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
 
     expect(instancesSelection.hasSelectedInstances()).toBe(false);
@@ -24,7 +24,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
       ignoreSeal: true,
     });
 
@@ -54,17 +54,17 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance2OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance1OfObject2,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(3);
@@ -92,7 +92,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: true,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.hasSelectedInstances()).toBe(true);
     expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
@@ -142,17 +142,17 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstance({
       instance: instance1OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance2OfObject1,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     instancesSelection.selectInstance({
       instance: instance1OfObject2,
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       false
@@ -176,7 +176,7 @@ describe('InstancesSelection', () => {
     instancesSelection.selectInstances({
       instances: [instance1OfObject1, instance2OfObject1, instance1OfObject2],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
       true
@@ -205,7 +205,7 @@ describe('InstancesSelection', () => {
     instance3OfObject2.delete();
   });
 
-  it('handles deselecting instances explicitely', () => {
+  it('handles deselecting instances explicitly', () => {
     const instancesSelection = new InstancesSelection();
     const instance1OfObject1 = new gd.InitialInstance();
     instance1OfObject1.setObjectName('Object1');
@@ -228,7 +228,7 @@ describe('InstancesSelection', () => {
         instance3OfObject2,
       ],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
     expect(instancesSelection.isInstanceSelected(instance1OfObject2)).toBe(
       true
@@ -316,7 +316,7 @@ describe('InstancesSelection', () => {
         instance2OfObject2,
       ],
       multiSelect: false,
-      layersVisibility: null,
+      layersLocks: null,
     });
 
     instancesSelection.unselectInstancesOnLayer('Layer1');
@@ -352,5 +352,31 @@ describe('InstancesSelection', () => {
     instance1OfObject2.delete();
     instance2OfObject2.delete();
     instance3OfObject2.delete();
+  });
+
+  it('can clean non existing instances', () => {
+    const initialInstancesContainer = new gd.InitialInstancesContainer();
+    const instance1 = initialInstancesContainer.insertNewInitialInstance();
+    const instance2 = initialInstancesContainer.insertNewInitialInstance();
+    const instance3 = initialInstancesContainer.insertNewInitialInstance();
+    const instance4 = initialInstancesContainer.insertNewInitialInstance();
+
+    const instancesSelection = new InstancesSelection();
+    instancesSelection.selectInstances({
+      multiSelect: true,
+      instances: [instance1, instance2, instance3, instance4],
+      layersLocks: null,
+    });
+
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(4);
+    initialInstancesContainer.removeInstance(instance2);
+    initialInstancesContainer.removeInstance(instance4);
+
+    instancesSelection.cleanNonExistingInstances(initialInstancesContainer);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
+    expect(instancesSelection.getSelectedInstances()).toContain(instance1);
+    expect(instancesSelection.getSelectedInstances()).toContain(instance3);
+
+    initialInstancesContainer.delete();
   });
 });

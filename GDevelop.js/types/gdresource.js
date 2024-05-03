@@ -4,8 +4,8 @@ declare class gdResource {
   clone(): gdResource;
   setName(name: string): void;
   getName(): string;
-  setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset'): void;
-  getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset';
+  setKind(kind: 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine'): void;
+  getKind(): 'image' | 'audio' | 'font' | 'video' | 'json' | 'tilemap' | 'tileset' | 'model3D' | 'atlas' | 'spine';
   isUserAdded(): boolean;
   setUserAdded(yes: boolean): void;
   useFile(): boolean;

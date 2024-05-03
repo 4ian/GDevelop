@@ -1,11 +1,6 @@
 // @ts-check
 describe('gdjs.DraggableRuntimeBehavior', function () {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: { resources: [] },
-    // @ts-ignore
-    properties: { windowWidth: 800, windowHeight: 600 },
-  });
+  const runtimeGame = gdjs.getPixiRuntimeGame();
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [
@@ -32,6 +27,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
     behaviorsSharedData: [],
     objects: [],
     instances: [],
+    usedResources: [],
   });
 
   var object = new gdjs.TestRuntimeObject(runtimeScene, {

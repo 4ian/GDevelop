@@ -1,8 +1,7 @@
 import { integer, float } from '../model/CommonTypes';
 import { EditableTileMap } from '../model/TileMapModel';
-import { TileMap } from '../types';
+import { TileMapFileContent } from '../load/TileMapFileContent';
 import { TileTextureCache } from './TileTextureCache';
-import PIXI = GlobalPIXIModule.PIXI;
 export declare namespace PixiTileMapHelper {
   /**
    * Split an atlas image into Pixi textures.
@@ -14,7 +13,7 @@ export declare namespace PixiTileMapHelper {
    * @returns A textures cache.
    */
   function parseAtlas(
-    tileMap: TileMap,
+    tileMap: TileMapFileContent,
     levelIndex: number,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>

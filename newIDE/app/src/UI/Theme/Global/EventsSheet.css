@@ -108,6 +108,10 @@
   border-left: var(--event-sheet-sub-instructions-border);
 }
 
+.gd-events-sheet .warning-instruction {
+  background-color: var(--event-sheet-warning-instruction-background-color);
+}
+
 /**
  * Instructions parameters color scheme
  */
@@ -115,8 +119,25 @@
   color: var(--event-sheet-instruction-parameter-base-color);
 }
 
-.gd-events-sheet .instruction-parameter.expression {
-  color: var(--event-sheet-instruction-parameter-expression-color);
+.gd-events-sheet .instruction-parameter.number {
+  color: var(--event-sheet-instruction-parameter-number-color);
+}
+
+.gd-events-sheet .instruction-missing {
+  text-decoration: var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
+
+.gd-events-sheet .instruction-missing .function-name {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  font-weight: bold;
+}
+.gd-events-sheet .instruction-missing .behavior-name {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  font-weight: bold;
+}
+.gd-events-sheet .instruction-missing .extension-name {
+  user-select: all;
+  font-weight: bold;
 }
 
 .gd-events-sheet .instruction-parameter.object,
@@ -161,9 +182,9 @@
 .gd-events-sheet .instruction-parameter .instruction-missing-parameter {
   display: inline-flex;
   background-color: var(--event-sheet-instruction-parameter-error-background-color);
-  border-bottom: 1px dashed  var(--event-sheet-instruction-parameter-error-color);
-  min-width: 25px;
-  min-height: 14px;
+  border-bottom: 1px dashed var(--event-sheet-instruction-parameter-error-color);
+  min-width: var(--instruction-missing-parameter-min-width);
+  min-height: var(--instruction-missing-parameter-min-height);
 }
 
 /**

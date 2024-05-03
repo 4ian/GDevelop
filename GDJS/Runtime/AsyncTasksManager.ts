@@ -73,13 +73,11 @@ namespace gdjs {
    */
   export abstract class ObjectBoundTask extends AsyncTask {
     public readonly objectInstance: RuntimeObject;
-    private hasBeenDeleted = false;
 
     constructor(objectInstance: RuntimeObject) {
       super();
       this.objectInstance = objectInstance;
       objectInstance.registerDestroyCallback(() => {
-        this.hasBeenDeleted = true;
         this.onObjectDeleted();
 
         // @ts-ignore At this point, the subclass code will not be called again,
@@ -92,7 +90,7 @@ namespace gdjs {
     /** The update method is handled by `ObjectBoundTask` - override `shouldResolve` instead. */
     update(runtimeScene: RuntimeScene) {
       // Force resolve if the object has been deleted from the scene
-      if (this.hasBeenDeleted) return true;
+      if (this.objectInstance === null) return true;
       // Else, delegate the resolve check to the subclass
       return this.shouldResolve(runtimeScene);
     }
@@ -169,6 +167,18 @@ ${error ? 'The following error was thrown: ' + error : ''}`
     }
 
     update() {
+      return this.isResolved;
+    }
+  }
+
+  export class ManuallyResolvableTask extends AsyncTask {
+    private isResolved = false;
+
+    resolve() {
+      this.isResolved = true;
+    }
+
+    update(): boolean {
       return this.isResolved;
     }
   }

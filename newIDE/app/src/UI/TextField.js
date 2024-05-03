@@ -1,16 +1,21 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import IconButton from '@material-ui/core/IconButton';
 import MUITextField from '@material-ui/core/TextField';
+import { type FieldFocusFunction } from '../EventsSheet/ParameterFields/ParameterFieldCommons';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Visibility from './CustomSvgIcons/Visibility';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
-import { useShouldAutofocusInput } from './Reponsive/ScreenTypeMeasurer';
+import { useShouldAutofocusInput } from './Responsive/ScreenTypeMeasurer';
+import { dataObjectToProps, type HTMLDataset } from '../Utils/HTMLDataset';
 
 type ValueProps =
-  // Support "text" and "password" type:
+  // Support "text", "password" and "email" type:
+  // "email" type is used to display appropriate keyboard on mobile.
   | {|
-      type?: 'text' | 'password' | 'search',
+      type?: 'text' | 'password' | 'email',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},
@@ -52,6 +57,7 @@ type Props = {|
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
+  stopContextMenuPropagation?: boolean,
 
   // Error handling/Validation:
   errorText?: React.Node,
@@ -69,6 +75,7 @@ type Props = {|
   hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
+  dataset?: HTMLDataset,
 
   // Keyboard focus:
   autoFocus?: 'desktop' | 'desktopAndMobileDevices',
@@ -89,12 +96,13 @@ type Props = {|
 
   // Support for adornments:
   endAdornment?: ?React.Node,
+  startAdornment?: ?React.Node,
 
   // Styling:
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18 | '1.3em',
+    fontSize?: 12 | 14 | 18 | '1.3em' | 'inherit', // 'inherit' should only be used on an event sheet where font size is adapted to zoom.
     fontStyle?: 'normal' | 'italic',
     width?: number | '30%' | '70%' | '100%',
     flex?: 1,
@@ -105,14 +113,12 @@ type Props = {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,
     WebkitTextFillColor?: string,
-    fontSize?: '1em',
+    fontSize?: '1em' | 14,
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
-    lineHeight?: 1.4 | 1.5,
     padding?: 0,
   |},
-  underlineFocusStyle?: {| borderColor: string |}, // TODO
   underlineShow?: boolean,
 |};
 
@@ -168,10 +174,11 @@ export const computeTextFieldStyleProps = (props: {
 };
 
 export type TextFieldInterface = {|
-  focus: () => void,
+  focus: FieldFocusFunction,
   blur: () => void,
   getInputNode: () => ?HTMLInputElement,
   getFieldWidth: () => ?number,
+  getCaretPosition: () => ?number,
 |};
 
 /**
@@ -180,10 +187,29 @@ export type TextFieldInterface = {|
 const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
   const inputRef = React.useRef<?HTMLInputElement>(null);
   const muiTextFieldRef = React.useRef<?MUITextField>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = React.useState<boolean>(
+    false
+  );
 
-  const focus = () => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+  const focus: FieldFocusFunction = options => {
+    const { current: input } = inputRef;
+    if (input) {
+      input.focus();
+
+      if (options && options.selectAll) {
+        input.select();
+      }
+
+      if (options && options.caretPosition === 'end' && props.value) {
+        input.setSelectionRange(
+          props.value.toString().length,
+          props.value.toString().length
+        );
+      }
+      if (options && Number.isInteger(options.caretPosition) && props.value) {
+        const position = Number(options.caretPosition);
+        input.setSelectionRange(position, position);
+      }
     }
   };
 
@@ -208,11 +234,19 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
     return null;
   };
 
+  const getCaretPosition = () => {
+    if (inputRef.current) {
+      return inputRef.current.selectionStart;
+    }
+    return null;
+  };
+
   React.useImperativeHandle(ref, () => ({
     focus,
     blur,
     getInputNode,
     getFieldWidth,
+    getCaretPosition,
   }));
 
   const onChange = props.onChange || undefined;
@@ -235,13 +269,26 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
           ref={muiTextFieldRef}
           color="secondary"
           // Value and change handling:
-          type={props.type !== undefined ? props.type : undefined}
+          type={
+            props.type !== undefined
+              ? props.type === 'password'
+                ? isPasswordVisible
+                  ? 'text'
+                  : 'password'
+                : props.type
+              : undefined
+          }
           value={props.value !== undefined ? props.value : undefined}
           defaultValue={
             props.defaultValue !== undefined ? props.defaultValue : undefined
           }
           onChange={
             onChange ? event => onChange(event, event.target.value) : undefined
+          }
+          onContextMenu={
+            props.stopContextMenuPropagation
+              ? e => e.stopPropagation()
+              : undefined
           }
           // Error handling:
           error={!!props.errorText}
@@ -276,6 +323,7 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
             style: {
               fontSize: props.style ? props.style.fontSize : undefined,
               fontStyle: props.style ? props.style.fontStyle : undefined,
+              padding: props.style ? props.style.padding : undefined,
             },
             readOnly: props.readOnly,
             inputProps: {
@@ -289,12 +337,34 @@ const TextField = React.forwardRef<Props, TextFieldInterface>((props, ref) => {
               max: props.max,
               min: props.min,
               step: props.step,
+              autoCapitalize: 'off', // For Safari iOS, avoid auto-capitalization
               style: props.inputStyle,
+              ...dataObjectToProps(props.dataset),
             },
             // Input adornment:
-            endAdornment: props.endAdornment ? (
-              <InputAdornment position="end">
-                {props.endAdornment}
+            endAdornment:
+              props.type !== undefined && props.type === 'password' ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                  >
+                    <Visibility />
+                  </IconButton>
+                </InputAdornment>
+              ) : props.endAdornment ? (
+                <InputAdornment
+                  position="end"
+                  style={props.multiline ? { marginTop: -17 } : undefined}
+                >
+                  {props.endAdornment}
+                </InputAdornment>
+              ) : (
+                undefined
+              ),
+            startAdornment: props.startAdornment ? (
+              <InputAdornment position="start">
+                {props.startAdornment}
               </InputAdornment>
             ) : (
               undefined

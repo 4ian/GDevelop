@@ -5,13 +5,12 @@ import { FileToCloudProjectResourceUploader } from '../../../ResourcesList/FileT
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import paperDecorator from '../../PaperDecorator';
-import muiDecorator from '../../ThemeDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../../GDevelopJsInitializerDecorator';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
@@ -20,11 +19,11 @@ const gd: libGDevelop = global.gd;
 export default {
   title: 'ResourcesList/FileToCloudProjectResourceUploader',
   component: FileToCloudProjectResourceUploader,
-  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [paperDecorator, GDevelopJsInitializerDecorator],
 };
 
 export const Default = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -36,12 +35,31 @@ export const Default = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput={false}
+    />
+  </AuthenticatedUserContext.Provider>
+);
+
+export const AutomaticallyOpenInput = () => (
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+    <FileToCloudProjectResourceUploader
+      project={testProject.project}
+      createNewResource={() => new gd.ImageResource()}
+      onChooseResources={action('onChooseResources')}
+      options={{
+        initialSourceName: 'unused',
+        multiSelection: true,
+        resourceKind: 'image',
+      }}
+      fileMetadata={{ fileIdentifier: 'fake-identifier' }}
+      getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput
     />
   </AuthenticatedUserContext.Provider>
 );
 
 export const SingleFile = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -53,12 +71,13 @@ export const SingleFile = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => CloudStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );
 
 export const IncompatibleStorageProvider = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -70,14 +89,13 @@ export const IncompatibleStorageProvider = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => UrlStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );
 
 export const NotAuthenticatedUser = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <FileToCloudProjectResourceUploader
       project={testProject.project}
       createNewResource={() => new gd.ImageResource()}
@@ -89,6 +107,7 @@ export const NotAuthenticatedUser = () => (
       }}
       fileMetadata={{ fileIdentifier: 'fake-identifier' }}
       getStorageProvider={() => UrlStorageProvider}
+      automaticallyOpenInput={false}
     />
   </AuthenticatedUserContext.Provider>
 );

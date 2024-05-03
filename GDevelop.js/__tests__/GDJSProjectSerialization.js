@@ -7,13 +7,9 @@ const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS project serialization tests', function () {
   let gd = null;
-
-  beforeAll((done) => {
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      makeTestExtensions(gd);
-      done();
-    });
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+    makeTestExtensions(gd);
   });
 
   it('should keep TextObject configuration after after a save and reload', function () {
@@ -23,7 +19,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
       );
-      expect(configuration.getString()).toBe('Hello');
+      expect(configuration.getText()).toBe('Hello');
     };
 
     const serializerElement = new gd.SerializerElement();
@@ -39,7 +35,7 @@ describe('libGD.js - GDJS project serialization tests', function () {
       const configuration = gd.asTextObjectConfiguration(
         object.getConfiguration()
       );
-      configuration.setString('Hello');
+      configuration.setText('Hello');
 
       checkConfiguration(project);
       project.serializeTo(serializerElement);

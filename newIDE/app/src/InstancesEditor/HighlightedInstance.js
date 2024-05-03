@@ -7,7 +7,9 @@ import Rectangle from '../Utils/Rectangle';
 export default class HighlightedInstance {
   instanceMeasurer: InstanceMeasurer;
   toCanvasCoordinates: (x: number, y: number) => [number, number];
+  isInstanceOf3DObject: gdInitialInstance => boolean;
   highlightedInstance: gdInitialInstance | null;
+  isHighlightedInstanceOf3DObject: boolean;
   highlightRectangle: PIXI.Container;
   tooltipBackground: PIXI.Container;
   tooltipText: PIXI.Container;
@@ -15,14 +17,18 @@ export default class HighlightedInstance {
   constructor({
     instanceMeasurer,
     toCanvasCoordinates,
+    isInstanceOf3DObject,
   }: {
     instanceMeasurer: InstanceMeasurer,
     toCanvasCoordinates: (x: number, y: number) => [number, number],
+    isInstanceOf3DObject: gdInitialInstance => boolean,
   }) {
     this.instanceMeasurer = instanceMeasurer;
     this.toCanvasCoordinates = toCanvasCoordinates;
+    this.isInstanceOf3DObject = isInstanceOf3DObject;
 
     this.highlightedInstance = null;
+    this.isHighlightedInstanceOf3DObject = false;
     this.highlightRectangle = new PIXI.Graphics();
     this.highlightRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
 
@@ -37,6 +43,9 @@ export default class HighlightedInstance {
   }
 
   setInstance(instance: gdInitialInstance | null) {
+    this.isHighlightedInstanceOf3DObject = instance
+      ? this.isInstanceOf3DObject(instance)
+      : false;
     this.highlightedInstance = instance;
   }
 
@@ -84,13 +93,19 @@ export default class HighlightedInstance {
       Math.round(highlightedInstance.getX() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
       '  Y: ' +
       Math.round(highlightedInstance.getY() * 100) / 100 + // An instance position can have a lot of decimals, so round to 2 decimals.
+      (this.isHighlightedInstanceOf3DObject
+        ? '  Z: ' +
+          // An instance position can have a lot of decimals, so round to 2 decimals.
+          Math.round(highlightedInstance.getZ() * 100) / 100
+        : '') +
       '\n' +
       'Layer: ' +
       (highlightedInstance.getLayer() || 'Base layer') +
-      '\n' +
-      'Z: ' +
-      highlightedInstance.getZOrder() +
+      (this.isHighlightedInstanceOf3DObject
+        ? ''
+        : '\nZ order: ' + highlightedInstance.getZOrder()) +
       '\n';
+
     this.tooltipText.text = tooltipInfo;
 
     this.tooltipText.x = Math.round(

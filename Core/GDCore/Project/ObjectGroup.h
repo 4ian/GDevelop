@@ -8,7 +8,9 @@
 #define GDCORE_OBJECTGROUP_H
 #include <utility>
 #include <vector>
+
 #include "GDCore/String.h"
+
 namespace gd {
 class SerializerElement;
 }

@@ -1,13 +1,13 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import ResourcesList from '../ResourcesList';
-import ResourcePropertiesEditor from './ResourcePropertiesEditor';
+import ResourcePropertiesEditor, {
+  type ResourcePropertiesEditorInterface,
+} from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
-import EditorMosaic from '../UI/EditorMosaic';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
+import EditorMosaic, { type EditorMosaicInterface } from '../UI/EditorMosaic';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -16,12 +16,20 @@ import {
   type ResourceManagementProps,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
+import { type FileMetadata } from '../ProjectsStorage';
 import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
+import type { StorageProvider } from '../ProjectsStorage';
+import {
+  registerOnResourceExternallyChangedCallback,
+  unregisterOnResourceExternallyChangedCallback,
+} from '../MainFrame/ResourcesWatcher';
 
 const gd: libGDevelop = global.gd;
 
-const electron = optionalRequire('electron');
-const shell = electron ? electron.shell : null;
+// It's important to use remote and not electron for folder actions,
+// otherwise they will be opened in the background.
+// See https://github.com/electron/electron/issues/4349#issuecomment-777475765
+const remote = optionalRequire('@electron/remote');
 const path = optionalRequire('path');
 const styles = {
   container: {
@@ -33,7 +41,6 @@ const styles = {
 };
 
 type State = {|
-  showPropertiesInfoBar: boolean,
   selectedResource: ?gdResource,
 |};
 
@@ -47,6 +54,8 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   resourceManagementProps: ResourceManagementProps,
+  fileMetadata: ?FileMetadata,
+  storageProvider: StorageProvider,
 |};
 
 const initialMosaicEditorNodes = {
@@ -60,32 +69,52 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   static defaultProps = {
     setToolbar: () => {},
   };
-
-  editorMosaic: ?EditorMosaic = null;
-  _propertiesEditor: ?ResourcePropertiesEditor = null;
+  resourceExternallyChangedCallbackId: ?string;
+  editorMosaic: ?EditorMosaicInterface = null;
+  _propertiesEditor: ?ResourcePropertiesEditorInterface = null;
   _resourcesList: ?ResourcesList = null;
   resourcesLoader = ResourcesLoader;
   state = {
-    showPropertiesInfoBar: false,
     selectedResource: null,
   };
+
+  componentDidMount() {
+    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
+      this.onResourceExternallyChanged.bind(this)
+    );
+  }
+  componentWillUnmount() {
+    unregisterOnResourceExternallyChangedCallback(
+      this.resourceExternallyChangedCallbackId
+    );
+  }
 
   refreshResourcesList() {
     if (this._resourcesList) this._resourcesList.forceUpdate();
   }
 
-  updateToolbar() {
+  updateToolbar = () => {
+    const openedEditorNames = this.editorMosaic
+      ? this.editorMosaic.getOpenedEditorNames()
+      : [];
+
     this.props.setToolbar(
       <Toolbar
         onOpenProjectFolder={this.openProjectFolder}
-        onOpenProperties={this.openProperties}
+        canOpenProjectFolder={
+          !!remote &&
+          !!this.props.fileMetadata &&
+          this.props.storageProvider.internalName === 'LocalFile'
+        }
+        onToggleProperties={this.toggleProperties}
+        isPropertiesShown={openedEditorNames.includes('properties')}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
           this.deleteResource(this.state.selectedResource)
         }
       />
     );
-  }
+  };
 
   deleteResource = (resource: ?gdResource) => {
     const { project, onDeleteResource } = this.props;
@@ -179,17 +208,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   openProjectFolder = () => {
-    const project = this.props.project;
-    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
+    if (remote)
+      remote.shell.openPath(path.dirname(this.props.project.getProjectFile()));
   };
 
-  openProperties = () => {
+  toggleProperties = () => {
     if (!this.editorMosaic) return;
-    if (!this.editorMosaic.openEditor('properties', 'start', 66, 'column')) {
-      this.setState({
-        showPropertiesInfoBar: true,
-      });
-    }
+    this.editorMosaic.toggleEditor('properties', 'start', 66, 'column');
   };
 
   _onResourceSelected = (selectedResource: ?gdResource) => {
@@ -204,9 +229,22 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   };
 
+  onResourceExternallyChanged = (resourceInfo: {| identifier: string |}) => {
+    if (this._propertiesEditor) {
+      this._propertiesEditor.forceUpdate();
+    }
+    this.refreshResourcesList();
+  };
+
   render() {
-    const { project, onRenameResource, resourceManagementProps } = this.props;
+    const {
+      project,
+      onRenameResource,
+      resourceManagementProps,
+      fileMetadata,
+    } = this.props;
     const { selectedResource } = this.state;
+    const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
 
     const editors = {
       properties: {
@@ -236,6 +274,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         renderEditor: () => (
           <ResourcesList
             project={project}
+            fileMetadata={fileMetadata}
             onDeleteResource={this.deleteResource}
             onRenameResource={onRenameResource}
             onSelectResource={this._onResourceSelected}
@@ -244,6 +283,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={
               this._removeAllResourcesWithInvalidPath
+            }
+            getResourceActionsSpecificToStorageProvider={
+              resourcesActionsMenuBuilder
             }
           />
         ),
@@ -261,22 +303,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
                 getDefaultEditorMosaicNode('resources-editor') ||
                 initialMosaicEditorNodes
               }
+              onOpenedEditorsChanged={this.updateToolbar}
               onPersistNodes={node =>
                 setDefaultEditorMosaicNode('resources-editor', node)
               }
             />
           )}
         </PreferencesContext.Consumer>
-        <DismissableInfoBar
-          message={
-            <Trans>
-              Properties panel is already opened. After selecting a resource,
-              inspect and change its properties from this panel.
-            </Trans>
-          }
-          show={!!this.state.showPropertiesInfoBar}
-          identifier="resource-properties-panel-explanation"
-        />
       </div>
     );
   }

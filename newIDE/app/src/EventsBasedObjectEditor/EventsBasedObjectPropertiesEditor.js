@@ -7,24 +7,26 @@ import * as React from 'react';
 import { Column, Line } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar from '../UI/MiniToolbar';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import { getMeasurementUnitShortLabel } from '../PropertiesEditor/PropertiesMapToSchema';
+import Visibility from '../UI/CustomSvgIcons/Visibility';
+import VisibilityOff from '../UI/CustomSvgIcons/VisibilityOff';
+import Add from '../UI/CustomSvgIcons/Add';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 
 const gd: libGDevelop = global.gd;
 
@@ -34,6 +36,7 @@ type Props = {|
   eventsBasedObject: gdEventsBasedObject,
   onPropertiesUpdated?: () => void,
   onRenameProperty: (oldName: string, newName: string) => void,
+  onEventsFunctionsAdded: () => void,
 |};
 
 const styles = {
@@ -42,46 +45,29 @@ const styles = {
   },
 };
 
-const validatePropertyName = (
-  i18n: I18nType,
-  properties: gdNamedPropertyDescriptorsList,
-  newName: string
-) => {
-  if (!newName) {
-    showWarningBox(i18n._(t`The name of a property cannot be empty.`), {
-      delayToNextTick: true,
-    });
-    return false;
-  }
-  if (newName === 'name' || newName === 'type') {
-    showWarningBox(
-      i18n._(
-        t`The name of a property cannot be "name" or "type", as they are used by GDevelop internally.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (properties.has(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is already used by another property. Choose a unique name for each property.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
-  if (!gd.Project.validateName(newName)) {
-    showWarningBox(
-      i18n._(
-        t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-      ),
-      { delayToNextTick: true }
-    );
-    return false;
-  }
+// Those names are used internally by GDevelop.
+const PROTECTED_PROPERTY_NAMES = ['name', 'type'];
 
-  return true;
+const getValidatedPropertyName = (
+  i18n: I18nType,
+  properties: gdPropertiesContainer,
+  newName: string
+): string => {
+  const safeAndUniqueNewName = newNameGenerator(
+    gd.Project.getSafeName(newName),
+    tentativeNewName => {
+      if (
+        properties.has(tentativeNewName) ||
+        PROTECTED_PROPERTY_NAMES.includes(tentativeNewName)
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+  );
+
+  return safeAndUniqueNewName;
 };
 
 const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
@@ -89,75 +75,94 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
   return extraInfoVector.toJSArray();
 };
 
-export default class EventsBasedObjectPropertiesEditor extends React.Component<
-  Props,
-  {||}
-> {
-  _addProperty = () => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+export default function EventsBasedObjectPropertiesEditor({
+  project,
+  extension,
+  eventsBasedObject,
+  onPropertiesUpdated,
+  onRenameProperty,
+  onEventsFunctionsAdded,
+}: Props) {
+  const scrollView = React.useRef<?ScrollViewInterface>(null);
 
-    const newName = newNameGenerator('Property', name => properties.has(name));
-    const property = properties.insertNew(newName, properties.getCount());
-    property.setType('Number');
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
+  const forceUpdate = useForceUpdate();
 
-  _removeProperty = (name: string) => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const addProperty = React.useCallback(
+    () => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    properties.remove(name);
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
-
-  _moveProperty = (oldIndex: number, newIndex: number) => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
-
-    properties.move(oldIndex, newIndex);
-    this.forceUpdate();
-    this.props.onPropertiesUpdated && this.props.onPropertiesUpdated();
-  };
-
-  _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
-    return (newExtraInfo: Array<string>) => {
-      const defaultValueIndex = getExtraInfoArray(property).indexOf(
-        property.getValue()
+      const newName = newNameGenerator('Property', name =>
+        properties.has(name)
       );
-      const vectorString = new gd.VectorString();
-      newExtraInfo.forEach(item => vectorString.push_back(item));
-      property.setExtraInfo(vectorString);
-      vectorString.delete();
-      property.setValue(newExtraInfo[defaultValueIndex] || '');
-      this.forceUpdate();
-    };
-  };
+      const property = properties.insertNew(newName, properties.getCount());
+      property.setType('Number');
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-  _getPropertyGroupNames = (): Array<string> => {
-    const { eventsBasedObject } = this.props;
-    const properties = eventsBasedObject.getPropertyDescriptors();
+  const removeProperty = React.useCallback(
+    (name: string) => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const groupNames = new Set<string>();
-    for (let i = 0; i < properties.size(); i++) {
-      const property = properties.at(i);
-      const group = property.getGroup() || '';
-      groupNames.add(group);
-    }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));
-  };
+      properties.remove(name);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-  render() {
-    const { eventsBasedObject } = this.props;
+  const moveProperty = React.useCallback(
+    (oldIndex: number, newIndex: number) => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
 
-    const properties = eventsBasedObject.getPropertyDescriptors();
+      properties.move(oldIndex, newIndex);
+      forceUpdate();
+      onPropertiesUpdated && onPropertiesUpdated();
+    },
+    [eventsBasedObject, forceUpdate, onPropertiesUpdated]
+  );
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <Column noMargin expand>
+  const setChoiceExtraInfo = React.useCallback(
+    (property: gdNamedPropertyDescriptor) => {
+      return (newExtraInfo: Array<string>) => {
+        const defaultValueIndex = getExtraInfoArray(property).indexOf(
+          property.getValue()
+        );
+        const vectorString = new gd.VectorString();
+        newExtraInfo.forEach(item => vectorString.push_back(item));
+        property.setExtraInfo(vectorString);
+        vectorString.delete();
+        property.setValue(newExtraInfo[defaultValueIndex] || '');
+        forceUpdate();
+      };
+    },
+    [forceUpdate]
+  );
+
+  const getPropertyGroupNames = React.useCallback(
+    (): Array<string> => {
+      const properties = eventsBasedObject.getPropertyDescriptors();
+
+      const groupNames = new Set<string>();
+      for (let i = 0; i < properties.size(); i++) {
+        const property = properties.at(i);
+        const group = property.getGroup() || '';
+        groupNames.add(group);
+      }
+      return [...groupNames].sort((a, b) => a.localeCompare(b));
+    },
+    [eventsBasedObject]
+  );
+
+  const properties = eventsBasedObject.getPropertyDescriptors();
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin expand useFullHeight>
+          <ScrollView ref={scrollView}>
             <Line noMargin>
               <div style={styles.propertiesContainer}>
                 {mapVector(
@@ -173,20 +178,20 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                             value={property.getName()}
                             onChange={newName => {
                               if (newName === property.getName()) return;
-                              if (
-                                !validatePropertyName(i18n, properties, newName)
-                              )
-                                return;
 
-                              this.props.onRenameProperty(
-                                property.getName(),
+                              const validatedNewName = getValidatedPropertyName(
+                                i18n,
+                                properties,
                                 newName
                               );
+                              onRenameProperty(
+                                property.getName(),
+                                validatedNewName
+                              );
+                              property.setName(validatedNewName);
 
-                              property.setName(newName);
-                              this.forceUpdate();
-                              this.props.onPropertiesUpdated &&
-                                this.props.onPropertiesUpdated();
+                              forceUpdate();
+                              onPropertiesUpdated && onPropertiesUpdated();
                             }}
                             fullWidth
                           />
@@ -202,9 +207,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           checked={!property.isHidden()}
                           onCheck={(e, checked) => {
                             property.setHidden(!checked);
-                            this.forceUpdate();
-                            this.props.onPropertiesUpdated &&
-                              this.props.onPropertiesUpdated();
+                            forceUpdate();
+                            onPropertiesUpdated && onPropertiesUpdated();
                           }}
                           checkedIcon={<Visibility />}
                           uncheckedIcon={<VisibilityOff />}
@@ -218,31 +222,32 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           buildMenuTemplate={(i18n: I18nType) => [
                             {
                               label: i18n._(t`Delete`),
-                              click: () =>
-                                this._removeProperty(property.getName()),
+                              click: () => removeProperty(property.getName()),
                             },
                             { type: 'separator' },
                             {
                               label: i18n._(t`Move up`),
-                              click: () => this._moveProperty(i, i - 1),
+                              click: () => moveProperty(i, i - 1),
                               enabled: i - 1 >= 0,
                             },
                             {
                               label: i18n._(t`Move down`),
-                              click: () => this._moveProperty(i, i + 1),
+                              click: () => moveProperty(i, i + 1),
                               enabled: i + 1 < properties.getCount(),
                             },
                             {
                               label: i18n._(t`Generate expression and action`),
-                              click: () =>
+                              click: () => {
                                 gd.PropertyFunctionGenerator.generateObjectGetterAndSetter(
-                                  this.props.project,
-                                  this.props.extension,
-                                  this.props.eventsBasedObject,
+                                  project,
+                                  extension,
+                                  eventsBasedObject,
                                   property
-                                ),
+                                );
+                                onEventsFunctionsAdded();
+                              },
                               enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                this.props.eventsBasedObject,
+                                eventsBasedObject,
                                 property
                               ),
                             },
@@ -257,33 +262,68 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getType()}
                               onChange={(e, i, value: string) => {
                                 property.setType(value);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
                               fullWidth
                             >
-                              <SelectOption
-                                value="Number"
-                                primaryText={t`Number`}
-                              />
-                              <SelectOption
-                                value="String"
-                                primaryText={t`String`}
-                              />
+                              <SelectOption value="Number" label={t`Number`} />
+                              <SelectOption value="String" label={t`String`} />
                               <SelectOption
                                 value="Boolean"
-                                primaryText={t`Boolean (checkbox)`}
+                                label={t`Boolean (checkbox)`}
                               />
                               <SelectOption
                                 value="Choice"
-                                primaryText={t`String from a list of options (text)`}
+                                label={t`String from a list of options (text)`}
                               />
                               <SelectOption
                                 value="Color"
-                                primaryText={t`Color (text)`}
+                                label={t`Color (text)`}
                               />
                             </SelectField>
+                            {property.getType() === 'Number' && (
+                              <SelectField
+                                floatingLabelText={
+                                  <Trans>Measurement unit</Trans>
+                                }
+                                value={property.getMeasurementUnit().getName()}
+                                onChange={(e, i, value: string) => {
+                                  property.setMeasurementUnit(
+                                    gd.MeasurementUnit.getDefaultMeasurementUnitByName(
+                                      value
+                                    )
+                                  );
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              >
+                                {mapFor(
+                                  0,
+                                  gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
+                                  i => {
+                                    const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                      i
+                                    );
+                                    const unitShortLabel = getMeasurementUnitShortLabel(
+                                      measurementUnit
+                                    );
+                                    const label =
+                                      measurementUnit.getLabel() +
+                                      (unitShortLabel.length > 0
+                                        ? ' — ' + unitShortLabel
+                                        : '');
+                                    return (
+                                      <SelectOption
+                                        value={measurementUnit.getName()}
+                                        label={label}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </SelectField>
+                            )}
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
                               <SemiControlledTextField
@@ -297,9 +337,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 value={property.getValue()}
                                 onChange={newValue => {
                                   property.setValue(newValue);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               />
@@ -314,19 +353,18 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 }
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
                                 <SelectOption
                                   value="true"
-                                  primaryText={t`True (checked)`}
+                                  label={t`True (checked)`}
                                 />
                                 <SelectOption
                                   value="false"
-                                  primaryText={t`False (not checked)`}
+                                  label={t`False (not checked)`}
                                 />
                               </SelectField>
                             )}
@@ -336,9 +374,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                 value={property.getValue()}
                                 onChange={(e, i, value) => {
                                   property.setValue(value);
-                                  this.forceUpdate();
-                                  this.props.onPropertiesUpdated &&
-                                    this.props.onPropertiesUpdated();
+                                  forceUpdate();
+                                  onPropertiesUpdated && onPropertiesUpdated();
                                 }}
                                 fullWidth
                               >
@@ -347,7 +384,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                                     <SelectOption
                                       key={index}
                                       value={choice}
-                                      primaryText={choice}
+                                      label={choice}
                                     />
                                   )
                                 )}
@@ -357,7 +394,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                           {property.getType() === 'Choice' && (
                             <StringArrayEditor
                               extraInfo={getExtraInfoArray(property)}
-                              setExtraInfo={this._setChoiceExtraInfo(property)}
+                              setExtraInfo={setChoiceExtraInfo(property)}
                             />
                           )}
                           {property.getType() === 'Color' && (
@@ -368,9 +405,8 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               color={property.getValue()}
                               onChange={color => {
                                 property.setValue(color);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
                             />
                           )}
@@ -383,7 +419,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getLabel()}
                               onChange={text => {
                                 property.setLabel(text);
-                                this.forceUpdate();
+                                forceUpdate();
                               }}
                               fullWidth
                             />
@@ -394,16 +430,13 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                               value={property.getGroup()}
                               onChange={text => {
                                 property.setGroup(text);
-                                this.forceUpdate();
-                                this.props.onPropertiesUpdated &&
-                                  this.props.onPropertiesUpdated();
+                                forceUpdate();
+                                onPropertiesUpdated && onPropertiesUpdated();
                               }}
-                              dataSource={this._getPropertyGroupNames().map(
-                                name => ({
-                                  text: name,
-                                  value: name,
-                                })
-                              )}
+                              dataSource={getPropertyGroupNames().map(name => ({
+                                text: name,
+                                value: name,
+                              }))}
                               openOnFocus={true}
                             />
                           </ResponsiveLineStackLayout>
@@ -415,7 +448,7 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                             value={property.getDescription()}
                             onChange={text => {
                               property.setDescription(text);
-                              this.forceUpdate();
+                              forceUpdate();
                             }}
                             fullWidth
                           />
@@ -438,16 +471,16 @@ export default class EventsBasedObjectPropertiesEditor extends React.Component<
                     <RaisedButton
                       primary
                       label={<Trans>Add a property</Trans>}
-                      onClick={this._addProperty}
+                      onClick={addProperty}
                       icon={<Add />}
                     />
                   </Line>
                 </Column>
               </div>
             </Line>
-          </Column>
-        )}
-      </I18n>
-    );
-  }
+          </ScrollView>
+        </Column>
+      )}
+    </I18n>
+  );
 }

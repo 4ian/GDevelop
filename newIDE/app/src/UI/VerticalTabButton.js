@@ -3,11 +3,13 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { Spacer } from './Grid';
 
+export const verticalTabButtonSize = 30;
+
 const styles = {
   button: {
     justifyContent: 'start',
     minWidth: 0, // Ensure we can use the button with just an icon.
-    minHeight: 30, // Ensure it stays the same size with and without label.
+    minHeight: verticalTabButtonSize, // Ensure it stays the same size with and without label.
     padding: '4px 6px', // Ensure same padding applied no matter the button variant.
     fontWeight: 400,
     transition: 'none', // Disable transition to avoid desync between label and icon color.
@@ -30,7 +32,7 @@ const styles = {
 type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
-  getIcon: (color: string) => React.Node,
+  getIcon: ({ color: string, fontSize: 'inherit' | 'small' }) => React.Node,
   isActive: boolean,
   hideLabel?: boolean,
   id?: string,
@@ -65,7 +67,10 @@ const VerticalTabButton = ({
             : styles.iconWrapperWithLabel
         }
       >
-        {getIcon(isActive ? 'inherit' : 'secondary')}
+        {getIcon({
+          color: isActive ? 'inherit' : 'secondary',
+          fontSize: 'small',
+        })}
       </div>
       {!hideLabel && (
         <>

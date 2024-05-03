@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef RESOURCESABSOLUTEPATHCHECKER_H
-#define RESOURCESABSOLUTEPATHCHECKER_H
+#pragma once
 
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
@@ -22,10 +21,10 @@ namespace gd {
  */
 class GD_CORE_API ResourcesAbsolutePathChecker
     : public ArbitraryResourceWorker {
- public:
-  ResourcesAbsolutePathChecker(AbstractFileSystem& fileSystem)
-      : ArbitraryResourceWorker(),
-        hasAbsoluteFilenames(false),
+public:
+  ResourcesAbsolutePathChecker(gd::ResourcesManager &resourcesManager,
+                               AbstractFileSystem &fileSystem)
+      : ArbitraryResourceWorker(resourcesManager), hasAbsoluteFilenames(false),
         fs(fileSystem){};
   virtual ~ResourcesAbsolutePathChecker(){};
 
@@ -47,5 +46,3 @@ class GD_CORE_API ResourcesAbsolutePathChecker
 };
 
 }  // namespace gd
-
-#endif  // RESOURCESABSOLUTEPATHCHECKER_H

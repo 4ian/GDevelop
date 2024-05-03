@@ -2,47 +2,51 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
 import UserChipComponent from '../../../UI/User/UserChip';
 import {
-  fakeIndieAuthenticatedUser,
-  fakeNotAuthenticatedAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
+  fakeNotAuthenticatedUser,
   fakeAuthenticatedUserWithBadges,
-  fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeAuthenticatedUserLoggingIn,
 } from '../../../fixtures/GDevelopServicesTestData';
-import AuthenticatedUserContext, {
-  type AuthenticatedUser,
-} from '../../../Profile/AuthenticatedUserContext';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 export default {
   title: 'User chips/UserChip',
   component: UserChipComponent,
-  decorators: [paperDecorator, muiDecorator],
-  argTypes: {
-    user: {
-      name: 'User',
-      control: { type: 'radio' },
-      options: [
-        'Anonymous',
-        'Logging in',
-        'Signed in',
-        'Signed in with notifications',
-      ],
-      defaultValue: 'Signed in',
-      mapping: {
-        Anonymous: fakeNotAuthenticatedAuthenticatedUser,
-        'Logging in': fakeAuthenticatedButLoadingAuthenticatedUser,
-        'Signed in': fakeIndieAuthenticatedUser,
-        'Signed in with notifications': fakeAuthenticatedUserWithBadges,
-      },
-    },
-  },
+  decorators: [paperDecorator],
 };
 
-export const UserChip = ({ user }: {| user: AuthenticatedUser |}) => (
-  <AuthenticatedUserContext.Provider value={user}>
-    <UserChipComponent onOpenProfile={action('open profile')} />
-  </AuthenticatedUserContext.Provider>
-);
+export const Anonymous = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
+      <UserChipComponent onOpenProfile={action('open profile')} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const LoggingIn = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeAuthenticatedUserLoggingIn}>
+      <UserChipComponent onOpenProfile={action('open profile')} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const SignedIn = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
+      <UserChipComponent onOpenProfile={action('open profile')} />
+    </AuthenticatedUserContext.Provider>
+  );
+};
+
+export const SignedInWithNotifications = () => {
+  return (
+    <AuthenticatedUserContext.Provider value={fakeAuthenticatedUserWithBadges}>
+      <UserChipComponent onOpenProfile={action('open profile')} />
+    </AuthenticatedUserContext.Provider>
+  );
+};

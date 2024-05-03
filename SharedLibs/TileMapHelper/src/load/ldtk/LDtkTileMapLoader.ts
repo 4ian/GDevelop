@@ -1,8 +1,8 @@
-import { integer } from '../../model/CommonTypes';
-import { EditableTileMap, TileDefinition } from '../../model/TileMapModel';
-import { getLDtkTileId } from './LDtkTileMapLoaderHelper';
-import { LDtkTileMap } from './LDtkFormat';
-import { getTileGID } from '../../model/GID';
+import { integer } from "../../model/CommonTypes";
+import { EditableTileMap, TileDefinition } from "../../model/TileMapModel";
+import { getLDtkTileId } from "./LDtkTileMapLoaderHelper";
+import { LDtkTileMap } from "./LDtkFormat";
+import { getTileGID } from "../../model/GID";
 
 export namespace LDtkTileMapLoader {
   /**
@@ -54,9 +54,9 @@ export namespace LDtkTileMapLoader {
       }
 
       if (
-        layer.__type === 'IntGrid' ||
-        layer.__type === 'AutoLayer' ||
-        layer.__type === 'Tiles'
+        layer.__type === "IntGrid" ||
+        layer.__type === "AutoLayer" ||
+        layer.__type === "Tiles"
       ) {
         if (gridSize === 0) {
           gridSize = layer.__gridSize;
@@ -64,7 +64,7 @@ export namespace LDtkTileMapLoader {
           dimY = layer.__cHei;
         } else if (layer.__gridSize !== gridSize) {
           console.warn(
-            'Grid size is different across layers. Only the first layer grid size will be followed.'
+            "Grid size is different across layers. Only the first layer grid size will be followed."
           );
         }
       }
@@ -124,7 +124,7 @@ export namespace LDtkTileMapLoader {
             const hash = `${oldTileDef
               .getStackedTiles()
               .map((tileId) => `${tileId}`)
-              .join(';')};${tileGID}`;
+              .join(";")};${tileGID}`;
             const tileDef = composedTileMap.get(hash);
             if (tileDef) {
               editableTileLayer.setTile(x, y, tileDef.getStackTileId());

@@ -201,13 +201,26 @@ class GD_CORE_API EventsFunction {
   /**
    * \brief Returns true if the function is private.
    */
-  bool IsPrivate() { return isPrivate; }
+  bool IsPrivate() const { return isPrivate; }
 
   /**
    * \brief Sets the privateness of the function.
    */
   EventsFunction& SetPrivate(bool _isPrivate) {
     isPrivate = _isPrivate;
+    return *this;
+  }
+
+  /**
+   * \brief Returns true if the function is async.
+   */
+  bool IsAsync() const { return isAsync; }
+
+  /**
+   * \brief Sets the asynchronicity of the function.
+   */
+  EventsFunction& SetAsync(bool _isAsync) {
+    isAsync = _isAsync;
     return *this;
   }
 
@@ -291,6 +304,7 @@ class GD_CORE_API EventsFunction {
   mutable std::vector<gd::ParameterMetadata> actionWithOperationParameters;
   gd::ObjectGroupsContainer objectGroups;
   bool isPrivate = false;
+  bool isAsync = false;
 };
 
 }  // namespace gd

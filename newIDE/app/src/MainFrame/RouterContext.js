@@ -2,13 +2,21 @@
 import * as React from 'react';
 import Window from '../Utils/Window';
 
-type Route = 'onboarding' | 'subscription' | 'games-dashboard' | 'asset-store';
+export type Route =
+  | 'onboarding' // For compatibility when there was only one tutorial.
+  | 'guided-lesson' // New way of opening a tutorial.
+  | 'subscription'
+  | 'games-dashboard'
+  | 'asset-store' // For compatibility when there was only asset packs.
+  | 'store'; // New way of opening the store.
 type RouteKey =
   | 'initial-dialog'
   | 'game-id'
   | 'games-dashboard-tab'
-  | 'asset-pack';
-type RouteArguments = { [RouteKey]: string };
+  | 'asset-pack'
+  | 'game-template'
+  | 'tutorial-id';
+export type RouteArguments = { [RouteKey]: string };
 
 export type Router = {|
   routeArguments: RouteArguments,

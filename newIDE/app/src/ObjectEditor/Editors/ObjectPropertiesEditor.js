@@ -24,12 +24,13 @@ const ObjectPropertiesEditor = (props: Props) => {
     project,
     resourceManagementProps,
     unsavedChanges,
+    renderObjectNameField,
   } = props;
 
   // TODO: Workaround a bad design of ObjectJsImplementation. When getProperties
   // and associated methods are redefined in JS, they have different arguments (
   // see ObjectJsImplementation C++ implementation). If called directly here from JS,
-  // the arguments will be mismatched. To workaround this, always case the object to
+  // the arguments will be mismatched. To workaround this, always cast the object to
   // a base gdObject to ensure C++ methods are called.
   const objectConfigurationAsGd = gd.castObject(
     objectConfiguration,
@@ -53,6 +54,7 @@ const ObjectPropertiesEditor = (props: Props) => {
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
+          {renderObjectNameField && renderObjectNameField()}
           {tutorialIds.map(tutorialId => (
             <DismissableTutorialMessage
               key={tutorialId}

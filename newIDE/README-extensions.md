@@ -60,7 +60,7 @@ Read about [`gdjs.RuntimeScene`](https://docs.gdevelop.io/GDJS%20Runtime%20Docum
 
 ##### How to create an asynchronous function
 
-You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instanciating a new `gdjs.PromiseTask` with your promise as argument.
+You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instantiating a new `gdjs.PromiseTask` with your promise as argument.
 
 #### How to create a behavior by extending `gdjs.RuntimeBehavior`
 
@@ -103,10 +103,10 @@ Use [`addAction`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_pl
 
 -   Chain calls to [`addParameter`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
 -   Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
-  -   If your function is asynchronous, call `setAsyncFunctionName` instead to tell GDevelop to wait for the returned `Task` to resolve before executing subsequent actions and subevents. 
-	-   If you want to be able to toggle the awaiting on and off, make one implementation of the function that returns a `Task` and one that doesn't, and use both `setFunctionName` and `setAsyncFunctionName` respectively to declare both to GDevelop, making the action optionally async.
-	-   If you just want to return a promise to be awaited, you do not need to create your own task. Simply return `new gd.PromiseTask(yourPromise)`.
-	-   Note that, as of now, *only actions can be asynchronous*. Giving other functions an async function name will not have any effect.
+    -   If your function is asynchronous, call `setAsyncFunctionName` instead to tell GDevelop to wait for the returned `Task` to resolve before executing subsequent actions and subevents.
+    -   If you want to be able to toggle the awaiting on and off, make one implementation of the function that returns a `Task` and one that doesn't, and use both `setFunctionName` and `setAsyncFunctionName` respectively to declare both to GDevelop, making the action optionally async.
+    -   If you just want to return a promise to be awaited, you do not need to create your own task. Simply return `new gdjs.PromiseTask(yourPromise)`.
+    -   Note that, as of now, _only actions can be asynchronous_. Giving other functions an async function name will not have any effect.
 
 > You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.
 
@@ -144,10 +144,10 @@ To declare one, just use `registerProperty`:
 ```js
 // From ExampleJsExtension/JsExtension.js:
 extension
-	.registerProperty("DummyPropertyString")
-	.setLabel(_("Dummy Property Name"))
-	.setDescription(_("Type in anything :)"))
-	.setType("string");
+    .registerProperty("DummyPropertyString")
+    .setLabel(_("Dummy Property Name"))
+    .setDescription(_("Type in anything :)"))
+    .setType("string");
 ```
 
 Once declared, you can access the property from JavaScript in the game engine using `getExtensionProperty` method of `gdjs.RuntimeGame`. Pass the extension name and the property name. This would get the AdMobAppId property of the AdMob extension for example:
@@ -166,26 +166,26 @@ You can declare a dependency on an npm package or cordova plugin with `addDepend
 ```js
 // From ExampleJsExtension/JsExtension.js:
 extension
-	.addDependency()
-	.setName("Thirteen Checker")
-	.setDependencyType("npm")
-	.setExportName("is-thirteen")
-	.setVersion("2.0.0");
+    .addDependency()
+    .setName("Thirteen Checker")
+    .setDependencyType("npm")
+    .setExportName("is-thirteen")
+    .setVersion("2.0.0");
 ```
 
 On cordova you can add plugin variables as extra properties:
 
 ```js
 extension
-	.addDependency()
-	.setName("Some Cordova Extension")
-	.setDependencyType("cordova")
-	.setExportName("cordova-some-plugin")
-	.setVersion("1.0.0")
-	.setExtraSetting(
-		"VARIABLE_NAME",
-		new gd.PropertyDescriptor().setValue("42")
-	);
+    .addDependency()
+    .setName("Some Cordova Extension")
+    .setDependencyType("cordova")
+    .setExportName("cordova-some-plugin")
+    .setVersion("1.0.0")
+    .setExtraSetting(
+        "VARIABLE_NAME",
+        new gd.PropertyDescriptor().setValue("42")
+    );
 ```
 
 You can also use an extension property to determine the value of the plugin variable:
@@ -193,23 +193,23 @@ You can also use an extension property to determine the value of the plugin vari
 ```js
 // From AdMob/JsExtension.js:
 extension
-	.registerProperty("AdMobAppId") // Remember Property Name
-	.setLabel("AdMob App ID")
-	.setDescription("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY")
-	.setType("string");
+    .registerProperty("AdMobAppId") // Remember Property Name
+    .setLabel("AdMob App ID")
+    .setDescription("ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY")
+    .setType("string");
 
 extension
-	.addDependency()
-	.setName("AdMob Cordova Extension")
-	.setDependencyType("cordova")
-	.setExportName("cordova-plugin-admob-free")
-	.setVersion("~0.21.0")
-	.setExtraSetting(
-		"ADMOB_APP_ID",
-		new gd.PropertyDescriptor()
-			.setType("ExtensionProperty") // Tell the exporter this is an extension property...
-			.setValue("AdMobAppId") // ... and what property it is (name of the property).
-	);
+    .addDependency()
+    .setName("AdMob Cordova Extension")
+    .setDependencyType("cordova")
+    .setExportName("cordova-plugin-admob-free")
+    .setVersion("~0.21.0")
+    .setExtraSetting(
+        "ADMOB_APP_ID",
+        new gd.PropertyDescriptor()
+            .setType("ExtensionProperty") // Tell the exporter this is an extension property...
+            .setValue("AdMobAppId") // ... and what property it is (name of the property).
+    );
 ```
 
 #### Declare an object editor
@@ -257,6 +257,7 @@ If you want to start a new extension:
 -   Remove all the actions/conditions/expressions declarations and tests, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
 -   Create a file called for example _yourextensionnametools.js_ in the same directory.
 -   Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the ts file that you've created **but with a js extension**, prefixed by the path from the root folder. For example:
+
     ```js
     .setIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.ts")
     ```

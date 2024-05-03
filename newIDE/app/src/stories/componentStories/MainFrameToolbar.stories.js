@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import MainFrameToolbar, {
@@ -14,7 +13,7 @@ import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 export default {
   title: 'MainFrameToolbar',
   component: MainFrameToolbar,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const fakeEditorToolbar = (
@@ -31,6 +30,9 @@ const fakeEditorToolbar = (
     <IconButton size="small" tooltip={'Test tooltip'} color="default">
       <DebugIcon />
     </IconButton>
+    <IconButton size="small" tooltip={'Test tooltip'} color="default" selected>
+      <DebugIcon />
+    </IconButton>
     <IconButton size="small" tooltip={'Test tooltip'} disabled color="default">
       <DebugIcon />
     </IconButton>
@@ -43,7 +45,8 @@ const fakeEditorToolbar = (
 const defaultProps: MainFrameToolbarProps = {
   showProjectButtons: true,
   toggleProjectManager: () => {},
-  exportProject: () => {},
+  openShareDialog: () => {},
+  isSharingEnabled: true,
 
   onPreviewWithoutHotReload: () => {},
   onOpenDebugger: () => {},
@@ -53,6 +56,11 @@ const defaultProps: MainFrameToolbarProps = {
   canDoNetworkPreview: true,
   isPreviewEnabled: false,
   hasPreviewsRunning: false,
+  canSave: true,
+  onSave: async () => {},
+  onOpenVersionHistory: () => {},
+  canQuitVersionHistory: true,
+  onQuitVersionHistory: async () => {},
   previewState: {
     isPreviewOverriden: false,
     previewLayoutName: null,

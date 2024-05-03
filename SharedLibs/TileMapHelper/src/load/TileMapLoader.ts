@@ -1,5 +1,5 @@
 import type { EditableTileMap } from "../model/TileMapModel";
-import { TileMap } from "../types";
+import { TileMapFileContent } from "./TileMapFileContent";
 import { LDtkTileMapLoader } from "./ldtk/LDtkTileMapLoader";
 import { TiledTileMapLoader } from "./tiled/TiledTileMapLoader";
 
@@ -7,21 +7,21 @@ export namespace TileMapLoader {
   /**
    * Create a {@link EditableTileMap} from the raw data.
    *
-   * @param tiledMap The data exported from Tiled/LDtk.
+   * @param tileMapFileContent The data exported from Tiled/LDtk.
    * @param levelIndex The level of the tile map to load from.
    * @param pako The zlib library.
    * @returns A {@link EditableTileMap}
    */
   export function load(
-    tileMap: TileMap,
+    tileMapFileContent: TileMapFileContent,
     levelIndex: number,
     pako: any
   ): EditableTileMap | null {
-    if (tileMap.kind === "ldtk") {
-      return LDtkTileMapLoader.load(tileMap.data, levelIndex);
+    if (tileMapFileContent.kind === "ldtk") {
+      return LDtkTileMapLoader.load(tileMapFileContent.data, levelIndex);
     }
-    if (tileMap.kind === "tiled") {
-      return TiledTileMapLoader.load(tileMap.data, pako);
+    if (tileMapFileContent.kind === "tiled") {
+      return TiledTileMapLoader.load(tileMapFileContent.data, pako);
     }
 
     console.warn(

@@ -1,7 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 
 import * as React from 'react';
 import TextField from '../UI/TextField';
@@ -9,17 +8,34 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import AlertMessage from '../UI/AlertMessage';
 import { ColumnStackLayout } from '../UI/Layout';
-import { showWarningBox } from '../UI/Messages/MessageBox';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import Checkbox from '../UI/Checkbox';
+import HelpButton from '../UI/HelpButton';
+import { Line } from '../UI/Grid';
+import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   eventsBasedObject: gdEventsBasedObject,
+  unsavedChanges?: ?UnsavedChanges,
 |};
 
-export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
+export default function EventsBasedObjectEditor({
+  eventsBasedObject,
+  unsavedChanges,
+}: Props) {
   const forceUpdate = useForceUpdate();
+
+  const onChange = React.useCallback(
+    () => {
+      if (unsavedChanges) {
+        unsavedChanges.triggerUnsavedChanges();
+      }
+      forceUpdate();
+    },
+    [forceUpdate, unsavedChanges]
+  );
 
   return (
     <ColumnStackLayout expand noMargin>
@@ -52,7 +68,7 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         value={eventsBasedObject.getFullName()}
         onChange={text => {
           eventsBasedObject.setFullName(text);
-          forceUpdate();
+          onChange();
         }}
         fullWidth
       />
@@ -64,37 +80,48 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
         value={eventsBasedObject.getDescription()}
         onChange={text => {
           eventsBasedObject.setDescription(text);
-          forceUpdate();
+          onChange();
         }}
         multiline
         fullWidth
         rows={3}
       />
-      <I18n>
-        {({ i18n }) => (
-          <SemiControlledTextField
-            commitOnBlur
-            floatingLabelText={<Trans>Default name for created objects</Trans>}
-            value={
-              eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
-            }
-            onChange={text => {
-              if (gd.Project.validateName(text)) {
-                eventsBasedObject.setDefaultName(text);
-                forceUpdate();
-              } else {
-                showWarningBox(
-                  i18n._(
-                    t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-                  ),
-                  { delayToNextTick: true }
-                );
-              }
-            }}
-            fullWidth
-          />
-        )}
-      </I18n>
+      <SemiControlledTextField
+        commitOnBlur
+        floatingLabelText={<Trans>Default name for created objects</Trans>}
+        value={
+          eventsBasedObject.getDefaultName() || eventsBasedObject.getName()
+        }
+        onChange={newName => {
+          eventsBasedObject.setDefaultName(gd.Project.getSafeName(newName));
+          onChange();
+        }}
+        fullWidth
+      />
+      <Checkbox
+        label={<Trans>Use 3D rendering</Trans>}
+        checked={eventsBasedObject.isRenderedIn3D()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsRenderedIn3D(checked);
+          onChange();
+        }}
+      />
+      <Checkbox
+        label={<Trans>Has animations</Trans>}
+        checked={eventsBasedObject.isAnimatable()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsAnimatable(checked);
+          onChange();
+        }}
+      />
+      <Checkbox
+        label={<Trans>Contains text</Trans>}
+        checked={eventsBasedObject.isTextContainer()}
+        onCheck={(e, checked) => {
+          eventsBasedObject.markAsTextContainer(checked);
+          onChange();
+        }}
+      />
       {eventsBasedObject.getEventsFunctions().getEventsFunctionsCount() ===
         0 && (
         <DismissableAlertMessage
@@ -102,11 +129,14 @@ export default function EventsBasedObjectEditor({ eventsBasedObject }: Props) {
           kind="info"
         >
           <Trans>
-            Once you're done, close this dialog and start adding some functions
-            to the object. Then, test the object by adding to a scene.
+            Once you're done, start adding some functions to the object. Then,
+            test the object by adding it to a scene.
           </Trans>
         </DismissableAlertMessage>
       )}
+      <Line noMargin>
+        <HelpButton key="help" helpPagePath="/objects/events-based-objects" />
+      </Line>
     </ColumnStackLayout>
   );
 }

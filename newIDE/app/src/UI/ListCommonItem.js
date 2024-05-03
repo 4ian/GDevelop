@@ -1,7 +1,7 @@
 // @flow
-import Add from '@material-ui/icons/Add';
-import Search from '@material-ui/icons/Search';
 import * as React from 'react';
+import Add from './CustomSvgIcons/Add';
+import Search from './CustomSvgIcons/Search';
 import { Column, Line } from './Grid';
 import RaisedButton from './RaisedButton';
 // No i18n in this file

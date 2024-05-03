@@ -4,8 +4,20 @@ import * as React from 'react';
 import { type Editor } from '.';
 import { Column, Line } from '../Grid';
 import FlatButton from '../FlatButton';
-import ArrowBack from '@material-ui/icons/ArrowBack';
 import Background from '../Background';
+import ChevronArrowLeft from '../CustomSvgIcons/ChevronArrowLeft';
+import {
+  getAvoidSoftKeyboardStyle,
+  useSoftKeyboardBottomOffset,
+} from '../MobileSoftKeyboard';
+
+const styles = {
+  avoidSoftKeyboardContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+};
 
 type Props = {|
   initialEditorName: string,
@@ -38,6 +50,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
     const [currentEditorName, setCurrentEditorName] = React.useState(
       initialEditorName
     );
+    const softKeyboardBottomOffset = useSoftKeyboardBottomOffset();
     React.useImperativeHandle(ref, () => ({
       openEditor: editorName => {
         setCurrentEditorName(editorName);
@@ -61,8 +74,22 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
       }
     }
 
+    const editor = editors[currentEditorName];
+    const renderedEditorWithKeyboardAvoidanceDiv = editor ? (
+      <div
+        style={{
+          ...styles.avoidSoftKeyboardContainer,
+          ...(editor.noSoftKeyboardAvoidance
+            ? null
+            : getAvoidSoftKeyboardStyle(softKeyboardBottomOffset)),
+        }}
+      >
+        {editor.renderEditor()}
+      </div>
+    ) : null;
+
     return (
-      <Column noMargin expand>
+      <Column noMargin expand noOverflowParent>
         {transition && (
           <Background maxWidth noExpand noFullHeight>
             <Column>
@@ -74,7 +101,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
                       if (transition.previousEditor)
                         setCurrentEditorName(transition.previousEditor);
                     }}
-                    leftIcon={<ArrowBack />}
+                    leftIcon={<ChevronArrowLeft />}
                   />
                 )}
                 {transition.nextLabel && transition.nextEditor && (
@@ -91,9 +118,7 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
             </Column>
           </Background>
         )}
-        {editors[currentEditorName]
-          ? editors[currentEditorName].renderEditor()
-          : null}
+        {renderedEditorWithKeyboardAvoidanceDiv}
       </Column>
     );
   }

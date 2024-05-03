@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
-import withMock from 'storybook-addon-mock';
 
-import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
 import ExtensionsSearchDialog from '../../../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import { I18n } from '@lingui/react';
@@ -16,7 +14,7 @@ import { fakeExtensionsRegistry } from '../../../../fixtures/GDevelopServicesTes
 export default {
   title: 'AssetStore/ExtensionStore/ExtensionSearchDialog',
   component: ExtensionsSearchDialog,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const apiDataServerSideError = {
@@ -62,7 +60,6 @@ export const Default = () => (
     )}
   </I18n>
 );
-Default.decorators = [withMock];
 Default.parameters = apiDataFakeExtensions;
 
 export const WithServerSideError = () => (
@@ -86,5 +83,4 @@ export const WithServerSideError = () => (
     )}
   </I18n>
 );
-WithServerSideError.decorators = [withMock];
 WithServerSideError.parameters = apiDataServerSideError;

@@ -7,12 +7,9 @@ const {
 
 describe('libGD.js - GDJS Object Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
   describe('SceneInstancesCount', () => {
     const prepareCompiledEvents = () => {
@@ -474,7 +471,9 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       eventsFunction
         .getEvents()
         .unserializeFrom(project, eventsSerializerElement);
-      const group = eventsFunction.getObjectGroups().insert('MyObjectGroup', 0);
+      const group = eventsFunction
+        .getObjectGroups()
+        .insertNew('MyObjectGroup', 0);
       group.setName('MyObjectGroup');
       group.addObject('ObjectParam1');
       group.addObject('ObjectParam2');

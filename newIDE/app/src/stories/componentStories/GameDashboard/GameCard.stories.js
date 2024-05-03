@@ -3,12 +3,10 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
-
 import paperDecorator from '../../PaperDecorator';
 import { GameCard } from '../../../GameDashboard/GameCard';
 import {
-  fakeIndieAuthenticatedUser,
+  fakeSilverAuthenticatedUser,
   game1,
 } from '../../../fixtures/GDevelopServicesTestData';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -16,11 +14,11 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 export default {
   title: 'GameDashboard/GameCard',
   component: GameCard,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator],
 };
 
 export const DefaultGameCard = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameCard
       game={game1}
       isCurrentGame={false}
@@ -31,7 +29,7 @@ export const DefaultGameCard = () => (
 );
 
 export const DefaultCurrentlyEditedCard = () => (
-  <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+  <AuthenticatedUserContext.Provider value={fakeSilverAuthenticatedUser}>
     <GameCard
       game={game1}
       isCurrentGame={true}

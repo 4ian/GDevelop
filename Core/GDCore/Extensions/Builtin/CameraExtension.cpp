@@ -27,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Layers and cameras"))
       .SetIcon("res/conditions/camera24.png");
   extension.AddInstructionOrExpressionGroupMetadata(_("Effects"))
-      .SetIcon("res/actions/effect24.png");
+      .SetIcon("res/actions/effect_black.svg");
 
   extension
       .AddExpressionAndConditionAndAction(
@@ -40,7 +40,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -72,7 +72,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -103,7 +103,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -119,7 +119,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -136,7 +136,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -153,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -170,7 +170,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -187,7 +187,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number"), "", true)
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
@@ -204,7 +204,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
       .UseStandardParameters("number", ParameterOptions::MakeNewOptions())
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -322,12 +322,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression",
                     _("Value (1:Initial zoom, 2:Zoom x2, 0.5:Unzoom x2...)"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
-  // TODO Deprecated: hide this action in a future release.
   extension
       .AddAction(
           "FixCamera",
@@ -339,6 +338,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "",
           "res/actions/camera24.png",
           "res/actions/camera.png")
+      .SetHidden()
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object"))
       .AddParameter("expression",
@@ -354,46 +354,41 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     "",
                     true)
       .SetDefaultValue("yes")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "ClampCamera",
-          _("Enforce camera boundaries"),
-          _("Enforce camera boundaries by moving the camera back inside specified boundaries."),
-          _("Enforce camera boundaries (left: _PARAM1_, top: _PARAM2_ "
-            "right: _PARAM3_, bottom: _PARAM4_, layer: _PARAM5_)"),
-          "",
-          "res/actions/camera24.png",
-          "res/actions/camera.png")
+      .AddAction("ClampCamera",
+                 _("Enforce camera boundaries"),
+                 _("Enforce camera boundaries by moving the camera back inside "
+                   "specified boundaries."),
+                 _("Enforce camera boundaries (left: _PARAM1_, top: _PARAM2_ "
+                   "right: _PARAM3_, bottom: _PARAM4_, layer: _PARAM5_)"),
+                 "",
+                 "res/actions/camera24.png",
+                 "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("expression",
-                    _("Left bound X Position"))
-      .AddParameter("expression",
-                    _("Top bound Y Position"))
-      .AddParameter("expression",
-                    _("Right bound X Position"))
-      .AddParameter("expression",
-                    _("Bottom bound Y Position"))
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("expression", _("Left bound X Position"))
+      .AddParameter("expression", _("Top bound Y Position"))
+      .AddParameter("expression", _("Right bound X Position"))
+      .AddParameter("expression", _("Bottom bound Y Position"))
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "CentreCamera",
-          _("Center the camera on an object"),
-          _("Center the camera on the specified object."),
-          _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
-          "",
-          "res/actions/camera24.png",
-          "res/actions/camera.png")
+      .AddAction("CentreCamera",
+                 _("Center the camera on an object"),
+                 _("Center the camera on the specified object."),
+                 _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
+                 _("Layers and cameras"),
+                 "res/actions/camera24.png",
+                 "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object"))
       .AddParameter("yesorno",
@@ -401,7 +396,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     "",
                     true)
       .SetDefaultValue("yes")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
@@ -449,58 +444,58 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction(
           "SetLayerEffectParameter",
-          _("Effect parameter (number)"),
-          _("Change the value of a parameter of an effect.") + "\n" +
-              _("You can find the parameter names (and change the effect "
+          _("Effect property (number)"),
+          _("Change the value of a property of an effect.") + "\n" +
+              _("You can find the property names (and change the effect "
                 "names) in the effects window."),
           _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
-      .AddParameter("layerEffectParameterName", _("Parameter name"))
+      .AddParameter("layerEffectParameterName", _("Property name"))
       .AddParameter("expression", _("New value"))
       .MarkAsAdvanced();
 
   extension
       .AddAction(
           "SetLayerEffectStringParameter",
-          _("Effect parameter (string)"),
-          _("Change the value (string) of a parameter of an effect.") + "\n" +
-              _("You can find the parameter names (and change the effect "
+          _("Effect property (string)"),
+          _("Change the value (string) of a property of an effect.") + "\n" +
+              _("You can find the property names (and change the effect "
                 "names) in the effects window."),
           _("Set _PARAM3_ to _PARAM4_ for effect _PARAM2_ of layer _PARAM1_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
-      .AddParameter("layerEffectParameterName", _("Parameter name"))
+      .AddParameter("layerEffectParameterName", _("Property name"))
       .AddParameter("string", _("New value"))
       .MarkAsAdvanced();
 
   extension
       .AddAction(
           "SetLayerEffectBooleanParameter",
-          _("Effect parameter (enable or disable)"),
-          _("Enable or disable a parameter of an effect.") + "\n" +
-              _("You can find the parameter names (and change the effect "
+          _("Effect property (enable or disable)"),
+          _("Enable or disable a property of an effect.") + "\n" +
+              _("You can find the property names (and change the effect "
                 "names) in the effects window."),
           _("Enable _PARAM3_ for effect _PARAM2_ of layer _PARAM1_: _PARAM4_"),
           _("Effects"),
-          "res/actions/effect24.png",
-          "res/actions/effect.png")
+          "res/actions/effect_black.svg",
+          "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
-      .AddParameter("layerEffectParameterName", _("Parameter name"))
-      .AddParameter("yesorno", _("Enable this parameter"))
+      .AddParameter("layerEffectParameterName", _("Property name"))
+      .AddParameter("yesorno", _("Enable this property"))
       .MarkAsAdvanced();
 
   extension
@@ -509,10 +504,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("The effect on a layer is enabled"),
                     _("Effect _PARAM2_ on layer _PARAM1_ is enabled"),
                     _(""),
-                    "res/actions/effect24.png",
-                    "res/actions/effect.png")
+                    "res/actions/effect_black.svg",
+                    "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
       .MarkAsAdvanced();
@@ -523,10 +518,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  _("Enable an effect on a layer"),
                  _("Enable effect _PARAM2_ on layer _PARAM1_: _PARAM3_"),
                  _("Effects"),
-                 "res/actions/effect24.png",
-                 "res/actions/effect.png")
+                 "res/actions/effect_black.svg",
+                 "res/actions/effect_black.svg")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("layerEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable"), "", true)
@@ -542,7 +537,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "res/conditions/time24.png",
           "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .UseStandardRelationalOperatorParameters(
           "number",
@@ -553,14 +548,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddAction(
           "ChangeLayerTimeScale",
-          _("Change layer time scale"),
+          _("Layer time scale"),
           _("Change the time scale applied to the objects of the layer."),
           _("Set the time scale of layer _PARAM1_ to _PARAM2_"),
           "",
           "res/actions/time24.png",
           "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression",
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
@@ -575,7 +570,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     "res/conditions/layer24.png",
                     "res/conditions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .UseStandardRelationalOperatorParameters(
           "number", gd::ParameterOptions::MakeNewOptions())
@@ -592,14 +587,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                  "res/actions/layer24.png",
                  "res/actions/layer.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("New default Z order"));
 
   extension
       .AddAction(
           "SetLayerAmbientLightColor",
-          _("Set the ambient light color"),
+          _("Ambient light color"),
           _("Set the ambient light color of the lighting layer in format "
             "\"R;G;B\" string."),
           _("Set the ambient color of the lighting layer _PARAM1_ to _PARAM2_"),
@@ -607,7 +602,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "res/actions/color24.png",
           "res/actions/color.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .AddParameter("layer", _("Layer"), "", true)
       .SetDefaultValue("\"Lighting\"")
       .AddParameter("color", _("Color"))
       .MarkAsAdvanced();

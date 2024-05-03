@@ -49,7 +49,7 @@ const MaxLeaderboardCountAlertMessage = ({
           <Text>
             {leaderboardLimits.canMaximumCountPerGameBeIncreased ? (
               <Trans>
-                Update to GDevelop Premium to get more leaderboards, storage,
+                Upgrade to GDevelop Premium to get more leaderboards, storage,
                 and one-click packagings!
               </Trans>
             ) : (

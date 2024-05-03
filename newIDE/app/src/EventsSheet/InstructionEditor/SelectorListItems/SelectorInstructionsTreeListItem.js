@@ -50,29 +50,28 @@ export const renderInstructionOrExpressionTree = <
 
       if (typeof instructionOrGroup.type === 'string') {
         // $FlowFixMe - see above
-        const instructionInformation: T = instructionOrGroup;
+        const instructionMetadata: T = instructionOrGroup;
         const value = getInstructionListItemValue(instructionOrGroup.type);
         const selected = selectedValue === value;
         return (
           <ListItem
             key={value}
-            primaryText={key}
+            primaryText={instructionMetadata.displayedName}
             selected={selected}
             id={
               // TODO: This id is used by in app tutorials. When in app tutorials
               // are linked to GDevelop versions, change this id to be more accurate
               // using getInstructionOrExpressionIdentifier
-              'instruction-item-' +
-              instructionInformation.type.replace(/:/g, '-')
+              'instruction-item-' + instructionMetadata.type.replace(/:/g, '-')
             }
             leftIcon={
               <ListIcon
                 iconSize={iconSize}
-                src={instructionInformation.iconFilename}
+                src={instructionMetadata.iconFilename}
               />
             }
             onClick={() => {
-              onChoose(instructionInformation.type, instructionInformation);
+              onChoose(instructionMetadata.type, instructionMetadata);
             }}
             ref={selected ? selectedItemRef : undefined}
           />
@@ -81,6 +80,7 @@ export const renderInstructionOrExpressionTree = <
         // $FlowFixMe - see above
         const groupOfInstructionInformation: InstructionOrExpressionTreeNode = instructionOrGroup;
         if (useSubheaders) {
+          const iconSrc = getGroupIconSrc(key) || parentGroupIconSrc;
           return [
             <Subheader key={getSubheaderListItemKey(key)}>{key}</Subheader>,
           ].concat(
@@ -93,7 +93,7 @@ export const renderInstructionOrExpressionTree = <
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
               getGroupIconSrc,
-              parentGroupIconSrc,
+              parentGroupIconSrc: iconSrc,
             })
           );
         } else {

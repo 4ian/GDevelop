@@ -32,7 +32,8 @@ namespace gdjs {
     _objects: Hashtable<ObjectData>;
     _objectsCtor: Hashtable<typeof RuntimeObject>;
 
-    _layers: Hashtable<Layer>;
+    _layers: Hashtable<RuntimeLayer>;
+    _orderedLayers: RuntimeLayer[]; // TODO: should this be a single structure with _layers, to enforce its usage?
     _layersCameraCoordinates: Record<string, [float, float, float, float]> = {};
 
     // Options for the debug draw:
@@ -48,6 +49,7 @@ namespace gdjs {
       this._objects = new Hashtable();
       this._objectsCtor = new Hashtable();
       this._layers = new Hashtable();
+      this._orderedLayers = [];
     }
 
     /**
@@ -235,6 +237,7 @@ namespace gdjs {
      * @param data The instances data
      * @param xPos The offset on X axis
      * @param yPos The offset on Y axis
+     * @param zPos The offset on Z axis
      * @param trackByPersistentUuid If true, objects are tracked by setting their `persistentUuid`
      * to the same as the associated instance. Useful for hot-reloading when instances are changed.
      */
@@ -242,21 +245,46 @@ namespace gdjs {
       data: InstanceData[],
       xPos: float,
       yPos: float,
+      zPos: float,
       trackByPersistentUuid: boolean
-    ) {
+    ): void {
+      let zOffset: number;
+      let shouldTrackByPersistentUuid: boolean;
+
+      if (arguments.length === 5) {
+        zOffset = zPos;
+        shouldTrackByPersistentUuid = trackByPersistentUuid;
+      } else {
+        /**
+         * Support for the previous signature (before 3D was introduced):
+         * createObjectsFrom(data, xPos, yPos, trackByPersistentUuid)
+         */
+        zOffset = 0;
+        shouldTrackByPersistentUuid = arguments[3];
+      }
+
       for (let i = 0, len = data.length; i < len; ++i) {
         const instanceData = data[i];
         const objectName = instanceData.name;
         const newObject = this.createObject(objectName);
         if (newObject !== null) {
-          if (trackByPersistentUuid) {
+          if (shouldTrackByPersistentUuid) {
             // Give the object the same persistentUuid as the instance, so that
             // it can be hot-reloaded.
             newObject.persistentUuid = instanceData.persistentUuid || null;
           }
           newObject.setPosition(instanceData.x + xPos, instanceData.y + yPos);
-          newObject.setZOrder(instanceData.zOrder);
           newObject.setAngle(instanceData.angle);
+          if (gdjs.Base3DHandler && gdjs.Base3DHandler.is3D(newObject)) {
+            if (instanceData.z !== undefined)
+              newObject.setZ(instanceData.z + zOffset);
+            if (instanceData.rotationX !== undefined)
+              newObject.setRotationX(instanceData.rotationX);
+            if (instanceData.rotationY !== undefined)
+              newObject.setRotationY(instanceData.rotationY);
+          }
+
+          newObject.setZOrder(instanceData.zOrder);
           newObject.setLayer(instanceData.layer);
           newObject
             .getVariables()
@@ -344,11 +372,8 @@ namespace gdjs {
      * Called to update effects of layers before rendering.
      */
     _updateLayersPreRender() {
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const layer = this._layers.items[name];
-          layer.updatePreRender(this);
-        }
+      for (const layer of this._orderedLayers) {
+        layer.updatePreRender(this);
       }
     }
 
@@ -362,6 +387,7 @@ namespace gdjs {
      */
     _updateObjectsPreRender() {
       const allInstancesList = this.getAdhocListOfAllInstances();
+      // TODO (3D) culling - add support for 3D object culling?
       for (let i = 0, len = allInstancesList.length; i < len; ++i) {
         const object = allInstancesList[i];
         const rendererObject = object.getRendererObject();
@@ -396,16 +422,16 @@ namespace gdjs {
      */
     _cacheOrClearRemovedInstances() {
       for (let k = 0, lenk = this._instancesRemoved.length; k < lenk; ++k) {
+        const instance = this._instancesRemoved[k];
         // Cache the instance to recycle it into a new instance later.
         // If the object does not support recycling, the cache won't be defined.
-        const cache = this._instancesCache.get(
-          this._instancesRemoved[k].getName()
-        );
+        const cache = this._instancesCache.get(instance.getName());
         if (cache) {
           if (cache.length < 128) {
-            cache.push(this._instancesRemoved[k]);
+            cache.push(instance);
           }
         }
+        instance.onDestroyed();
       }
       this._instancesRemoved.length = 0;
     }
@@ -587,7 +613,7 @@ namespace gdjs {
       }
 
       // Notify the object it was removed from the container
-      obj.onDestroyFromScene(this);
+      obj.onDeletedFromScene(this);
 
       // Notify the global callbacks
       for (let j = 0; j < gdjs.callbacksObjectDeletedFromScene.length; ++j) {
@@ -601,7 +627,7 @@ namespace gdjs {
      * @param name The name of the layer
      * @returns The layer, or the base layer if not found
      */
-    getLayer(name: string): gdjs.Layer {
+    getLayer(name: string): gdjs.RuntimeLayer {
       if (this._layers.containsKey(name)) {
         return this._layers.get(name);
       }
@@ -620,9 +646,7 @@ namespace gdjs {
      * Add a layer.
      * @param layerData The data to construct the layer
      */
-    addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
-    }
+    abstract addLayer(layerData: LayerData);
 
     /**
      * Remove a layer. All {@link gdjs.RuntimeObject} on this layer will
@@ -630,6 +654,9 @@ namespace gdjs {
      * @param layerName The name of the layer to remove
      */
     removeLayer(layerName: string) {
+      const existingLayer = this._layers.get(layerName);
+      if (!existingLayer) return;
+
       const allInstances = this.getAdhocListOfAllInstances();
       for (let i = 0; i < allInstances.length; ++i) {
         const runtimeObject = allInstances[i];
@@ -638,6 +665,8 @@ namespace gdjs {
         }
       }
       this._layers.remove(layerName);
+      const layerIndex = this._orderedLayers.indexOf(existingLayer);
+      this._orderedLayers.splice(layerIndex, 1);
     }
 
     /**
@@ -646,12 +675,18 @@ namespace gdjs {
      * @param layerName The name of the layer to reorder
      * @param index The new position in the list of layers
      */
-    setLayerIndex(layerName: string, index: integer): void {
-      const layer: gdjs.Layer = this._layers.get(layerName);
+    setLayerIndex(layerName: string, newIndex: integer): void {
+      const layer: gdjs.RuntimeLayer = this._layers.get(layerName);
       if (!layer) {
         return;
       }
-      this.getRenderer().setLayerIndex(layer, index);
+      const layerIndex = this._orderedLayers.indexOf(layer);
+      if (layerIndex === newIndex) return;
+
+      this._orderedLayers.splice(layerIndex, 1);
+      this._orderedLayers.splice(newIndex, 0, layer);
+
+      this.getRenderer().setLayerIndex(layer, newIndex);
     }
 
     /**
@@ -704,6 +739,7 @@ namespace gdjs {
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the container is released immediately.
       this._layers = new Hashtable();
+      this._orderedLayers = [];
       this._objects = new Hashtable();
       this._instances = new Hashtable();
       this._instancesCache = new Hashtable();

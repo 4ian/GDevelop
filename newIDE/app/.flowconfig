@@ -2,6 +2,7 @@
 <PROJECT_ROOT>/resources/.*
 <PROJECT_ROOT>/node_modules/protobufjs/src/bower.json
 <PROJECT_ROOT>/node_modules/resolve/test/resolver/malformed_package_json/.*
+<PROJECT_ROOT>/node_modules/eslint-plugin-react/node_modules/resolve/test/resolver/malformed_package_json/.*
 <PROJECT_ROOT>/node_modules/.cache/.*
 # Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
 # as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
@@ -10,16 +11,15 @@
 # almost always during development (any change in GDJS/extensions, or any restart of the app).
 <PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/.*
 
+[untyped]
+# react-window has some errors
+<PROJECT_ROOT>/node_modules/react-window/*
+
 [declarations]
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
-
-[include]
-# Type check the declarations of the JavaScript extensions (i.e: JsExtension.js files) with Flow
-# (and actually any file in Extensions containing `// @flow`).
-../../Extensions
 
 [libs]
 ../../GDevelop.js/types

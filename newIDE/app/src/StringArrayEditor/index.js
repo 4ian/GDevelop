@@ -6,9 +6,9 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { Line, Column } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { IconButton } from '@material-ui/core';
-import Delete from '@material-ui/icons/Delete';
 import RaisedButton from '../UI/RaisedButton';
-import Add from '@material-ui/icons/Add';
+import Add from '../UI/CustomSvgIcons/Add';
+import Trash from '../UI/CustomSvgIcons/Trash';
 
 type StringArrayEditorProps = {|
   extraInfo: Array<string>,
@@ -25,9 +25,15 @@ const StringArrayEditor = ({
 
   return (
     <ResponsiveLineStackLayout>
-      <Column justifyContent="flex-end" expand>
+      <Column justifyContent="flex-end" expand noMargin>
         {extraInfo.map((item, index) => (
-          <Line key={index} justifyContent="flex-end" expand>
+          <Line
+            key={index}
+            justifyContent="flex-end"
+            expand
+            alignItems="center"
+            noMargin
+          >
             <SemiControlledTextField
               disabled={disabled}
               commitOnBlur
@@ -46,7 +52,7 @@ const StringArrayEditor = ({
                 updateExtraInfo();
               }}
             >
-              <Delete />
+              <Trash />
             </IconButton>
           </Line>
         ))}

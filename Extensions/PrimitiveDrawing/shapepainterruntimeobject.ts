@@ -13,6 +13,8 @@ namespace gdjs {
     b: integer;
   };
 
+  export type Antialiasing = 'none' | 'low' | 'medium' | 'high';
+
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
   export type ShapePainterObjectDataType = {
     /** The color (in RGB format) of the inner part of the painted shape */
@@ -29,6 +31,8 @@ namespace gdjs {
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
     clearBetweenFrames: boolean;
+    /** The type of anti-aliasing to apply at rendering. */
+    antialiasing: Antialiasing;
   };
 
   export type ShapePainterObjectData = ObjectData & ShapePainterObjectDataType;
@@ -36,7 +40,9 @@ namespace gdjs {
   /**
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
-  export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
+  export class ShapePainterRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.Resizable, gdjs.Scalable, gdjs.Flippable {
     _scaleX: number = 1;
     _scaleY: number = 1;
     _blendMode: number = 0;
@@ -52,6 +58,7 @@ namespace gdjs {
     _outlineSize: float;
     _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
+    _antialiasing: Antialiasing;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
     private static readonly _pointForTransformation: FloatPoint = [0, 0];
@@ -86,6 +93,7 @@ namespace gdjs {
       this._outlineSize = shapePainterObjectData.outlineSize;
       this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
+      this._antialiasing = shapePainterObjectData.antialiasing;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
         instanceContainer
@@ -166,6 +174,11 @@ namespace gdjs {
       super.stepBehaviorsPreEvents(instanceContainer);
     }
 
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
+    }
+
     /**
      * Clear the graphics.
      */
@@ -197,6 +210,22 @@ namespace gdjs {
       this._renderer.drawEllipse(centerX, centerY, width, height);
     }
 
+    drawFilletRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      fillet: float
+    ) {
+      this._renderer.drawFilletRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        fillet
+      );
+    }
+
     drawRoundedRectangle(
       startX1: float,
       startY1: float,
@@ -210,6 +239,56 @@ namespace gdjs {
         endX2,
         endY2,
         radius
+      );
+    }
+
+    drawChamferRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      chamfer: float
+    ) {
+      this._renderer.drawChamferRectangle(
+        startX1,
+        startY1,
+        endX2,
+        endY2,
+        chamfer
+      );
+    }
+
+    drawTorus(
+      centerX: float,
+      centerY: float,
+      innerRadius: float,
+      outerRadius: float,
+      startArc: float,
+      endArc: float
+    ) {
+      this._renderer.drawTorus(
+        centerX,
+        centerY,
+        innerRadius,
+        outerRadius,
+        startArc,
+        endArc
+      );
+    }
+
+    drawRegularPolygon(
+      centerX: float,
+      centerY: float,
+      sides: float,
+      radius: float,
+      rotation: float
+    ) {
+      this._renderer.drawRegularPolygon(
+        centerX,
+        centerY,
+        sides,
+        radius,
+        rotation
       );
     }
 
@@ -335,6 +414,19 @@ namespace gdjs {
 
     isClearedBetweenFrames(): boolean {
       return this._clearBetweenFrames;
+    }
+
+    setAntialiasing(value: Antialiasing): void {
+      this._antialiasing = value;
+      this._renderer.updateAntialiasing();
+    }
+
+    getAntialiasing(): Antialiasing {
+      return this._antialiasing;
+    }
+
+    checkAntialiasing(valueToCompare: Antialiasing): boolean {
+      return this._antialiasing === valueToCompare;
     }
 
     setCoordinatesRelative(value: boolean): void {
@@ -474,7 +566,7 @@ namespace gdjs {
     /**
      * The center of rotation is defined relatively
      * to the drawing origin (the object position).
-     * This avoid the center to move on the drawing
+     * This avoids the center to move on the drawing
      * when new shapes push the bounds.
      *
      * When no custom center is defined, it will move
@@ -536,11 +628,6 @@ namespace gdjs {
       );
     }
 
-    /**
-     * Change the width of the object. This changes the scale on X axis of the object.
-     *
-     * @param newWidth The new width of the object, in pixels.
-     */
     setWidth(newWidth: float): void {
       const unscaledWidth = this._renderer.getUnscaledWidth();
       if (unscaledWidth !== 0) {
@@ -548,16 +635,16 @@ namespace gdjs {
       }
     }
 
-    /**
-     * Change the height of the object. This changes the scale on Y axis of the object.
-     *
-     * @param newHeight The new height of the object, in pixels.
-     */
     setHeight(newHeight: float): void {
       const unscaledHeight = this._renderer.getUnscaledHeight();
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
+    }
+
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

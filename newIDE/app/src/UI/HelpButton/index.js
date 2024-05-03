@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
 import TextButton from '../TextButton';
-import HelpOutline from '@material-ui/icons/HelpOutline';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
 import { Trans } from '@lingui/macro';
-import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../Responsive/ResponsiveWindowMeasurer';
 import HelpIcon from '../HelpIcon';
+import Help from '../CustomSvgIcons/Help';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -18,7 +18,7 @@ type PropsType = {
  * The button that can be used in any dialog to open a help page
  */
 const HelpButton = (props: PropsType) => {
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   if (!props.helpPagePath) return null;
   const helpLink = getHelpLink(props.helpPagePath, props.anchor);
   if (!helpLink) return null;
@@ -29,12 +29,12 @@ const HelpButton = (props: PropsType) => {
     }
   };
 
-  return windowWidth !== 'small' ? (
+  return !isMobile ? (
     <TextButton
       onClick={onClick}
       target="_blank"
       label={props.label || <Trans>Help</Trans>}
-      icon={<HelpOutline />}
+      icon={<Help />}
     />
   ) : (
     <HelpIcon size="small" helpPagePath={props.helpPagePath} />

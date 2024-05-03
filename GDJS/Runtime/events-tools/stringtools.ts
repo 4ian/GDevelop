@@ -158,7 +158,7 @@ namespace gdjs {
           // Start the search again after the replacement.
           // If the pattern to search is empty, add 1 because an empty pattern means that every "empty
           // space" between each character will be matched. If we don't add 1, we would match again the
-          // "empty space" just after where we added the remplacement.
+          // "empty space" just after where we added the replacement.
           searchStartPosition =
             patternPosition +
             replacement.length +

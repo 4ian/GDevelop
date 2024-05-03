@@ -23,15 +23,62 @@ const makeAddOneToObjectTestVariableEvent = (objectName) => ({
 
 describe('libGD.js - GDJS Code Generation integration tests', function () {
   let gd = null;
-  beforeAll((done) =>
-    initializeGDevelopJs().then((module) => {
-      gd = module;
-      done();
-    })
-  );
+  beforeAll(async () => {
+    gd = await initializeGDevelopJs();
+  });
 
-  it('generates a working function for While event', function () {
-    // Create nested events using And and StrEqual conditions
+  it('does not generate anything for a disabled event and its sub events', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', '1'],
+          },
+        ],
+        events: [],
+      },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        disabled: true,
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', '1'],
+          },
+        ],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['Counter', '+', '1'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(1);
+  });
+
+  it('can generate a While event', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
@@ -64,7 +111,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       },
     ]);
 
-    var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement
     );
@@ -76,53 +123,85 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(4);
   });
 
-  it('generates a working function with nested Or and StrEqual', function () {
-    // Create nested events using Or and StrEqual conditions
+  it('can generate nested While events', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: {
-              value: 'BuiltinCommonInstructions::Or',
-            },
-            parameters: [],
-            subInstructions: [
-              {
-                type: { value: 'Egal' },
-                parameters: ['1', '=', '2'],
-              },
-              {
-                type: {
-                  value: 'BuiltinCommonInstructions::Or',
-                },
-                parameters: [],
-                subInstructions: [
-                  // This should be true and make the entire conditions true.
-                  {
-                    type: { value: 'StrEqual' },
-                    parameters: ['"1"', '=', '"1"'],
-                  },
-                ],
-              },
-              {
-                type: { value: 'StrEqual' },
-                parameters: ['"1"', '=', '"2"'],
-              },
-            ],
-          },
-        ],
+        conditions: [],
         actions: [
           {
             type: { value: 'ModVarScene' },
-            parameters: ['SuccessVariable', '=', '1'],
+            parameters: ['Counter', '=', '0'],
           },
         ],
         events: [],
       },
+      {
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['CellY', '=', '0'],
+          },
+        ],
+        events: [],
+      },
+      {
+        infiniteLoopWarning: true,
+        type: 'BuiltinCommonInstructions::While',
+        whileConditions: [
+          {
+            type: { value: 'VarScene' },
+            parameters: ['CellY', '<', '4'],
+          },
+        ],
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['CellX', '=', '0'],
+          },
+        ],
+        events: [
+          {
+            infiniteLoopWarning: true,
+            type: 'BuiltinCommonInstructions::While',
+            whileConditions: [
+              {
+                type: { value: 'VarScene' },
+                parameters: ['CellX', '<', '5'],
+              },
+            ],
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['CellX', '+', '1'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['Counter', '+', '1'],
+              },
+            ],
+            events: [],
+          },
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['CellY', '+', '1'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
     ]);
 
-    var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement
     );
@@ -130,78 +209,27 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
 
-    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
-    expect(
-      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-    ).toBe(1);
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(20);
   });
 
-  it('generates a working function with nested And and StrEqual', function () {
-    // Create nested events using And and StrEqual conditions
+  it('can generate a Repeat event', function () {
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: {
-              value: 'BuiltinCommonInstructions::And',
-            },
-            parameters: [],
-            subInstructions: [
-              {
-                type: { value: 'Egal' },
-                parameters: ['1', '=', '1'],
-              },
-              {
-                type: {
-                  value: 'BuiltinCommonInstructions::And',
-                },
-                parameters: [],
-                subInstructions: [
-                  {
-                    type: { value: 'Egal' },
-                    parameters: ['1', '=', '1'],
-                  },
-                  {
-                    type: {
-                      value: 'BuiltinCommonInstructions::And',
-                    },
-                    parameters: [],
-                    subInstructions: [
-                      {
-                        type: { value: 'Egal' },
-                        parameters: ['1', '=', '1'],
-                      },
-                      {
-                        type: { value: 'StrEqual' },
-                        parameters: ['"1"', '=', '"1"'],
-                      },
-                    ],
-                  },
-                  {
-                    type: { value: 'StrEqual' },
-                    parameters: ['"1"', '=', '"1"'],
-                  },
-                ],
-              },
-              {
-                type: { value: 'StrEqual' },
-                parameters: ['"1"', '=', '"1"'],
-              },
-            ],
-          },
-        ],
+        type: 'BuiltinCommonInstructions::Repeat',
+        repeatExpression: '4',
+        conditions: [],
         actions: [
           {
             type: { value: 'ModVarScene' },
-            parameters: ['SuccessVariable', '=', '1'],
+            parameters: ['Counter', '+', '1'],
           },
         ],
         events: [],
       },
     ]);
 
-    var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
       gd,
       serializerElement
     );
@@ -209,10 +237,266 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runCompiledEvents(gdjs, runtimeScene, []);
 
-    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
-    expect(
-      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-    ).toBe(1);
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(4);
+  });
+
+  it('can generate a nested Repeat event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::Repeat',
+        repeatExpression: '4',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::Repeat',
+            repeatExpression: '5',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['Counter', '+', '1'],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(20);
+  });
+
+  it('can generate a "for each object" event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'MyObject',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', 'MyObject.Variable(MyVariable)'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: {
+          MyObject: 'object',
+        },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    // Create 4 objects with variable values from 1 to 4.
+    const objectLists = new gdjs.Hashtable();
+    const myObjects = [];
+    objectLists.put('MyObject', myObjects);
+    for (let index = 1; index <= 4; index++) {
+      const myObject = runtimeScene.createObject('MyObject');
+      myObject.getVariables().get('MyVariable').setNumber(index);
+      myObjects.push(myObject);
+    }
+
+    runCompiledEvents(gdjs, runtimeScene, [objectLists]);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      1 + 2 + 3 + 4
+    );
+  });
+
+  it('can generate a nested "for each object" event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEach',
+        object: 'MyObjectA',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEach',
+            object: 'MyObjectB',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: [
+                  'Counter',
+                  '+',
+                  'MyObjectA.Variable(MyVariable) * MyObjectB.Variable(MyVariable)',
+                ],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        parameterTypes: {
+          MyObjectA: 'object',
+          MyObjectB: 'object',
+        },
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    // Create 4 objects with variable values from 1 to 4.
+    const objectALists = new gdjs.Hashtable();
+    const myObjectsA = [];
+    objectALists.put('MyObjectA', myObjectsA);
+    for (let index = 1; index <= 4; index++) {
+      const myObjectA = runtimeScene.createObject('MyObjectA');
+      myObjectA.getVariables().get('MyVariable').setNumber(index);
+      myObjectsA.push(myObjectA);
+    }
+    // Create 3 objects with variable values from 5 to 7.
+    const objectBLists = new gdjs.Hashtable();
+    const myObjectsB = [];
+    objectBLists.put('MyObjectB', myObjectsB);
+    for (let index = 1; index <= 3; index++) {
+      const myObjectB = runtimeScene.createObject('MyObjectB');
+      myObjectB
+        .getVariables()
+        .get('MyVariable')
+        .setNumber(4 + index);
+      myObjectsB.push(myObjectB);
+    }
+
+    runCompiledEvents(gdjs, runtimeScene, [objectALists, objectBLists]);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      (1 + 2 + 3 + 4) * (5 + 6 + 7)
+    );
+  });
+
+  it('can generate a "for each child variable" event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyVariable',
+        valueIteratorVariableName: 'child',
+        keyIteratorVariableName: '',
+        conditions: [],
+        actions: [
+          {
+            type: { value: 'ModVarScene' },
+            parameters: ['Counter', '+', 'Variable(child)'],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    // Create 4 child-variables with values from 1 to 4.
+    const myVariable = runtimeScene.getVariables().get('MyVariable');
+    for (let index = 1; index <= 4; index++) {
+      myVariable.getChild('Child' + index).setNumber(index);
+    }
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      1 + 2 + 3 + 4
+    );
+  });
+
+  it('can generate a nested "for each child variable" event', function () {
+    const serializerElement = gd.Serializer.fromJSObject([
+      {
+        type: 'BuiltinCommonInstructions::ForEachChildVariable',
+        iterableVariableName: 'MyVariableA',
+        valueIteratorVariableName: 'childA',
+        keyIteratorVariableName: '',
+        conditions: [],
+        actions: [],
+        events: [
+          {
+            type: 'BuiltinCommonInstructions::ForEachChildVariable',
+            iterableVariableName: 'MyVariableB',
+            valueIteratorVariableName: 'childB',
+            keyIteratorVariableName: '',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'ModVarScene' },
+                parameters: [
+                  'Counter',
+                  '+',
+                  'Variable(childA) * Variable(childB)',
+                ],
+              },
+            ],
+            events: [],
+          },
+        ],
+      },
+    ]);
+
+    const runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      serializerElement,
+      {
+        logCode: false,
+      }
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+
+    // Create 4 child-variables with values from 1 to 4.
+    const myVariableA = runtimeScene.getVariables().get('MyVariableA');
+    for (let index = 1; index <= 4; index++) {
+      myVariableA.getChild('Child' + index).setNumber(index);
+    }
+    // Create 4 child-variables with values from 5 to 7.
+    const myVariableB = runtimeScene.getVariables().get('MyVariableB');
+    for (let index = 1; index <= 3; index++) {
+      myVariableB.getChild('Child' + index).setNumber(4 + index);
+    }
+
+    runCompiledEvents(gdjs, runtimeScene, []);
+
+    expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+    expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(
+      (1 + 2 + 3 + 4) * (5 + 6 + 7)
+    );
   });
 
   it('generates a working function creating objects', function () {
@@ -316,7 +600,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     eventsFunction
       .getEvents()
       .unserializeFrom(project, eventsSerializerElement);
-    const group = eventsFunction.getObjectGroups().insert('MyObjectGroup', 0);
+    const group = eventsFunction
+      .getObjectGroups()
+      .insertNew('MyObjectGroup', 0);
     group.setName('MyObjectGroup');
     group.addObject('ObjectParam1');
     group.addObject('ObjectParam2');

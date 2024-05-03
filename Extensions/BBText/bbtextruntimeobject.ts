@@ -26,7 +26,9 @@ namespace gdjs {
   /**
    * Displays a rich text using BBCode markup (allowing to set parts of the text as bold, italic, use different colors and shadows).
    */
-  export class BBTextRuntimeObject extends gdjs.RuntimeObject {
+  export class BBTextRuntimeObject
+    extends gdjs.RuntimeObject
+    implements gdjs.OpacityHandler {
     _opacity: float;
 
     _text: string;
@@ -128,8 +130,9 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(instanceContainer: gdjs.RuntimeInstanceContainer): void {
-      super.onDestroyFromScene(instanceContainer);
+    onDestroyed(): void {
+      super.onDestroyed();
+      this._renderer.destroy();
     }
 
     /**
@@ -138,6 +141,7 @@ namespace gdjs {
     setBBText(text): void {
       this._text = text;
       this._renderer.updateText();
+      this.invalidateHitboxes();
     }
 
     /**

@@ -33,7 +33,7 @@ class GD_CORE_API ArbitraryObjectsWorker {
   virtual ~ArbitraryObjectsWorker();
 
   /**
-   * \brief Launch the worker on the specified events list.
+   * \brief Launch the worker on the specified object container.
    */
   void Launch(gd::ObjectsContainer& objects) { VisitObjectContainer(objects); };
 

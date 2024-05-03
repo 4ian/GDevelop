@@ -43,6 +43,12 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
     this._pixiContainer.addChild(this._pixiObject);
   }
 
+  onRemovedFromScene(): void {
+    super.onRemovedFromScene();
+    // Keep textures because they are shared by all sprites.
+    this._pixiObject.destroy(false);
+  }
+
   /**
    * Return a URL for thumbnail of the specified object.
    */
@@ -65,8 +71,8 @@ export default class RenderedTiledSpriteInstance extends RenderedInstance {
       this._associatedObjectConfiguration
     );
     if (this._instance.hasCustomSize()) {
-      this._pixiObject.width = this._instance.getCustomWidth();
-      this._pixiObject.height = this._instance.getCustomHeight();
+      this._pixiObject.width = this.getCustomWidth();
+      this._pixiObject.height = this.getCustomHeight();
     } else {
       this._pixiObject.width = tiledSprite.getWidth();
       this._pixiObject.height = tiledSprite.getHeight();

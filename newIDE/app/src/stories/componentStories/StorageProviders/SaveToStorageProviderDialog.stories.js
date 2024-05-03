@@ -7,25 +7,21 @@ import { action } from '@storybook/addon-actions';
 import SaveToStorageProviderDialog from '../../../ProjectsStorage/SaveToStorageProviderDialog';
 import GoogleDriveStorageProvider from '../../../ProjectsStorage/GoogleDriveStorageProvider';
 import CloudStorageProvider from '../../../ProjectsStorage/CloudStorageProvider';
-import muiDecorator from '../../ThemeDecorator';
 import UrlStorageProvider from '../../../ProjectsStorage/UrlStorageProvider';
 import DownloadFileStorageProvider from '../../../ProjectsStorage/DownloadFileStorageProvider';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import {
-  fakeNotAuthenticatedAuthenticatedUser,
-  fakeAuthenticatedAndEmailVerifiedUser,
+  fakeNotAuthenticatedUser,
+  fakeAuthenticatedUserWithEmailVerified,
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'Storage Providers/Writers/SaveToStorageProviderDialog',
   component: SaveToStorageProviderDialog,
-  decorators: [muiDecorator],
 };
 
 export const UserNotAuthenticated = () => (
-  <AuthenticatedUserContext.Provider
-    value={fakeNotAuthenticatedAuthenticatedUser}
-  >
+  <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedUser}>
     <SaveToStorageProviderDialog
       storageProviders={[
         UrlStorageProvider,
@@ -41,7 +37,7 @@ export const UserNotAuthenticated = () => (
 
 export const UserAuthenticated = () => (
   <AuthenticatedUserContext.Provider
-    value={fakeAuthenticatedAndEmailVerifiedUser}
+    value={fakeAuthenticatedUserWithEmailVerified}
   >
     <SaveToStorageProviderDialog
       storageProviders={[

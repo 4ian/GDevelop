@@ -435,6 +435,7 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  * \note If a group contains only objects of a same type, then the group has
  * this type. Otherwise, it is considered as an object without any specific
  * type.
+ * \deprecated Use gd::ObjectsContainersList::GetTypeOfObject instead.
  *
  * @return Type of the object/group.
  */
@@ -442,10 +443,45 @@ gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        const ObjectsContainer& layout,
                                        gd::String objectName,
                                        bool searchInGroups = true);
+/**
+ * \brief Check if an object or all objects of a group has a behavior.
+ * \deprecated Use gd::ObjectsContainersList::HasBehaviorInObjectOrGroup instead.
+ */
+bool GD_CORE_API HasBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
+                                            const gd::ObjectsContainer &layout,
+                                            const gd::String &objectOrGroupName,
+                                            const gd::String &behaviorName,
+                                            bool searchInGroups = true);
+/**
+ * \brief Get the names of behavior of a given type if an object or all objects of a group has it.
+ */
+std::vector<gd::String> GD_CORE_API GetBehaviorNamesInObjectOrGroup(
+    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
+    const gd::String &objectOrGroupName, const gd::String &behaviorType,
+    bool searchInGroups);
 
+/**
+ * \brief Check if a behavior is a default one or doesn't exist in an object or
+ * all objects of a group.
+ */
+bool GD_CORE_API IsDefaultBehavior(const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
+                                   gd::String objectOrGroupName,
+                                   gd::String behaviorName,
+                                   bool searchInGroups = true);
+
+/**
+ * \brief Get the type of a behavior if an object or all objects of a group has it.
+ */
+gd::String GD_CORE_API GetTypeOfBehaviorInObjectOrGroup(const gd::ObjectsContainer &project,
+                                            const gd::ObjectsContainer &layout,
+                                            const gd::String &objectOrGroupName,
+                                            const gd::String &behaviorName,
+                                            bool searchInGroups = true);
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
+ * @deprecated - Use GetTypeOfBehaviorInObjectOrGroup instead.
  */
 gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
                                          const ObjectsContainer& layout,
@@ -462,7 +498,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
 std::vector<gd::String> GD_CORE_API
 GetBehaviorsOfObject(const ObjectsContainer& game,
                      const ObjectsContainer& layout,
-                     gd::String objectName,
+                     const gd::String& objectName,
                      bool searchInGroups = true);
 
 }  // namespace gd

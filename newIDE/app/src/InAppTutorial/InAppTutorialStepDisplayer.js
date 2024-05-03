@@ -9,10 +9,14 @@ import {
   type InAppTutorialFlowFormattedStep,
   type InAppTutorialFormattedTooltip,
   type EditorIdentifier,
-} from './InAppTutorialContext';
+} from '../Utils/GDevelopServices/InAppTutorial';
 import InAppTutorialElementHighlighter from './InAppTutorialElementHighlighter';
 import InAppTutorialTooltipDisplayer from './InAppTutorialTooltipDisplayer';
-import { isElementADialog } from '../UI/MaterialUISpecificUtil';
+import {
+  aboveMaterialUiMaxZIndex,
+  isElementADialog,
+  isElementAMuiInput,
+} from '../UI/MaterialUISpecificUtil';
 import { getEditorTabSelector } from './InAppTutorialOrchestrator';
 import InAppTutorialDialog from './InAppTutorialDialog';
 
@@ -21,7 +25,7 @@ const styles = {
     position: 'absolute',
     left: 20,
     bottom: 20,
-    zIndex: 5, // Scene editor mosaic z-index is 4
+    zIndex: aboveMaterialUiMaxZIndex, // Make sure the avatar is above the dialogs or drawers created by Material UI.
     display: 'flex',
     visibility: 'hidden',
     boxShadow:
@@ -94,6 +98,36 @@ const getWrongEditorTooltip = (
   };
 };
 
+export const queryElementOrItsMostVisuallySignificantParent = (
+  elementToHighlightId: string
+): {|
+  elementToHighlight: ?HTMLElement,
+  elementWithId: ?HTMLElement,
+|} => {
+  let foundElement = document.querySelector(elementToHighlightId);
+  if (foundElement instanceof HTMLTextAreaElement) {
+    // In this case, the element to highlight is a Material UI multiline text field
+    // and the textarea only occupies a fraction of the whole input. So we're going
+    // to highlight the parent div.
+    const parentDiv = foundElement.closest('div');
+    if (parentDiv instanceof HTMLElement && isElementAMuiInput(parentDiv)) {
+      return { elementToHighlight: parentDiv, elementWithId: foundElement };
+    }
+  } else if (
+    foundElement instanceof HTMLInputElement &&
+    'searchBar' in foundElement.dataset
+  ) {
+    const containerDiv = foundElement.closest('div[data-search-bar-container]');
+    if (containerDiv instanceof HTMLElement) {
+      return { elementToHighlight: containerDiv, elementWithId: foundElement };
+    }
+  }
+  return {
+    elementToHighlight: foundElement,
+    elementWithId: foundElement,
+  };
+};
+
 type Props = {|
   step: InAppTutorialFlowFormattedStep,
   expectedEditor: {| editor: EditorIdentifier, scene?: string |} | null,
@@ -121,6 +155,7 @@ function InAppTutorialStepDisplayer({
     elementToHighlight,
     setElementToHighlight,
   ] = React.useState<?HTMLElement>(null);
+  const [elementWithId, setElementWithId] = React.useState<?HTMLElement>(null);
   const [
     hideBehindOtherDialog,
     setHideBehindOtherDialog,
@@ -140,7 +175,13 @@ function InAppTutorialStepDisplayer({
   const queryElement = React.useCallback(
     () => {
       if (!elementToHighlightId) return;
-      setElementToHighlight(document.querySelector(elementToHighlightId));
+
+      const {
+        elementToHighlight,
+        elementWithId,
+      } = queryElementOrItsMostVisuallySignificantParent(elementToHighlightId);
+      setElementToHighlight(elementToHighlight);
+      setElementWithId(elementWithId);
     },
     [elementToHighlightId]
   );
@@ -231,6 +272,36 @@ function InAppTutorialStepDisplayer({
     );
   };
 
+  const getFillAutomaticallyFunction = React.useCallback(
+    () => {
+      if (!nextStepTrigger || !nextStepTrigger.valueEquals) {
+        return undefined;
+      }
+
+      if (
+        !(elementWithId instanceof HTMLInputElement) &&
+        !(elementWithId instanceof HTMLTextAreaElement)
+      ) {
+        return undefined;
+      }
+
+      const valuePropertyDescriptor = Object.getOwnPropertyDescriptor(
+        elementWithId.constructor.prototype,
+        'value'
+      );
+      if (!valuePropertyDescriptor) return undefined;
+      const valueSetter = valuePropertyDescriptor.set;
+      if (!valueSetter) return undefined;
+      return () => {
+        valueSetter.call(elementWithId, nextStepTrigger.valueEquals);
+        // Trigger blur to make sure the value is taken into account
+        // by the React input.
+        elementWithId.dispatchEvent(new Event('blur', { bubbles: true }));
+      };
+    },
+    [nextStepTrigger, elementWithId]
+  );
+
   const renderTooltip = (i18n: I18nType) => {
     if (tooltip && !expectedEditor) {
       const anchorElement = tooltip.standalone
@@ -250,6 +321,7 @@ function InAppTutorialStepDisplayer({
               ? nextStepTrigger.clickOnTooltipButton
               : undefined
           }
+          fillAutomatically={getFillAutomaticallyFunction()}
         />
       );
     }
@@ -259,7 +331,7 @@ function InAppTutorialStepDisplayer({
       return (
         <InAppTutorialTooltipDisplayer
           endTutorial={endTutorial}
-          showQuitButton={!isOnClosableDialog}
+          showQuitButton // Always show the quit button when the user is on the wrong editor
           anchorElement={assistantImage}
           tooltip={wrongEditorTooltip}
           progress={progress}
@@ -283,6 +355,7 @@ function InAppTutorialStepDisplayer({
                 visibility: displayRedHero ? 'visible' : 'hidden',
               }}
               ref={defineAssistantImage}
+              id="in-app-tutorial-avatar"
             >
               <img
                 alt="GDevelop mascot red hero"

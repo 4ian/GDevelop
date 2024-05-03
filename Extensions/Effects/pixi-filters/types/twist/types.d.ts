@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class TwistFilter extends PIXI.Filter {
     constructor(radius?: number, angle?: number, padding?: number);
     angle: number;

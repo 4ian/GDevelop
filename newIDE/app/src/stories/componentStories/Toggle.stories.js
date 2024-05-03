@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 
-import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 import Toggle from '../../UI/Toggle';
 import { ColumnStackLayout } from '../../UI/Layout';
@@ -9,7 +8,7 @@ import { ColumnStackLayout } from '../../UI/Layout';
 export default {
   title: 'UI Building Blocks/Toggle',
   component: Toggle,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 const WithLeftLabel = () => {

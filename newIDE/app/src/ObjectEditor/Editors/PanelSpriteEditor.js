@@ -18,6 +18,8 @@ export default class PanelSpriteEditor extends React.Component<
       objectConfiguration,
       project,
       resourceManagementProps,
+      objectName,
+      renderObjectNameField,
     } = this.props;
     const panelSpriteConfiguration = gd.asPanelSpriteConfiguration(
       objectConfiguration
@@ -25,11 +27,13 @@ export default class PanelSpriteEditor extends React.Component<
 
     return (
       <ColumnStackLayout noMargin>
+        {renderObjectNameField && renderObjectNameField()}
         <ResourceSelectorWithThumbnail
           project={project}
           resourceManagementProps={resourceManagementProps}
           resourceKind="image"
           resourceName={panelSpriteConfiguration.getTexture()}
+          defaultNewResourceName={objectName}
           onChange={resourceName => {
             panelSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();

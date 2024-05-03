@@ -6,6 +6,13 @@
   color: var(--table-text-color);
 }
 
+.gd-table .tableHeaderRow {
+  /* react-virtualized adds a padding right directly on the header row element
+   * so the !important is needed to override it. It is set to 0 to avoid having
+   * a gap between the right part of the screen/container and the scroll bar. */
+  padding-right: 0px !important;
+}
+
 .gd-table .tableHeaderRow,
 .gd-table .tableEvenRow,
 .gd-table .tableSelectedRow,

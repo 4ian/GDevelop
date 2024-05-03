@@ -12,7 +12,7 @@ const fs = require('fs').promises;
 
 /** @param {string} outPath */
 const renameBuiltFile = (outPath) => {
-  return outPath.replace(/\.ts$/, '.js');
+  return outPath.replace(/\.tsx?$/, '.js');
 };
 
 const bundledOutPath =

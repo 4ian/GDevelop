@@ -7,18 +7,19 @@ import {
   getLeaves,
 } from 'react-mosaic-component';
 import CloseButton from './CloseButton';
-import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-import debounce from 'lodash/debounce';
+import { useDebounce } from '../../Utils/UseDebounce';
 
 // EditorMosaic default styling:
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
+import classNames from 'classnames';
 
 export type Editor = {|
   type: 'primary' | 'secondary',
   renderEditor: () => React.Node,
   noTitleBar?: boolean,
+  noSoftKeyboardAvoidance?: boolean,
   title?: MessageDescriptor,
   toolbarControls?: Array<React.Node>,
 |};
@@ -127,6 +128,88 @@ const replaceNode = (
   }
 };
 
+// Remove the specified node (editor).
+const removeNode = (
+  currentNode: ?EditorMosaicNode,
+  oldNode: ?EditorMosaicNode
+): ?EditorMosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  } else if (typeof currentNode === 'string') {
+    if (currentNode === oldNode) return null;
+
+    return currentNode;
+  } else {
+    if (currentNode === oldNode) return null;
+
+    const first = removeNode(currentNode.first, oldNode);
+    const second = removeNode(currentNode.second, oldNode);
+
+    if (first && second) {
+      return {
+        ...currentNode,
+        first,
+        second,
+      };
+    } else {
+      if (!first) return second;
+      else return first;
+    }
+  }
+};
+
+const resizeNode = (
+  currentNode: ?EditorMosaicNode,
+  resizedNode: ?EditorMosaicNode,
+  splitPercentage: number
+): ?EditorMosaicNode => {
+  if (!currentNode) {
+    return currentNode;
+  }
+  if (typeof currentNode === 'string') {
+    return currentNode;
+  }
+  if (currentNode.first === resizedNode) {
+    return {
+      ...currentNode,
+      splitPercentage: splitPercentage,
+    };
+  }
+  if (currentNode.second === resizedNode) {
+    return {
+      ...currentNode,
+      splitPercentage: 100 - splitPercentage,
+    };
+  }
+  return {
+    ...currentNode,
+    first: resizeNode(currentNode.first, resizedNode, splitPercentage),
+    second: resizeNode(currentNode.second, resizedNode, splitPercentage),
+  };
+};
+
+const getNodeSize = (
+  currentNode: ?EditorMosaicNode,
+  resizedNode: ?EditorMosaicNode
+): number => {
+  if (!currentNode) {
+    return 0;
+  }
+  if (typeof currentNode === 'string') {
+    return 0;
+  }
+  if (currentNode.first === resizedNode) {
+    return currentNode.splitPercentage;
+  }
+  if (currentNode.second === resizedNode) {
+    return 100 - currentNode.splitPercentage;
+  }
+  return (
+    getNodeSize(currentNode.first, resizedNode) ||
+    getNodeSize(currentNode.second, resizedNode)
+  );
+};
+
 const defaultToolbarControls = [<CloseButton key="close" />];
 
 const renderMosaicWindowPreview = props => (
@@ -151,17 +234,29 @@ const MosaicWindow = (props: any) => (
   />
 );
 
+export type EditorMosaicInterface = {|
+  getOpenedEditorNames: () => Array<string>,
+  toggleEditor: (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number,
+    direction: 'row' | 'column'
+  ) => boolean,
+  collapseEditor: (editorName: string) => boolean,
+  uncollapseEditor: (
+    editorName: string,
+    defaultSplitPercentage: number
+  ) => boolean,
+|};
+
 type Props = {|
   initialNodes: EditorMosaicNode,
   editors: {
     [string]: Editor,
   },
   limitToOneSecondaryEditor?: boolean,
+  onOpenedEditorsChanged?: () => void,
   onPersistNodes?: EditorMosaicNode => void,
-|};
-
-type State = {|
-  mosaicNode: ?EditorMosaicNode,
 |};
 
 /**
@@ -170,81 +265,149 @@ type State = {|
  * Can be used to create a mosaic of resizable editors.
  * Must be used inside a component wrapped in a DragDropContext.
  */
-export default class EditorMosaic extends React.Component<Props, State> {
-  state = {
-    mosaicNode: this.props.initialNodes,
-  };
-
-  openEditor = (
-    editorName: string,
-    position: 'start' | 'end',
-    splitPercentage: number,
-    direction: 'row' | 'column'
+const EditorMosaic = React.forwardRef<Props, EditorMosaicInterface>(
+  (
+    {
+      initialNodes,
+      editors,
+      limitToOneSecondaryEditor,
+      onOpenedEditorsChanged,
+      onPersistNodes,
+    },
+    ref
   ) => {
-    const { editors, limitToOneSecondaryEditor } = this.props;
+    const [mosaicNode, setMosaicNode] = React.useState<?EditorMosaicNode>(
+      initialNodes
+    );
+    const collapsedEditorSize = React.useRef<Map<string, number>>(new Map());
 
-    const editor = this.props.editors[editorName];
-    if (!editor) return false;
+    const openEditor = React.useCallback(
+      (
+        editorName: string,
+        position: 'start' | 'end',
+        splitPercentage: number,
+        direction: 'row' | 'column'
+      ) => {
+        const editor = editors[editorName];
+        if (!editor) return false;
 
-    const openedEditorNames = getLeaves(this.state.mosaicNode);
-    if (openedEditorNames.indexOf(editorName) !== -1) {
-      return false;
-    }
+        const openedEditorNames = getLeaves(mosaicNode);
+        if (openedEditorNames.indexOf(editorName) !== -1) {
+          // Editor is already opened.
+          return false;
+        }
 
-    if (limitToOneSecondaryEditor && editor.type === 'secondary') {
-      // Replace the existing secondary editor, if any.
-      const secondaryEditorName = openedEditorNames.find(
-        editorName => editors[editorName].type === 'secondary'
-      );
-      if (secondaryEditorName) {
-        this.setState({
-          mosaicNode: replaceNode(
-            this.state.mosaicNode,
-            secondaryEditorName,
-            editorName
-          ),
-        });
+        if (limitToOneSecondaryEditor && editor.type === 'secondary') {
+          // Replace the existing secondary editor, if any.
+          const secondaryEditorName = openedEditorNames.find(
+            editorName => editors[editorName].type === 'secondary'
+          );
+          if (secondaryEditorName) {
+            setMosaicNode(
+              replaceNode(mosaicNode, secondaryEditorName, editorName)
+            );
 
-        this._persistNodes();
+            return true;
+          }
+        }
+
+        // Open a new editor at the indicated position.
+        setMosaicNode(
+          addNode(mosaicNode, editorName, position, splitPercentage, direction)
+        );
+
         return true;
+      },
+      [mosaicNode, editors, limitToOneSecondaryEditor]
+    );
+
+    React.useImperativeHandle(ref, () => ({
+      getOpenedEditorNames: (): Array<string> => {
+        return getLeaves(mosaicNode);
+      },
+      toggleEditor: (
+        editorName: string,
+        position: 'start' | 'end',
+        splitPercentage: number,
+        direction: 'row' | 'column'
+      ) => {
+        const editor = editors[editorName];
+        if (!editor) return false;
+
+        const openedEditorNames = getLeaves(mosaicNode);
+        if (openedEditorNames.indexOf(editorName) !== -1) {
+          // The editor is already opened: close it.
+          setMosaicNode(removeNode(mosaicNode, editorName));
+
+          return false;
+        }
+
+        return openEditor(editorName, position, splitPercentage, direction);
+      },
+      collapseEditor: (editorName: string) => {
+        const editor = editors[editorName];
+        if (!editor) return false;
+
+        const nodeSize = getNodeSize(mosaicNode, editorName);
+        if (nodeSize > 0) {
+          collapsedEditorSize.current.set(
+            editorName,
+            getNodeSize(mosaicNode, editorName)
+          );
+        }
+        setMosaicNode(resizeNode(mosaicNode, editorName, 0));
+        return true;
+      },
+      uncollapseEditor: (
+        editorName: string,
+        defaultSplitPercentage: number
+      ) => {
+        const editor = editors[editorName];
+        if (!editor) return false;
+
+        if (getNodeSize(mosaicNode, editorName) !== 0) {
+          return false;
+        }
+
+        setMosaicNode(
+          resizeNode(
+            mosaicNode,
+            editorName,
+            collapsedEditorSize.current.get(editorName) ||
+              defaultSplitPercentage
+          )
+        );
+        return true;
+      },
+    }));
+
+    const debouncedPersistNodes = useDebounce(() => {
+      if (onPersistNodes && mosaicNode) {
+        onPersistNodes(mosaicNode);
       }
-    }
+    }, 2000);
 
-    // Open a new editor at the indicated position
-    this.setState({
-      mosaicNode: addNode(
-        this.state.mosaicNode,
-        editorName,
-        position,
-        splitPercentage,
-        direction
-      ),
-    });
+    React.useEffect(
+      () => {
+        if (onOpenedEditorsChanged) {
+          onOpenedEditorsChanged();
+        }
 
-    this._persistNodes();
-    return true;
-  };
+        debouncedPersistNodes();
+      },
+      [mosaicNode, onOpenedEditorsChanged, debouncedPersistNodes]
+    );
 
-  _onChange = (mosaicNode: EditorMosaicNode) => {
-    this.setState({ mosaicNode });
-    this._persistNodes();
-  };
-
-  _persistNodes = debounce(() => {
-    if (this.props.onPersistNodes && this.state.mosaicNode) {
-      this.props.onPersistNodes(this.state.mosaicNode);
-    }
-  }, 2000);
-
-  render() {
-    const { editors } = this.props;
     return (
-      <ThemeConsumer>
-        {muiTheme => (
+      <I18n>
+        {({ i18n }) => (
           <MosaicWithoutDragDropContext
-            className={`${
-              muiTheme.mosaicRootClassName
-            } mosaic-blueprint-theme mosaic-gd-theme`}
+            className={classNames({
+              'mosaic-gd-theme': true,
+              'mosaic-blueprint-theme': true,
+              // Move the entire mosaic up when the soft keyboard is open:
+              'avoid-soft-keyboard': true,
+            })}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
               if (!editor) {
@@ -259,24 +422,23 @@ export default class EditorMosaic extends React.Component<Props, State> {
               }
 
               return (
-                <I18n>
-                  {({ i18n }) => (
-                    <MosaicWindow
-                      path={path}
-                      title={i18n._(editor.title)}
-                      toolbarControls={editor.toolbarControls}
-                    >
-                      {editor.renderEditor()}
-                    </MosaicWindow>
-                  )}
-                </I18n>
+                <MosaicWindow
+                  path={path}
+                  title={i18n._(editor.title)}
+                  toolbarControls={editor.toolbarControls}
+                >
+                  {editor.renderEditor()}
+                </MosaicWindow>
               );
             }}
-            value={this.state.mosaicNode}
-            onChange={this._onChange}
+            value={mosaicNode}
+            onChange={setMosaicNode}
+            onRelease={setMosaicNode}
           />
         )}
-      </ThemeConsumer>
+      </I18n>
     );
   }
-}
+);
+
+export default EditorMosaic;

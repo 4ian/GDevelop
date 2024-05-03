@@ -4,14 +4,15 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/ObjectGroupsListWithObjectGroupEditor';
 import { Tabs } from '../../UI/Tabs';
-import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
-import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
+import { EventsFunctionParametersEditor } from './EventsFunctionParametersEditor';
+import { EventsFunctionPropertiesEditor } from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
 import { Column, Line } from '../../UI/Grid';
-import { showWarningBox } from '../../UI/Messages/MessageBox';
 import Window from '../../Utils/Window';
 import { type GroupWithContext } from '../../ObjectsList/EnumerateObjects';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
+import newNameGenerator from '../../Utils/NewNameGenerator';
+import { type ExtensionItemConfigurationAttribute } from '../../EventsFunctionsExtensionEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,7 +26,7 @@ type Props = {|
   eventsFunctionsContainer: gdEventsFunctionsContainer,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: (whatChanged?: 'type') => void,
+  onConfigurationUpdated?: (?ExtensionItemConfigurationAttribute) => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
@@ -67,29 +68,26 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     currentTab: 'config',
   };
 
-  _canObjectOrGroupUseNewName = (newName: string) => {
+  _getValidatedObjectOrGroupName = (newName: string) => {
     const { objectsContainer, globalObjectsContainer } = this.props;
 
-    if (
-      objectsContainer.hasObjectNamed(newName) ||
-      globalObjectsContainer.hasObjectNamed(newName) ||
-      objectsContainer.getObjectGroups().has(newName) ||
-      globalObjectsContainer.getObjectGroups().has(newName)
-    ) {
-      showWarningBox(
-        'Another object or group with this name already exists in this function.',
-        { delayToNextTick: true }
-      );
-      return false;
-    } else if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
-        { delayToNextTick: true }
-      );
-      return false;
-    }
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        if (
+          objectsContainer.hasObjectNamed(tentativeNewName) ||
+          globalObjectsContainer.hasObjectNamed(tentativeNewName) ||
+          objectsContainer.getObjectGroups().has(tentativeNewName) ||
+          globalObjectsContainer.getObjectGroups().has(tentativeNewName)
+        ) {
+          return true;
+        }
 
-    return true;
+        return false;
+      }
+    );
+
+    return safeAndUniqueNewName;
   };
 
   _onDeleteGroup = (
@@ -178,9 +176,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <Column expand useFullHeight>
+      <Column expand useFullHeight noOverflowParent>
         <Line>
-          <Column noMargin expand>
+          <Column noMargin expand noOverflowParent>
             <Tabs
               value={this.state.currentTab}
               onChange={this._chooseTab}
@@ -246,7 +244,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             objectsContainer={objectsContainer}
             globalObjectGroups={globalObjectsContainer.getObjectGroups()}
             objectGroups={eventsFunction.getObjectGroups()}
-            canRenameGroup={this._canObjectOrGroupUseNewName}
+            getValidatedObjectOrGroupName={this._getValidatedObjectOrGroupName}
             onRenameGroup={this._onRenameGroup}
             onDeleteGroup={this._onDeleteGroup}
             onGroupsUpdated={onParametersOrGroupsUpdated}

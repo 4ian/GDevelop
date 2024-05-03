@@ -1,5 +1,5 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -7,77 +7,23 @@ import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import Subheader from '../UI/Subheader';
-import ListIcon from '../UI/ListIcon';
-import { Tabs } from '../UI/Tabs';
-import { List, ListItem } from '../UI/List';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Create from '@material-ui/icons/Create';
-import { Column, Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
-import { getHelpLink } from '../Utils/HelpLink';
-import {
-  type EnumeratedBehaviorMetadata,
-  enumerateBehaviorsMetadata,
-  filterEnumeratedBehaviorMetadata,
-} from './EnumerateBehaviorsMetadata';
-import SearchBar, { type SearchBarInterface } from '../UI/SearchBar';
-import EmptyMessage from '../UI/EmptyMessage';
-import { ExtensionStore } from '../AssetStore/ExtensionStore';
-import Window from '../Utils/Window';
+import { enumerateBehaviorsMetadata } from './EnumerateBehaviorsMetadata';
+import { BehaviorStore } from '../AssetStore/BehaviorStore';
+import { type SearchableBehaviorMetadata } from '../AssetStore/BehaviorStore/BehaviorStoreContext';
+import { type BehaviorShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
-import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { useShouldAutofocusInput } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { mapVector } from '../Utils/MapFor';
 
-const styles = {
-  disabledItem: { opacity: 0.6 },
-};
-
-const BehaviorListItem = ({
-  i18n,
-  behaviorMetadata,
-  alreadyInstalled,
-  onClick,
-  disabled,
-}: {|
-  i18n: I18nType,
-  behaviorMetadata: EnumeratedBehaviorMetadata,
-  alreadyInstalled: boolean,
-  onClick: () => void,
-  disabled: boolean,
-|}) => (
-  <ListItem
-    leftIcon={
-      <ListIcon
-        src={behaviorMetadata.iconFilename}
-        iconSize={40}
-        isGDevelopIcon
-      />
-    }
-    key={behaviorMetadata.type}
-    primaryText={`${behaviorMetadata.fullName} ${
-      alreadyInstalled ? i18n._(t`(already added to this object)`) : ''
-    }`}
-    secondaryText={behaviorMetadata.description}
-    secondaryTextLines={2}
-    onClick={onClick}
-    style={disabled ? styles.disabledItem : undefined}
-    disabled={disabled}
-    id={'behavior-item-' + behaviorMetadata.type.replace(/:/g, '-')}
-  />
-);
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -98,17 +44,7 @@ export default function NewBehaviorDialog({
   objectType,
   objectBehaviorsTypes,
 }: Props) {
-  const windowWidth = useResponsiveWindowWidth();
-  const [showDeprecated, setShowDeprecated] = React.useState(false);
-  const [searchText, setSearchText] = React.useState('');
-  const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
-    'installed'
-  );
-  const searchBar = React.useRef<?SearchBarInterface>(null);
-  const scrollView = React.useRef((null: ?ScrollViewInterface));
-
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const [extensionInstallTime, setExtensionInstallTime] = React.useState(0);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -120,55 +56,101 @@ export default function NewBehaviorDialog({
     installExtension
   );
 
-  const platform = project.getCurrentPlatform();
-  const behaviorsMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
-    () => {
-      return project && platform
-        ? enumerateBehaviorsMetadata(
-            platform,
-            project,
-            eventsFunctionsExtension
-          )
-        : [];
-    },
-    [project, platform, eventsFunctionsExtension, extensionInstallTime] // eslint-disable-line react-hooks/exhaustive-deps
+  const deprecatedBehaviorsInformation = React.useMemo(
+    () => getDeprecatedBehaviorsInformation(),
+    []
   );
 
-  const shouldAutofocusSearchbar = useShouldAutofocusInput();
-  React.useEffect(
-    () => {
-      setTimeout(() => {
-        if (shouldAutofocusSearchbar && searchBar.current)
-          searchBar.current.focus();
-      }, 20 /* Be sure that the search bar is shown */);
+  const getAllRequiredBehaviorTypes = React.useCallback(
+    (
+      behaviorMetadata: gdBehaviorMetadata,
+      allRequiredBehaviorTypes: Array<string> = []
+    ): Array<string> => {
+      mapVector(
+        behaviorMetadata.getRequiredBehaviorTypes(),
+        requiredBehaviorType => {
+          if (allRequiredBehaviorTypes.includes(requiredBehaviorType)) {
+            return;
+          }
+          allRequiredBehaviorTypes.push(requiredBehaviorType);
+          const requiredBehaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            project.getCurrentPlatform(),
+            requiredBehaviorType
+          );
+          getAllRequiredBehaviorTypes(
+            requiredBehaviorMetadata,
+            allRequiredBehaviorTypes
+          );
+        }
+      );
+      return allRequiredBehaviorTypes;
     },
-    [shouldAutofocusSearchbar]
+    [project]
+  );
+
+  const allInstalledBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () => {
+      const platform = project.getCurrentPlatform();
+      const behaviorMetadataList =
+        project && platform
+          ? enumerateBehaviorsMetadata(
+              platform,
+              project,
+              eventsFunctionsExtension
+            )
+          : [];
+      return behaviorMetadataList
+        .filter(behavior => !behavior.behaviorMetadata.isHidden())
+        .map(behavior => ({
+          type: behavior.type,
+          fullName: behavior.fullName,
+          description: behavior.description,
+          previewIconUrl: behavior.previewIconUrl,
+          objectType: behavior.objectType,
+          category: behavior.category,
+          allRequiredBehaviorTypes: getAllRequiredBehaviorTypes(
+            behavior.behaviorMetadata
+          ),
+          tags: behavior.tags,
+        }));
+    },
+    [project, eventsFunctionsExtension, getAllRequiredBehaviorTypes]
+  );
+
+  const installedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () =>
+      allInstalledBehaviorMetadataList.filter(
+        behavior => !deprecatedBehaviorsInformation[behavior.type]
+      ),
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
+  );
+
+  const deprecatedBehaviorMetadataList: Array<SearchableBehaviorMetadata> = React.useMemo(
+    () => {
+      const deprecatedBehaviors = allInstalledBehaviorMetadataList.filter(
+        behavior => deprecatedBehaviorsInformation[behavior.type]
+      );
+      deprecatedBehaviors.forEach(behavior => (behavior.isDeprecated = true));
+      return deprecatedBehaviors;
+    },
+    [allInstalledBehaviorMetadataList, deprecatedBehaviorsInformation]
   );
 
   if (!open || !project) return null;
 
-  const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
-
-  const filteredBehaviorMetadata = filterEnumeratedBehaviorMetadata(
-    behaviorsMetadata,
-    searchText
-  );
-  const behaviors = filteredBehaviorMetadata.filter(
-    ({ type }) => !deprecatedBehaviorsInformation[type]
-  );
-  const deprecatedBehaviors = filteredBehaviorMetadata.filter(
-    ({ type }) => !!deprecatedBehaviorsInformation[type]
-  );
-
-  const _chooseBehavior = (
-    i18n: I18nType,
-    { type, defaultName }: EnumeratedBehaviorMetadata
-  ) => {
-    if (deprecatedBehaviorsInformation[type]) {
-      showMessageBox(i18n._(deprecatedBehaviorsInformation[type].warning));
+  const _chooseBehavior = (i18n: I18nType, behaviorType: string) => {
+    if (deprecatedBehaviorsInformation[behaviorType]) {
+      showMessageBox(
+        i18n._(deprecatedBehaviorsInformation[behaviorType].warning)
+      );
     }
 
-    return onChoose(type, defaultName);
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      project.getCurrentPlatform(),
+      behaviorType
+    );
+
+    return onChoose(behaviorType, behaviorMetadata.getDefaultName());
   };
   const chooseBehavior = addCreateBadgePreHookIfNotClaimed(
     authenticatedUser,
@@ -176,25 +158,9 @@ export default function NewBehaviorDialog({
     _chooseBehavior
   );
 
-  const isAmongObjectBehaviors = (
-    behaviorMetadata: EnumeratedBehaviorMetadata
-  ) => objectBehaviorsTypes.includes(behaviorMetadata.type);
-
-  const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
-    // An empty object type means the base object, i.e: any object.
-    return (
-      (behaviorMetadata.objectType === '' ||
-        behaviorMetadata.objectType === objectType) &&
-      !isAmongObjectBehaviors(behaviorMetadata)
-    );
-  };
-
-  const hasSearchNoResult =
-    !!searchText && !behaviors.length && !deprecatedBehaviors.length;
-
   const onInstallExtension = async (
     i18n: I18nType,
-    extensionShortHeader: ExtensionShortHeader
+    behaviorShortHeader: BehaviorShortHeader
   ) => {
     setIsInstalling(true);
     try {
@@ -202,18 +168,9 @@ export default function NewBehaviorDialog({
         i18n,
         project,
         eventsFunctionsExtensionsState,
-        extensionShortHeader
+        behaviorShortHeader
       );
-
-      if (wasExtensionInstalled) {
-        // Setting the extension install time will force a reload of
-        // the behavior metadata, and so the list of behaviors.
-        setExtensionInstallTime(Date.now());
-        setCurrentTab('installed');
-        if (scrollView.current) scrollView.current.scrollToBottom();
-        return true;
-      }
-      return false;
+      return wasExtensionInstalled;
     } finally {
       setIsInstalling(false);
     }
@@ -237,149 +194,21 @@ export default function NewBehaviorDialog({
           ]}
           open
           onRequestClose={onClose}
-          flexColumnBody
+          flexBody
           fullHeight
           id="new-behavior-dialog"
-          fixedContent={
-            <Tabs
-              value={currentTab}
-              onChange={setCurrentTab}
-              options={[
-                {
-                  label: <Trans>Installed behaviors</Trans>,
-                  value: 'installed',
-                },
-                {
-                  label: <Trans>Search new behaviors</Trans>,
-                  value: 'search',
-                },
-              ]}
-              // Enforce scroll on small screen, because the tabs have long names.
-              variant={windowWidth === 'small' ? 'scrollable' : undefined}
-            />
-          }
         >
-          {currentTab === 'installed' && (
-            <React.Fragment>
-              <Line>
-                <Column expand noMargin>
-                  <SearchBar
-                    value={searchText}
-                    onRequestSearch={() => {
-                      if (behaviors.length) {
-                        chooseBehavior(i18n, behaviors[0]);
-                      } else if (showDeprecated && deprecatedBehaviors.length) {
-                        chooseBehavior(i18n, deprecatedBehaviors[0]);
-                      }
-                    }}
-                    onChange={setSearchText}
-                    ref={searchBar}
-                    placeholder={t`Search installed behaviors`}
-                  />
-                </Column>
-              </Line>
-              {hasSearchNoResult && (
-                <EmptyMessage>
-                  <Trans>
-                    No behavior found for your search. Try another search, or
-                    search for new behaviors to install.
-                  </Trans>
-                </EmptyMessage>
-              )}
-              <ScrollView ref={scrollView}>
-                <List>
-                  {behaviors.map((behaviorMetadata, index) => (
-                    <BehaviorListItem
-                      i18n={i18n}
-                      key={index}
-                      behaviorMetadata={behaviorMetadata}
-                      alreadyInstalled={isAmongObjectBehaviors(
-                        behaviorMetadata
-                      )}
-                      onClick={() => chooseBehavior(i18n, behaviorMetadata)}
-                      disabled={!canBehaviorBeUsed(behaviorMetadata)}
-                    />
-                  ))}
-                  {showDeprecated && !!deprecatedBehaviors.length && (
-                    <Subheader>
-                      Deprecated (old, prefer not to use anymore)
-                    </Subheader>
-                  )}
-                  {showDeprecated &&
-                    deprecatedBehaviors.map((behaviorMetadata, index) => (
-                      <BehaviorListItem
-                        i18n={i18n}
-                        key={index}
-                        behaviorMetadata={behaviorMetadata}
-                        alreadyInstalled={isAmongObjectBehaviors(
-                          behaviorMetadata
-                        )}
-                        onClick={() => chooseBehavior(i18n, behaviorMetadata)}
-                        disabled={!canBehaviorBeUsed(behaviorMetadata)}
-                      />
-                    ))}
-                </List>
-                <Line justifyContent="center" alignItems="center">
-                  {!showDeprecated ? (
-                    <FlatButton
-                      key="toggle-experimental"
-                      leftIcon={<Visibility />}
-                      primary={false}
-                      onClick={() => {
-                        setShowDeprecated(true);
-                      }}
-                      label={<Trans>Show deprecated (old) behaviors</Trans>}
-                    />
-                  ) : (
-                    <FlatButton
-                      key="toggle-experimental"
-                      leftIcon={<VisibilityOff />}
-                      primary={false}
-                      onClick={() => {
-                        setShowDeprecated(false);
-                      }}
-                      label={<Trans>Show deprecated (old) behaviors</Trans>}
-                    />
-                  )}
-                </Line>
-                <Line justifyContent="center" alignItems="center">
-                  <FlatButton
-                    leftIcon={<Create />}
-                    primary={false}
-                    onClick={() =>
-                      Window.openExternalURL(
-                        getHelpLink('/behaviors/events-based-behaviors')
-                      )
-                    }
-                    label={<Trans>Create your own behavior</Trans>}
-                  />
-                </Line>
-              </ScrollView>
-            </React.Fragment>
-          )}
-          {currentTab === 'search' && (
-            <Line expand>
-              <Column expand noMargin>
-                <ExtensionStore
-                  project={project}
-                  isInstalling={isInstalling}
-                  onInstall={async extensionShortHeader =>
-                    onInstallExtension(i18n, extensionShortHeader)
-                  }
-                  showOnlyWithBehaviors
-                />
-              </Column>
-            </Line>
-          )}
-          <DismissableInfoBar
-            identifier="extension-installed-explanation"
-            message={
-              <Trans>
-                The behavior was added to the project. You can now add it to
-                your object.
-              </Trans>
+          <BehaviorStore
+            project={project}
+            objectType={objectType}
+            objectBehaviorsTypes={objectBehaviorsTypes}
+            isInstalling={isInstalling}
+            onInstall={async shortHeader =>
+              onInstallExtension(i18n, shortHeader)
             }
-            show={extensionInstallTime !== 0}
+            onChoose={behaviorType => chooseBehavior(i18n, behaviorType)}
+            installedBehaviorMetadataList={installedBehaviorMetadataList}
+            deprecatedBehaviorMetadataList={deprecatedBehaviorMetadataList}
           />
         </Dialog>
       )}

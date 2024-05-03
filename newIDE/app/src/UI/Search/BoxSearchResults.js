@@ -10,6 +10,7 @@ import EmptyMessage from '../EmptyMessage';
 type Props<SearchItem> = {|
   searchItems: ?Array<SearchItem>,
   renderSearchItem: (item: SearchItem, size: number) => React.Node,
+  spacing: number,
   error: ?Error,
   onRetry: () => void,
   baseSize: number,
@@ -38,6 +39,7 @@ export const BoxSearchResults = React.forwardRef<
     {
       searchItems,
       renderSearchItem,
+      spacing,
       error,
       onRetry,
       baseSize,
@@ -97,7 +99,10 @@ export const BoxSearchResults = React.forwardRef<
     }
 
     return (
-      <ErrorBoundary>
+      <ErrorBoundary
+        componentTitle={<Trans>Search results</Trans>}
+        scope="box-search-result"
+      >
         <div style={styles.container}>
           <AutoSizer>
             {({ width, height }) => {
@@ -122,9 +127,18 @@ export const BoxSearchResults = React.forwardRef<
                     : null;
 
                 return (
-                  <div key={key} style={style}>
+                  <div
+                    key={key}
+                    style={{
+                      ...style,
+                      left: style.left + spacing / 2,
+                      top: style.top + spacing / 2,
+                      width: style.width - spacing,
+                      height: style.height - spacing,
+                    }}
+                  >
                     {searchItem
-                      ? renderSearchItem(searchItem, columnWidth)
+                      ? renderSearchItem(searchItem, columnWidth - spacing)
                       : null}
                   </div>
                 );

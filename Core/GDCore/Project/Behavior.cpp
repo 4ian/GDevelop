@@ -4,8 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/Behavior.h"
-#include <iostream>
-#include "GDCore/Project/PropertyDescriptor.h"
 
 namespace gd {
 

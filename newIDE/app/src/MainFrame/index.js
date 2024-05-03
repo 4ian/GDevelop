@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import './MainFrame.css';
-import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
 import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
@@ -12,7 +11,6 @@ import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
-import DrawerTopBar from '../UI/DrawerTopBar';
 import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
@@ -37,11 +35,11 @@ import {
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
+  type EditorKind,
   getEventsFunctionsExtensionEditor,
-  notifyPreviewWillStart,
+  notifyPreviewOrExportWillStart,
   moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
-import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
 import { renderExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
@@ -50,13 +48,16 @@ import { renderExternalLayoutEditorContainer } from './EditorContainers/External
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
 import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import ErrorBoundary from '../UI/ErrorBoundary';
+import { type RenderEditorContainerPropsWithRef } from './EditorContainers/BaseEditor';
+import ErrorBoundary, {
+  getEditorErrorBoundaryProps,
+} from '../UI/ErrorBoundary';
 import ResourcesLoader from '../ResourcesLoader/index';
 import {
   type PreviewLauncherInterface,
   type PreviewLauncherProps,
   type PreviewLauncherComponent,
-} from '../Export/PreviewLauncher.flow';
+} from '../ExportAndShare/PreviewLauncher.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -71,27 +72,20 @@ import {
   getElectronUpdateNotificationBody,
   type ElectronUpdateStatus,
 } from './UpdaterTools';
-import { showWarningBox } from '../UI/Messages/MessageBox';
-import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext, {
   type InAppTutorialUserProgress,
 } from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
-import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import CreateProjectDialog, {
-  createNewProjectWithDefaultLogin,
-  type NewProjectSetup,
-} from '../ProjectCreation/CreateProjectDialog';
 import {
-  createNewProjectFromExampleShortHeader,
-  createNewProject,
-} from '../ProjectCreation/CreateProjectDialog';
+  type ShareDialogWithoutExportsProps,
+  type ShareTab,
+} from '../ExportAndShare/ShareDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -99,6 +93,7 @@ import {
   type FileMetadata,
   type SaveAsLocation,
   type FileMetadataAndStorageProviderName,
+  type ResourcesActionsMenuBuilder,
 } from '../ProjectsStorage';
 import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
 import SaveToStorageProviderDialog from '../ProjectsStorage/SaveToStorageProviderDialog';
@@ -108,6 +103,7 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 import {
   type BuildMainMenuProps,
   type MainMenuCallbacks,
+  type MainMenuExtraCallbacks,
   buildMainMenuDeclarativeTemplate,
   adaptFromDeclarativeTemplate,
 } from './MainMenu';
@@ -115,7 +111,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import useStateWithCallback from '../Utils/UseSetStateWithCallback';
 import { useKeyboardShortcuts, useShortcutMap } from '../KeyboardShortcuts';
 import useMainFrameCommands from './MainFrameCommands';
-import CommandPalette, {
+import {
+  CommandPaletteWithAlgoliaSearch,
   type CommandPaletteInterface,
 } from '../CommandPalette/CommandPalette';
 import CommandsContextScopedProvider from '../CommandPalette/CommandsScopedContext';
@@ -129,7 +126,7 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
+import useExampleOrGameTemplateDialogs from './UseExampleOrGameTemplateDialogs';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
@@ -139,7 +136,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import StartInAppTutorialDialog from './InAppTutorial/StartInAppTutorialDialog';
+import StartInAppTutorialDialog from './EditorContainers/HomePage/InAppTutorials/StartInAppTutorialDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import {
   sendInAppTutorialStarted,
@@ -158,25 +155,46 @@ import {
 } from '../ProjectsStorage/ResourceFetcher';
 import QuitInAppTutorialDialog from '../InAppTutorial/QuitInAppTutorialDialog';
 import InAppTutorialContext from '../InAppTutorial/InAppTutorialContext';
-import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
+import useOpenInitialDialog from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
-import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
 import TabsTitlebar from './TabsTitlebar';
-import { registerGame } from '../Utils/GDevelopServices/Game';
-import RouterContext from './RouterContext';
-
+import {
+  useStableUpToDateCallback,
+  useStableUpToDateRef,
+} from '../Utils/UseStableUpToDateCallback';
+import { emptyStorageProvider } from '../ProjectsStorage/ProjectStorageProviders';
+import {
+  isMiniTutorial,
+  allInAppTutorialIds,
+} from '../Utils/GDevelopServices/InAppTutorial';
+import CustomDragLayer from '../UI/DragAndDrop/CustomDragLayer';
+import CloudProjectRecoveryDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectRecoveryDialog';
+import CloudProjectSaveChoiceDialog from '../ProjectsStorage/CloudStorageProvider/CloudProjectSaveChoiceDialog';
+import useCreateProject from '../Utils/UseCreateProject';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import { addDefaultLightToAllLayers } from '../ProjectCreation/CreateProject';
+import useEditorTabsStateSaving from './EditorTabs/UseEditorTabsStateSaving';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import useResourcesWatcher from './ResourcesWatcher';
+import { extractGDevelopApiErrorStatusAndCode } from '../Utils/GDevelopServices/Errors';
+import useVersionHistory from '../VersionHistory/UseVersionHistory';
+import { ProjectManagerDrawer } from '../ProjectManager/ProjectManagerDrawer';
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
 const gd: libGDevelop = global.gd;
 
-const styles = {
-  drawerContent: {
-    width: 320,
-    overflowX: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
+const editorKindToRenderer: {
+  [key: EditorKind]: (props: RenderEditorContainerPropsWithRef) => React.Node,
+} = {
+  debugger: renderDebuggerEditorContainer,
+  'layout events': renderEventsEditorContainer,
+  'external events': renderExternalEventsEditorContainer,
+  layout: renderSceneEditorContainer,
+  'external layout': renderExternalLayoutEditorContainer,
+  'events functions extension': renderEventsFunctionsExtensionEditorContainer,
+  'start page': renderHomePageContainer,
+  resources: renderResourcesEditorContainer,
 };
 
 const defaultSnackbarAutoHideDuration = 3000;
@@ -213,7 +231,7 @@ const findStorageProviderFor = (
  * It is useful to detect if the project stored in a variable is still
  * valid (still currently opened). If it's not, it means the variable is "stale".
  */
-const isCurrentProjectStale = (
+const isCurrentProjectFresh = (
   currentProjectRef: {| current: ?gdProject |},
   currentProject: gdProject
 ) =>
@@ -221,7 +239,6 @@ const isCurrentProjectStale = (
   currentProject.ptr === currentProjectRef.current.ptr;
 
 export type State = {|
-  createDialogOpen: boolean,
   currentProject: ?gdProject,
   currentFileMetadata: ?FileMetadata,
   editorTabs: EditorTabsState,
@@ -233,7 +250,6 @@ export type State = {|
   saveToStorageProviderDialogOpen: boolean,
   eventsFunctionsExtensionsError: ?Error,
   gdjsDevelopmentWatcherEnabled: boolean,
-  initialExampleShortHeader: ?ExampleShortHeader,
 |};
 
 const initialPreviewState: PreviewState = {
@@ -252,7 +268,11 @@ type LaunchPreviewOptions = {
 };
 
 export type Props = {|
-  renderMainMenu?: (BuildMainMenuProps, MainMenuCallbacks) => React.Node,
+  renderMainMenu?: (
+    BuildMainMenuProps,
+    MainMenuCallbacks,
+    MainMenuExtraCallbacks
+  ) => React.Node,
   renderPreviewLauncher?: (
     props: PreviewLauncherProps,
     ref: (previewLauncher: ?PreviewLauncherInterface) => void
@@ -264,11 +284,12 @@ export type Props = {|
   getStorageProviderOperations: (
     storageProvider?: ?StorageProvider
   ) => StorageProviderOperations,
+  getStorageProviderResourceOperations: () => ?ResourcesActionsMenuBuilder,
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   requestUpdate?: () => void,
-  renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
+  renderShareDialog: ShareDialogWithoutExportsProps => React.Node,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -281,7 +302,6 @@ const MainFrame = (props: Props) => {
     ((State => State) | State) => Promise<State>,
   ] = useStateWithCallback(
     ({
-      createDialogOpen: false,
       currentProject: null,
       currentFileMetadata: null,
       editorTabs: getEditorTabsInitialState(),
@@ -293,12 +313,22 @@ const MainFrame = (props: Props) => {
       saveToStorageProviderDialogOpen: false,
       eventsFunctionsExtensionsError: null,
       gdjsDevelopmentWatcherEnabled: false,
-      initialExampleShortHeader: null,
     }: State)
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-
+  const [
+    cloudProjectFileMetadataToRecover,
+    setCloudProjectFileMetadataToRecover,
+  ] = React.useState<?FileMetadata>(null);
+  const [
+    cloudProjectRecoveryOpenedVersionId,
+    setCloudProjectRecoveryOpenedVersionId,
+  ] = React.useState<?string>(null);
+  const [
+    cloudProjectSaveChoiceOpen,
+    setCloudProjectSaveChoiceOpen,
+  ] = React.useState<boolean>(false);
   const [
     chooseResourceOptions,
     setChooseResourceOptions,
@@ -318,9 +348,6 @@ const MainFrame = (props: Props) => {
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
-  const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
-    false
-  );
   const [
     platformSpecificAssetsDialogOpen,
     openPlatformSpecificAssetsDialog,
@@ -335,14 +362,19 @@ const MainFrame = (props: Props) => {
     newProjectSetupDialogOpen,
     setNewProjectSetupDialogOpen,
   ] = React.useState<boolean>(false);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+
   const [isProjectOpening, setIsProjectOpening] = React.useState<boolean>(
     false
   );
-  const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
+  const [
+    isProjectClosedSoAvoidReloadingExtensions,
+    setIsProjectClosedSoAvoidReloadingExtensions,
+  ] = React.useState<boolean>(false);
+  const [shareDialogOpen, setShareDialogOpen] = React.useState<boolean>(false);
+  const [
+    shareDialogInitialTab,
+    setShareDialogInitialTab,
+  ] = React.useState<?ShareTab>(null);
   const { showConfirmation, showAlert } = useAlertDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
@@ -352,6 +384,10 @@ const MainFrame = (props: Props) => {
   const inAppTutorialOrchestratorRef = React.useRef<?InAppTutorialOrchestratorInterface>(
     null
   );
+  const [
+    loaderModalOpeningMessage,
+    setLoaderModalOpeningMessage,
+  ] = React.useState<?MessageDescriptor>(null);
 
   const eventsFunctionsExtensionsContext = React.useContext(
     EventsFunctionsExtensionsContext
@@ -379,6 +415,7 @@ const MainFrame = (props: Props) => {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const {
     currentlyRunningInAppTutorial,
+    getInAppTutorialShortHeader,
     endTutorial: doEndTutorial,
     startTutorial,
     startStepIndex,
@@ -408,14 +445,6 @@ const MainFrame = (props: Props) => {
     setFileMetadataOpeningMessage,
   ] = React.useState<?MessageDescriptor>(null);
 
-  /** This reference is useful to get the current opened project,
-   * even in the callback of a hook/promise - without risking to read "stale" data.
-   * This can be different from the `currentProject` (coming from the state)
-   * that an effect or a callback manipulates when a promise resolves for instance.
-   * See `isCurrentProjectStale`.
-   */
-  const currentProjectRef = React.useRef<?gdProject>(null);
-
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
   // React.useEffect(() => {
@@ -429,13 +458,14 @@ const MainFrame = (props: Props) => {
     eventsFunctionsExtensionsError,
   } = state;
   const {
-    renderExportDialog,
+    renderShareDialog,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
     resourceMover,
     resourceFetcher,
     getStorageProviderOperations,
+    getStorageProviderResourceOperations,
     getStorageProvider,
     initialFileMetadataToOpen,
     i18n,
@@ -451,13 +481,39 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher({ resourceFetcher });
+  useResourcesWatcher({
+    getStorageProvider,
+    fileMetadata: currentFileMetadata,
+    isProjectSplitInMultipleFiles: currentProject
+      ? currentProject.isFolderProject()
+      : false,
+  });
+  const {
+    selectedExampleShortHeader,
+    selectedPrivateGameTemplateListingData,
+    onSelectExampleShortHeader,
+    onSelectPrivateGameTemplate,
+    renderExampleOrGameTemplateDialogs,
+    closeExampleStoreDialog,
+    openExampleStoreDialog,
+  } = useExampleOrGameTemplateDialogs({
+    isProjectOpening,
+    onOpenNewProjectSetupDialog: () => setNewProjectSetupDialogOpen(true),
+  });
 
-  React.useEffect(
-    () => {
-      currentProjectRef.current = currentProject;
-    },
-    [currentProject]
-  );
+  /**
+   * This reference is useful to get the current opened project,
+   * even in the callback of a hook/promise - without risking to read "stale" data.
+   * This can be different from the `currentProject` (coming from the state)
+   * that an effect or a callback manipulates when a promise resolves for instance.
+   * See `isCurrentProjectFresh`.
+   */
+  const currentProjectRef = useStableUpToDateRef(currentProject);
+
+  /**
+   * Similar to `currentProjectRef`, an always fresh reference to the latest `currentFileMetadata`.
+   */
+  const currentFileMetadataRef = useStableUpToDateRef(currentFileMetadata);
 
   React.useEffect(
     () => {
@@ -532,13 +588,95 @@ const MainFrame = (props: Props) => {
     []
   );
 
+  const getEditorOpeningOptions = React.useCallback(
+    ({
+      kind,
+      name,
+      dontFocusTab,
+    }: {
+      kind: EditorKind,
+      name: string,
+      dontFocusTab?: boolean,
+    }) => {
+      const label =
+        kind === 'resources'
+          ? i18n._(t`Resources`)
+          : kind === 'start page'
+          ? i18n._(t`Home`)
+          : kind === 'debugger'
+          ? i18n._(t`Debugger`)
+          : kind === 'layout events'
+          ? name + ` ${i18n._(t`(Events)`)}`
+          : kind === 'events functions extension'
+          ? name + ` ${i18n._(t`(Extension)`)}`
+          : name;
+      const tabOptions =
+        kind === 'layout'
+          ? { data: { scene: name, type: 'layout' } }
+          : kind === 'layout events'
+          ? { data: { scene: name, type: 'layout-events' } }
+          : undefined;
+      const key = [
+        'layout',
+        'layout events',
+        'external events',
+        'external layout',
+        'events functions extension',
+      ].includes(kind)
+        ? `${kind} ${name}`
+        : kind;
+      const icon =
+        kind === 'start page' ? <HomeIcon titleAccess="Home" /> : undefined;
+      const closable = kind !== 'start page';
+      const extraEditorProps =
+        kind === 'start page'
+          ? { storageProviders: props.storageProviders }
+          : undefined;
+      return {
+        icon,
+        closable,
+        label,
+        projectItemName: name,
+        tabOptions,
+        renderEditorContainer: editorKindToRenderer[kind],
+        extraEditorProps,
+        key,
+        dontFocusTab,
+      };
+    },
+    [i18n, props.storageProviders]
+  );
+
+  const setEditorTabs = React.useCallback(
+    newEditorTabs => {
+      setState(state => ({
+        ...state,
+        editorTabs: newEditorTabs,
+      }));
+    },
+    [setState]
+  );
+
+  const {
+    hasAPreviousSaveForEditorTabsState,
+    openEditorTabsFromPersistedState,
+  } = useEditorTabsStateSaving({
+    currentProjectId: state.currentProject
+      ? state.currentProject.getProjectUuid()
+      : null,
+    editorTabs: state.editorTabs,
+    setEditorTabs: setEditorTabs,
+    getEditorOpeningOptions,
+  });
+
   useOpenInitialDialog({
-    openOnboardingDialog: () => {
-      selectInAppTutorial(FLING_GAME_IN_APP_TUTORIAL_ID);
+    openInAppTutorialDialog: (tutorialId: string) => {
+      if (allInAppTutorialIds.includes(tutorialId)) {
+        selectInAppTutorial(tutorialId);
+      }
     },
     openProfileDialog,
   });
-  const { navigateToRoute } = React.useContext(RouterContext);
 
   const _closeSnackMessage = React.useCallback(
     () => {
@@ -572,6 +710,24 @@ const MainFrame = (props: Props) => {
       setTimeout(() => _showSnackMessage(snackMessage, autoHideDuration), 200);
     },
     [_closeSnackMessage, _showSnackMessage]
+  );
+
+  const openShareDialog = React.useCallback(
+    (initialTab?: ShareTab) => {
+      notifyPreviewOrExportWillStart(state.editorTabs);
+
+      setShareDialogInitialTab(initialTab || null);
+      setShareDialogOpen(true);
+    },
+    [state.editorTabs]
+  );
+
+  const closeShareDialog = React.useCallback(
+    () => {
+      setShareDialogOpen(false);
+      setShareDialogInitialTab(null);
+    },
+    [setShareDialogOpen, setShareDialogInitialTab]
   );
 
   const openInitialFileMetadata = async () => {
@@ -666,34 +822,47 @@ const MainFrame = (props: Props) => {
   useDiscordRichPresence(currentProject);
 
   const closeProject = React.useCallback(
-    (): Promise<void> => {
+    async (): Promise<void> => {
       setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
-      return setState(state => {
-        if (!currentProject) {
-          // It's important to return a new object to ensure that the promise
-          // will be fired.
-          return { ...state };
-        }
 
-        eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
-          currentProject
-        );
-        currentProject.delete();
-        if (unsavedChanges.hasUnsavedChanges) {
-          unsavedChanges.sealUnsavedChanges();
-        }
+      console.info('Closing project...');
+      // TODO Remove this state
+      // Instead:
+      // - Move the EventsFunctionsExtensionsLoader to Core
+      // - Add a dirty flag system to refresh on demand.
+      setIsProjectClosedSoAvoidReloadingExtensions(true);
 
-        return {
-          ...state,
-          currentProject: null,
-          currentFileMetadata: null,
-          editorTabs: closeProjectTabs(state.editorTabs, currentProject),
-        };
-      }).then(() => {});
+      // While not strictly necessary, use `currentProjectRef` to be 100%
+      // sure to have the latest project (avoid risking any stale variable to an old
+      // `currentProject` from the state in case someone kept an old reference to `closeProject`
+      // somewhere).
+      const currentProject = currentProjectRef.current;
+      if (!currentProject) return;
+
+      // Close the editors related to this project.
+      await setState(state => ({
+        ...state,
+        currentProject: null,
+        currentFileMetadata: null,
+        editorTabs: closeProjectTabs(state.editorTabs, currentProject),
+      }));
+
+      // Delete the project from memory. All references to it have been dropped previously
+      // by the setState.
+      console.info('Deleting project from memory...');
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtensions(
+        currentProject
+      );
+      await eventsFunctionsExtensionsState.ensureLoadFinished();
+      currentProject.delete();
+      if (unsavedChanges.hasUnsavedChanges) {
+        unsavedChanges.sealUnsavedChanges();
+      }
+      console.info('Project closed.');
     },
     [
-      currentProject,
+      currentProjectRef,
       eventsFunctionsExtensionsState,
       setHasProjectOpened,
       setState,
@@ -720,7 +889,6 @@ const MainFrame = (props: Props) => {
               ...fileMetadata,
               name: project.getName(),
               gameId: project.getProjectUuid(),
-              lastModifiedDate: Date.now(),
             },
             storageProviderName: storageProvider.internalName,
           });
@@ -733,14 +901,14 @@ const MainFrame = (props: Props) => {
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
-      // TODO: Pixi cache should also be burst
+      PixiResourcesLoader.burstCache();
 
       const state = await setState(state => ({
         ...state,
         currentProject: project,
         currentFileMetadata: fileMetadata,
-        createDialogOpen: false,
       }));
+      closeExampleStoreDialog({ deselectExampleAndGameTemplate: false });
 
       // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
       // their editor will take care of reloading them.
@@ -764,13 +932,15 @@ const MainFrame = (props: Props) => {
         //   to this base URL and which will be converted to full URLs.
         // ...
         // See `ResourceFetcher` for all the cases.
-        await ensureResourcesAreFetched({
+        await ensureResourcesAreFetched(() => ({
           project,
           fileMetadata,
           storageProvider,
           storageProviderOperations,
           authenticatedUser,
-        });
+        }));
+
+        setIsProjectClosedSoAvoidReloadingExtensions(false);
       }
 
       return state;
@@ -779,6 +949,7 @@ const MainFrame = (props: Props) => {
       setState,
       closeProject,
       preferences,
+      closeExampleStoreDialog,
       eventsFunctionsExtensionsState,
       getStorageProvider,
       getStorageProviderOperations,
@@ -812,11 +983,14 @@ const MainFrame = (props: Props) => {
   };
 
   const openFromFileMetadata = React.useCallback(
-    async (fileMetadata: FileMetadata): Promise<?State> => {
+    async (
+      fileMetadata: FileMetadata,
+      options?: {| openingMessage?: ?MessageDescriptor |}
+    ): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
 
       const {
-        hasAutoSave,
+        getAutoSaveCreationDate,
         onGetAutoSave,
         onOpen,
         getOpenErrorMessage,
@@ -832,16 +1006,21 @@ const MainFrame = (props: Props) => {
       }
 
       const checkForAutosave = async (): Promise<FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return fileMetadata;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, true);
-        if (!canOpenAutosave) return fileMetadata;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          true
+        );
+        if (!autoSaveCreationDate) return fileMetadata;
 
         const answer = await showConfirmation({
           title: t`This project has an auto-saved version`,
-          message: t`GDevelop automatically saved a newer version of this project. This new version might differ from the one that you manually saved. Which version would you like to open?`,
+          message: t`GDevelop automatically saved a newer version of this project on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}. This new version might differ from the one that you manually saved. Which version would you like to open?`,
           dismissButtonLabel: t`My manual save`,
           confirmButtonLabel: t`GDevelop auto-save`,
         });
@@ -851,47 +1030,65 @@ const MainFrame = (props: Props) => {
       };
 
       const checkForAutosaveAfterFailure = async (): Promise<?FileMetadata> => {
-        if (!hasAutoSave || !onGetAutoSave) {
+        if (!getAutoSaveCreationDate || !onGetAutoSave) {
           return null;
         }
 
-        const canOpenAutosave = await hasAutoSave(fileMetadata, false);
-        if (!canOpenAutosave) return null;
+        const autoSaveCreationDate = await getAutoSaveCreationDate(
+          fileMetadata,
+          false
+        );
+        if (!autoSaveCreationDate) return null;
 
         const answer = await showConfirmation({
           title: t`This project cannot be opened`,
-          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`,
+          message: t`The project file appears to be corrupted, but an autosave file exists (backup made automatically by GDevelop on ${new Date(
+            autoSaveCreationDate
+          ).toLocaleString()}). Would you like to try to load it instead?`,
           confirmButtonLabel: t`Load autosave`,
         });
         if (!answer) return null;
         return onGetAutoSave(fileMetadata);
       };
 
+      if (options && options.openingMessage) {
+        setLoaderModalOpeningMessage(options.openingMessage);
+      }
       setIsLoadingProject(true);
 
       // Try to find an autosave (and ask user if found)
       try {
         await delay(150);
-        const autoSavefileMetadata = await checkForAutosave();
         let content;
+        let openingError: Error | null = null;
         try {
+          const autoSaveFileMetadata = await checkForAutosave();
           const result = await onOpen(
-            autoSavefileMetadata,
+            autoSaveFileMetadata,
             setLoaderModalProgress
           );
           content = result.content;
         } catch (error) {
-          // onOpen failed, tried to find again an autosave
-          const autoSaveAfterFailurefileMetadata = await checkForAutosaveAfterFailure();
-          if (autoSaveAfterFailurefileMetadata) {
-            const result = await onOpen(autoSaveAfterFailurefileMetadata);
+          openingError = error;
+          // onOpen failed, try to find again an autosave.
+          const autoSaveAfterFailureFileMetadata = await checkForAutosaveAfterFailure();
+          if (autoSaveAfterFailureFileMetadata) {
+            const result = await onOpen(autoSaveAfterFailureFileMetadata);
             content = result.content;
           }
+        } finally {
+          setIsLoadingProject(false);
+          setLoaderModalOpeningMessage(null);
+          setLoaderModalProgress(null, null);
+        }
+        if (!content) {
+          throw openingError ||
+            new Error(
+              'The project file content could not be read. It might be corrupted/malformed.'
+            );
         }
         if (!verifyProjectContent(i18n, content)) {
           // The content is not recognized and the user was warned. Abort the opening.
-          setIsLoadingProject(false);
-          setLoaderModalProgress(null, null);
           return;
         }
 
@@ -905,24 +1102,24 @@ const MainFrame = (props: Props) => {
             // that we're opening the file that was originally requested by the user.
             fileMetadata
           );
-          serializedProject.delete();
           return state;
-        } catch (err) {
+        } finally {
           serializedProject.delete();
-          throw err;
         }
       } catch (error) {
-        const errorMessage = getOpenErrorMessage
-          ? getOpenErrorMessage(error)
-          : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
+        if (error.name === 'CloudProjectReadingError') {
+          setCloudProjectFileMetadataToRecover(fileMetadata);
+        } else {
+          const errorMessage = getOpenErrorMessage
+            ? getOpenErrorMessage(error)
+            : t`Ensure that you are connected to internet and that the URL used is correct, then try again.`;
 
-        await showAlert({
-          title: t`Unable to open the project`,
-          message: errorMessage,
-        });
-        setIsLoadingProject(false);
-        setLoaderModalProgress(null, null);
-        throw error;
+          await showAlert({
+            title: t`Unable to open the project`,
+            message: errorMessage,
+          });
+          throw error;
+        }
       }
     },
     [
@@ -933,6 +1130,48 @@ const MainFrame = (props: Props) => {
       showAlert,
     ]
   );
+
+  const {
+    createEmptyProject,
+    createProjectFromExample,
+    createProjectFromPrivateGameTemplate,
+    createProjectFromInAppTutorial,
+    createProjectWithLogin,
+    createProjectFromAIGeneration,
+  } = useCreateProject({
+    beforeCreatingProject: () => {
+      setIsProjectOpening(true);
+    },
+    getStorageProviderOperations,
+    afterCreatingProject: async ({ project, editorTabs, oldProjectId }) => {
+      setNewProjectSetupDialogOpen(false);
+      closeExampleStoreDialog({ deselectExampleAndGameTemplate: true });
+      findLeaderboardsToReplace(project, oldProjectId);
+      openSceneOrProjectManager({
+        currentProject: project,
+        editorTabs: editorTabs,
+      });
+      setIsProjectClosedSoAvoidReloadingExtensions(false);
+    },
+    onError: () => {
+      setIsProjectClosedSoAvoidReloadingExtensions(true);
+    },
+    onSuccessOrError: () => {
+      // Stop the loading when we're successful or have failed.
+      setIsProjectOpening(false);
+      setIsLoadingProject(false);
+      setLoaderModalProgress(null, null);
+    },
+    loadFromProject,
+    openFromFileMetadata,
+    onProjectSaved: fileMetadata => {
+      setState(state => ({
+        ...state,
+        currentFileMetadata: fileMetadata,
+      }));
+    },
+    ensureResourcesAreMoved,
+  });
 
   const closeApp = React.useCallback((): void => {
     return Window.quit();
@@ -964,15 +1203,11 @@ const MainFrame = (props: Props) => {
         eventsFunctionsExtensionName
       )
     ) {
-      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
-        eventsFunctionsExtensionName
-      );
-
       setState(state => ({
         ...state,
         editorTabs: closeEventsFunctionsExtensionTabs(
           state.editorTabs,
-          eventsFunctionsExtension
+          eventsFunctionsExtensionName
         ),
       }));
     }
@@ -1058,16 +1293,16 @@ const MainFrame = (props: Props) => {
     );
     if (!answer) return;
 
+    const extensionName = eventsFunctionsExtension.getName();
     setState(state => ({
       ...state,
       editorTabs: closeEventsFunctionsExtensionTabs(
         state.editorTabs,
-        eventsFunctionsExtension
+        extensionName
       ),
     })).then(state => {
       // Unload the Platform extension that was generated from the events
       // functions extension.
-      const extensionName = eventsFunctionsExtension.getName();
       eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
         currentProject,
         extensionName
@@ -1091,20 +1326,12 @@ const MainFrame = (props: Props) => {
 
     if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasLayoutNamed(newName)) {
-      showWarningBox(i18n._(t`Another scene with this name already exists.`), {
-        delayToNextTick: true,
-      });
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasLayoutNamed(tentativeNewName);
+      }
+    );
 
     const layout = currentProject.getLayout(oldName);
     const shouldChangeProjectFirstLayout =
@@ -1113,12 +1340,17 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      layout.setName(newName);
+      layout.setName(uniqueNewName);
+      gd.WholeProjectRefactorer.renameLayout(
+        currentProject,
+        oldName,
+        uniqueNewName
+      );
       if (inAppTutorialOrchestratorRef.current) {
-        inAppTutorialOrchestratorRef.current.changeData(oldName, newName);
+        inAppTutorialOrchestratorRef.current.changeData(oldName, uniqueNewName);
       }
       if (shouldChangeProjectFirstLayout)
-        currentProject.setFirstLayout(newName);
+        currentProject.setFirstLayout(uniqueNewName);
       _onProjectItemModified();
     });
   };
@@ -1131,28 +1363,24 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalLayoutNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Another external layout with this name already exists.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalLayoutNamed(tentativeNewName);
+      }
+    );
 
     const externalLayout = currentProject.getExternalLayout(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalLayoutTabs(state.editorTabs, externalLayout),
     })).then(state => {
-      externalLayout.setName(newName);
+      externalLayout.setName(uniqueNewName);
+      gd.WholeProjectRefactorer.renameExternalLayout(
+        currentProject,
+        oldName,
+        uniqueNewName
+      );
       _onProjectItemModified();
     });
   };
@@ -1165,35 +1393,30 @@ const MainFrame = (props: Props) => {
     if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (currentProject.hasExternalEventsNamed(newName)) {
-      showWarningBox(
-        i18n._(t`Other external events with this name already exist.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const uniqueNewName = newNameGenerator(
+      newName || i18n._(t`Unnamed`),
+      tentativeNewName => {
+        return currentProject.hasExternalEventsNamed(tentativeNewName);
+      }
+    );
 
     const externalEvents = currentProject.getExternalEvents(oldName);
     setState(state => ({
       ...state,
       editorTabs: closeExternalEventsTabs(state.editorTabs, externalEvents),
     })).then(state => {
-      externalEvents.setName(newName);
+      externalEvents.setName(uniqueNewName);
+      gd.WholeProjectRefactorer.renameExternalEvents(
+        currentProject,
+        oldName,
+        uniqueNewName
+      );
       _onProjectItemModified();
     });
   };
 
   const renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = state;
-    const { i18n } = props;
     if (!currentProject) return;
 
     if (
@@ -1202,57 +1425,35 @@ const MainFrame = (props: Props) => {
     )
       return;
 
-    if (newName === '') {
-      showWarningBox(
-        i18n._(t`This name cannot be empty, please enter a new name.`),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (isExtensionNameTaken(newName, currentProject)) {
-      showWarningBox(
-        i18n._(
-          t`Another extension with this name already exists (or you used a reserved extension name). Please choose another name.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
-
-    if (!gd.Project.validateName(newName)) {
-      showWarningBox(
-        i18n._(
-          t`This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.`
-        ),
-        { delayToNextTick: true }
-      );
-      return;
-    }
+    const safeAndUniqueNewName = newNameGenerator(
+      gd.Project.getSafeName(newName),
+      tentativeNewName => {
+        return isExtensionNameTaken(tentativeNewName, currentProject);
+      }
+    );
 
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
     );
+
+    // Refactor the project to update the instructions (and later expressions)
+    // of this extension:
+    gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
+      currentProject,
+      eventsFunctionsExtension,
+      oldName,
+      safeAndUniqueNewName
+    );
+    eventsFunctionsExtension.setName(safeAndUniqueNewName);
+    eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
+      currentProject,
+      oldName
+    );
+
     setState(state => ({
       ...state,
-      editorTabs: closeEventsFunctionsExtensionTabs(
-        state.editorTabs,
-        eventsFunctionsExtension
-      ),
+      editorTabs: closeEventsFunctionsExtensionTabs(state.editorTabs, oldName),
     })).then(state => {
-      // Refactor the project to update the instructions (and later expressions)
-      // of this extension:
-      gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
-        currentProject,
-        eventsFunctionsExtension,
-        oldName,
-        newName
-      );
-      eventsFunctionsExtension.setName(newName);
-      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
-        currentProject,
-        oldName
-      );
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
@@ -1339,7 +1540,7 @@ const MainFrame = (props: Props) => {
       if (!previewLauncher) return;
 
       setPreviewLoading(true);
-      notifyPreviewWillStart(state.editorTabs);
+      notifyPreviewOrExportWillStart(state.editorTabs);
 
       const layoutName = previewState.isPreviewOverriden
         ? previewState.overridenPreviewLayoutName
@@ -1365,6 +1566,13 @@ const MainFrame = (props: Props) => {
       // from the user.
       findAndLogProjectPreviewErrors(currentProject);
 
+      const fallbackAuthor = authenticatedUser.profile
+        ? {
+            username: authenticatedUser.profile.username || '',
+            id: authenticatedUser.profile.id,
+          }
+        : null;
+
       eventsFunctionsExtensionsState
         .ensureLoadFinished()
         .then(() =>
@@ -1376,6 +1584,7 @@ const MainFrame = (props: Props) => {
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
             fullLoadingScreen: !!fullLoadingScreen,
+            fallbackAuthor,
             getIsMenuBarHiddenInPreview:
               preferences.getIsMenuBarHiddenInPreview,
             getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
@@ -1402,6 +1611,7 @@ const MainFrame = (props: Props) => {
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
+      authenticatedUser.profile,
     ]
   );
 
@@ -1437,6 +1647,35 @@ const MainFrame = (props: Props) => {
     [hasPreviewsRunning, launchPreview]
   );
 
+  const getEditorsTabStateWithScene = React.useCallback(
+    (
+      editorTabs: EditorTabsState,
+      name: string,
+      {
+        openEventsEditor,
+        openSceneEditor,
+      }: { openEventsEditor: boolean, openSceneEditor: boolean }
+    ): EditorTabsState => {
+      const sceneEditorOptions = getEditorOpeningOptions({
+        kind: 'layout',
+        name,
+      });
+      const eventsEditorOptions = getEditorOpeningOptions({
+        kind: 'layout events',
+        name,
+        dontFocusTab: openSceneEditor,
+      });
+
+      const tabsWithSceneEditor = openSceneEditor
+        ? openEditorTab(editorTabs, sceneEditorOptions)
+        : editorTabs;
+      return openEventsEditor
+        ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
+        : tabsWithSceneEditor;
+    },
+    [getEditorOpeningOptions]
+  );
+
   const openLayout = React.useCallback(
     (
       name: string,
@@ -1444,145 +1683,109 @@ const MainFrame = (props: Props) => {
         openEventsEditor = true,
         openSceneEditor = true,
       }: { openEventsEditor: boolean, openSceneEditor: boolean } = {},
-      editorTabs = state.editorTabs
-    ): EditorTabsState => {
-      const sceneEditorOptions = {
-        label: name,
-        projectItemName: name,
-        tabOptions: { data: { scene: name, type: 'layout' } },
-        renderEditorContainer: renderSceneEditorContainer,
-        key: 'layout ' + name,
-      };
-      const eventsEditorOptions = {
-        label: name + ' ' + i18n._(t`(Events)`),
-        projectItemName: name,
-        tabOptions: { data: { scene: name, type: 'layout-events' } },
-        renderEditorContainer: renderEventsEditorContainer,
-        key: 'layout events ' + name,
-        dontFocusTab: openSceneEditor,
-      };
-
-      const tabsWithSceneEditor = openSceneEditor
-        ? openEditorTab(editorTabs, sceneEditorOptions)
-        : editorTabs;
-      const tabsWithSceneAndEventsEditors = openEventsEditor
-        ? openEditorTab(tabsWithSceneEditor, eventsEditorOptions)
-        : tabsWithSceneEditor;
-
+      editorTabs?: EditorTabsState
+    ): void => {
       setState(state => ({
         ...state,
-        editorTabs: tabsWithSceneAndEventsEditors,
+        editorTabs: getEditorsTabStateWithScene(
+          editorTabs || state.editorTabs,
+          name,
+          {
+            openEventsEditor,
+            openSceneEditor,
+          }
+        ),
       }));
-      setIsLoadingProject(false);
-      setLoaderModalProgress(null, null);
-      openProjectManager(false);
-      return tabsWithSceneAndEventsEditors;
     },
-    [i18n, setState, state.editorTabs]
+    [setState, getEditorsTabStateWithScene]
   );
 
   const openExternalEvents = React.useCallback(
     (name: string) => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: name,
-          projectItemName: name,
-          renderEditorContainer: renderExternalEventsEditorContainer,
-          key: 'external events ' + name,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'external events', name })
+        ),
       }));
-      openProjectManager(false);
     },
-    [setState]
+    [setState, getEditorOpeningOptions]
   );
 
   const openExternalLayout = React.useCallback(
     (name: string) => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: name,
-          projectItemName: name,
-          renderEditorContainer: renderExternalLayoutEditorContainer,
-          key: 'external layout ' + name,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'external layout', name })
+        ),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager]
+    [setState, getEditorOpeningOptions]
   );
 
   const openEventsFunctionsExtension = React.useCallback(
     (
       name: string,
-      initiallyFocusedFunctionName?: string,
+      initiallyFocusedFunctionName?: ?string,
       initiallyFocusedBehaviorName?: ?string
     ) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: name + ' ' + i18n._(t`(Extension)`),
-          projectItemName: name,
+          ...getEditorOpeningOptions({
+            kind: 'events functions extension',
+            name,
+          }),
           extraEditorProps: {
             initiallyFocusedFunctionName,
             initiallyFocusedBehaviorName,
           },
-          renderEditorContainer: renderEventsFunctionsExtensionEditorContainer,
-          key: 'events functions extension ' + name,
         }),
       }));
-      openProjectManager(false);
     },
-    [setState, openProjectManager, i18n]
+    [setState, getEditorOpeningOptions]
   );
 
-  const openResources = () => {
-    const { i18n } = props;
-    setState(state => ({
-      ...state,
-      editorTabs: openEditorTab(state.editorTabs, {
-        label: i18n._(t`Resources`),
-        projectItemName: null,
-        renderEditorContainer: renderResourcesEditorContainer,
-        key: 'resources',
-      }),
-    }));
-  };
+  const openResources = React.useCallback(
+    () => {
+      setState(state => ({
+        ...state,
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'resources', name: '' })
+        ),
+      }));
+    },
+    [getEditorOpeningOptions, setState]
+  );
 
   const openHomePage = React.useCallback(
     () => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon titleAccess="Home" fontSize="small" />,
-          label: i18n._(t`Home`),
-          projectItemName: null,
-          renderEditorContainer: renderHomePageContainer,
-          key: 'start page',
-          extraEditorProps: {
-            storageProviders: props.storageProviders,
-          },
-          closable: false,
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'start page', name: '' })
+        ),
       }));
     },
-    [setState, i18n, props.storageProviders]
+    [setState, getEditorOpeningOptions]
   );
 
   const _openDebugger = React.useCallback(
     () => {
       setState(state => ({
         ...state,
-        editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Debugger`),
-          projectItemName: null,
-          renderEditorContainer: renderDebuggerEditorContainer,
-          key: 'debugger',
-        }),
+        editorTabs: openEditorTab(
+          state.editorTabs,
+          getEditorOpeningOptions({ kind: 'debugger', name: '' })
+        ),
       }));
     },
-    [i18n, setState]
+    [getEditorOpeningOptions, setState]
   );
 
   const openDebugger = addCreateBadgePreHookIfNotClaimed(
@@ -1644,6 +1847,39 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const openBehaviorEvents = (extensionName: string, behaviorName: string) => {
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsBasedBehaviorByName(behaviorName);
+        setState(state => ({
+          ...state,
+          editorTabs: changeCurrentTab(editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        openEventsFunctionsExtension(extensionName, null, behaviorName);
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
+  };
+
   const _onProjectItemModified = () => {
     if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
     forceUpdate();
@@ -1686,20 +1922,6 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openCreateProjectDialog = React.useCallback(
-    (open: boolean, exampleShortHeader: ?ExampleShortHeader) => {
-      setState(state => ({
-        ...state,
-        initialExampleShortHeader: exampleShortHeader,
-        createDialogOpen: open,
-      }));
-    },
-    [setState]
-  );
-  const closeCreateDialog = () => {
-    setState(state => ({ ...state, createDialogOpen: false }));
-  };
-
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
       setState(state => ({
@@ -1723,7 +1945,10 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       if (currentProject.getLayoutsCount() === 0) {
-        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+        const layoutName = i18n._(t`Untitled scene`);
+        currentProject.insertNewLayout(layoutName, 0);
+        const layout = currentProject.getLayout(layoutName);
+        addDefaultLightToAllLayers(layout);
       }
       openLayout(
         currentProject.getLayoutAt(0).getName(),
@@ -1733,11 +1958,42 @@ const MainFrame = (props: Props) => {
         },
         editorTabs
       );
+      setIsLoadingProject(false);
+      setLoaderModalProgress(null, null);
+
       if (currentProject.getLayoutsCount() > 1) {
         openProjectManager(true);
+      } else {
+        openProjectManager(false);
       }
     },
     [openLayout, i18n]
+  );
+
+  const getEditorsTabStateWithAllScenes = React.useCallback(
+    (newState: {|
+      currentProject: ?gdProject,
+      editorTabs: EditorTabsState,
+    |}): EditorTabsState => {
+      const { currentProject, editorTabs } = newState;
+      if (!currentProject) return editorTabs;
+      const layoutsCount = currentProject.getLayoutsCount();
+      if (layoutsCount === 0) return editorTabs;
+
+      let editorTabsWithAllScenes = editorTabs;
+      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
+        editorTabsWithAllScenes = getEditorsTabStateWithScene(
+          editorTabsWithAllScenes,
+          currentProject.getLayoutAt(layoutIndex).getName(),
+          {
+            openSceneEditor: true,
+            openEventsEditor: true,
+          }
+        );
+      }
+      return editorTabsWithAllScenes;
+    },
+    [getEditorsTabStateWithScene]
   );
 
   const openAllScenes = React.useCallback(
@@ -1750,20 +2006,16 @@ const MainFrame = (props: Props) => {
       const layoutsCount = currentProject.getLayoutsCount();
       if (layoutsCount === 0) return;
 
-      let editorTabs = state.editorTabs;
+      setState(state => ({
+        ...state,
+        editorTabs: getEditorsTabStateWithAllScenes(newState),
+      }));
 
-      for (let layoutIndex = 0; layoutIndex < layoutsCount; layoutIndex++) {
-        editorTabs = openLayout(
-          currentProject.getLayoutAt(layoutIndex).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      }
+      setIsLoadingProject(false);
+      setLoaderModalProgress(null, null);
+      openProjectManager(false);
     },
-    [openLayout, state.editorTabs]
+    [getEditorsTabStateWithAllScenes, setState]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -1779,10 +2031,30 @@ const MainFrame = (props: Props) => {
 
           return openFromFileMetadata(fileMetadata).then(state => {
             if (state) {
-              openSceneOrProjectManager({
-                currentProject: state.currentProject,
-                editorTabs: state.editorTabs,
-              });
+              const { currentProject } = state;
+              if (
+                currentProject &&
+                hasAPreviousSaveForEditorTabsState(currentProject)
+              ) {
+                const openedEditorsCount = openEditorTabsFromPersistedState(
+                  currentProject
+                );
+                if (openedEditorsCount === 0) {
+                  openSceneOrProjectManager({
+                    currentProject: currentProject,
+                    editorTabs: state.editorTabs,
+                  });
+                } else {
+                  setIsLoadingProject(false);
+                  setLoaderModalProgress(null, null);
+                  openProjectManager(false);
+                }
+              } else {
+                openSceneOrProjectManager({
+                  currentProject: currentProject,
+                  editorTabs: state.editorTabs,
+                });
+              }
               const currentStorageProvider = getStorageProvider();
               if (currentStorageProvider.internalName === 'LocalFile') {
                 setHasProjectOpened(true);
@@ -1806,6 +2078,8 @@ const MainFrame = (props: Props) => {
     },
     [
       i18n,
+      hasAPreviousSaveForEditorTabsState,
+      openEditorTabsFromPersistedState,
       getStorageProviderOperations,
       openFromFileMetadata,
       openSceneOrProjectManager,
@@ -1815,11 +2089,18 @@ const MainFrame = (props: Props) => {
   );
 
   const openFromFileMetadataWithStorageProvider = React.useCallback(
-    (
+    async (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName,
-      options: ?{ openAllScenes: boolean }
-    ) => {
-      if (unsavedChanges.hasUnsavedChanges) {
+      options: ?{|
+        openAllScenes?: boolean,
+        ignoreUnsavedChanges?: boolean,
+        openingMessage?: ?MessageDescriptor,
+      |}
+    ): Promise<void> => {
+      if (
+        unsavedChanges.hasUnsavedChanges &&
+        !(options && options.ignoreUnsavedChanges)
+      ) {
         const answer = Window.showConfirmDialog(
           i18n._(
             t`Open a new project? Any changes that have not been saved will be lost.`
@@ -1839,17 +2120,37 @@ const MainFrame = (props: Props) => {
       if (!storageProvider) return;
 
       getStorageProviderOperations(storageProvider);
-      openFromFileMetadata(fileMetadata)
+      await openFromFileMetadata(fileMetadata, {
+        openingMessage: (options && options.openingMessage) || null,
+      })
         .then(state => {
           if (state) {
+            const { currentProject } = state;
             if (options && options.openAllScenes) {
               openAllScenes({
-                currentProject: state.currentProject,
+                currentProject: currentProject,
                 editorTabs: state.editorTabs,
               });
+            } else if (
+              currentProject &&
+              hasAPreviousSaveForEditorTabsState(currentProject)
+            ) {
+              const openedEditorsCount = openEditorTabsFromPersistedState(
+                currentProject
+              );
+              if (openedEditorsCount === 0) {
+                openSceneOrProjectManager({
+                  currentProject: currentProject,
+                  editorTabs: state.editorTabs,
+                });
+              } else {
+                setIsLoadingProject(false);
+                setLoaderModalProgress(null, null);
+                openProjectManager(false);
+              }
             } else {
               openSceneOrProjectManager({
-                currentProject: state.currentProject,
+                currentProject: currentProject,
                 editorTabs: state.editorTabs,
               });
             }
@@ -1873,8 +2174,48 @@ const MainFrame = (props: Props) => {
       getStorageProvider,
       setHasProjectOpened,
       openAllScenes,
+      hasAPreviousSaveForEditorTabsState,
+      openEditorTabsFromPersistedState,
     ]
   );
+
+  const onOpenCloudProjectOnSpecificVersion = React.useCallback(
+    ({
+      fileMetadata,
+      versionId,
+      ignoreUnsavedChanges,
+      openingMessage,
+    }: {|
+      fileMetadata: FileMetadata,
+      versionId: string,
+      ignoreUnsavedChanges: boolean,
+      openingMessage: MessageDescriptor,
+    |}): Promise<void> => {
+      return openFromFileMetadataWithStorageProvider(
+        {
+          storageProviderName: 'Cloud',
+          fileMetadata: {
+            ...fileMetadata,
+            version: versionId,
+          },
+        },
+        { ignoreUnsavedChanges, openingMessage }
+      );
+    },
+    [openFromFileMetadataWithStorageProvider]
+  );
+
+  const {
+    renderVersionHistoryPanel,
+    openVersionHistoryPanel,
+    checkedOutVersionStatus,
+    onQuitVersionHistory,
+  } = useVersionHistory({
+    getStorageProvider,
+    isSavingProject,
+    fileMetadata: currentFileMetadata,
+    onOpenCloudProjectOnSpecificVersion,
+  });
 
   const openSaveToStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -1916,6 +2257,7 @@ const MainFrame = (props: Props) => {
         onSaveProjectAs,
         onChooseSaveProjectAsLocation,
         getWriteErrorMessage,
+        canFileMetadataBeSafelySavedAs,
       } = newStorageProviderOperations;
       if (!onSaveProjectAs) {
         // The new storage provider can't even save as. It's strange that it was even
@@ -1939,6 +2281,18 @@ const MainFrame = (props: Props) => {
           });
           if (!saveAsLocation) {
             return; // Save as was cancelled.
+          }
+
+          if (canFileMetadataBeSafelySavedAs && currentFileMetadata) {
+            const canProjectBeSafelySavedAs = await canFileMetadataBeSafelySavedAs(
+              currentFileMetadata,
+              {
+                showAlert,
+                showConfirmation,
+              }
+            );
+
+            if (!canProjectBeSafelySavedAs) return;
           }
           newSaveAsLocation = saveAsLocation;
         }
@@ -1969,6 +2323,8 @@ const MainFrame = (props: Props) => {
 
         unsavedChanges.sealUnsavedChanges();
         _replaceSnackMessage(i18n._(t`Project properly saved`));
+        setCloudProjectSaveChoiceOpen(false);
+        setCloudProjectRecoveryOpenedVersionId(null);
 
         if (!fileMetadata) {
           // Some storage provider like "DownloadFile" don't have file metadata, because
@@ -1985,6 +2341,7 @@ const MainFrame = (props: Props) => {
         preferences.insertRecentProjectFile(fileMetadataAndStorageProviderName);
         if (
           currentlyRunningInAppTutorial &&
+          !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
           inAppTutorialOrchestratorRef.current
         ) {
           preferences.saveTutorialProgress({
@@ -2004,7 +2361,7 @@ const MainFrame = (props: Props) => {
         // Ensure resources are re-loaded from their new location.
         ResourcesLoader.burstAllUrlsCache();
 
-        if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+        if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
           // We do not want to change the current file metadata if the
           // project has changed since the beginning of the save, which
           // can happen if another project was loaded in the meantime.
@@ -2014,7 +2371,6 @@ const MainFrame = (props: Props) => {
           }));
         }
       } catch (rawError) {
-        // If any error happens, ensure we hide the snackbars.
         _closeSnackMessage();
         const errorMessage = getWriteErrorMessage
           ? getWriteErrorMessage(rawError)
@@ -2032,6 +2388,7 @@ const MainFrame = (props: Props) => {
       i18n,
       isSavingProject,
       currentProject,
+      currentProjectRef,
       currentFileMetadata,
       getStorageProviderOperations,
       unsavedChanges,
@@ -2044,12 +2401,24 @@ const MainFrame = (props: Props) => {
       ensureResourcesAreMoved,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      showAlert,
+      showConfirmation,
     ]
   );
 
+  // Prevent "save project as" when no current project or when the opened project
+  // is a previous version (cloud project only) of the current project.
+  const canSaveProjectAs = !!currentProject && !checkedOutVersionStatus;
   const saveProjectAs = React.useCallback(
     () => {
-      if (!currentProject) return;
+      if (!canSaveProjectAs) {
+        return;
+      }
+
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
+      }
 
       const storageProviderOperations = getStorageProviderOperations();
       if (
@@ -2064,11 +2433,13 @@ const MainFrame = (props: Props) => {
       }
     },
     [
-      currentProject,
       getStorageProviderOperations,
       openSaveToStorageProviderDialog,
       props.storageProviders,
       saveProjectAsWithStorageProvider,
+      cloudProjectRecoveryOpenedVersionId,
+      cloudProjectSaveChoiceOpen,
+      canSaveProjectAs,
     ]
   );
 
@@ -2078,15 +2449,24 @@ const MainFrame = (props: Props) => {
       if (!currentFileMetadata) {
         return saveProjectAs();
       }
+      const isProjectOwnedBySomeoneElse = !!currentFileMetadata.ownerId;
+      if (isProjectOwnedBySomeoneElse) return;
+
+      if (cloudProjectRecoveryOpenedVersionId && !cloudProjectSaveChoiceOpen) {
+        setCloudProjectSaveChoiceOpen(true);
+        return;
+      }
 
       const storageProviderOperations = getStorageProviderOperations();
-      const { onSaveProject } = storageProviderOperations;
+      const {
+        onSaveProject,
+        canFileMetadataBeSafelySaved,
+      } = storageProviderOperations;
       if (!onSaveProject) {
         return saveProjectAs();
       }
 
       saveUiSettings(state.editorTabs);
-      _showSnackMessage(i18n._(t`Saving...`), null);
 
       // Protect against concurrent saves, which can trigger issues with the
       // file system.
@@ -2094,6 +2474,25 @@ const MainFrame = (props: Props) => {
         console.info('Project is already being saved, not triggering save.');
         return;
       }
+
+      if (checkedOutVersionStatus) {
+        const shouldRestoreCheckedOutVersion = await showConfirmation({
+          title: t`Restore this version`,
+          message: t`You're trying to save changes made to a previous version of your project. If you continue, it will be used as the new latest version.`,
+        });
+        if (!shouldRestoreCheckedOutVersion) return;
+      } else if (canFileMetadataBeSafelySaved) {
+        const canProjectBeSafelySaved = await canFileMetadataBeSafelySaved(
+          currentFileMetadata,
+          {
+            showAlert,
+            showConfirmation,
+          }
+        );
+        if (!canProjectBeSafelySaved) return;
+      }
+
+      _showSnackMessage(i18n._(t`Saving...`), null);
       setIsSavingProject(true);
 
       try {
@@ -2104,15 +2503,26 @@ const MainFrame = (props: Props) => {
         // store their values in variables now.
         const storageProviderInternalName = getStorageProvider().internalName;
 
+        const saveOptions = {};
+        if (cloudProjectRecoveryOpenedVersionId) {
+          saveOptions.previousVersion = cloudProjectRecoveryOpenedVersionId;
+        }
+        if (checkedOutVersionStatus) {
+          saveOptions.restoredFromVersionId =
+            checkedOutVersionStatus.version.id;
+        }
         const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
-          currentFileMetadata
+          currentFileMetadata,
+          saveOptions
         );
 
         if (wasSaved) {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          setCloudProjectSaveChoiceOpen(false);
+          setCloudProjectRecoveryOpenedVersionId(null);
 
           const fileMetadataAndStorageProviderName = {
             fileMetadata: fileMetadata,
@@ -2123,6 +2533,7 @@ const MainFrame = (props: Props) => {
           );
           if (
             currentlyRunningInAppTutorial &&
+            !isMiniTutorial(currentlyRunningInAppTutorial.id) && // Don't save the progress of mini-tutorials
             inAppTutorialOrchestratorRef.current
           ) {
             preferences.saveTutorialProgress({
@@ -2134,7 +2545,7 @@ const MainFrame = (props: Props) => {
               fileMetadataAndStorageProviderName,
             });
           }
-          if (isCurrentProjectStale(currentProjectRef, currentProject)) {
+          if (isCurrentProjectFresh(currentProjectRef, currentProject)) {
             // We do not want to change the current file metadata if the
             // project has changed since the beginning of the save, which
             // can happen if another project was loaded in the meantime.
@@ -2147,14 +2558,19 @@ const MainFrame = (props: Props) => {
           unsavedChanges.sealUnsavedChanges();
           _replaceSnackMessage(i18n._(t`Project properly saved`));
         }
-      } catch (rawError) {
-        showErrorBox({
-          message: i18n._(
-            t`Unable to save as the project! Please try again by choosing another location.`
-          ),
-          rawError,
-          errorId: 'project-save-error',
+      } catch (error) {
+        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+          error
+        );
+        const message =
+          extractedStatusAndCode && extractedStatusAndCode.status === 403
+            ? t`You don't have permissions to save this project. Please choose another location.`
+            : t`An error occurred when saving the project. Please try again later.`;
+        showAlert({
+          title: t`Unable to save the project`,
+          message,
         });
+        _closeSnackMessage();
       } finally {
         setIsSavingProject(false);
       }
@@ -2162,9 +2578,11 @@ const MainFrame = (props: Props) => {
     [
       isSavingProject,
       currentProject,
+      currentProjectRef,
       currentFileMetadata,
       getStorageProviderOperations,
       _showSnackMessage,
+      _closeSnackMessage,
       _replaceSnackMessage,
       i18n,
       unsavedChanges,
@@ -2175,6 +2593,11 @@ const MainFrame = (props: Props) => {
       setState,
       authenticatedUser,
       currentlyRunningInAppTutorial,
+      cloudProjectRecoveryOpenedVersionId,
+      cloudProjectSaveChoiceOpen,
+      showAlert,
+      showConfirmation,
+      checkedOutVersionStatus,
     ]
   );
 
@@ -2245,29 +2668,28 @@ const MainFrame = (props: Props) => {
   };
 
   const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
-    setState(state => {
-      return {
-        ...state,
-        editorTabs: moveTabToTheRightOfHoveredTab(
-          state.editorTabs,
-          fromIndex,
-          toHoveredIndex
-        ),
-      };
-    });
+    setState(state => ({
+      ...state,
+      editorTabs: moveTabToTheRightOfHoveredTab(
+        state.editorTabs,
+        fromIndex,
+        toHoveredIndex
+      ),
+    }));
   };
 
   const endTutorial = React.useCallback(
-    (shouldCloseProject?: boolean) => {
+    async (shouldCloseProject?: boolean) => {
       if (shouldCloseProject) {
-        closeProject().then(() => {
-          doEndTutorial();
-        });
+        await closeProject();
+        doEndTutorial();
       } else {
         doEndTutorial();
       }
+      // Open the homepage, so that the user can start a new tutorial.
+      openHomePage();
     },
-    [doEndTutorial, closeProject]
+    [doEndTutorial, closeProject, openHomePage]
   );
 
   const selectInAppTutorial = React.useCallback(
@@ -2283,82 +2705,24 @@ const MainFrame = (props: Props) => {
     [preferences, authenticatedUser.profile]
   );
 
-  const startSelectedTutorial = React.useCallback(
-    async (scenario: 'resume' | 'startOver' | 'start') => {
-      if (!selectedInAppTutorialInfo) return;
-      const { userProgress, tutorialId } = selectedInAppTutorialInfo;
-      if (userProgress && scenario === 'resume') {
-        if (currentProject) {
-          // If there's a project opened, check if this is the one we should open
-          // for the stored tutorial userProgress.
-          if (
-            currentFileMetadata &&
-            currentFileMetadata.fileIdentifier !==
-              userProgress.fileMetadataAndStorageProviderName.fileMetadata
-                .fileIdentifier
-          ) {
-            const projectIsClosed = await askToCloseProject();
-            if (!projectIsClosed) {
-              return;
-            }
-            openFromFileMetadataWithStorageProvider(
-              userProgress.fileMetadataAndStorageProviderName,
-              { openAllScenes: true }
-            );
-          } else {
-            // If the current project is the same stored for the tutorial,
-            // open all scenes.
-            openAllScenes({ currentProject, editorTabs: state.editorTabs });
-          }
-        } else {
-          openFromFileMetadataWithStorageProvider(
-            userProgress.fileMetadataAndStorageProviderName,
-            { openAllScenes: true }
-          );
-        }
-      } else {
-        const projectIsClosed = await askToCloseProject();
-        if (!projectIsClosed) {
-          return;
-        }
-      }
-
-      await startTutorial({
-        tutorialId,
-        initialStepIndex:
-          userProgress && scenario === 'resume' ? userProgress.step : 0,
-        initialProjectData:
-          userProgress && scenario === 'resume' ? userProgress.projectData : {},
-      });
-      sendInAppTutorialStarted({ tutorialId, scenario });
-      setSelectedInAppTutorialInfo(null);
-    },
-    [
-      askToCloseProject,
-      startTutorial,
-      selectedInAppTutorialInfo,
-      openFromFileMetadataWithStorageProvider,
-      state.editorTabs,
-      currentProject,
-      currentFileMetadata,
-      openAllScenes,
-    ]
-  );
-
   const onChangeProjectName = async (newName: string): Promise<void> => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
+    let newFileMetadata = { ...currentFileMetadata, name: newName };
     if (storageProviderOperations.onChangeProjectProperty) {
-      const wasSaved = await storageProviderOperations.onChangeProjectProperty(
+      const fileMetadataNewAttributes = await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
-      if (wasSaved) unsavedChanges.sealUnsavedChanges();
+      if (fileMetadataNewAttributes) {
+        unsavedChanges.sealUnsavedChanges();
+        newFileMetadata = { ...newFileMetadata, ...fileMetadataNewAttributes };
+      }
     }
     await setState(state => ({
       ...state,
-      currentFileMetadata: { ...currentFileMetadata, name: newName },
+      currentFileMetadata: newFileMetadata,
     }));
   };
 
@@ -2375,6 +2739,21 @@ const MainFrame = (props: Props) => {
     }
     return true;
   };
+
+  const onOpenCloudProjectOnSpecificVersionForRecovery = React.useCallback(
+    (versionId: string) => {
+      if (!cloudProjectFileMetadataToRecover) return;
+      onOpenCloudProjectOnSpecificVersion({
+        fileMetadata: cloudProjectFileMetadataToRecover,
+        versionId,
+        ignoreUnsavedChanges: false,
+        openingMessage: t`Recovering older version...`,
+      });
+      setCloudProjectFileMetadataToRecover(null);
+      setCloudProjectRecoveryOpenedVersionId(versionId);
+    },
+    [cloudProjectFileMetadataToRecover, onOpenCloudProjectOnSpecificVersion]
+  );
 
   const canInstallPrivateAsset = React.useCallback(
     () => {
@@ -2415,194 +2794,133 @@ const MainFrame = (props: Props) => {
     }
   };
 
-  const createProject = async (
-    i18n: I18n,
-    newProjectSetup: NewProjectSetup
-  ) => {
-    setIsProjectOpening(true);
-
-    try {
-      const source = selectedExampleShortHeader
-        ? await createNewProjectFromExampleShortHeader({
-            i18n,
-            exampleShortHeader: selectedExampleShortHeader,
-          })
-        : newProjectSetup.allowPlayersToLogIn
-        ? await createNewProjectWithDefaultLogin()
-        : await createNewProject();
-
-      if (!source) return; // New project creation aborted.
-
-      let state: ?State;
-      const sourceStorageProvider = source.storageProvider;
-      const sourceStorageProviderOperations = sourceStorageProvider
-        ? getStorageProviderOperations(source.storageProvider)
+  const startSelectedTutorial = React.useCallback(
+    async (scenario: 'resume' | 'startOver' | 'start') => {
+      if (!selectedInAppTutorialInfo) return;
+      const { userProgress, tutorialId } = selectedInAppTutorialInfo;
+      const fileMetadataAndStorageProviderName = userProgress
+        ? userProgress.fileMetadataAndStorageProviderName
         : null;
-      if (source.project) {
-        state = await loadFromProject(source.project, null);
-      } else if (source.fileMetadata && sourceStorageProvider) {
-        state = await openFromFileMetadata(source.fileMetadata);
-      }
-
-      if (!state) {
-        throw new Error(
-          'Neither a project nor a file metadata to load was provided for the new project'
-        );
-      }
-
-      const { currentProject, editorTabs } = state;
-      if (!currentProject) {
-        throw new Error('The new project could not be opened.');
-      }
-
-      const oldProjectId = currentProject.getProjectUuid();
-      currentProject.resetProjectUuid();
-
-      currentProject.setVersion('1.0.0');
-      currentProject.getAuthorIds().clear();
-      currentProject.setAuthor('');
-      if (selectedExampleShortHeader) {
-        // Use the project settings of the example and add template slug to project
-        currentProject.setTemplateSlug(selectedExampleShortHeader.slug);
+      if (
+        userProgress &&
+        scenario === 'resume' &&
+        fileMetadataAndStorageProviderName // The user can only resume if the project was saved to a storage provider.
+      ) {
+        if (currentProject) {
+          // If there's a project opened, check if this is the one we should open
+          // for the stored tutorial userProgress.
+          if (
+            currentFileMetadata &&
+            currentFileMetadata.fileIdentifier !==
+              fileMetadataAndStorageProviderName.fileMetadata.fileIdentifier
+          ) {
+            const projectIsClosed = await askToCloseProject();
+            if (!projectIsClosed) {
+              return;
+            }
+            openFromFileMetadataWithStorageProvider(
+              fileMetadataAndStorageProviderName,
+              { openAllScenes: true }
+            );
+          } else {
+            // If the current project is the same stored for the tutorial,
+            // open all scenes.
+            openAllScenes({ currentProject, editorTabs: state.editorTabs });
+          }
+        } else {
+          openFromFileMetadataWithStorageProvider(
+            fileMetadataAndStorageProviderName,
+            { openAllScenes: true }
+          );
+        }
       } else {
-        // Use the project settings requested by the user
-        currentProject.setGameResolutionSize(
-          newProjectSetup.width,
-          newProjectSetup.height
-        );
-        currentProject.setOrientation(newProjectSetup.orientation);
-        if (newProjectSetup.optimizeForPixelArt) {
-          currentProject.setPixelsRounding(true);
-          currentProject.setScaleMode('nearest');
+        const projectIsClosed = await askToCloseProject();
+        if (!projectIsClosed) {
+          return;
         }
       }
 
-      if (newProjectSetup.projectName) {
-        currentProject.setName(newProjectSetup.projectName);
-      }
+      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
+        tutorialId
+      );
+      if (!selectedInAppTutorialShortHeader) return;
 
-      if (authenticatedUser.profile) {
-        // if the user is connected, try to register the game to avoid
-        // any gdevelop services to ask the user to register the game.
-        // (for instance, leaderboards, player authentication, ...)
+      // If the tutorial has a template, create a new project from it.
+      const initialTemplateUrl =
+        selectedInAppTutorialShortHeader.initialTemplateUrl;
+      if (initialTemplateUrl) {
         try {
-          await registerGame(
-            authenticatedUser.getAuthorizationHeader,
-            authenticatedUser.profile.id,
+          await createProjectFromInAppTutorial(
+            selectedInAppTutorialShortHeader.id,
             {
-              gameId: currentProject.getProjectUuid(),
-              authorName: currentProject.getAuthor() || 'Unspecified publisher',
-              gameName: currentProject.getName() || 'Untitled game',
-              templateSlug: currentProject.getTemplateSlug(),
+              storageProvider: emptyStorageProvider,
+              saveAsLocation: null,
+              // Remaining will be set by the template.
             }
           );
         } catch (error) {
-          // Do not prevent the user from opening the game if the registration failed.
-          console.error(
-            'Unable to register the game to the user profile, the game will not be listed in the user profile.',
-            error
-          );
+          showErrorBox({
+            message: i18n._(
+              t`Unable to create a new project for the tutorial. Try again later.`
+            ),
+            rawError: new Error(
+              `Can't create project from template "${initialTemplateUrl}"`
+            ),
+            errorId: 'cannot-create-project-from-template',
+          });
+          return;
         }
       }
 
-      const destinationStorageProviderOperations = getStorageProviderOperations(
-        newProjectSetup.storageProvider
-      );
+      const initialStepIndex =
+        userProgress && scenario === 'resume' ? userProgress.step : 0;
+      const initialProjectData =
+        userProgress && scenario === 'resume'
+          ? userProgress.projectData
+          : selectedInAppTutorialShortHeader.initialProjectData || {};
 
-      const { onSaveProjectAs } = destinationStorageProviderOperations;
-
-      if (onSaveProjectAs) {
-        const { wasSaved, fileMetadata } = await onSaveProjectAs(
-          currentProject,
-          newProjectSetup.saveAsLocation,
-          {
-            onStartSaving: () => {
-              console.log('Start saving as the new project...');
-            },
-            onMoveResources: async ({ newFileMetadata }) => {
-              if (
-                !sourceStorageProvider ||
-                !sourceStorageProviderOperations ||
-                !source.fileMetadata
-              ) {
-                console.log(
-                  'No storage provider set or no previous FileMetadata (probably creating a blank project) - skipping resources copy.'
-                );
-                return;
-              }
-
-              await ensureResourcesAreMoved({
-                project: currentProject,
-                newFileMetadata,
-                newStorageProvider: newProjectSetup.storageProvider,
-                newStorageProviderOperations: destinationStorageProviderOperations,
-                oldFileMetadata: source.fileMetadata,
-                oldStorageProvider: sourceStorageProvider,
-                oldStorageProviderOperations: sourceStorageProviderOperations,
-                authenticatedUser,
-              });
-            },
-          }
-        );
-
-        if (wasSaved) {
-          setState(state => ({
-            ...state,
-            currentFileMetadata: fileMetadata,
-          }));
-          unsavedChanges.sealUnsavedChanges();
-          if (newProjectSetup.storageProvider.internalName === 'LocalFile') {
-            preferences.setHasProjectOpened(true);
-          }
-        }
-      }
-
-      // We were able to load and then save the project. We can now close the dialog,
-      // open the project editors and check if leaderboards must be replaced.
-      setNewProjectSetupDialogOpen(false);
-      setSelectedExampleShortHeader(null);
-      await setState(state => ({ ...state, createDialogOpen: false }));
-      findLeaderboardsToReplace(currentProject, oldProjectId);
-      openSceneOrProjectManager({
-        currentProject: currentProject,
-        editorTabs: editorTabs,
+      await startTutorial({
+        tutorialId,
+        initialStepIndex,
+        initialProjectData,
       });
-    } catch (rawError) {
-      const { getWriteErrorMessage } = getStorageProviderOperations();
-      const errorMessage = getWriteErrorMessage
-        ? getWriteErrorMessage(rawError)
-        : t`An error occurred when opening or saving the project. Try again later or choose another location to save the project to.`;
-
-      showErrorBox({
-        message: i18n._(errorMessage),
-        rawError,
-        errorId: 'project-creation-save-as-error',
-      });
-    } finally {
-      // Stop the loading when we're successful or have failed.
-      setIsProjectOpening(false);
-      setIsLoadingProject(false);
-      setLoaderModalProgress(null, null);
-    }
-  };
-
-  const onFetchNewlyAddedResources = React.useCallback(
-    async (): Promise<void> => {
-      if (!currentProject || !currentFileMetadata) return;
-
-      const storageProvider = getStorageProvider();
-      const storageProviderOperations = getStorageProviderOperations();
-      await ensureResourcesAreFetched({
-        project: currentProject,
-        fileMetadata: currentFileMetadata,
-        storageProvider,
-        storageProviderOperations,
-        authenticatedUser,
-      });
+      sendInAppTutorialStarted({ tutorialId, scenario });
+      setSelectedInAppTutorialInfo(null);
     },
     [
+      i18n,
+      getInAppTutorialShortHeader,
+      createProjectFromInAppTutorial,
+      askToCloseProject,
+      startTutorial,
+      selectedInAppTutorialInfo,
+      openFromFileMetadataWithStorageProvider,
+      state.editorTabs,
       currentProject,
       currentFileMetadata,
+      openAllScenes,
+    ]
+  );
+
+  const fetchNewlyAddedResources = React.useCallback(
+    async (): Promise<void> => {
+      if (!currentProjectRef.current || !currentFileMetadataRef.current) return;
+
+      await ensureResourcesAreFetched(() => ({
+        // Use the refs to the `currentProject` and `currentFileMetadata` to ensure
+        // that we never fetch resources for a stale project or file metadata, even
+        // if it changed in the meantime (like, a save took a long time before updating
+        // the fileMetadata).
+        project: currentProjectRef.current,
+        fileMetadata: currentFileMetadataRef.current,
+        storageProvider: getStorageProvider(),
+        storageProviderOperations: getStorageProviderOperations(),
+        authenticatedUser,
+      }));
+    },
+    [
+      currentProjectRef,
+      currentFileMetadataRef,
       ensureResourcesAreFetched,
       getStorageProvider,
       getStorageProviderOperations,
@@ -2610,11 +2928,22 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  /** (Stable) callback to launch the fetching of the resources of the project. */
+  const onFetchNewlyAddedResources = useStableUpToDateCallback(
+    fetchNewlyAddedResources
+  );
+
   useKeyboardShortcuts(
     commandPaletteRef.current
       ? commandPaletteRef.current.launchCommand
       : () => {}
   );
+
+  const openCommandPalette = React.useCallback(() => {
+    if (commandPaletteRef.current) {
+      commandPaletteRef.current.open();
+    }
+  }, []);
 
   useMainFrameCommands({
     i18n,
@@ -2639,18 +2968,16 @@ const MainFrame = (props: Props) => {
     onCloseProject: async () => {
       askToCloseProject();
     },
-    onExportGame: React.useCallback(() => openExportDialog(true), []),
+    onExportGame: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
     onOpenLayout: name => {
       openLayout(name);
     },
     onOpenExternalEvents: openExternalEvents,
     onOpenExternalLayout: openExternalLayout,
     onOpenEventsFunctionsExtension: openEventsFunctionsExtension,
-    onOpenCommandPalette: commandPaletteRef.current
-      ? commandPaletteRef.current.open
-      : () => {},
+    onOpenCommandPalette: openCommandPalette,
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
   });
 
   const resourceManagementProps: ResourceManagementProps = React.useMemo(
@@ -2660,6 +2987,7 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     }),
     [
       resourceSources,
@@ -2667,15 +2995,16 @@ const MainFrame = (props: Props) => {
       resourceExternalEditors,
       getStorageProvider,
       onFetchNewlyAddedResources,
+      getStorageProviderResourceOperations,
     ]
   );
 
   const showLoader = isLoadingProject || previewLoading;
-
   const shortcutMap = useShortcutMap();
   const buildMainMenuProps = {
     i18n: i18n,
     project: state.currentProject,
+    canSaveProjectAs,
     recentProjectFiles: preferences.getRecentProjectFiles(),
     shortcutMap,
     isApplicationTopLevelMenu: false,
@@ -2685,10 +3014,12 @@ const MainFrame = (props: Props) => {
     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
+    onShowVersionHistory: openVersionHistoryPanel,
     onCloseProject: askToCloseProject,
     onCloseApp: closeApp,
-    onExportProject: () => openExportDialog(true),
-    onCreateProject: () => openCreateProjectDialog(true, null),
+    onExportProject: () => openShareDialog('publish'),
+    onInviteCollaborators: () => openShareDialog('invite'),
+    onCreateProject: openExampleStoreDialog,
     onCreateBlank: () => setNewProjectSetupDialogOpen(true),
     onOpenProjectManager: () => openProjectManager(true),
     onOpenHomePage: openHomePage,
@@ -2697,9 +3028,15 @@ const MainFrame = (props: Props) => {
     onOpenPreferences: () => openPreferencesDialog(true),
     onOpenLanguage: () => openLanguageDialog(true),
     onOpenProfile: () => openProfileDialog(true),
-    onOpenGamesDashboard: () => navigateToRoute('games-dashboard'),
     setElectronUpdateStatus: setElectronUpdateStatus,
   };
+
+  const isProjectOwnedBySomeoneElse =
+    !!currentFileMetadata && !!currentFileMetadata.ownerId;
+  const canSave =
+    !!state.currentProject &&
+    !isSavingProject &&
+    (!currentFileMetadata || !isProjectOwnedBySomeoneElse);
 
   return (
     <div
@@ -2710,7 +3047,13 @@ const MainFrame = (props: Props) => {
       {!!renderMainMenu &&
         renderMainMenu(
           { ...buildMainMenuProps, isApplicationTopLevelMenu: true },
-          mainMenuCallbacks
+          mainMenuCallbacks,
+          {
+            onClosePreview:
+              _previewLauncher.current && _previewLauncher.current.closePreview
+                ? _previewLauncher.current.closePreview
+                : null,
+          }
         )}
       <ProjectTitlebar
         projectName={currentProject ? currentProject.getName() : null}
@@ -2718,24 +3061,14 @@ const MainFrame = (props: Props) => {
         storageProvider={getStorageProvider()}
         i18n={i18n}
       />
-      <Drawer
-        open={projectManagerOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={toggleProjectManager}
+      <ProjectManagerDrawer
+        projectManagerOpen={projectManagerOpen}
+        toggleProjectManager={toggleProjectManager}
+        title={
+          state.currentProject ? state.currentProject.getName() : 'No project'
+        }
       >
-        <DrawerTopBar
-          title={
-            state.currentProject ? state.currentProject.getName() : 'No project'
-          }
-          onClose={toggleProjectManager}
-        />
-        {currentProject && (
+        {currentProject ? (
           <ProjectManager
             project={currentProject}
             onChangeProjectName={onChangeProjectName}
@@ -2755,33 +3088,28 @@ const MainFrame = (props: Props) => {
             onRenameExternalLayout={renameExternalLayout}
             onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
             onRenameExternalEvents={renameExternalEvents}
-            onOpenResources={() => {
-              openResources();
-              openProjectManager(false);
-            }}
+            onOpenResources={openResources}
             onOpenPlatformSpecificAssets={() =>
               openPlatformSpecificAssetsDialog(true)
             }
             eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
             onReloadEventsFunctionsExtensions={() => {
+              if (isProjectClosedSoAvoidReloadingExtensions) {
+                return;
+              }
               // Check if load is sufficient
               eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
                 currentProject
               );
             }}
+            onShareProject={() => openShareDialog()}
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
             resourceManagementProps={resourceManagementProps}
-            shortcutMap={shortcutMap}
           />
-        )}
-        {!state.currentProject && (
-          <EmptyMessage>
-            <Trans>To begin, open or create a new project.</Trans>
-          </EmptyMessage>
-        )}
-      </Drawer>
+        ) : null}
+      </ProjectManagerDrawer>
       <TabsTitlebar
         onBuildMenuTemplate={() =>
           adaptFromDeclarativeTemplate(
@@ -2814,8 +3142,15 @@ const MainFrame = (props: Props) => {
               : null
           )
         }
+        canSave={canSave}
+        onSave={saveProject}
         toggleProjectManager={toggleProjectManager}
-        exportProject={() => openExportDialog(true)}
+        openShareDialog={() =>
+          openShareDialog(/* leave the dialog decide which tab to open */)
+        }
+        isSharingEnabled={
+          !checkedOutVersionStatus && !cloudProjectRecoveryOpenedVersionId
+        }
         onOpenDebugger={launchDebuggerAndPreview}
         hasPreviewsRunning={hasPreviewsRunning}
         onPreviewWithoutHotReload={launchNewPreview}
@@ -2830,6 +3165,10 @@ const MainFrame = (props: Props) => {
           !!currentProject && currentProject.getLayoutsCount() > 0
         }
         previewState={previewState}
+        onOpenVersionHistory={openVersionHistoryPanel}
+        checkedOutVersionStatus={checkedOutVersionStatus}
+        onQuitVersionHistory={onQuitVersionHistory}
+        canQuitVersionHistory={!isSavingProject}
       />
       <LeaderboardProvider
         gameId={
@@ -2838,14 +3177,21 @@ const MainFrame = (props: Props) => {
       >
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          const errorBoundaryProps = getEditorErrorBoundaryProps(editorTab.key);
+
           return (
             <TabContentContainer key={editorTab.key} active={isCurrentTab}>
               <CommandsContextScopedProvider active={isCurrentTab}>
-                <ErrorBoundary>
+                <ErrorBoundary
+                  componentTitle={errorBoundaryProps.componentTitle}
+                  scope={errorBoundaryProps.scope}
+                >
                   {editorTab.renderEditorContainer({
                     isActive: isCurrentTab,
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
+                    fileMetadata: currentFileMetadata,
+                    storageProvider: getStorageProvider(),
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
                       setEditorToolbar(editorToolbar, isCurrentTab),
@@ -2867,6 +3213,8 @@ const MainFrame = (props: Props) => {
                       });
                     },
                     resourceManagementProps,
+                    onSave: saveProject,
+                    canSave,
                     onCreateEventsFunction,
                     openInstructionOrExpression,
                     unsavedChanges: unsavedChanges,
@@ -2876,24 +3224,47 @@ const MainFrame = (props: Props) => {
                     canInstallPrivateAsset,
                     onChooseProject: () => openOpenFromStorageProviderDialog(),
                     onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                    onOpenNewProjectSetupDialog: exampleShortHeader => {
-                      setSelectedExampleShortHeader(exampleShortHeader);
+                    onOpenNewProjectSetupDialog: () => {
                       setNewProjectSetupDialogOpen(true);
                     },
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onCreateProject: exampleShortHeader =>
-                      openCreateProjectDialog(true, exampleShortHeader),
+                    onOpenExampleStore: openExampleStoreDialog,
+                    onSelectExampleShortHeader: onSelectExampleShortHeader,
+                    onPreviewPrivateGameTemplateListingData: privateGameTemplateListingData =>
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: true,
+                      }),
+                    onOpenPrivateGameTemplateListingData: privateGameTemplateListingData => {
+                      onSelectPrivateGameTemplate({
+                        privateGameTemplateListingData,
+                        openDialog: false,
+                      });
+                      setNewProjectSetupDialogOpen(true);
+                    },
                     onOpenProfile: () => openProfileDialog(true),
-                    onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
                     onOpenPreferences: () => openPreferencesDialog(true),
                     onOpenAbout: () => openAboutDialog(true),
                     selectInAppTutorial: selectInAppTutorial,
-                    onLoadEventsFunctionsExtensions: () =>
-                      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                    onLoadEventsFunctionsExtensions: () => {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
+                        return Promise.resolve();
+                      }
+                      return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
-                      ),
+                      );
+                    },
+                    onReloadEventsFunctionsExtensionMetadata: extension => {
+                      if (isProjectClosedSoAvoidReloadingExtensions) {
+                        return;
+                      }
+                      eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensionMetadata(
+                        currentProject,
+                        extension
+                      );
+                    },
                     onDeleteResource: (
                       resource: gdResource,
                       cb: boolean => void
@@ -2913,6 +3284,7 @@ const MainFrame = (props: Props) => {
 
                       cb(true);
                     },
+                    openBehaviorEvents: openBehaviorEvents,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>
@@ -2920,15 +3292,11 @@ const MainFrame = (props: Props) => {
           );
         })}
       </LeaderboardProvider>
-      <CommandPalette ref={commandPaletteRef} />
+      <CommandPaletteWithAlgoliaSearch ref={commandPaletteRef} />
       <LoaderModal
         show={showLoader}
         progress={fileMetadataOpeningProgress}
-        message={fileMetadataOpeningMessage}
-      />
-      <HelpFinder
-        open={helpFinderDialogOpen}
-        onClose={() => openHelpFinderDialog(false)}
+        message={loaderModalOpeningMessage || fileMetadataOpeningMessage}
       />
       <Snackbar
         open={state.snackMessageOpen}
@@ -2939,28 +3307,17 @@ const MainFrame = (props: Props) => {
         }}
         message={<span id="snackbar-message">{state.snackMessage}</span>}
       />
-      {!!renderExportDialog &&
-        exportDialogOpen &&
-        renderExportDialog({
-          onClose: () => openExportDialog(false),
-          onChangeSubscription: () => {
-            openExportDialog(false);
-          },
+      {shareDialogOpen &&
+        renderShareDialog({
+          onClose: closeShareDialog,
+          onChangeSubscription: closeShareDialog,
           project: state.currentProject,
           onSaveProject: saveProject,
+          isSavingProject: isSavingProject,
+          fileMetadata: currentFileMetadata,
+          storageProvider: getStorageProvider(),
+          initialTab: shareDialogInitialTab,
         })}
-      {state.createDialogOpen && (
-        <CreateProjectDialog
-          open
-          onClose={closeCreateDialog /*TODO */}
-          initialExampleShortHeader={state.initialExampleShortHeader}
-          isProjectOpening={isProjectOpening}
-          onChoose={exampleShortHeader => {
-            setSelectedExampleShortHeader(exampleShortHeader);
-            setNewProjectSetupDialogOpen(true);
-          }}
-        />
-      )}
       {!!currentProject && platformSpecificAssetsDialogOpen && (
         <PlatformSpecificAssetsDialog
           project={currentProject}
@@ -2975,7 +3332,7 @@ const MainFrame = (props: Props) => {
           {
             getIncludeFileHashs:
               eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openExportDialog(true),
+            onExport: () => openShareDialog('publish'),
           },
           (previewLauncher: ?PreviewLauncherInterface) => {
             _previewLauncher.current = previewLauncher;
@@ -3003,7 +3360,6 @@ const MainFrame = (props: Props) => {
       )}
       {profileDialogOpen && (
         <ProfileDialog
-          currentProject={currentProject}
           open
           onClose={() => {
             openProfileDialog(false);
@@ -3013,33 +3369,56 @@ const MainFrame = (props: Props) => {
       {newProjectSetupDialogOpen && (
         <NewProjectSetupDialog
           authenticatedUser={authenticatedUser}
-          isOpening={isProjectOpening}
+          isOpeningProject={isProjectOpening}
           onClose={() => setNewProjectSetupDialogOpen(false)}
-          onCreate={projectSettings => createProject(i18n, projectSettings)}
-          storageProviders={props.storageProviders}
-          isFromExample={!!selectedExampleShortHeader}
-          sourceExampleName={
-            selectedExampleShortHeader
-              ? selectedExampleShortHeader.name
-              : undefined
+          onCreateEmptyProject={createEmptyProject}
+          onCreateFromExample={createProjectFromExample}
+          onCreateProjectFromPrivateGameTemplate={
+            createProjectFromPrivateGameTemplate
           }
+          onCreateWithLogin={createProjectWithLogin}
+          onCreateFromAIGeneration={async (generatedProject, projectSetup) => {
+            const projectFileUrl = generatedProject.fileUrl;
+            if (!projectFileUrl) return;
+            await createProjectFromAIGeneration(projectFileUrl, projectSetup);
+          }}
+          storageProviders={props.storageProviders}
+          selectedExampleShortHeader={selectedExampleShortHeader}
+          selectedPrivateGameTemplateListingData={
+            selectedPrivateGameTemplateListingData
+          }
+        />
+      )}
+      {cloudProjectFileMetadataToRecover && (
+        <CloudProjectRecoveryDialog
+          cloudProjectId={cloudProjectFileMetadataToRecover.fileIdentifier}
+          onClose={() => setCloudProjectFileMetadataToRecover(null)}
+          onOpenPreviousVersion={onOpenCloudProjectOnSpecificVersionForRecovery}
+        />
+      )}
+      {cloudProjectSaveChoiceOpen && (
+        <CloudProjectSaveChoiceDialog
+          isLoading={isSavingProject}
+          onClose={() => setCloudProjectSaveChoiceOpen(false)}
+          onSaveAsMainVersion={saveProject}
+          onSaveAsDuplicate={saveProjectAs}
         />
       )}
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={languageChanged => {
+          onClose={options => {
             openPreferencesDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
       {languageDialogOpen && (
         <LanguageDialog
           open
-          onClose={languageChanged => {
+          onClose={options => {
             openLanguageDialog(false);
-            if (languageChanged) _languageDidChange();
+            if (options.languageDidChange) _languageDidChange();
           }}
         />
       )}
@@ -3075,6 +3454,8 @@ const MainFrame = (props: Props) => {
       {renderLeaderboardReplacerDialog()}
       {renderResourceMoverDialog()}
       {renderResourceFetcherDialog()}
+      {renderVersionHistoryPanel()}
+      {renderExampleOrGameTemplateDialogs()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
         i18n={props.i18n}
@@ -3099,6 +3480,7 @@ const MainFrame = (props: Props) => {
           onClose={() => {
             setSelectedInAppTutorialInfo(null);
           }}
+          isProjectOpening={isProjectOpening}
         />
       )}
       {state.gdjsDevelopmentWatcherEnabled &&
@@ -3121,8 +3503,15 @@ const MainFrame = (props: Props) => {
           startStepIndex={startStepIndex}
           startProjectData={startProjectData}
           project={currentProject}
-          endTutorial={(shouldCloseProject?: boolean) => {
+          endTutorial={({
+            shouldCloseProject,
+            shouldWarnAboutUnsavedChanges,
+          }: {|
+            shouldCloseProject: boolean,
+            shouldWarnAboutUnsavedChanges: boolean,
+          |}) => {
             if (
+              shouldWarnAboutUnsavedChanges &&
               currentProject &&
               (!currentFileMetadata || unsavedChanges.hasUnsavedChanges)
             ) {
@@ -3142,9 +3531,12 @@ const MainFrame = (props: Props) => {
           canEndTutorial={
             !!currentFileMetadata && !unsavedChanges.hasUnsavedChanges
           }
-          endTutorial={() => endTutorial(true)}
+          endTutorial={() => {
+            endTutorial(true);
+          }}
         />
       )}
+      <CustomDragLayer />
     </div>
   );
 };

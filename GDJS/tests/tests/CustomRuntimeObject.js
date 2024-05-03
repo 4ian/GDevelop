@@ -12,7 +12,7 @@ describe('gdjs.CustomRuntimeObject', function () {
   const createCustomObject = (instanceContainer) => {
     // The corresponding event-based object declaration is done by
     // getPixiRuntimeGameWithAssets.
-    const customObject = new gdjs.CustomRuntimeObject(instanceContainer, {
+    const customObject = new gdjs.CustomRuntimeObject2D(instanceContainer, {
       name: 'MyCustomObject',
       type: 'MyExtension::MyEventsBasedObject',
       variables: [],
@@ -198,8 +198,8 @@ describe('gdjs.CustomRuntimeObject', function () {
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
         [32, 32],
-        [31.999999999999993, -31.999999999999996],
-        [96, 31.999999999999996],
+        [32, -32],
+        [96, 32],
       ]);
       expect(customObject.getHitBoxes()[1].vertices).to.eql([
         [32, 96],
@@ -245,6 +245,12 @@ describe('gdjs.CustomRuntimeObject', function () {
       customObject.setWidth(32);
       customObject.setHeight(96);
 
+      // To draw the transformed shapes:
+      // - draw 2 squares side-by-side
+      // - scale them and keep the top-left corner in place
+      // - rotate the shape keeping the center of the scaled drawing in place
+      // - translate it according to the object new position.
+
       expect(customObject.getWidth()).to.be(32);
       expect(customObject.getHeight()).to.be(96);
 
@@ -253,14 +259,14 @@ describe('gdjs.CustomRuntimeObject', function () {
 
       expect(customObject.getHitBoxes().length).to.be(2);
       expect(customObject.getHitBoxes()[0].vertices).to.eql([
-        [-12, 100],
-        [-12, 84],
-        [84, 100],
+        [-24, 64],
+        [-24, 48],
+        [72, 64],
       ]);
       expect(customObject.getHitBoxes()[1].vertices).to.eql([
-        [-12, 116],
-        [-12, 100],
-        [84, 116],
+        [-24, 80],
+        [-24, 64],
+        [72, 80],
       ]);
     });
 

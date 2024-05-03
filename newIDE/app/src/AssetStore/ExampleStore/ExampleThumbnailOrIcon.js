@@ -2,39 +2,39 @@
 import * as React from 'react';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../UI/Responsive/ResponsiveWindowMeasurer';
+import { iconWithBackgroundStyle } from '../../UI/IconContainer';
 
 const styles = {
   iconBackground: {
     flex: 0,
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'left',
   },
   icon: {
-    background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
+    ...iconWithBackgroundStyle,
     padding: 1,
-    borderRadius: 4,
   },
 };
 
-const ICON_HEIGHT = 120;
-const SMALL_WINDOW_ICON_HEIGHT = 50;
+const ICON_DESKTOP_HEIGHT = 120;
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
 |};
 
 export const ExampleThumbnailOrIcon = ({ exampleShortHeader }: Props) => {
-  const windowWidth = useResponsiveWindowWidth();
+  const { isMobile } = useResponsiveWindowSize();
   const iconUrl = exampleShortHeader.previewImageUrls[0];
   const aspectRatio = iconUrl.endsWith('square-icon.png') ? '1 / 1' : '16 / 9';
-  const height =
-    windowWidth === 'small' ? SMALL_WINDOW_ICON_HEIGHT : ICON_HEIGHT;
+  // Make the icon be full width on mobile.
+  const height = isMobile ? undefined : ICON_DESKTOP_HEIGHT;
+  const width = isMobile ? '100%' : undefined;
 
   return (
     <div style={styles.iconBackground}>
       <CorsAwareImage
-        style={{ ...styles.icon, height, aspectRatio }}
+        style={{ ...styles.icon, height, width, aspectRatio }}
         src={iconUrl}
         alt={exampleShortHeader.name}
       />

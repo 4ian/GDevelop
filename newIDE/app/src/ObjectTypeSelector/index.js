@@ -55,7 +55,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
       >
         <SelectOption
           value=""
-          primaryText={t`Any object`}
+          label={t`Any object`}
           disabled={isDisabled('')}
         />
         {objectMetadata.map((metadata: EnumeratedObjectMetadata) => {
@@ -68,7 +68,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
             <SelectOption
               key={metadata.name}
               value={metadata.name}
-              primaryText={metadata.fullName}
+              label={metadata.fullName}
               disabled={isDisabled(metadata.name)}
             />
           );

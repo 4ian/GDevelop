@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../../../../UI/FlatButton';
 import EmptyMessage from '../../../../UI/EmptyMessage';
@@ -12,22 +12,22 @@ import ImagePreview, {
 } from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
-  allSpritesHaveSameCollisionMasksAs,
+  allAnimationSpritesHaveSameCollisionMasksAs,
   copyAnimationsSpriteCollisionMasks,
+  allObjectSpritesHaveSameCollisionMaskAs,
 } from '../Utils/SpriteObjectHelper';
 import SpriteSelector from '../Utils/SpriteSelector';
-import Window from '../../../../Utils/Window';
-import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import EditorMosaic, {
   type Editor,
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
-import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowSize } from '../../../../UI/Responsive/ResponsiveWindowMeasurer';
 import Paper from '../../../../UI/Paper';
 import ScrollView from '../../../../UI/ScrollView';
-const gd: libGDevelop = global.gd;
+import useAlertDialog from '../../../../UI/Alert/useAlertDialog';
+import AlertMessage from '../../../../UI/AlertMessage';
 
 const styles = {
   leftContainer: {
@@ -37,6 +37,8 @@ const styles = {
   },
   rightContainer: {
     display: 'flex',
+    paddingLeft: 4,
+    paddingRight: 4,
   },
 };
 
@@ -55,17 +57,19 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  objectConfiguration: gdSpriteObject,
+  animations: gdSpriteAnimationList,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   onMasksUpdated?: () => void,
+  onCreateMatchingSpriteCollisionMask: () => Promise<void>,
 |};
 
 const CollisionMasksEditor = ({
-  objectConfiguration,
+  animations,
   resourcesLoader,
   project,
   onMasksUpdated,
+  onCreateMatchingSpriteCollisionMask,
 }: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
@@ -77,36 +81,45 @@ const CollisionMasksEditor = ({
   const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
     null
   );
-  // Note: these two booleans are set to false to avoid erasing points of other
-  // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
-  // theory, they should be set to the appropriate value at their initialization,
-  // for consistency of the state.
-  const [
-    sameCollisionMasksForAnimations,
-    setSameCollisionMasksForAnimations,
-  ] = React.useState(false);
-  const [
-    sameCollisionMasksForSprites,
-    setSameCollisionMasksForSprites,
-  ] = React.useState(false);
-  const [spriteWidth, setSpriteWidth] = React.useState(0);
-  const [spriteHeight, setSpriteHeight] = React.useState(0);
+
+  const [currentSpriteSize, setCurrentSpriteSize] = React.useState<
+    [number, number]
+  >([0, 0]);
   const forceUpdate = useForceUpdate();
 
-  const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
+  const { showConfirmation } = useAlertDialog();
+
   const { animation, sprite } = getCurrentElements(
-    spriteConfiguration,
+    animations,
     animationIndex,
     directionIndex,
     spriteIndex
   );
 
+  // Note: sprite should always be defined so this value will be correctly initialised.
+  const [
+    sameCollisionMasksForAnimations,
+    setSameCollisionMasksForAnimations,
+  ] = React.useState(
+    sprite ? allObjectSpritesHaveSameCollisionMaskAs(sprite, animations) : false
+  );
+
+  // Note: sprite & animation should always be defined so this value will be correctly initialised.
+  const [
+    sameCollisionMasksForSprites,
+    setSameCollisionMasksForSprites,
+  ] = React.useState(
+    sprite && animation
+      ? allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
+      : false
+  );
+
   const updateCollisionMasks = React.useCallback(
-    () => {
+    (sameCollisionMasksForAnimations, sameCollisionMasksForSprites) => {
       if (animation && sprite) {
         if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-            const otherAnimation = spriteConfiguration.getAnimation(i);
+          mapFor(0, animations.getAnimationsCount(), i => {
+            const otherAnimation = animations.getAnimation(i);
             copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
           });
         } else if (sameCollisionMasksForSprites) {
@@ -117,15 +130,7 @@ const CollisionMasksEditor = ({
       forceUpdate(); // Refresh the preview and the list
       if (onMasksUpdated) onMasksUpdated();
     },
-    [
-      animation,
-      sprite,
-      spriteConfiguration,
-      sameCollisionMasksForAnimations,
-      sameCollisionMasksForSprites,
-      forceUpdate,
-      onMasksUpdated,
-    ]
+    [animation, sprite, animations, forceUpdate, onMasksUpdated]
   );
 
   const chooseAnimation = index => {
@@ -143,85 +148,170 @@ const CollisionMasksEditor = ({
     setSpriteIndex(index);
   };
 
-  const updateSameCollisionMasksToggles = () => {
-    if (!animation || !sprite) return;
+  // When an animation or sprite is changed, recompute if all collision masks are the same
+  // to enable the toggle.
+  // Note: we do not recompute if all animations have the same collision masks, as we consider
+  // that if the user has enabled/disabled this, they want to keep it that way.
+  React.useEffect(
+    () => {
+      if (!animation || !sprite) return;
 
-    setSameCollisionMasksForAnimations(
-      every(
-        mapFor(0, spriteConfiguration.getAnimationsCount(), i => {
-          const otherAnimation = spriteConfiguration.getAnimation(i);
-          return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
-        })
-      )
-    );
-
-    setSameCollisionMasksForSprites(
-      allSpritesHaveSameCollisionMasksAs(sprite, animation)
-    );
-  };
-
-  const onSetCollisionMaskAutomatic = React.useCallback(
-    (automatic: boolean = true) => {
-      if (!sprite) return;
-      sprite.setCollisionMaskAutomatic(automatic);
-      updateCollisionMasks();
+      setSameCollisionMasksForSprites(
+        allAnimationSpritesHaveSameCollisionMasksAs(sprite, animation)
+      );
     },
-    [sprite, updateCollisionMasks]
+    [animation, sprite]
   );
 
-  const setSameCollisionMasksForAllAnimations = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?"
+  const onSetFullImageCollisionMask = React.useCallback(
+    async (fullImage: boolean = true) => {
+      if (!sprite) return;
+      if (fullImage) {
+        // Revert to non-automatic collision mask.
+        animations.setAdaptCollisionMaskAutomatically(false);
+      }
+      sprite.setFullImageCollisionMask(fullImage);
+      updateCollisionMasks(
+        sameCollisionMasksForAnimations,
+        sameCollisionMasksForSprites
       );
-      if (!answer) return;
-    }
+    },
+    [
+      sprite,
+      updateCollisionMasks,
+      sameCollisionMasksForAnimations,
+      sameCollisionMasksForSprites,
+      animations,
+    ]
+  );
 
-    setSameCollisionMasksForAnimations(enable);
-    setSameCollisionMasksForSprites(enable || sameCollisionMasksForSprites);
-  };
+  const setSameCollisionMasksForAllAnimations = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same collision mask for all animations?`,
+          message: t`Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?`,
+          confirmButtonLabel: t`Use same collision mask`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-  const setSameCollisionMasksForAllSprites = (enable: boolean) => {
-    if (enable) {
-      const answer = Window.showConfirmDialog(
-        "Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?"
+      const newSameCollisionMasksForAnimationsValue = enable;
+      const newSameCollisionMasksForSpritesValue =
+        enable || sameCollisionMasksForSprites;
+
+      setSameCollisionMasksForAnimations(
+        newSameCollisionMasksForAnimationsValue
       );
-      if (!answer) return;
-    }
+      setSameCollisionMasksForSprites(newSameCollisionMasksForSpritesValue);
+      updateCollisionMasks(
+        newSameCollisionMasksForAnimationsValue,
+        newSameCollisionMasksForSpritesValue
+      );
+    },
+    [sameCollisionMasksForSprites, updateCollisionMasks, showConfirmation]
+  );
 
-    setSameCollisionMasksForAnimations(
-      enable && sameCollisionMasksForAnimations
-    );
-    setSameCollisionMasksForSprites(enable);
-  };
+  const setSameCollisionMasksForAllSprites = React.useCallback(
+    async (enable: boolean) => {
+      if (enable) {
+        const answer = await showConfirmation({
+          title: t`Use same collision mask for all frames?`,
+          message: t`
+          Having the same collision masks for all frames will erase and reset all the other frames collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the frames of the animation?`,
+          confirmButtonLabel: t`Use same collision mask`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
 
-  const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
-    setSpriteWidth(spriteWidth);
-    setSpriteHeight(spriteHeight);
-  };
+      const newSameCollisionMasksForAnimationsValue =
+        enable && sameCollisionMasksForAnimations;
+      const newSameCollisionMasksForSpritesValue = enable;
 
-  // Note: might be worth fixing these warnings:
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateCollisionMasks, [
-    sameCollisionMasksForAnimations,
-    sameCollisionMasksForSprites,
-  ]);
+      setSameCollisionMasksForAnimations(
+        newSameCollisionMasksForAnimationsValue
+      );
+      setSameCollisionMasksForSprites(newSameCollisionMasksForSpritesValue);
+      updateCollisionMasks(
+        newSameCollisionMasksForAnimationsValue,
+        newSameCollisionMasksForSpritesValue
+      );
+    },
+    [sameCollisionMasksForAnimations, updateCollisionMasks, showConfirmation]
+  );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
+  const onSetAutomaticallyAdaptCollisionMasks = React.useCallback(
+    async value => {
+      // If enabling automatic while custom was selected, then ask for confirmation.
+      if (value && sprite && !sprite.isFullImageCollisionMask()) {
+        const answer = await showConfirmation({
+          title: t`Adapt collision mask?`,
+          message: t`
+            You will lose all custom collision masks. Do you want to continue?`,
+          confirmButtonLabel: t`Adapt automatically`,
+          dismissButtonLabel: t`Cancel`,
+        });
+        if (!answer) return;
+      }
+
+      animations.setAdaptCollisionMaskAutomatically(value);
+
+      // Recompute collision mask when enabling automatic, and enable same masks for all animations & sprites.
+      if (value) {
+        onCreateMatchingSpriteCollisionMask();
+        setSameCollisionMasksForAnimations(true);
+        setSameCollisionMasksForSprites(true);
+      }
+      forceUpdate();
+    },
+    [
+      animations,
+      forceUpdate,
+      onCreateMatchingSpriteCollisionMask,
+      showConfirmation,
+      sprite,
+    ]
+  );
+
+  const onUseCustomCollisionMask = React.useCallback(
+    () => {
+      onSetFullImageCollisionMask(false);
+      onSetAutomaticallyAdaptCollisionMasks(false);
+    },
+    [onSetFullImageCollisionMask, onSetAutomaticallyAdaptCollisionMasks]
+  );
+
+  const onPolygonsUpdated = React.useCallback(
+    () => {
+      // Revert to non-automatic collision mask.
+      animations.setAdaptCollisionMaskAutomatically(false);
+      updateCollisionMasks(
+        sameCollisionMasksForAnimations,
+        sameCollisionMasksForSprites
+      );
+    },
+    [
+      animations,
+      updateCollisionMasks,
+      sameCollisionMasksForAnimations,
+      sameCollisionMasksForSprites,
+    ]
+  );
 
   // Keep panes vertical for small screens, side-by-side for large screens
-  const screenSize = useResponsiveWindowWidth();
-  const editorNodes =
-    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+  const { isMobile } = useResponsiveWindowSize();
+  const editorNodes = isMobile ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  if (!objectConfiguration.getAnimationsCount()) return null;
+  if (!animations.getAnimationsCount()) return null;
   const resourceName = sprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
       type: 'primary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.leftContainer} square>
           <Column expand noMargin useFullHeight>
@@ -236,14 +326,15 @@ const CollisionMasksEditor = ({
                 project,
                 resourceName
               )}
-              onSize={setCurrentSpriteSize}
+              onImageSize={setCurrentSpriteSize}
               renderOverlay={overlayProps =>
                 sprite && (
                   <CollisionMasksPreview
                     {...overlayProps}
-                    isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                    isDefaultBoundingBox={sprite.isFullImageCollisionMask()}
+                    hideControls={animations.adaptCollisionMaskAutomatically()}
                     polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={updateCollisionMasks}
+                    onPolygonsUpdated={onPolygonsUpdated}
                     highlightedVerticePtr={highlightedVerticePtr}
                     selectedVerticePtr={selectedVerticePtr}
                     onClickVertice={setSelectedVerticePtr}
@@ -258,13 +349,14 @@ const CollisionMasksEditor = ({
     properties: {
       type: 'secondary',
       noTitleBar: true,
+      noSoftKeyboardAvoidance: true,
       renderEditor: () => (
         <Paper background="medium" style={styles.rightContainer} square>
           <Column expand noMargin>
             <Line>
-              <Column expand>
+              <Column expand noMargin>
                 <SpriteSelector
-                  spriteConfiguration={spriteConfiguration}
+                  animations={animations}
                   animationIndex={animationIndex}
                   directionIndex={directionIndex}
                   spriteIndex={spriteIndex}
@@ -286,39 +378,66 @@ const CollisionMasksEditor = ({
                       animation
                     </Trans>
                   }
+                  hideControlsForSprite={(sprite: gdSprite) =>
+                    animations.adaptCollisionMaskAutomatically() ||
+                    sprite.isFullImageCollisionMask()
+                  }
                 />
               </Column>
             </Line>
             <ScrollView>
-              {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+              {!!sprite &&
+                !sprite.isFullImageCollisionMask() &&
+                !animations.adaptCollisionMaskAutomatically() && (
+                  <React.Fragment>
+                    <PolygonsList
+                      polygons={sprite.getCustomCollisionMask()}
+                      onPolygonsUpdated={onPolygonsUpdated}
+                      onSetFullImageCollisionMask={() =>
+                        onSetFullImageCollisionMask(true)
+                      }
+                      onSetAutomaticallyAdaptCollisionMasks={() =>
+                        onSetAutomaticallyAdaptCollisionMasks(true)
+                      }
+                      onHoverVertice={setHighlightedVerticePtr}
+                      onClickVertice={setSelectedVerticePtr}
+                      selectedVerticePtr={selectedVerticePtr}
+                      spriteSize={currentSpriteSize}
+                    />
+                  </React.Fragment>
+                )}
+              {!!sprite &&
+                !sprite.isFullImageCollisionMask() &&
+                animations.adaptCollisionMaskAutomatically() && (
+                  <React.Fragment>
+                    <AlertMessage kind="info">
+                      <Trans>
+                        Automatic collision mask activated. Click on the button
+                        to replace it with a custom one.
+                      </Trans>
+                    </AlertMessage>
+                    <Line justifyContent="center">
+                      <FlatButton
+                        label={<Trans>Use a custom collision mask</Trans>}
+                        primary={false}
+                        onClick={onUseCustomCollisionMask}
+                      />
+                    </Line>
+                  </React.Fragment>
+                )}
+              {!!sprite && sprite.isFullImageCollisionMask() && (
                 <React.Fragment>
-                  <PolygonsList
-                    polygons={sprite.getCustomCollisionMask()}
-                    onPolygonsUpdated={updateCollisionMasks}
-                    restoreCollisionMask={() =>
-                      onSetCollisionMaskAutomatic(true)
-                    }
-                    onHoverVertice={setHighlightedVerticePtr}
-                    onClickVertice={setSelectedVerticePtr}
-                    selectedVerticePtr={selectedVerticePtr}
-                    spriteWidth={spriteWidth}
-                    spriteHeight={spriteHeight}
-                  />
-                </React.Fragment>
-              )}
-              {!!sprite && sprite.isCollisionMaskAutomatic() && (
-                <React.Fragment>
-                  <EmptyMessage>
+                  <AlertMessage kind="info">
                     <Trans>
-                      This sprite uses the default collision mask, a rectangle
-                      that is as large as the sprite.
+                      This sprite uses a rectangle that is as large as the
+                      sprite for its collision mask.
                     </Trans>
-                  </EmptyMessage>
+                  </AlertMessage>
                   <Line justifyContent="center">
                     <FlatButton
                       label={<Trans>Use a custom collision mask</Trans>}
                       primary={false}
-                      onClick={() => onSetCollisionMaskAutomatic(false)}
+                      onClick={onUseCustomCollisionMask}
                     />
                   </Line>
                 </React.Fragment>

@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -68,14 +60,15 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.makeDirectory');
+      .setFunctionName('gdjs.fileSystem.makeDirectory')
+      .setAsyncFunctionName('gdjs.fileSystem.makeDirectoryAsync');
 
     extension
       .addAction(
@@ -94,7 +87,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -120,14 +113,15 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.saveStringToFileAsync');
+      .setFunctionName('gdjs.fileSystem.saveStringToFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.saveStringToFileAsyncTask');
 
     extension
       .addAction(
@@ -146,7 +140,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -172,14 +166,15 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsync');
+      .setFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.saveVariableToJSONFileAsyncTask');
 
     extension
       .addAction(
@@ -198,7 +193,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -217,7 +212,8 @@ module.exports = {
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync');
+      .setFunctionName('gdjs.fileSystem.loadStringFromFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.loadStringFromFileAsyncTask');
 
     extension
       .addAction(
@@ -236,7 +232,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -274,7 +270,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -312,7 +308,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -331,7 +327,10 @@ module.exports = {
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync');
+      .setFunctionName('gdjs.fileSystem.loadVariableFromJSONFileAsync')
+      .setAsyncFunctionName(
+        'gdjs.fileSystem.loadVariableFromJSONFileAsyncTask'
+      );
 
     extension
       .addAction(
@@ -347,7 +346,7 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
@@ -372,14 +371,15 @@ module.exports = {
       .addParameter(
         'scenevar',
         _(
-          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
+          "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occurred."
         ),
         '',
         true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
-      .setFunctionName('gdjs.fileSystem.deleteFileAsync');
+      .setFunctionName('gdjs.fileSystem.deleteFileAsync')
+      .setAsyncFunctionName('gdjs.fileSystem.deleteFileAsyncTask');
 
     extension
       .addStrExpression(
@@ -542,10 +542,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
 };

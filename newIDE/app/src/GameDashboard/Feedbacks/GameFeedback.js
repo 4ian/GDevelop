@@ -318,7 +318,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
           {authenticatedUser.authenticated && isErrored && (
             <PlaceholderError onRetry={loadFeedbacksAndBuilds}>
               <Trans>
-                An error occured while retrieving feedbacks for this game.
+                An error occurred while retrieving feedbacks for this game.
               </Trans>
             </PlaceholderError>
           )}
@@ -330,7 +330,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                     <BackgroundText>
                       <Trans>
                         This is all the feedback received on {game.gameName}{' '}
-                        coming from Liluo.
+                        coming from gd.games.
                       </Trans>
                     </BackgroundText>
                   </LineStackLayout>
@@ -350,19 +350,19 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                           <SelectOption
                             key={'all'}
                             value={''}
-                            primaryText={t`All builds`}
+                            label={t`All builds`}
                           />
                           <SelectOption
                             key={'game-only'}
                             value={'game-only'}
-                            primaryText={t`On game page only`}
+                            label={t`On game page only`}
                           />
                           {Object.keys(buildsByIds).map(buildId => {
                             return (
                               <SelectOption
                                 key={buildId}
                                 value={buildId}
-                                primaryText={getBuildNameOption(buildId)}
+                                label={getBuildNameOption(buildId)}
                               />
                             );
                           })}
@@ -373,7 +373,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 )}
               </ResponsiveLineStackLayout>
               <ColumnStackLayout expand noMargin>
-                {!!feedbacks && feedbacks.length && (
+                {!!feedbacks && feedbacks.length > 0 && (
                   <FeedbackAverageCard feedbacks={feedbacks} />
                 )}
               </ColumnStackLayout>

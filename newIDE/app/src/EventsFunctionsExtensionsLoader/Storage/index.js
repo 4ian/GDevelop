@@ -1,8 +1,8 @@
 // @flow
 
 export type EventsFunctionsExtensionOpener = {
-  chooseEventsFunctionExtensionFile: () => Promise<?string>,
-  readEventsFunctionExtensionFile: (filepath: string) => Promise<Object>,
+  chooseEventsFunctionExtensionFile: () => Promise<?any>,
+  readEventsFunctionExtensionFile: (filepath: any) => Promise<Object>,
 };
 
 export type EventsFunctionsExtensionWriter = {
@@ -13,6 +13,4 @@ export type EventsFunctionsExtensionWriter = {
     extension: gdEventsFunctionsExtension,
     filepath: string
   ) => Promise<void>,
-  chooseCustomObjectFile: (objectName?: string) => Promise<?string>,
-  writeCustomObject: (extension: gdObject, filepath: string) => Promise<void>,
 };

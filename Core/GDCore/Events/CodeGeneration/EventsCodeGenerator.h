@@ -12,6 +12,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Project/ProjectScopedContainers.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -19,6 +20,7 @@ class Expression;
 class Project;
 class Layout;
 class ObjectsContainer;
+class ObjectsContainersList;
 class ExternalEvents;
 class ParameterMetadata;
 class ObjectMetadata;
@@ -56,9 +58,9 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Construct a code generator for the specified
    * objects/groups and platform
    */
-  EventsCodeGenerator(const gd::Platform& platform,
-                      const gd::ObjectsContainer& globalObjectsAndGroups_,
-                      const gd::ObjectsContainer& objectsAndGroups_);
+  EventsCodeGenerator(
+      const gd::Platform& platform,
+      const gd::ProjectScopedContainers& projectScopedContainers_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -326,18 +328,12 @@ class GD_CORE_API EventsCodeGenerator {
    */
   bool ErrorOccurred() const { return errorOccurred; };
 
-  /**
-   * \brief Get the global objects/groups used for code generation.
-   */
-  const gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
-    return globalObjectsAndGroups;
-  }
+  const gd::ObjectsContainersList& GetObjectsContainersList() const {
+    return projectScopedContainers.GetObjectsContainersList();
+  };
 
-  /**
-   * \brief Get the objects/groups used for code generation.
-   */
-  const gd::ObjectsContainer& GetObjectsAndGroups() const {
-    return objectsAndGroups;
+  const gd::ProjectScopedContainers& GetProjectScopedContainers() const {
+    return projectScopedContainers;
   }
 
   /**
@@ -364,22 +360,6 @@ class GD_CORE_API EventsCodeGenerator {
   const gd::Platform& GetPlatform() const { return platform; }
 
   /**
-   * \brief Convert a group name to the full list of objects contained in the
-   * group.
-   *
-   * Get a list containing the "real" objects name when the events refers to \a
-   * objectName :<br> If \a objectName is really an object, the list will only
-   * contains \a objectName unchanged.<br> If \a objectName is a group, the list
-   * will contains all the objects of the group.<br> If \a objectName is the
-   * "current" object in the context ( i.e: The object being used for launching
-   * an action... ), none of the two rules below apply, and the list will only
-   * contains the context "current" object name.
-   */
-  std::vector<gd::String> ExpandObjectsName(
-      const gd::String& objectName,
-      const EventsCodeGenerationContext& context) const;
-
-  /**
    * \brief Get the maximum depth of custom conditions reached during code
    * generation.
    */
@@ -399,6 +379,18 @@ class GD_CORE_API EventsCodeGenerator {
    * Default implementation just returns the boolean name passed as argument.
    */
   virtual gd::String GenerateBooleanFullName(
+      const gd::String& boolName,
+      const gd::EventsCodeGenerationContext& context) {
+    return boolName;
+  }
+
+  /**
+   * \brief Generate the full name for accessing to a boolean variable used for
+   * conditions.
+   *
+   * Default implementation just returns the boolean name passed as argument.
+   */
+  virtual gd::String GenerateUpperScopeBooleanFullName(
       const gd::String& boolName,
       const gd::EventsCodeGenerationContext& context) {
     return boolName;
@@ -481,10 +473,15 @@ class GD_CORE_API EventsCodeGenerator {
    */
   size_t GenerateSingleUsageUniqueIdForEventsList();
 
+  virtual gd::String GenerateRelationalOperation(
+      const gd::String& relationalOperator,
+      const gd::String& lhs,
+      const gd::String& rhs);
+
+ protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);
 
- protected:
   /**
    * \brief Generate the code for a single parameter.
    *
@@ -493,9 +490,9 @@ class GD_CORE_API EventsCodeGenerator {
    * - object : Object name -> string
    * - expression : Mathematical expression -> number (double)
    * - string : %Text expression -> string
-   * - layer, color, file, joyaxis : Same as string
+   * - layer, color, file, stringWithSelector : Same as string
    * - relationalOperator : Used to make a comparison between the function
-  resturn value and value of the parameter preceding the relationOperator
+  return value and value of the parameter preceding the relationOperator
   parameter -> string
    * - operator : Used to update a value using a setter and a getter -> string
    * - key, mouse, objectvar, scenevar, globalvar, password, musicfile,
@@ -554,6 +551,12 @@ class GD_CORE_API EventsCodeGenerator {
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
   };
 
+  virtual gd::String GenerateVariableValueAs(const gd::String& type) {
+    return type == "number|string" ? ".getAsNumberOrString()"
+           : type == "string"      ? ".getAsString()"
+                                   : ".getAsNumber()";
+  }
+
   /**
    * \brief Generate the code to get the child of a variable,
    * using generated the expression.
@@ -581,6 +584,17 @@ class GD_CORE_API EventsCodeGenerator {
                                     gd::EventsCodeGenerationContext& context) {
     return "fakeObjectListOf_" + objectName;
   }
+
+  virtual gd::String GeneratePropertyGetter(
+      const gd::PropertiesContainer& propertiesContainer,
+      const gd::NamedPropertyDescriptor& property,
+      const gd::String& type,
+      gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateParameterGetter(
+      const gd::ParameterMetadata& parameter,
+      const gd::String& type,
+      gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate the code to reference an object which is
@@ -656,27 +670,15 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
-   * \brief Must negate a predicat.
+   * \brief Must negate a predicate.
    *
-   * The default implementation generates C-style code : It wraps the predicat
+   * The default implementation generates C-style code : It wraps the predicate
    * inside parenthesis and add a !.
    */
-  virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
-    return "!(" + predicat + ")";
+  virtual gd::String GenerateNegatedPredicate(
+      const gd::String& predicate) const {
+    return "!(" + predicate + ")";
   };
-
-  /**
-   * \brief Must create a boolean which is a reference to a boolean declared in
-   * the parent scope.
-   *
-   * The default implementation generates C-style code.
-   */
-  virtual gd::String GenerateReferenceToUpperScopeBoolean(
-      const gd::String& referenceName,
-      const gd::String& referencedBoolean,
-      gd::EventsCodeGenerationContext& context) {
-    return "bool & " + referenceName + " = " + referencedBoolean + ";\n";
-  }
 
   virtual gd::String GenerateFreeCondition(
       const std::vector<gd::String>& arguments,
@@ -735,6 +737,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::String& callStartString,
       std::size_t startFromArgument = 0);
+
   gd::String GenerateOperatorCall(const gd::InstructionMetadata& instrInfos,
                                   const std::vector<gd::String>& arguments,
                                   const gd::String& callStartString,
@@ -778,15 +781,14 @@ class GD_CORE_API EventsCodeGenerator {
 
   const gd::Platform& platform;  ///< The platform being used.
 
-  const gd::ObjectsContainer& globalObjectsAndGroups;
-  const gd::ObjectsContainer& objectsAndGroups;
+  gd::ProjectScopedContainers projectScopedContainers;
 
   bool hasProjectAndLayout;  ///< true only if project and layout are valid
                              ///< references. If false, they should not be used.
   const gd::Project* project;  ///< The project being used.
   const gd::Layout* scene;     ///< The scene being generated.
 
-  bool errorOccurred;          ///< Must be set to true if an error occured.
+  bool errorOccurred;          ///< Must be set to true if an error occurred.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
                                ///< made for runtime only.
 

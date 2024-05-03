@@ -9,6 +9,11 @@ const inAppTutorialDecorator: StoryDecorator = (Story, context) => {
     <InAppTutorialContext.Provider
       value={{
         currentlyRunningInAppTutorial: null,
+        getInAppTutorialShortHeader: (tutorialId: string) => ({
+          id: 'flingGame',
+          availableLocales: ['en', 'fr-FR'],
+          contentUrl: 'fakeContentUrl',
+        }),
         startTutorial: async () => {
           action('Start tutorial')();
         },

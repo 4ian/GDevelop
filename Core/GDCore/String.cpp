@@ -251,26 +251,26 @@ String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t
     return *this;
 }
 
-String& String::RemoveConsecutiveOccurrences(iterator i1, iterator i2, const char c)
-{
-    std::vector<std::pair<size_type, size_type>> ranges_to_remove;
-    for(iterator current_index = i1.base(); current_index < i2.base(); current_index++)
-    {
-        if (*current_index == c){
-            iterator current_subindex = current_index;
-            std::advance(current_subindex, 1);
-            if (*current_subindex == c) {
-                while(current_subindex < end() && *current_subindex == c)
-                {
-                    current_subindex++;
-                }
-                replace(std::distance(begin(), current_index),
-                        std::distance(current_index, current_subindex),
-                        c);
-
-                std::advance(current_index, 1);
-            }
+String &String::RemoveConsecutiveOccurrences(iterator i1,
+                                             iterator i2,
+                                             const char c) {
+    iterator end = i2;
+    for (iterator current_index = i1.base(); current_index < end.base();
+         current_index++) {
+      if (*current_index == c) {
+        iterator current_subindex = current_index;
+        current_subindex++;
+        while (current_subindex < end.base() && *current_subindex == c) {
+          current_subindex++;
         }
+        difference_type difference_to_replace =
+            std::distance(current_index, current_subindex);
+        if (difference_to_replace > 1) {
+          replace(
+              std::distance(begin(), current_index), difference_to_replace, c);
+          std::advance(end, -(difference_to_replace - 1));
+        }
+      }
     }
     return *this;
 }
@@ -401,6 +401,11 @@ String String::LowerCase() const
     std::for_each( begin(), end(), [&](char32_t codepoint){ lowerCasedStr.push_back( utf8proc_tolower(codepoint) ); } );
 
     return lowerCasedStr;
+}
+
+String String::CapitalizeFirstLetter() const
+{
+  return size() < 1 ? *this : substr(0, 1).UpperCase() + substr(1);
 }
 
 String String::FindAndReplace(String search, String replacement, bool all) const
@@ -684,6 +689,16 @@ String GD_CORE_API operator+(const char *lhs, const String &rhs)
     String str(lhs);
     str += rhs;
     return str;
+}
+
+const String& GD_CORE_API operator||(const String& lhs, const String &rhs)
+{
+    return lhs.empty() ? rhs : lhs;
+}
+
+String GD_CORE_API operator||(String lhs, const char *rhs)
+{
+    return lhs.empty() ? rhs : lhs;
 }
 
 bool GD_CORE_API operator==( const String &lhs, const String &rhs )

@@ -10,5 +10,5 @@ Most extensions can be written in JavaScript.
 
 ## License
 
-- Extensions are provided under the MIT License: see license.txt file.
+- Extensions are provided under the MIT License: see [LICENSE.md](LICENSE.md) file.
 - External libraries can be used by extensions (Box2D, Dlib or SPARK for example). See their licenses in their directories.

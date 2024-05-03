@@ -3,7 +3,7 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
 import CheckeredBackground from '../CheckeredBackground';
 
@@ -65,13 +65,15 @@ const ImageThumbnail = (props: Props) => {
     )
   );
 
-  const { selectedBorderColor } = theme.imageThumbnail;
   const normalBorderColor = theme.imagePreview.borderColor;
-  const borderColor = props.selected ? selectedBorderColor : normalBorderColor;
+  const borderColor = props.selected
+    ? theme.palette.secondary
+    : normalBorderColor;
 
   const containerStyle = {
     ...styles.spriteThumbnail,
-    border: `1px solid ${borderColor}`,
+    border: `2px solid ${borderColor}`,
+    borderRadius: 4,
     ...props.style,
   };
 

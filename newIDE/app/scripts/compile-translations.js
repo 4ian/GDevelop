@@ -247,12 +247,12 @@ getLocales()
 
     const successesLocales = successes.map(({ locale }) => locale).join(',');
     if (successesLocales) {
-      shell.echo(`ℹ️ Concatened translations for ${successesLocales}.`);
+      shell.echo(`ℹ️ Concatenated translations for ${successesLocales}.`);
     }
     if (failures.length) {
       failures.forEach(({ locale, shellOutput }) => {
         shell.echo(
-          `❌ Error(s) occurred while concatening translations for ${locale}: ` +
+          `❌ Error(s) occurred while concatenating translations for ${locale}: ` +
             shellOutput.stderr
         );
       });

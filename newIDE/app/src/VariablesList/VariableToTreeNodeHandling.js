@@ -102,43 +102,6 @@ export const getVariableContextFromNodeId = (
   };
 };
 
-export const getExpandedNodeIdsFromVariables = (
-  variables: { name: string, variable: gdVariable }[],
-  accumulator: string[],
-  parentNodeId: string = ''
-): string[] => {
-  let newAccumulator = [];
-  for (const { name, variable } of variables) {
-    const nodeId = parentNodeId ? `${parentNodeId}${separator}${name}` : name;
-    if (!variable.isFolded() && variable.getChildrenCount() > 0) {
-      newAccumulator.push(nodeId);
-    }
-    if (variable.getType() === gd.Variable.Array) {
-      const children = mapFor(0, variable.getChildrenCount(), index => ({
-        name: index.toString(),
-        variable: variable.getAtIndex(index),
-      }));
-      newAccumulator = [
-        ...newAccumulator,
-        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
-      ];
-    } else if (variable.getType() === gd.Variable.Structure) {
-      const children = variable
-        .getAllChildrenNames()
-        .toJSArray()
-        .map((childName, index) => ({
-          variable: variable.getChild(childName),
-          name: childName,
-        }));
-      newAccumulator = [
-        ...newAccumulator,
-        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
-      ];
-    }
-  }
-  return newAccumulator;
-};
-
 export const updateListOfNodesFollowingChangeName = (
   list: string[],
   oldNodeId: string,
@@ -162,38 +125,6 @@ export const updateListOfNodesFollowingChangeName = (
     newList.splice(index, 1, bitsToChange.join(separator));
   });
   return newList;
-};
-
-export const getExpandedNodeIdsFromVariablesContainer = (
-  variablesContainer: gdVariablesContainer,
-  isInherited: boolean = false
-): string[] => {
-  const variables = [];
-  for (let index = 0; index < variablesContainer.count(); index += 1) {
-    variables.push({
-      name: `${
-        isInherited ? inheritedPrefix : ''
-      }${variablesContainer.getNameAt(index)}`,
-      variable: variablesContainer.getAt(index),
-    });
-  }
-  return getExpandedNodeIdsFromVariables(variables, []);
-};
-
-export const foldNodesVariables = (
-  variablesContainer: gdVariablesContainer,
-  nodes: string[],
-  fold: boolean
-) => {
-  nodes.forEach(nodeId => {
-    const { variable } = getVariableContextFromNodeId(
-      nodeId,
-      variablesContainer
-    );
-    if (variable) {
-      variable.setFolded(fold);
-    }
-  });
 };
 
 export const getMovementTypeWithinVariablesContainer = (

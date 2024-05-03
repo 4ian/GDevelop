@@ -14,7 +14,7 @@ import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
 import {
-  checkRequiredExtensionUpdate,
+  checkRequiredExtensionsUpdateForAssets,
   installRequiredExtensions,
   installPublicAsset,
 } from './InstallAsset';
@@ -35,6 +35,10 @@ import {
   useFetchAssets,
 } from './NewObjectDialog';
 import { type InstallAssetOutput } from './InstallAsset';
+
+// We limit the number of assets that can be installed at once to avoid
+// timeouts especially with premium packs.
+const MAX_ASSETS_TO_INSTALL = 200;
 
 type Props = {|
   assetPack: PublicAssetPack | PrivateAssetPack | null,
@@ -68,6 +72,8 @@ const AssetPackInstallDialog = ({
   const noAssetsInstalled =
     !allAssetsInstalled &&
     missingAssetShortHeaders.length === assetShortHeaders.length;
+  const isInstallingTooManyAssets =
+    assetShortHeaders.length > MAX_ASSETS_TO_INSTALL;
 
   const [
     areAssetsBeingInstalled,
@@ -140,20 +146,22 @@ const AssetPackInstallDialog = ({
   const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
+      if (assetShortHeaders.length > MAX_ASSETS_TO_INSTALL) return;
 
       setAreAssetsBeingInstalled(true);
       try {
         const assets = await fetchAssets(assetShortHeaders);
-        const requiredExtensionInstallation = await checkRequiredExtensionUpdate(
+        const requiredExtensionInstallation = await checkRequiredExtensionsUpdateForAssets(
           {
             assets,
             project,
           }
         );
         const shouldUpdateExtension =
-          requiredExtensionInstallation.outOfDateExtensions.length > 0 &&
+          requiredExtensionInstallation.outOfDateExtensionShortHeaders.length >
+            0 &&
           (await showExtensionUpdateConfirmation(
-            requiredExtensionInstallation.outOfDateExtensions
+            requiredExtensionInstallation.outOfDateExtensionShortHeaders
           ));
         await installRequiredExtensions({
           requiredExtensionInstallation,
@@ -239,12 +247,32 @@ const AssetPackInstallDialog = ({
           onApply: () => {},
           content: (
             <AlertMessage kind="warning">
-              <Text>
-                <Trans>
-                  You need to save this project as a cloud project to install
-                  premium assets. Please save your project and try again.
-                </Trans>
-              </Text>
+              <Trans>
+                You need to save this project as a cloud project to install
+                premium assets. Please save your project and try again.
+              </Trans>
+            </AlertMessage>
+          ),
+        }
+      : isInstallingTooManyAssets
+      ? {
+          actionButton: (
+            <RaisedButton
+              key="continue"
+              label={<Trans>Add the assets</Trans>}
+              primary
+              disabled
+              onClick={() => {}}
+            />
+          ),
+          onApply: () => {},
+          content: (
+            <AlertMessage kind="warning">
+              <Trans>
+                You can only install up to {MAX_ASSETS_TO_INSTALL} assets at
+                once. Try filtering the assets you would like to install, or
+                install them one by one.
+              </Trans>
             </AlertMessage>
           ),
         }
@@ -295,7 +323,13 @@ const AssetPackInstallDialog = ({
           actionButton: (
             <RaisedButton
               key="continue"
-              label={<Trans>Add the assets</Trans>}
+              label={
+                assetShortHeaders.length > 1 ? (
+                  <Trans>Add the assets</Trans>
+                ) : (
+                  <Trans>Add asset</Trans>
+                )
+              }
               primary
               onClick={() => onInstallAssets(assetShortHeaders)}
             />
@@ -303,9 +337,13 @@ const AssetPackInstallDialog = ({
           onApply: () => onInstallAssets(assetShortHeaders),
           content: (
             <Text>
-              <Trans>
-                You're about to add {assetShortHeaders.length} assets.
-              </Trans>
+              {assetShortHeaders.length > 1 ? (
+                <Trans>
+                  You're about to add {assetShortHeaders.length} assets.
+                </Trans>
+              ) : (
+                <Trans>You're about to add 1 asset.</Trans>
+              )}
             </Text>
           ),
         }

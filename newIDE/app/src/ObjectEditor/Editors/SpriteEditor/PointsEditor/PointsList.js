@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
 import PointRow from './PointRow';
 import styles from './styles';
+import Add from '../../../../UI/CustomSvgIcons/Add';
 const gd: libGDevelop = global.gd;
 
 type PointsListBodyProps = {|
@@ -24,12 +24,14 @@ type PointsListBodyProps = {|
   onPointsUpdated: () => void,
   onHoverPoint: (pointName: ?string) => void,
   onSelectPoint: (pointName: string) => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
+  spriteSize: [number, number],
 |};
 
 const PointsListBody = (props: PointsListBodyProps) => {
   const [nameErrors, setNameErrors] = React.useState({});
-  const { pointsContainer } = props;
+  const { pointsContainer, onHoverPoint } = props;
   const forceUpdate = useForceUpdate();
 
   const onPointsUpdated = () => {
@@ -67,6 +69,10 @@ const PointsListBody = (props: PointsListBodyProps) => {
     onPointsUpdated();
   };
 
+  const onPointerLeave = React.useCallback(() => onHoverPoint(null), [
+    onHoverPoint,
+  ]);
+
   const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
   const pointsRows = mapVector(nonDefaultPoints, (point, i) => {
     const pointName = point.getName();
@@ -89,7 +95,9 @@ const PointsListBody = (props: PointsListBodyProps) => {
           if (pointsContainer.hasPoint(newName)) {
             success = false;
           } else {
+            const oldName = point.getName();
             point.setName(newName);
+            props.onRenamedPoint(oldName, newName);
             if (props.selectedPointName === pointName) {
               props.onSelectPoint(newName);
             }
@@ -99,7 +107,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
         onPointerEnter={props.onHoverPoint}
-        onPointerLeave={props.onHoverPoint}
+        onPointerLeave={onPointerLeave}
         onClick={props.onSelectPoint}
         onRemove={() => {
           const answer = Window.showConfirmDialog(
@@ -126,22 +134,28 @@ const PointsListBody = (props: PointsListBodyProps) => {
       onChangePointX={updateOriginPointX}
       onChangePointY={updateOriginPointY}
       onPointerEnter={props.onHoverPoint}
-      onPointerLeave={props.onHoverPoint}
+      onPointerLeave={onPointerLeave}
       onClick={props.onSelectPoint}
       selected={'Origin' === props.selectedPointName}
     />
   );
+
+  const isDefaultCenterPoint = pointsContainer.isDefaultCenterPoint();
   const centerRow = (
     <PointRow
       key={'center-point-row'}
       pointName="Center"
-      isAutomatic={pointsContainer.isDefaultCenterPoint()}
-      pointX={centerPoint.getX()}
-      pointY={centerPoint.getY()}
+      isAutomatic={isDefaultCenterPoint}
+      pointX={
+        isDefaultCenterPoint ? props.spriteSize[0] / 2 : centerPoint.getX()
+      }
+      pointY={
+        isDefaultCenterPoint ? props.spriteSize[1] / 2 : centerPoint.getY()
+      }
       onChangePointX={updateCenterPointX}
       onChangePointY={updateCenterPointY}
       onPointerEnter={props.onHoverPoint}
-      onPointerLeave={props.onHoverPoint}
+      onPointerLeave={onPointerLeave}
       onClick={props.onSelectPoint}
       selected={'Center' === props.selectedPointName}
       onEdit={
@@ -171,7 +185,9 @@ type PointsListProps = {|
   onPointsUpdated: () => void,
   onHoverPoint: (pointName: ?string) => void,
   onSelectPoint: (pointName: ?string) => void,
+  onRenamedPoint: (oldName: string, newName: string) => void,
   selectedPointName: ?string,
+  spriteSize: [number, number],
 |};
 
 const PointsList = (props: PointsListProps) => {
@@ -198,13 +214,15 @@ const PointsList = (props: PointsListProps) => {
           onSelectPoint={props.onSelectPoint}
           selectedPointName={props.selectedPointName}
           onPointsUpdated={props.onPointsUpdated}
+          onRenamedPoint={props.onRenamedPoint}
+          spriteSize={props.spriteSize}
         />
       </Table>
       <Spacer />
       <Line alignItems="center" justifyContent="center">
         <RaisedButton
           primary
-          icon={<AddIcon />}
+          icon={<Add />}
           label={<Trans>Add a point</Trans>}
           onClick={() => {
             const name = newNameGenerator('Point', name =>

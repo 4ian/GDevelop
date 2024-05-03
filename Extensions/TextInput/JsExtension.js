@@ -1,4 +1,5 @@
-// @flow
+//@ts-check
+/// <reference path="../JsExtensionTypes.d.ts" />
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -12,18 +13,9 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 
-/*::
-// Import types to allow Flow to do static type checking on this file.
-// Extensions declaration are typed using Flow (like the editor), but the files
-// for the game engine are checked with TypeScript annotations.
-import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
-*/
-
+/** @type {ExtensionModule} */
 module.exports = {
-  createExtension: function (
-    _ /*: (string) => string */,
-    gd /*: libGDevelop */
-  ) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
@@ -39,7 +31,6 @@ module.exports = {
       .setIcon('JsPlatform/Extensions/text_input.svg');
 
     const textInputObject = new gd.ObjectJsImplementation();
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateProperty = function (
       objectContent,
       propertyName,
@@ -94,7 +85,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getProperties = function (objectContent) {
       const objectProperties = new gd.MapStringPropertyDescriptor();
 
@@ -232,7 +222,6 @@ module.exports = {
       })
     );
 
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.updateInitialInstanceProperty = function (
       objectContent,
       instance,
@@ -251,7 +240,6 @@ module.exports = {
 
       return false;
     };
-    // $FlowExpectedError - ignore Flow warning as we're creating an object
     textInputObject.getInitialInstanceProperties = function (
       content,
       instance,
@@ -283,13 +271,18 @@ module.exports = {
         textInputObject
       )
       .setCategoryFullName(_('User interface'))
-      .addUnsupportedBaseObjectCapability('effect')
+      // Effects are unsupported because the object is not rendered with PIXI.
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
-      );
+      )
+      .addDefaultBehavior('TextContainerCapability::TextContainerBehavior')
+      .addDefaultBehavior('ResizableCapability::ResizableBehavior')
+      .addDefaultBehavior('OpacityCapability::OpacityBehavior');
 
     // Properties expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'string',
@@ -300,13 +293,25 @@ module.exports = {
         '',
         'res/conditions/text24_black.png'
       )
+      .setHidden()
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
         'string',
         gd.ParameterOptions.makeNewOptions().setDescription(_('Text'))
       )
-      .setFunctionName('setString')
-      .setGetter('getString');
+      .setFunctionName('setText')
+      .setGetter('getText');
+
+    object
+      .addStrExpression(
+        'Text',
+        _('Text'),
+        _('Return the text.'),
+        '',
+        'res/conditions/text24_black.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .setFunctionName('getText');
 
     object
       .addExpressionAndConditionAndAction(
@@ -366,7 +371,7 @@ module.exports = {
         'res/actions/font24.png',
         'res/actions/font.png'
       )
-      .addParameter('object', _('Bitmap text'), 'TextInputObject', false)
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
       .addParameter('fontResource', _('Font resource name'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setFontResourceName');
@@ -383,9 +388,23 @@ module.exports = {
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters(
-        'string',
-        gd.ParameterOptions.makeNewOptions().setDescription(_('Input type'))
-      ) // TODO: stringWithSelector?
+        'stringWithSelector',
+        gd.ParameterOptions.makeNewOptions()
+          .setDescription(_('Input type'))
+          .setTypeExtraInfo(
+            JSON.stringify([
+              'text',
+              'text area',
+              'email',
+              'password',
+              'number',
+              'telephone number',
+              'url',
+              'search',
+              'email',
+            ])
+          )
+      )
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 
@@ -525,6 +544,8 @@ module.exports = {
       .setGetter('isDisabled');
 
     // Other expressions/conditions/actions:
+
+    // Deprecated
     object
       .addExpressionAndConditionAndAction(
         'number',
@@ -543,7 +564,8 @@ module.exports = {
         )
       )
       .setFunctionName('setOpacity')
-      .setGetter('getOpacity');
+      .setGetter('getOpacity')
+      .setHidden();
 
     object
       .addScopedCondition(
@@ -561,11 +583,27 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('isFocused');
 
+    object
+      .addScopedAction(
+        'Focus',
+        _('Focus'),
+        _(
+          'Focus the input so that text can be entered (like if it was touched/clicked).'
+        ),
+        _('Focus _PARAM0_'),
+        _(''),
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('focus');
+
     return extension;
   },
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array.
@@ -573,10 +611,7 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function (
-    gd /*: libGDevelop */,
-    extension /*: gdPlatformExtension*/
-  ) {
+  runExtensionSanityTests: function (gd, extension) {
     return [];
   },
   /**
@@ -584,9 +619,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerEditorConfigurations: function (
-    objectsEditorService /*: ObjectsEditorService */
-  ) {
+  registerEditorConfigurations: function (objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       'TextInput::TextInputObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
@@ -599,9 +632,7 @@ module.exports = {
    *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-  registerInstanceRenderers: function (
-    objectsRenderingService /*: ObjectsRenderingService */
-  ) {
+  registerInstanceRenderers: function (objectsRenderingService) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
@@ -642,6 +673,12 @@ module.exports = {
         this._pixiObject.addChild(this._pixiTextMask);
         this._pixiContainer.addChild(this._pixiObject);
         this.update();
+      }
+
+      onRemovedFromScene() {
+        super.onRemovedFromScene();
+        this._pixiText.destroy(true);
+        this._pixiObject.destroy({ children: true });
       }
 
       static getThumbnail(project, resourcesLoader, objectConfiguration) {
@@ -700,8 +737,8 @@ module.exports = {
         let width = DEFAULT_WIDTH;
         let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
-          width = instance.getCustomWidth();
-          height = instance.getCustomHeight();
+          width = this.getCustomWidth();
+          height = this.getCustomHeight();
         }
 
         this._pixiObject.pivot.x = width / 2;

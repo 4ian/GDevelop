@@ -69,7 +69,7 @@ export const selectLanguageOrLocale = (
   // try to find a (good enough) translation for the language only.
   const language = getLanguageOnlyFromLanguageOrLocale(languageOrLocale);
   if (language) {
-    // Find the langauge corresponding locales ordered by translation ratio.
+    // Find the language corresponding locales ordered by translation ratio.
     const localeCandidates = LocalesMetadata.filter(localeMetadata =>
       localeMetadata.languageCode.startsWith(language)
     ).sort((a, b) => (a.translationRatio > b.translationRatio ? -1 : 1));

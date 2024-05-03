@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import Text from '../../../UI/Text';
 import PlaceholderError from '../../../UI/PlaceholderError';
@@ -10,7 +9,7 @@ import PlaceholderError from '../../../UI/PlaceholderError';
 export default {
   title: 'UI Building Blocks/PlaceholderError',
   component: PlaceholderError,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator],
 };
 
 export const Default = () => {

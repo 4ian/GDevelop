@@ -153,6 +153,25 @@
         }
       }
     },
+    "swipeable-drawer": {
+      "top-bar": {
+        "pill-color": {
+          "value": "#7F7F85"
+        }
+      }
+    },
+    "icon-button": {
+      "selected": {
+        "color": {
+          "value": "#1D1D26",
+          "comment": "Palette/Grey/100"
+        },
+        "background-color": {
+          "value": "#DDD1FF",
+          "comment:": "Palette/Purple/10"
+        }
+      }
+    },
     "link": {
       "color": {
         "value": "#7046EC",
@@ -198,7 +217,8 @@
     "search-bar": {
       "default": {
         "background-color": {
-          "value": "#FFFFFF"
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
         },
         "text-color": {
           "value": "#7F7F85",
@@ -293,6 +313,15 @@
         "color": {
           "value": "#FFFFFF"
         }
+      },
+      "hot": {
+        "background-color": {
+          "value": "#FF5E3B",
+          "comment": "Palette/Red/50"
+        },
+        "color": {
+          "value": "#1D1D26"
+        }
       }
     },
     "toolbar-separator": {
@@ -327,6 +356,12 @@
       }
     },
     "list-item": {
+      "hover": {
+        "background-color": {
+          "value": "#F6F2FF",
+          "comment": "Palette/Purple/00"
+        }
+      },
       "group": {
         "text": {
           "color": {
@@ -418,6 +453,21 @@
         }
       }
     },
+    "example": {
+      "difficulty": {
+        "color": {
+          "simple": {
+            "value": "#00AB6A"
+          },
+          "advanced": {
+            "value": "#FB9600"
+          },
+          "expert": {
+            "value": "#F03F18"
+          }
+        }
+      }
+    },
     "tabs": {
       "text-color": {
         "value": "#7F7F85",
@@ -443,6 +493,60 @@
         "background-color": {
           "value": "#9979F1",
           "comment": "Palette/Purple/30"
+        }
+      }
+    },
+    "notification": {
+      "badge-color": {
+        "value": "#2B8CFF"
+      }
+    },
+    "text-field": {
+      "active": {
+        "error": {
+          "value": "#FF8569",
+          "comment": "Palette/Red/40"
+        },
+        "border-color": {
+          "value": "#7046EC",
+          "comment": "Palette/Purple/40"
+        },
+        "caret-color": {
+          "value": "#9979F1",
+          "comment": "Palette/Purple/30"
+        }
+      },
+      "disabled": {
+        "color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "placeholder": {
+        "color": {
+          "value": "#7F7F85",
+          "comment": "Palette/Grey/50"
+        }
+      },
+      "default": {
+        "background-color": {
+          "value": "#D9D9DE",
+          "comment": "Palette/Grey/20"
+        },
+        "error": {
+          "value": "#FF5E3B",
+          "comment": "Palette/Red/50"
+        }
+      },
+      "hover": {
+        "border-color": {
+          "value": "#A6A6AB",
+          "comment": "Palette/Grey/40"
+        }
+      },
+      "endAdornmentIcon": {
+        "background-color": {
+          "value": "rgba(79, 40, 205, 0.16)"
         }
       }
     }
@@ -542,13 +646,19 @@
         "value": "1px solid {event-sheet.sub-instructions.border-color.value}"
       }
     },
+    "warning-instruction": {
+      "background-color": {
+        "value": "rgba(255, 188, 87, 0.125)",
+        "comment": "Palette/Yellow/40 and alpha"
+      }
+    },
     "instruction-parameter": {
       "base": {
         "color": {
           "value": "rgb(78, 78, 78)"
         }
       },
-      "expression": {
+      "number": {
         "color": {
           "value": "rgb(27, 143, 1)"
         }
@@ -633,7 +743,8 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "#000000"
+        "value": "#1D1D26",
+        "comment": "Palette/Grey/100"
       }
     },
     "layout": {
@@ -641,12 +752,14 @@
         "value": "#bbbbbb"
       },
       "background-color": {
-        "value": "#e0e0e0"
+        "value": "#FAFAFA",
+        "comment": "Palette/Grey/00"
       }
     },
     "toolbar": {
       "background-color": {
-        "value": "#e1e1e1"
+        "value": "#C5C5C9",
+        "comment": "Palette/Grey/30"
       },
       "border-color-hover": {
         "value": "#efefef"

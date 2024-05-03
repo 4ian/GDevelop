@@ -2,27 +2,26 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
-import { Column } from '../UI/Grid';
-import TextField from '../UI/TextField';
 import {
-  type LoginForm,
+  type LoginForm as LoginFormType,
   type ForgotPasswordForm,
   type AuthError,
+  type IdentityProvider,
 } from '../Utils/GDevelopServices/Authentication';
+import LoginForm from './LoginForm';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
-import { getEmailErrorText, getPasswordErrorText } from './CreateAccountDialog';
 import { ColumnStackLayout } from '../UI/Layout';
+import { Column } from '../UI/Grid';
 import HelpButton from '../UI/HelpButton';
+import FlatButton from '../UI/FlatButton';
 import Link from '../UI/Link';
 import GDevelopGLogo from '../UI/CustomSvgIcons/GDevelopGLogo';
-import ForgotPasswordDialog from './ForgotPasswordDialog';
+import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
 
 const styles = {
   formContainer: {
-    width: '60%',
     marginTop: 20,
   },
 };
@@ -30,7 +29,9 @@ const styles = {
 type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
-  onLogin: (form: LoginForm) => Promise<void>,
+  onLogin: (form: LoginFormType) => Promise<void>,
+  onLogout: () => Promise<void>,
+  onLoginWithProvider: (provider: IdentityProvider) => Promise<void>,
   onForgotPassword: (form: ForgotPasswordForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
@@ -40,22 +41,21 @@ const LoginDialog = ({
   onClose,
   onGoToCreateAccount,
   onLogin,
+  onLogout,
+  onLoginWithProvider,
   onForgotPassword,
   loginInProgress,
   error,
 }: Props) => {
+  const { isMobile } = useResponsiveWindowSize();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [
-    isForgotPasswordDialogOpen,
-    setIsForgotPasswordDialogOpen,
-  ] = React.useState(false);
 
   const doLogin = () => {
     if (loginInProgress) return;
 
     onLogin({
-      email,
+      email: email.trim(),
       password,
     });
   };
@@ -63,7 +63,6 @@ const LoginDialog = ({
   const actions = [
     <FlatButton
       label={<Trans>Cancel</Trans>}
-      disabled={loginInProgress}
       key="cancel"
       primary={false}
       onClick={onClose}
@@ -79,91 +78,67 @@ const LoginDialog = ({
     </LeftLoader>,
   ];
 
+  const secondaryActions = [
+    <HelpButton key="help" helpPagePath={'/interface/profile'} />,
+  ];
+
+  const dialogContent = (
+    <ColumnStackLayout
+      noMargin
+      expand
+      justifyContent="center"
+      alignItems="center"
+    >
+      <GDevelopGLogo fontSize="large" />
+      <Text size="title" align="center">
+        <Trans>Log in to your account</Trans>
+      </Text>
+      <Column noMargin alignItems="center">
+        <Text size="body2" noMargin>
+          <Trans>Don't have an account yet?</Trans>
+        </Text>
+        <Link href="" onClick={onGoToCreateAccount} disabled={loginInProgress}>
+          <Text size="body2" noMargin color="inherit">
+            <Trans>Create an account</Trans>
+          </Text>
+        </Link>
+      </Column>
+      <div
+        style={{
+          ...styles.formContainer,
+          // Take full width on mobile.
+          width: isMobile ? '95%' : '60%',
+        }}
+      >
+        <LoginForm
+          onLogin={doLogin}
+          onLoginWithProvider={onLoginWithProvider}
+          email={email}
+          onChangeEmail={setEmail}
+          password={password}
+          onChangePassword={setPassword}
+          onForgotPassword={onForgotPassword}
+          loginInProgress={loginInProgress}
+          error={error}
+        />
+      </div>
+    </ColumnStackLayout>
+  );
+
   return (
     <Dialog
       title={null} // This dialog has a custom design to be more welcoming, the title is set in the content.
       id="login-dialog"
       actions={actions}
-      secondaryActions={[
-        <HelpButton key="help" helpPagePath={'/interface/profile'} />,
-      ]}
+      secondaryActions={secondaryActions}
       cannotBeDismissed={loginInProgress}
       onRequestClose={onClose}
-      onApply={() => {
-        // This is a hack to avoid submitting the login form
-        // when submitting the forgot password form.
-        if (isForgotPasswordDialogOpen) return;
-        doLogin();
-      }}
+      onApply={doLogin}
       maxWidth="sm"
       open
+      flexColumnBody
     >
-      <ColumnStackLayout
-        noMargin
-        expand
-        justifyContent="center"
-        alignItems="center"
-      >
-        <GDevelopGLogo fontSize="large" />
-        <Text size="title">
-          <Trans>Log in to your account</Trans>
-        </Text>
-        <Column noMargin alignItems="center">
-          <Text size="body2" noMargin>
-            <Trans>Don't have an account yet?</Trans>
-          </Text>
-          <Link
-            href=""
-            onClick={onGoToCreateAccount}
-            disabled={loginInProgress}
-          >
-            <Text size="body2" noMargin color="inherit">
-              <Trans>Create an account</Trans>
-            </Text>
-          </Link>
-        </Column>
-        <div style={styles.formContainer}>
-          <ColumnStackLayout noMargin>
-            <TextField
-              autoFocus="desktop"
-              value={email}
-              floatingLabelText={<Trans>Email</Trans>}
-              errorText={getEmailErrorText(error)}
-              onChange={(e, value) => {
-                setEmail(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-            <TextField
-              value={password}
-              floatingLabelText={<Trans>Password</Trans>}
-              errorText={getPasswordErrorText(error)}
-              type="password"
-              onChange={(e, value) => {
-                setPassword(value);
-              }}
-              fullWidth
-              disabled={loginInProgress}
-            />
-          </ColumnStackLayout>
-        </div>
-        <Link
-          href=""
-          onClick={() => setIsForgotPasswordDialogOpen(true)}
-          disabled={loginInProgress}
-        >
-          <Text size="body2" noMargin color="inherit">
-            <Trans>Did you forget your password?</Trans>
-          </Text>
-        </Link>
-      </ColumnStackLayout>
-      {isForgotPasswordDialogOpen && (
-        <ForgotPasswordDialog
-          onClose={() => setIsForgotPasswordDialogOpen(false)}
-          onForgotPassword={onForgotPassword}
-        />
-      )}
+      {dialogContent}
     </Dialog>
   );
 };

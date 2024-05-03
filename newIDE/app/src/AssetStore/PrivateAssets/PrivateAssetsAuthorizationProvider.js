@@ -6,6 +6,7 @@ import {
   type AssetShortHeader,
   type Asset,
   type Environment,
+  getPrivateAssetPackAudioFilesArchiveUrl,
 } from '../../Utils/GDevelopServices/Asset';
 import {
   addAssetToProject,
@@ -17,6 +18,7 @@ import {
   getAuthorizationTokenForPrivateAssets,
 } from '../../Utils/GDevelopServices/Shop';
 import PrivateAssetsAuthorizationContext from './PrivateAssetsAuthorizationContext';
+import { extractGDevelopApiErrorStatusAndCode } from '../../Utils/GDevelopServices/Errors';
 
 type Props = {| children: React.Node |};
 
@@ -93,7 +95,10 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       });
       return asset;
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
+        error
+      );
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
         // If the token is expired, fetch a new one and try again.
         token = await fetchAuthorizationToken(userId);
         const asset = await getPrivateAsset(assetShortHeader, token, {
@@ -131,6 +136,19 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     });
   };
 
+  // This URL is only valid for a limited time, so this function needs to be called
+  // every time the user wants to download the audio files.
+  const getPrivateAssetPackAudioArchiveUrl = async (
+    privateAssetPackId: string
+  ): Promise<string | null> => {
+    if (!profile) return null;
+
+    // Always fetch a new token, as the URL is only valid for a limited time.
+    const token = await fetchAuthorizationToken(profile.id);
+
+    return getPrivateAssetPackAudioFilesArchiveUrl(privateAssetPackId, token);
+  };
+
   return (
     <PrivateAssetsAuthorizationContext.Provider
       value={{
@@ -138,6 +156,7 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
         updateAuthorizationToken,
         fetchPrivateAsset,
         installPrivateAsset,
+        getPrivateAssetPackAudioArchiveUrl,
       }}
     >
       {children}

@@ -9,24 +9,24 @@ import {
 } from 'react-virtualized';
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
 import SearchBar, { type SearchBarInterface } from '../../UI/SearchBar';
-import Lock from '@material-ui/icons/Lock';
-import LockOpen from '@material-ui/icons/LockOpen';
-import NotInterested from '@material-ui/icons/NotInterested';
+import RemoveCircle from '../../UI/CustomSvgIcons/RemoveCircle';
+import Lock from '../../UI/CustomSvgIcons/Lock';
+import LockOpen from '../../UI/CustomSvgIcons/LockOpen';
+import { toFixedWithoutTrailingZeros } from '../../Utils/Mathematics';
+import ErrorBoundary from '../../UI/ErrorBoundary';
+import useForceUpdate from '../../Utils/UseForceUpdate';
+import { Column, Line } from '../../UI/Grid';
 const gd = global.gd;
 
-type State = {|
-  searchText: string,
-  sortBy: string,
-  sortDirection: SortDirection,
-|};
-
-type Props = {|
-  instances: gdInitialInstancesContainer,
-  selectedInstances: Array<gdInitialInstance>,
-  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
-|};
+const minimumWidths = {
+  table: 400,
+  objectName: 80,
+  icon: 40,
+  numberProperty: 40,
+  layerName: 50,
+};
 
 type RenderedRowInfo = {
   instance: gdInitialInstance,
@@ -46,6 +46,11 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
   },
+  tableContainer: {
+    flex: 1,
+    overflowX: 'auto',
+    overflowY: 'hidden',
+  },
 };
 
 const compareStrings = (x: string, y: string, direction: number): number => {
@@ -57,7 +62,23 @@ const compareStrings = (x: string, y: string, direction: number): number => {
   return 0;
 };
 
-export default class InstancesList extends Component<Props, State> {
+export type InstancesListInterface = {|
+  forceUpdate: () => void,
+|};
+
+type State = {|
+  searchText: string,
+  sortBy: string,
+  sortDirection: SortDirection,
+|};
+
+type Props = {|
+  instances: gdInitialInstancesContainer,
+  selectedInstances: Array<gdInitialInstance>,
+  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
+|};
+
+class InstancesList extends Component<Props, State> {
   state = {
     searchText: '',
     sortBy: '',
@@ -89,9 +110,9 @@ export default class InstancesList extends Component<Props, State> {
           instance,
           name,
           locked: instance.isLocked(),
-          x: instance.getX().toFixed(2),
-          y: instance.getY().toFixed(2),
-          angle: instance.getAngle().toFixed(2),
+          x: toFixedWithoutTrailingZeros(instance.getX(), 2),
+          y: toFixedWithoutTrailingZeros(instance.getY(), 2),
+          angle: toFixedWithoutTrailingZeros(instance.getAngle(), 2),
           layer: instance.getLayer(),
           zOrder: instance.getZOrder(),
         });
@@ -150,7 +171,7 @@ export default class InstancesList extends Component<Props, State> {
         }}
       >
         {instance.isLocked() && instance.isSealed() ? (
-          <NotInterested />
+          <RemoveCircle />
         ) : instance.isLocked() ? (
           <Lock />
         ) : (
@@ -221,11 +242,27 @@ export default class InstancesList extends Component<Props, State> {
     const tableKey = instances.ptr;
 
     return (
-      <ThemeConsumer>
-        {muiTheme => (
+      <GDevelopThemeContext.Consumer>
+        {gdevelopTheme => (
           <div style={styles.container}>
+            <Line>
+              <Column expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={searchText =>
+                    this.setState({
+                      searchText,
+                    })
+                  }
+                  onRequestSearch={this._selectFirstInstance}
+                  ref={this._searchBar}
+                  placeholder={t`Search instances`}
+                  autoFocus="desktop"
+                />
+              </Column>
+            </Line>
             <div
-              style={{ flex: 1 }}
+              style={styles.tableContainer}
               onKeyDown={this._keyboardShortcuts.onKeyDown}
               onKeyUp={this._keyboardShortcuts.onKeyUp}
             >
@@ -236,7 +273,7 @@ export default class InstancesList extends Component<Props, State> {
                     key={tableKey}
                     headerHeight={30}
                     height={height}
-                    className={`gd-table ${muiTheme.tableRootClassName}`}
+                    className={`gd-table`}
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}
@@ -246,71 +283,94 @@ export default class InstancesList extends Component<Props, State> {
                     sort={this._sort}
                     sortBy={sortBy}
                     sortDirection={sortDirection}
-                    width={width}
+                    width={Math.max(width, minimumWidths.table)}
                   >
                     <RVColumn
                       label={<Trans>Object name</Trans>}
                       dataKey="name"
-                      width={width * 0.35}
+                      width={Math.max(width * 0.35, minimumWidths.objectName)}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label=""
                       dataKey="locked"
-                      width={width * 0.05}
+                      width={Math.max(
+                        width * 0.05,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                       cellRenderer={this._renderLockCell}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}
                       dataKey="x"
-                      width={width * 0.1}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Y</Trans>}
                       dataKey="y"
-                      width={width * 0.1}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Angle</Trans>}
                       dataKey="angle"
-                      width={width * 0.1}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Layer</Trans>}
                       dataKey="layer"
-                      width={width * 0.2}
+                      width={Math.max(width * 0.2, minimumWidths.layerName)}
                       className={'tableColumn'}
                     />
                     <RVColumn
                       label={<Trans>Z Order</Trans>}
                       dataKey="zOrder"
-                      width={width * 0.1}
+                      width={Math.max(
+                        width * 0.1,
+                        minimumWidths.numberProperty
+                      )}
                       className={'tableColumn'}
                     />
                   </RVTable>
                 )}
               </AutoSizer>
             </div>
-            <SearchBar
-              value={searchText}
-              onChange={searchText =>
-                this.setState({
-                  searchText,
-                })
-              }
-              onRequestSearch={this._selectFirstInstance}
-              ref={this._searchBar}
-              placeholder={t`Search instances`}
-              aspect="integrated-search-bar"
-              autoFocus="desktop"
-            />
           </div>
         )}
-      </ThemeConsumer>
+      </GDevelopThemeContext.Consumer>
     );
   }
 }
+
+const InstancesListWithErrorBoundary = React.forwardRef<
+  Props,
+  InstancesListInterface
+>((props, ref) => {
+  const forceUpdate = useForceUpdate();
+  React.useImperativeHandle(ref, () => ({
+    forceUpdate,
+  }));
+
+  return (
+    <ErrorBoundary
+      componentTitle={<Trans>Instances list</Trans>}
+      scope="scene-editor-instances-list"
+    >
+      <InstancesList {...props} />
+    </ErrorBoundary>
+  );
+});
+
+export default InstancesListWithErrorBoundary;

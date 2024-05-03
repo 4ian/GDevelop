@@ -6,6 +6,9 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Game manager');
 
+  const sleep = (ms: float) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
     /** The path for this script file. */
@@ -13,6 +16,9 @@ namespace gdjs {
     /** The hash of the script file content. */
     hash: number;
   };
+
+  const getGlobalResourceNames = (projectData: ProjectData): Array<string> =>
+    projectData.usedResources.map((resource) => resource.name);
 
   /** Options given to the game at startup. */
   export type RuntimeGameOptions = {
@@ -43,6 +49,20 @@ namespace gdjs {
     electronRemoteRequirePath?: string;
 
     /**
+     * the token to use by the game engine when requiring any resource stored on
+     * GDevelop Cloud buckets. Note that this is only useful during previews.
+     */
+    gdevelopResourceToken?: string;
+
+    /**
+     * Check if, in some exceptional cases, we allow authentication
+     * to be done through a iframe.
+     * This is usually discouraged as the user can't verify that the authentication
+     * window is a genuine one. It's only to be used in trusted contexts.
+     */
+    allowAuthenticationUsingIframeForPreview?: boolean;
+
+    /**
      * If set, the game should use the specified environment for making calls
      * to GDevelop APIs ("dev" = development APIs).
      */
@@ -53,15 +73,11 @@ namespace gdjs {
    * Represents a game being played.
    */
   export class RuntimeGame {
+    _resourcesLoader: gdjs.ResourceLoader;
     _variables: VariablesContainer;
     _data: ProjectData;
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
-    _imageManager: ImageManager;
-    _soundManager: SoundManager;
-    _fontManager: FontManager;
-    _jsonManager: JsonManager;
     _effectsManager: EffectsManager;
-    _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;
     _gameResolutionWidth: integer;
@@ -72,12 +88,15 @@ namespace gdjs {
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
+    _antialiasingMode: 'none' | 'MSAA';
+    _isAntialisingEnabledOnMobile: boolean;
     /**
      * Game loop management (see startGameLoop method)
      */
     _renderer: RuntimeGameRenderer;
     _sessionId: string | null;
     _playerId: string | null;
+    _watermark: watermark.RuntimeWatermark;
 
     _sceneStack: SceneStack;
     /**
@@ -126,21 +145,17 @@ namespace gdjs {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
       this._data = data;
-      this._imageManager = new gdjs.ImageManager(
-        this._data.resources.resources
+
+      this._resourcesLoader = new gdjs.ResourceLoader(
+        this,
+        data.resources.resources,
+        getGlobalResourceNames(data),
+        data.layouts
       );
-      this._soundManager = new gdjs.SoundManager(
-        this._data.resources.resources
-      );
-      this._fontManager = new gdjs.FontManager(this._data.resources.resources);
-      this._jsonManager = new gdjs.JsonManager(this._data.resources.resources);
-      this._bitmapFontManager = new gdjs.BitmapFontManager(
-        this._data.resources.resources,
-        this._imageManager
-      );
+
       this._effectsManager = new gdjs.EffectsManager();
-      this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
-      this._minFPS = this._data ? this._data.properties.minFPS : 15;
+      this._maxFPS = this._data.properties.maxFPS;
+      this._minFPS = this._data.properties.minFPS;
       this._gameResolutionWidth = this._data.properties.windowWidth;
       this._gameResolutionHeight = this._data.properties.windowHeight;
       this._originalWidth = this._gameResolutionWidth;
@@ -149,9 +164,16 @@ namespace gdjs {
       this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
+      this._antialiasingMode = this._data.properties.antialiasingMode;
+      this._isAntialisingEnabledOnMobile = this._data.properties.antialisingEnabledOnMobile;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
+      );
+      this._watermark = new gdjs.watermark.RuntimeWatermark(
+        this,
+        data.properties.authorUsernames,
+        this._data.properties.watermark
       );
       this._sceneStack = new gdjs.SceneStack(this);
       this._inputManager = new gdjs.InputManager();
@@ -176,7 +198,7 @@ namespace gdjs {
             }
           } catch {
             logger.error(
-              'Some metadata of resources can not be succesfully parsed.'
+              'Some metadata of resources can not be successfully parsed.'
             );
           }
         }
@@ -208,11 +230,11 @@ namespace gdjs {
      */
     setProjectData(projectData: ProjectData): void {
       this._data = projectData;
-      this._imageManager.setResources(this._data.resources.resources);
-      this._soundManager.setResources(this._data.resources.resources);
-      this._fontManager.setResources(this._data.resources.resources);
-      this._jsonManager.setResources(this._data.resources.resources);
-      this._bitmapFontManager.setResources(this._data.resources.resources);
+      this._resourcesLoader.setResources(
+        projectData.resources.resources,
+        getGlobalResourceNames(projectData),
+        projectData.layouts
+      );
     }
 
     /**
@@ -240,7 +262,7 @@ namespace gdjs {
      * @return The sound manager.
      */
     getSoundManager(): gdjs.HowlerSoundManager {
-      return this._soundManager;
+      return this._resourcesLoader.getSoundManager();
     }
 
     /**
@@ -248,7 +270,7 @@ namespace gdjs {
      * @return The image manager.
      */
     getImageManager(): gdjs.PixiImageManager {
-      return this._imageManager;
+      return this._resourcesLoader.getImageManager();
     }
 
     /**
@@ -256,7 +278,7 @@ namespace gdjs {
      * @return The font manager.
      */
     getFontManager(): gdjs.FontFaceObserverFontManager {
-      return this._fontManager;
+      return this._resourcesLoader.getFontManager();
     }
 
     /**
@@ -264,8 +286,43 @@ namespace gdjs {
      * @return The bitmap font manager.
      */
     getBitmapFontManager(): gdjs.BitmapFontManager {
-      // @ts-ignore
-      return this._bitmapFontManager;
+      return this._resourcesLoader.getBitmapFontManager();
+    }
+
+    /**
+     * Get the JSON manager of the game, used to load JSON from game
+     * resources.
+     * @return The json manager for the game
+     */
+    getJsonManager(): gdjs.JsonManager {
+      return this._resourcesLoader.getJsonManager();
+    }
+
+    /**
+     * Get the 3D model manager of the game, used to load 3D model from game
+     * resources.
+     * @return The 3D model manager for the game
+     */
+    getModel3DManager(): gdjs.Model3DManager {
+      return this._resourcesLoader.getModel3DManager();
+    }
+
+    /**
+     * Get the Spine manager of the game, used to load and construct spine skeletons from game
+     * resources.
+     * @return The Spine manager for the game
+     */
+    getSpineManager(): gdjs.SpineManager | null {
+      return this._resourcesLoader.getSpineManager();
+    }
+
+    /**
+     * Get the Spine Atlas manager of the game, used to load atlases from game
+     * resources.
+     * @return The Spine Atlas manager for the game
+     */
+    getSpineAtlasManager(): gdjs.SpineAtlasManager | null {
+      return this._resourcesLoader.getSpineAtlasManager();
     }
 
     /**
@@ -275,15 +332,6 @@ namespace gdjs {
      */
     getInputManager(): gdjs.InputManager {
       return this._inputManager;
-    }
-
-    /**
-     * Get the JSON manager of the game, used to load JSON from game
-     * resources.
-     * @return The json manager for the game
-     */
-    getJsonManager(): gdjs.JsonManager {
-      return this._jsonManager;
     }
 
     /**
@@ -527,6 +575,20 @@ namespace gdjs {
     }
 
     /**
+     * Return the antialiasing mode used by the game ("none" or "MSAA").
+     */
+    getAntialiasingMode(): 'none' | 'MSAA' {
+      return this._antialiasingMode;
+    }
+
+    /**
+     * Return true if antialising is enabled on mobiles.
+     */
+    isAntialisingEnabledOnMobile(): boolean {
+      return this._isAntialisingEnabledOnMobile;
+    }
+
+    /**
      * Set or unset the game as paused.
      * When paused, the game won't step and will be freezed. Useful for debugging.
      * @param enable true to pause the game, false to unpause
@@ -550,98 +612,162 @@ namespace gdjs {
     }
 
     /**
-     * Load all assets, displaying progress in renderer.
+     * Preload a scene assets as soon as possible in background.
      */
-    loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
-      const loadingScreen = new gdjs.LoadingScreenRenderer(
-        this.getRenderer(),
-        this._imageManager,
-        this._data.properties.loadingScreen
-      );
-      const allAssetsTotal = this._data.resources.resources.length;
-      const that = this;
+    prioritizeLoadingOfScene(sceneName: string) {
+      // Don't await the scene assets to be loaded.
+      this._resourcesLoader.loadSceneResources(sceneName);
+    }
 
-      // TODO: All the `loadXXX` (or `preloadXXX`) methods would be
-      // better converted to return promises, for better readability of the code.
-      // See how `loadBitmapFontData` is done.
-      this._imageManager.loadTextures(
-        function (count, total) {
-          const percent = Math.floor((count / allAssetsTotal) * 100);
-          loadingScreen.setPercent(percent);
-          if (progressCallback) {
-            progressCallback(percent);
-          }
-        },
-        function (texturesTotalCount) {
-          that._soundManager.preloadAudio(
-            function (count, total) {
-              const percent = Math.floor(
-                ((texturesTotalCount + count) / allAssetsTotal) * 100
-              );
-              loadingScreen.setPercent(percent);
-              if (progressCallback) {
-                progressCallback(percent);
+    /**
+     * @return The progress of assets loading in background for a scene
+     * (between 0 and 1).
+     */
+    getSceneLoadingProgress(sceneName: string): number {
+      return this._resourcesLoader.getSceneLoadingProgress(sceneName);
+    }
+
+    /**
+     * @returns true when all the resources of the given scene are loaded
+     * (but maybe not parsed).
+     */
+    areSceneAssetsLoaded(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsLoaded(sceneName);
+    }
+
+    /**
+     * @returns true when all the resources of the given scene are loaded and
+     * parsed.
+     */
+    areSceneAssetsReady(sceneName: string): boolean {
+      return this._resourcesLoader.areSceneAssetsReady(sceneName);
+    }
+
+    /**
+     * Load all assets needed to display the 1st scene, displaying progress in
+     * renderer.
+     */
+    loadAllAssets(
+      callback: () => void,
+      progressCallback?: (progress: float) => void
+    ) {
+      this.loadFirstAssetsAndStartBackgroundLoading(
+        this._getFirstSceneName(),
+        progressCallback
+      ).then(callback);
+    }
+
+    /**
+     * Load all assets needed to display the 1st scene, displaying progress in
+     * renderer.
+     *
+     * When a game is hot-reload, this method can be called with the current
+     * scene.
+     */
+    async loadFirstAssetsAndStartBackgroundLoading(
+      firstSceneName: string,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      try {
+        // Download the loading screen background image first to be able to
+        // display the loading screen as soon as possible.
+        const backgroundImageResourceName = this._data.properties.loadingScreen
+          .backgroundImageResourceName;
+        if (backgroundImageResourceName) {
+          await this._resourcesLoader
+            .getImageManager()
+            .loadResource(backgroundImageResourceName);
+        }
+        await Promise.all([
+          this._loadAssetsWithLoadingScreen(
+            /* isFirstScene = */ true,
+            async (onProgress) => {
+              // TODO Is a setting needed?
+              if (false) {
+                await this._resourcesLoader.loadAllResources(onProgress);
+              } else {
+                await this._resourcesLoader.loadGlobalAndFirstSceneResources(
+                  firstSceneName,
+                  onProgress
+                );
+                // Don't await as it must not block the first scene from starting.
+                this._resourcesLoader.loadAllSceneInBackground();
               }
             },
-            function (audioTotalCount) {
-              that._fontManager.loadFonts(
-                function (count, total) {
-                  const percent = Math.floor(
-                    ((texturesTotalCount + audioTotalCount + count) /
-                      allAssetsTotal) *
-                      100
-                  );
-                  loadingScreen.setPercent(percent);
-                  if (progressCallback) {
-                    progressCallback(percent);
-                  }
-                },
-                function (fontTotalCount) {
-                  that._jsonManager.preloadJsons(
-                    function (count, total) {
-                      const percent = Math.floor(
-                        ((texturesTotalCount +
-                          audioTotalCount +
-                          fontTotalCount +
-                          count) /
-                          allAssetsTotal) *
-                          100
-                      );
-                      loadingScreen.setPercent(percent);
-                      if (progressCallback) {
-                        progressCallback(percent);
-                      }
-                    },
-                    function (jsonTotalCount) {
-                      that._bitmapFontManager
-                        .loadBitmapFontData((count) => {
-                          var percent = Math.floor(
-                            ((texturesTotalCount +
-                              audioTotalCount +
-                              fontTotalCount +
-                              jsonTotalCount +
-                              count) /
-                              allAssetsTotal) *
-                              100
-                          );
-                          loadingScreen.setPercent(percent);
-                          if (progressCallback) progressCallback(percent);
-                        })
-                        .then(() => loadingScreen.unload())
-                        .then(() =>
-                          gdjs.getAllAsynchronouslyLoadingLibraryPromise()
-                        )
-                        .then(() => {
-                          callback();
-                        });
-                    }
-                  );
-                }
-              );
-            }
+            progressCallback
+          ),
+          // TODO This is probably not necessary in case of hot reload.
+          gdjs.getAllAsynchronouslyLoadingLibraryPromise(),
+        ]);
+      } catch (e) {
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
+        throw e;
+      }
+    }
+
+    /**
+     * Load all assets for a given scene, displaying progress in renderer.
+     */
+    async loadSceneAssets(
+      sceneName: string,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      await this._loadAssetsWithLoadingScreen(
+        /* isFirstLayout = */ false,
+        async (onProgress) => {
+          await this._resourcesLoader.loadAndProcessSceneResources(
+            sceneName,
+            onProgress
           );
-        }
+        },
+        progressCallback
       );
+    }
+
+    /**
+     * Load assets, displaying progress in renderer.
+     */
+    private async _loadAssetsWithLoadingScreen(
+      isFirstScene: boolean,
+      loadAssets: (
+        onProgress: (count: integer, total: integer) => Promise<void>
+      ) => Promise<void>,
+      progressCallback?: (progress: float) => void
+    ): Promise<void> {
+      this.pause(true);
+      const loadingScreen = new gdjs.LoadingScreenRenderer(
+        this.getRenderer(),
+        this._resourcesLoader.getImageManager(),
+        this._data.properties.loadingScreen,
+        this._data.properties.watermark.showWatermark,
+        isFirstScene
+      );
+
+      const onProgress = async (count: integer, total: integer) => {
+        const percent = Math.floor((100 * count) / total);
+        loadingScreen.setPercent(percent);
+        if (progressCallback) {
+          progressCallback(percent);
+        }
+        const hasRendered = loadingScreen.renderIfNeeded();
+        if (hasRendered) {
+          // Give a chance to draw calls from the renderer to be handled.
+          await sleep(1);
+        }
+      };
+      await loadAssets(onProgress);
+
+      await loadingScreen.unload();
+      this.pause(false);
+    }
+
+    private _getFirstSceneName(): string {
+      const firstSceneName = this._data.firstLayout;
+      return this.hasScene(firstSceneName)
+        ? firstSceneName
+        : // @ts-ignore - no risk of null object.
+          this.getSceneData().name;
     }
 
     /**
@@ -656,14 +782,11 @@ namespace gdjs {
         this._forceGameResolutionUpdate();
 
         // Load the first scene
-        const firstSceneName = this._data.firstLayout;
         this._sceneStack.push(
-          this.hasScene(firstSceneName)
-            ? firstSceneName
-            : // @ts-ignore - no risk of null object.
-              this.getSceneData().name,
+          this._getFirstSceneName(),
           this._injectExternalLayout
         );
+        this._watermark.displayAtStartup();
 
         //Uncomment to profile the first x frames of the game.
         // var x = 500;
@@ -680,48 +803,55 @@ namespace gdjs {
         this._setupGameVisibilityEvents();
 
         // The standard game loop
-        const that = this;
         let accumulatedElapsedTime = 0;
         this._hasJustResumed = false;
-        this._renderer.startGameLoop(function (lastCallElapsedTime) {
-          if (that._paused) {
-            return true;
-          }
+        this._renderer.startGameLoop((lastCallElapsedTime) => {
+          try {
+            if (this._paused) {
+              return true;
+            }
 
-          // Skip the frame if we rendering frames too fast
-          accumulatedElapsedTime += lastCallElapsedTime;
-          if (
-            that._maxFPS > 0 &&
-            1000.0 / accumulatedElapsedTime > that._maxFPS + 7
-          ) {
-            // Only skip frame if the framerate is 7 frames above the maximum framerate.
-            // Most browser/engines will try to run at slightly more than 60 frames per second.
-            // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
-            // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
-            return true;
-          }
-          const elapsedTime = accumulatedElapsedTime;
-          accumulatedElapsedTime = 0;
+            // Skip the frame if we rendering frames too fast
+            accumulatedElapsedTime += lastCallElapsedTime;
+            if (
+              this._maxFPS > 0 &&
+              1000.0 / accumulatedElapsedTime > this._maxFPS + 7
+            ) {
+              // Only skip frame if the framerate is 7 frames above the maximum framerate.
+              // Most browser/engines will try to run at slightly more than 60 frames per second.
+              // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
+              // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
+              return true;
+            }
+            const elapsedTime = accumulatedElapsedTime;
+            accumulatedElapsedTime = 0;
 
-          // Manage resize events.
-          if (that._notifyScenesForGameResolutionResize) {
-            that._sceneStack.onGameResolutionResized();
-            that._notifyScenesForGameResolutionResize = false;
-          }
+            // Manage resize events.
+            if (this._notifyScenesForGameResolutionResize) {
+              this._sceneStack.onGameResolutionResized();
+              this._notifyScenesForGameResolutionResize = false;
+            }
 
-          // Render and step the scene.
-          if (that._sceneStack.step(elapsedTime)) {
-            that.getInputManager().onFrameEnded();
-            that._hasJustResumed = false;
-            return true;
+            // Render and step the scene.
+            if (this._sceneStack.step(elapsedTime)) {
+              this.getInputManager().onFrameEnded();
+              this._hasJustResumed = false;
+              return true;
+            }
+            return false;
+          } catch (e) {
+            if (this._debuggerClient)
+              this._debuggerClient.onUncaughtException(e);
+
+            throw e;
           }
-          return false;
         });
         setTimeout(() => {
           this._setupSessionMetrics();
         }, 10000);
       } catch (e) {
-        logger.error('Internal crash: ' + e);
+        if (this._debuggerClient) this._debuggerClient.onUncaughtException(e);
+
         throw e;
       }
     }
@@ -1040,6 +1170,17 @@ namespace gdjs {
       return mapping && mapping[embeddedResourceName]
         ? mapping[embeddedResourceName]
         : embeddedResourceName;
+    }
+
+    /**
+     * Returns the array of resources that are embedded to passed one.
+     * @param resourceName The name of resource to find embedded resources of.
+     * @returns The array of related resources names.
+     */
+    getEmbeddedResourcesNames(resourceName: string): string[] {
+      return this._embeddedResourcesMappings.has(resourceName)
+        ? Object.keys(this._embeddedResourcesMappings.get(resourceName)!)
+        : [];
     }
   }
 }

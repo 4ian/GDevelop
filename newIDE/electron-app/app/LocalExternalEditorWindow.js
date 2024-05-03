@@ -108,7 +108,8 @@ const loadExternalEditorWindow = ({
     });
 
     modalWindow.on('close', event => {
-      // use destroy as a wordaround to force window closing, which is not done properly otherwise on Windows
+      if (!modalWindow) return;
+      // use destroy as a workaround to force window closing, which is not done properly otherwise on Windows
       modalWindow.destroy();
       modalWindow = null;
     });

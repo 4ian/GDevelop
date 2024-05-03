@@ -9,6 +9,7 @@
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/PropertiesContainer.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -25,15 +26,15 @@ public:
   CustomConfigurationHelper() {}
 
   static void InitializeContent(
-      const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+      const gd::PropertiesContainer &properties,
       gd::SerializerElement &behaviorContent);
 
   static std::map<gd::String, gd::PropertyDescriptor> GetProperties(
-      const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+      const gd::PropertiesContainer &properties,
       const gd::SerializerElement &behaviorContent);
 
   static bool UpdateProperty(
-      const gd::SerializableWithNameList<gd::NamedPropertyDescriptor> &properties,
+      const gd::PropertiesContainer &properties,
       gd::SerializerElement &behaviorContent,
       const gd::String &name,
       const gd::String &value);

@@ -2,23 +2,31 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import Radio from '@material-ui/core/Radio';
+import Tooltip from '@material-ui/core/Tooltip';
 import { t, Trans } from '@lingui/macro';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import FlareIcon from '@material-ui/icons/Flare';
 import IconButton from '../UI/IconButton';
-import Delete from '@material-ui/icons/Delete';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
-import EditIcon from '@material-ui/icons/Edit';
 import Badge from '../UI/Badge';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
-import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
+
 import ThreeDotsMenu from '../UI/CustomSvgIcons/ThreeDotsMenu';
+import VisibilityIcon from '../UI/CustomSvgIcons/Visibility';
+import LockIcon from '../UI/CustomSvgIcons/Lock';
+import LockOpenIcon from '../UI/CustomSvgIcons/LockOpen';
+import VisibilityOffIcon from '../UI/CustomSvgIcons/VisibilityOff';
+import TrashIcon from '../UI/CustomSvgIcons/Trash';
+import EditIcon from '../UI/CustomSvgIcons/Edit';
+import LightbulbIcon from '../UI/CustomSvgIcons/Lightbulb';
+import LightModeIcon from '../UI/CustomSvgIcons/LightMode';
+import Object2dIcon from '../UI/CustomSvgIcons/Object2d';
+import Object3dIcon from '../UI/CustomSvgIcons/Object3d';
+import Layer2dAnd3dIcon from '../UI/CustomSvgIcons/Layer2dAnd3d';
 
 const DragSourceAndDropTarget = makeDragSourceAndDropTarget('layers-list');
 
@@ -31,6 +39,8 @@ export const styles = {
 type Props = {|
   id: string,
   layer: gdLayer,
+  isSelected: boolean,
+  onSelect: string => void,
   nameError: React.Node,
   onBlur: string => void,
   onRemove: () => void,
@@ -38,6 +48,8 @@ type Props = {|
   onDrop: () => void,
   isVisible: boolean,
   onChangeVisibility: boolean => void,
+  isLocked: boolean,
+  onChangeLockState: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
   onEdit: () => void,
@@ -47,10 +59,14 @@ type Props = {|
 const LayerRow = ({
   id,
   layer,
+  isSelected,
+  onSelect,
   nameError,
   onBlur,
   onRemove,
   isVisible,
+  isLocked,
+  onChangeLockState,
   effectsCount,
   onEditEffects,
   onChangeVisibility,
@@ -63,6 +79,19 @@ const LayerRow = ({
 
   const layerName = layer.getName();
   const isLightingLayer = layer.isLightingLayer();
+  const renderingType = layer.getRenderingType();
+
+  const editPropertiesIcon = isLightingLayer ? (
+    <LightbulbIcon />
+  ) : renderingType === '2d' ? (
+    <Object2dIcon />
+  ) : renderingType === '3d' ? (
+    <Object3dIcon />
+  ) : renderingType === '2d+3d' ? (
+    <Layer2dAnd3dIcon />
+  ) : (
+    <EditIcon />
+  );
 
   const isBaseLayer = !layerName;
 
@@ -93,10 +122,28 @@ const LayerRow = ({
                 <TreeTableRow id={id}>
                   <TreeTableCell>
                     {connectDragSource(
-                      <span>
+                      <span id="layer-drag-handle">
                         <DragHandle />
                       </span>
                     )}
+                  </TreeTableCell>
+                  <TreeTableCell>
+                    <Tooltip
+                      title={
+                        <Trans>
+                          Layer where instances are added by default
+                        </Trans>
+                      }
+                    >
+                      <Radio
+                        checked={isSelected}
+                        onChange={onSelect}
+                        size="small"
+                        id={`layer-selected-${
+                          isSelected ? 'checked' : 'unchecked'
+                        }`}
+                      />
+                    </Tooltip>
                   </TreeTableCell>
                   <TreeTableCell expand>
                     <SemiControlledTextField
@@ -135,6 +182,13 @@ const LayerRow = ({
                             checked: isVisible,
                             click: () => onChangeVisibility(!isVisible),
                           },
+                          {
+                            type: 'checkbox',
+                            label: i18n._(t`Locked`),
+                            enabled: isVisible,
+                            checked: isLocked || !isVisible,
+                            click: () => onChangeLockState(!isLocked),
+                          },
                           { type: 'separator' },
                           {
                             label: i18n._(t`Delete`),
@@ -147,9 +201,10 @@ const LayerRow = ({
                       <React.Fragment>
                         <InlineCheckbox
                           id="layer-visibility"
+                          paddingSize="small"
                           checked={isVisible}
-                          checkedIcon={<Visibility />}
-                          uncheckedIcon={<VisibilityOff />}
+                          checkedIcon={<VisibilityIcon />}
+                          uncheckedIcon={<VisibilityOffIcon />}
                           onCheck={(e, value) => onChangeVisibility(value)}
                           tooltipOrHelperText={
                             isVisible ? (
@@ -159,13 +214,29 @@ const LayerRow = ({
                             )
                           }
                         />
+                        <InlineCheckbox
+                          id="layer-lock"
+                          paddingSize="small"
+                          disabled={!isVisible}
+                          checked={isLocked || !isVisible}
+                          checkedIcon={<LockIcon />}
+                          uncheckedIcon={<LockOpenIcon />}
+                          onCheck={(e, value) => onChangeLockState(value)}
+                          tooltipOrHelperText={
+                            isLocked ? (
+                              <Trans>Unlock layer</Trans>
+                            ) : (
+                              <Trans>Lock layer</Trans>
+                            )
+                          }
+                        />
                         <IconButton
                           size="small"
                           onClick={onEditEffects}
                           tooltip={t`Edit effects (${effectsCount})`}
                         >
                           <Badge badgeContent={effectsCount} color="primary">
-                            <FlareIcon />
+                            <LightModeIcon />
                           </Badge>
                         </IconButton>
                         <IconButton
@@ -177,11 +248,7 @@ const LayerRow = ({
                               : t`Edit properties`
                           }
                         >
-                          {isLightingLayer ? (
-                            <EmojiObjectsIcon />
-                          ) : (
-                            <EditIcon />
-                          )}
+                          {editPropertiesIcon}
                         </IconButton>
                         <IconButton
                           size="small"
@@ -189,7 +256,7 @@ const LayerRow = ({
                           disabled={isBaseLayer}
                           tooltip={t`Delete the layer`}
                         >
-                          <Delete />
+                          <TrashIcon />
                         </IconButton>
                       </React.Fragment>
                     )}

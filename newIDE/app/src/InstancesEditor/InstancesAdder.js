@@ -71,7 +71,7 @@ export default class InstancesAdder {
 
     let addedInstancesLowestZOrder = null;
 
-    const newInstances = serializedInstances.map(serializedInstance => {
+    const newInstances = serializedInstances.map((serializedInstance) => {
       const instance = new gd.InitialInstance();
       unserializeFromJSObject(instance, serializedInstance);
       const desiredPosition = [
@@ -99,7 +99,7 @@ export default class InstancesAdder {
     });
 
     if (addInstancesInTheForeground && addedInstancesLowestZOrder !== null) {
-      newInstances.forEach(instance => {
+      newInstances.forEach((instance) => {
         instance.setZOrder(
           instance.getZOrder() -
             // Flow is not happy with addedInstancesLowestZOrder possible null value
@@ -127,8 +127,9 @@ export default class InstancesAdder {
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
     const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
-    const addedInstances = objectNames.map(objectName => {
-      const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
+    const addedInstances = objectNames.map((objectName) => {
+      const instance: gdInitialInstance =
+        this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
@@ -171,8 +172,9 @@ export default class InstancesAdder {
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
     const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
-    this._temporaryInstances = objectNames.map(objectName => {
-      const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
+    this._temporaryInstances = objectNames.map((objectName) => {
+      const instance: gdInitialInstance =
+        this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
@@ -191,7 +193,7 @@ export default class InstancesAdder {
     pos: [number, number]
   ): Array<gdInitialInstance> => {
     const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
-    this._temporaryInstances.forEach(instance => {
+    this._temporaryInstances.forEach((instance) => {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
     });
@@ -203,7 +205,7 @@ export default class InstancesAdder {
    * Delete the temporary instances.
    */
   deleteTemporaryInstances() {
-    this._temporaryInstances.forEach(instance => {
+    this._temporaryInstances.forEach((instance) => {
       this._instances.removeInstance(instance);
     });
     this._temporaryInstances = [];

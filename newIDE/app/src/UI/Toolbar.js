@@ -40,15 +40,15 @@ export const Toolbar = React.memo<ToolbarProps>(
   }
 );
 
-const toolbarGroupStyle = props => ({
+const toolbarGroupStyle = (props) => ({
   flex: 1,
   display: 'flex',
   alignItems: 'center',
   justifyContent: props.firstChild
     ? 'flex-start'
     : props.lastChild
-    ? 'flex-end'
-    : 'center',
+      ? 'flex-end'
+      : 'center',
 });
 
 type ToolbarGroupProps = {|

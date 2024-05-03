@@ -69,54 +69,51 @@ const VariablesEditorDialog = ({
     onCancel,
     resetThenClearPersistentUuid: true,
   });
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-variables'
-  );
+  const { DismissableTutorialMessage } =
+    useDismissableTutorialMessage('intro-variables');
 
-  const onRefactorAndApply = React.useCallback(
-    async () => {
-      if (inheritedVariablesContainer) {
-        // No refactoring to do - this is a variable container of an instance
-        // (or something else that overrides variables from another container),
-        // which does not have an impact on the rest of the project.
-      } else {
-        const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
+  const onRefactorAndApply = React.useCallback(async () => {
+    if (inheritedVariablesContainer) {
+      // No refactoring to do - this is a variable container of an instance
+      // (or something else that overrides variables from another container),
+      // which does not have an impact on the rest of the project.
+    } else {
+      const changeset =
+        gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
           project,
           getOriginalContentSerializedElement(),
           variablesContainer
         );
-        if (
-          preventRefactoringToDeleteInstructions ||
-          // While we support refactoring that would remove all references (actions, conditions...)
-          // it's both a bit dangerous for the user and we would need to show the user what
-          // will be removed before doing so. For now, just clear the removed variables so they don't
-          // trigger any refactoring.
-          true
-        ) {
-          // Clear the removed variables from the changeset, so they do not trigger
-          // deletion of actions/conditions or events using them.
-          changeset.clearRemovedVariables();
-        }
-
-        gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
-          project,
-          variablesContainer,
-          changeset
-        );
+      if (
+        preventRefactoringToDeleteInstructions ||
+        // While we support refactoring that would remove all references (actions, conditions...)
+        // it's both a bit dangerous for the user and we would need to show the user what
+        // will be removed before doing so. For now, just clear the removed variables so they don't
+        // trigger any refactoring.
+        true
+      ) {
+        // Clear the removed variables from the changeset, so they do not trigger
+        // deletion of actions/conditions or events using them.
+        changeset.clearRemovedVariables();
       }
 
-      variablesContainer.clearPersistentUuid();
-      onApply();
-    },
-    [
-      onApply,
-      project,
-      getOriginalContentSerializedElement,
-      variablesContainer,
-      inheritedVariablesContainer,
-      preventRefactoringToDeleteInstructions,
-    ]
-  );
+      gd.WholeProjectRefactorer.applyRefactoringForVariablesContainer(
+        project,
+        variablesContainer,
+        changeset
+      );
+    }
+
+    variablesContainer.clearPersistentUuid();
+    onApply();
+  }, [
+    onApply,
+    project,
+    getOriginalContentSerializedElement,
+    variablesContainer,
+    inheritedVariablesContainer,
+    preventRefactoringToDeleteInstructions,
+  ]);
 
   return (
     <Dialog

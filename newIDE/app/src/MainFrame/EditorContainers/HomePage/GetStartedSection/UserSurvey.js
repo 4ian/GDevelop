@@ -50,7 +50,7 @@ export const formatUserAnswers = (userAnswers: UserAnswers): UserSurveyType => {
   const userSurvey = {};
   userAnswers.forEach(({ questionId, answers, userInput }) => {
     // Remove `input` choice from answers since input content should be handled differently.
-    let cleanedAnswers = answers.filter(answer => answer !== 'input');
+    let cleanedAnswers = answers.filter((answer) => answer !== 'input');
     if (
       questionId === 'buildingKindOfProjects' ||
       questionId === 'learningKindOfProjects'
@@ -100,7 +100,7 @@ const NavigationStep = ({ stepIndex }: {| stepIndex: number |}) => {
 type DisplayProps = {|
   userAnswers: UserAnswers,
   onSelectAnswer: (string, string) => void,
-  goToNextQuestion: QuestionData => void,
+  goToNextQuestion: (QuestionData) => void,
   onClickSend: () => void,
   onChangeUserInputValue: (string, string) => void,
   questionId: string,
@@ -127,12 +127,9 @@ const DesktopDisplay = ({
     }, 100);
   }, []);
 
-  React.useEffect(
-    () => {
-      scrollToLastQuestion();
-    },
-    [questionId, scrollToLastQuestion]
-  );
+  React.useEffect(() => {
+    scrollToLastQuestion();
+  }, [questionId, scrollToLastQuestion]);
 
   const questionsPropsToRender = userAnswers.map((userAnswer, index) => {
     const relatedQuestionData = questionnaire[userAnswer.questionId];
@@ -140,7 +137,7 @@ const DesktopDisplay = ({
       key: userAnswer.questionId,
       questionData: relatedQuestionData,
       selectedAnswers: userAnswer.answers,
-      onSelectAnswer: answer => onSelectAnswer(userAnswer.questionId, answer),
+      onSelectAnswer: (answer) => onSelectAnswer(userAnswer.questionId, answer),
       showNextButton:
         (relatedQuestionData.multi ||
           isOnlyOneFreeAnswerPossible(relatedQuestionData.answers)) &&
@@ -151,7 +148,7 @@ const DesktopDisplay = ({
       onClickSend:
         userAnswer.questionId === firstQuestion ? onClickSend : undefined,
       userInputValue: userAnswer.userInput || '',
-      onChangeUserInputValue: value =>
+      onChangeUserInputValue: (value) =>
         onChangeUserInputValue(userAnswer.questionId, value),
     };
   });
@@ -176,7 +173,7 @@ const DesktopDisplay = ({
       key: questionId,
       questionData: questionData,
       selectedAnswers: [],
-      onSelectAnswer: answer => onSelectAnswer(questionId, answer),
+      onSelectAnswer: (answer) => onSelectAnswer(questionId, answer),
       onClickNext: () => goToNextQuestion(questionData),
       showNextButton: questionData.multi,
       showQuestionText: true,
@@ -226,20 +223,17 @@ const MobileDisplay = ({
 }: MobileDisplayProps) => {
   const scrollViewRef = React.useRef<?ScrollViewInterface>();
 
-  React.useEffect(
-    () => {
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollToPosition(0);
-      }
-    },
-    [questionId]
-  );
+  React.useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToPosition(0);
+    }
+  }, [questionId]);
 
   const questionData = questionnaire[questionId];
   if (!questionData) return null;
 
   const userAnswer = userAnswers.find(
-    answer => answer.questionId === questionId
+    (answer) => answer.questionId === questionId
   );
 
   return (
@@ -272,7 +266,7 @@ const MobileDisplay = ({
                 key={questionId}
                 questionData={questionData}
                 selectedAnswers={userAnswer ? userAnswer.answers : []}
-                onSelectAnswer={answer => onSelectAnswer(questionId, answer)}
+                onSelectAnswer={(answer) => onSelectAnswer(questionId, answer)}
                 onClickNext={() => goToNextQuestion(questionData)}
                 showNextButton={false}
                 showQuestionText={false}
@@ -282,7 +276,7 @@ const MobileDisplay = ({
                 userInputValue={
                   userAnswer ? userAnswer.userInput || '' : undefined
                 }
-                onChangeUserInputValue={value =>
+                onChangeUserInputValue={(value) =>
                   onChangeUserInputValue(questionId, value)
                 }
               />
@@ -333,7 +327,7 @@ const MobileDisplay = ({
 };
 
 type Props = {|
-  onCompleted: UserSurveyType => Promise<void>,
+  onCompleted: (UserSurveyType) => Promise<void>,
   onStarted: () => void,
 |};
 
@@ -363,14 +357,11 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
       userAnswers[0].questionId === firstQuestion &&
       userAnswers[0].answers.length === 1 &&
       userAnswers[0].answers[0] === 'input');
-  React.useEffect(
-    () => {
-      if (hasUserStartedSurvey) {
-        onStarted();
-      }
-    },
-    [hasUserStartedSurvey, onStarted]
-  );
+  React.useEffect(() => {
+    if (hasUserStartedSurvey) {
+      onStarted();
+    }
+  }, [hasUserStartedSurvey, onStarted]);
 
   const goToNextQuestion = React.useCallback(
     (questionData: QuestionData, answerData?: AnswerData) => {
@@ -397,7 +388,7 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
   const onChangeUserInputValue = React.useCallback(
     (questionId: string, value: string) => {
       const matchingUserAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.questionId === questionId
+        (userAnswer) => userAnswer.questionId === questionId
       );
       if (matchingUserAnswerIndex < 0) return;
       const newUserAnswers = [...userAnswers];
@@ -407,47 +398,41 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
     [userAnswers]
   );
 
-  React.useEffect(
-    () => {
-      // On each questionId change, check if new question only has one free answer possible.
-      // If that's the case, automatically add an answer to user answers.
-      const questionData = questionnaire[questionId];
-      if (!questionData) return;
-      const { answers } = questionData;
-      if (
-        isOnlyOneFreeAnswerPossible(answers) &&
-        userAnswers.every(userAnswer => userAnswer.questionId !== questionId)
-      ) {
-        setUserAnswers([
-          ...userAnswers,
-          { questionId, userInput: '', answers: [answers[0].id] },
-        ]);
-      }
-    },
-    [questionId, userAnswers]
-  );
+  React.useEffect(() => {
+    // On each questionId change, check if new question only has one free answer possible.
+    // If that's the case, automatically add an answer to user answers.
+    const questionData = questionnaire[questionId];
+    if (!questionData) return;
+    const { answers } = questionData;
+    if (
+      isOnlyOneFreeAnswerPossible(answers) &&
+      userAnswers.every((userAnswer) => userAnswer.questionId !== questionId)
+    ) {
+      setUserAnswers([
+        ...userAnswers,
+        { questionId, userInput: '', answers: [answers[0].id] },
+      ]);
+    }
+  }, [questionId, userAnswers]);
 
-  React.useEffect(
-    () => {
-      // Call onCompleted in effect instead of directly in goToNextQuestion
-      // to avoid cases where userAnswers is not up to date and does not contain the
-      // last selected answer.
-      // This effect should be called only once when questionId is set to this specific
-      // value. After that, the whole component should be unmounted and the effect would
-      // not be called a second time.
-      if (questionId === QUESTIONNAIRE_FINISHED_STEP) {
-        onCompleted(formatUserAnswers(userAnswers));
-      }
-    },
-    [questionId, onCompleted, userAnswers]
-  );
+  React.useEffect(() => {
+    // Call onCompleted in effect instead of directly in goToNextQuestion
+    // to avoid cases where userAnswers is not up to date and does not contain the
+    // last selected answer.
+    // This effect should be called only once when questionId is set to this specific
+    // value. After that, the whole component should be unmounted and the effect would
+    // not be called a second time.
+    if (questionId === QUESTIONNAIRE_FINISHED_STEP) {
+      onCompleted(formatUserAnswers(userAnswers));
+    }
+  }, [questionId, onCompleted, userAnswers]);
 
   const onSelectAnswer = React.useCallback(
     (questionId: string, answerId: string) => {
       const questionData = questionnaire[questionId];
       const { multi } = questionData;
       const existingUserAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.questionId === questionId
+        (userAnswer) => userAnswer.questionId === questionId
       );
       if (existingUserAnswerIndex >= 0) {
         const isLastAnswer = existingUserAnswerIndex === userAnswers.length - 1;
@@ -455,9 +440,8 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
         if (multi) {
           // Add or remove answer to multi-choice question
           const newUserAnswers = [...userAnswers];
-          const answerIndex = newUserAnswers[
-            existingUserAnswerIndex
-          ].answers.indexOf(answerId);
+          const answerIndex =
+            newUserAnswers[existingUserAnswerIndex].answers.indexOf(answerId);
           if (answerIndex >= 0) {
             newUserAnswers[existingUserAnswerIndex].answers.splice(
               answerIndex,
@@ -491,7 +475,7 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
 
           if (doesAnswerChangesFollowingQuestion) {
             const answerData = questionData.answers.find(
-              answerData => answerData.id === answerId
+              (answerData) => answerData.id === answerId
             );
             goToNextQuestion(questionData, answerData);
           } else {
@@ -507,7 +491,7 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
         const shouldGoToNextQuestion = answerId !== 'input';
         setUserAnswers([...userAnswers, { questionId, answers: [answerId] }]);
         const answerData = questionData.answers.find(
-          answerData => answerData.id === answerId
+          (answerData) => answerData.id === answerId
         );
         if (!multi && shouldGoToNextQuestion) {
           goToNextQuestion(questionData, answerData);
@@ -517,19 +501,16 @@ const UserSurvey = ({ onCompleted, onStarted }: Props) => {
     [userAnswers, goToNextQuestion, isMobile]
   );
 
-  const goToPreviousQuestion = React.useCallback(
-    () => {
-      const currentAnswerIndex = userAnswers.findIndex(
-        userAnswer => userAnswer.questionId === questionId
-      );
-      if (currentAnswerIndex === -1) {
-        setQuestionId(userAnswers[userAnswers.length - 1].questionId);
-      } else if (currentAnswerIndex >= 1) {
-        setQuestionId(userAnswers[currentAnswerIndex - 1].questionId);
-      }
-    },
-    [userAnswers, questionId]
-  );
+  const goToPreviousQuestion = React.useCallback(() => {
+    const currentAnswerIndex = userAnswers.findIndex(
+      (userAnswer) => userAnswer.questionId === questionId
+    );
+    if (currentAnswerIndex === -1) {
+      setQuestionId(userAnswers[userAnswers.length - 1].questionId);
+    } else if (currentAnswerIndex >= 1) {
+      setQuestionId(userAnswers[currentAnswerIndex - 1].questionId);
+    }
+  }, [userAnswers, questionId]);
 
   const endQuestionnaireEarly = React.useCallback(() => {
     setQuestionId(QUESTIONNAIRE_FINISHED_STEP);

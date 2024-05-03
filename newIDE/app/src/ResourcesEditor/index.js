@@ -45,7 +45,7 @@ type State = {|
 |};
 
 type Props = {|
-  setToolbar: React.Node => void,
+  setToolbar: (React.Node) => void,
   project: gdProject,
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
   onRenameResource: (
@@ -79,9 +79,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
-      this.onResourceExternallyChanged.bind(this)
-    );
+    this.resourceExternallyChangedCallbackId =
+      registerOnResourceExternallyChangedCallback(
+        this.onResourceExternallyChanged.bind(this)
+      );
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -125,7 +126,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    onDeleteResource(resource, doRemove => {
+    onDeleteResource(resource, (doRemove) => {
       if (!doRemove || !resource) return;
 
       project.getResourcesManager().removeResource(resource.getName());
@@ -154,9 +155,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
       resourceKind
     ).toJSArray();
     console.info(
-      `Removing ${
-        removedResourceNames.length
-      } unused ${resourceKind} resource(s):`,
+      `Removing ${removedResourceNames.length} unused ${resourceKind} resource(s):`,
       removedResourceNames
     );
 
@@ -185,11 +184,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const removedResourceNames = resourcesManager
       .getAllResourceNames()
       .toJSArray()
-      .filter(resourceName => {
+      .filter((resourceName) => {
         return getResourceFilePathStatus(project, resourceName) === 'error';
       });
 
-    removedResourceNames.forEach(resourceName => {
+    removedResourceNames.forEach((resourceName) => {
       resourcesManager.removeResource(resourceName);
       console.info('Removed due to invalid path: ' + resourceName);
     });
@@ -237,14 +236,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render() {
-    const {
-      project,
-      onRenameResource,
-      resourceManagementProps,
-      fileMetadata,
-    } = this.props;
+    const { project, onRenameResource, resourceManagementProps, fileMetadata } =
+      this.props;
     const { selectedResource } = this.state;
-    const resourcesActionsMenuBuilder = resourceManagementProps.getStorageProviderResourceOperations();
+    const resourcesActionsMenuBuilder =
+      resourceManagementProps.getStorageProviderResourceOperations();
 
     const editors = {
       properties: {
@@ -256,7 +252,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             resources={selectedResource ? [selectedResource] : []}
             project={project}
             resourcesLoader={this.resourcesLoader}
-            ref={propertiesEditor =>
+            ref={(propertiesEditor) =>
               (this._propertiesEditor = propertiesEditor)
             }
             onResourcePathUpdated={() => {
@@ -279,7 +275,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             onRenameResource={onRenameResource}
             onSelectResource={this._onResourceSelected}
             selectedResource={selectedResource}
-            ref={resourcesList => (this._resourcesList = resourcesList)}
+            ref={(resourcesList) => (this._resourcesList = resourcesList)}
             onRemoveUnusedResources={this._removeUnusedResources}
             onRemoveAllResourcesWithInvalidPath={
               this._removeAllResourcesWithInvalidPath
@@ -298,13 +294,13 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
             <EditorMosaic
               editors={editors}
-              ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+              ref={(editorMosaic) => (this.editorMosaic = editorMosaic)}
               initialNodes={
                 getDefaultEditorMosaicNode('resources-editor') ||
                 initialMosaicEditorNodes
               }
               onOpenedEditorsChanged={this.updateToolbar}
-              onPersistNodes={node =>
+              onPersistNodes={(node) =>
                 setDefaultEditorMosaicNode('resources-editor', node)
               }
             />

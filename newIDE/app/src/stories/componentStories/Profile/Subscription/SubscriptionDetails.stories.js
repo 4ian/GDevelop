@@ -102,28 +102,29 @@ export const Default = ({
     authenticated === 'no'
       ? fakeNotAuthenticatedUser
       : authenticated === 'loading'
-      ? fakeAuthenticatedUserLoggingIn
-      : userSubscriptionId === 'none'
-      ? fakeAuthenticatedUserWithNoSubscription
-      : userSubscriptionId === 'gdevelop_silver'
-      ? fakeSilverAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_gold'
-      ? fakeGoldAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_startup'
-      ? fakeStartupAuthenticatedUser
-      : userSubscriptionId === 'gdevelop_education'
-      ? fakeAuthenticatedUserWithEducationPlan
-      : userSubscriptionId === 'education student'
-      ? fakeAuthenticatedStudentFromEducationPlan
-      : userSubscriptionId === 'education teacher'
-      ? fakeAuthenticatedTeacherFromEducationPlan
-      : userSubscriptionId === 'gdevelop_indie'
-      ? fakeAuthenticatedUserWithLegacyIndieSubscription
-      : userSubscriptionId === 'gdevelop_pro'
-      ? fakeAuthenticatedUserWithLegacyProSubscription
-      : userSubscriptionId === 'gold purchasely subscription'
-      ? fakeGoldWithPurchaselyAuthenticatedUser
-      : fakeNotAuthenticatedUser;
+        ? fakeAuthenticatedUserLoggingIn
+        : userSubscriptionId === 'none'
+          ? fakeAuthenticatedUserWithNoSubscription
+          : userSubscriptionId === 'gdevelop_silver'
+            ? fakeSilverAuthenticatedUser
+            : userSubscriptionId === 'gdevelop_gold'
+              ? fakeGoldAuthenticatedUser
+              : userSubscriptionId === 'gdevelop_startup'
+                ? fakeStartupAuthenticatedUser
+                : userSubscriptionId === 'gdevelop_education'
+                  ? fakeAuthenticatedUserWithEducationPlan
+                  : userSubscriptionId === 'education student'
+                    ? fakeAuthenticatedStudentFromEducationPlan
+                    : userSubscriptionId === 'education teacher'
+                      ? fakeAuthenticatedTeacherFromEducationPlan
+                      : userSubscriptionId === 'gdevelop_indie'
+                        ? fakeAuthenticatedUserWithLegacyIndieSubscription
+                        : userSubscriptionId === 'gdevelop_pro'
+                          ? fakeAuthenticatedUserWithLegacyProSubscription
+                          : userSubscriptionId ===
+                              'gold purchasely subscription'
+                            ? fakeGoldWithPurchaselyAuthenticatedUser
+                            : fakeNotAuthenticatedUser;
 
   if (authenticatedUser.subscription) {
     if (pricingSystem === 'redeemed') {
@@ -138,7 +139,8 @@ export const Default = ({
     } else if (pricingSystem === 'manually added') {
       authenticatedUser.subscription.pricingSystemId = 'MANUALLY_ADDED';
     } else {
-      authenticatedUser.subscription.cancelAtPeriodEnd = !!willCancelAtPeriodEndOrIsExpired;
+      authenticatedUser.subscription.cancelAtPeriodEnd =
+        !!willCancelAtPeriodEndOrIsExpired;
       if (userSubscriptionId === 'gdevelop_silver') {
         if (pricingSystem === 'yearly') {
           authenticatedUser.subscription.pricingSystemId =

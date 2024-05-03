@@ -95,7 +95,7 @@ export const filterAppleCertificateSigningCredentials = (
   return signingCredentials
     ? // $FlowFixMe - we're sure this should refine the type.
       signingCredentials.filter(
-        signingCredential => signingCredential.type === 'apple-certificate'
+        (signingCredential) => signingCredential.type === 'apple-certificate'
       )
     : null;
 };
@@ -106,7 +106,7 @@ export const filterAppleAuthKeySigningCredentials = (
   return signingCredentials
     ? // $FlowFixMe - we're sure this should refine the type.
       signingCredentials.filter(
-        signingCredential => signingCredential.type === 'apple-auth-key'
+        (signingCredential) => signingCredential.type === 'apple-auth-key'
       )
     : null;
 };
@@ -214,7 +214,7 @@ export const buildElectron = (
   payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
         params: {
           userId,
@@ -230,7 +230,7 @@ export const buildElectron = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const buildWeb = (
@@ -245,7 +245,7 @@ export const buildWeb = (
   payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
         params: {
           userId,
@@ -260,7 +260,7 @@ export const buildWeb = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const buildCordovaAndroid = (
@@ -277,7 +277,7 @@ export const buildCordovaAndroid = (
   payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build`,
         JSON.stringify({
@@ -301,7 +301,7 @@ export const buildCordovaAndroid = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const buildCordovaIos = (
@@ -318,7 +318,7 @@ export const buildCordovaIos = (
   payWithCredits: boolean
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build`,
         {
@@ -340,7 +340,7 @@ export const buildCordovaIos = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getBuild = (
@@ -349,7 +349,7 @@ export const getBuild = (
   buildId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
         params: {
           userId,
@@ -359,7 +359,7 @@ export const getBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getBuilds = (
@@ -368,7 +368,7 @@ export const getBuilds = (
   gameId?: string
 ): Promise<Array<Build>> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
         params: {
           userId,
@@ -379,7 +379,7 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const updateBuild = (
@@ -389,7 +389,7 @@ export const updateBuild = (
   { name, description }: { name?: string, description?: string }
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.patch(
         `${GDevelopBuildApi.baseUrl}/build/${buildId}`,
         { name, description },
@@ -403,7 +403,7 @@ export const updateBuild = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const deleteBuild = (
@@ -412,7 +412,7 @@ export const deleteBuild = (
   buildId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.delete(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
         params: {
           userId,
@@ -422,7 +422,7 @@ export const deleteBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserSigningCredentials = async (
@@ -487,9 +487,7 @@ export const signingCredentialApi = {
     const authorizationHeader = await getAuthorizationHeader();
 
     const response = await axios.post(
-      `${
-        GDevelopBuildApi.baseUrl
-      }/signing-credential/action/upload-certificate`,
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/upload-certificate`,
       {
         ...options,
       },
@@ -517,9 +515,7 @@ export const signingCredentialApi = {
     const authorizationHeader = await getAuthorizationHeader();
 
     const response = await axios.post(
-      `${
-        GDevelopBuildApi.baseUrl
-      }/signing-credential/action/create-certificate-p12`,
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/create-certificate-p12`,
       {
         ...options,
       },
@@ -545,9 +541,7 @@ export const signingCredentialApi = {
     const authorizationHeader = await getAuthorizationHeader();
 
     const response = await axios.post(
-      `${
-        GDevelopBuildApi.baseUrl
-      }/signing-credential/action/upload-mobile-provision`,
+      `${GDevelopBuildApi.baseUrl}/signing-credential/action/upload-mobile-provision`,
       {
         ...options,
       },

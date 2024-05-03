@@ -41,20 +41,26 @@ const ResourcePreview = (props: Props) => {
         />
       );
     case 'audio':
-      return <GenericIconPreview renderIcon={props => <Music {...props} />} />;
+      return (
+        <GenericIconPreview renderIcon={(props) => <Music {...props} />} />
+      );
     case 'json':
     case 'tilemap':
     case 'tileset':
     case 'model3D':
     case 'atlas':
     case 'spine':
-      return <GenericIconPreview renderIcon={props => <File {...props} />} />;
+      return <GenericIconPreview renderIcon={(props) => <File {...props} />} />;
     case 'video':
-      return <GenericIconPreview renderIcon={props => <Video {...props} />} />;
+      return (
+        <GenericIconPreview renderIcon={(props) => <Video {...props} />} />
+      );
     case 'font':
     case 'bitmapFont':
       return (
-        <GenericIconPreview renderIcon={props => <FontDownload {...props} />} />
+        <GenericIconPreview
+          renderIcon={(props) => <FontDownload {...props} />}
+        />
       );
     default:
       return null;

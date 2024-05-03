@@ -25,7 +25,7 @@ type Props = {|
   open: boolean,
   onRequestClose: () => void,
   onApply: () => void,
-  onChange: string => void,
+  onChange: (string) => void,
 
   instruction: ?gdInstruction,
   isCondition: boolean,
@@ -51,14 +51,10 @@ const InlineParameterEditor = ({
   anchorEl,
   resourceManagementProps,
 }: Props) => {
-  const [
-    parameterMetadata,
-    setParameterMetadata,
-  ] = React.useState<?gdParameterMetadata>(null);
-  const [
-    instructionMetadata,
-    setInstructionMetadata,
-  ] = React.useState<?gdInstructionMetadata>(null);
+  const [parameterMetadata, setParameterMetadata] =
+    React.useState<?gdParameterMetadata>(null);
+  const [instructionMetadata, setInstructionMetadata] =
+    React.useState<?gdInstructionMetadata>(null);
   const [ParameterComponent, setParameterComponent] = React.useState(null);
   const field = React.useRef<?ParameterFieldInterface>(null);
 
@@ -70,81 +66,68 @@ const InlineParameterEditor = ({
     setParameterComponent(null);
   };
 
-  const loadComponentFromInstruction = React.useCallback(
-    () => {
-      if (!instruction) return unload();
+  const loadComponentFromInstruction = React.useCallback(() => {
+    if (!instruction) return unload();
 
-      const type = instruction.getType();
-      const instructionMetadata = isCondition
-        ? gd.MetadataProvider.getConditionMetadata(
-            project.getCurrentPlatform(),
-            type
-          )
-        : gd.MetadataProvider.getActionMetadata(
-            project.getCurrentPlatform(),
-            type
-          );
-
-      if (parameterIndex >= instructionMetadata.getParametersCount())
-        return unload();
-
-      const parameterMetadata = instructionMetadata.getParameter(
-        parameterIndex
-      );
-      const ParameterComponent = ParameterRenderingService.getParameterComponent(
-        parameterMetadata.getType()
-      );
-      setParameterComponent(ParameterComponent);
-      setParameterMetadata(parameterMetadata);
-      setInstructionMetadata(instructionMetadata);
-      // Give a bit of time for the popover to mount itself
-      setTimeout(() => {
-        // We select the whole text when the inline field opens, for easier editing.
-        if (field.current) field.current.focus({ selectAll: true });
-      }, 10);
-    },
-    [instruction, isCondition, parameterIndex, project]
-  );
-
-  React.useEffect(
-    () => {
-      if (open && instruction) {
-        loadComponentFromInstruction();
-      }
-    },
-    [open, instruction, loadComponentFromInstruction]
-  );
-
-  const onParameterEdited = React.useCallback(
-    () => {
-      // When the parameter is done being edited, ensure the instruction parameters
-      // are properly set up. For example, it's possible that the object name was
-      // changed, and so the associated behavior should be updated.
-      if (instruction && instructionMetadata) {
-        const objectParameterIndex = getObjectParameterIndex(
-          instructionMetadata
+    const type = instruction.getType();
+    const instructionMetadata = isCondition
+      ? gd.MetadataProvider.getConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          project.getCurrentPlatform(),
+          type
         );
-        setupInstructionParameters(
-          globalObjectsContainer,
-          objectsContainer,
-          instruction,
-          instructionMetadata,
-          objectParameterIndex !== -1
-            ? instruction.getParameter(objectParameterIndex).getPlainString()
-            : null
-        );
-      }
 
-      onApply();
-    },
-    [
-      instruction,
-      instructionMetadata,
-      onApply,
-      objectsContainer,
-      globalObjectsContainer,
-    ]
-  );
+    if (parameterIndex >= instructionMetadata.getParametersCount())
+      return unload();
+
+    const parameterMetadata = instructionMetadata.getParameter(parameterIndex);
+    const ParameterComponent = ParameterRenderingService.getParameterComponent(
+      parameterMetadata.getType()
+    );
+    setParameterComponent(ParameterComponent);
+    setParameterMetadata(parameterMetadata);
+    setInstructionMetadata(instructionMetadata);
+    // Give a bit of time for the popover to mount itself
+    setTimeout(() => {
+      // We select the whole text when the inline field opens, for easier editing.
+      if (field.current) field.current.focus({ selectAll: true });
+    }, 10);
+  }, [instruction, isCondition, parameterIndex, project]);
+
+  React.useEffect(() => {
+    if (open && instruction) {
+      loadComponentFromInstruction();
+    }
+  }, [open, instruction, loadComponentFromInstruction]);
+
+  const onParameterEdited = React.useCallback(() => {
+    // When the parameter is done being edited, ensure the instruction parameters
+    // are properly set up. For example, it's possible that the object name was
+    // changed, and so the associated behavior should be updated.
+    if (instruction && instructionMetadata) {
+      const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+      setupInstructionParameters(
+        globalObjectsContainer,
+        objectsContainer,
+        instruction,
+        instructionMetadata,
+        objectParameterIndex !== -1
+          ? instruction.getParameter(objectParameterIndex).getPlainString()
+          : null
+      );
+    }
+
+    onApply();
+  }, [
+    instruction,
+    instructionMetadata,
+    onApply,
+    objectsContainer,
+    globalObjectsContainer,
+  ]);
 
   if (
     !ParameterComponent ||

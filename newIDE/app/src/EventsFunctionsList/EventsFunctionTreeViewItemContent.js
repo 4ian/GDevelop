@@ -55,7 +55,7 @@ export type EventsFunctionCallbacks = {|
   onAddEventsFunction: (
     eventsBasedBehavior: ?gdEventsBasedBehavior,
     eventsBasedObject: ?gdEventsBasedObject,
-    (parameters: ?EventsFunctionCreationParameters) => void
+    ((parameters: ?EventsFunctionCreationParameters) => void)
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
 |};
@@ -210,7 +210,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       this.props.eventsBasedObject,
       this.eventsFunction,
       newName,
-      doRename => {
+      (doRename) => {
         if (!doRename) return;
         this._onEventsFunctionModified();
       }
@@ -229,8 +229,8 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       this.getEventsBasedBehavior()
         ? 'behavior'
         : this.getEventsBasedObject()
-        ? 'object'
-        : 'extension'
+          ? 'object'
+          : 'extension'
     );
   }
 
@@ -361,7 +361,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsFunction(this.eventsFunction, doRemove => {
+    this.props.onDeleteEventsFunction(this.eventsFunction, (doRemove) => {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(
@@ -411,7 +411,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
     const { project, eventsFunctionsContainer } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
 
@@ -440,7 +440,7 @@ export class EventsFunctionTreeViewItemContent implements TreeViewItemContent {
 
   _duplicateEventsFunction(): void {
     const { eventsFunctionsContainer } = this.props;
-    const newName = newNameGenerator(this.eventsFunction.getName(), name =>
+    const newName = newNameGenerator(this.eventsFunction.getName(), (name) =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
     const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(

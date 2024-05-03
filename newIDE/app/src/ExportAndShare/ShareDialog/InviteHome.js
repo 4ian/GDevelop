@@ -132,7 +132,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
 
   const [projectUserAcls, setProjectUserAcls] = React.useState(null);
   const [fetchError, setFetchError] = React.useState<
-    'project-not-found' | 'project-not-owned' | 'unexpected' | null
+    'project-not-found' | 'project-not-owned' | 'unexpected' | null,
   >(null);
   const [addError, setAddError] = React.useState<
     | 'user-not-found'
@@ -141,96 +141,78 @@ const InviteHome = ({ cloudProjectId }: Props) => {
     | 'user-owner'
     | 'not-allowed'
     | 'unexpected'
-    | null
+    | null,
   >(null);
   const [userPublicProfileByIds, setUserPublicProfileByIds] = React.useState(
     {}
   );
-  const [
-    showCollaboratorAddDialog,
-    setShowCollaboratorAddDialog,
-  ] = React.useState(false);
+  const [showCollaboratorAddDialog, setShowCollaboratorAddDialog] =
+    React.useState(false);
   const [isEmailValid, setIsEmailValid] = React.useState<boolean>(true);
   const [actionInProgress, setActionInProgress] = React.useState(false);
   const [collaboratorEmail, setCollaboratorEmail] = React.useState('');
-  const [collaboratorLevel, setCollaboratorLevel] = React.useState<Level>(
-    'writer'
-  );
+  const [collaboratorLevel, setCollaboratorLevel] =
+    React.useState<Level>('writer');
   const { showAlert, showConfirmation } = useAlertDialog();
 
-  const fetchProjectUserAcls = React.useCallback(
-    async () => {
-      if (!cloudProjectId) {
+  const fetchProjectUserAcls = React.useCallback(async () => {
+    if (!cloudProjectId) {
+      setFetchError('project-not-found');
+      return;
+    }
+
+    try {
+      setActionInProgress(true);
+      const projectUserAcls = await listProjectUserAcls(authenticatedUser, {
+        projectId: cloudProjectId,
+      });
+      const collaboratorProjectUserAcls = projectUserAcls
+        ? projectUserAcls.filter(
+            (projectUserAcl) => projectUserAcl.feature === 'collaboration'
+          )
+        : [];
+      setProjectUserAcls(collaboratorProjectUserAcls);
+    } catch (error) {
+      console.error('Unable to fetch the project user acls', error);
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
         setFetchError('project-not-found');
         return;
       }
-
-      try {
-        setActionInProgress(true);
-        const projectUserAcls = await listProjectUserAcls(authenticatedUser, {
-          projectId: cloudProjectId,
-        });
-        const collaboratorProjectUserAcls = projectUserAcls
-          ? projectUserAcls.filter(
-              projectUserAcl => projectUserAcl.feature === 'collaboration'
-            )
-          : [];
-        setProjectUserAcls(collaboratorProjectUserAcls);
-      } catch (error) {
-        console.error('Unable to fetch the project user acls', error);
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setFetchError('project-not-found');
-          return;
-        }
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-          setFetchError('project-not-owned');
-          return;
-        }
-        setFetchError('unexpected');
-      } finally {
-        setActionInProgress(false);
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+        setFetchError('project-not-owned');
+        return;
       }
-    },
-    [authenticatedUser, cloudProjectId]
-  );
+      setFetchError('unexpected');
+    } finally {
+      setActionInProgress(false);
+    }
+  }, [authenticatedUser, cloudProjectId]);
 
-  React.useEffect(
-    () => {
-      fetchProjectUserAcls();
-    },
-    [fetchProjectUserAcls]
-  );
+  React.useEffect(() => {
+    fetchProjectUserAcls();
+  }, [fetchProjectUserAcls]);
 
-  const fetchCollaboratorPublicProfileByIds = React.useCallback(
-    async () => {
-      if (!projectUserAcls || !projectUserAcls.length) return;
+  const fetchCollaboratorPublicProfileByIds = React.useCallback(async () => {
+    if (!projectUserAcls || !projectUserAcls.length) return;
 
-      const userIds = projectUserAcls.map(
-        projectUserAcl => projectUserAcl.userId
-      );
-      try {
-        const userPublicProfileByIds = await getUserPublicProfilesByIds(
-          userIds
-        );
-        setUserPublicProfileByIds(userPublicProfileByIds);
-      } catch (error) {
-        console.error('Unable to fetch the collaborator profiles', error);
-        // Do not throw if the user profile cannot be fetched as
-        // they're only used to display the username.
-      }
-    },
-    [projectUserAcls]
-  );
+    const userIds = projectUserAcls.map(
+      (projectUserAcl) => projectUserAcl.userId
+    );
+    try {
+      const userPublicProfileByIds = await getUserPublicProfilesByIds(userIds);
+      setUserPublicProfileByIds(userPublicProfileByIds);
+    } catch (error) {
+      console.error('Unable to fetch the collaborator profiles', error);
+      // Do not throw if the user profile cannot be fetched as
+      // they're only used to display the username.
+    }
+  }, [projectUserAcls]);
 
-  React.useEffect(
-    () => {
-      fetchCollaboratorPublicProfileByIds();
-    },
-    [fetchCollaboratorPublicProfileByIds]
-  );
+  React.useEffect(() => {
+    fetchCollaboratorPublicProfileByIds();
+  }, [fetchCollaboratorPublicProfileByIds]);
 
   const getCollaboratorUsername = (userId: string) => {
     if (!userPublicProfileByIds[userId]) return null;
@@ -267,9 +249,8 @@ const InviteHome = ({ cloudProjectId }: Props) => {
       await fetchProjectUserAcls();
     } catch (error) {
       console.error('Unable to add collaborator', error);
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (extractedStatusAndCode && extractedStatusAndCode.status === 400) {
         if (
           extractedStatusAndCode.code ===
@@ -417,7 +398,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
         ) : !projectUserAcls ? (
           <PlaceholderLoader />
         ) : (
-          projectUserAcls.map(projectUserAcl => (
+          projectUserAcls.map((projectUserAcl) => (
             <UserLine
               username={getCollaboratorUsername(projectUserAcl.userId)}
               email={projectUserAcl.email}
@@ -497,7 +478,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
                   )
                 }
                 fullWidth
-                onBlur={event => {
+                onBlur={(event) => {
                   const trimmedEmail = event.currentTarget.value.trim();
                   setCollaboratorEmail(trimmedEmail);
                   setIsEmailValid(emailRegex.test(trimmedEmail));
@@ -514,7 +495,7 @@ const InviteHome = ({ cloudProjectId }: Props) => {
                 translatableHintText={t`Choose the effect to apply`}
                 disabled={actionInProgress}
               >
-                {['reader', 'writer'].map(level => (
+                {['reader', 'writer'].map((level) => (
                   <SelectOption
                     key={level}
                     value={level}

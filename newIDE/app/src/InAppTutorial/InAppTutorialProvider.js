@@ -19,16 +19,14 @@ const InAppTutorialProvider = (props: Props) => {
   const [startProjectData, setStartProjectData] = React.useState<{
     [key: string]: string,
   }>({});
-  const [
-    inAppTutorialShortHeaders,
-    setInAppTutorialShortHeaders,
-  ] = React.useState<?Array<InAppTutorialShortHeader>>(null);
+  const [inAppTutorialShortHeaders, setInAppTutorialShortHeaders] =
+    React.useState<?Array<InAppTutorialShortHeader>>(null);
 
   const getInAppTutorialShortHeader = React.useCallback(
     (tutorialId: string) => {
       if (!inAppTutorialShortHeaders) return null;
       const inAppTutorialShortHeader = inAppTutorialShortHeaders.find(
-        shortHeader => shortHeader.id === tutorialId
+        (shortHeader) => shortHeader.id === tutorialId
       );
       return inAppTutorialShortHeader;
     },
@@ -65,7 +63,8 @@ const InAppTutorialProvider = (props: Props) => {
   const loadInAppTutorials = React.useCallback(async () => {
     setFetchingError(null);
     try {
-      const fetchedInAppTutorialShortHeaders = await fetchInAppTutorialShortHeaders();
+      const fetchedInAppTutorialShortHeaders =
+        await fetchInAppTutorialShortHeaders();
       setInAppTutorialShortHeaders(fetchedInAppTutorialShortHeaders);
     } catch (error) {
       console.error('An error occurred when fetching in app tutorials:', error);
@@ -74,16 +73,13 @@ const InAppTutorialProvider = (props: Props) => {
   }, []);
 
   // Preload the in-app tutorial short headers when the app loads.
-  React.useEffect(
-    () => {
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching in-app tutorials...');
-        loadInAppTutorials();
-      }, IN_APP_TUTORIALS_FETCH_TIMEOUT);
-      return () => clearTimeout(timeoutId);
-    },
-    [loadInAppTutorials]
-  );
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching in-app tutorials...');
+      loadInAppTutorials();
+    }, IN_APP_TUTORIALS_FETCH_TIMEOUT);
+    return () => clearTimeout(timeoutId);
+  }, [loadInAppTutorials]);
 
   return (
     <InAppTutorialContext.Provider

@@ -60,8 +60,8 @@ class LocalFileSystem {
       .replace(/\\/g, '/');
 
     return Object.keys(this._filesToDownload)
-      .filter(filePath => filePath.indexOf(normalizedPathPrefix) === 0)
-      .map(filePath => ({
+      .filter((filePath) => filePath.indexOf(normalizedPathPrefix) === 0)
+      .map((filePath) => ({
         filePath,
         url: this._filesToDownload[filePath],
       }));
@@ -183,7 +183,7 @@ class LocalFileSystem {
       var files = [];
       if (fs.existsSync(path)) {
         files = fs.readdirSync(path);
-        files.forEach(function(file) {
+        files.forEach(function (file) {
           if (
             ext.length === 0 ||
             file.toUpperCase().indexOf(ext, file.length - ext.length) !== -1
@@ -201,9 +201,8 @@ class LocalFileSystem {
   fileExists = (filePath: string) => {
     // Check if a file WILL exists once downloaded.
     const normalizedFilePath = pathPosix.normalize(filePath);
-    const shouldTheFileBeDownloaded = !!this._filesToDownload[
-      normalizedFilePath
-    ];
+    const shouldTheFileBeDownloaded =
+      !!this._filesToDownload[normalizedFilePath];
     if (shouldTheFileBeDownloaded) {
       return true;
     }

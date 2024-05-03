@@ -56,8 +56,8 @@ const getEditObjectButton = ({
   disabled: 'onValuesDifferent',
   nonFieldType: 'button',
   getIcon: is3DInstance
-    ? props => <Object3d {...props} />
-    : props => <Object2d {...props} />,
+    ? (props) => <Object3d {...props} />
+    : (props) => <Object2d {...props} />,
   getValue: (instance: gdInitialInstance) => instance.getObjectName(),
   onClick: (instance: gdInitialInstance) =>
     onEditObjectByName(instance.getObjectName()),
@@ -71,7 +71,7 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationX(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationX(newValue),
-    renderLeftIcon: className => <RotateX className={className} />,
+    renderLeftIcon: (className) => <RotateX className={className} />,
   },
   {
     name: 'Rotation Y',
@@ -80,7 +80,7 @@ const getRotationXAndRotationYFields = ({ i18n }: {| i18n: I18nType |}) => [
     getValue: (instance: gdInitialInstance) => instance.getRotationY(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setRotationY(newValue),
-    renderLeftIcon: className => <RotateY className={className} />,
+    renderLeftIcon: (className) => <RotateY className={className} />,
   },
 ];
 const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
@@ -90,7 +90,7 @@ const getRotationZField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getAngle(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setAngle(newValue),
-  renderLeftIcon: className => <RotateZ className={className} />,
+  renderLeftIcon: (className) => <RotateZ className={className} />,
 });
 const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
   {
@@ -100,7 +100,7 @@ const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
     getValue: (instance: gdInitialInstance) => instance.getX(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setX(newValue),
-    renderLeftIcon: className => <LetterX className={className} />,
+    renderLeftIcon: (className) => <LetterX className={className} />,
   },
   {
     name: 'Y',
@@ -109,7 +109,7 @@ const getXAndYFields = ({ i18n }: {| i18n: I18nType |}): Schema => [
     getValue: (instance: gdInitialInstance) => instance.getY(),
     setValue: (instance: gdInitialInstance, newValue: number) =>
       instance.setY(newValue),
-    renderLeftIcon: className => <LetterY className={className} />,
+    renderLeftIcon: (className) => <LetterY className={className} />,
   },
 ];
 const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
@@ -119,7 +119,7 @@ const getZField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getZ(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZ(newValue),
-  renderLeftIcon: className => <LetterZ className={className} />,
+  renderLeftIcon: (className) => <LetterZ className={className} />,
 });
 const getLayerField = ({
   i18n,
@@ -135,7 +135,7 @@ const getLayerField = ({
   getValue: (instance: gdInitialInstance) => instance.getLayer(),
   setValue: (instance: gdInitialInstance, newValue: string) =>
     instance.setLayer(newValue),
-  renderLeftIcon: className => <Layers className={className} />,
+  renderLeftIcon: (className) => <Layers className={className} />,
 });
 const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
   name: 'Z Order',
@@ -144,7 +144,7 @@ const getZOrderField = ({ i18n }: {| i18n: I18nType |}) => ({
   getValue: (instance: gdInitialInstance) => instance.getZOrder(),
   setValue: (instance: gdInitialInstance, newValue: number) =>
     instance.setZOrder(newValue),
-  renderLeftIcon: className => <LetterZ className={className} />,
+  renderLeftIcon: (className) => <LetterZ className={className} />,
 });
 
 const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
@@ -155,7 +155,7 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
     {
       name: 'Instance',
       title: i18n._(t`Instance`),
-      renderLeftIcon: className => (
+      renderLeftIcon: (className) => (
         <Instance className={className} style={styles.icon} />
       ),
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
@@ -168,10 +168,10 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
         instance.isSealed()
           ? i18n._(t`Free instance`)
           : instance.isLocked()
-          ? i18n._(t`Prevent selection in the editor`)
-          : i18n._(t`Lock position/angle in the editor`),
+            ? i18n._(t`Prevent selection in the editor`)
+            : i18n._(t`Lock position/angle in the editor`),
       valueType: 'enumIcon',
-      renderIcon: value =>
+      renderIcon: (value) =>
         value === 'sealed' ? (
           <RemoveCircle style={styles.icon} />
         ) : value === 'locked' ? (
@@ -179,13 +179,13 @@ const getTitleRow = ({ i18n }: {| i18n: I18nType |}) => ({
         ) : (
           <LockOpen style={styles.icon} />
         ),
-      isHighlighted: value => value === 'locked' || value === 'sealed',
+      isHighlighted: (value) => value === 'locked' || value === 'sealed',
       getValue: (instance: gdInitialInstance) =>
         instance.isSealed()
           ? 'sealed'
           : instance.isLocked()
-          ? 'locked'
-          : 'free',
+            ? 'locked'
+            : 'free',
       setValue: (
         instance: gdInitialInstance,
         newValue: 'sealed' | 'locked' | 'free'
@@ -214,9 +214,9 @@ const getWidthField = ({
   forceUpdate,
 }: {|
   i18n: I18nType,
-  getInstanceWidth: gdInitialInstance => number,
-  getInstanceHeight: gdInitialInstance => number,
-  getInstanceDepth: gdInitialInstance => number,
+  getInstanceWidth: (gdInitialInstance) => number,
+  getInstanceHeight: (gdInitialInstance) => number,
+  getInstanceDepth: (gdInitialInstance) => number,
   forceUpdate: () => void,
 |}) => ({
   name: 'Width',
@@ -254,10 +254,10 @@ const getWidthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  renderLeftIcon: className => <LetterW className={className} />,
+  renderLeftIcon: (className) => <LetterW className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      return className => <Restore className={className} />;
+      return (className) => <Restore className={className} />;
     }
     return null;
   },
@@ -275,9 +275,9 @@ const getHeightField = ({
   forceUpdate,
 }: {|
   i18n: I18nType,
-  getInstanceWidth: gdInitialInstance => number,
-  getInstanceHeight: gdInitialInstance => number,
-  getInstanceDepth: gdInitialInstance => number,
+  getInstanceWidth: (gdInitialInstance) => number,
+  getInstanceHeight: (gdInitialInstance) => number,
+  getInstanceDepth: (gdInitialInstance) => number,
   forceUpdate: () => void,
 |}) => ({
   name: 'Height',
@@ -315,10 +315,10 @@ const getHeightField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  renderLeftIcon: className => <LetterH className={className} />,
+  renderLeftIcon: (className) => <LetterH className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      return className => <Restore className={className} />;
+      return (className) => <Restore className={className} />;
     }
     return null;
   },
@@ -336,9 +336,9 @@ const getDepthField = ({
   forceUpdate,
 }: {|
   i18n: I18nType,
-  getInstanceWidth: gdInitialInstance => number,
-  getInstanceHeight: gdInitialInstance => number,
-  getInstanceDepth: gdInitialInstance => number,
+  getInstanceWidth: (gdInitialInstance) => number,
+  getInstanceHeight: (gdInitialInstance) => number,
+  getInstanceDepth: (gdInitialInstance) => number,
   forceUpdate: () => void,
 |}) => ({
   name: 'Depth',
@@ -376,10 +376,10 @@ const getDepthField = ({
     instance.setHasCustomDepth(true);
     forceUpdate();
   },
-  renderLeftIcon: className => <LetterD className={className} />,
+  renderLeftIcon: (className) => <LetterD className={className} />,
   getEndAdornmentIcon: (instance: gdInitialInstance) => {
     if (instance.hasCustomDepth() || instance.hasCustomSize()) {
-      return className => <Restore className={className} />;
+      return (className) => <Restore className={className} />;
     }
     return null;
   },
@@ -397,16 +397,16 @@ const getKeepRatioField = ({
   forceUpdate,
 }: {|
   i18n: I18nType,
-  getInstanceWidth: gdInitialInstance => number,
-  getInstanceHeight: gdInitialInstance => number,
-  getInstanceDepth: gdInitialInstance => number,
+  getInstanceWidth: (gdInitialInstance) => number,
+  getInstanceHeight: (gdInitialInstance) => number,
+  getInstanceDepth: (gdInitialInstance) => number,
   forceUpdate: () => void,
 |}) => ({
   name: 'Keep ratio',
   getLabel: () => i18n._(t`Keep ratio`),
   valueType: 'enumIcon',
-  isHighlighted: value => value,
-  renderIcon: value =>
+  isHighlighted: (value) => value,
+  renderIcon: (value) =>
     value ? <Link style={styles.icon} /> : <Unlink style={styles.icon} />,
   getValue: (instance: gdInitialInstance) => instance.shouldKeepRatio(),
   setValue: (instance: gdInitialInstance, newValue: boolean) =>
@@ -426,7 +426,7 @@ export const makeSchema = ({
   i18n: I18nType,
   forceUpdate: () => void,
   onEditObjectByName: (name: string) => void,
-  onGetInstanceSize: gdInitialInstance => [number, number, number],
+  onGetInstanceSize: (gdInitialInstance) => [number, number, number],
   layout: gdLayout,
 |}): Schema => {
   const getInstanceWidth = (instance: gdInitialInstance) =>
@@ -580,7 +580,7 @@ export const reorderInstanceSchemaForCustomProperties = (
 ): Schema => {
   const newSchema = [...schema];
   const animationFieldIndex = newSchema.findIndex(
-    field => field.name && field.name === 'animation'
+    (field) => field.name && field.name === 'animation'
   );
   const contentSectionTitle: SectionTitle = {
     nonFieldType: 'sectionTitle',

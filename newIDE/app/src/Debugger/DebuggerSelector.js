@@ -8,7 +8,7 @@ import { type DebuggerId } from '../ExportAndShare/PreviewLauncher.flow';
 type Props = {|
   selectedId: DebuggerId,
   debuggerIds: Array<DebuggerId>,
-  onChooseDebugger: DebuggerId => void,
+  onChooseDebugger: (DebuggerId) => void,
 |};
 
 export default class DebuggerSelector extends React.Component<Props, void> {
@@ -23,7 +23,7 @@ export default class DebuggerSelector extends React.Component<Props, void> {
         }
         disabled={!hasDebuggers}
       >
-        {this.props.debuggerIds.map(id => (
+        {this.props.debuggerIds.map((id) => (
           <SelectOption value={id} key={id} label={t`Game preview #${id}`} />
         ))}
         {!hasDebuggers && (

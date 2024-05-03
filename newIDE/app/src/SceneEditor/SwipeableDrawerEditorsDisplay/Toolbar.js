@@ -32,15 +32,15 @@ type Props = {|
   isGridShown: boolean,
   toggleGrid: () => void,
   openSetupGrid: () => void,
-  getContextMenuZoomItems: I18nType => Array<MenuItemTemplate>,
-  setZoomFactor: number => void,
+  getContextMenuZoomItems: (I18nType) => Array<MenuItemTemplate>,
+  setZoomFactor: (number) => void,
   onOpenSettings: () => void,
   settingsIcon: React.Node,
   canRenameObject: boolean,
   onRenameObject: () => void,
 |};
 
-const Toolbar = React.memo<Props>(function(props) {
+const Toolbar = React.memo<Props>(function (props) {
   return (
     <>
       <ToolbarCommands

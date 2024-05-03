@@ -89,7 +89,7 @@ const ColorField = ({
         type="text"
         translatableHintText={disabled ? null : t`R;G;B, like 100;200;180`}
         value={colorValue}
-        onChange={event => handleChange(event.target.value, alphaValue)}
+        onChange={(event) => handleChange(event.target.value, alphaValue)}
         onBlur={handleBlur}
         ref={textFieldRef}
         disabled={disabled}

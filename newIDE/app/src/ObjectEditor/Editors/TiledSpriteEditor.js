@@ -10,7 +10,7 @@ const gd = global.gd;
 
 export default class TiledSpriteEditor extends React.Component<
   EditorProps,
-  void
+  void,
 > {
   render() {
     const {
@@ -20,9 +20,8 @@ export default class TiledSpriteEditor extends React.Component<
       objectName,
       renderObjectNameField,
     } = this.props;
-    const tiledSpriteConfiguration = gd.asTiledSpriteConfiguration(
-      objectConfiguration
-    );
+    const tiledSpriteConfiguration =
+      gd.asTiledSpriteConfiguration(objectConfiguration);
 
     return (
       <ColumnStackLayout noMargin>
@@ -33,7 +32,7 @@ export default class TiledSpriteEditor extends React.Component<
           resourceKind="image"
           resourceName={tiledSpriteConfiguration.getTexture()}
           defaultNewResourceName={objectName}
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             tiledSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();
           }}
@@ -46,7 +45,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteConfiguration.getWidth()}
-            onChange={value => {
+            onChange={(value) => {
               tiledSpriteConfiguration.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -57,7 +56,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteConfiguration.getHeight()}
-            onChange={value => {
+            onChange={(value) => {
               tiledSpriteConfiguration.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

@@ -48,11 +48,11 @@ const chartMargins = {
 const chartWidth = '99%';
 const chartHeight = 300;
 
-const minutesFormatter = value => {
+const minutesFormatter = (value) => {
   return value.toFixed(2);
 };
 
-const percentFormatter = value => {
+const percentFormatter = (value) => {
   return value.toFixed(2);
 };
 
@@ -99,9 +99,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     AuthenticatedUserContext
   );
 
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
-    null
-  );
+  const [gameRollingMetrics, setGameMetrics] =
+    React.useState<?(GameMetrics[])>(null);
   const { yearChartData, monthChartData } = React.useMemo(
     () => buildChartData(gameRollingMetrics),
     [gameRollingMetrics]
@@ -109,46 +108,39 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
   const [dataPeriod, setDataPeriod] = React.useState('month');
   const chartData = dataPeriod === 'year' ? yearChartData : monthChartData;
 
-  const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
-    null
-  );
+  const [gameRollingMetricsError, setGameMetricsError] =
+    React.useState<?Error>(null);
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
   // TODO In some timezones, it might ask one less or extra day.
   const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
     representation: 'date',
   });
-  const loadGameMetrics = React.useCallback(
-    async () => {
-      if (!profile) return;
+  const loadGameMetrics = React.useCallback(async () => {
+    if (!profile) return;
 
-      const { id } = profile;
+    const { id } = profile;
 
-      setIsGameMetricsLoading(true);
-      setGameMetricsError(null);
-      try {
-        const gameRollingMetrics = await getGameMetricsFrom(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          lastYearIsoDate
-        );
-        setGameMetrics(gameRollingMetrics);
-      } catch (err) {
-        console.error(`Unable to load game rolling metrics:`, err);
-        setGameMetricsError(err);
-      }
-      setIsGameMetricsLoading(false);
-    },
-    [getAuthorizationHeader, profile, game, lastYearIsoDate]
-  );
+    setIsGameMetricsLoading(true);
+    setGameMetricsError(null);
+    try {
+      const gameRollingMetrics = await getGameMetricsFrom(
+        getAuthorizationHeader,
+        id,
+        game.id,
+        lastYearIsoDate
+      );
+      setGameMetrics(gameRollingMetrics);
+    } catch (err) {
+      console.error(`Unable to load game rolling metrics:`, err);
+      setGameMetricsError(err);
+    }
+    setIsGameMetricsLoading(false);
+  }, [getAuthorizationHeader, profile, game, lastYearIsoDate]);
 
-  React.useEffect(
-    () => {
-      loadGameMetrics();
-    },
-    [loadGameMetrics]
-  );
+  React.useEffect(() => {
+    loadGameMetrics();
+  }, [loadGameMetrics]);
 
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
@@ -251,7 +243,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         style={styles.tickLabel}
                       />
                       <Tooltip
-                        content={props =>
+                        content={(props) =>
                           CustomTooltip({
                             ...props,
                             customStyle: styles.tooltipContent,
@@ -295,7 +287,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         style={styles.tickLabel}
                       />
                       <Tooltip
-                        content={props =>
+                        content={(props) =>
                           CustomTooltip({
                             ...props,
                             customStyle: styles.tooltipContent,
@@ -347,7 +339,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         style={styles.tickLabel}
                       />
                       <Tooltip
-                        content={props =>
+                        content={(props) =>
                           CustomTooltip({
                             ...props,
                             customStyle: styles.tooltipContent,
@@ -406,7 +398,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         strokeDasharray="3 3"
                       />
                       <Tooltip
-                        content={props =>
+                        content={(props) =>
                           CustomTooltip({
                             ...props,
                             customStyle: styles.tooltipContent,
@@ -510,7 +502,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         unit={' %'}
                       />
                       <Tooltip
-                        content={props =>
+                        content={(props) =>
                           CustomTooltip({
                             ...props,
                             customStyle: styles.tooltipContent,

@@ -61,7 +61,7 @@ const InlineCheckbox = ({
       disabled={disabled}
       checked={checked}
       onChange={
-        onCheck ? event => onCheck(event, event.target.checked) : undefined
+        onCheck ? (event) => onCheck(event, event.target.checked) : undefined
       }
       classes={paddingSize === 'small' ? smallPaddingClasses : null}
       icon={uncheckedIcon}

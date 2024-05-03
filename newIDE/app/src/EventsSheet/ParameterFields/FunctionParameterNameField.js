@@ -13,7 +13,7 @@ import SelectOption from '../../UI/SelectOption';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function FunctionParameterNameField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?SelectFieldInterface>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -40,7 +40,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           )
         : [];
 
-    const selectOptions = parameters.map(parameter => {
+    const selectOptions = parameters.map((parameter) => {
       const parameterName = parameter.getName();
       return (
         <SelectOption

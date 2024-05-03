@@ -52,10 +52,8 @@ const ScenePropertiesDialog = ({
   const [windowTitle, setWindowTitle] = React.useState<string>(
     layout.getWindowDefaultTitle()
   );
-  const [
-    shouldStopSoundsOnStartup,
-    setShouldStopSoundsOnStartup,
-  ] = React.useState<boolean>(layout.stopSoundsOnStartup());
+  const [shouldStopSoundsOnStartup, setShouldStopSoundsOnStartup] =
+    React.useState<boolean>(layout.stopSoundsOnStartup());
   const [backgroundColor, setBackgroundColor] = React.useState<?RGBColor>({
     r: layout.getBackgroundColorRed(),
     g: layout.getBackgroundColorGreen(),
@@ -63,21 +61,18 @@ const ScenePropertiesDialog = ({
     a: 1,
   });
 
-  React.useEffect(
-    () => {
-      if (open && layout) {
-        setWindowTitle(layout.getWindowDefaultTitle());
-        setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
-        setBackgroundColor({
-          r: layout.getBackgroundColorRed(),
-          g: layout.getBackgroundColorGreen(),
-          b: layout.getBackgroundColorBlue(),
-          a: 1,
-        });
-      }
-    },
-    [open, layout]
-  );
+  React.useEffect(() => {
+    if (open && layout) {
+      setWindowTitle(layout.getWindowDefaultTitle());
+      setShouldStopSoundsOnStartup(layout.stopSoundsOnStartup());
+      setBackgroundColor({
+        r: layout.getBackgroundColorRed(),
+        g: layout.getBackgroundColorGreen(),
+        b: layout.getBackgroundColorBlue(),
+        a: 1,
+      });
+    }
+  }, [open, layout]);
 
   const onSubmit = () => {
     layout.setWindowDefaultTitle(windowTitle);
@@ -112,7 +107,7 @@ const ScenePropertiesDialog = ({
     .toJSArray();
 
   const propertiesEditors = allBehaviorSharedDataNames
-    .map(behaviorName => {
+    .map((behaviorName) => {
       const behaviorSharedData = layout.getBehaviorSharedData(behaviorName);
 
       if (isNullPtr(gd, behaviorSharedData)) return null;
@@ -120,7 +115,7 @@ const ScenePropertiesDialog = ({
       const properties = behaviorSharedData.getProperties();
       const propertiesSchema = propertiesMapToSchema(
         properties,
-        sharedDataContent => behaviorSharedData.getProperties(),
+        (sharedDataContent) => behaviorSharedData.getProperties(),
         (sharedDataContent, name, value) => {
           behaviorSharedData.updateProperty(name, value);
         }
@@ -180,7 +175,7 @@ const ScenePropertiesDialog = ({
                 {enabledTutorialIds.length ? (
                   <Line>
                     <ColumnStackLayout expand>
-                      {tutorialIds.map(tutorialId => (
+                      {tutorialIds.map((tutorialId) => (
                         <DismissableTutorialMessage
                           key={tutorialId}
                           tutorialId={tutorialId}
@@ -245,7 +240,7 @@ const ScenePropertiesDialog = ({
           fullWidth
           disableAlpha
           color={rgbColorToRGBString(backgroundColor)}
-          onChange={color =>
+          onChange={(color) =>
             setBackgroundColor(rgbStringAndAlphaToRGBColor(color))
           }
         />

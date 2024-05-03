@@ -37,7 +37,7 @@ type State = {|
 
 export default class EventBasedObjectChildrenEditor extends React.Component<
   Props,
-  State
+  State,
 > {
   _objectsList: ?ObjectsListInterface;
 
@@ -47,44 +47,43 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
     selectedObjectFolderOrObjectsWithContext: [],
   };
 
-  _onDeleteObjects = (i18n: I18nType) => (
-    objectsWithContext: ObjectWithContext[],
-    done: boolean => void
-  ) => {
-    const message =
-      objectsWithContext.length === 1
-        ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-        : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
+  _onDeleteObjects =
+    (i18n: I18nType) =>
+    (objectsWithContext: ObjectWithContext[], done: (boolean) => void) => {
+      const message =
+        objectsWithContext.length === 1
+          ? t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+          : t`Do you want to remove all references to these objects in groups and events (actions and conditions using the objects)?`;
 
-    const answer = Window.showYesNoCancelDialog(i18n._(message));
+      const answer = Window.showYesNoCancelDialog(i18n._(message));
 
-    if (answer === 'cancel') return;
-    const shouldRemoveReferences = answer === 'yes';
+      if (answer === 'cancel') return;
+      const shouldRemoveReferences = answer === 'yes';
 
-    const { project, globalObjectsContainer, eventsBasedObject } = this.props;
+      const { project, globalObjectsContainer, eventsBasedObject } = this.props;
 
-    objectsWithContext.forEach(objectWithContext => {
-      const { object } = objectWithContext;
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
-        project,
-        eventsBasedObject,
-        globalObjectsContainer,
-        // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
-        eventsBasedObject,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
-      );
-    });
-    done(true);
-  };
+      objectsWithContext.forEach((objectWithContext) => {
+        const { object } = objectWithContext;
+        gd.WholeProjectRefactorer.objectOrGroupRemovedInEventsBasedObject(
+          project,
+          eventsBasedObject,
+          globalObjectsContainer,
+          // $FlowFixMe gdObjectsContainer should be a member of gdEventsBasedObject instead of a base class.
+          eventsBasedObject,
+          object.getName(),
+          /* isObjectGroup=*/ false,
+          shouldRemoveReferences
+        );
+      });
+      done(true);
+    };
 
   _getValidatedObjectOrGroupName = (newName: string) => {
     const { eventsBasedObject } = this.props;
 
     const safeAndUniqueNewName = newNameGenerator(
       gd.Project.getSafeName(newName),
-      tentativeNewName => {
+      (tentativeNewName) => {
         if (
           eventsBasedObject.hasObjectNamed(tentativeNewName) ||
           eventsBasedObject.getObjectGroups().has(tentativeNewName) ||
@@ -133,13 +132,12 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
   _onRenameObjectFolderOrObjectFinish = (
     objectFolderOrObjectWithContext: ObjectFolderOrObjectWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { objectFolderOrObject, global } = objectFolderOrObjectWithContext;
 
-    const unifiedName = getObjectFolderOrObjectUnifiedName(
-      objectFolderOrObject
-    );
+    const unifiedName =
+      getObjectFolderOrObjectUnifiedName(objectFolderOrObject);
     // Avoid triggering renaming refactoring if name has not really changed
     if (unifiedName === newName) {
       this._onObjectFolderOrObjectWithContextSelected(
@@ -272,7 +270,7 @@ export default class EventBasedObjectChildrenEditor extends React.Component<
                 // Instances can't be created from this context.
                 onAddObjectInstance={() => {}}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
-                ref={objectsList => (this._objectsList = objectsList)}
+                ref={(objectsList) => (this._objectsList = objectsList)}
                 // TODO EBO Hide the preview button or implement it.
                 // Note that it will be hard to do hot reload as extensions need
                 // to be generated.

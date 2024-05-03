@@ -26,7 +26,7 @@ type ExampleStoreState = {|
   exampleShortHeaders: ?Array<ExampleShortHeader>,
   error: ?Error,
   searchText: string,
-  setSearchText: string => void,
+  setSearchText: (string) => void,
   filtersState: FiltersState,
 |};
 
@@ -54,83 +54,73 @@ type ExampleStoreStateProviderProps = {|
 export const ExampleStoreStateProvider = ({
   children,
 }: ExampleStoreStateProviderProps) => {
-  const [
-    exampleShortHeadersById,
-    setExampleShortHeadersById,
-  ] = React.useState<?{
-    [string]: ExampleShortHeader,
-  }>(null);
+  const [exampleShortHeadersById, setExampleShortHeadersById] =
+    React.useState<?{
+      [string]: ExampleShortHeader,
+    }>(null);
   const [exampleFilters, setExampleFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    exampleShortHeaders,
-    setExampleShortHeaders,
-  ] = React.useState<?Array<ExampleShortHeader>>(null);
+  const [exampleShortHeaders, setExampleShortHeaders] =
+    React.useState<?Array<ExampleShortHeader>>(null);
 
   const isLoading = React.useRef<boolean>(false);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
-  const fetchExamplesAndFilters = React.useCallback(
-    () => {
-      // Don't attempt to load again resources and filters if they
-      // were loaded already.
-      if (exampleShortHeadersById || isLoading.current) return;
+  const fetchExamplesAndFilters = React.useCallback(() => {
+    // Don't attempt to load again resources and filters if they
+    // were loaded already.
+    if (exampleShortHeadersById || isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const fetchedAllExamples = await listAllExamples();
-          const {
-            exampleShortHeaders: fetchedExampleShortHeaders,
-            filters: fetchedFilters,
-          } = fetchedAllExamples;
+      try {
+        const fetchedAllExamples = await listAllExamples();
+        const {
+          exampleShortHeaders: fetchedExampleShortHeaders,
+          filters: fetchedFilters,
+        } = fetchedAllExamples;
 
-          console.info(
-            `Loaded ${
-              fetchedExampleShortHeaders ? fetchedExampleShortHeaders.length : 0
-            } examples from the example store.`
-          );
+        console.info(
+          `Loaded ${
+            fetchedExampleShortHeaders ? fetchedExampleShortHeaders.length : 0
+          } examples from the example store.`
+        );
 
-          setExampleShortHeaders(fetchedExampleShortHeaders);
-          setExampleFilters(fetchedFilters);
+        setExampleShortHeaders(fetchedExampleShortHeaders);
+        setExampleFilters(fetchedFilters);
 
-          const exampleShortHeadersById = {};
-          fetchedExampleShortHeaders.forEach(exampleShortHeader => {
-            exampleShortHeadersById[exampleShortHeader.id] = exampleShortHeader;
-          });
-          setExampleShortHeadersById(exampleShortHeadersById);
-        } catch (error) {
-          console.error(
-            `Unable to load the examples from the example store:`,
-            error
-          );
-          setError(error);
-        }
+        const exampleShortHeadersById = {};
+        fetchedExampleShortHeaders.forEach((exampleShortHeader) => {
+          exampleShortHeadersById[exampleShortHeader.id] = exampleShortHeader;
+        });
+        setExampleShortHeadersById(exampleShortHeadersById);
+      } catch (error) {
+        console.error(
+          `Unable to load the examples from the example store:`,
+          error
+        );
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [exampleShortHeadersById, isLoading]
-  );
+      isLoading.current = false;
+    })();
+  }, [exampleShortHeadersById, isLoading]);
 
-  React.useEffect(
-    () => {
-      // Don't attempt to load again examples and filters if they
-      // were loaded already.
-      if (exampleShortHeadersById || isLoading.current) return;
+  React.useEffect(() => {
+    // Don't attempt to load again examples and filters if they
+    // were loaded already.
+    if (exampleShortHeadersById || isLoading.current) return;
 
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching examples from the example store...');
-        fetchExamplesAndFilters();
-      }, EXAMPLES_FETCH_TIMEOUT);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchExamplesAndFilters, exampleShortHeadersById, isLoading]
-  );
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching examples from the example store...');
+      fetchExamplesAndFilters();
+    }, EXAMPLES_FETCH_TIMEOUT);
+    return () => clearTimeout(timeoutId);
+  }, [fetchExamplesAndFilters, exampleShortHeadersById, isLoading]);
 
   const { chosenCategory, chosenFilters } = filtersState;
   const exampleShortHeadersSearchResults: ?Array<{|

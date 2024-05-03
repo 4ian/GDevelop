@@ -421,7 +421,7 @@ const createEventBasedObject = (
     if (propertyData.value) {
       property.setValue(propertyData.value);
     }
-    propertyData.extraInfos.forEach(extraInfo =>
+    propertyData.extraInfos.forEach((extraInfo) =>
       property.addExtraInfo(extraInfo)
     );
   });
@@ -454,7 +454,7 @@ const createCustomObjectConfiguration = (
   // Add default values from the event-based object.
   const instanceProperties = customObjectConfiguration.getProperties();
   const properties = eventBasedObject.getPropertyDescriptors();
-  mapFor(0, properties.size(), index => {
+  mapFor(0, properties.size(), (index) => {
     const property = properties.getAt(index);
     instanceProperties
       .getOrCreate(property.getName())
@@ -523,7 +523,7 @@ class MockedParent implements LayoutedParent<MockedChildRenderedInstance> {
     this.childrenRenderedInstances = [];
     this.childrenRenderedInstanceByNames = new Map<
       string,
-      MockedChildRenderedInstance
+      MockedChildRenderedInstance,
     >();
   }
 

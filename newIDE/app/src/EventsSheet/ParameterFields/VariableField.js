@@ -94,7 +94,7 @@ export const quicklyAnalyzeVariableName = (
 
   if (
     variablesContainers &&
-    !variablesContainers.some(variablesContainer =>
+    !variablesContainers.some((variablesContainer) =>
       variablesContainer.has(nameToCheck)
     )
   ) {
@@ -118,42 +118,37 @@ export default React.forwardRef<Props, VariableFieldInterface>(
     } = props;
 
     const field = React.useRef<?SemiControlledAutoCompleteInterface>(null);
-    const [
-      autocompletionVariableNames,
-      setAutocompletionVariableNames,
-    ] = React.useState<DataSource>([]);
+    const [autocompletionVariableNames, setAutocompletionVariableNames] =
+      React.useState<DataSource>([]);
     /**
      * Can be called to set up or force updating the variables list.
      */
-    const updateAutocompletions = React.useCallback(
-      () => {
-        const definedVariableNames =
-          variablesContainers.length === 0
-            ? []
-            : variablesContainers
-                .map(variablesContainer =>
-                  enumerateVariables(variablesContainer)
-                    .map(({ name, isValidName }) =>
-                      isValidName
-                        ? name
-                        : // Hide invalid variable names - they would not
-                          // be parsed correctly anyway.
-                          null
-                    )
-                    .filter(Boolean)
-                )
-                .reduce((a, b) => intersection(a, b));
-        setAutocompletionVariableNames(
-          definedVariableNames.map(name => ({
-            text: name,
-            value: name,
-          }))
-        );
-      },
-      [variablesContainers]
-    );
+    const updateAutocompletions = React.useCallback(() => {
+      const definedVariableNames =
+        variablesContainers.length === 0
+          ? []
+          : variablesContainers
+              .map((variablesContainer) =>
+                enumerateVariables(variablesContainer)
+                  .map(({ name, isValidName }) =>
+                    isValidName
+                      ? name
+                      : // Hide invalid variable names - they would not
+                        // be parsed correctly anyway.
+                        null
+                  )
+                  .filter(Boolean)
+              )
+              .reduce((a, b) => intersection(a, b));
+      setAutocompletionVariableNames(
+        definedVariableNames.map((name) => ({
+          text: name,
+          value: name,
+        }))
+      );
+    }, [variablesContainers]);
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -161,12 +156,9 @@ export default React.forwardRef<Props, VariableFieldInterface>(
       updateAutocompletions,
     }));
 
-    React.useEffect(
-      () => {
-        updateAutocompletions();
-      },
-      [updateAutocompletions]
-    );
+    React.useEffect(() => {
+      updateAutocompletions();
+    }, [updateAutocompletions]);
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -215,8 +207,8 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                   warningTranslatableText
                     ? i18n._(warningTranslatableText)
                     : parameterMetadata
-                    ? parameterMetadata.getLongDescription()
-                    : undefined
+                      ? parameterMetadata.getLongDescription()
+                      : undefined
                 }
                 errorText={errorText}
                 fullWidth
@@ -240,7 +232,7 @@ export default React.forwardRef<Props, VariableFieldInterface>(
                 id={id}
               />
             )}
-            renderButton={style =>
+            renderButton={(style) =>
               onOpenDialog && !isInline ? (
                 <RaisedButton
                   icon={<ShareExternal />}
@@ -266,7 +258,7 @@ export const renderVariableWithIcon = (
     InvalidParameterValue,
     MissingParameterValue,
   }: ParameterInlineRendererProps,
-  VariableIcon: SvgIconProps => React.Element<typeof SvgIcon>,
+  VariableIcon: (SvgIconProps) => React.Element<typeof SvgIcon>,
   tooltip: string
 ) => {
   if (!value && !parameterMetadata.isOptional()) {

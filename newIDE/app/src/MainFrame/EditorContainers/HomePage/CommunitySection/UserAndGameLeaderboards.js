@@ -19,18 +19,12 @@ const styles = {
 };
 
 export const UserAndGameLeaderboards = () => {
-  const {
-    fetchCommunityLeaderboards,
-    gameLeaderboards,
-    userLeaderboards,
-  } = React.useContext(CommunityLeaderboardsContext);
+  const { fetchCommunityLeaderboards, gameLeaderboards, userLeaderboards } =
+    React.useContext(CommunityLeaderboardsContext);
 
-  React.useEffect(
-    () => {
-      fetchCommunityLeaderboards();
-    },
-    [fetchCommunityLeaderboards]
-  );
+  React.useEffect(() => {
+    fetchCommunityLeaderboards();
+  }, [fetchCommunityLeaderboards]);
 
   const { windowSize } = useResponsiveWindowSize();
 
@@ -52,7 +46,7 @@ export const UserAndGameLeaderboards = () => {
           <GameFeedbackLeaderboard
             gameLeaderboard={
               (gameLeaderboards &&
-                gameLeaderboards.find(leaderboard =>
+                gameLeaderboards.find((leaderboard) =>
                   leaderboard.name.startsWith('daily')
                 )) ||
               null
@@ -74,7 +68,7 @@ export const UserAndGameLeaderboards = () => {
           <UserFeedbackLeaderboard
             userLeaderboard={
               (userLeaderboards &&
-                userLeaderboards.find(leaderboard =>
+                userLeaderboards.find((leaderboard) =>
                   leaderboard.name.startsWith('weekly')
                 )) ||
               null
@@ -84,7 +78,7 @@ export const UserAndGameLeaderboards = () => {
           <GameFeedbackLeaderboard
             gameLeaderboard={
               (gameLeaderboards &&
-                gameLeaderboards.find(leaderboard =>
+                gameLeaderboards.find((leaderboard) =>
                   leaderboard.name.startsWith('weekly')
                 )) ||
               null
@@ -106,7 +100,7 @@ export const UserAndGameLeaderboards = () => {
           <UserFeedbackLeaderboard
             userLeaderboard={
               (userLeaderboards &&
-                userLeaderboards.find(leaderboard =>
+                userLeaderboards.find((leaderboard) =>
                   leaderboard.name.startsWith('monthly')
                 )) ||
               null

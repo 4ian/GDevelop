@@ -41,8 +41,8 @@ const sortCommandsIntoAreasAndGetReverseMap = (
   const areaWiseCommands = {};
   const shortcutStringToCommands: { [string]: Array<CommandName> } = {};
   Object.keys(commandsList)
-    .filter(name => !commandsList[name].noShortcut)
-    .forEach(name => {
+    .filter((name) => !commandsList[name].noShortcut)
+    .forEach((name) => {
       // Sort commands by area
       const areaName = commandsList[name].area;
       if (!areaWiseCommands[areaName]) areaWiseCommands[areaName] = [];
@@ -72,10 +72,8 @@ type Props = {|
 |};
 
 const ShortcutsList = (props: Props) => {
-  const [
-    editedShortcut,
-    setEditedShortcut,
-  ] = React.useState<null | CommandName>(null);
+  const [editedShortcut, setEditedShortcut] =
+    React.useState<null | CommandName>(null);
 
   const resetAllShortcutsToDefault = () => {
     const answer = Window.showConfirmDialog(
@@ -91,10 +89,8 @@ const ShortcutsList = (props: Props) => {
     props.onEdit(commandName, defaultShortcuts[commandName]);
   };
 
-  const [
-    areaWiseCommands,
-    shortcutStringToCommands,
-  ] = sortCommandsIntoAreasAndGetReverseMap(props.userShortcutMap);
+  const [areaWiseCommands, shortcutStringToCommands] =
+    sortCommandsIntoAreasAndGetReverseMap(props.userShortcutMap);
 
   const commandPaletteShortcut = getShortcutDisplayName(
     props.userShortcutMap['OPEN_COMMAND_PALETTE'] ||
@@ -117,12 +113,12 @@ const ShortcutsList = (props: Props) => {
         fullWidth
       />
       <List>
-        {Object.keys(areaWiseCommands).map(areaName => (
+        {Object.keys(areaWiseCommands).map((areaName) => (
           <React.Fragment key={areaName}>
             <Text size="block-title">
               {props.i18n._(commandAreas[areaName])}
             </Text>
-            {areaWiseCommands[areaName].map(commandName => {
+            {areaWiseCommands[areaName].map((commandName) => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];
               const defaultShortcut = defaultShortcuts[commandName] || '';
@@ -130,9 +126,8 @@ const ShortcutsList = (props: Props) => {
                 defaultShortcut,
                 userShortcut
               );
-              const shortcutDisplayName = getShortcutDisplayName(
-                shortcutString
-              );
+              const shortcutDisplayName =
+                getShortcutDisplayName(shortcutString);
               // Check if shortcut clashes with another command
               const clashingCommands = shortcutStringToCommands[shortcutString];
               const hasClash = clashingCommands && clashingCommands.length > 1;
@@ -157,7 +152,7 @@ const ShortcutsList = (props: Props) => {
         <DetectShortcutDialog
           commandText={props.i18n._(commandsList[editedShortcut].displayText)}
           onClose={() => setEditedShortcut(null)}
-          onSet={shortcut => {
+          onSet={(shortcut) => {
             props.onEdit(editedShortcut, shortcut);
           }}
         />

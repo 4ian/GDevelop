@@ -41,7 +41,7 @@ const isAchievementAlreadyClaimed = (
   badges: Badge[],
   achievementId: string
 ): boolean => {
-  return badges.map(badge => badge.achievementId).includes(achievementId);
+  return badges.map((badge) => badge.achievementId).includes(achievementId);
 };
 
 export const createOrEnsureBadgeForUser = async (
@@ -97,7 +97,7 @@ export const createOrEnsureBadgeForUser = async (
  * any extra code if that's the case.
  */
 export const addCreateBadgePreHookIfNotClaimed = <
-  T: (...args: Array<any>) => any
+  T: (...args: Array<any>) => any,
 >(
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
@@ -134,15 +134,11 @@ export const getAchievements = async (): Promise<Array<Achievement>> => {
 export const markBadgesAsSeen = async (
   authenticatedUser: AuthenticatedUser
 ): Promise<?void> => {
-  const {
-    badges,
-    firebaseUser,
-    getAuthorizationHeader,
-    onBadgesChanged,
-  } = authenticatedUser;
+  const { badges, firebaseUser, getAuthorizationHeader, onBadgesChanged } =
+    authenticatedUser;
   if (!badges || !firebaseUser) return null;
 
-  const unseenBadges = badges.filter(badge => !badge.seen);
+  const unseenBadges = badges.filter((badge) => !badge.seen);
   if (unseenBadges.length === 0) return;
 
   const userId = firebaseUser.uid;
@@ -150,7 +146,7 @@ export const markBadgesAsSeen = async (
     const authorizationHeader = await getAuthorizationHeader();
     const response = await axios.patch(
       `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
-      unseenBadges.map(badge => ({
+      unseenBadges.map((badge) => ({
         achievementId: badge.achievementId,
         seen: true,
       })),

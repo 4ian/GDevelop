@@ -37,7 +37,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     getInspectorDescriptions: InspectorDescriptionsGetter,
     path: Array<string>
   ): Array<React$Element<any> | null> {
-    return getInspectorDescriptions(gameData).map(inspectorDescription => {
+    return getInspectorDescriptions(gameData).map((inspectorDescription) => {
       if (!inspectorDescription) return null;
       const fullInspectorPath = path.concat(inspectorDescription.key);
 

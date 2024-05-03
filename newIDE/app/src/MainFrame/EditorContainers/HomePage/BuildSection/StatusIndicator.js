@@ -13,8 +13,8 @@ const StatusIndicator = ({ status }: Props) => {
     status === 'success'
       ? GDevelopTheme.statusIndicator.success
       : status === 'error'
-      ? GDevelopTheme.statusIndicator.error
-      : GDevelopTheme.statusIndicator.warning;
+        ? GDevelopTheme.statusIndicator.error
+        : GDevelopTheme.statusIndicator.warning;
   return (
     <div
       style={{

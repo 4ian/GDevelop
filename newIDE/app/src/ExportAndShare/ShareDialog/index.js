@@ -116,45 +116,34 @@ const ShareDialog = ({
   storageProvider,
 }: Props) => {
   const { isMobile } = useResponsiveWindowSize();
-  const {
-    setShareDialogDefaultTab,
-    getShareDialogDefaultTab,
-  } = React.useContext(PreferencesContext);
+  const { setShareDialogDefaultTab, getShareDialogDefaultTab } =
+    React.useContext(PreferencesContext);
   const [currentTab, setCurrentTab] = React.useState<ShareTab>(
     initialTab || getShareDialogDefaultTab()
   );
   const showOnlineWebExporterOnly = !automatedExporters && !manualExporters;
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<?ExporterSection>(
-    showOnlineWebExporterOnly ? 'browser' : null
-  );
-  const [
-    chosenExporterSubSection,
-    setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>(
-    showOnlineWebExporterOnly ? 'online' : null
-  );
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<?ExporterSection>(
+      showOnlineWebExporterOnly ? 'browser' : null
+    );
+  const [chosenExporterSubSection, setChosenExporterSubSection] =
+    React.useState<?ExporterSubSection>(
+      showOnlineWebExporterOnly ? 'online' : null
+    );
 
-  React.useEffect(() => setShareDialogDefaultTab(currentTab), [
-    setShareDialogDefaultTab,
-    currentTab,
-  ]);
+  React.useEffect(
+    () => setShareDialogDefaultTab(currentTab),
+    [setShareDialogDefaultTab, currentTab]
+  );
   const isOnline = useOnlineStatus();
 
-  const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
-    false
-  );
-  const [
-    isNavigationDisabled,
-    setIsNavigationDisabled,
-  ] = React.useState<boolean>(false);
+  const [buildsDialogOpen, setBuildsDialogOpen] =
+    React.useState<boolean>(false);
+  const [isNavigationDisabled, setIsNavigationDisabled] =
+    React.useState<boolean>(false);
   const [game, setGame] = React.useState<?Game>(null);
-  const [
-    gameAvailabilityError,
-    setGameAvailabilityError,
-  ] = React.useState<?GameAvailabilityError>(null);
+  const [gameAvailabilityError, setGameAvailabilityError] =
+    React.useState<?GameAvailabilityError>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { profile, getAuthorizationHeader } = authenticatedUser;
   const { showAlert } = useAlertDialog();
@@ -166,8 +155,8 @@ const ShareDialog = ({
         gameAvailabilityError === 'not-found'
           ? t`Register or publish your game first to see its exports.`
           : gameAvailabilityError === 'not-owned'
-          ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
-          : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
+            ? t`You are not the owner of this game, ask the owner to add you as an owner to see its exports.`
+            : t`Either this game is not registered or you are not its owner, so you cannot see its builds.`;
 
       showAlert({
         title,
@@ -178,47 +167,40 @@ const ShareDialog = ({
     setBuildsDialogOpen(true);
   };
 
-  const loadGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
+  const loadGame = React.useCallback(async () => {
+    if (!profile || !project) return;
 
-      const { id } = profile;
-      try {
-        setGameAvailabilityError(null);
-        const game = await getGame(
-          getAuthorizationHeader,
-          id,
-          project.getProjectUuid()
-        );
-        setGame(game);
-      } catch (error) {
-        console.error('Unable to load the game', error);
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
-          setGameAvailabilityError('not-found');
-          return;
-        }
-        if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
-          setGameAvailabilityError('not-owned');
-          return;
-        }
-        setGameAvailabilityError('unexpected');
+    const { id } = profile;
+    try {
+      setGameAvailabilityError(null);
+      const game = await getGame(
+        getAuthorizationHeader,
+        id,
+        project.getProjectUuid()
+      );
+      setGame(game);
+    } catch (error) {
+      console.error('Unable to load the game', error);
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
+        setGameAvailabilityError('not-found');
+        return;
       }
-    },
-    [project, getAuthorizationHeader, profile]
-  );
+      if (extractedStatusAndCode && extractedStatusAndCode.status === 403) {
+        setGameAvailabilityError('not-owned');
+        return;
+      }
+      setGameAvailabilityError('unexpected');
+    }
+  }, [project, getAuthorizationHeader, profile]);
 
-  React.useEffect(
-    () => {
-      // Load game only once.
-      if (!game) {
-        loadGame();
-      }
-    },
-    [loadGame, game]
-  );
+  React.useEffect(() => {
+    // Load game only once.
+    if (!game) {
+      loadGame();
+    }
+  }, [loadGame, game]);
 
   const exporters = React.useMemo(
     () => [
@@ -229,21 +211,18 @@ const ShareDialog = ({
     [automatedExporters, manualExporters, onlineWebExporter]
   );
 
-  const exporter: ?Exporter = React.useMemo(
-    () => {
-      if (!chosenExporterSection) return null;
-      if (!chosenExporterSubSection) return null;
+  const exporter: ?Exporter = React.useMemo(() => {
+    if (!chosenExporterSection) return null;
+    if (!chosenExporterSubSection) return null;
 
-      const exporterKey =
-        exporterSectionMapping[chosenExporterSection][chosenExporterSubSection];
-      const chosenExporter = exporters.find(
-        exporter => exporter.key === exporterKey
-      );
+    const exporterKey =
+      exporterSectionMapping[chosenExporterSection][chosenExporterSubSection];
+    const chosenExporter = exporters.find(
+      (exporter) => exporter.key === exporterKey
+    );
 
-      return chosenExporter || null;
-    },
-    [chosenExporterSection, chosenExporterSubSection, exporters]
-  );
+    return chosenExporter || null;
+  }, [chosenExporterSection, chosenExporterSubSection, exporters]);
 
   if (!project) return null;
 

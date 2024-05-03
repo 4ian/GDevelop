@@ -68,7 +68,7 @@ type State = {|
 
 export default class JsCodeEvent extends React.Component<
   EventRendererProps,
-  State
+  State,
 > {
   _objectField: ?ParameterFieldInterface = null;
   state = {
@@ -184,7 +184,7 @@ export default class JsCodeEvent extends React.Component<
           [selectableArea]: true,
         })}
         onClick={this.editObject}
-        onKeyPress={event => {
+        onKeyPress={(event) => {
           if (shouldActivate(event)) {
             this.editObject(event);
           }
@@ -293,14 +293,14 @@ export default class JsCodeEvent extends React.Component<
                 globalObjectsContainer={this.props.globalObjectsContainer}
                 objectsContainer={this.props.objectsContainer}
                 value={parameterObjects}
-                onChange={text => {
+                onChange={(text) => {
                   jsCodeEvent.setParameterObjects(text);
                   this.props.onUpdate();
                 }}
                 isInline
                 onRequestClose={this.cancelObjectEditing}
                 onApply={this.endObjectEditing}
-                ref={objectField => (this._objectField = objectField)}
+                ref={(objectField) => (this._objectField = objectField)}
               />
             </InlinePopover>
           </div>

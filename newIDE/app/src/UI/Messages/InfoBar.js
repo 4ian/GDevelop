@@ -27,17 +27,14 @@ const InfoBar = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
-  React.useEffect(
-    () => {
-      if (visible) {
-        const timeout = setTimeout(() => {
-          hide();
-        }, duration);
-        return () => clearTimeout(timeout);
-      }
-    },
-    [visible, hide, duration]
-  );
+  React.useEffect(() => {
+    if (visible) {
+      const timeout = setTimeout(() => {
+        hide();
+      }, duration);
+      return () => clearTimeout(timeout);
+    }
+  }, [visible, hide, duration]);
 
   return (
     <Snackbar

@@ -69,31 +69,33 @@ export const setupFunctionFromEvents = ({
       (objectOrGroupName: string) =>
         objectNames.indexOf(objectOrGroupName) === -1
     )
-    .map(groupName =>
+    .map((groupName) =>
       getObjectGroupByName(globalObjectsContainer, objectsContainer, groupName)
     )
     .filter(Boolean);
 
   // Compute what the parameters should be:
   // 1) The groups, but only the ones that have no object directly referenced.
-  const parameterGroups: Array<gdObjectGroup> = groups.filter(group => {
-    return !objectOrGroupNames.some(referencedObjectOrGroupName =>
+  const parameterGroups: Array<gdObjectGroup> = groups.filter((group) => {
+    return !objectOrGroupNames.some((referencedObjectOrGroupName) =>
       group.find(referencedObjectOrGroupName)
     );
   });
-  const parameterGroupNames: Array<string> = parameterGroups.map(group =>
+  const parameterGroupNames: Array<string> = parameterGroups.map((group) =>
     group.getName()
   );
 
   // 2) The objects, but only the ones that are already in the groups in parameters
-  const parameterObjectNames: Array<string> = objectNames.filter(objectName => {
-    return !parameterGroups.some(group => group.find(objectName));
-  });
+  const parameterObjectNames: Array<string> = objectNames.filter(
+    (objectName) => {
+      return !parameterGroups.some((group) => group.find(objectName));
+    }
+  );
 
   // Create parameters for these objects (or these groups without any object directly referenced)
   const parameters = eventsFunction.getParameters();
   parameters.clear();
-  [...parameterGroupNames, ...parameterObjectNames].forEach(objectName => {
+  [...parameterGroupNames, ...parameterObjectNames].forEach((objectName) => {
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
     newParameter.setName(objectName);
@@ -109,7 +111,7 @@ export const setupFunctionFromEvents = ({
       .toNewVectorString()
       .toJSArray();
 
-    behaviorNames.forEach(behaviorName => {
+    behaviorNames.forEach((behaviorName) => {
       const newParameter = new gd.ParameterMetadata();
       newParameter.setType('behavior');
       newParameter.setName(behaviorName);
@@ -125,8 +127,8 @@ export const setupFunctionFromEvents = ({
   // Import groups that are used in events, but are not in parameters,
   // inside the events function groups.
   groups
-    .filter(group => !parameterGroupNames.includes(group.getName()))
-    .forEach(group => {
+    .filter((group) => !parameterGroupNames.includes(group.getName()))
+    .forEach((group) => {
       if (group) {
         eventsFunction.getObjectGroups().insert(group, 0);
       }
@@ -196,9 +198,8 @@ export const validateEventsFunctionNameUniqueness = (
   eventsFunction: gdEventsFunction
 ) => {
   if (project.hasEventsFunctionsExtensionNamed(extensionName)) {
-    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
-      extensionName
-    );
+    const eventsFunctionsExtension =
+      project.getEventsFunctionsExtension(extensionName);
 
     return !eventsFunctionsExtension.hasEventsFunctionNamed(
       eventsFunction.getName()

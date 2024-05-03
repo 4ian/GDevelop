@@ -308,9 +308,9 @@ export type Preferences = {|
   setNewFeaturesAcknowledgements: ({
     [featureId: string]: {| dates: [number] |},
   }) => void,
-  getEditorStateForProject: (
-    projectId: string
-  ) => ?{| editorTabs: EditorTabsPersistedState |},
+  getEditorStateForProject: (projectId: string) => ?{|
+    editorTabs: EditorTabsPersistedState,
+  |},
   setEditorStateForProject: (
     projectId: string,
     editorState?: {| editorTabs: EditorTabsPersistedState |}
@@ -426,7 +426,7 @@ export const initialPreferences = {
   setUseShortcutToClosePreviewWindow: () => {},
   setWatchProjectFolderFilesForLocalProjects: () => {},
   setNewFeaturesAcknowledgements: () => {},
-  getEditorStateForProject: projectId => {},
+  getEditorStateForProject: (projectId) => {},
   setEditorStateForProject: (projectId, editorState) => {},
 };
 

@@ -68,8 +68,8 @@ export const TextFieldWithButtonLayout = ({
             ? textFieldWithButtonLayoutStyles.standardTextFieldWithoutLabelRightButtonMargins
             : textFieldWithButtonLayoutStyles.standardTextFieldWithLabelRightButtonMargins
           : noFloatingLabelText
-          ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
-          : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
+            ? textFieldWithButtonLayoutStyles.filledTextFieldWithoutLabelRightButtonMargins
+            : textFieldWithButtonLayoutStyles.filledTextFieldWithLabelRightButtonMargins
       )}
     </ResponsiveLineStackLayout>
   );

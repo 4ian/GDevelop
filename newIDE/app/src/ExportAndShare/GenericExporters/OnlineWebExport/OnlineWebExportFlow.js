@@ -33,13 +33,11 @@ const OnlineWebExportFlow = ({
 }: OnlineWebExportFlowProps) => {
   const hasGameExistingBuilds =
     game && builds
-      ? !!builds.filter(build => build.gameId === game.id).length
+      ? !!builds.filter((build) => build.gameId === game.id).length
       : false;
   const isPublishedOnGdgames = !!game && !!game.publicWebBuildId;
-  const [
-    automaticallyOpenGameProperties,
-    setAutomaticallyOpenGameProperties,
-  ] = React.useState(false);
+  const [automaticallyOpenGameProperties, setAutomaticallyOpenGameProperties] =
+    React.useState(false);
 
   const isExportPending = exportStep !== '' && exportStep !== 'done';
 

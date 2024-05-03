@@ -58,27 +58,20 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     const [searchText, setSearchText] = React.useState<string>('');
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
-    const [
-      selectedCommand,
-      selectCommand,
-    ] = React.useState<null | NamedCommandWithOptions>(null);
+    const [selectedCommand, selectCommand] =
+      React.useState<null | NamedCommandWithOptions>(null);
     const { results, status } = useInstantSearch();
     const { refine } = useSearchBox();
-    const [
-      algoliaSearchStableStatus,
-      setAlgoliaSearchStableStatus,
-    ] = React.useState<'error' | 'ok'>('ok');
+    const [algoliaSearchStableStatus, setAlgoliaSearchStableStatus] =
+      React.useState<'error' | 'ok'>('ok');
 
-    React.useEffect(
-      () => {
-        if (algoliaSearchStableStatus === 'ok' && status === 'error') {
-          setAlgoliaSearchStableStatus('error');
-        } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
-          setAlgoliaSearchStableStatus('ok');
-        }
-      },
-      [status, algoliaSearchStableStatus]
-    );
+    React.useEffect(() => {
+      if (algoliaSearchStableStatus === 'ok' && status === 'error') {
+        setAlgoliaSearchStableStatus('error');
+      } else if (algoliaSearchStableStatus === 'error' && status === 'idle') {
+        setAlgoliaSearchStableStatus('ok');
+      }
+    }, [status, algoliaSearchStableStatus]);
     const shouldHideAlgoliaSearchResults =
       !searchText || algoliaSearchStableStatus === 'error';
     /**
@@ -121,7 +114,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
      * manager and launches command accordingly
      */
     const launchCommand = React.useCallback(
-      commandName => {
+      (commandName) => {
         const command = commandManager.getNamedCommand(commandName);
         if (!command) return;
         handleCommandChoose(command);
@@ -142,13 +135,13 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
 
     React.useEffect(launchSearch, [searchText, launchSearch]);
 
-    const allCommands: Array<NamedCommand | GoToWikiCommand> = React.useMemo(
-      () => {
+    const allCommands: Array<NamedCommand | GoToWikiCommand> =
+      React.useMemo(() => {
         const namedCommands = commandManager
           .getAllNamedCommands()
-          .filter(command => !commandsList[command.name].ghost)
+          .filter((command) => !commandsList[command.name].ghost)
           // $FlowFixMe[incompatible-type]
-          .map(command => ({ ...command, icon: <Command /> }));
+          .map((command) => ({ ...command, icon: <Command /> }));
         if (shouldHideAlgoliaSearchResults) return namedCommands;
 
         const algoliaCommands: Array<GoToWikiCommand> = results.hits.map(
@@ -160,9 +153,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
           }
         );
         return namedCommands.concat(algoliaCommands);
-      },
-      [commandManager, results.hits, shouldHideAlgoliaSearchResults]
-    );
+      }, [commandManager, results.hits, shouldHideAlgoliaSearchResults]);
 
     const closeDialog = React.useCallback(() => {
       setMode('closed');
@@ -216,7 +207,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
 
 export const CommandPaletteWithAlgoliaSearch = React.forwardRef<
   {},
-  CommandPaletteInterface
+  CommandPaletteInterface,
 >((props, ref) => (
   <InstantSearch searchClient={searchClient} indexName={indexName}>
     <CommandPalette ref={ref} />

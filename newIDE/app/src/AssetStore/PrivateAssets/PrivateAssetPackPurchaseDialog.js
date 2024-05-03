@@ -46,15 +46,11 @@ const PrivateAssetPackPurchaseDialog = ({
     assetPackPurchases,
   } = React.useContext(AuthenticatedUserContext);
   const [isPurchasing, setIsPurchasing] = React.useState(false);
-  const [
-    isCheckingPurchasesAfterLogin,
-    setIsCheckingPurchasesAfterLogin,
-  ] = React.useState(!receivedAssetPacks);
+  const [isCheckingPurchasesAfterLogin, setIsCheckingPurchasesAfterLogin] =
+    React.useState(!receivedAssetPacks);
   const [purchaseSuccessful, setPurchaseSuccessful] = React.useState(false);
-  const [
-    displayPasswordPrompt,
-    setDisplayPasswordPrompt,
-  ] = React.useState<boolean>(false);
+  const [displayPasswordPrompt, setDisplayPasswordPrompt] =
+    React.useState<boolean>(false);
   const [password, setPassword] = React.useState<string>('');
   const { showAlert } = useAlertDialog();
 
@@ -79,7 +75,7 @@ const PrivateAssetPackPurchaseDialog = ({
     }
 
     const price = privateAssetPackListingData.prices.find(
-      price => price.usageType === usageType
+      (price) => price.usageType === usageType
     );
     if (!price) {
       console.error('Unable to find the price for the usage type', usageType);
@@ -102,9 +98,8 @@ const PrivateAssetPackPurchaseDialog = ({
       });
       Window.openExternalURL(checkoutUrl);
     } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (
         extractedStatusAndCode &&
         extractedStatusAndCode.status === 403 &&
@@ -142,32 +137,29 @@ const PrivateAssetPackPurchaseDialog = ({
     []
   );
 
-  React.useEffect(
-    () => {
-      const checkIfPurchaseIsDone = async () => {
-        if (
-          isPurchasing &&
-          assetPackPurchases &&
-          assetPackPurchases.find(
-            userPurchase =>
-              userPurchase.productId === privateAssetPackListingData.id
-          )
-        ) {
-          // We found the purchase, the user has bought the asset pack.
-          // We do not close the dialog yet, as we need to trigger a refresh of the products received.
-          await onPurchaseSuccessful();
-        }
-      };
-      checkIfPurchaseIsDone();
-    },
-    [
-      isPurchasing,
-      assetPackPurchases,
-      privateAssetPackListingData,
-      onPurchaseSuccessful,
-      onRefreshAssetPackPurchases,
-    ]
-  );
+  React.useEffect(() => {
+    const checkIfPurchaseIsDone = async () => {
+      if (
+        isPurchasing &&
+        assetPackPurchases &&
+        assetPackPurchases.find(
+          (userPurchase) =>
+            userPurchase.productId === privateAssetPackListingData.id
+        )
+      ) {
+        // We found the purchase, the user has bought the asset pack.
+        // We do not close the dialog yet, as we need to trigger a refresh of the products received.
+        await onPurchaseSuccessful();
+      }
+    };
+    checkIfPurchaseIsDone();
+  }, [
+    isPurchasing,
+    assetPackPurchases,
+    privateAssetPackListingData,
+    onPurchaseSuccessful,
+    onRefreshAssetPackPurchases,
+  ]);
 
   useInterval(
     () => {
@@ -178,52 +170,46 @@ const PrivateAssetPackPurchaseDialog = ({
 
   // Listen to the received asset pack, to know when a user has just logged in and the received asset packs have been loaded.
   // In this case, start a timeout to remove the loader and give some time for the asset store to refresh.
-  React.useEffect(
-    () => {
-      let timeoutId;
-      (async () => {
-        if (receivedAssetPacks) {
-          timeoutId = setTimeout(
-            () => setIsCheckingPurchasesAfterLogin(false),
-            3000
-          );
-        }
-      })();
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    },
-    [receivedAssetPacks]
-  );
+  React.useEffect(() => {
+    let timeoutId;
+    (async () => {
+      if (receivedAssetPacks) {
+        timeoutId = setTimeout(
+          () => setIsCheckingPurchasesAfterLogin(false),
+          3000
+        );
+      }
+    })();
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [receivedAssetPacks]);
 
   // If the user has received this particular pack, either:
   // - they just logged in, and already have it, so we close the dialog.
   // - they just bought it, we display the success message.
-  React.useEffect(
-    () => {
-      if (receivedAssetPacks) {
-        const receivedAssetPack = receivedAssetPacks.find(
-          pack => pack.id === privateAssetPackListingData.id
-        );
-        if (receivedAssetPack) {
-          if (isPurchasing) {
-            setIsPurchasing(false);
-            setPurchaseSuccessful(true);
-          } else if (!purchaseSuccessful) {
-            onClose();
-          }
+  React.useEffect(() => {
+    if (receivedAssetPacks) {
+      const receivedAssetPack = receivedAssetPacks.find(
+        (pack) => pack.id === privateAssetPackListingData.id
+      );
+      if (receivedAssetPack) {
+        if (isPurchasing) {
+          setIsPurchasing(false);
+          setPurchaseSuccessful(true);
+        } else if (!purchaseSuccessful) {
+          onClose();
         }
       }
-    },
-    [
-      receivedAssetPacks,
-      privateAssetPackListingData,
-      isPurchasing,
-      onClose,
-      isCheckingPurchasesAfterLogin,
-      purchaseSuccessful,
-    ]
-  );
+    }
+  }, [
+    receivedAssetPacks,
+    privateAssetPackListingData,
+    isPurchasing,
+    onClose,
+    isCheckingPurchasesAfterLogin,
+    purchaseSuccessful,
+  ]);
 
   const dialogContents = !profile
     ? {
@@ -244,84 +230,84 @@ const PrivateAssetPackPurchaseDialog = ({
         ),
       }
     : purchaseSuccessful
-    ? {
-        subtitle: <Trans>Your purchase has been processed!</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                You can now go back to the asset store to use the assets in your
-                games.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      }
-    : isPurchasing
-    ? {
-        subtitle: shouldUseOrSimulateAppStoreProduct ? (
-          <Trans>Complete your purchase with the app store.</Trans>
-        ) : (
-          <Trans>Complete your payment on the web browser</Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? (
-          <>
-            <ColumnStackLayout justifyContent="center" alignItems="center">
-              <CircularProgress size={40} />
-              <Text>
-                <Trans>
-                  The purchase will be linked to your account once done.
-                </Trans>
-              </Text>
-            </ColumnStackLayout>
-          </>
-        ) : (
-          <>
+      ? {
+          subtitle: <Trans>Your purchase has been processed!</Trans>,
+          content: (
             <Line justifyContent="center" alignItems="center">
-              <CircularProgress size={20} />
-              <Spacer />
               <Text>
-                <Trans>Waiting for the purchase confirmation...</Trans>
+                <Trans>
+                  You can now go back to the asset store to use the assets in
+                  your games.
+                </Trans>
               </Text>
             </Line>
-            <Spacer />
-            <Line justifyContent="center">
-              <BackgroundText>
+          ),
+        }
+      : isPurchasing
+        ? {
+            subtitle: shouldUseOrSimulateAppStoreProduct ? (
+              <Trans>Complete your purchase with the app store.</Trans>
+            ) : (
+              <Trans>Complete your payment on the web browser</Trans>
+            ),
+            content: shouldUseOrSimulateAppStoreProduct ? (
+              <>
+                <ColumnStackLayout justifyContent="center" alignItems="center">
+                  <CircularProgress size={40} />
+                  <Text>
+                    <Trans>
+                      The purchase will be linked to your account once done.
+                    </Trans>
+                  </Text>
+                </ColumnStackLayout>
+              </>
+            ) : (
+              <>
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                  <Spacer />
+                  <Text>
+                    <Trans>Waiting for the purchase confirmation...</Trans>
+                  </Text>
+                </Line>
+                <Spacer />
+                <Line justifyContent="center">
+                  <BackgroundText>
+                    <Trans>
+                      Once you're done, come back to GDevelop and the assets
+                      will be added to your account automatically.
+                    </Trans>
+                  </BackgroundText>
+                </Line>
+              </>
+            ),
+          }
+        : isCheckingPurchasesAfterLogin
+          ? {
+              subtitle: <Trans>Loading your profile...</Trans>,
+              content: (
+                <Line justifyContent="center" alignItems="center">
+                  <CircularProgress size={20} />
+                </Line>
+              ),
+            }
+          : {
+              subtitle: (
                 <Trans>
-                  Once you're done, come back to GDevelop and the assets will be
-                  added to your account automatically.
+                  The asset pack {privateAssetPackListingData.name} will be
+                  linked to your account {profile.email}.
                 </Trans>
-              </BackgroundText>
-            </Line>
-          </>
-        ),
-      }
-    : isCheckingPurchasesAfterLogin
-    ? {
-        subtitle: <Trans>Loading your profile...</Trans>,
-        content: (
-          <Line justifyContent="center" alignItems="center">
-            <CircularProgress size={20} />
-          </Line>
-        ),
-      }
-    : {
-        subtitle: (
-          <Trans>
-            The asset pack {privateAssetPackListingData.name} will be linked to
-            your account {profile.email}.
-          </Trans>
-        ),
-        content: shouldUseOrSimulateAppStoreProduct ? null : (
-          <Line justifyContent="center" alignItems="center">
-            <Text>
-              <Trans>
-                A new secure window will open to complete the purchase.
-              </Trans>
-            </Text>
-          </Line>
-        ),
-      };
+              ),
+              content: shouldUseOrSimulateAppStoreProduct ? null : (
+                <Line justifyContent="center" alignItems="center">
+                  <Text>
+                    <Trans>
+                      A new secure window will open to complete the purchase.
+                    </Trans>
+                  </Text>
+                </Line>
+              ),
+            };
 
   const allowPurchase =
     profile &&

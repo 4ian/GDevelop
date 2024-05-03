@@ -75,9 +75,8 @@ const useCreateProject = ({
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const preferences = React.useContext(PreferencesContext);
   const { showAlert } = useAlertDialog();
-  const { getInAppTutorialShortHeader } = React.useContext(
-    InAppTutorialContext
-  );
+  const { getInAppTutorialShortHeader } =
+    React.useContext(InAppTutorialContext);
 
   const initialiseProjectProperties = (
     project: gdProject,
@@ -165,9 +164,8 @@ const useCreateProject = ({
           }
         }
 
-        const destinationStorageProviderOperations = getStorageProviderOperations(
-          newProjectSetup.storageProvider
-        );
+        const destinationStorageProviderOperations =
+          getStorageProviderOperations(newProjectSetup.storageProvider);
 
         const { onSaveProjectAs } = destinationStorageProviderOperations;
 
@@ -196,7 +194,8 @@ const useCreateProject = ({
                   project: currentProject,
                   newFileMetadata,
                   newStorageProvider: newProjectSetup.storageProvider,
-                  newStorageProviderOperations: destinationStorageProviderOperations,
+                  newStorageProviderOperations:
+                    destinationStorageProviderOperations,
                   oldFileMetadata: newProjectSource.fileMetadata,
                   oldStorageProvider: sourceStorageProvider,
                   oldStorageProviderOperations: sourceStorageProviderOperations,
@@ -317,9 +316,8 @@ const useCreateProject = ({
   const createProjectFromInAppTutorial = React.useCallback(
     async (tutorialId: string, newProjectSetup: NewProjectSetup) => {
       beforeCreatingProject();
-      const selectedInAppTutorialShortHeader = getInAppTutorialShortHeader(
-        tutorialId
-      );
+      const selectedInAppTutorialShortHeader =
+        getInAppTutorialShortHeader(tutorialId);
       if (!selectedInAppTutorialShortHeader) {
         throw new Error(`No in app tutorial found for id "${tutorialId}"`);
       }
@@ -350,9 +348,8 @@ const useCreateProject = ({
   const createProjectFromAIGeneration = React.useCallback(
     async (projectFileUrl: string, newProjectSetup: NewProjectSetup) => {
       beforeCreatingProject();
-      const newProjectSource = createNewProjectFromAIGeneratedProject(
-        projectFileUrl
-      );
+      const newProjectSource =
+        createNewProjectFromAIGeneratedProject(projectFileUrl);
       await createProject(newProjectSource, newProjectSetup);
     },
     [beforeCreatingProject, createProject]

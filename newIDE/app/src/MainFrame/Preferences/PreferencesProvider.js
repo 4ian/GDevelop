@@ -107,14 +107,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showAnnouncement: this._showAnnouncement.bind(this),
     showAllAnnouncements: this._showAllAnnouncements.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
-    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
-      this
-    ),
+    setEventsSheetShowObjectThumbnails:
+      this._setEventsSheetShowObjectThumbnails.bind(this),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
-    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
-      this
-    ),
+    setEventsSheetUseAssignmentOperators:
+      this._setEventsSheetUseAssignmentOperators.bind(this),
     setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
@@ -126,9 +124,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
     getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
     setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
-    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
-      this
-    ),
+    hadProjectOpenedDuringLastSession:
+      this._hadProjectOpenedDuringLastSession.bind(this),
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
     setShortcutForCommand: this._setShortcutForCommand.bind(this),
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
@@ -139,47 +136,36 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
-    setResourcesImporationBehavior: this._setResourcesImporationBehavior.bind(
-      this
-    ),
+    setResourcesImporationBehavior:
+      this._setResourcesImporationBehavior.bind(this),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
-    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
-      this
-    ),
+    setEventsSheetCancelInlineParameter:
+      this._setEventsSheetCancelInlineParameter.bind(this),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
-    setShowGetStartedSectionByDefault: this._setShowGetStartedSection.bind(
-      this
-    ),
-    setShowEventBasedObjectsEditor: this._setShowEventBasedObjectsEditor.bind(
-      this
-    ),
-    getShowEventBasedObjectsEditor: this._getShowEventBasedObjectsEditor.bind(
-      this
-    ),
-    setShowDeprecatedInstructionWarning: this._setShowDeprecatedInstructionWarning.bind(
-      this
-    ),
-    getShowDeprecatedInstructionWarning: this._getShowDeprecatedInstructionWarning.bind(
-      this
-    ),
+    setShowGetStartedSectionByDefault:
+      this._setShowGetStartedSection.bind(this),
+    setShowEventBasedObjectsEditor:
+      this._setShowEventBasedObjectsEditor.bind(this),
+    getShowEventBasedObjectsEditor:
+      this._getShowEventBasedObjectsEditor.bind(this),
+    setShowDeprecatedInstructionWarning:
+      this._setShowDeprecatedInstructionWarning.bind(this),
+    getShowDeprecatedInstructionWarning:
+      this._getShowDeprecatedInstructionWarning.bind(this),
     setUse3DEditor: this._setUse3DEditor.bind(this),
     getUse3DEditor: this._getUse3DEditor.bind(this),
     saveTutorialProgress: this._saveTutorialProgress.bind(this),
     getTutorialProgress: this._getTutorialProgress.bind(this),
     setNewProjectsDefaultFolder: this._setNewProjectsDefaultFolder.bind(this),
-    setNewProjectsDefaultStorageProviderName: this._setNewProjectsDefaultStorageProviderName.bind(
-      this
-    ),
-    setUseShortcutToClosePreviewWindow: this._setUseShortcutToClosePreviewWindow.bind(
-      this
-    ),
-    setWatchProjectFolderFilesForLocalProjects: this._setWatchProjectFolderFilesForLocalProjects.bind(
-      this
-    ),
-    setNewFeaturesAcknowledgements: this._setNewFeaturesAcknowledgements.bind(
-      this
-    ),
+    setNewProjectsDefaultStorageProviderName:
+      this._setNewProjectsDefaultStorageProviderName.bind(this),
+    setUseShortcutToClosePreviewWindow:
+      this._setUseShortcutToClosePreviewWindow.bind(this),
+    setWatchProjectFolderFilesForLocalProjects:
+      this._setWatchProjectFolderFilesForLocalProjects.bind(this),
+    setNewFeaturesAcknowledgements:
+      this._setNewFeaturesAcknowledgements.bind(this),
     getEditorStateForProject: this._getEditorStateForProject.bind(this),
     setEditorStateForProject: this._setEditorStateForProject.bind(this),
   };
@@ -191,7 +177,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setLanguage(language: string) {
     setLanguageInDOM(language);
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           language,
@@ -205,7 +191,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetShowObjectThumbnails: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetShowObjectThumbnails,
@@ -217,7 +203,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutosaveOnPreview(autosaveOnPreview: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autosaveOnPreview,
@@ -267,16 +253,15 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     userId: ?string,
   |}) {
     const userIdKey: string = userId || 'anonymous';
-    const tutorialProgresses = this.state.values.inAppTutorialsProgress[
-      tutorialId
-    ];
+    const tutorialProgresses =
+      this.state.values.inAppTutorialsProgress[tutorialId];
     if (!tutorialProgresses) return undefined;
     return tutorialProgresses[userIdKey];
   }
 
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           useGDJSDevelopmentWatcher,
@@ -290,7 +275,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetUseAssignmentOperators: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetUseAssignmentOperators,
@@ -302,7 +287,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setEventsSheetZoomLevel(eventsSheetZoomLevel: number) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetZoomLevel,
@@ -314,7 +299,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShowEffectParameterNames(showEffectParameterNames: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showEffectParameterNames,
@@ -326,7 +311,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShowGetStartedSection(showGetStartedSectionByDefault: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showGetStartedSectionByDefault,
@@ -338,7 +323,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setThemeName(themeName: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           themeName,
@@ -350,7 +335,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setCodeEditorThemeName(codeEditorThemeName: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           codeEditorThemeName,
@@ -362,7 +347,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoDownloadUpdates(autoDownloadUpdates: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoDownloadUpdates,
@@ -374,7 +359,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoDisplayChangelog(autoDisplayChangelog: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoDisplayChangelog,
@@ -388,7 +373,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetCancelInlineParameter: 'apply' | 'cancel'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
@@ -402,7 +387,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     useShortcutToClosePreviewWindow: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           useShortcutToClosePreviewWindow,
@@ -414,7 +399,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShowCommunityExtensions(showCommunityExtensions: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showCommunityExtensions,
@@ -426,7 +411,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShowEventBasedObjectsEditor(showEventBasedObjectsEditor: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showEventBasedObjectsEditor,
@@ -444,7 +429,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showDeprecatedInstructionWarning: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showDeprecatedInstructionWarning,
@@ -460,7 +445,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setUse3DEditor(use3DEditor: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           use3DEditor,
@@ -498,7 +483,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
     // This is a new version: store the version number
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           lastLaunchedVersion: currentVersion,
@@ -518,7 +503,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAlertMessage(identifier: AlertMessageIdentifier, show: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAlertMessages: {
@@ -534,7 +519,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAllAlertMessages() {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAlertMessages: {},
@@ -546,7 +531,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showTutorialHint(identifier: string, show: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenTutorialHints: {
@@ -561,7 +546,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAllTutorialHints() {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenTutorialHints: {},
@@ -573,7 +558,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAnnouncement(identifier: string, show: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAnnouncements: {
@@ -588,7 +573,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAllAnnouncements() {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAnnouncements: {},
@@ -649,7 +634,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setDefaultEditorMosaicNode(name: EditorMosaicName, node: ?EditorMosaicNode) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           defaultEditorMosaicNodes: {
@@ -669,7 +654,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           recentProjectFiles: recents,
@@ -684,7 +669,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     if (newRecentFile.storageProviderName === 'Cloud') return;
 
     let recentProjectFiles = this._getRecentProjectFiles();
-    const isNotNewRecentFile = recentFile =>
+    const isNotNewRecentFile = (recentFile) =>
       recentFile.fileMetadata.fileIdentifier !==
       newRecentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
@@ -696,7 +681,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    const isNotRemovedRecentFile = recentFileItem =>
+    const isNotRemovedRecentFile = (recentFileItem) =>
       recentFileItem.fileMetadata.fileIdentifier !==
       recentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
@@ -713,7 +698,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoOpenMostRecentProject(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoOpenMostRecentProject: enabled,
@@ -729,7 +714,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setHasProjectOpened(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hasProjectOpened: enabled,
@@ -741,7 +726,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _resetShortcutsToDefault() {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, userShortcutMap: {} },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -757,7 +742,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     else updatedShortcutMap[commandName] = shortcutString;
 
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, userShortcutMap: updatedShortcutMap },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -772,7 +757,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     newObjectDialogDefaultTab: 'asset-store' | 'new-object'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, newObjectDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -785,7 +770,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShareDialogDefaultTab(shareDialogDefaultTab: 'invite' | 'publish') {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, shareDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -798,7 +783,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setIsMenuBarHiddenInPreview(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           isMenuBarHiddenInPreview: enabled,
@@ -812,7 +797,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     backdropClickBehavior: 'nothing' | 'apply' | 'cancel'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, backdropClickBehavior },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -823,7 +808,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     resourcesImporationBehavior: ResourceImportationBehavior
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, resourcesImporationBehavior },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -836,7 +821,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setIsAlwaysOnTopInPreview(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,
@@ -848,7 +833,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setNewProjectsDefaultFolder(newProjectsDefaultFolder: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           newProjectsDefaultFolder,
@@ -860,7 +845,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setNewProjectsDefaultStorageProviderName(newStorageProviderName: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           newProjectsDefaultStorageProviderName: newStorageProviderName,
@@ -872,7 +857,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setWatchProjectFolderFilesForLocalProjects(enable: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           watchProjectFolderFilesForLocalProjects: enable,
@@ -886,7 +871,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     [featureId: string]: {| dates: [number] |},
   }) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           newFeaturesAcknowledgements,
@@ -905,7 +890,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     editorState?: {| editorTabs: EditorTabsPersistedState |}
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           editorStateByProject: {

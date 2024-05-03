@@ -59,7 +59,7 @@ const downloadSvgAsBase64 = async (url: string): Promise<string> => {
 type HelpPathTextFieldProps = {|
   i18n: I18nType,
   helpPath: string,
-  onChangeHelpPath: string => void,
+  onChangeHelpPath: (string) => void,
 |};
 
 const HelpPathTextField = ({
@@ -126,7 +126,7 @@ export const ExtensionOptionsEditor = ({
             fullWidth
           />
           <TextFieldWithButtonLayout
-            renderButton={style => (
+            renderButton={(style) => (
               <RaisedButton
                 onClick={() => {
                   setResourceStoreOpen(true);
@@ -141,7 +141,7 @@ export const ExtensionOptionsEditor = ({
               <SemiControlledTextField
                 floatingLabelText={<Trans>Icon URL</Trans>}
                 value={eventsFunctionsExtension.getPreviewIconUrl()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsFunctionsExtension.setPreviewIconUrl(text);
                 }}
                 disabled
@@ -198,7 +198,7 @@ export const ExtensionOptionsEditor = ({
             floatingLabelText={<Trans>Category (shown in the editor)</Trans>}
             fullWidth
             value={eventsFunctionsExtension.getCategory()}
-            onChange={category => {
+            onChange={(category) => {
               eventsFunctionsExtension.setCategory(category);
               forceUpdate();
             }}
@@ -268,18 +268,15 @@ export const ExtensionOptionsEditor = ({
           />
           <SemiControlledTextField
             floatingLabelText={<Trans>Tags (comma separated)</Trans>}
-            value={eventsFunctionsExtension
-              .getTags()
-              .toJSArray()
-              .join(', ')}
-            onChange={text => {
+            value={eventsFunctionsExtension.getTags().toJSArray().join(', ')}
+            onChange={(text) => {
               const tags = eventsFunctionsExtension.getTags();
               tags.clear();
               text
                 .split(',')
-                .map(tag => tag.trim())
+                .map((tag) => tag.trim())
                 .filter(Boolean)
-                .forEach(tag => {
+                .forEach((tag) => {
                   tags.push_back(tag);
                 });
               forceUpdate();
@@ -289,17 +286,17 @@ export const ExtensionOptionsEditor = ({
           <HelpPathTextField
             i18n={i18n}
             helpPath={eventsFunctionsExtension.getHelpPath()}
-            onChangeHelpPath={helpPath => {
+            onChangeHelpPath={(helpPath) => {
               eventsFunctionsExtension.setHelpPath(helpPath);
               forceUpdate();
             }}
           />
           <UsersAutocomplete
             userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}
-            onChange={userIdAndUsernames => {
+            onChange={(userIdAndUsernames) => {
               const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
               projectAuthorIds.clear();
-              userIdAndUsernames.forEach(userIdAndUsername =>
+              userIdAndUsernames.forEach((userIdAndUsername) =>
                 projectAuthorIds.push_back(userIdAndUsername.userId)
               );
             }}
@@ -333,12 +330,12 @@ export const ExtensionOptionsEditor = ({
               }}
             >
               <ResourceStore
-                onChoose={resource => {
+                onChoose={(resource) => {
                   setResourceStoreOpen(false);
                   onLoadChange(true);
                   downloadSvgAsBase64(resource.url)
                     .then(
-                      base64Svg => {
+                      (base64Svg) => {
                         if (!isMounted.current) return;
 
                         eventsFunctionsExtension.setPreviewIconUrl(
@@ -346,7 +343,7 @@ export const ExtensionOptionsEditor = ({
                         );
                         eventsFunctionsExtension.setIconUrl(base64Svg);
                       },
-                      rawError => {
+                      (rawError) => {
                         if (!isMounted.current) return;
 
                         showErrorBox({

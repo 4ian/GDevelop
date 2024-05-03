@@ -21,7 +21,7 @@ type Props = {|
   onChooseProvider: (storageProvider: StorageProvider) => void,
 |};
 
-const useListItemStyles = makeStyles(theme => {
+const useListItemStyles = makeStyles((theme) => {
   return {
     root: {
       border: `1px solid ${theme.palette.divider}`,

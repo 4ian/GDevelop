@@ -18,16 +18,15 @@ export type ChosenCategory = {|
 
 export type FiltersState = {|
   chosenFilters: Set<string>,
-  addFilter: string => void,
-  removeFilter: string => void,
+  addFilter: (string) => void,
+  removeFilter: (string) => void,
   chosenCategory: ?ChosenCategory,
   setChosenCategory: (?ChosenCategory) => void,
 |};
 
 export const useFilters = (): FiltersState => {
-  const [chosenCategory, setChosenCategory] = React.useState<?ChosenCategory>(
-    null
-  );
+  const [chosenCategory, setChosenCategory] =
+    React.useState<?ChosenCategory>(null);
   const [chosenFilters, setChosenFilters] = React.useState<Set<string>>(
     () => new Set()
   );
@@ -99,7 +98,7 @@ export const FiltersChooser = ({ filtersState, allFilters, error }: Props) => {
           <Trans>Choose a category to display filters</Trans>
         </EmptyMessage>
       ) : selectedCategoryTags.length ? (
-        selectedCategoryTags.map(tag => (
+        selectedCategoryTags.map((tag) => (
           <InlineCheckbox
             key={tag}
             label={capitalize(tag)}

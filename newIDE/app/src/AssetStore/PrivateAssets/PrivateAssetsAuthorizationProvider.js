@@ -29,9 +29,9 @@ const enrichAssetWithAuthorizedResourceUrls = (
   const objectAssets = asset.objectAssets;
   return {
     ...asset,
-    objectAssets: objectAssets.map(objectAsset => ({
+    objectAssets: objectAssets.map((objectAsset) => ({
       ...objectAsset,
-      resources: objectAsset.resources.map(resource => ({
+      resources: objectAsset.resources.map((resource) => ({
         ...resource,
         file: createProductAuthorizedUrl(resource.file, authorizationToken),
       })),
@@ -42,9 +42,8 @@ const enrichAssetWithAuthorizedResourceUrls = (
 const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const profile = authenticatedUser.profile;
-  const [authorizationToken, setAuthorizationToken] = React.useState<?string>(
-    null
-  );
+  const [authorizationToken, setAuthorizationToken] =
+    React.useState<?string>(null);
   const isLoading = React.useRef<boolean>(false);
 
   const fetchAuthorizationToken = React.useCallback(
@@ -95,9 +94,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
       });
       return asset;
     } catch (error) {
-      const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-        error
-      );
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
       if (extractedStatusAndCode && extractedStatusAndCode.status === 404) {
         // If the token is expired, fetch a new one and try again.
         token = await fetchAuthorizationToken(userId);
@@ -124,10 +122,8 @@ const PrivateAssetsAuthorizationProvider = ({ children }: Props) => {
     const token =
       authorizationToken || (await fetchAuthorizationToken(profile.id));
 
-    const assetWithAuthorizedResourceUrls = enrichAssetWithAuthorizedResourceUrls(
-      asset,
-      token
-    );
+    const assetWithAuthorizedResourceUrls =
+      enrichAssetWithAuthorizedResourceUrls(asset, token);
 
     return addAssetToProject({
       asset: assetWithAuthorizedResourceUrls,

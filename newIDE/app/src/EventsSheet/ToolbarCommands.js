@@ -55,7 +55,7 @@ const ToolbarCommands = (props: Props) => {
   useCommandWithOptions('CHOOSE_AND_ADD_EVENT', true, {
     generateOptions: React.useCallback(
       () =>
-        props.allEventsMetadata.map(metadata => ({
+        props.allEventsMetadata.map((metadata) => ({
           text: metadata.fullName,
           handler: () => {
             onAddEvent(metadata.type);

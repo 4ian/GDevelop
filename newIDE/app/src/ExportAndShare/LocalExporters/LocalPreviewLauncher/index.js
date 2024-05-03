@@ -47,7 +47,7 @@ type State = {|
 
 export default class LocalPreviewLauncher extends React.Component<
   Props,
-  State
+  State,
 > {
   canDoNetworkPreview = () => true;
   canDoHotReload = () => true;
@@ -183,7 +183,7 @@ export default class LocalPreviewLauncher extends React.Component<
     // hot reload.
     return this.getPreviewDebuggerServer()
       .startServer()
-      .catch(err => {
+      .catch((err) => {
         // Ignore any error when running the debugger server - the preview
         // can still work without it.
         console.error(
@@ -233,7 +233,8 @@ export default class LocalPreviewLauncher extends React.Component<
               )
             );
 
-            const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+            const debuggerIds =
+              this.getPreviewDebuggerServer().getExistingDebuggerIds();
             const shouldHotReload =
               previewOptions.hotReload && !!debuggerIds.length;
 
@@ -258,7 +259,7 @@ export default class LocalPreviewLauncher extends React.Component<
             exporter.delete();
 
             if (shouldHotReload) {
-              debuggerIds.forEach(debuggerId => {
+              debuggerIds.forEach((debuggerId) => {
                 this.getPreviewDebuggerServer().sendMessage(debuggerId, {
                   command: 'hotReload',
                 });
@@ -270,14 +271,14 @@ export default class LocalPreviewLauncher extends React.Component<
               ) {
                 this._hotReloadSubscriptionChecker.checkUserHasSubscription();
               }
-              this.setState(state => ({
+              this.setState((state) => ({
                 hotReloadsCount: state.hotReloadsCount + 1,
               }));
             } else {
               this._openPreviewWindow(project, outputDir, previewOptions);
             }
           },
-          time => console.info(`Preview took ${time}ms`)
+          (time) => console.info(`Preview took ${time}ms`)
         );
       });
   };
@@ -303,7 +304,7 @@ export default class LocalPreviewLauncher extends React.Component<
     return (
       <React.Fragment>
         <SubscriptionChecker
-          ref={subscriptionChecker =>
+          ref={(subscriptionChecker) =>
             (this._networkPreviewSubscriptionChecker = subscriptionChecker)
           }
           onChangeSubscription={() =>
@@ -314,7 +315,7 @@ export default class LocalPreviewLauncher extends React.Component<
           mode="try"
         />
         <SubscriptionChecker
-          ref={subscriptionChecker =>
+          ref={(subscriptionChecker) =>
             (this._hotReloadSubscriptionChecker = subscriptionChecker)
           }
           id="Hot reloading"

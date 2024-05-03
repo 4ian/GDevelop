@@ -15,7 +15,7 @@ export type State = {|
 |};
 export type Props = {|
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   width?: number,
   height?: number,
   onEditorMounted?: () => void,
@@ -45,7 +45,7 @@ export class CodeEditor extends React.Component<Props, State> {
     if (!monacoThemesInitialized) {
       monacoThemesInitialized = true;
 
-      getAllThemes().forEach(codeEditorTheme => {
+      getAllThemes().forEach((codeEditorTheme) => {
         // Builtin themes don't have themeData, don't redefine them.
         if (codeEditorTheme.themeData) {
           monaco.editor.defineTheme(
@@ -101,13 +101,13 @@ export class CodeEditor extends React.Component<Props, State> {
     // Define the global variable used by Monaco Editor to find its worker
     // (used, at least, for auto-completions).
     window.MonacoEnvironment = {
-      getWorkerUrl: function(workerId, label) {
+      getWorkerUrl: function (workerId, label) {
         return 'external/monaco-editor-min/vs/base/worker/workerMain.js';
       },
     };
 
     import(/* webpackChunkName: "react-monaco-editor" */ 'react-monaco-editor')
-      .then(module =>
+      .then((module) =>
         this.setState({
           MonacoEditor: module.default,
         })

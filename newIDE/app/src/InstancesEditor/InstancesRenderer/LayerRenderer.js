@@ -23,18 +23,18 @@ export default class LayerRenderer {
    */
   layer: gdLayer;
   viewPosition: ViewPosition;
-  onInstanceClicked: gdInitialInstance => void;
+  onInstanceClicked: (gdInitialInstance) => void;
   onInstanceRightClicked: ({|
     offsetX: number,
     offsetY: number,
     x: number,
     y: number,
   |}) => void;
-  onInstanceDoubleClicked: gdInitialInstance => void;
-  onOverInstance: gdInitialInstance => void;
-  onOutInstance: gdInitialInstance => void;
+  onInstanceDoubleClicked: (gdInitialInstance) => void;
+  onOverInstance: (gdInitialInstance) => void;
+  onOutInstance: (gdInitialInstance) => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
-  onMoveInstanceEnd: void => void;
+  onMoveInstanceEnd: (void) => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
   onUpInstance: (gdInitialInstance, number, number) => void;
   /** Used for instances culling on rendering. */
@@ -51,7 +51,12 @@ export default class LayerRenderer {
   wasUsed: boolean = false;
 
   _temporaryRectangle: Rectangle = new Rectangle();
-  _temporaryRectanglePath: Polygon = [[0, 0], [0, 0], [0, 0], [0, 0]];
+  _temporaryRectanglePath: Polygon = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ];
 
   /**
    * The render texture where the whole 2D layer is rendered.
@@ -101,18 +106,18 @@ export default class LayerRenderer {
     layout: gdLayout,
     layer: gdLayer,
     viewPosition: ViewPosition,
-    onInstanceClicked: gdInitialInstance => void,
+    onInstanceClicked: (gdInitialInstance) => void,
     onInstanceRightClicked: ({|
       offsetX: number,
       offsetY: number,
       x: number,
       y: number,
     |}) => void,
-    onInstanceDoubleClicked: gdInitialInstance => void,
-    onOverInstance: gdInitialInstance => void,
-    onOutInstance: gdInitialInstance => void,
+    onInstanceDoubleClicked: (gdInitialInstance) => void,
+    onOverInstance: (gdInitialInstance) => void,
+    onOutInstance: (gdInitialInstance) => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
-    onMoveInstanceEnd: void => void,
+    onMoveInstanceEnd: (void) => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
     onUpInstance: (gdInitialInstance, number, number) => void,
     pixiRenderer: PIXI.Renderer,
@@ -144,7 +149,7 @@ export default class LayerRenderer {
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
-    this.instancesRenderer.invoke = instancePtr => {
+    this.instancesRenderer.invoke = (instancePtr) => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance: gdInitialInstance = gd.wrapPointer(
         instancePtr,
@@ -152,13 +157,12 @@ export default class LayerRenderer {
       );
 
       //Get the "RenderedInstance" object associated to the instance and tell it to update.
-      var renderedInstance:
-        | RenderedInstance
-        | Rendered3DInstance
-        | null = this.getRendererOfInstance(instance);
+      var renderedInstance: RenderedInstance | Rendered3DInstance | null =
+        this.getRendererOfInstance(instance);
       if (!renderedInstance) return;
 
-      const pixiObject: PIXI.DisplayObject | null = renderedInstance.getPixiObject();
+      const pixiObject: PIXI.DisplayObject | null =
+        renderedInstance.getPixiObject();
       if (pixiObject) {
         if (renderedInstance instanceof Rendered3DInstance) {
           pixiObject.zOrder = instance.getZ() + renderedInstance.getDepth();
@@ -265,18 +269,18 @@ export default class LayerRenderer {
     const width = hasCustomSize
       ? instance.getCustomWidth()
       : renderedInstance
-      ? renderedInstance.getDefaultWidth()
-      : 0;
+        ? renderedInstance.getDefaultWidth()
+        : 0;
     const height = hasCustomSize
       ? instance.getCustomHeight()
       : renderedInstance
-      ? renderedInstance.getDefaultHeight()
-      : 0;
+        ? renderedInstance.getDefaultHeight()
+        : 0;
     const depth = hasCustomDepth
       ? instance.getCustomDepth()
       : renderedInstance
-      ? renderedInstance.getDefaultDepth()
-      : 0;
+        ? renderedInstance.getDefaultDepth()
+        : 0;
 
     return [width, height, depth];
   };
@@ -378,21 +382,20 @@ export default class LayerRenderer {
       if (!associatedObject) return null;
 
       //...so let's create a renderer.
-      renderedInstance = this.renderedInstances[
-        instance.ptr
-      ] = ObjectsRenderingService.createNewInstanceRenderer(
-        this.project,
-        this.layout,
-        instance,
-        associatedObject.getConfiguration(),
-        this.pixiContainer,
-        this._threeGroup
-      );
+      renderedInstance = this.renderedInstances[instance.ptr] =
+        ObjectsRenderingService.createNewInstanceRenderer(
+          this.project,
+          this.layout,
+          instance,
+          associatedObject.getConfiguration(),
+          this.pixiContainer,
+          this._threeGroup
+        );
 
       renderedInstance._pixiObject.eventMode = 'static';
       panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.addEventListener('click', event => {
+      renderedInstance._pixiObject.addEventListener('click', (event) => {
         if (event.data.originalEvent.button === 0)
           this.onInstanceClicked(instance);
       });
@@ -430,7 +433,7 @@ export default class LayerRenderer {
       );
       renderedInstance._pixiObject.addEventListener(
         'rightclick',
-        interactionEvent => {
+        (interactionEvent) => {
           const {
             data: { global: viewPoint, originalEvent: event },
           } = interactionEvent;
@@ -455,7 +458,7 @@ export default class LayerRenderer {
           return false;
         }
       );
-      renderedInstance._pixiObject.addEventListener('touchstart', event => {
+      renderedInstance._pixiObject.addEventListener('touchstart', (event) => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -467,7 +470,7 @@ export default class LayerRenderer {
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
-      renderedInstance._pixiObject.addEventListener('touchend', event => {
+      renderedInstance._pixiObject.addEventListener('touchend', (event) => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -492,7 +495,7 @@ export default class LayerRenderer {
           this.onMoveInstance(instance, event.deltaX, event.deltaY);
         }
       );
-      renderedInstance._pixiObject.addEventListener('panend', event => {
+      renderedInstance._pixiObject.addEventListener('panend', (event) => {
         this.onMoveInstanceEnd();
       });
     }
@@ -741,9 +744,8 @@ export default class LayerRenderer {
       return;
     }
 
-    const glTexture = this._renderTexture.baseTexture._glTextures[
-      pixiRenderer.CONTEXT_UID
-    ];
+    const glTexture =
+      this._renderTexture.baseTexture._glTextures[pixiRenderer.CONTEXT_UID];
     if (glTexture) {
       // "Hack" into the Three.js renderer by getting the internal WebGL texture for the PixiJS plane,
       // and set it so that it's the same as the WebGL texture for the PixiJS RenderTexture.

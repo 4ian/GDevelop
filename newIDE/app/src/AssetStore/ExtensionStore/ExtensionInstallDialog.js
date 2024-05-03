@@ -1,5 +1,6 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { withI18n } from '@lingui/react';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -64,14 +65,15 @@ type Props = {|
   project: gdProject,
 |};
 
-const ExtensionInstallDialog = ({
+const ExtensionInstallDialog = withI18n<Props>()(({
   extensionShortHeader,
   isInstalling,
   onClose,
   onInstall,
   onEdit,
   project,
-}: Props) => {
+  i18n,
+}) => {
   const isAlreadyInstalled: boolean = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
@@ -87,25 +89,20 @@ const ExtensionInstallDialog = ({
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    extensionHeader,
-    setExtensionHeader,
-  ] = React.useState<?ExtensionHeader>(null);
+  const [extensionHeader, setExtensionHeader] =
+    React.useState<?ExtensionHeader>(null);
 
-  const loadExtensionheader = React.useCallback(
-    () => {
-      setError(null);
-      getExtensionHeader(extensionShortHeader).then(
-        extensionHeader => {
-          setExtensionHeader(extensionHeader);
-        },
-        error => {
-          setError(error);
-        }
-      );
-    },
-    [extensionShortHeader]
-  );
+  const loadExtensionheader = React.useCallback(() => {
+    setError(null);
+    getExtensionHeader(extensionShortHeader).then(
+      (extensionHeader) => {
+        setExtensionHeader(extensionHeader);
+      },
+      (error) => {
+        setError(error);
+      }
+    );
+  }, [extensionShortHeader]);
 
   React.useEffect(() => loadExtensionheader(), [loadExtensionheader]);
 
@@ -114,46 +111,74 @@ const ExtensionInstallDialog = ({
     extensionShortHeader
   );
 
-  const canInstallExtension = !isInstalling && isCompatible;
-  const onInstallExtension = React.useCallback(
-    () => {
-      if (canInstallExtension && onInstall) {
-        if (isAlreadyInstalled) {
-          let dialogText =
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?';
-          if (!isFromStore)
-            dialogText =
-              'An other extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?';
+  const hasBreakingChanges =
+    extensionUpdate && extensionUpdate.type === 'major';
 
-          const answer = Window.showConfirmDialog(dialogText);
-          if (!answer) return;
-          onInstall();
-        } else {
-          onInstall();
-        }
+  const potentiallyHasBreakingChanges =
+    extensionUpdate &&
+    (extensionUpdate.type === 'unknown' ||
+      extensionShortHeader.tier === 'community');
+
+  const isDowngrade = extensionUpdate && extensionUpdate.isDowngrade;
+
+  const canInstallExtension = !isInstalling && isCompatible;
+  const onInstallExtension = React.useCallback(() => {
+    if (canInstallExtension && onInstall) {
+      if (isAlreadyInstalled) {
+        const answer = Window.showConfirmDialog(
+          !isFromStore
+            ? i18n._(
+                t`A different extension with the same name is already in your project. Installing this extension will overwrite your current extension. Do you want to continue?`
+              )
+            : isDowngrade
+              ? i18n._(
+                  t`The currently installed version of this extension has a higher version number than the latest one on the registery. Do you really wish to override your current version with an older one?`
+                )
+              : hasBreakingChanges
+                ? i18n._(
+                    t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                  )
+                : potentiallyHasBreakingChanges
+                  ? i18n._(
+                      t`The latest version will be installed, but it cannot be determined whether this update includes breaking changes. Adaptations may be required for your game to keep working. We advise to back up your game before proceeding. Do you want to continue?`
+                    )
+                  : extensionUpdate
+                    ? i18n._(
+                        t`The extension will be updated. Any modifications you might have made to the extension since installing it will be discarded. Do you want to continue?`
+                      )
+                    : i18n._(
+                        t`This extension is already in your project, and will be reinstalled. Any modifications you might have made to the extension since installing it will be discarded. Do you want to continue?`
+                      )
+        );
+        if (!answer) return;
       }
-    },
-    [onInstall, canInstallExtension, isAlreadyInstalled, isFromStore]
-  );
+      onInstall();
+    }
+  }, [
+    extensionUpdate,
+    onInstall,
+    canInstallExtension,
+    isAlreadyInstalled,
+    hasBreakingChanges,
+    potentiallyHasBreakingChanges,
+    isDowngrade,
+    isFromStore,
+    i18n,
+  ]);
 
   const showOutOfDateAlert = useOutOfDateAlertDialog();
-  const onUserReportIssue = React.useCallback(
-    async () => {
-      if (extensionUpdate) {
-        const shouldNotReportIssue = await showOutOfDateAlert();
-        if (shouldNotReportIssue) {
-          return;
-        }
+  const onUserReportIssue = React.useCallback(async () => {
+    if (extensionUpdate) {
+      const shouldNotReportIssue = await showOutOfDateAlert();
+      if (shouldNotReportIssue) {
+        return;
       }
-      Window.openExternalURL(
-        `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
-          `?assignees=&labels=&template=bug-report.md&title=[${
-            extensionShortHeader.name
-          }] Issue short description`
-      );
-    },
-    [extensionShortHeader.name, extensionUpdate, showOutOfDateAlert]
-  );
+    }
+    Window.openExternalURL(
+      `https://github.com/GDevelopApp/GDevelop-extensions/issues/new` +
+        `?assignees=&labels=&template=bug-report.md&title=[${extensionShortHeader.name}] Issue short description`
+    );
+  }, [extensionShortHeader.name, extensionUpdate, showOutOfDateAlert]);
 
   return (
     <Dialog
@@ -177,8 +202,14 @@ const ExtensionInstallDialog = ({
                 ) : isAlreadyInstalled ? (
                   isFromStore ? (
                     extensionUpdate ? (
-                      extensionShortHeader.tier === 'community' ? (
-                        <Trans>Update (could break the project)</Trans>
+                      extensionUpdate.isDowngrade ? (
+                        <Trans>Downgrade</Trans>
+                      ) : potentiallyHasBreakingChanges ? (
+                        <Trans>
+                          Update (could potentially break the project)
+                        </Trans>
+                      ) : hasBreakingChanges ? (
+                        <Trans>Update (will likely break the project)</Trans>
                       ) : (
                         <Trans>Update</Trans>
                       )
@@ -206,26 +237,20 @@ const ExtensionInstallDialog = ({
             label={<Trans>Open in editor</Trans>}
             onClick={onEdit}
           />
-        ) : (
-          undefined
-        ),
+        ) : undefined,
         isAlreadyInstalled ? (
           <FlatButton
             key="report-extension"
             label={<Trans>Report an issue</Trans>}
             onClick={() => onUserReportIssue()}
           />
-        ) : (
-          undefined
-        ),
+        ) : undefined,
         extensionHeader && extensionHeader.helpPath ? (
           <HelpButton
             key="help-button"
             helpPagePath={extensionHeader.helpPath}
           />
-        ) : (
-          undefined
-        ),
+        ) : undefined,
       ].filter(Boolean)}
       open
       cannotBeDismissed={isInstalling}
@@ -252,7 +277,7 @@ const ExtensionInstallDialog = ({
             <Line>
               <div style={{ flexWrap: 'wrap' }}>
                 {extensionShortHeader.authors &&
-                  extensionShortHeader.authors.map(author => (
+                  extensionShortHeader.authors.map((author) => (
                     <UserPublicProfileChip
                       user={author}
                       key={author.id}
@@ -308,6 +333,6 @@ const ExtensionInstallDialog = ({
       </ColumnStackLayout>
     </Dialog>
   );
-};
+});
 
 export default ExtensionInstallDialog;

@@ -41,8 +41,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return 0;
 
-        const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-          .top;
+        const scrollViewYPosition =
+          scrollViewElement.getBoundingClientRect().top;
         return scrollViewElement.scrollTop + scrollViewYPosition;
       },
       /**
@@ -56,8 +56,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         if (targetElement instanceof HTMLElement) {
           const yPosition = targetElement.getBoundingClientRect().top;
 
-          const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-            .top;
+          const scrollViewYPosition =
+            scrollViewElement.getBoundingClientRect().top;
           scrollViewElement.scrollTop += yPosition - scrollViewYPosition;
         } else {
           console.error(
@@ -72,8 +72,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         const scrollViewElement = scrollView.current;
         if (!scrollViewElement) return;
 
-        const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-          .top;
+        const scrollViewYPosition =
+          scrollViewElement.getBoundingClientRect().top;
         scrollViewElement.scrollTop = y - scrollViewYPosition;
       },
       /**
@@ -87,21 +87,18 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       },
     }));
 
-    const handleScroll = React.useCallback(
-      () => {
-        if (!onScroll) return;
-        const scrollViewElement = scrollView.current;
-        if (!scrollViewElement) return;
+    const handleScroll = React.useCallback(() => {
+      if (!onScroll) return;
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
 
-        onScroll({
-          remainingScreensToBottom:
-            (scrollViewElement.scrollHeight -
-              (scrollViewElement.clientHeight + scrollViewElement.scrollTop)) /
-            scrollViewElement.clientHeight,
-        });
-      },
-      [onScroll]
-    );
+      onScroll({
+        remainingScreensToBottom:
+          (scrollViewElement.scrollHeight -
+            (scrollViewElement.clientHeight + scrollViewElement.scrollTop)) /
+          scrollViewElement.clientHeight,
+      });
+    }, [onScroll]);
 
     return (
       <div

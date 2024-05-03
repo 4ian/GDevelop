@@ -15,14 +15,13 @@ type ProductLicenseStoreState = {|
   error: ?Error,
 |};
 
-export const ProductLicenseStoreContext = React.createContext<ProductLicenseStoreState>(
-  {
+export const ProductLicenseStoreContext =
+  React.createContext<ProductLicenseStoreState>({
     fetchProductLicenses: () => {},
     assetPackLicenses: null,
     gameTemplateLicenses: null,
     error: null,
-  }
-);
+  });
 
 type ProductLicenseStoreStateProviderProps = {|
   children: React.Node,
@@ -32,32 +31,25 @@ export const ProductLicenseStoreStateProvider = ({
   children,
 }: ProductLicenseStoreStateProviderProps) => {
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    gameTemplateLicenses,
-    setGameTemplateLicenses,
-  ] = React.useState<?Array<ProductLicense>>(null);
-  const [
-    assetPackLicenses,
-    setAssetPackLicenses,
-  ] = React.useState<?Array<ProductLicense>>(null);
+  const [gameTemplateLicenses, setGameTemplateLicenses] =
+    React.useState<?Array<ProductLicense>>(null);
+  const [assetPackLicenses, setAssetPackLicenses] =
+    React.useState<?Array<ProductLicense>>(null);
 
   const isLoading = React.useRef<boolean>(false);
 
-  const fetchProductLicenses = React.useCallback(
-    () => {
-      // If the product licenses are already loaded, or being loaded, don't load them again.
-      if (isLoading.current || (gameTemplateLicenses && assetPackLicenses))
-        return;
+  const fetchProductLicenses = React.useCallback(() => {
+    // If the product licenses are already loaded, or being loaded, don't load them again.
+    if (isLoading.current || (gameTemplateLicenses && assetPackLicenses))
+      return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const [
-            fetchedAssetPackLicenses,
-            fetchedGameTemplateLicenses,
-          ] = await Promise.all([
+      try {
+        const [fetchedAssetPackLicenses, fetchedGameTemplateLicenses] =
+          await Promise.all([
             listProductLicenses({
               productType: 'asset-pack',
             }),
@@ -66,43 +58,36 @@ export const ProductLicenseStoreStateProvider = ({
             }),
           ]);
 
-          console.info(
-            `Loaded ${
-              fetchedAssetPackLicenses ? fetchedAssetPackLicenses.length : 0
-            } asset pack licenses and ${
-              fetchedGameTemplateLicenses
-                ? fetchedGameTemplateLicenses.length
-                : 0
-            } game template licenses`
-          );
+        console.info(
+          `Loaded ${
+            fetchedAssetPackLicenses ? fetchedAssetPackLicenses.length : 0
+          } asset pack licenses and ${
+            fetchedGameTemplateLicenses ? fetchedGameTemplateLicenses.length : 0
+          } game template licenses`
+        );
 
-          setAssetPackLicenses(fetchedAssetPackLicenses);
-          setGameTemplateLicenses(fetchedGameTemplateLicenses);
-        } catch (error) {
-          console.error(`Unable to load product licenses:`, error);
-          setError(error);
-        }
+        setAssetPackLicenses(fetchedAssetPackLicenses);
+        setGameTemplateLicenses(fetchedGameTemplateLicenses);
+      } catch (error) {
+        console.error(`Unable to load product licenses:`, error);
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [assetPackLicenses, gameTemplateLicenses]
-  );
+      isLoading.current = false;
+    })();
+  }, [assetPackLicenses, gameTemplateLicenses]);
 
-  React.useEffect(
-    () => {
-      // If the product licenses are already loaded, or being loaded, don't load them again.
-      if (isLoading.current || (gameTemplateLicenses && assetPackLicenses))
-        return;
+  React.useEffect(() => {
+    // If the product licenses are already loaded, or being loaded, don't load them again.
+    if (isLoading.current || (gameTemplateLicenses && assetPackLicenses))
+      return;
 
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching product licenses...');
-        fetchProductLicenses();
-      }, PRODUCT_LICENSES_FETCH_TIMEOUT);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchProductLicenses, assetPackLicenses, gameTemplateLicenses]
-  );
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching product licenses...');
+      fetchProductLicenses();
+    }, PRODUCT_LICENSES_FETCH_TIMEOUT);
+    return () => clearTimeout(timeoutId);
+  }, [fetchProductLicenses, assetPackLicenses, gameTemplateLicenses]);
   const ProductLicenseStoreState = React.useMemo(
     () => ({
       assetPackLicenses: assetPackLicenses,

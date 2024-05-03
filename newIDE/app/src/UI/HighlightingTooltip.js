@@ -110,9 +110,8 @@ const HighlightingTooltip = ({
 }: Props) => {
   const classes = useClasses();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const { currentlyRunningInAppTutorial } = React.useContext(
-    InAppTutorialContext
-  );
+  const { currentlyRunningInAppTutorial } =
+    React.useContext(InAppTutorialContext);
   if (currentlyRunningInAppTutorial) return null;
 
   const popper = (
@@ -182,7 +181,7 @@ const HighlightingTooltip = ({
   if (closeWithBackdropClick) {
     return (
       <ClickAwayListener
-        onClickAway={event => {
+        onClickAway={(event) => {
           event.preventDefault();
           event.stopPropagation();
           onClose();

@@ -101,7 +101,7 @@ type Props = {|
   game?: ?Game,
   onGameUpdated?: () => Promise<void>,
   gameUpdating?: boolean,
-  setGameUpdating?: boolean => void,
+  setGameUpdating?: (boolean) => void,
   onCopyToClipboard?: () => void,
 |};
 
@@ -150,16 +150,14 @@ const BuildProgressAndActions = ({
       const answer = Window.showConfirmDialog(
         buildId
           ? i18n._(
-              t`"${build.name ||
-                shortenUuidForDisplay(
-                  build.id
-                )}" will be the new build of this game published on gd.games. Continue?`
+              t`"${
+                build.name || shortenUuidForDisplay(build.id)
+              }" will be the new build of this game published on gd.games. Continue?`
             )
           : i18n._(
-              t`"${build.name ||
-                shortenUuidForDisplay(
-                  build.id
-                )}" will be unpublished on gd.games. Continue?`
+              t`"${
+                build.name || shortenUuidForDisplay(build.id)
+              }" will be unpublished on gd.games. Continue?`
             )
       );
       if (!answer) return;
@@ -301,8 +299,8 @@ const BuildProgressAndActions = ({
                   </>
                 )}
                 {downloadButtons
-                  .filter(button => !!build[button.key])
-                  .map(button => (
+                  .filter((button) => !!build[button.key])
+                  .map((button) => (
                     <React.Fragment key={button.key}>
                       <RaisedButton
                         primary

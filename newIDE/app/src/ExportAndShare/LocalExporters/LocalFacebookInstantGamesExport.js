@@ -58,7 +58,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
 
@@ -68,7 +68,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
       : '',
   }),
 
-  canLaunchBuild: exportState => !!exportState.archiveOutputFilename,
+  canLaunchBuild: (exportState) => !!exportState.archiveOutputFilename,
 
   isNavigationDisabled: () => false,
 
@@ -92,7 +92,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
             ]}
             value={exportState.archiveOutputFilename}
             defaultPath={app ? app.getPath('documents') : ''}
-            onChange={value =>
+            onChange={(value) =>
               updateExportState(() => ({ archiveOutputFilename: value }))
             }
             fullWidth

@@ -65,7 +65,7 @@ export type TabOptions<TabName> = Array<{|
 // They should be self descriptive - refer to Material UI docs otherwise.
 type TabsProps<TabName> = {|
   value?: TabName,
-  onChange: TabName => void,
+  onChange: (TabName) => void,
   options: TabOptions<TabName>,
   variant?: 'scrollable', // Allow overriding the scrollable variant for specific cases.
 |};
@@ -110,7 +110,7 @@ export function Tabs<TabName>({
       {options.map((option, index) => {
         const isTabSelected = option.value === value;
         const selectedTabIndex = options.findIndex(
-          option => option.value === value
+          (option) => option.value === value
         );
         // Apply a specific style if it's far from the selected tab.
         // 2 to the right, 1 to the left, as we apply a border on the left of the tab.
@@ -130,12 +130,10 @@ export function Tabs<TabName>({
               ...(isTabSelected
                 ? styles.selectedTab
                 : isTabDistant
-                ? {
-                    borderLeft: `1px solid ${
-                      gdevelopTheme.tabs.separator.color
-                    }`,
-                  }
-                : {}),
+                  ? {
+                      borderLeft: `1px solid ${gdevelopTheme.tabs.separator.color}`,
+                    }
+                  : {}),
             }}
           />
         );

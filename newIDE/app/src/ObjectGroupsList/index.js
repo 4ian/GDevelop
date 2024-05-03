@@ -84,7 +84,7 @@ type Props = {|
   globalObjectGroups: gdObjectGroupsContainer,
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
-  onEditGroup: gdObjectGroup => void,
+  onEditGroup: (gdObjectGroup) => void,
   getValidatedObjectOrGroupName: (newName: string, global: boolean) => string,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
@@ -115,18 +115,13 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       onEditGroup,
       canSetAsGlobalGroup,
     } = props;
-    const [
-      selectedGroupWithContext,
-      setSelectedGroupWithContext,
-    ] = React.useState<?GroupWithContext>(null);
+    const [selectedGroupWithContext, setSelectedGroupWithContext] =
+      React.useState<?GroupWithContext>(null);
     const [searchText, setSearchText] = React.useState<string>('');
     const treeViewRef = React.useRef<?TreeViewInterface<TreeViewItem>>(null);
     const forceUpdate = useForceUpdate();
-    const {
-      showDeleteConfirmation,
-      showConfirmation,
-      showAlert,
-    } = useAlertDialog();
+    const { showDeleteConfirmation, showConfirmation, showAlert } =
+      useAlertDialog();
 
     React.useImperativeHandle(ref, () => ({ forceUpdate }));
 
@@ -147,59 +142,50 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       []
     );
 
-    const onObjectGroupModified = React.useCallback(
-      () => {
-        if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-        forceUpdate();
-      },
-      [unsavedChanges, forceUpdate]
-    );
+    const onObjectGroupModified = React.useCallback(() => {
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      forceUpdate();
+    }, [unsavedChanges, forceUpdate]);
 
-    const addGroup = React.useCallback(
-      () => {
-        const name = newNameGenerator(
-          'Group',
-          name => objectGroups.has(name) || globalObjectGroups.has(name)
-        );
+    const addGroup = React.useCallback(() => {
+      const name = newNameGenerator(
+        'Group',
+        (name) => objectGroups.has(name) || globalObjectGroups.has(name)
+      );
 
-        const newObjectGroup = objectGroups.insertNew(
-          name,
-          objectGroups.count()
-        );
-        onObjectGroupModified();
+      const newObjectGroup = objectGroups.insertNew(name, objectGroups.count());
+      onObjectGroupModified();
 
-        if (onGroupAdded) {
-          onGroupAdded();
-        }
+      if (onGroupAdded) {
+        onGroupAdded();
+      }
 
-        const groupWithContext: GroupWithContext = {
-          group: newObjectGroup,
-          global: false, // A new group is not global by default.
-        };
+      const groupWithContext: GroupWithContext = {
+        group: newObjectGroup,
+        global: false, // A new group is not global by default.
+      };
 
-        if (treeViewRef.current)
-          treeViewRef.current.openItems([sceneGroupsRootFolderId]);
+      if (treeViewRef.current)
+        treeViewRef.current.openItems([sceneGroupsRootFolderId]);
 
-        // Scroll to the new group.
-        // Ideally, we'd wait for the list to be updated to scroll, but
-        // to simplify the code, we just wait a few ms for a new render
-        // to be done.
-        setTimeout(() => {
-          scrollToItem(groupWithContext);
-        }, 100); // A few ms is enough for a new render to be done.
+      // Scroll to the new group.
+      // Ideally, we'd wait for the list to be updated to scroll, but
+      // to simplify the code, we just wait a few ms for a new render
+      // to be done.
+      setTimeout(() => {
+        scrollToItem(groupWithContext);
+      }, 100); // A few ms is enough for a new render to be done.
 
-        // We focus it so the user can edit the name directly.
-        onEditName(groupWithContext);
-      },
-      [
-        globalObjectGroups,
-        objectGroups,
-        onGroupAdded,
-        onEditName,
-        onObjectGroupModified,
-        scrollToItem,
-      ]
-    );
+      // We focus it so the user can edit the name directly.
+      onEditName(groupWithContext);
+    }, [
+      globalObjectGroups,
+      objectGroups,
+      onGroupAdded,
+      onEditName,
+      onObjectGroupModified,
+      scrollToItem,
+    ]);
 
     const onDelete = React.useCallback(
       async (groupWithContext: GroupWithContext) => {
@@ -211,7 +197,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         });
         if (!answer) return;
 
-        onDeleteGroup(groupWithContext, doRemove => {
+        onDeleteGroup(groupWithContext, (doRemove) => {
           if (!doRemove) return;
 
           if (global) {
@@ -242,7 +228,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
 
         const newName = newNameGenerator(
           group.getName(),
-          name => objectGroups.has(name) || globalObjectGroups.has(name),
+          (name) => objectGroups.has(name) || globalObjectGroups.has(name),
           ''
         );
 
@@ -275,7 +261,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
         if (group.getName() === newName) return;
 
         const validatedNewName = getValidatedObjectOrGroupName(newName, global);
-        onRenameGroup(groupWithContext, validatedNewName, doRename => {
+        onRenameGroup(groupWithContext, validatedNewName, (doRename) => {
           if (!doRename) return;
 
           group.setName(validatedNewName);
@@ -493,10 +479,10 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
       (i18n: I18nType): Array<TreeViewItem> => {
         const objectGroupsList: GroupWithContextList = enumerateGroups(
           objectGroups
-        ).map(group => ({ group, global: false }));
+        ).map((group) => ({ group, global: false }));
         const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
           globalObjectGroups
-        ).map(group => ({ group, global: true }));
+        ).map((group) => ({ group, global: true }));
 
         const treeViewItems = [
           {
@@ -577,7 +563,7 @@ const ObjectGroupsList = React.forwardRef<Props, ObjectGroupsListInterface>(
                             ? [selectedGroupWithContext]
                             : []
                         }
-                        onSelectItems={items => {
+                        onSelectItems={(items) => {
                           if (!items) setSelectedGroupWithContext(null);
                           const itemToSelect = items[0];
                           if (itemToSelect.isRoot || itemToSelect.isPlaceholder)
@@ -632,7 +618,7 @@ const MemoizedObjectGroupsList = React.memo<Props, ObjectGroupsListInterface>(
 
 const ObjectGroupsListWithErrorBoundary = React.forwardRef<
   Props,
-  ObjectGroupsListInterface
+  ObjectGroupsListInterface,
 >((props, ref) => (
   <ErrorBoundary
     componentTitle={<Trans>Object groups list</Trans>}

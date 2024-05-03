@@ -7,7 +7,7 @@ import classes from './CompactSemiControlledNumberField.module.css';
 type Props = {|
   id?: string,
   value: number,
-  onChange: number => void,
+  onChange: (number) => void,
   commitOnBlur?: boolean,
   disabled?: boolean,
   errored?: boolean,
@@ -50,11 +50,11 @@ const CompactSemiControlledNumberField = ({
             setTemporaryValue(null);
           }
         }}
-        onFocus={event => {
+        onFocus={(event) => {
           setFocused(true);
           setTemporaryValue(value);
         }}
-        onBlur={event => {
+        onBlur={(event) => {
           const newValue = parseFloat(event.currentTarget.value);
           const isNewValueValid = !Number.isNaN(newValue);
           if (isNewValueValid && newValue !== value) {

@@ -12,7 +12,7 @@ import DownloadFileSaveAsDialog from './DownloadFileSaveAsDialog';
 export default ({
   internalName: 'DownloadFile',
   name: t`Download a copy`,
-  renderIcon: props => <Download fontSize={props.size} />,
+  renderIcon: (props) => <Download fontSize={props.size} />,
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: async (
@@ -22,7 +22,7 @@ export default ({
     ) => {
       options.onStartSaving();
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setDialog(() => (
           <DownloadFileSaveAsDialog
             onDone={() => {

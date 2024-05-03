@@ -37,7 +37,7 @@ const styles = {
   },
 };
 
-const stopPropagation = e => e.stopPropagation();
+const stopPropagation = (e) => e.stopPropagation();
 
 /**
  * A text field, inspired from Material UI, but lightweight
@@ -45,20 +45,17 @@ const stopPropagation = e => e.stopPropagation();
  */
 export const SimpleTextField = React.memo<
   SimpleTextFieldProps,
-  SimpleTextFieldInterface
+  SimpleTextFieldInterface,
 >(
   React.forwardRef<SimpleTextFieldProps, SimpleTextFieldInterface>(
     (props, ref) => {
       const inputRef = React.useRef<?HTMLInputElement>(null);
 
-      React.useEffect(
-        () => {
-          // If the value passed changed, update the input. Otherwise,
-          // keep the input uncontrolled.
-          if (inputRef.current) inputRef.current.value = props.value;
-        },
-        [props.value]
-      );
+      React.useEffect(() => {
+        // If the value passed changed, update the input. Otherwise,
+        // keep the input uncontrolled.
+        if (inputRef.current) inputRef.current.value = props.value;
+      }, [props.value]);
 
       const focus = React.useCallback((options: ?FocusOptions) => {
         const input = inputRef.current;
@@ -112,12 +109,12 @@ export const SimpleTextField = React.memo<
             defaultValue={props.value}
             onClick={stopPropagation}
             onDoubleClick={stopPropagation}
-            onBlur={e => {
+            onBlur={(e) => {
               props.onChange(e.currentTarget.value, props.additionalContext);
             }}
             onChange={
               props.directlyStoreValueChangesWhileEditing
-                ? e => {
+                ? (e) => {
                     props.onChange(
                       e.currentTarget.value,
                       props.additionalContext
@@ -125,7 +122,7 @@ export const SimpleTextField = React.memo<
                   }
                 : undefined
             }
-            onKeyUp={e => {
+            onKeyUp={(e) => {
               if (shouldValidate(e)) {
                 props.onChange(e.currentTarget.value, props.additionalContext);
               }

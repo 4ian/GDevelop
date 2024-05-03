@@ -102,7 +102,7 @@ const VariableTypeSelector = React.memo<Props>((props: Props) => {
             value={props.variableType}
             margin="none"
             stopPropagationOnClick
-            onChange={event =>
+            onChange={(event) =>
               props.onChange(
                 getVariableTypeToString()[event.target.value],
                 props.nodeId

@@ -22,7 +22,7 @@ import { dataObjectToProps } from '../../Utils/HTMLDataset';
 import { type DraggedItem } from '../DragAndDrop/DragSourceAndDropTarget';
 import classNames from 'classnames';
 
-const stopPropagation = e => e.stopPropagation();
+const stopPropagation = (e) => e.stopPropagation();
 
 const DELAY_BEFORE_OPENING_FOLDER_ON_DRAG_HOVER = 800;
 const DELAY_BEFORE_OPENING_CONTEXT_MENU_ON_MOBILE = 1000;
@@ -65,12 +65,9 @@ const SemiControlledRowInput = ({
    * with the current value, even if the user hit Escape key and expected the
    * initialValue to be set.
    */
-  React.useEffect(
-    () => {
-      return onBlur;
-    },
-    [onBlur]
-  );
+  React.useEffect(() => {
+    return onBlur;
+  }, [onBlur]);
 
   return (
     <div className={classes.itemNameInputContainer}>
@@ -81,7 +78,7 @@ const SemiControlledRowInput = ({
         className={classes.itemNameInput}
         value={value}
         spellCheck={false}
-        onChange={e => {
+        onChange={(e) => {
           setValue(e.currentTarget.value);
         }}
         onClick={stopPropagation}
@@ -90,7 +87,7 @@ const SemiControlledRowInput = ({
           onEndRenaming(value);
         }}
         onKeyDown={onInputKeyDown}
-        onKeyUp={e => {
+        onKeyUp={(e) => {
           if (shouldCloseOrCancel(e)) {
             // Prevent closing dialog if TreeView is displayed in dialog.
             e.preventDefault();
@@ -142,7 +139,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   const isStayingOverRef = React.useRef<boolean>(false);
   const openWhenOverTimeoutId = React.useRef<?TimeoutID>(null);
   const [whereToDrop, setWhereToDrop] = React.useState<
-    'before' | 'after' | 'inside'
+    'before' | 'after' | 'inside',
   >('before');
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const openContextMenu = React.useCallback(
@@ -162,7 +159,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
   });
 
   const onClickItem = React.useCallback(
-    event => {
+    (event) => {
       if (!node || node.item.isPlaceholder) return;
       if (node.item.isRoot) {
         onOpen(node);
@@ -276,7 +273,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
         drop={() => {
           onDrop(node.item, whereToDrop);
         }}
-        hover={monitor => {
+        hover={(monitor) => {
           if (node.item.isRoot) {
             if (whereToDrop !== 'inside') setWhereToDrop('inside');
             return;
@@ -295,8 +292,8 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                   y - containerYPosition <= 6
                     ? 'before'
                     : y - containerYPosition <= 26
-                    ? 'inside'
-                    : 'after'
+                      ? 'inside'
+                      : 'after'
                 );
               } else {
                 // If the folder is open, do not suggest to drop after as
@@ -333,7 +330,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                 <>
                   <IconButton
                     size="small"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       onOpen(node);
                     }}
@@ -430,7 +427,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                       <IconButton
                         id={rightButton.id}
                         size="small"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           if (rightButton.click) {
                             rightButton.click();
@@ -443,7 +440,7 @@ const TreeViewRow = <Item: ItemBaseAttributes>(props: Props<Item>) => {
                     {shouldDisplayMenu && (
                       <IconButton
                         size="small"
-                        onClick={e => {
+                        onClick={(e) => {
                           e.stopPropagation();
                           onContextMenu({
                             item: node.item,

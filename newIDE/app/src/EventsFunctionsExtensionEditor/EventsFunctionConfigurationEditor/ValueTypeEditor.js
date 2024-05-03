@@ -259,7 +259,7 @@ export default function ValueTypeEditor({
                 floatingLabelText={<Trans>Identifier name</Trans>}
                 floatingLabelFixed
                 value={getIdentifierName(valueTypeMetadata.getExtraInfo())}
-                onChange={value => {
+                onChange={(value) => {
                   const scope = getIdentifierScope(
                     valueTypeMetadata.getExtraInfo()
                   );

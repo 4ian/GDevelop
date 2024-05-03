@@ -18,7 +18,7 @@ const Form = ({
 }: Props) => {
   return (
     <form
-      onSubmit={event => {
+      onSubmit={(event) => {
         // Prevent browser to navigate on form submission.
         event.preventDefault();
         onSubmit();

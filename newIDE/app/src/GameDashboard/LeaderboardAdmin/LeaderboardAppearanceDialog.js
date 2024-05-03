@@ -83,7 +83,7 @@ const unitSelectOptions = orderedTimeUnits.reduce(
 type Props = {
   open: boolean,
   leaderboardCustomizationSettings: ?LeaderboardCustomizationSettings,
-  onSave: LeaderboardCustomizationSettings => Promise<void>,
+  onSave: (LeaderboardCustomizationSettings) => Promise<void>,
   onClose: () => void,
 };
 
@@ -101,31 +101,26 @@ function LeaderboardAppearanceDialog({
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const { canUseTheme, canUseCustomCss } = canUserCustomizeLeaderboardTheme(
-    authenticatedUser
-  );
+  const { canUseTheme, canUseCustomCss } =
+    canUserCustomizeLeaderboardTheme(authenticatedUser);
   const rgbLeaderboardTheme = getRGBLeaderboardTheme(
     leaderboardCustomizationSettings
   );
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
-  const [
-    defaultDisplayedEntriesNumber,
-    setDefaultDisplayedEntriesNumber,
-  ] = React.useState<number>(
-    (leaderboardCustomizationSettings &&
-      leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
-      20
-  );
+  const [defaultDisplayedEntriesNumber, setDefaultDisplayedEntriesNumber] =
+    React.useState<number>(
+      (leaderboardCustomizationSettings &&
+        leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
+        20
+    );
   const [backgroundColor, setBackgroundColor] = React.useState<string>(
     rgbLeaderboardTheme.backgroundColor
   );
   const [textColor, setTextColor] = React.useState<string>(
     rgbLeaderboardTheme.textColor
   );
-  const [
-    highlightBackgroundColor,
-    setHighlightBackgroundColor,
-  ] = React.useState<string>(rgbLeaderboardTheme.highlightBackgroundColor);
+  const [highlightBackgroundColor, setHighlightBackgroundColor] =
+    React.useState<string>(rgbLeaderboardTheme.highlightBackgroundColor);
   const [highlightTextColor, setHighlightTextColor] = React.useState<string>(
     rgbLeaderboardTheme.highlightTextColor
   );
@@ -524,7 +519,7 @@ function LeaderboardAppearanceDialog({
                   onChange={(e, i, newValue) => setTimeUnits(newValue)}
                   disabled={isLoading}
                 >
-                  {Object.keys(unitSelectOptions).map(option => (
+                  {Object.keys(unitSelectOptions).map((option) => (
                     <SelectOption key={option} value={option} label={option} />
                   ))}
                 </SelectField>

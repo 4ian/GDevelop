@@ -54,25 +54,19 @@ export function ExampleDialog({
   const [error, setError] = React.useState<?Error>(null);
   const [example, setExample] = React.useState<?Example>(null);
 
-  const loadExample = React.useCallback(
-    async () => {
-      setError(null);
-      try {
-        const example = await getExample(exampleShortHeader);
-        setExample(example);
-      } catch (error) {
-        setError(error);
-      }
-    },
-    [exampleShortHeader]
-  );
+  const loadExample = React.useCallback(async () => {
+    setError(null);
+    try {
+      const example = await getExample(exampleShortHeader);
+      setExample(example);
+    } catch (error) {
+      setError(error);
+    }
+  }, [exampleShortHeader]);
 
-  React.useEffect(
-    () => {
-      loadExample();
-    },
-    [loadExample]
-  );
+  React.useEffect(() => {
+    loadExample();
+  }, [loadExample]);
 
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),
@@ -81,12 +75,9 @@ export function ExampleDialog({
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
   const canOpenExample = !isOpening && isCompatible;
-  const onOpenExample = React.useCallback(
-    () => {
-      if (canOpenExample) onOpen();
-    },
-    [onOpen, canOpenExample]
-  );
+  const onOpenExample = React.useCallback(() => {
+    if (canOpenExample) onOpen();
+  }, [onOpen, canOpenExample]);
 
   return (
     <Dialog
@@ -111,7 +102,7 @@ export function ExampleDialog({
             primary
             onClick={onOpenExample}
             disabled={!canOpenExample}
-            buildMenuTemplate={i18n => [
+            buildMenuTemplate={(i18n) => [
               {
                 label: electron
                   ? i18n._(t`Open in the web-app`)
@@ -158,7 +149,7 @@ export function ExampleDialog({
                     />
                   )}
                   {exampleShortHeader.authors &&
-                    exampleShortHeader.authors.map(author => (
+                    exampleShortHeader.authors.map((author) => (
                       <UserPublicProfileChip
                         user={author}
                         key={author.id}

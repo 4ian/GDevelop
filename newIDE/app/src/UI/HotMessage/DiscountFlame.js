@@ -1,7 +1,7 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.memo(props => (
+export default React.memo((props) => (
   <SvgIcon {...props} width="39" height="40" viewBox="0 0 39 40" fill="none">
     <g clipPath="url(#clip0_1247_1919)">
       <path

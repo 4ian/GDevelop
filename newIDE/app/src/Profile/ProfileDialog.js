@@ -80,35 +80,30 @@ const ProfileDialog = ({ open, onClose }: Props) => {
     markBadgesAsSeen
   );
 
-  const [
-    isManageSubscriptionLoading,
-    setIsManageSubscriptionLoading,
-  ] = React.useState(false);
-  const onManageSubscription = React.useCallback(
-    async () => {
-      const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-      if (!firebaseUser) return;
+  const [isManageSubscriptionLoading, setIsManageSubscriptionLoading] =
+    React.useState(false);
+  const onManageSubscription = React.useCallback(async () => {
+    const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+    if (!firebaseUser) return;
 
-      try {
-        setIsManageSubscriptionLoading(true);
-        const url = await getRedirectToSubscriptionPortalUrl(
-          getAuthorizationHeader,
-          firebaseUser.uid
-        );
-        Window.openExternalURL(url);
-      } catch (error) {
-        showErrorBox({
-          message:
-            'Unable to load the portal to manage your subscription. Please contact us on billing@gdevelop.io',
-          rawError: error,
-          errorId: 'subscription-portal-error',
-        });
-      } finally {
-        setIsManageSubscriptionLoading(false);
-      }
-    },
-    [authenticatedUser]
-  );
+    try {
+      setIsManageSubscriptionLoading(true);
+      const url = await getRedirectToSubscriptionPortalUrl(
+        getAuthorizationHeader,
+        firebaseUser.uid
+      );
+      Window.openExternalURL(url);
+    } catch (error) {
+      showErrorBox({
+        message:
+          'Unable to load the portal to manage your subscription. Please contact us on billing@gdevelop.io',
+        rawError: error,
+        errorId: 'subscription-portal-error',
+      });
+    } finally {
+      setIsManageSubscriptionLoading(false);
+    }
+  }, [authenticatedUser]);
 
   React.useEffect(
     () => {
@@ -119,13 +114,10 @@ const ProfileDialog = ({ open, onClose }: Props) => {
     [authenticatedUser.onRefreshUserProfile, open] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  const onLogout = React.useCallback(
-    async () => {
-      await authenticatedUser.onLogout();
-      onClose();
-    },
-    [authenticatedUser, onClose]
-  );
+  const onLogout = React.useCallback(async () => {
+    await authenticatedUser.onLogout();
+    onClose();
+  }, [authenticatedUser, onClose]);
 
   const isConnected =
     authenticatedUser.authenticated && authenticatedUser.profile;

@@ -30,7 +30,7 @@ export const toEventsContextResult = (
     .toJSArray();
 
   const objectOrGroupBehaviorNames = {};
-  objectOrGroupNames.forEach(objectOrGroupName => {
+  objectOrGroupNames.forEach((objectOrGroupName) => {
     const behaviorNames = eventsContext
       .getBehaviorNamesOfObjectOrGroup(objectOrGroupName)
       .toNewVectorString()
@@ -55,7 +55,7 @@ type Props = {|
 
 export default class EventsContextAnalyzerDialog extends React.Component<
   Props,
-  {}
+  {},
 > {
   render() {
     const { onClose, eventsContextResult } = this.props;
@@ -90,7 +90,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
         <Text>
           <Trans>All behaviors being directly referenced in the events:</Trans>{' '}
           {Object.keys(eventsContextResult.objectOrGroupBehaviorNames).map(
-            objectOrGroupName => {
+            (objectOrGroupName) => {
               return (
                 <Trans key={objectOrGroupName}>
                   Behaviors of {objectOrGroupName}:{' '}

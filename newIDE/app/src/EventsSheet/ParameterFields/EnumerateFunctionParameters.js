@@ -9,7 +9,7 @@ export const enumerateParametersUsableInExpressions = (
 ): Array<gdParameterMetadata> => {
   return mapVector(
     eventsFunction.getParametersForEvents(eventsFunctionsContainer),
-    parameterMetadata =>
+    (parameterMetadata) =>
       !parameterMetadata.isCodeOnly() &&
       !gd.ParameterMetadata.isObject(parameterMetadata.getType()) &&
       !gd.ParameterMetadata.isBehavior(parameterMetadata.getType()) &&

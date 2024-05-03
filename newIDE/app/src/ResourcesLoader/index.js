@@ -95,7 +95,7 @@ export default class ResourcesLoader {
     resourcesNames: Array<string>
   ) {
     const resourcesManager = project.getResourcesManager();
-    resourcesNames.forEach(resourceName => {
+    resourcesNames.forEach((resourceName) => {
       if (resourcesManager.hasResource(resourceName)) {
         ResourcesLoader._cache.burstUrl(
           project,

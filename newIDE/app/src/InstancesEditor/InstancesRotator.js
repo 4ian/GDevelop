@@ -46,9 +46,8 @@ export default class InstancesRotator {
     const initialAABB = this._instanceAABBs[instance.ptr];
     if (initialAABB) return initialAABB;
 
-    return (this._instanceAABBs[
-      instance.ptr
-    ] = this._instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
+    return (this._instanceAABBs[instance.ptr] =
+      this._instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
@@ -75,7 +74,7 @@ export default class InstancesRotator {
     proportional: boolean
   ) {
     const nonLockedInstances = instances.filter(
-      instance => !instance.isLocked()
+      (instance) => !instance.isLocked()
     );
 
     if (!this._fixedPointIsUpToDate) {
@@ -105,9 +104,8 @@ export default class InstancesRotator {
 
       const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
       const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);
-      const initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
-        selectedInstance
-      );
+      const initialInstanceOriginPosition =
+        this._getOrCreateInstanceOriginPosition(selectedInstance);
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
       // We round the angle to the nearest degree when an instance is rotated in the editor.

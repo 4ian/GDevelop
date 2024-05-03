@@ -163,7 +163,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
       <React.Fragment>
         <SemiControlledTextField
           value={value.toString()}
-          onChange={newValue => setValue(parseFloat(newValue))}
+          onChange={(newValue) => setValue(parseFloat(newValue))}
         />
         <p>
           State value is {value} ({typeof value})
@@ -178,7 +178,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
       <React.Fragment>
         <SemiControlledTextField
           value={value.toString()}
-          onChange={newValue => setValue(parseFloat(newValue))}
+          onChange={(newValue) => setValue(parseFloat(newValue))}
           commitOnBlur
         />
         <p>
@@ -277,7 +277,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
           <SemiControlledAutoComplete
             value={value}
             onChange={onChange}
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
@@ -295,7 +295,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
           <SemiControlledAutoComplete
             value={value}
             onChange={onChange}
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
@@ -359,7 +359,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
                 type: 'separator',
               },
             ].concat(
-              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                 text: `Choice ${i}`,
                 value: `Choice ${i}`,
               }))
@@ -404,7 +404,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
                   type: 'separator',
                 },
               ].concat(
-                [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                   text:
                     i % 2
                       ? `Choice ${i}`
@@ -446,7 +446,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
                 type: 'separator',
               },
             ].concat(
-              [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                 text: `Choice ${i}`,
                 value: `Choice ${i}`,
               }))
@@ -468,7 +468,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
               margin="none"
               value={value}
               onChange={onChange}
-              dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                 text: `Choice ${i}`,
                 value: `Choice ${i}`,
               }))}
@@ -488,7 +488,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
             value={value}
             onChange={onChange}
             helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
@@ -508,7 +508,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
             onChange={onChange}
             floatingLabelText="This is a floating label"
             helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
@@ -535,7 +535,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               <SemiControlledMultiAutoComplete
                 value={value}
                 onChange={(event, value) => onChange(value)}
-                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                   text: `Choice ${i}`,
                   value: `choice-${i}`,
                 }))}
@@ -547,7 +547,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               />
               <p>
                 values are{' '}
-                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+                {value.map((v) => `(${v.text} - ${v.value})`).join(', ')}
               </p>
             </React.Fragment>
           )}
@@ -569,7 +569,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               <SemiControlledMultiAutoComplete
                 value={value}
                 onChange={(event, value) => onChange(value)}
-                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                   text: `Choice ${i}`,
                   value: `choice-${i}`,
                 }))}
@@ -581,7 +581,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               />
               <p>
                 values are{' '}
-                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+                {value.map((v) => `(${v.text} - ${v.value})`).join(', ')}
               </p>
             </React.Fragment>
           )}
@@ -603,7 +603,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               <SemiControlledMultiAutoComplete
                 value={value}
                 onChange={(event, value) => onChange(value)}
-                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
                   text: `Choice ${i}`,
                   value: `choice-${i}`,
                 }))}
@@ -616,7 +616,7 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
               />
               <p>
                 values are{' '}
-                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+                {value.map((v) => `(${v.text} - ${v.value})`).join(', ')}
               </p>
             </React.Fragment>
           )}
@@ -697,7 +697,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           onChange={() => {}}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -713,7 +713,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           onChange={() => {}}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -725,13 +725,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           floatingLabelText="Hello world"
           value={''}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -743,13 +743,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
         <SemiControlledAutoComplete
           value={''}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -763,13 +763,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           floatingLabelText="Hello world"
           value={''}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -783,13 +783,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           margin="none"
           value={''}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -805,13 +805,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
             margin="none"
             value={''}
             onChange={() => {}}
-            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
               text: `Choice ${i}`,
               value: `Choice ${i}`,
             }))}
           />
         )}
-        renderButton={style => (
+        renderButton={(style) => (
           <IconButton size="small">
             <Brush />
           </IconButton>
@@ -828,7 +828,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           onChange={() => {}}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -843,7 +843,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           fullWidth
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -858,7 +858,7 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           onChange={() => {}}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -870,13 +870,13 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           floatingLabelText="Hello world"
           value={'Choice 5'}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -888,14 +888,14 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
           floatingLabelText="Hello world"
           value={'Choice 5'}
           onChange={() => {}}
-          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+          dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => ({
             text: `Choice ${i}`,
             value: `Choice ${i}`,
           }))}
           fullWidth
         />
       )}
-      renderButton={style => (
+      renderButton={(style) => (
         <RaisedButton style={style} label="Button" onClick={() => {}} />
       )}
     />
@@ -909,14 +909,14 @@ storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
   .add('default', () => (
     <React.Fragment>
-      {[0, 1, 2].map(idx => (
+      {[0, 1, 2].map((idx) => (
         <Accordion key={idx}>
           <AccordionHeader
             actions={[
               <IconButton
                 key="delete"
                 size="small"
-                onClick={ev => {
+                onClick={(ev) => {
                   ev.stopPropagation();
                   action('Header action')();
                 }}
@@ -1240,13 +1240,13 @@ storiesOf('PropertiesEditor', module)
           name: 'Object name',
           valueType: 'string',
           disabled: true,
-          getValue: instance => 'Disabled field',
+          getValue: (instance) => 'Disabled field',
           setValue: (instance, newValue) => {},
         },
         {
           name: 'Some field with edit buttons',
           valueType: 'string',
-          getValue: instance => 'Click to test',
+          getValue: (instance) => 'Click to test',
           setValue: (instance, newValue) => {},
           onEditButtonBuildMenuTemplate: () => [
             {
@@ -1266,13 +1266,13 @@ storiesOf('PropertiesEditor', module)
             {
               name: 'X',
               valueType: 'number',
-              getValue: instance => 10,
+              getValue: (instance) => 10,
               setValue: (instance, newValue) => {},
             },
             {
               name: 'Y',
               valueType: 'number',
-              getValue: instance => 20.1234,
+              getValue: (instance) => 20.1234,
               setValue: (instance, newValue) => {},
             },
           ],
@@ -1280,19 +1280,19 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Angle',
           valueType: 'number',
-          getValue: instance => 90.123456,
+          getValue: (instance) => 90.123456,
           setValue: (instance, newValue) => {},
         },
         {
           name: 'Checked checkbox',
           valueType: 'boolean',
-          getValue: instance => true,
+          getValue: (instance) => true,
           setValue: (instance, newValue) => {},
         },
         {
           name: 'Unchecked checkbox',
           valueType: 'boolean',
-          getValue: instance => false,
+          getValue: (instance) => false,
           setValue: (instance, newValue) => {},
         },
       ]}
@@ -1306,7 +1306,7 @@ storiesOf('PropertiesEditor', module)
           name: 'Object name',
           valueType: 'string',
           disabled: true,
-          getValue: instance => 'Disabled field',
+          getValue: (instance) => 'Disabled field',
           setValue: (instance, newValue) => {},
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
@@ -1314,7 +1314,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Some field with edit buttons',
           valueType: 'string',
-          getValue: instance => 'Click to test',
+          getValue: (instance) => 'Click to test',
           setValue: (instance, newValue) => {},
           onEditButtonBuildMenuTemplate: () => [
             {
@@ -1334,7 +1334,7 @@ storiesOf('PropertiesEditor', module)
             {
               name: 'X',
               valueType: 'number',
-              getValue: instance => 10,
+              getValue: (instance) => 10,
               setValue: (instance, newValue) => {},
               getDescription: () =>
                 'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
@@ -1342,7 +1342,7 @@ storiesOf('PropertiesEditor', module)
             {
               name: 'Y',
               valueType: 'number',
-              getValue: instance => 20.1234,
+              getValue: (instance) => 20.1234,
               setValue: (instance, newValue) => {},
               getDescription: () =>
                 'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
@@ -1352,7 +1352,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Angle',
           valueType: 'number',
-          getValue: instance => 90.123456,
+          getValue: (instance) => 90.123456,
           setValue: (instance, newValue) => {},
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
@@ -1360,7 +1360,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Checked checkbox',
           valueType: 'boolean',
-          getValue: instance => true,
+          getValue: (instance) => true,
           setValue: (instance, newValue) => {},
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',
@@ -1368,7 +1368,7 @@ storiesOf('PropertiesEditor', module)
         {
           name: 'Unchecked checkbox',
           valueType: 'boolean',
-          getValue: instance => false,
+          getValue: (instance) => false,
           setValue: (instance, newValue) => {},
           getDescription: () =>
             'This is a description. It can be fairly long and even have some *Markdown*, including [links](http://example.com).',

@@ -71,9 +71,7 @@ export const NoStartupSubscription = () => {
 NoStartupSubscription.parameters = {
   mockData: [
     {
-      url: `${
-        GDevelopProjectApi.baseUrl
-      }/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
+      url: `${GDevelopProjectApi.baseUrl}/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
       method: 'GET',
       status: 200,
       response: [],
@@ -92,9 +90,7 @@ export const NotOwnerOfProject = () => {
 NotOwnerOfProject.parameters = {
   mockData: [
     {
-      url: `${
-        GDevelopProjectApi.baseUrl
-      }/project-user-acl?userId=indie-user&projectId=${notOwnedProjectId}`,
+      url: `${GDevelopProjectApi.baseUrl}/project-user-acl?userId=indie-user&projectId=${notOwnedProjectId}`,
       method: 'GET',
       status: 403,
       response: [],
@@ -113,9 +109,7 @@ export const Errored = () => {
 Errored.parameters = {
   mockData: [
     {
-      url: `${
-        GDevelopProjectApi.baseUrl
-      }/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
+      url: `${GDevelopProjectApi.baseUrl}/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
       method: 'GET',
       status: 500,
       response: [],
@@ -134,9 +128,7 @@ export const WithCollaborators = () => {
 WithCollaborators.parameters = {
   mockData: [
     {
-      url: `${
-        GDevelopProjectApi.baseUrl
-      }/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
+      url: `${GDevelopProjectApi.baseUrl}/project-user-acl?userId=indie-user&projectId=${ownedProjectId}`,
       method: 'GET',
       status: 200,
       response: projectUserAcls,

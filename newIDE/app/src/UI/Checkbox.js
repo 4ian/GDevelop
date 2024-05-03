@@ -55,7 +55,7 @@ const Checkbox = (props: Props) => {
       disabled={props.disabled}
       checked={props.checked}
       onChange={
-        onCheck ? event => onCheck(event, event.target.checked) : undefined
+        onCheck ? (event) => onCheck(event, event.target.checked) : undefined
       }
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}

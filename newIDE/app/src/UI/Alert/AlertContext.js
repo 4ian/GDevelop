@@ -12,7 +12,7 @@ export type ShowAlertDialogOptionsWithCallback = {|
   ...ShowAlertDialogOptions,
   callback: Function,
 |};
-export type ShowAlertFunction = ShowAlertDialogOptions => Promise<void>;
+export type ShowAlertFunction = (ShowAlertDialogOptions) => Promise<void>;
 
 // Confirm
 export type ShowConfirmDialogOptions = {|
@@ -28,7 +28,8 @@ export type ShowConfirmDialogOptionsWithCallback = {|
   ...ShowConfirmDialogOptions,
   callback: Function,
 |};
-export type ShowConfirmFunction = ShowConfirmDialogOptions => Promise<boolean>;
+export type ShowConfirmFunction =
+  (ShowConfirmDialogOptions) => Promise<boolean>;
 
 // Confirm Delete
 export type ShowConfirmDeleteDialogOptions = {|
@@ -43,7 +44,8 @@ export type ShowConfirmDeleteDialogOptionsWithCallback = {|
   ...ShowConfirmDeleteDialogOptions,
   callback: Function,
 |};
-export type ShowConfirmDeleteFunction = ShowConfirmDeleteDialogOptions => Promise<boolean>;
+export type ShowConfirmDeleteFunction =
+  (ShowConfirmDeleteDialogOptions) => Promise<boolean>;
 
 // Yes No Cancel
 export type ShowYesNoCancelDialogOptions = {|
@@ -59,17 +61,17 @@ export type ShowYesNoCancelDialogOptionsWithCallback = {|
 |};
 
 export type ConfirmState = {|
-  showAlertDialog: ShowAlertDialogOptionsWithCallback => void,
-  showConfirmDialog: ShowConfirmDialogOptionsWithCallback => void,
-  showConfirmDeleteDialog: ShowConfirmDeleteDialogOptionsWithCallback => void,
-  showYesNoCancelDialog: ShowYesNoCancelDialogOptionsWithCallback => void,
+  showAlertDialog: (ShowAlertDialogOptionsWithCallback) => void,
+  showConfirmDialog: (ShowConfirmDialogOptionsWithCallback) => void,
+  showConfirmDeleteDialog: (ShowConfirmDeleteDialogOptionsWithCallback) => void,
+  showYesNoCancelDialog: (ShowYesNoCancelDialogOptionsWithCallback) => void,
 |};
 
 const initialConfirmState = {
-  showAlertDialog: ShowAlertDialogOptionsWithCallback => {},
-  showConfirmDialog: ShowConfirmDialogOptionsWithCallback => {},
-  showConfirmDeleteDialog: ShowConfirmDeleteDialogOptionsWithCallback => {},
-  showYesNoCancelDialog: ShowYesNoCancelDialogOptionsWithCallback => {},
+  showAlertDialog: (ShowAlertDialogOptionsWithCallback) => {},
+  showConfirmDialog: (ShowConfirmDialogOptionsWithCallback) => {},
+  showConfirmDeleteDialog: (ShowConfirmDeleteDialogOptionsWithCallback) => {},
+  showYesNoCancelDialog: (ShowYesNoCancelDialogOptionsWithCallback) => {},
 };
 
 const AlertContext = React.createContext<ConfirmState>(initialConfirmState);

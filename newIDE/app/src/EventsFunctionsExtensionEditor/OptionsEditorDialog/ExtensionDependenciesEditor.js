@@ -51,7 +51,7 @@ export const ExtensionDependenciesEditor = ({
     eventsFunctionsExtension
       .addDependency()
       .setName(
-        newNameGenerator('New Dependency', newName =>
+        newNameGenerator('New Dependency', (newName) =>
           checkNameExists(newName, deps)
         )
       )
@@ -92,90 +92,92 @@ export const ExtensionDependenciesEditor = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {// $FlowFixMe - unsure why Flow complains about TableRow.
-              mapVector<gdDependencyMetadata, TableRow>(
-                eventsFunctionsExtension.getAllDependencies(),
-                (dependency, index) => (
-                  // $FlowFixMe - unsure why Flow complains about TableRow.
-                  <TableRow key={dependency.getName()}>
-                    <TableRowColumn>
-                      <SemiControlledTextField
-                        commitOnBlur
-                        value={dependency.getName()}
-                        onChange={newName => {
-                          if (newName === dependency.getName()) return;
+              {
+                // $FlowFixMe - unsure why Flow complains about TableRow.
+                mapVector<gdDependencyMetadata, TableRow>(
+                  eventsFunctionsExtension.getAllDependencies(),
+                  (dependency, index) => (
+                    // $FlowFixMe - unsure why Flow complains about TableRow.
+                    <TableRow key={dependency.getName()}>
+                      <TableRowColumn>
+                        <SemiControlledTextField
+                          commitOnBlur
+                          value={dependency.getName()}
+                          onChange={(newName) => {
+                            if (newName === dependency.getName()) return;
 
-                          if (checkNameExists(newName, deps)) {
-                            showWarningBox(
-                              `This name is already in use! Please use a unique name.`,
-                              { delayToNextTick: true }
-                            );
-                          } else {
-                            dependency.setName(newName);
+                            if (checkNameExists(newName, deps)) {
+                              showWarningBox(
+                                `This name is already in use! Please use a unique name.`,
+                                { delayToNextTick: true }
+                              );
+                            } else {
+                              dependency.setName(newName);
+                              forceUpdate();
+                            }
+                          }}
+                          margin="none"
+                        />
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <SemiControlledTextField
+                          commitOnBlur
+                          value={dependency.getExportName()}
+                          onChange={(newExportName) => {
+                            if (newExportName === dependency.getExportName())
+                              return;
+
+                            dependency.setExportName(newExportName);
                             forceUpdate();
-                          }
-                        }}
-                        margin="none"
-                      />
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <SemiControlledTextField
-                        commitOnBlur
-                        value={dependency.getExportName()}
-                        onChange={newExportName => {
-                          if (newExportName === dependency.getExportName())
-                            return;
+                          }}
+                          margin="none"
+                        />
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <SemiControlledTextField
+                          commitOnBlur
+                          value={dependency.getVersion()}
+                          onChange={(newVersion) => {
+                            if (newVersion === dependency.getVersion()) return;
 
-                          dependency.setExportName(newExportName);
-                          forceUpdate();
-                        }}
-                        margin="none"
-                      />
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <SemiControlledTextField
-                        commitOnBlur
-                        value={dependency.getVersion()}
-                        onChange={newVersion => {
-                          if (newVersion === dependency.getVersion()) return;
+                            dependency.setVersion(newVersion);
+                            forceUpdate();
+                          }}
+                          margin="none"
+                        />
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <SelectField
+                          value={dependency.getDependencyType()}
+                          onChange={(_, __, newType) => {
+                            if (newType === dependency.getDependencyType())
+                              return;
 
-                          dependency.setVersion(newVersion);
-                          forceUpdate();
-                        }}
-                        margin="none"
-                      />
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <SelectField
-                        value={dependency.getDependencyType()}
-                        onChange={(_, __, newType) => {
-                          if (newType === dependency.getDependencyType())
-                            return;
-
-                          dependency.setDependencyType(newType);
-                          forceUpdate();
-                        }}
-                        margin="none"
-                      >
-                        <SelectOption value="npm" label={t`NPM`} />
-                        <SelectOption value="cordova" label={t`Cordova`} />
-                      </SelectField>
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <IconButton
-                        tooltip={t`Delete`}
-                        onClick={() => {
-                          eventsFunctionsExtension.removeDependencyAt(index);
-                          forceUpdate();
-                        }}
-                        size="small"
-                      >
-                        <Trash />
-                      </IconButton>
-                    </TableRowColumn>
-                  </TableRow>
+                            dependency.setDependencyType(newType);
+                            forceUpdate();
+                          }}
+                          margin="none"
+                        >
+                          <SelectOption value="npm" label={t`NPM`} />
+                          <SelectOption value="cordova" label={t`Cordova`} />
+                        </SelectField>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        <IconButton
+                          tooltip={t`Delete`}
+                          onClick={() => {
+                            eventsFunctionsExtension.removeDependencyAt(index);
+                            forceUpdate();
+                          }}
+                          size="small"
+                        >
+                          <Trash />
+                        </IconButton>
+                      </TableRowColumn>
+                    </TableRow>
+                  )
                 )
-              )}
+              }
             </TableBody>
           </Table>
           <Column expand>

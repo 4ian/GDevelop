@@ -47,7 +47,7 @@ type Props = {|
   canBeReset?: boolean,
   initialResourceName: string,
   defaultNewResourceName?: string,
-  onChange: string => void,
+  onChange: (string) => void,
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
@@ -73,9 +73,8 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       onChange,
     } = props;
     const forceUpdate = useForceUpdate();
-    const autoCompleteRef = React.useRef<?SemiControlledAutoCompleteInterface>(
-      null
-    );
+    const autoCompleteRef =
+      React.useRef<?SemiControlledAutoCompleteInterface>(null);
     const { showConfirmation } = useAlertDialog();
     const abortControllerRef = React.useRef<?AbortController>(null);
     const allResourcesNamesRef = React.useRef<Array<string>>([]);
@@ -83,12 +82,10 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
     const [resourceName, setResourceName] = React.useState<string>(
       props.initialResourceName
     );
-    const [
-      externalEditorOpened,
-      setExternalEditorOpened,
-    ] = React.useState<boolean>(false);
+    const [externalEditorOpened, setExternalEditorOpened] =
+      React.useState<boolean>(false);
 
-    const focus: FieldFocusFunction = React.useCallback(options => {
+    const focus: FieldFocusFunction = React.useCallback((options) => {
       if (autoCompleteRef.current) autoCompleteRef.current.focus(options);
     }, []);
 
@@ -104,14 +101,11 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [initialResourceName]
     );
 
-    const onResetResourceName = React.useCallback(
-      () => {
-        setResourceName('');
-        setNotFoundError(false);
-        if (onChange) onChange('');
-      },
-      [onChange]
-    );
+    const onResetResourceName = React.useCallback(() => {
+      setResourceName('');
+      setNotFoundError(false);
+      if (onChange) onChange('');
+    }, [onChange]);
 
     const onChangeResourceName = React.useCallback(
       (newResourceName: string) => {
@@ -137,16 +131,18 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
           .getAllResourceNames()
           .toJSArray();
         if (resourceKind) {
-          const mainResourcesNames = allResourcesNames.filter(resourceName => {
-            return (
-              resourcesManager.getResource(resourceName).getKind() ===
-              resourceKind
-            );
-          });
+          const mainResourcesNames = allResourcesNames.filter(
+            (resourceName) => {
+              return (
+                resourcesManager.getResource(resourceName).getKind() ===
+                resourceKind
+              );
+            }
+          );
 
           if (fallbackResourceKind) {
             mainResourcesNames.push(
-              ...allResourcesNames.filter(resourceName => {
+              ...allResourcesNames.filter((resourceName) => {
                 return (
                   resourcesManager.getResource(resourceName).getKind() ===
                   fallbackResourceKind
@@ -161,15 +157,12 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       [resourceKind, fallbackResourceKind]
     );
 
-    const refreshResources = React.useCallback(
-      () => {
-        if (project) {
-          loadFrom(project.getResourcesManager());
-          forceUpdate();
-        }
-      },
-      [project, forceUpdate, loadFrom]
-    );
+    const refreshResources = React.useCallback(() => {
+      if (project) {
+        loadFrom(project.getResourcesManager());
+        forceUpdate();
+      }
+    }, [project, forceUpdate, loadFrom]);
 
     React.useEffect(
       refreshResources,
@@ -213,7 +206,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
 
           // Important, we are responsible for deleting the resources that were given to us.
           // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-          resources.forEach(resource => resource.delete());
+          resources.forEach((resource) => resource.delete());
 
           await resourceManagementProps.onFetchNewlyAddedResources();
           triggerResourcesHaveChanged();
@@ -232,33 +225,30 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       ]
     );
 
-    const getResourceSourceItems = React.useCallback(
-      (): DataSource => {
-        const sources = resourceManagementProps.resourceSources || [];
-        const storageProvider = resourceManagementProps.getStorageProvider();
+    const getResourceSourceItems = React.useCallback((): DataSource => {
+      const sources = resourceManagementProps.resourceSources || [];
+      const storageProvider = resourceManagementProps.getStorageProvider();
 
-        return [
-          ...sources
-            .filter(source => source.kind === resourceKind)
-            .filter(
-              ({ onlyForStorageProvider }) =>
-                !onlyForStorageProvider ||
-                onlyForStorageProvider === storageProvider.internalName
-            )
-            .map(source => ({
-              text: '',
-              value: '',
-              translatableValue: source.displayName,
-              renderIcon: () => <Add />,
-              onClick: () => addFrom(source),
-            })),
-          {
-            type: 'separator',
-          },
-        ];
-      },
-      [addFrom, resourceManagementProps, resourceKind]
-    );
+      return [
+        ...sources
+          .filter((source) => source.kind === resourceKind)
+          .filter(
+            ({ onlyForStorageProvider }) =>
+              !onlyForStorageProvider ||
+              onlyForStorageProvider === storageProvider.internalName
+          )
+          .map((source) => ({
+            text: '',
+            value: '',
+            translatableValue: source.displayName,
+            renderIcon: () => <Add />,
+            onClick: () => addFrom(source),
+          })),
+        {
+          type: 'separator',
+        },
+      ];
+    }, [addFrom, resourceManagementProps, resourceKind]);
 
     const editWith = React.useCallback(
       async (
@@ -334,36 +324,34 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
       ]
     );
 
-    const cancelEditingWithExternalEditor = React.useCallback(
-      async () => {
-        const shouldContinue = await showConfirmation({
-          title: t`Cancel editing`,
-          message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
-          confirmButtonLabel: t`Cancel edition`,
-          dismissButtonLabel: t`Continue editing`,
-        });
-        if (!shouldContinue) return;
-        if (abortControllerRef.current) {
-          abortControllerRef.current.abort();
-        } else {
-          console.error(
-            'Cannot cancel editing with external editor, abort controller is missing.'
-          );
-        }
-      },
-      [showConfirmation]
-    );
+    const cancelEditingWithExternalEditor = React.useCallback(async () => {
+      const shouldContinue = await showConfirmation({
+        title: t`Cancel editing`,
+        message: t`You will lose any progress made with the external editor. Do you wish to cancel?`,
+        confirmButtonLabel: t`Cancel edition`,
+        dismissButtonLabel: t`Continue editing`,
+      });
+      if (!shouldContinue) return;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      } else {
+        console.error(
+          'Cannot cancel editing with external editor, abort controller is missing.'
+        );
+      }
+    }, [showConfirmation]);
 
     const errorText = notFoundError ? (
       <Trans>This resource does not exist in the game</Trans>
     ) : null;
 
-    const externalEditors = resourceManagementProps.resourceExternalEditors.filter(
-      externalEditor => externalEditor.kind === resourceKind
-    );
+    const externalEditors =
+      resourceManagementProps.resourceExternalEditors.filter(
+        (externalEditor) => externalEditor.kind === resourceKind
+      );
 
     const resourceSourceItems = getResourceSourceItems();
-    const resourceItems = allResourcesNamesRef.current.map(resourceName => ({
+    const resourceItems = allResourcesNamesRef.current.map((resourceName) => ({
       text: resourceName,
       value: resourceName,
     }));
@@ -434,7 +422,7 @@ const ResourceSelector = React.forwardRef<Props, ResourceSelectorInterface>(
                 )}
                 onClick={() => editWith(i18n, externalEditors[0])}
                 buildMenuTemplate={(i18n: I18nType) =>
-                  externalEditors.map(externalEditor => ({
+                  externalEditors.map((externalEditor) => ({
                     label: i18n._(
                       resourceName
                         ? externalEditor.editDisplayName

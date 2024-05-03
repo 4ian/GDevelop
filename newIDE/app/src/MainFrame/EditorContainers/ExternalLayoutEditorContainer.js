@@ -39,7 +39,7 @@ type State = {|
 
 export class ExternalLayoutEditorContainer extends React.Component<
   RenderEditorContainerProps,
-  State
+  State,
 > {
   editor: ?SceneEditor;
   resourceExternallyChangedCallbackId: ?string;
@@ -68,9 +68,10 @@ export class ExternalLayoutEditorContainer extends React.Component<
         projectItemName
       );
     }
-    this.resourceExternallyChangedCallbackId = registerOnResourceExternallyChangedCallback(
-      this.onResourceExternallyChanged.bind(this)
-    );
+    this.resourceExternallyChangedCallbackId =
+      registerOnResourceExternallyChangedCallback(
+        this.onResourceExternallyChanged.bind(this)
+      );
   }
   componentWillUnmount() {
     unregisterOnResourceExternallyChangedCallback(
@@ -193,7 +194,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
             resourceManagementProps={this.props.resourceManagementProps}
             unsavedChanges={this.props.unsavedChanges}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            ref={editor => (this.editor = editor)}
+            ref={(editor) => (this.editor = editor)}
             project={project}
             layout={layout}
             initialInstances={externalLayout.getInitialInstances()}

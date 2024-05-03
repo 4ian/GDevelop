@@ -32,47 +32,43 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
   const [apiKey, setApiKey] = React.useState('');
   const [apiIssuer, setApiIssuer] = React.useState('');
 
-  const [lastUploadedApiKey, setLastUploadedApiKey] = React.useState<?string>(
-    null
-  );
+  const [lastUploadedApiKey, setLastUploadedApiKey] =
+    React.useState<?string>(null);
   const [isAuthKeyLoading, setIsAuthKeyLoading] = React.useState(false);
   const [authKeyError, setAuthKeyError] = React.useState<?Error>(null);
 
-  const onUploadAuthKey = React.useCallback(
-    async () => {
-      if (!userId || !authKeyFile) return;
+  const onUploadAuthKey = React.useCallback(async () => {
+    if (!userId || !authKeyFile) return;
 
-      try {
-        setIsAuthKeyLoading(true);
-        setLastUploadedApiKey(null);
-        setAuthKeyError(null);
-        const appleAuthKeyP8AsBase64 = await getBase64FromFile(authKeyFile);
-        await signingCredentialApi.uploadAuthKey(
-          authenticatedUser.getAuthorizationHeader,
-          userId,
-          {
-            name,
-            appleAuthKeyP8AsBase64,
-            appleApiKey: apiKey,
-            appleApiIssuer: apiIssuer,
-          }
-        );
-        setLastUploadedApiKey(apiKey);
-      } catch (err) {
-        setAuthKeyError(err);
-      } finally {
-        setIsAuthKeyLoading(false);
-      }
-    },
-    [
-      apiIssuer,
-      apiKey,
-      authKeyFile,
-      name,
-      authenticatedUser.getAuthorizationHeader,
-      userId,
-    ]
-  );
+    try {
+      setIsAuthKeyLoading(true);
+      setLastUploadedApiKey(null);
+      setAuthKeyError(null);
+      const appleAuthKeyP8AsBase64 = await getBase64FromFile(authKeyFile);
+      await signingCredentialApi.uploadAuthKey(
+        authenticatedUser.getAuthorizationHeader,
+        userId,
+        {
+          name,
+          appleAuthKeyP8AsBase64,
+          appleApiKey: apiKey,
+          appleApiIssuer: apiIssuer,
+        }
+      );
+      setLastUploadedApiKey(apiKey);
+    } catch (err) {
+      setAuthKeyError(err);
+    } finally {
+      setIsAuthKeyLoading(false);
+    }
+  }, [
+    apiIssuer,
+    apiKey,
+    authKeyFile,
+    name,
+    authenticatedUser.getAuthorizationHeader,
+    userId,
+  ]);
 
   return (
     <ColumnStackLayout noMargin>
@@ -140,7 +136,7 @@ export const CreateAuthKeySteps = ({ authenticatedUser }: Props) => {
               multiple={false}
               type="file"
               disabled={!apiKey || !apiIssuer || isAuthKeyLoading}
-              onChange={event => {
+              onChange={(event) => {
                 setAuthKeyFile(event.currentTarget.files[0] || null);
               }}
             />

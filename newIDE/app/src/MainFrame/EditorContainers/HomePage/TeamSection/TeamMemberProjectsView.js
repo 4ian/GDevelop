@@ -162,7 +162,7 @@ const TeamMemberProjectsView = ({
               </>
             ) : (
               <List>
-                {fileMetadataAndStorageProviderNames.map(file => (
+                {fileMetadataAndStorageProviderNames.map((file) => (
                   <ProjectFileListItem
                     file={file}
                     currentFileMetadata={currentFileMetadata}

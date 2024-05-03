@@ -116,7 +116,7 @@ type SerializedExtensionWithTagsAsString = {
  * to their new representation (array of strings).
  */
 const transformTagsAsStringToTagsAsArray = <
-  T: { tags: string } | { tags: string[] }
+  T: { tags: string } | { tags: string[] },
 >(
   dataWithTags: T
 ): $Exact<{ ...T, tags: Array<string> }> => {
@@ -130,7 +130,7 @@ const transformTagsAsStringToTagsAsArray = <
   // $FlowIgnore - ignore issue with non exact types
   return {
     ...dataWithTags,
-    tags: dataWithTags.tags.split(',').map(tag => tag.trim().toLowerCase()),
+    tags: dataWithTags.tags.split(',').map((tag) => tag.trim().toLowerCase()),
   };
 };
 
@@ -197,11 +197,10 @@ const adaptBehaviorHeader = (
 export const getExtensionHeader = (
   extensionShortHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<ExtensionHeader> => {
-  return axios.get(extensionShortHeader.headerUrl).then(response => {
+  return axios.get(extensionShortHeader.headerUrl).then((response) => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
-    const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
-      data
-    );
+    const transformedData: ExtensionHeader =
+      transformTagsAsStringToTagsAsArray(data);
     return transformedData;
   });
 };
@@ -209,11 +208,10 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | BehaviorShortHeader
 ): Promise<SerializedExtension> => {
-  return axios.get(extensionHeader.url).then(response => {
+  return axios.get(extensionHeader.url).then((response) => {
     const data: SerializedExtensionWithTagsAsString = response.data;
-    const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
-      data
-    );
+    const transformedData: SerializedExtension =
+      transformTagsAsStringToTagsAsArray(data);
     return transformedData;
   });
 };

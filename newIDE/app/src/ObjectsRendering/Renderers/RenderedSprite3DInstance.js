@@ -82,18 +82,14 @@ export default class RenderedSprite3DInstance extends Rendered3DInstance {
     resourcesLoader: Class<ResourcesLoader>,
     objectConfiguration: gdObjectConfiguration
   ): string {
-    const customObjectConfiguration = gd.asCustomObjectConfiguration(
-      objectConfiguration
-    );
+    const customObjectConfiguration =
+      gd.asCustomObjectConfiguration(objectConfiguration);
     const animations = customObjectConfiguration.getAnimations();
 
     if (
       animations.getAnimationsCount() > 0 &&
       animations.getAnimation(0).getDirectionsCount() > 0 &&
-      animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSpritesCount() > 0
+      animations.getAnimation(0).getDirection(0).getSpritesCount() > 0
     ) {
       const imageName = animations
         .getAnimation(0)

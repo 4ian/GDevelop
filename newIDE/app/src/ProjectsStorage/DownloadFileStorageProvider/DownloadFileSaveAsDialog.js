@@ -79,50 +79,46 @@ export const downloadResourcesAsBlobs = async ({
     const resourcesManager = project.getResourcesManager();
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
     return allResourceNames
-      .map(
-        (resourceName: string): ?ResourceToFetch => {
-          const resource = resourcesManager.getResource(resourceName);
-          const resourceFile = resource.getFile();
+      .map((resourceName: string): ?ResourceToFetch => {
+        const resource = resourcesManager.getResource(resourceName);
+        const resourceFile = resource.getFile();
 
-          if (isURL(resourceFile)) {
-            if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
-              return {
-                resource,
-                url: resourceFile,
-                filename: extractDecodedFilenameFromProjectResourceUrl(
-                  resourceFile
-                ),
-              };
-            } else {
-              // Public URL resource: nothing to do.
-              return null;
-            }
+        if (isURL(resourceFile)) {
+          if (checkIfIsGDevelopCloudBucketUrl(resourceFile)) {
+            return {
+              resource,
+              url: resourceFile,
+              filename:
+                extractDecodedFilenameFromProjectResourceUrl(resourceFile),
+            };
           } else {
-            // Local resource: unsupported.
-            result.erroredResources.push({
-              resourceName: resource.getName(),
-              error: new Error(
-                'Unsupported relative file when downloading a copy.'
-              ),
-            });
+            // Public URL resource: nothing to do.
             return null;
           }
+        } else {
+          // Local resource: unsupported.
+          result.erroredResources.push({
+            resourceName: resource.getName(),
+            error: new Error(
+              'Unsupported relative file when downloading a copy.'
+            ),
+          });
+          return null;
         }
-      )
+      })
       .filter(Boolean);
   };
 
   const resourcesToFetchAndUpload = getResourcesToFetch(project);
 
   // Download all the project resources as blob (much like what is done during an export).
-  const downloadedBlobsAndResources: Array<
-    ItemResult<ResourceToFetch>
-  > = await downloadUrlsToBlobs({
-    urlContainers: resourcesToFetchAndUpload,
-    onProgress: (count, total) => {
-      onProgress(count, total * 2);
-    },
-  });
+  const downloadedBlobsAndResources: Array<ItemResult<ResourceToFetch>> =
+    await downloadUrlsToBlobs({
+      urlContainers: resourcesToFetchAndUpload,
+      onProgress: (count, total) => {
+        onProgress(count, total * 2);
+      },
+    });
 
   const alreadyUsedFilenames = new Set([PROJECT_JSON_FILENAME]);
 
@@ -140,7 +136,7 @@ export const downloadResourcesAsBlobs = async ({
     const extension = pathPosix.extname(filename);
     const basename = pathPosix.basename(filename, extension);
     const pathPrefix = 'assets/' + resource.getKind();
-    const newBasename = newNameGenerator(basename, tentativeBasename =>
+    const newBasename = newNameGenerator(basename, (tentativeBasename) =>
       alreadyUsedFilenames.has(
         pathPosix.join(pathPrefix, tentativeBasename + extension)
       )
@@ -162,70 +158,64 @@ type Props = {|
 
 export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
   const [zippedProjectBlob, setZippedProjectBlob] = React.useState<?Blob>(null);
-  const {
-    ensureProcessIsDone,
-    renderProcessDialog,
-  } = useGenericRetryableProcessWithProgress<DownloadResourcesAsBlobsOptionsWithoutProgress>(
-    {
-      onDoProcess: React.useCallback(
-        (options, onProgress) =>
-          downloadResourcesAsBlobs({ ...options, onProgress }),
-        []
-      ),
-    }
-  );
-  React.useEffect(
-    () => {
-      (async () => {
-        setZippedProjectBlob(null);
-        const newProject = gd.ProjectHelper.createNewGDJSProject();
-        try {
-          // Make a copy of the project, as it will be updated.
-          const serializedProject = new gd.SerializerElement();
-          project.serializeTo(serializedProject);
-          newProject.unserializeFrom(serializedProject);
-          serializedProject.delete();
+  const { ensureProcessIsDone, renderProcessDialog } =
+    useGenericRetryableProcessWithProgress<DownloadResourcesAsBlobsOptionsWithoutProgress>(
+      {
+        onDoProcess: React.useCallback(
+          (options, onProgress) =>
+            downloadResourcesAsBlobs({ ...options, onProgress }),
+          []
+        ),
+      }
+    );
+  React.useEffect(() => {
+    (async () => {
+      setZippedProjectBlob(null);
+      const newProject = gd.ProjectHelper.createNewGDJSProject();
+      try {
+        // Make a copy of the project, as it will be updated.
+        const serializedProject = new gd.SerializerElement();
+        project.serializeTo(serializedProject);
+        newProject.unserializeFrom(serializedProject);
+        serializedProject.delete();
 
-          // Download resources to blobs, and update the project resources.
-          const blobFiles: Array<BlobFileDescriptor> = [];
-          const textFiles: Array<TextFileDescriptor> = [];
-          await ensureProcessIsDone({
-            project: newProject,
-            onAddBlobFile: (blobFileDescriptor: BlobFileDescriptor) => {
-              blobFiles.push(blobFileDescriptor);
-            },
-          });
+        // Download resources to blobs, and update the project resources.
+        const blobFiles: Array<BlobFileDescriptor> = [];
+        const textFiles: Array<TextFileDescriptor> = [];
+        await ensureProcessIsDone({
+          project: newProject,
+          onAddBlobFile: (blobFileDescriptor: BlobFileDescriptor) => {
+            blobFiles.push(blobFileDescriptor);
+          },
+        });
 
-          // Serialize the project.
-          textFiles.push({
-            text: JSON.stringify(serializeToJSObject(newProject)),
-            filePath: PROJECT_JSON_FILENAME,
-          });
+        // Serialize the project.
+        textFiles.push({
+          text: JSON.stringify(serializeToJSObject(newProject)),
+          filePath: PROJECT_JSON_FILENAME,
+        });
 
-          // Archive the whole project.
-          const zippedProjectBlob = await archiveFiles({
-            textFiles,
-            blobFiles,
-            basePath: '/',
-            onProgress: (count: number, total: number) => {},
-          });
-          setZippedProjectBlob(zippedProjectBlob);
-        } catch (rawError) {
-          showErrorBox({
-            message:
-              'Unable to save your project because of an internal error.',
-            rawError,
-            errorId: 'download-file-save-as-dialog-error',
-          });
-          return;
-        } finally {
-          newProject.delete();
-        }
-      })();
-      return () => setZippedProjectBlob(null);
-    },
-    [project, ensureProcessIsDone]
-  );
+        // Archive the whole project.
+        const zippedProjectBlob = await archiveFiles({
+          textFiles,
+          blobFiles,
+          basePath: '/',
+          onProgress: (count: number, total: number) => {},
+        });
+        setZippedProjectBlob(zippedProjectBlob);
+      } catch (rawError) {
+        showErrorBox({
+          message: 'Unable to save your project because of an internal error.',
+          rawError,
+          errorId: 'download-file-save-as-dialog-error',
+        });
+        return;
+      } finally {
+        newProject.delete();
+      }
+    })();
+    return () => setZippedProjectBlob(null);
+  }, [project, ensureProcessIsDone]);
 
   return (
     <Dialog
@@ -258,7 +248,7 @@ export default function DownloadFileSaveAsDialog({ project, onDone }: Props) {
         <Line noMargin expand justifyContent="center">
           {zippedProjectBlob ? (
             <BlobDownloadUrlHolder blob={zippedProjectBlob}>
-              {blobDownloadUrl => (
+              {(blobDownloadUrl) => (
                 <RaisedButton
                   primary
                   onClick={() =>

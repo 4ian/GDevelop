@@ -13,8 +13,8 @@ export type ParameterInlineRendererProps = {|
   parameterMetadata: gdParameterMetadata,
   value: string,
   expressionIsValid: boolean,
-  renderObjectThumbnail: string => React.Node,
-  InvalidParameterValue: InvalidParameterValueProps => React.Node,
+  renderObjectThumbnail: (string) => React.Node,
+  InvalidParameterValue: (InvalidParameterValueProps) => React.Node,
   MissingParameterValue: () => React.Node,
   useAssignmentOperators: boolean,
 |};
@@ -22,4 +22,5 @@ export type ParameterInlineRendererProps = {|
 /**
  * The type of a function that renders a parameter in the events sheet
  */
-export type ParameterInlineRenderer = ParameterInlineRendererProps => React.Node;
+export type ParameterInlineRenderer =
+  (ParameterInlineRendererProps) => React.Node;

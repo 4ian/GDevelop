@@ -9,8 +9,8 @@ import PrivateGameTemplateInformationPage from './PrivateGameTemplateInformation
 type Props = {|
   privateGameTemplateListingData: PrivateGameTemplateListingData,
   privateGameTemplateListingDatasFromSameCreator: ?Array<PrivateGameTemplateListingData>,
-  onGameTemplateOpen: PrivateGameTemplateListingData => void,
-  onCreateWithGameTemplate: PrivateGameTemplateListingData => void,
+  onGameTemplateOpen: (PrivateGameTemplateListingData) => void,
+  onCreateWithGameTemplate: (PrivateGameTemplateListingData) => void,
   onClose: () => void,
 |};
 

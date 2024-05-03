@@ -98,7 +98,7 @@ const SortableList = SortableContainer(
     return (
       <div style={styles.spritesList}>
         {[
-          ...mapFor(0, spritesCount, i => {
+          ...mapFor(0, spritesCount, (i) => {
             const sprite = direction.getSprite(i);
             return hasMoreThanOneSprite ? (
               <SortableSpriteThumbnail
@@ -108,7 +108,7 @@ const SortableList = SortableContainer(
                 isFirst={i === 0}
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
-                onSelect={selected => onSelectSprite(sprite, selected)}
+                onSelect={(selected) => onSelectSprite(sprite, selected)}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -118,7 +118,7 @@ const SortableList = SortableContainer(
                 key={sprite.ptr}
                 selectable
                 selected={!!selectedSprites[sprite.ptr]}
-                onSelect={selected => onSelectSprite(sprite, selected)}
+                onSelect={(selected) => onSelectSprite(sprite, selected)}
                 onContextMenu={(x, y) => onOpenSpriteContextMenu(x, y, sprite)}
                 resourceName={sprite.getImageName()}
                 resourcesLoader={resourcesLoader}
@@ -153,10 +153,11 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
       firstDirectionSprite,
       direction
     );
-    allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
-      firstDirectionSprite,
-      direction
-    );
+    allDirectionSpritesHaveSameCollisionMasks =
+      allDirectionSpritesHaveSameCollisionMasksAs(
+        firstDirectionSprite,
+        direction
+      );
   }
 
   return {
@@ -180,10 +181,8 @@ const checkObjectPointsAndCollisionsMasks = (
       firstObjectSprite,
       animations
     );
-    allObjectSpritesHaveSameCollisionMasks = allObjectSpritesHaveSameCollisionMaskAs(
-      firstObjectSprite,
-      animations
-    );
+    allObjectSpritesHaveSameCollisionMasks =
+      allObjectSpritesHaveSameCollisionMaskAs(firstObjectSprite, animations);
   }
 
   return {
@@ -205,9 +204,8 @@ export const applyPointsAndMasksToSpriteIfNecessary = (
     allObjectSpritesHaveSameCollisionMasks,
     allObjectSpritesHaveSamePoints,
   } = checkObjectPointsAndCollisionsMasks(animations);
-  const shouldUseFullImageCollisionMask = isFirstSpriteUsingFullImageCollisionMask(
-    animations
-  );
+  const shouldUseFullImageCollisionMask =
+    isFirstSpriteUsingFullImageCollisionMask(animations);
   const firstObjectSprite = getCurrentElements(animations, 0, 0, 0).sprite;
   const firstDirectionSprite =
     direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
@@ -312,9 +310,10 @@ const SpritesList = ({
         } else {
           // If moving up, the other sprites are going down, so their previous index was i+1.
           const previousSpriteIndex = i + 1;
-          const previousSelectionStatus = !!selectedSprites.current[
-            direction.getSprite(previousSpriteIndex).ptr
-          ];
+          const previousSelectionStatus =
+            !!selectedSprites.current[
+              direction.getSprite(previousSpriteIndex).ptr
+            ];
           selectedSprites.current[spriteAtIndex.ptr] = previousSelectionStatus;
         }
       }
@@ -332,9 +331,10 @@ const SpritesList = ({
         } else {
           // If moving down, the other sprites are going up, so their previous index was i-1.
           const previousSpriteIndex = i - 1;
-          const previousSelectionStatus = !!selectedSprites.current[
-            direction.getSprite(previousSpriteIndex).ptr
-          ];
+          const previousSelectionStatus =
+            !!selectedSprites.current[
+              direction.getSprite(previousSpriteIndex).ptr
+            ];
           selectedSprites.current[spriteAtIndex.ptr] = previousSelectionStatus;
         }
       }
@@ -347,9 +347,8 @@ const SpritesList = ({
       if (oldIndex === newIndex) return;
       // We store the selection value of the moved sprite, as its pointer will
       // be changed by the move.
-      const wasMovedItemSelected = !!selectedSprites.current[
-        direction.getSprite(oldIndex).ptr
-      ];
+      const wasMovedItemSelected =
+        !!selectedSprites.current[direction.getSprite(oldIndex).ptr];
       direction.moveSprite(oldIndex, newIndex);
 
       // When moving a sprite, the pointers are all shifted, so we need to
@@ -395,7 +394,7 @@ const SpritesList = ({
         multiSelection: true,
         resourceKind: 'image',
       });
-      resources.forEach(resource => {
+      resources.forEach((resource) => {
         applyResourceDefaults(project, resource);
         project.getResourcesManager().addResource(resource);
       });
@@ -420,7 +419,7 @@ const SpritesList = ({
 
       // Important, we are responsible for deleting the resources that were given to us.
       // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
+      resources.forEach((resource) => resource.delete());
 
       forceUpdate();
 
@@ -445,80 +444,74 @@ const SpritesList = ({
     ]
   );
 
-  const deleteSprites = React.useCallback(
-    async () => {
-      const sprites = selectedSprites.current;
-      const firstSpritePtr = animations
-        .getAnimation(0)
-        .getDirection(0)
-        .getSprite(0).ptr;
-      const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
+  const deleteSprites = React.useCallback(async () => {
+    const sprites = selectedSprites.current;
+    const firstSpritePtr = animations
+      .getAnimation(0)
+      .getDirection(0)
+      .getSprite(0).ptr;
+    const isObjectFirstSpriteDeleted = !!sprites[firstSpritePtr];
 
-      const totalSpritesCount = getTotalSpritesCount(animations);
-      const isDeletingLastSprites =
-        Object.keys(sprites).length === totalSpritesCount;
-      const oneOfSpritesInCurrentDirection =
-        direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
+    const totalSpritesCount = getTotalSpritesCount(animations);
+    const isDeletingLastSprites =
+      Object.keys(sprites).length === totalSpritesCount;
+    const oneOfSpritesInCurrentDirection =
+      direction.getSpritesCount() > 0 ? direction.getSprite(0) : null;
 
-      const isUsingCustomCollisionMask =
-        !animations.adaptCollisionMaskAutomatically() &&
-        oneOfSpritesInCurrentDirection &&
-        !oneOfSpritesInCurrentDirection.isFullImageCollisionMask();
-      const shouldWarnBecauseLosingCustomCollisionMask =
-        isDeletingLastSprites && isUsingCustomCollisionMask;
+    const isUsingCustomCollisionMask =
+      !animations.adaptCollisionMaskAutomatically() &&
+      oneOfSpritesInCurrentDirection &&
+      !oneOfSpritesInCurrentDirection.isFullImageCollisionMask();
+    const shouldWarnBecauseLosingCustomCollisionMask =
+      isDeletingLastSprites && isUsingCustomCollisionMask;
 
-      if (shouldWarnBecauseLosingCustomCollisionMask) {
-        const deleteAnswer = await showConfirmation({
-          title: t`Remove the sprite`,
-          message: t`You are about to remove the last sprite of this object, which has a custom collision mask. The custom collision mask will be lost. Are you sure you want to continue?`,
-          confirmButtonLabel: t`Remove`,
-          dismissButtonLabel: t`Cancel`,
-        });
-        if (!deleteAnswer) return;
-      }
-
-      mapFor(0, animations.getAnimationsCount(), index => {
-        const animation = animations.getAnimation(index);
-        deleteSpritesFromAnimation(animation, sprites);
+    if (shouldWarnBecauseLosingCustomCollisionMask) {
+      const deleteAnswer = await showConfirmation({
+        title: t`Remove the sprite`,
+        message: t`You are about to remove the last sprite of this object, which has a custom collision mask. The custom collision mask will be lost. Are you sure you want to continue?`,
+        confirmButtonLabel: t`Remove`,
+        dismissButtonLabel: t`Cancel`,
       });
+      if (!deleteAnswer) return;
+    }
 
-      // Clear selection after deletion.
-      selectedSprites.current = {};
-      forceUpdate();
-      if (onSpriteUpdated) onSpriteUpdated();
-      if (isObjectFirstSpriteDeleted && onFirstSpriteUpdated)
-        onFirstSpriteUpdated();
-      if (shouldWarnBecauseLosingCustomCollisionMask) {
-        // The user has deleted the last custom collision mask, so revert to automatic
-        // collision mask adaptation.
-        animations.setAdaptCollisionMaskAutomatically(true);
-      }
-    },
-    [
-      onSpriteUpdated,
-      onFirstSpriteUpdated,
-      animations,
-      forceUpdate,
-      showConfirmation,
-      direction,
-    ]
-  );
+    mapFor(0, animations.getAnimationsCount(), (index) => {
+      const animation = animations.getAnimation(index);
+      deleteSpritesFromAnimation(animation, sprites);
+    });
 
-  const duplicateSprites = React.useCallback(
-    () => {
-      const sprites = selectedSprites.current;
-      mapFor(0, animations.getAnimationsCount(), index => {
-        const animation = animations.getAnimation(index);
-        duplicateSpritesInAnimation(animation, sprites);
-      });
+    // Clear selection after deletion.
+    selectedSprites.current = {};
+    forceUpdate();
+    if (onSpriteUpdated) onSpriteUpdated();
+    if (isObjectFirstSpriteDeleted && onFirstSpriteUpdated)
+      onFirstSpriteUpdated();
+    if (shouldWarnBecauseLosingCustomCollisionMask) {
+      // The user has deleted the last custom collision mask, so revert to automatic
+      // collision mask adaptation.
+      animations.setAdaptCollisionMaskAutomatically(true);
+    }
+  }, [
+    onSpriteUpdated,
+    onFirstSpriteUpdated,
+    animations,
+    forceUpdate,
+    showConfirmation,
+    direction,
+  ]);
 
-      // Clear selection after duplication.
-      selectedSprites.current = {};
-      forceUpdate();
-      if (onSpriteUpdated) onSpriteUpdated();
-    },
-    [onSpriteUpdated, animations, forceUpdate]
-  );
+  const duplicateSprites = React.useCallback(() => {
+    const sprites = selectedSprites.current;
+    mapFor(0, animations.getAnimationsCount(), (index) => {
+      const animation = animations.getAnimation(index);
+      duplicateSpritesInAnimation(animation, sprites);
+    });
+
+    // Clear selection after duplication.
+    selectedSprites.current = {};
+    forceUpdate();
+    if (onSpriteUpdated) onSpriteUpdated();
+  }, [onSpriteUpdated, animations, forceUpdate]);
 
   const addSpriteToSelection = React.useCallback(
     (sprite, selected) => {
@@ -557,7 +550,7 @@ const SpritesList = ({
 
   const storageProvider = resourceManagementProps.getStorageProvider();
   const resourceSources = resourceManagementProps.resourceSources
-    .filter(source => source.kind === 'image')
+    .filter((source) => source.kind === 'image')
     .filter(
       ({ onlyForStorageProvider }) =>
         !onlyForStorageProvider ||
@@ -618,15 +611,16 @@ const SpritesList = ({
             icon={<Add />}
             primary
             buildMenuTemplate={(i18n: I18nType) => {
-              const storageProvider = resourceManagementProps.getStorageProvider();
+              const storageProvider =
+                resourceManagementProps.getStorageProvider();
               return resourceManagementProps.resourceSources
-                .filter(source => source.kind === 'image')
+                .filter((source) => source.kind === 'image')
                 .filter(
                   ({ onlyForStorageProvider }) =>
                     !onlyForStorageProvider ||
                     onlyForStorageProvider === storageProvider.internalName
                 )
-                .map(source => ({
+                .map((source) => ({
                   label: i18n._(source.displayName),
                   click: () => onAddSprite(source),
                 }));

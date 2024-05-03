@@ -15,7 +15,7 @@ const existingPreviewWindows: {
 } = {};
 
 const getExistingDebuggerIds = () =>
-  Object.keys(existingPreviewWindows).map(key => Number(key));
+  Object.keys(existingPreviewWindows).map((key) => Number(key));
 
 const getDebuggerIdForPreviewWindow = (previewWindow: any) => {
   for (const key in existingPreviewWindows) {
@@ -70,7 +70,7 @@ export const browserPreviewDebuggerServer: PreviewDebuggerServer = {
     if (debuggerServerState === 'started') return;
     debuggerServerState = 'started';
 
-    window.addEventListener('message', event => {
+    window.addEventListener('message', (event) => {
       if (event.origin !== PREVIEWS_ORIGIN) return;
 
       const id = getDebuggerIdForPreviewWindow(event.source);

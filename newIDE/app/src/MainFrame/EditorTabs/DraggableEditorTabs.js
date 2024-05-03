@@ -49,16 +49,13 @@ export function DraggableEditorTabs({
 
   const currentTab = getCurrentTab(editorTabs);
 
-  React.useEffect(
-    () => {
-      if (!currentTab) return;
-      const tabElement = document.getElementById(getTabId(currentTab));
-      if (tabElement) {
-        tabElement.scrollIntoView();
-      }
-    },
-    [currentTab]
-  );
+  React.useEffect(() => {
+    if (!currentTab) return;
+    const tabElement = document.getElementById(getTabId(currentTab));
+    if (tabElement) {
+      tabElement.scrollIntoView();
+    }
+  }, [currentTab]);
 
   return (
     <ClosableTabs hideLabels={hideLabels}>
@@ -83,7 +80,7 @@ export function DraggableEditorTabs({
               draggedTabIndex = id;
               return editorTab;
             }}
-            onDrop={toHoveredIndex => {
+            onDrop={(toHoveredIndex) => {
               if (typeof draggedTabIndex === 'number') {
                 onDropTab(draggedTabIndex, id);
                 draggedTabIndex = null;
@@ -121,7 +118,7 @@ export function DraggableClosableTab({
 }: DraggableClosableTabProps) {
   return (
     <ScreenTypeMeasurer>
-      {screenType => (
+      {(screenType) => (
         <DragSourceAndDropTarget
           beginDrag={onBeginDrag}
           canDrag={() => {

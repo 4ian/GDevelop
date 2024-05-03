@@ -92,57 +92,54 @@ const GitHubUsernameField = ({
   const { showAlert } = useAlertDialog();
 
   const hasGithubStarBadge =
-    !!badges && badges.some(badge => badge.achievementId === 'github-star');
+    !!badges && badges.some((badge) => badge.achievementId === 'github-star');
   const githubStarAchievement =
     (achievements &&
-      achievements.find(achievement => achievement.id === 'github-star')) ||
+      achievements.find((achievement) => achievement.id === 'github-star')) ||
     null;
 
-  const onClaim = React.useCallback(
-    async () => {
-      try {
-        const response = await onUpdateGitHubStar(githubUsername);
-        sendGitHubStarUpdated({ code: response.code });
+  const onClaim = React.useCallback(async () => {
+    try {
+      const response = await onUpdateGitHubStar(githubUsername);
+      sendGitHubStarUpdated({ code: response.code });
 
-        if (
-          response.code === 'github-star/badge-given' ||
-          response.code === 'github-star/badge-already-given'
-        ) {
-          showAlert({
-            title: t`You're awesome!`,
-            message: t`Thanks for starring GDevelop repository. We added credits to your account as a thank you gift.`,
-          });
-        } else if (response.code === 'github-star/repository-not-starred') {
-          showAlert({
-            title: t`We could not find your GitHub star`,
-            message: t`Make sure you star the repository called 4ian/GDevelop with your GitHub user and try again.`,
-          });
-        } else if (response.code === 'github-star/user-not-found') {
-          showAlert({
-            title: t`We could not find your GitHub user and star`,
-            message: t`Make sure you create your GitHub account, star the repository called 4ian/GDevelop, enter your username here and try again.`,
-          });
-        } else {
-          throw new Error(
-            `Error while updating the GitHub star: ${response.code}.`
-          );
-        }
-      } catch (error) {
-        console.error('Error while updating GitHub star:', error);
+      if (
+        response.code === 'github-star/badge-given' ||
+        response.code === 'github-star/badge-already-given'
+      ) {
         showAlert({
-          title: t`Something went wrong`,
-          message: t`Make sure you have a proper internet connection or try again later.`,
+          title: t`You're awesome!`,
+          message: t`Thanks for starring GDevelop repository. We added credits to your account as a thank you gift.`,
         });
+      } else if (response.code === 'github-star/repository-not-starred') {
+        showAlert({
+          title: t`We could not find your GitHub star`,
+          message: t`Make sure you star the repository called 4ian/GDevelop with your GitHub user and try again.`,
+        });
+      } else if (response.code === 'github-star/user-not-found') {
+        showAlert({
+          title: t`We could not find your GitHub user and star`,
+          message: t`Make sure you create your GitHub account, star the repository called 4ian/GDevelop, enter your username here and try again.`,
+        });
+      } else {
+        throw new Error(
+          `Error while updating the GitHub star: ${response.code}.`
+        );
       }
-    },
-    [githubUsername, onUpdateGitHubStar, showAlert]
-  );
+    } catch (error) {
+      console.error('Error while updating GitHub star:', error);
+      showAlert({
+        title: t`Something went wrong`,
+        message: t`Make sure you have a proper internet connection or try again later.`,
+      });
+    }
+  }, [githubUsername, onUpdateGitHubStar, showAlert]);
 
   return (
     <I18n>
       {({ i18n }) => (
         <TextFieldWithButtonLayout
-          renderButton={style => (
+          renderButton={(style) => (
             <RaisedButton
               onClick={onClaim}
               icon={<Coin fontSize="small" />}
@@ -171,9 +168,11 @@ const GitHubUsernameField = ({
               maxLength={githubUsernameConfig.maxLength}
               helperMarkdownText={i18n._(
                 !hasGithubStarBadge
-                  ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
-                      githubStarAchievement.rewardValueInCredits) ||
-                      '-'} free credits as a thank you!`
+                  ? t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${
+                      (githubStarAchievement &&
+                        githubStarAchievement.rewardValueInCredits) ||
+                      '-'
+                    } free credits as a thank you!`
                   : t`Thank you for supporting the GDevelop open-source community. Credits were added to your account as a thank you.`
               )}
             />
@@ -284,28 +283,26 @@ const EditProfileDialog = ({
   const [getNewsletterEmail, setGetNewsletterEmail] = React.useState(
     !!profile.getNewsletterEmail
   );
-  const [
-    usernameAvailability,
-    setUsernameAvailability,
-  ] = React.useState<?UsernameAvailability>(null);
-  const [
-    isValidatingUsername,
-    setIsValidatingUsername,
-  ] = React.useState<boolean>(false);
+  const [usernameAvailability, setUsernameAvailability] =
+    React.useState<?UsernameAvailability>(null);
+  const [isValidatingUsername, setIsValidatingUsername] =
+    React.useState<boolean>(false);
 
-  const personalWebsiteError = communityLinksConfig.personalWebsiteLink.getFormattingError(
-    personalWebsiteLink
-  );
-  const personalWebsite2Error = communityLinksConfig.personalWebsite2Link.getFormattingError(
-    personalWebsite2Link
-  );
-  const discordServerLinkError = communityLinksConfig.discordServerLink.getFormattingError(
-    discordServerLink
-  );
+  const personalWebsiteError =
+    communityLinksConfig.personalWebsiteLink.getFormattingError(
+      personalWebsiteLink
+    );
+  const personalWebsite2Error =
+    communityLinksConfig.personalWebsite2Link.getFormattingError(
+      personalWebsite2Link
+    );
+  const discordServerLinkError =
+    communityLinksConfig.discordServerLink.getFormattingError(
+      discordServerLink
+    );
   const donateLinkError = donateLinkConfig.getFormattingError(donateLink);
-  const tiktokUsernameError = communityLinksConfig.tiktokUsername.getFormattingError(
-    tiktokUsername
-  );
+  const tiktokUsernameError =
+    communityLinksConfig.tiktokUsername.getFormattingError(tiktokUsername);
 
   const hasFormattingError =
     personalWebsiteError ||

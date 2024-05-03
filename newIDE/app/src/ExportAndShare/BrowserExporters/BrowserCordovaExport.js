@@ -56,7 +56,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   packageNameWarningType: 'mobile',
@@ -129,7 +129,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
     return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -152,7 +152,7 @@ export const browserCordovaExportPipeline: ExportPipeline<
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
-            {blobDownloadUrl => (
+            {(blobDownloadUrl) => (
               <RaisedButton
                 primary
                 onClick={() => openBlobDownloadUrl(blobDownloadUrl, 'game.zip')}

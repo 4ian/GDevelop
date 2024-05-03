@@ -108,49 +108,43 @@ const ProfileDetails = ({
   const { showAlert } = useAlertDialog();
   const githubStarAchievement =
     (achievements &&
-      achievements.find(achievement => achievement.id === 'github-star')) ||
+      achievements.find((achievement) => achievement.id === 'github-star')) ||
     null;
 
-  const [
-    discordUsernameSyncStatus,
-    setDiscordUsernameSyncStatus,
-  ] = React.useState<null | 'syncing' | 'success'>(null);
+  const [discordUsernameSyncStatus, setDiscordUsernameSyncStatus] =
+    React.useState<null | 'syncing' | 'success'>(null);
 
-  const onSyncDiscordUsername = React.useCallback(
-    async () => {
-      if (!profile) return;
-      setDiscordUsernameSyncStatus('syncing');
-      try {
-        await syncDiscordUsername(getAuthorizationHeader, profile.id);
-        setDiscordUsernameSyncStatus('success');
-      } catch (error) {
-        console.error('Error while syncing discord username:', error);
-        const extractedStatusAndCode = extractGDevelopApiErrorStatusAndCode(
-          error
-        );
-        if (
-          extractedStatusAndCode &&
-          extractedStatusAndCode.status === 400 &&
-          extractedStatusAndCode.code ===
-            'discord-role-update/discord-user-not-found'
-        ) {
-          showAlert({
-            title: t`Discord user not found`,
-            message: t`Ensure you don't have any typo in your username and that you have joined the GDevelop Discord server.`,
-          });
-          return;
-        }
+  const onSyncDiscordUsername = React.useCallback(async () => {
+    if (!profile) return;
+    setDiscordUsernameSyncStatus('syncing');
+    try {
+      await syncDiscordUsername(getAuthorizationHeader, profile.id);
+      setDiscordUsernameSyncStatus('success');
+    } catch (error) {
+      console.error('Error while syncing discord username:', error);
+      const extractedStatusAndCode =
+        extractGDevelopApiErrorStatusAndCode(error);
+      if (
+        extractedStatusAndCode &&
+        extractedStatusAndCode.status === 400 &&
+        extractedStatusAndCode.code ===
+          'discord-role-update/discord-user-not-found'
+      ) {
         showAlert({
-          title: t`Discord username sync failed`,
-          message: t`Something went wrong while syncing your Discord username. Please try again later.`,
+          title: t`Discord user not found`,
+          message: t`Ensure you don't have any typo in your username and that you have joined the GDevelop Discord server.`,
         });
-      } finally {
-        // Wait a bit to avoid spam and allow showing the success icon.
-        setTimeout(() => setDiscordUsernameSyncStatus(null), 3000);
+        return;
       }
-    },
-    [getAuthorizationHeader, profile, showAlert]
-  );
+      showAlert({
+        title: t`Discord username sync failed`,
+        message: t`Something went wrong while syncing your Discord username. Please try again later.`,
+      });
+    } finally {
+      // Wait a bit to avoid spam and allow showing the success icon.
+      setTimeout(() => setDiscordUsernameSyncStatus(null), 3000);
+    }
+  }, [getAuthorizationHeader, profile, showAlert]);
 
   const canUserBenefitFromDiscordRole = canBenefitFromDiscordRole(subscription);
 
@@ -248,9 +242,11 @@ const ProfileDetails = ({
                 <Text>
                   {!githubUsername ? (
                     <MarkdownText
-                      translatableSource={t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${(githubStarAchievement &&
-                        githubStarAchievement.rewardValueInCredits) ||
-                        '-'} free credits as a thank you!.`}
+                      translatableSource={t`[Star the GDevelop repository](https://github.com/4ian/GDevelop) and add your GitHub username here to get ${
+                        (githubStarAchievement &&
+                          githubStarAchievement.rewardValueInCredits) ||
+                        '-'
+                      } free credits as a thank you!.`}
                     />
                   ) : (
                     githubUsername

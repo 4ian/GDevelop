@@ -119,9 +119,9 @@ type Props = {|
   game: Game,
   onGameUpdated?: () => Promise<void>,
   gameUpdating: boolean,
-  setGameUpdating: boolean => void,
-  onBuildUpdated: Build => void,
-  onBuildDeleted: Build => void,
+  setGameUpdating: (boolean) => void,
+  onBuildUpdated: (Build) => void,
+  onBuildDeleted: (Build) => void,
   authenticatedUser: AuthenticatedUser,
 |};
 
@@ -302,11 +302,11 @@ export const BuildCard = ({
                       }}
                       hintText={buildName}
                       disabled={gameUpdating}
-                      onKeyPress={event => {
+                      onKeyPress={(event) => {
                         if (shouldValidate(event) && nameInput.current)
                           nameInput.current.blur();
                       }}
-                      onKeyDown={event => {
+                      onKeyDown={(event) => {
                         if (shouldCloseOrCancel(event)) {
                           event.stopPropagation();
                           setIsEditingName(false);

@@ -51,10 +51,8 @@ export default function SpriteEditor({
 }: SpriteEditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
-  const [
-    collisionMasksEditorOpen,
-    setCollisionMasksEditorOpen,
-  ] = React.useState(false);
+  const [collisionMasksEditorOpen, setCollisionMasksEditorOpen] =
+    React.useState(false);
   const forceUpdate = useForceUpdate();
   const spriteConfiguration = gd.asSpriteConfiguration(objectConfiguration);
   const animations = spriteConfiguration.getAnimations();
@@ -63,58 +61,50 @@ export default function SpriteEditor({
   const scrollView = React.useRef<?ScrollViewInterface>(null);
   const animationList = React.useRef<?AnimationListInterface>(null);
 
-  const [
-    justAddedAnimationName,
-    setJustAddedAnimationName,
-  ] = React.useState<?string>(null);
+  const [justAddedAnimationName, setJustAddedAnimationName] =
+    React.useState<?string>(null);
   const justAddedAnimationElement = React.useRef<?any>(null);
 
-  React.useEffect(
-    () => {
-      if (
-        scrollView.current &&
-        justAddedAnimationElement.current &&
-        justAddedAnimationName
-      ) {
-        scrollView.current.scrollTo(justAddedAnimationElement.current);
-        setJustAddedAnimationName(null);
-        justAddedAnimationElement.current = null;
-      }
-    },
-    [justAddedAnimationName]
-  );
+  React.useEffect(() => {
+    if (
+      scrollView.current &&
+      justAddedAnimationElement.current &&
+      justAddedAnimationName
+    ) {
+      scrollView.current.scrollTo(justAddedAnimationElement.current);
+      setJustAddedAnimationName(null);
+      justAddedAnimationElement.current = null;
+    }
+  }, [justAddedAnimationName]);
 
   // The matching collision mask only takes the first sprite of the first
   // animation of the object. We consider this is enough to start with, and
   // the user can then edit the collision mask for further needs.
-  const onCreateMatchingSpriteCollisionMask = React.useCallback(
-    async () => {
-      const firstSprite = getFirstAnimationFrame(animations);
-      if (!firstSprite) {
-        return;
-      }
-      const firstSpriteResourceName = firstSprite.getImageName();
-      const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
-        project,
-        firstSpriteResourceName,
-        {}
+  const onCreateMatchingSpriteCollisionMask = React.useCallback(async () => {
+    const firstSprite = getFirstAnimationFrame(animations);
+    if (!firstSprite) {
+      return;
+    }
+    const firstSpriteResourceName = firstSprite.getImageName();
+    const firstAnimationResourceSource = ResourcesLoader.getResourceFullUrl(
+      project,
+      firstSpriteResourceName,
+      {}
+    );
+    let matchingCollisionMask = null;
+    try {
+      matchingCollisionMask = await getMatchingCollisionMask(
+        firstAnimationResourceSource
       );
-      let matchingCollisionMask = null;
-      try {
-        matchingCollisionMask = await getMatchingCollisionMask(
-          firstAnimationResourceSource
-        );
-      } catch (e) {
-        console.error(
-          'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
-          e
-        );
-      }
-      setCollisionMaskOnAllFrames(animations, matchingCollisionMask);
-      forceUpdate();
-    },
-    [animations, project, forceUpdate]
-  );
+    } catch (e) {
+      console.error(
+        'Unable to create a matching collision mask for the sprite, fallback to full image collision mask.',
+        e
+      );
+    }
+    setCollisionMaskOnAllFrames(animations, matchingCollisionMask);
+    forceUpdate();
+  }, [animations, project, forceUpdate]);
 
   return (
     <I18n>
@@ -170,7 +160,7 @@ export default function SpriteEditor({
                   label={<Trans>Edit collision masks</Trans>}
                   onClick={() => setCollisionMasksEditorOpen(true)}
                   disabled={!hasAnyFrame(animations)}
-                  buildMenuTemplate={i18n =>
+                  buildMenuTemplate={(i18n) =>
                     [
                       {
                         label: i18n._(t`Edit points`),

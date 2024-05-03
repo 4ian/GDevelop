@@ -452,7 +452,7 @@ export const Default = () => {
   const [multiSelect, setMultiSelect] = React.useState<boolean>(true);
   const [selectedItems, setSelectedItems] = React.useState<Node[]>([]);
   const onSelectItems = (items: Node[]) => {
-    setSelectedItems(items.filter(item => !item.isRoot));
+    setSelectedItems(items.filter((item) => !item.isRoot));
   };
   return (
     <DragAndDropContextProvider>
@@ -489,13 +489,13 @@ export const Default = () => {
                     width={width}
                     items={nodes}
                     searchText={searchText}
-                    getItemId={node => node.id}
-                    getItemName={node => node.name}
+                    getItemId={(node) => node.id}
+                    getItemName={(node) => node.name}
                     onEditItem={action('Edit item')}
                     selectedItems={selectedItems}
                     onSelectItems={onSelectItems}
                     onRenameItem={action('Rename item')}
-                    getItemThumbnail={node =>
+                    getItemThumbnail={(node) =>
                       node.children
                         ? null
                         : sample([
@@ -506,7 +506,7 @@ export const Default = () => {
                           ])
                     }
                     // $FlowIgnore
-                    getItemChildren={node => node.children}
+                    getItemChildren={(node) => node.children}
                     buildMenuTemplate={() => [{ label: 'salut' }]}
                     onMoveSelectionToItem={action('Drop selection on item')}
                     canMoveSelectionToItem={() => Math.random() > 0.2}

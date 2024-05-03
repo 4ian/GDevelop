@@ -69,7 +69,7 @@ export const getFuseSearchQueryForMultipleKeys = (
   const searchQuery: {
     $or: Fuse.Expression[],
   }[] = tokenisedSearchQuery.map((searchToken: string) => {
-    const orFields: Fuse.Expression[] = keys.map(key => ({
+    const orFields: Fuse.Expression[] = keys.map((key) => ({
       [key]: searchToken,
     }));
 
@@ -86,15 +86,14 @@ export const getFuseSearchQueryForMultipleKeys = (
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
   const lowerCaseSearchText = searchText.toLowerCase();
   return match.indices
-    .map(index => {
+    .map((index) => {
       const lowerCaseMatchedText = match.value
         .slice(index[0], index[1] + 1)
         .toLowerCase();
       // if exact match, return indices untouched
       if (lowerCaseMatchedText === lowerCaseSearchText) return index;
-      const indexOfSearchTextInMatchedText = lowerCaseMatchedText.indexOf(
-        lowerCaseSearchText
-      );
+      const indexOfSearchTextInMatchedText =
+        lowerCaseMatchedText.indexOf(lowerCaseSearchText);
 
       // if searched text is not in match returned by the fuzzy search
       // ("too" could be matched when searching for "ot"),
@@ -112,7 +111,7 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
 };
 
 export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
-  result.matches.map<SearchMatch>(match => ({
+  result.matches.map<SearchMatch>((match) => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
@@ -145,7 +144,8 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
         // If the chosen category is a container of tags, not a real tag, then
         // skip checking if the item has it.
         chosenCategory.node.isTagContainerOnly ||
-        (item.tags && item.tags.some(tag => tag === chosenCategory.node.name));
+        (item.tags &&
+          item.tags.some((tag) => tag === chosenCategory.node.name));
       if (!hasChosenCategoryTag) return false; // Item is not in the selected category
       for (const parentNode of chosenCategory.parentNodes) {
         if (parentNode.isTagContainerOnly) {
@@ -155,7 +155,7 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
         }
 
         const hasParentCategoryTag =
-          item.tags && item.tags.some(tag => tag === parentNode.name);
+          item.tags && item.tags.some((tag) => tag === parentNode.name);
         if (!hasParentCategoryTag) return false; // Item is not in the parent(s) of the selected category
       }
 
@@ -167,16 +167,16 @@ export const filterSearchResults = <SearchItem: SearchableItem>(
       // Particularly useful when multiple items are being searched but are not
       // in the same repository, so the tags/categories are not always the same case.
       const lowerCaseChosenFilters = new Set(
-        [...chosenFilters].map(filter => filter.toLowerCase())
+        [...chosenFilters].map((filter) => filter.toLowerCase())
       );
       const passChosenFilters =
         lowerCaseChosenFilters.size === 0 ||
         (item.tags &&
-          item.tags.some(tag =>
+          item.tags.some((tag) =>
             lowerCaseChosenFilters.has(tag.toLowerCase())
           )) ||
         (item.categories &&
-          item.categories.some(category =>
+          item.categories.some((category) =>
             lowerCaseChosenFilters.has(category.toLowerCase())
           ));
 
@@ -216,146 +216,134 @@ export const useSearchStructuredItem = <SearchItem: SearchableItem>(
   |}>>(null);
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
-  const orderedSearchResults: Array<
-    SearchResult<SearchItem>
-  > | null = React.useMemo(
-    () => {
+  const orderedSearchResults: Array<SearchResult<SearchItem>> | null =
+    React.useMemo(() => {
       if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
       const alreadyOrderedIds = new Set<string>(defaultFirstSearchItemIds);
       const nonOrderedIds = Object.keys(searchItemsById).filter(
-        id => !alreadyOrderedIds.has(id)
+        (id) => !alreadyOrderedIds.has(id)
       );
 
       // Return the ordered results first, and shuffle the rest.
       return [
         ...defaultFirstSearchItemIds,
         ...(shuffleResults ? shuffle(nonOrderedIds) : nonOrderedIds),
-      ].map(id => ({
+      ].map((id) => ({
         item: searchItemsById[id],
         matches: [],
       }));
-    },
-    [searchItemsById, defaultFirstSearchItemIds, shuffleResults]
-  );
+    }, [searchItemsById, defaultFirstSearchItemIds, shuffleResults]);
 
   // Index items that have been loaded.
-  React.useEffect(
-    () => {
-      if (!searchItemsById) {
-        // Nothing to index - yet.
-        return;
-      }
+  React.useEffect(() => {
+    if (!searchItemsById) {
+      // Nothing to index - yet.
+      return;
+    }
 
-      const startTime = performance.now();
-      if (searchApiRef.current) {
-        searchApiRef.current = null;
-      }
+    const startTime = performance.now();
+    if (searchApiRef.current) {
+      searchApiRef.current = null;
+    }
 
-      try {
-        const newSearchApi = new Fuse(Object.values(searchItemsById), {
-          keys: [
-            { name: 'name', weight: 2 },
-            { name: 'fullName', weight: 5 },
-            { name: 'shortDescription', weight: 1 },
-            { name: 'tags', weight: 4 },
-          ],
-          minMatchCharLength: 2,
-          threshold: 0.35,
-          includeMatches: true,
-          ignoreLocation: true,
-          useExtendedSearch: true,
-          findAllMatches: true,
-        });
+    try {
+      const newSearchApi = new Fuse(Object.values(searchItemsById), {
+        keys: [
+          { name: 'name', weight: 2 },
+          { name: 'fullName', weight: 5 },
+          { name: 'shortDescription', weight: 1 },
+          { name: 'tags', weight: 4 },
+        ],
+        minMatchCharLength: 2,
+        threshold: 0.35,
+        includeMatches: true,
+        ignoreLocation: true,
+        useExtendedSearch: true,
+        findAllMatches: true,
+      });
 
-        const totalTime = performance.now() - startTime;
-        console.info(
-          `Indexed ${
-            Object.keys(searchItemsById).length
-          } items in ${totalTime.toFixed(3)}ms.`
-        );
-        searchApiRef.current = newSearchApi;
-      } catch (error) {
-        console.error('Error while indexing items: ', error);
-      }
-    },
-    [searchItemsById]
-  );
+      const totalTime = performance.now() - startTime;
+      console.info(
+        `Indexed ${
+          Object.keys(searchItemsById).length
+        } items in ${totalTime.toFixed(3)}ms.`
+      );
+      searchApiRef.current = newSearchApi;
+    } catch (error) {
+      console.error('Error while indexing items: ', error);
+    }
+  }, [searchItemsById]);
 
   // Update the search results according to the items, search term
   // chosen category and chosen filters.
   const searchApi = searchApiRef.current;
-  React.useEffect(
-    () => {
-      let discardSearch = false;
-      if (!searchText) {
-        setSearchResults(
-          filterSearchResults(
-            orderedSearchResults,
-            chosenItemCategory,
-            chosenCategory,
-            chosenFilters,
-            excludedTiers
-          )
-        );
-      } else {
-        if (!searchItemsById || !searchApi) {
-          console.info(
-            'Search for items skipped because items are not ready - will be retried when ready'
-          );
-          return;
-        }
-
-        const startTime = performance.now();
-        const results = searchApi.search(
-          getFuseSearchQueryForMultipleKeys(searchText, [
-            'name',
-            'fullName',
-            'shortDescription',
-            'tags',
-          ])
-        );
-        const totalTime = performance.now() - startTime;
+  React.useEffect(() => {
+    let discardSearch = false;
+    if (!searchText) {
+      setSearchResults(
+        filterSearchResults(
+          orderedSearchResults,
+          chosenItemCategory,
+          chosenCategory,
+          chosenFilters,
+          excludedTiers
+        )
+      );
+    } else {
+      if (!searchItemsById || !searchApi) {
         console.info(
-          `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`
+          'Search for items skipped because items are not ready - will be retried when ready'
         );
-        if (discardSearch) {
-          console.info(
-            'Discarding search results as a new search was launched.'
-          );
-          return;
-        }
-        setSearchResults(
-          filterSearchResults(
-            results.map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            })),
-            chosenItemCategory,
-            chosenCategory,
-            chosenFilters,
-            excludedTiers
-          )
-        );
+        return;
       }
 
-      return () => {
-        // Effect is being destroyed - meaning that a new search was launched.
-        // Cancel this one.
-        discardSearch = true;
-      };
-    },
-    [
-      orderedSearchResults,
-      searchItemsById,
-      searchText,
-      chosenItemCategory,
-      chosenCategory,
-      chosenFilters,
-      searchApi,
-      excludedTiers,
-    ]
-  );
+      const startTime = performance.now();
+      const results = searchApi.search(
+        getFuseSearchQueryForMultipleKeys(searchText, [
+          'name',
+          'fullName',
+          'shortDescription',
+          'tags',
+        ])
+      );
+      const totalTime = performance.now() - startTime;
+      console.info(
+        `Found ${results.length} items in ${totalTime.toFixed(3)}ms.`
+      );
+      if (discardSearch) {
+        console.info('Discarding search results as a new search was launched.');
+        return;
+      }
+      setSearchResults(
+        filterSearchResults(
+          results.map((result) => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          })),
+          chosenItemCategory,
+          chosenCategory,
+          chosenFilters,
+          excludedTiers
+        )
+      );
+    }
+
+    return () => {
+      // Effect is being destroyed - meaning that a new search was launched.
+      // Cancel this one.
+      discardSearch = true;
+    };
+  }, [
+    orderedSearchResults,
+    searchItemsById,
+    searchText,
+    chosenItemCategory,
+    chosenCategory,
+    chosenFilters,
+    searchApi,
+    excludedTiers,
+  ]);
 
   return searchResults;
 };

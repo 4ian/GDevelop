@@ -45,8 +45,8 @@ export const resizeImage = (
       height - 2 * transparentBorderSize
     );
 
-    canvasElement.toBlob(blob => {
-      blob.arrayBuffer().then(buffer => {
+    canvasElement.toBlob((blob) => {
+      blob.arrayBuffer().then((buffer) => {
         fs.writeFileSync(outputFile, Buffer.from(buffer));
         resolve(true);
       });

@@ -12,7 +12,7 @@ import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ColorExpressionField(props: ParameterFieldProps, ref) {
     const field = React.useRef<?GenericExpressionField>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -28,7 +28,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             style={style}
             disableAlpha
             color={rgbStringAndAlphaToRGBColor(props.value)}
-            onChangeComplete={color => {
+            onChangeComplete={(color) => {
               onChange(
                 '"' + color.rgb.r + ';' + color.rgb.g + ';' + color.rgb.b + '"'
               );

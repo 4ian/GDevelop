@@ -37,13 +37,11 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const texts = TUTORIAL_CATEGORY_TEXTS[category];
   const filteredTutorials = tutorials.filter(
-    tutorial => tutorial.category === category
+    (tutorial) => tutorial.category === category
   );
 
-  const [
-    selectedTutorial,
-    setSelectedTutorial,
-  ] = React.useState<Tutorial | null>(null);
+  const [selectedTutorial, setSelectedTutorial] =
+    React.useState<Tutorial | null>(null);
 
   return (
     <I18n>
@@ -55,7 +53,7 @@ const TutorialsCategoryPage = ({ category, tutorials, onBack }: Props) => {
         >
           <SectionRow>
             <ImageTileGrid
-              items={filteredTutorials.map(tutorial =>
+              items={filteredTutorials.map((tutorial) =>
                 formatTutorialToImageTileComponent({
                   i18n,
                   limits,

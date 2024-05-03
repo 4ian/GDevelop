@@ -24,8 +24,8 @@ export const getBackgroundColor = (
   backgroundColor === 'dark'
     ? gdevelopTheme.paper.backgroundColor.dark
     : backgroundColor === 'medium'
-    ? gdevelopTheme.paper.backgroundColor.medium
-    : gdevelopTheme.paper.backgroundColor.light;
+      ? gdevelopTheme.paper.backgroundColor.medium
+      : gdevelopTheme.paper.backgroundColor.light;
 
 const Paper = ({
   id,

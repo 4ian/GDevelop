@@ -31,14 +31,10 @@ const onlineWebExporter: Exporter = {
 };
 
 export const Default = () => {
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<?ExporterSection>(null);
-  const [
-    chosenExporterSubSection,
-    setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>(null);
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<?ExporterSection>(null);
+  const [chosenExporterSubSection, setChosenExporterSubSection] =
+    React.useState<?ExporterSubSection>(null);
   return (
     <PublishHome
       project={testProject.project}
@@ -60,14 +56,10 @@ export const Default = () => {
 };
 
 export const OnlineWebExporterSelected = () => {
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<?ExporterSection>('browser');
-  const [
-    chosenExporterSubSection,
-    setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>('online');
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<?ExporterSection>('browser');
+  const [chosenExporterSubSection, setChosenExporterSubSection] =
+    React.useState<?ExporterSubSection>('online');
   return (
     <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
       <PublishHome
@@ -91,14 +83,10 @@ export const OnlineWebExporterSelected = () => {
 };
 
 export const OnlineWebExporterSelectedForGameNotOwned = () => {
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<?ExporterSection>('browser');
-  const [
-    chosenExporterSubSection,
-    setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>('online');
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<?ExporterSection>('browser');
+  const [chosenExporterSubSection, setChosenExporterSubSection] =
+    React.useState<?ExporterSubSection>('online');
   return (
     <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
       <PublishHome
@@ -122,14 +110,10 @@ export const OnlineWebExporterSelectedForGameNotOwned = () => {
 };
 
 export const OnlyOnlineWebExporter = () => {
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<?ExporterSection>('browser');
-  const [
-    chosenExporterSubSection,
-    setChosenExporterSubSection,
-  ] = React.useState<?ExporterSubSection>('online');
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<?ExporterSection>('browser');
+  const [chosenExporterSubSection, setChosenExporterSubSection] =
+    React.useState<?ExporterSubSection>('online');
   return (
     <AuthenticatedUserContext.Provider value={fakeStartupAuthenticatedUser}>
       <PublishHome

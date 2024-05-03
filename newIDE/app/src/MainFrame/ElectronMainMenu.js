@@ -25,16 +25,13 @@ const useIPCEventListener = ({
   callback: Function,
   shouldApply: boolean,
 }) => {
-  React.useEffect(
-    () => {
-      if (!ipcRenderer || !shouldApply) return;
+  React.useEffect(() => {
+    if (!ipcRenderer || !shouldApply) return;
 
-      const handler = (event, ...eventArgs) => callback(...eventArgs);
-      ipcRenderer.on(ipcEvent, handler);
-      return () => ipcRenderer.removeListener(ipcEvent, handler);
-    },
-    [ipcEvent, callback, shouldApply]
-  );
+    const handler = (event, ...eventArgs) => callback(...eventArgs);
+    ipcRenderer.on(ipcEvent, handler);
+    return () => ipcRenderer.removeListener(ipcEvent, handler);
+  }, [ipcEvent, callback, shouldApply]);
 };
 
 const useAppEventListener = ({
@@ -44,15 +41,12 @@ const useAppEventListener = ({
   event: string,
   callback: Function,
 }) => {
-  React.useEffect(
-    () => {
-      if (!app) return;
-      const handler = (event, ...eventArgs) => callback(...eventArgs);
-      app.on(event, handler);
-      return () => app.removeListener(event, handler);
-    },
-    [event, callback]
-  );
+  React.useEffect(() => {
+    if (!app) return;
+    const handler = (event, ...eventArgs) => callback(...eventArgs);
+    app.on(event, handler);
+    return () => app.removeListener(event, handler);
+  }, [event, callback]);
 };
 
 const isMainWindow = (windowTitle: string): boolean => {
@@ -88,10 +82,8 @@ const ElectronMainMenu = ({
   } = props;
   const { onClosePreview } = extraCallbacks;
   const language = i18n.language;
-  const [
-    isFocusedOnMainWindow,
-    setIsFocusedOnMainWindow,
-  ] = React.useState<boolean>(true);
+  const [isFocusedOnMainWindow, setIsFocusedOnMainWindow] =
+    React.useState<boolean>(true);
   const [focusedWindowId, setFocusedWindowId] = React.useState<number>(
     remote.getCurrentWindow().id
   );
@@ -105,14 +97,14 @@ const ElectronMainMenu = ({
 
   useAppEventListener({
     event: 'browser-window-focus',
-    callback: window => {
+    callback: (window) => {
       setFocusedWindowId(window.id);
       setIsFocusedOnMainWindow(isMainWindow(window.title));
     },
   });
   useAppEventListener({
     event: 'browser-window-blur',
-    callback: window => {
+    callback: (window) => {
       setIsFocusedOnMainWindow(!isMainWindow(window.title));
     },
   });
@@ -221,38 +213,35 @@ const ElectronMainMenu = ({
     shouldApply: true, // Keep logic around app update even if on preview window
   });
 
-  React.useEffect(
-    () => {
-      if (ipcRenderer) {
-        ipcRenderer.send(
-          'set-main-menu',
-          buildMainMenuDeclarativeTemplate({
-            project,
-            canSaveProjectAs,
-            i18n,
-            recentProjectFiles,
-            shortcutMap,
-            isApplicationTopLevelMenu,
-          })
-        );
-      }
-    },
-    [
-      i18n,
-      language,
-      project,
-      canSaveProjectAs,
-      recentProjectFiles,
-      shortcutMap,
-      isApplicationTopLevelMenu,
-    ]
-  );
+  React.useEffect(() => {
+    if (ipcRenderer) {
+      ipcRenderer.send(
+        'set-main-menu',
+        buildMainMenuDeclarativeTemplate({
+          project,
+          canSaveProjectAs,
+          i18n,
+          recentProjectFiles,
+          shortcutMap,
+          isApplicationTopLevelMenu,
+        })
+      );
+    }
+  }, [
+    i18n,
+    language,
+    project,
+    canSaveProjectAs,
+    recentProjectFiles,
+    shortcutMap,
+    isApplicationTopLevelMenu,
+  ]);
 
   const { onOpenRecentFile } = callbacks;
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
     generateOptions: React.useCallback(
       () =>
-        recentProjectFiles.map(item => ({
+        recentProjectFiles.map((item) => ({
           text: item.fileMetadata.fileIdentifier,
           handler: () => onOpenRecentFile(item),
         })),

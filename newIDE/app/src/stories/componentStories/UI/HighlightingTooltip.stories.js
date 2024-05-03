@@ -31,7 +31,7 @@ export const WithThumbnailSetByHref = () => {
           display: 'flex',
           justifyContent: 'center',
         }}
-        ref={ref => setAnchorEl(ref)}
+        ref={(ref) => setAnchorEl(ref)}
       >
         Anchor
       </div>
@@ -77,7 +77,7 @@ export const WithThumbnailSetInContent = () => {
           display: 'flex',
           justifyContent: 'center',
         }}
-        ref={ref => setAnchorEl(ref)}
+        ref={(ref) => setAnchorEl(ref)}
       >
         Anchor
       </div>

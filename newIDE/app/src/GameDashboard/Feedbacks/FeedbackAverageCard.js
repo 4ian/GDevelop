@@ -24,7 +24,7 @@ type Props = {|
 const FeedbackAverageCard = ({ feedbacks }: Props) => {
   if (feedbacks.length === 0) return null;
 
-  const ratings = feedbacks.map(feedback => feedback.ratings).filter(Boolean);
+  const ratings = feedbacks.map((feedback) => feedback.ratings).filter(Boolean);
   const ratingsSum: GameRatings = ratings.reduce(
     (acc, rating) => {
       if (!rating) return acc;
@@ -62,7 +62,7 @@ const FeedbackAverageCard = ({ feedbacks }: Props) => {
             <Spacer />
             {displayedRatings && (
               <ResponsiveLineStackLayout noColumnMargin expand>
-                {displayedRatings.map(rating => (
+                {displayedRatings.map((rating) => (
                   <Line expand noMargin key={rating.key}>
                     <Rating label={rating.label} value={rating.value} />
                     <Spacer />

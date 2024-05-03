@@ -23,7 +23,7 @@ export const makeLocalEventsFunctionCodeWriter = ({
     os.tmpdir(),
     `GDGeneratedEventsFunctions-` + getUID()
   );
-  fs.mkdir(outputDir, err => {
+  fs.mkdir(outputDir, (err) => {
     if (err && err.code !== 'EEXIST') {
       console.error(
         'Unable to create the directory where to output events functions generated code: ',
@@ -46,7 +46,7 @@ export const makeLocalEventsFunctionCodeWriter = ({
       return new Promise((resolve, reject) => {
         const includeFile = getPathFor(functionCodeNamespace);
         onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
+        fs.writeFile(includeFile, code, (err) => {
           if (err) return reject(err);
 
           resolve();
@@ -60,7 +60,7 @@ export const makeLocalEventsFunctionCodeWriter = ({
       return new Promise((resolve, reject) => {
         const includeFile = getPathFor(behaviorCodeNamespace);
         onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
+        fs.writeFile(includeFile, code, (err) => {
           if (err) return reject(err);
 
           resolve();
@@ -74,7 +74,7 @@ export const makeLocalEventsFunctionCodeWriter = ({
       return new Promise((resolve, reject) => {
         const includeFile = getPathFor(objectCodeNamespace);
         onWriteFile({ includeFile, content: code });
-        fs.writeFile(includeFile, code, err => {
+        fs.writeFile(includeFile, code, (err) => {
           if (err) return reject(err);
 
           resolve();

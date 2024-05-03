@@ -25,7 +25,7 @@ const styles = {
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function TrueFalseField(props: ParameterFieldProps, ref) {
     const button = React.useRef<?TwoStatesButtonInterface>(null);
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (button.current) button.current.focusLeftButton();
     };
     React.useImperativeHandle(ref, () => ({

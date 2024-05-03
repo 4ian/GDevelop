@@ -119,11 +119,11 @@ const isPlanRecommendationRelevant = (
     subscription.planId === 'gdevelop_indie'
       ? ['gold', 'startup', 'business', 'education']
       : subscription.planId === 'gdevelop_gold' ||
-        subscription.planId === 'gdevelop_pro'
-      ? ['startup', 'business', 'education']
-      : subscription.planId === 'gdevelop_startup'
-      ? ['business']
-      : [];
+          subscription.planId === 'gdevelop_pro'
+        ? ['startup', 'business', 'education']
+        : subscription.planId === 'gdevelop_startup'
+          ? ['business']
+          : [];
   return relevantPlans.includes(planRecommendation.id);
 };
 
@@ -152,7 +152,7 @@ const TextTutorialsRow = ({ tutorials }: TextTutorialsRowProps) => {
         cellHeight="auto"
         spacing={10}
       >
-        {tutorials.map(tutorial => (
+        {tutorials.map((tutorial) => (
           <GridListTile key={tutorial.id} classes={{ tile: classes.tile }}>
             <CardWidget
               onClick={() => Window.openExternalURL(tutorial.link)}
@@ -193,51 +193,45 @@ const RecommendationList = ({
   hasFilledSurveyAlready,
   onOpenProfile,
 }: Props) => {
-  const {
-    recommendations,
-    subscription,
-    limits,
-    badges,
-    achievements,
-  } = authenticatedUser;
+  const { recommendations, subscription, limits, badges, achievements } =
+    authenticatedUser;
   const { tutorials } = React.useContext(TutorialContext);
   const { getTutorialProgress } = React.useContext(PreferencesContext);
 
-  const [
-    selectedTutorial,
-    setSelectedTutorial,
-  ] = React.useState<Tutorial | null>(null);
+  const [selectedTutorial, setSelectedTutorial] =
+    React.useState<Tutorial | null>(null);
 
   if (!recommendations) return <PlaceholderLoader />;
 
   const recommendedTutorials = tutorials
     ? recommendations
-        .map(recommendation =>
+        .map((recommendation) =>
           recommendation.type === 'gdevelop-tutorial'
-            ? tutorials.find(tutorial => tutorial.id === recommendation.id)
+            ? tutorials.find((tutorial) => tutorial.id === recommendation.id)
             : null
         )
         .filter(Boolean)
     : [];
 
   const recommendedVideoTutorials = recommendedTutorials.filter(
-    tutorial => tutorial.type === 'video'
+    (tutorial) => tutorial.type === 'video'
   );
   const recommendedTextTutorials = recommendedTutorials.filter(
-    tutorial => tutorial.type === 'text'
+    (tutorial) => tutorial.type === 'text'
   );
 
   // $FlowIgnore
-  const guidedLessonsRecommendation: ?GuidedLessonsRecommendation = recommendations.find(
-    recommendation => recommendation.type === 'guided-lessons'
-  );
+  const guidedLessonsRecommendation: ?GuidedLessonsRecommendation =
+    recommendations.find(
+      (recommendation) => recommendation.type === 'guided-lessons'
+    );
   const guidedLessonsIds = guidedLessonsRecommendation
     ? guidedLessonsRecommendation.lessonsIds
     : null;
 
   // $FlowIgnore
   const planRecommendation: ?PlanRecommendation = recommendations.find(
-    recommendation => recommendation.type === 'plan'
+    (recommendation) => recommendation.type === 'plan'
   );
 
   const getInAppTutorialPartProgress = ({
@@ -273,8 +267,10 @@ const RecommendationList = ({
         if (guidedLessonsRecommendation) {
           const displayTextAfterGuidedLessons = guidedLessonsIds
             ? guidedLessonsIds
-                .map(tutorialId => getInAppTutorialPartProgress({ tutorialId }))
-                .every(progress => progress === 100)
+                .map((tutorialId) =>
+                  getInAppTutorialPartProgress({ tutorialId })
+                )
+                .every((progress) => progress === 100)
             : false;
 
           items.push(
@@ -303,7 +299,7 @@ const RecommendationList = ({
               <ImageTileRow
                 title={<Trans>Get started with game creation</Trans>}
                 margin="dense"
-                items={recommendedVideoTutorials.map(tutorial =>
+                items={recommendedVideoTutorials.map((tutorial) =>
                   formatTutorialToImageTileComponent({
                     i18n,
                     limits,

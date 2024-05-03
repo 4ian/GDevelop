@@ -66,12 +66,11 @@ const getSearchInitialOffset = (
   const eventsToSearch = [selectedEvents[0], ...resultEvents];
 
   const positionFinder = new gd.EventsPositionFinder();
-  eventsToSearch.forEach(event => positionFinder.addEventToSearch(event));
+  eventsToSearch.forEach((event) => positionFinder.addEventToSearch(event));
   positionFinder.launch(events);
-  const [
-    selectedEventPosition,
-    ...searchResultsPositions
-  ] = positionFinder.getPositions().toJSArray();
+  const [selectedEventPosition, ...searchResultsPositions] = positionFinder
+    .getPositions()
+    .toJSArray();
   positionFinder.delete();
 
   // Search results are considered to be sorted by position
@@ -122,7 +121,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     const resultEventsWithDuplicates = mapFor(
       0,
       eventsSearchResults.size(),
-      eventIndex => {
+      (eventIndex) => {
         const eventsSearchResult = eventsSearchResults.at(eventIndex);
         return eventsSearchResult.isEventValid()
           ? eventsSearchResult.getEvent()
@@ -132,7 +131,10 @@ export default class EventsSearcher extends React.Component<Props, State> {
 
     // Store a list of unique events, because browsing for results in the events
     // tree is made event by event.
-    return uniqBy<gdBaseEvent>(resultEventsWithDuplicates, event => event.ptr);
+    return uniqBy<gdBaseEvent>(
+      resultEventsWithDuplicates,
+      (event) => event.ptr
+    );
   };
 
   _doReplaceInEvents = (
@@ -238,9 +240,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return;
     }
 
-    this._resultEvents = this._deduplicateEventSearchResults(
-      eventsSearchResults
-    );
+    this._resultEvents =
+      this._deduplicateEventSearchResults(eventsSearchResults);
   };
 
   _goToSearchResults = (step: number): ?gdBaseEvent => {

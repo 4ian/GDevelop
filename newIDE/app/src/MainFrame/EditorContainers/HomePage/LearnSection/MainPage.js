@@ -93,7 +93,7 @@ type TutorialsRowProps = {|
   limits: ?Limits,
   tutorials: Tutorial[],
   category: TutorialCategory,
-  onSelectCategory: TutorialCategory => void,
+  onSelectCategory: (TutorialCategory) => void,
   onSelectTutorial: (tutorial: Tutorial) => void,
 |};
 
@@ -110,8 +110,8 @@ export const TutorialsRow = ({
         title={TUTORIAL_CATEGORY_TEXTS[category].title}
         description={TUTORIAL_CATEGORY_TEXTS[category].description}
         items={tutorials
-          .filter(tutorial => tutorial.category === category)
-          .map(tutorial =>
+          .filter((tutorial) => tutorial.category === category)
+          .map((tutorial) =>
             formatTutorialToImageTileComponent({
               i18n,
               limits,
@@ -145,12 +145,8 @@ const MainPage = ({
 }: Props) => {
   const { limits } = React.useContext(AuthenticatedUserContext);
   const classes = useStyles();
-  const {
-    windowSize,
-    isMobile,
-    isLandscape,
-    isMediumScreen,
-  } = useResponsiveWindowSize();
+  const { windowSize, isMobile, isLandscape, isMediumScreen } =
+    useResponsiveWindowSize();
   const helpItems: {
     title: React.Node,
     description: React.Node,
@@ -175,10 +171,8 @@ const MainPage = ({
     },
   ].filter(Boolean);
 
-  const [
-    selectedTutorial,
-    setSelectedTutorial,
-  ] = React.useState<Tutorial | null>(null);
+  const [selectedTutorial, setSelectedTutorial] =
+    React.useState<Tutorial | null>(null);
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>

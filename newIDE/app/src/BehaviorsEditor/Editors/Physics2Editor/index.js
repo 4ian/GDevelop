@@ -223,11 +223,11 @@ const Physics2Editor = (props: Props) => {
               shape === 'Circle'
                 ? 'Radius'
                 : shape === 'Edge'
-                ? 'Length'
-                : 'Width'
+                  ? 'Length'
+                  : 'Width'
             }
             min={0}
-            onChange={newValue =>
+            onChange={(newValue) =>
               updateBehaviorProperty('shapeDimensionA', newValue)
             }
             type="number"
@@ -243,7 +243,7 @@ const Physics2Editor = (props: Props) => {
             key={'shapeDimensionB'}
             floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
             min={shape === 'Edge' ? undefined : 0}
-            onChange={newValue =>
+            onChange={(newValue) =>
               updateBehaviorProperty('shapeDimensionB', newValue)
             }
             type="number"
@@ -284,7 +284,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'shapeOffsetX'}
           step={1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty('shapeOffsetX', newValue)
           }
         />
@@ -292,7 +292,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'shapeOffsetY'}
           step={1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty('shapeOffsetY', newValue)
           }
         />
@@ -310,7 +310,7 @@ const Physics2Editor = (props: Props) => {
           resourceKind={'image'}
           initialResourceName={''}
           fullWidth
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             setImage(resourceName);
             onBehaviorUpdated();
             forceUpdate();
@@ -347,7 +347,7 @@ const Physics2Editor = (props: Props) => {
                 image
               )}
               fixedHeight={200}
-              renderOverlay={overlayProps => {
+              renderOverlay={(overlayProps) => {
                 // The result from `getProperties` is temporary, and because this renderOverlay
                 // function can be called outside of the render, we must get the properties again.
                 const properties = behavior.getProperties();
@@ -410,7 +410,7 @@ const Physics2Editor = (props: Props) => {
               vertices.push({ x: 0, y: 0 });
               updateBehaviorProperty('vertices', JSON.stringify(vertices));
             }}
-            onRemove={index => {
+            onRemove={(index) => {
               let vertices = JSON.parse(properties.get('vertices').getValue());
               vertices.splice(index, 1);
               updateBehaviorProperty('vertices', JSON.stringify(vertices));
@@ -424,7 +424,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'density'}
           step={0.1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty(
               'density',
               parseFloat(newValue) > 0 ? newValue : '0'
@@ -435,7 +435,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'gravityScale'}
           step={0.1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty('gravityScale', newValue)
           }
         />
@@ -445,7 +445,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'friction'}
           step={0.1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty(
               'friction',
               parseFloat(newValue) > 0 ? newValue : '0'
@@ -456,7 +456,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'restitution'}
           step={0.1}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty(
               'restitution',
               parseFloat(newValue) > 0 ? newValue : '0'
@@ -469,7 +469,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'linearDamping'}
           step={0.05}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty('linearDamping', newValue)
           }
         />
@@ -478,7 +478,7 @@ const Physics2Editor = (props: Props) => {
           properties={properties}
           propertyName={'angularDamping'}
           step={0.05}
-          onUpdate={newValue =>
+          onUpdate={(newValue) =>
             updateBehaviorProperty('angularDamping', newValue)
           }
         />

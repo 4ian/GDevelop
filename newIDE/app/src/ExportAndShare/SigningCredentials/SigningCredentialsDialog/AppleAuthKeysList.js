@@ -41,9 +41,8 @@ export const AppleAuthKeysList = ({
   onRefreshSigningCredentials,
   onAddNew,
 }: Props) => {
-  const appleAuthKeySigningCredentials = filterAppleAuthKeySigningCredentials(
-    signingCredentials
-  );
+  const appleAuthKeySigningCredentials =
+    filterAppleAuthKeySigningCredentials(signingCredentials);
 
   return (
     <ColumnStackLayout noMargin>
@@ -71,7 +70,7 @@ export const AppleAuthKeysList = ({
           }
         />
       ) : (
-        appleAuthKeySigningCredentials.map(signingCredential => {
+        appleAuthKeySigningCredentials.map((signingCredential) => {
           return (
             <Card
               background="medium"

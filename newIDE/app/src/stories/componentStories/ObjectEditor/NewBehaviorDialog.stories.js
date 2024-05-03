@@ -61,9 +61,8 @@ export const DefaultForSpriteObject = () => (
 DefaultForSpriteObject.parameters = apiDataFakeBehaviors;
 
 export const WithCommunityExtensions = () => {
-  const [showCommunityExtensions, setShowCommunityExtensions] = React.useState(
-    true
-  );
+  const [showCommunityExtensions, setShowCommunityExtensions] =
+    React.useState(true);
   const preferences: Preferences = {
     ...initialPreferences,
     values: { ...initialPreferences.values, showCommunityExtensions },

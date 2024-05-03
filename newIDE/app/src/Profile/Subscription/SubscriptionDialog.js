@@ -138,12 +138,12 @@ const getSubscriptionPricingSystemPeriod = (
   if (!subscription || !subscriptionPlansWithPricingSystems) return null;
   const allPricingSystems = subscriptionPlansWithPricingSystems
     .map(
-      subscriptionPlanWithPricingSystems =>
+      (subscriptionPlanWithPricingSystems) =>
         subscriptionPlanWithPricingSystems.pricingSystems
     )
     .flat();
   const subscriptionPricingSystem = allPricingSystems.find(
-    pricingSystem => pricingSystem.id === subscription.pricingSystemId
+    (pricingSystem) => pricingSystem.id === subscription.pricingSystemId
   );
   if (
     !subscriptionPricingSystem ||
@@ -163,14 +163,14 @@ const getMaximumYearlyDiscountOverPlans = ({
   if (!subscriptionPlansWithPricingSystems) return 0;
   let maximumDiscount = 0;
   subscriptionPlansWithPricingSystems.forEach(
-    subscriptionPlanWithPricingSystems => {
+    (subscriptionPlanWithPricingSystems) => {
       if (subscriptionPlanWithPricingSystems.isLegacy) return;
       const { pricingSystems } = subscriptionPlanWithPricingSystems;
       const monthlyPricingSystem = pricingSystems.find(
-        pricingSystem => pricingSystem.period === 'month'
+        (pricingSystem) => pricingSystem.period === 'month'
       );
       const yearlyPricingSystem = pricingSystems.find(
-        pricingSystem => pricingSystem.period === 'year'
+        (pricingSystem) => pricingSystem.period === 'year'
       );
       if (!monthlyPricingSystem || !yearlyPricingSystem) return;
       const discount =
@@ -193,7 +193,7 @@ const getPlanSpecificRequirements = (
   const planSpecificRequirements = subscriptionPlansWithPricingSystems
     ? uniq(
         subscriptionPlansWithPricingSystems
-          .map(subscriptionPlanWithPricingSystems => {
+          .map((subscriptionPlanWithPricingSystems) => {
             if (!subscriptionPlanWithPricingSystems.specificRequirementByLocale)
               return null;
             return selectMessageByLocale(
@@ -225,17 +225,12 @@ export default function SubscriptionDialog({
   userLegacySubscriptionPlanWithPricingSystem,
   filter,
 }: Props) {
-  const [isChangingSubscription, setIsChangingSubscription] = React.useState(
-    false
-  );
-  const [
-    educationPlanSeatsCount,
-    setEducationPlanSeatsCount,
-  ] = React.useState<number>(20);
-  const [
-    subscriptionPendingDialogOpen,
-    setSubscriptionPendingDialogOpen,
-  ] = React.useState(false);
+  const [isChangingSubscription, setIsChangingSubscription] =
+    React.useState(false);
+  const [educationPlanSeatsCount, setEducationPlanSeatsCount] =
+    React.useState<number>(20);
+  const [subscriptionPendingDialogOpen, setSubscriptionPendingDialogOpen] =
+    React.useState(false);
   const [redeemCodeDialogOpen, setRedeemCodeDialogOpen] = React.useState(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [period, setPeriod] = React.useState<'year' | 'month'>(
@@ -246,18 +241,14 @@ export default function SubscriptionDialog({
   );
 
   const { showConfirmation } = useAlertDialog();
-  const [cancelReasonDialogOpen, setCancelReasonDialogOpen] = React.useState(
-    false
-  );
+  const [cancelReasonDialogOpen, setCancelReasonDialogOpen] =
+    React.useState(false);
 
-  React.useEffect(
-    () => {
-      if (open) {
-        sendSubscriptionDialogShown(analyticsMetadata);
-      }
-    },
-    [open, analyticsMetadata]
-  );
+  React.useEffect(() => {
+    if (open) {
+      sendSubscriptionDialogShown(analyticsMetadata);
+    }
+  }, [open, analyticsMetadata]);
 
   const buyUpdateOrCancelPlan = async (
     i18n: I18nType,
@@ -320,8 +311,8 @@ export default function SubscriptionDialog({
       !needToCancelSubscription || hasExpiredRedeemedSubscription
         ? seamlesslyChangeConfirmationTexts
         : hasValidRedeemedSubscription
-        ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
-        : cancelAndChangeConfirmationTexts;
+          ? cancelAndChangeWithValidRedeemedCodeConfirmationTexts
+          : cancelAndChangeConfirmationTexts;
 
     if (!shouldSkipAlert) {
       const answer = await showConfirmation(confirmDialogTexts);
@@ -396,40 +387,41 @@ export default function SubscriptionDialog({
 
   const { windowSize, isMobile } = useResponsiveWindowSize();
 
-  const displayedSubscriptionPlanWithPricingSystems = subscriptionPlansWithPricingSystems
-    ? [
-        userLegacySubscriptionPlanWithPricingSystem,
-        ...subscriptionPlansWithPricingSystems,
-      ]
-        .filter(Boolean)
-        .filter(plan => {
-          if (filter === 'individual') {
-            return ['free', 'gdevelop_silver', 'gdevelop_gold'].includes(
-              plan.id
-            );
-          }
-          if (filter === 'team') {
-            return ['gdevelop_startup', 'gdevelop_enterprise'].includes(
-              plan.id
-            );
-          }
-          if (filter === 'education') {
-            return ['gdevelop_education'].includes(plan.id);
-          }
+  const displayedSubscriptionPlanWithPricingSystems =
+    subscriptionPlansWithPricingSystems
+      ? [
+          userLegacySubscriptionPlanWithPricingSystem,
+          ...subscriptionPlansWithPricingSystems,
+        ]
+          .filter(Boolean)
+          .filter((plan) => {
+            if (filter === 'individual') {
+              return ['free', 'gdevelop_silver', 'gdevelop_gold'].includes(
+                plan.id
+              );
+            }
+            if (filter === 'team') {
+              return ['gdevelop_startup', 'gdevelop_enterprise'].includes(
+                plan.id
+              );
+            }
+            if (filter === 'education') {
+              return ['gdevelop_education'].includes(plan.id);
+            }
 
-          return plan.id !== 'gdevelop_education';
-        })
-    : null;
+            return plan.id !== 'gdevelop_education';
+          })
+      : null;
 
   const dialogMaxWidth =
     !displayedSubscriptionPlanWithPricingSystems ||
     displayedSubscriptionPlanWithPricingSystems.length === 1
       ? 'md'
       : displayedSubscriptionPlanWithPricingSystems.length < 4
-      ? 'lg'
-      : displayedSubscriptionPlanWithPricingSystems.length < 5
-      ? 'xl'
-      : false;
+        ? 'lg'
+        : displayedSubscriptionPlanWithPricingSystems.length < 5
+          ? 'xl'
+          : false;
   const maximumDiscount = getMaximumYearlyDiscountOverPlans({
     subscriptionPlansWithPricingSystems,
   });
@@ -523,12 +515,12 @@ export default function SubscriptionDialog({
                       windowSize === 'large' || windowSize === 'xlarge'
                         ? styles.planCardsLineContainer
                         : isMobile
-                        ? styles.planCardsMobileContainer
-                        : styles.planCardsContainer
+                          ? styles.planCardsMobileContainer
+                          : styles.planCardsContainer
                     }
                   >
                     {displayedSubscriptionPlanWithPricingSystems.map(
-                      subscriptionPlanWithPricingSystems => {
+                      (subscriptionPlanWithPricingSystems) => {
                         const isFreePlan =
                           subscriptionPlanWithPricingSystems.id === 'free';
                         const isUserCurrentOrLegacyPlan =
@@ -536,7 +528,8 @@ export default function SubscriptionDialog({
                         const pricingSystem = isFreePlan
                           ? null
                           : subscriptionPlanWithPricingSystems.pricingSystems.find(
-                              _pricingSystem => _pricingSystem.period === period
+                              (_pricingSystem) =>
+                                _pricingSystem.period === period
                             );
                         let actions: React.Node = null;
                         if (isFreePlan || !pricingSystem) {
@@ -546,12 +539,14 @@ export default function SubscriptionDialog({
                           'gdevelop_education'
                         ) {
                           if (!isUserCurrentOrLegacyPlan) {
-                            const yearlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
-                              price => price.period === 'year'
-                            );
-                            const monthlyPlanPrice = subscriptionPlanWithPricingSystems.pricingSystems.find(
-                              price => price.period === 'month'
-                            );
+                            const yearlyPlanPrice =
+                              subscriptionPlanWithPricingSystems.pricingSystems.find(
+                                (price) => price.period === 'year'
+                              );
+                            const monthlyPlanPrice =
+                              subscriptionPlanWithPricingSystems.pricingSystems.find(
+                                (price) => price.period === 'month'
+                              );
                             if (yearlyPlanPrice && monthlyPlanPrice) {
                               actions = [
                                 <ColumnStackLayout
@@ -568,7 +563,7 @@ export default function SubscriptionDialog({
                                     }
                                     commitOnBlur
                                     type="number"
-                                    onChange={value => {
+                                    onChange={(value) => {
                                       const newValue = parseInt(value);
                                       setEducationPlanSeatsCount(
                                         Math.min(
@@ -677,9 +672,11 @@ export default function SubscriptionDialog({
                             ];
                           }
                         } else {
-                          const pricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
-                            _pricingSystem => _pricingSystem.period === period
-                          );
+                          const pricingSystem =
+                            subscriptionPlanWithPricingSystems.pricingSystems.find(
+                              (_pricingSystem) =>
+                                _pricingSystem.period === period
+                            );
                           if (pricingSystem) {
                             actions = [
                               <RaisedButton
@@ -725,7 +722,7 @@ export default function SubscriptionDialog({
               {getPlanSpecificRequirements(
                 i18n,
                 displayedSubscriptionPlanWithPricingSystems
-              ).map(planSpecificRequirements => (
+              ).map((planSpecificRequirements) => (
                 <AlertMessage
                   kind="info"
                   key={planSpecificRequirements.substring(0, 25)}
@@ -806,7 +803,7 @@ export default function SubscriptionDialog({
           {redeemCodeDialogOpen && (
             <RedeemCodeDialog
               authenticatedUser={authenticatedUser}
-              onClose={async hasJustRedeemedCode => {
+              onClose={async (hasJustRedeemedCode) => {
                 setRedeemCodeDialogOpen(false);
 
                 if (hasJustRedeemedCode) {

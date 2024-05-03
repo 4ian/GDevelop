@@ -28,7 +28,7 @@ export const Default = () => (
           onEditGroup={action('onEditGroup')}
           onRenameGroup={action('onRenameGroup')}
           onDeleteGroup={action('onDeleteGroup')}
-          getValidatedObjectOrGroupName={newName => newName}
+          getValidatedObjectOrGroupName={(newName) => newName}
         />
       </div>
     </SerializedObjectDisplay>

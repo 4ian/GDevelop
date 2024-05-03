@@ -65,7 +65,7 @@ describe('LocalResourceMover', () => {
 
   test('load resources and upload them', async () => {
     // Simulate reading and uploading files without issues.
-    mockFn(readLocalFileToFile).mockImplementation(async filePath => {
+    mockFn(readLocalFileToFile).mockImplementation(async (filePath) => {
       return {
         name: 'fake-file-for-' + filePath,
         originalFilePath: filePath,
@@ -75,7 +75,7 @@ describe('LocalResourceMover', () => {
     mockFn(getCredentialsForCloudProject).mockResolvedValue(undefined);
     mockFn(uploadProjectResourceFiles).mockImplementation(
       async (authenticatedUser, cloudProjectId, files) => {
-        return files.map(file => ({
+        return files.map((file) => ({
           url: 'fake-url-for-' + file.name,
           error: null,
         }));
@@ -85,9 +85,8 @@ describe('LocalResourceMover', () => {
     // Launch the resources mover.
     const project = makeTestProjectWithResourcesToUpload();
     const options = makeMoveAllLocalResourcesToCloudResourcesOptions(project);
-    const fetchedResources = await moveAllLocalResourcesToCloudResources(
-      options
-    );
+    const fetchedResources =
+      await moveAllLocalResourcesToCloudResources(options);
 
     // Check local resources were read.
     expect(readLocalFileToFile).toHaveBeenCalledWith(
@@ -121,10 +120,7 @@ describe('LocalResourceMover', () => {
 
     // Check local resources were updated with the URL they were uploaded to.
     expect(
-      project
-        .getResourcesManager()
-        .getResource('MyLocalResource')
-        .getFile()
+      project.getResourcesManager().getResource('MyLocalResource').getFile()
     ).toBe(
       'fake-url-for-fake-file-for-' +
         path.resolve('some-local-file.png').replace(/\\/g, '/')
@@ -148,7 +144,7 @@ describe('LocalResourceMover', () => {
 
   test('load resources and upload them in chunks if too big', async () => {
     // Simulate reading 300MB files.
-    mockFn(readLocalFileToFile).mockImplementation(async filePath => {
+    mockFn(readLocalFileToFile).mockImplementation(async (filePath) => {
       return {
         name: 'fake-file-for-' + filePath,
         originalFilePath: filePath,
@@ -162,7 +158,7 @@ describe('LocalResourceMover', () => {
     mockFn(getCredentialsForCloudProject).mockResolvedValue(undefined);
     mockFn(uploadProjectResourceFiles).mockImplementation(
       async (authenticatedUser, cloudProjectId, files) => {
-        return files.map(file => ({
+        return files.map((file) => ({
           url: 'fake-url-for-' + file.name,
           error: null,
         }));
@@ -172,9 +168,8 @@ describe('LocalResourceMover', () => {
     // Launch the resources mover.
     const project = makeTestProjectWithResourcesToUpload();
     const options = makeMoveAllLocalResourcesToCloudResourcesOptions(project);
-    const fetchedResources = await moveAllLocalResourcesToCloudResources(
-      options
-    );
+    const fetchedResources =
+      await moveAllLocalResourcesToCloudResources(options);
 
     // Check local resources were read.
     expect(readLocalFileToFile).toHaveBeenCalledWith(
@@ -216,10 +211,7 @@ describe('LocalResourceMover', () => {
 
     // Check local resources were updated with the URL they were uploaded to.
     expect(
-      project
-        .getResourcesManager()
-        .getResource('MyLocalResource')
-        .getFile()
+      project.getResourcesManager().getResource('MyLocalResource').getFile()
     ).toBe(
       'fake-url-for-fake-file-for-' +
         path.resolve('some-local-file.png').replace(/\\/g, '/')
@@ -243,7 +235,7 @@ describe('LocalResourceMover', () => {
 
   test('load resources and report an error if read fails', async () => {
     // Simulate an error when reading a file.
-    mockFn(readLocalFileToFile).mockImplementation(async filePath => {
+    mockFn(readLocalFileToFile).mockImplementation(async (filePath) => {
       if (filePath.includes('another-local-file.png'))
         throw new Error('fake-reading-error');
 
@@ -256,7 +248,7 @@ describe('LocalResourceMover', () => {
     mockFn(getCredentialsForCloudProject).mockResolvedValue(undefined);
     mockFn(uploadProjectResourceFiles).mockImplementation(
       async (authenticatedUser, cloudProjectId, files) => {
-        return files.map(file => {
+        return files.map((file) => {
           return {
             url: 'fake-url-for-' + file.name,
             error: null,
@@ -268,9 +260,8 @@ describe('LocalResourceMover', () => {
     // Launch the resources mover.
     const project = makeTestProjectWithResourcesToUpload();
     const options = makeMoveAllLocalResourcesToCloudResourcesOptions(project);
-    const fetchedResources = await moveAllLocalResourcesToCloudResources(
-      options
-    );
+    const fetchedResources =
+      await moveAllLocalResourcesToCloudResources(options);
 
     // Check local resources were read.
     expect(readLocalFileToFile).toHaveBeenCalledWith(
@@ -301,10 +292,7 @@ describe('LocalResourceMover', () => {
     // Check local resources were updated with the URL they were uploaded to,
     // except if they could not be read.
     expect(
-      project
-        .getResourcesManager()
-        .getResource('MyLocalResource')
-        .getFile()
+      project.getResourcesManager().getResource('MyLocalResource').getFile()
     ).toBe(
       'fake-url-for-fake-file-for-' +
         path.resolve('some-local-file.png').replace(/\\/g, '/')

@@ -85,8 +85,7 @@ describe('CloudResourceFetcher', () => {
     mockFn(downloadUrlsToBlobs).mockImplementationOnce(() => [
       {
         item: {
-          url:
-            'https://private-assets.gdevelop.io/file-to-download.png?token=123',
+          url: 'https://private-assets.gdevelop.io/file-to-download.png?token=123',
           resource: resourceToDownloadAndReupload,
           filename: 'file-to-download.png',
         },
@@ -117,13 +116,11 @@ describe('CloudResourceFetcher', () => {
     mockFn(getCredentialsForCloudProject).mockImplementation(async () => {});
     mockFn(uploadProjectResourceFiles).mockImplementation(() => [
       {
-        url:
-          'https://project-resources.gdevelop.io/fake-cloud-project-id/file-to-download.png',
+        url: 'https://project-resources.gdevelop.io/fake-cloud-project-id/file-to-download.png',
         error: null,
       },
       {
-        url:
-          "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
+        url: "https://project-resources.gdevelop.io/fake-cloud-project-id/My Blob Resource To Download with 汉字 and funk¥__character__'_.png",
         error: null,
       },
     ]);
@@ -134,8 +131,7 @@ describe('CloudResourceFetcher', () => {
     expect(downloadUrlsToBlobs).toHaveBeenCalledWith({
       urlContainers: [
         {
-          url:
-            'https://private-assets.gdevelop.io/file-to-download.png?token=123',
+          url: 'https://private-assets.gdevelop.io/file-to-download.png?token=123',
           resource: expect.any(gd.Resource),
           filename: 'file-to-download.png',
         },
@@ -152,8 +148,7 @@ describe('CloudResourceFetcher', () => {
       [
         {
           item: {
-            url:
-              'https://private-assets.gdevelop.io/file-to-download.png?token=123',
+            url: 'https://private-assets.gdevelop.io/file-to-download.png?token=123',
             resource: expect.any(gd.Resource),
             filename: 'file-to-download.png',
           },

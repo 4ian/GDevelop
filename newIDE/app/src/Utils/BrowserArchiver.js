@@ -51,14 +51,13 @@ export const downloadUrlFilesToBlobFiles = async ({
   urlFiles: Array<UrlFileDescriptor>,
   onProgress: (count: number, total: number) => void,
 |}): Promise<Array<BlobFileDescriptor>> => {
-  const downloadedBlobs: Array<
-    ItemResult<UrlFileDescriptor>
-  > = await downloadUrlsToBlobs({
-    urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
-    onProgress,
-  });
+  const downloadedBlobs: Array<ItemResult<UrlFileDescriptor>> =
+    await downloadUrlsToBlobs({
+      urlContainers: urlFiles.filter(({ url }) => url.indexOf('.h') === -1), // Should be useless now, still keep it by safety.
+      onProgress,
+    });
 
-  const erroredUrls = downloadedBlobs.filter(downloadedBlob => {
+  const erroredUrls = downloadedBlobs.filter((downloadedBlob) => {
     return !!downloadedBlob.error || !downloadedBlob.blob;
   });
   if (erroredUrls.length) {
@@ -111,7 +110,7 @@ export const archiveFiles = async ({
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
       new zipJs.BlobWriter('application/zip'),
-      function(zipWriter) {
+      function (zipWriter) {
         eachCallback(
           blobFiles,
           ({ filePath, blob }, done) => {
@@ -160,8 +159,9 @@ export const archiveFiles = async ({
                     );
                     reject(
                       new Error(
-                        `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${sizeLimit /
-                          (1000 * 1000)} MB.`
+                        `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${
+                          sizeLimit / (1000 * 1000)
+                        } MB.`
                       )
                     );
                   }
@@ -172,7 +172,7 @@ export const archiveFiles = async ({
           }
         );
       },
-      error => {
+      (error) => {
         console.error('Error while making zip:', error);
         reject(error);
       }

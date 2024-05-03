@@ -14,7 +14,7 @@ const gd: libGDevelop = global.gd;
 // $FlowExpectedError
 const makeFakeI18n = (fakeI18n): I18nType => ({
   ...fakeI18n,
-  _: message => message.id,
+  _: (message) => message.id,
 });
 
 describe('EnumerateExpressions', () => {
@@ -156,10 +156,8 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions (number only)', () => {
     makeTestExtensions(gd);
-    const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number',
-      makeFakeI18n()
-    );
+    const allNumberExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('number', makeFakeI18n());
     // Check a free expression:
     expect(allNumberExpressions).toContainEqual(
       expect.objectContaining({
@@ -185,10 +183,8 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions', () => {
     makeTestExtensions(gd);
-    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string',
-      makeFakeI18n()
-    );
+    const allExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('string', makeFakeI18n());
     // Check a free expression:
     expect(allExpressions).toContainEqual(
       expect.objectContaining({
@@ -214,10 +210,8 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can create the tree of all expressions', () => {
-    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number',
-      makeFakeI18n()
-    );
+    const allExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('number', makeFakeI18n());
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there

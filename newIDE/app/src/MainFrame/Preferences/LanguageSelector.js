@@ -15,7 +15,7 @@ type Props = {|
   onLanguageChanged: (language: string) => void,
 |};
 
-const displayLocaleMetadata = localeMetadata => {
+const displayLocaleMetadata = (localeMetadata) => {
   if (localeMetadata.languageCode === 'en') return false;
   if (localeMetadata.languageCode === 'pseudo_LOCALE') return Window.isDev();
 
@@ -24,13 +24,13 @@ const displayLocaleMetadata = localeMetadata => {
 
 const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata);
 const goodProgressLocales = localesToDisplay.filter(
-  localeMetadata => localeMetadata.translationRatio > 0.5
+  (localeMetadata) => localeMetadata.translationRatio > 0.5
 );
 const startedLocales = localesToDisplay.filter(
-  localeMetadata => localeMetadata.translationRatio < 0.5
+  (localeMetadata) => localeMetadata.translationRatio < 0.5
 );
 
-const renderLanguageSelectOption = localeMetadata => {
+const renderLanguageSelectOption = (localeMetadata) => {
   const translationRatio = localeMetadata.translationRatio || 0;
   const percent = (100 * localeMetadata.translationRatio).toFixed(0);
   const isStarted = translationRatio > 0;
@@ -63,10 +63,10 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
           fullWidth
         >
           <SelectOption value="en" label="English (default)" />
-          {goodProgressLocales.map(localeMetadata =>
+          {goodProgressLocales.map((localeMetadata) =>
             renderLanguageSelectOption(localeMetadata)
           )}
-          {startedLocales.map(localeMetadata =>
+          {startedLocales.map((localeMetadata) =>
             renderLanguageSelectOption(localeMetadata)
           )}
         </SelectField>

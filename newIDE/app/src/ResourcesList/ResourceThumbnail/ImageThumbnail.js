@@ -58,7 +58,7 @@ const ImageThumbnail = (props: Props) => {
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
-      event => {
+      (event) => {
         if (onContextMenu) onContextMenu(event.clientX, event.clientY);
       },
       [onContextMenu]
@@ -81,7 +81,7 @@ const ImageThumbnail = (props: Props) => {
     <div
       title={resourceName}
       style={containerStyle}
-      onContextMenu={e => {
+      onContextMenu={(e) => {
         e.stopPropagation();
         if (onContextMenu) onContextMenu(e.clientX, e.clientY);
       }}

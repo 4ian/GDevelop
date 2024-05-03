@@ -11,7 +11,7 @@ import { type StorageProvider } from '.';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
-  onChooseProvider: StorageProvider => void,
+  onChooseProvider: (StorageProvider) => void,
   onClose: () => void,
 |};
 
@@ -37,8 +37,8 @@ const SaveToStorageProviderDialog = ({
     >
       <List useGap>
         {storageProviders
-          .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
-          .map(storageProvider => (
+          .filter((storageProvider) => !storageProvider.hiddenInSaveDialog)
+          .map((storageProvider) => (
             <StorageProviderListItem
               key={storageProvider.internalName}
               onChooseProvider={onChooseProvider}

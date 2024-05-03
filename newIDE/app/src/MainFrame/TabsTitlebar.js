@@ -32,12 +32,9 @@ export default function TabsTitlebar({ children, onBuildMenuTemplate }: Props) {
   const forceUpdate = useForceUpdate();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const backgroundColor = gdevelopTheme.titlebar.backgroundColor;
-  React.useEffect(
-    () => {
-      Window.setTitleBarColor(backgroundColor);
-    },
-    [backgroundColor]
-  );
+  React.useEffect(() => {
+    Window.setTitleBarColor(backgroundColor);
+  }, [backgroundColor]);
 
   // An installed PWA can have window controls displayed as overlay. If supported,
   // we set up a listener to detect any change and force a refresh that will read

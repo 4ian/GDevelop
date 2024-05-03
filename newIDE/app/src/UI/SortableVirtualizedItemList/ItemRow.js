@@ -31,7 +31,7 @@ type Props<Item> = {|
   id?: ?string,
   data?: HTMLDataset,
   isBold: boolean,
-  onRename: string => void,
+  onRename: (string) => void,
   editingName: boolean,
   getThumbnail?: () => string,
   renderItemLabel?: () => React.Node,
@@ -66,18 +66,15 @@ function ItemRow<Item>({
   const shouldDiscardChanges = React.useRef<boolean>(false);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
-  React.useEffect(
-    () => {
-      if (editingName) {
-        shouldDiscardChanges.current = false;
-        const timeoutId = setTimeout(() => {
-          if (textFieldRef.current) textFieldRef.current.focus();
-        }, 100);
-        return () => clearTimeout(timeoutId);
-      }
-    },
-    [editingName]
-  );
+  React.useEffect(() => {
+    if (editingName) {
+      shouldDiscardChanges.current = false;
+      const timeoutId = setTimeout(() => {
+        if (textFieldRef.current) textFieldRef.current.focus();
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [editingName]);
 
   const label = editingName ? (
     <TextField
@@ -85,17 +82,17 @@ function ItemRow<Item>({
       margin="none"
       ref={textFieldRef}
       defaultValue={itemName}
-      onBlur={e => {
+      onBlur={(e) => {
         onRename(
           shouldDiscardChanges.current ? itemName : e.currentTarget.value
         );
       }}
-      onKeyPress={event => {
+      onKeyPress={(event) => {
         if (shouldValidate(event)) {
           if (textFieldRef.current) textFieldRef.current.blur();
         }
       }}
-      onKeyUp={event => {
+      onKeyUp={(event) => {
         if (shouldCloseOrCancel(event)) {
           const { current: currentTextField } = textFieldRef;
           if (currentTextField) {
@@ -132,15 +129,15 @@ function ItemRow<Item>({
       ? errorStatus === ''
         ? gdevelopTheme.listItem.selectedBackgroundColor
         : errorStatus === 'error'
-        ? gdevelopTheme.listItem.selectedErrorBackgroundColor
-        : gdevelopTheme.listItem.selectedWarningBackgroundColor
+          ? gdevelopTheme.listItem.selectedErrorBackgroundColor
+          : gdevelopTheme.listItem.selectedWarningBackgroundColor
       : undefined,
     color:
       errorStatus === ''
         ? undefined
         : errorStatus === 'error'
-        ? gdevelopTheme.listItem.errorTextColor
-        : gdevelopTheme.listItem.warningTextColor,
+          ? gdevelopTheme.listItem.errorTextColor
+          : gdevelopTheme.listItem.warningTextColor,
   };
 
   const leftIcon = getThumbnail ? (
@@ -173,7 +170,7 @@ function ItemRow<Item>({
 
         onItemSelected(selected ? null : item);
       }}
-      onDoubleClick={event => {
+      onDoubleClick={(event) => {
         if (event.button !== LEFT_MOUSE_BUTTON) return;
         if (!onEdit) return;
         if (editingName) return;

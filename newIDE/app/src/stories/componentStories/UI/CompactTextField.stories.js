@@ -53,7 +53,7 @@ export const Default = () => {
         <CompactTextField
           value={value3}
           onChange={setValue3}
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
           id="with-icon"
         />
@@ -61,32 +61,32 @@ export const Default = () => {
           value={value4}
           onChange={setValue4}
           errored
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
         />
         <CompactTextField
           value={value5}
           onChange={setValue5}
           placeholder="With placeholder"
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
         />
         <CompactTextField
           disabled
           value={'disabled field'}
           onChange={() => {}}
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
         />
         <Text>Numbers</Text>
         <CompactTextField
           type="number"
           value={value6}
-          onChange={valueAsString => {
+          onChange={(valueAsString) => {
             if (!valueAsString) setValue6(valueAsString);
             else setValue6(parseFloat(valueAsString) || 0);
           }}
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
           useLeftIconAsNumberControl
           id="number-with-icon"
@@ -94,11 +94,11 @@ export const Default = () => {
         <CompactTextField
           type="number"
           value={value7}
-          onChange={valueAsString => {
+          onChange={(valueAsString) => {
             if (!valueAsString) setValue7(valueAsString);
             else setValue7(parseFloat(valueAsString) || 0);
           }}
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
           placeholder="80"
           useLeftIconAsNumberControl
@@ -107,8 +107,8 @@ export const Default = () => {
           type="number"
           disabled
           value={45}
-          onChange={valueAsString => {}}
-          renderLeftIcon={className => <Angle className={className} />}
+          onChange={(valueAsString) => {}}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle disabled'}
           useLeftIconAsNumberControl
         />
@@ -116,11 +116,11 @@ export const Default = () => {
         <CompactTextField
           value={value8}
           onChange={setValue8}
-          renderLeftIcon={className => <Angle className={className} />}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle'}
           useLeftIconAsNumberControl
           id="text-with-end-adornment"
-          renderEndAdornmentOnHover={className => (
+          renderEndAdornmentOnHover={(className) => (
             <Restore className={className} />
           )}
           onClickEndAdornment={action('onClickEndAdornment')}
@@ -128,11 +128,11 @@ export const Default = () => {
         <CompactTextField
           disabled
           value={'Disabled field'}
-          onChange={valueAsString => {}}
-          renderLeftIcon={className => <Angle className={className} />}
+          onChange={(valueAsString) => {}}
+          renderLeftIcon={(className) => <Angle className={className} />}
           leftIconTooltip={'Angle disabled'}
           useLeftIconAsNumberControl
-          renderEndAdornmentOnHover={className => (
+          renderEndAdornmentOnHover={(className) => (
             <Restore className={className} />
           )}
           onClickEndAdornment={action('onClickEndAdornment')}

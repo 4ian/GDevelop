@@ -115,11 +115,13 @@ export const getAssetShortHeadersToDisplay = (
   selectedFolders: string[],
   pageBreakIndex: number = 0
 ): AssetShortHeader[] => {
-  let assetShortHeaders = allAssetShortHeaders.filter(assetShortHeader => {
+  let assetShortHeaders = allAssetShortHeaders.filter((assetShortHeader) => {
     if (!selectedFolders.length) return true;
     const allAssetTags = assetShortHeader.tags;
     // Check that the asset has all the selected folders tags.
-    return selectedFolders.every(folderTag => allAssetTags.includes(folderTag));
+    return selectedFolders.every((folderTag) =>
+      allAssetTags.includes(folderTag)
+    );
   });
   // Limit the number of displayed assets to avoid performance issues
   const pageBreakAssetLowerIndex = getPageBreakAssetLowerIndex(pageBreakIndex);
@@ -174,7 +176,7 @@ const styles = {
 type PageBreakNavigationProps = {|
   currentPage: AssetStorePageState,
   pageBreakIndex: number,
-  setPageBreakIndex: number => void,
+  setPageBreakIndex: (number) => void,
   assetShortHeaders: Array<AssetShortHeader>,
   scrollView: ?ScrollViewInterface,
 |};
@@ -283,39 +285,25 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       assetPackFiltersState,
       privateAssetPackListingDatas: allPrivateAssetPackListingDatas,
     } = React.useContext(AssetStoreContext);
-    const {
-      error: gameTemplateStoreError,
-      fetchGameTemplates,
-    } = React.useContext(PrivateGameTemplateStoreContext);
-    const {
-      receivedAssetPacks,
-      receivedGameTemplates,
-      assetPackPurchases,
-    } = React.useContext(AuthenticatedUserContext);
-    const [
-      authorPublicProfile,
-      setAuthorPublicProfile,
-    ] = React.useState<?UserPublicProfile>(null);
-    const [
-      openAuthorPublicProfileDialog,
-      setOpenAuthorPublicProfileDialog,
-    ] = React.useState<boolean>(false);
-    const [
-      isNavigatingInsideFolder,
-      setIsNavigatingInsideFolder,
-    ] = React.useState<boolean>(false);
-    const { openedAssetPack, selectedFolders } = React.useMemo(
-      () => {
-        if (!currentPage) {
-          return { openedAssetPack: null, selectedFolders: [] };
-        }
-        return {
-          openedAssetPack: currentPage.openedAssetPack,
-          selectedFolders: currentPage.selectedFolders,
-        };
-      },
-      [currentPage]
-    );
+    const { error: gameTemplateStoreError, fetchGameTemplates } =
+      React.useContext(PrivateGameTemplateStoreContext);
+    const { receivedAssetPacks, receivedGameTemplates, assetPackPurchases } =
+      React.useContext(AuthenticatedUserContext);
+    const [authorPublicProfile, setAuthorPublicProfile] =
+      React.useState<?UserPublicProfile>(null);
+    const [openAuthorPublicProfileDialog, setOpenAuthorPublicProfileDialog] =
+      React.useState<boolean>(false);
+    const [isNavigatingInsideFolder, setIsNavigatingInsideFolder] =
+      React.useState<boolean>(false);
+    const { openedAssetPack, selectedFolders } = React.useMemo(() => {
+      if (!currentPage) {
+        return { openedAssetPack: null, selectedFolders: [] };
+      }
+      return {
+        openedAssetPack: currentPage.openedAssetPack,
+        selectedFolders: currentPage.selectedFolders,
+      };
+    }, [currentPage]);
     const { windowSize, isLandscape } = useResponsiveWindowSize();
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -333,13 +321,10 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       },
     }));
 
-    const fetchAssetsAndGameTemplates = React.useCallback(
-      () => {
-        fetchAssetsAndFilters();
-        fetchGameTemplates();
-      },
-      [fetchAssetsAndFilters, fetchGameTemplates]
-    );
+    const fetchAssetsAndGameTemplates = React.useCallback(() => {
+      fetchAssetsAndFilters();
+      fetchGameTemplates();
+    }, [fetchAssetsAndFilters, fetchGameTemplates]);
 
     const shopError = assetStoreError || gameTemplateStoreError;
 
@@ -406,266 +391,242 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       [selectedFolders]
     );
 
-    const folderTags: Array<string> = React.useMemo(
-      () => {
-        // When inside an asset pack, it will automatically select a folder.
-        // So if the list is empty or if the assets are not loaded, we don't load the tags.
-        if (!selectedFolders.length || !assetShortHeaders) return [];
-        return getFolderTagsFromAssetShortHeaders({
-          assetShortHeaders,
-          selectedFolders,
-        });
-      },
-      [assetShortHeaders, selectedFolders]
-    );
+    const folderTags: Array<string> = React.useMemo(() => {
+      // When inside an asset pack, it will automatically select a folder.
+      // So if the list is empty or if the assets are not loaded, we don't load the tags.
+      if (!selectedFolders.length || !assetShortHeaders) return [];
+      return getFolderTagsFromAssetShortHeaders({
+        assetShortHeaders,
+        selectedFolders,
+      });
+    }, [assetShortHeaders, selectedFolders]);
 
-    const folderTiles = React.useMemo(
-      () => {
-        // Don't show folders if we are searching.
-        if (!folderTags.length || !onFolderSelection) return [];
-        return folderTags.map(folderTag => (
-          <AssetFolderTile
-            tag={folderTag}
-            key={folderTag}
-            onSelect={() => {
-              onFolderSelection(folderTag);
-            }}
-          />
-        ));
-      },
-      [folderTags, onFolderSelection]
-    );
+    const folderTiles = React.useMemo(() => {
+      // Don't show folders if we are searching.
+      if (!folderTags.length || !onFolderSelection) return [];
+      return folderTags.map((folderTag) => (
+        <AssetFolderTile
+          tag={folderTag}
+          key={folderTag}
+          onSelect={() => {
+            onFolderSelection(folderTag);
+          }}
+        />
+      ));
+    }, [folderTags, onFolderSelection]);
 
-    const selectedPrivateAssetPackListingData = React.useMemo(
-      () => {
-        if (
-          !allPrivateAssetPackListingDatas ||
-          !openedAssetPack ||
-          // public pack selected.
-          !openedAssetPack.id
-        )
-          return null;
+    const selectedPrivateAssetPackListingData = React.useMemo(() => {
+      if (
+        !allPrivateAssetPackListingDatas ||
+        !openedAssetPack ||
+        // public pack selected.
+        !openedAssetPack.id
+      )
+        return null;
 
-        // As the list should already been fetched, we can find the selected pack
-        // if it is a private pack.
-        return allPrivateAssetPackListingDatas.find(
-          privateAssetPackListingData =>
-            privateAssetPackListingData.id === openedAssetPack.id
-        );
-      },
-      [allPrivateAssetPackListingDatas, openedAssetPack]
-    );
+      // As the list should already been fetched, we can find the selected pack
+      // if it is a private pack.
+      return allPrivateAssetPackListingDatas.find(
+        (privateAssetPackListingData) =>
+          privateAssetPackListingData.id === openedAssetPack.id
+      );
+    }, [allPrivateAssetPackListingDatas, openedAssetPack]);
 
     const [pageBreakIndex, setPageBreakIndex] = React.useState<number>(
       (currentPage && currentPage.pageBreakIndex) || 0
     );
 
-    const assetTiles = React.useMemo(
-      () => {
-        // Loading
-        if (!assetShortHeaders) return null;
-        // Don't show assets if filtering on asset packs.)
-        if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
+    const assetTiles = React.useMemo(() => {
+      // Loading
+      if (!assetShortHeaders) return null;
+      // Don't show assets if filtering on asset packs.)
+      if (hasAssetPackFiltersApplied && !openedAssetPack) return [];
 
-        return getAssetShortHeadersToDisplay(
-          assetShortHeaders,
-          selectedFolders,
-          pageBreakIndex
-        ).map(assetShortHeader => (
-          <AssetCardTile
-            assetShortHeader={assetShortHeader}
-            onOpenDetails={() => onOpenDetails(assetShortHeader)}
-            size={getAssetSize(windowSize)}
-            key={assetShortHeader.id}
-            margin={cellSpacing / 2}
-          />
-        ));
-      },
-      [
+      return getAssetShortHeadersToDisplay(
         assetShortHeaders,
-        hasAssetPackFiltersApplied,
-        openedAssetPack,
         selectedFolders,
-        pageBreakIndex,
-        windowSize,
-        onOpenDetails,
-      ]
-    );
+        pageBreakIndex
+      ).map((assetShortHeader) => (
+        <AssetCardTile
+          assetShortHeader={assetShortHeader}
+          onOpenDetails={() => onOpenDetails(assetShortHeader)}
+          size={getAssetSize(windowSize)}
+          key={assetShortHeader.id}
+          margin={cellSpacing / 2}
+        />
+      ));
+    }, [
+      assetShortHeaders,
+      hasAssetPackFiltersApplied,
+      openedAssetPack,
+      selectedFolders,
+      pageBreakIndex,
+      windowSize,
+      onOpenDetails,
+    ]);
 
-    const publicPacksTiles: Array<React.Node> = React.useMemo(
-      () => {
-        if (
-          !publicAssetPacks ||
-          !onPublicAssetPackSelection ||
-          // Don't show public packs if filtering on assets.
-          hasAssetFiltersApplied
-        )
-          return [];
-        return publicAssetPacks.map((assetPack, index) => (
-          <PublicAssetPackTile
-            assetPack={assetPack}
-            onSelect={() => onPublicAssetPackSelection(assetPack)}
-            key={`${assetPack.tag}-${index}`}
-          />
-        ));
-      },
-      [publicAssetPacks, onPublicAssetPackSelection, hasAssetFiltersApplied]
-    );
+    const publicPacksTiles: Array<React.Node> = React.useMemo(() => {
+      if (
+        !publicAssetPacks ||
+        !onPublicAssetPackSelection ||
+        // Don't show public packs if filtering on assets.
+        hasAssetFiltersApplied
+      )
+        return [];
+      return publicAssetPacks.map((assetPack, index) => (
+        <PublicAssetPackTile
+          assetPack={assetPack}
+          onSelect={() => onPublicAssetPackSelection(assetPack)}
+          key={`${assetPack.tag}-${index}`}
+        />
+      ));
+    }, [publicAssetPacks, onPublicAssetPackSelection, hasAssetFiltersApplied]);
 
-    const { allStandAlonePackTiles, allBundlePackTiles } = React.useMemo(
-      () => {
-        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateAssetPackBundleTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
+    const { allStandAlonePackTiles, allBundlePackTiles } = React.useMemo(() => {
+      const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateAssetPackBundleTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        if (
-          !privateAssetPackListingDatas ||
-          !receivedAssetPacks ||
-          // Don't show private packs if filtering on assets.
-          hasAssetFiltersApplied
-        ) {
-          return {
-            allStandAlonePackTiles: [],
-            allBundlePackTiles: [],
-          };
-        }
+      if (
+        !privateAssetPackListingDatas ||
+        !receivedAssetPacks ||
+        // Don't show private packs if filtering on assets.
+        hasAssetFiltersApplied
+      ) {
+        return {
+          allStandAlonePackTiles: [],
+          allBundlePackTiles: [],
+        };
+      }
 
-        !!onPrivateAssetPackSelection &&
-          privateAssetPackListingDatas.forEach(assetPackListingData => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(assetPackListingData);
-                }}
-                owned={isPackOwned}
-                key={assetPackListingData.id}
-              />
+      !!onPrivateAssetPackSelection &&
+        privateAssetPackListingDatas.forEach((assetPackListingData) => {
+          const isPackOwned =
+            !!receivedAssetPacks &&
+            !!receivedAssetPacks.find(
+              (pack) => pack.id === assetPackListingData.id
             );
-            if (
-              assetPackListingData.includedListableProductIds &&
-              !!assetPackListingData.includedListableProductIds.length
-            ) {
-              if (isPackOwned) {
-                privateOwnedAssetPackBundleTiles.push(tile);
-              } else {
-                privateAssetPackBundleTiles.push(tile);
-              }
-            } else {
-              if (isPackOwned) {
-                privateOwnedAssetPackStandAloneTiles.push(tile);
-              } else {
-                privateAssetPackStandAloneTiles.push(tile);
-              }
-            }
-          });
-
-        const allBundlePackTiles = [
-          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-          ...privateAssetPackBundleTiles,
-        ];
-
-        const allStandAlonePackTiles = [
-          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-          ...mergeArraysPerGroup(
-            privateAssetPackStandAloneTiles,
-            publicPacksTiles,
-            2,
-            1
-          ),
-        ];
-
-        return { allStandAlonePackTiles, allBundlePackTiles };
-      },
-      [
-        privateAssetPackListingDatas,
-        onPrivateAssetPackSelection,
-        publicPacksTiles,
-        receivedAssetPacks,
-        hasAssetFiltersApplied,
-      ]
-    );
-
-    const gameTemplateTiles = React.useMemo(
-      () => {
-        if (
-          !privateGameTemplateListingDatas ||
-          !onPrivateGameTemplateSelection ||
-          // Don't show private game templates if filtering on assets.
-          hasAssetFiltersApplied ||
-          // Don't show private game templates if filtering on asset packs.
-          hasAssetPackFiltersApplied
-        )
-          return [];
-
-        return privateGameTemplateListingDatas.map(
-          (privateGameTemplateListingData, index) => (
-            <PrivateGameTemplateTile
-              privateGameTemplateListingData={privateGameTemplateListingData}
+          const tile = (
+            <PrivateAssetPackTile
+              assetPackListingData={assetPackListingData}
               onSelect={() => {
-                onPrivateGameTemplateSelection(privateGameTemplateListingData);
+                onPrivateAssetPackSelection(assetPackListingData);
               }}
-              owned={
-                !!receivedGameTemplates &&
-                !!receivedGameTemplates.find(
-                  pack => pack.id === privateGameTemplateListingData.id
-                )
-              }
-              key={privateGameTemplateListingData.id}
+              owned={isPackOwned}
+              key={assetPackListingData.id}
             />
-          )
-        );
-      },
-      [
-        privateGameTemplateListingDatas,
-        onPrivateGameTemplateSelection,
-        receivedGameTemplates,
-        hasAssetFiltersApplied,
-        hasAssetPackFiltersApplied,
-      ]
-    );
+          );
+          if (
+            assetPackListingData.includedListableProductIds &&
+            !!assetPackListingData.includedListableProductIds.length
+          ) {
+            if (isPackOwned) {
+              privateOwnedAssetPackBundleTiles.push(tile);
+            } else {
+              privateAssetPackBundleTiles.push(tile);
+            }
+          } else {
+            if (isPackOwned) {
+              privateOwnedAssetPackStandAloneTiles.push(tile);
+            } else {
+              privateAssetPackStandAloneTiles.push(tile);
+            }
+          }
+        });
+
+      const allBundlePackTiles = [
+        ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+        ...privateAssetPackBundleTiles,
+      ];
+
+      const allStandAlonePackTiles = [
+        ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+        ...mergeArraysPerGroup(
+          privateAssetPackStandAloneTiles,
+          publicPacksTiles,
+          2,
+          1
+        ),
+      ];
+
+      return { allStandAlonePackTiles, allBundlePackTiles };
+    }, [
+      privateAssetPackListingDatas,
+      onPrivateAssetPackSelection,
+      publicPacksTiles,
+      receivedAssetPacks,
+      hasAssetFiltersApplied,
+    ]);
+
+    const gameTemplateTiles = React.useMemo(() => {
+      if (
+        !privateGameTemplateListingDatas ||
+        !onPrivateGameTemplateSelection ||
+        // Don't show private game templates if filtering on assets.
+        hasAssetFiltersApplied ||
+        // Don't show private game templates if filtering on asset packs.
+        hasAssetPackFiltersApplied
+      )
+        return [];
+
+      return privateGameTemplateListingDatas.map(
+        (privateGameTemplateListingData, index) => (
+          <PrivateGameTemplateTile
+            privateGameTemplateListingData={privateGameTemplateListingData}
+            onSelect={() => {
+              onPrivateGameTemplateSelection(privateGameTemplateListingData);
+            }}
+            owned={
+              !!receivedGameTemplates &&
+              !!receivedGameTemplates.find(
+                (pack) => pack.id === privateGameTemplateListingData.id
+              )
+            }
+            key={privateGameTemplateListingData.id}
+          />
+        )
+      );
+    }, [
+      privateGameTemplateListingDatas,
+      onPrivateGameTemplateSelection,
+      receivedGameTemplates,
+      hasAssetFiltersApplied,
+      hasAssetPackFiltersApplied,
+    ]);
 
     const packMainImageUrl = openedAssetPack
       ? openedAssetPack.thumbnailUrl
         ? openedAssetPack.thumbnailUrl
         : openedAssetPack.previewImageUrls
-        ? openedAssetPack.previewImageUrls[0]
-        : null
+          ? openedAssetPack.previewImageUrls[0]
+          : null
       : null;
 
-    React.useEffect(
-      () => {
-        (async () => {
-          if (!selectedPrivateAssetPackListingData) {
-            setAuthorPublicProfile(null);
-            return;
-          }
-          try {
-            const authorProfile = await getUserPublicProfile(
-              selectedPrivateAssetPackListingData.sellerId
-            );
+    React.useEffect(() => {
+      (async () => {
+        if (!selectedPrivateAssetPackListingData) {
+          setAuthorPublicProfile(null);
+          return;
+        }
+        try {
+          const authorProfile = await getUserPublicProfile(
+            selectedPrivateAssetPackListingData.sellerId
+          );
 
-            setAuthorPublicProfile(authorProfile);
-          } catch (error) {
-            console.error(error);
-            // Do not block the UI if the author profile can't be fetched.
-          }
-        })();
-      },
-      [selectedPrivateAssetPackListingData]
-    );
+          setAuthorPublicProfile(authorProfile);
+        } catch (error) {
+          console.error(error);
+          // Do not block the UI if the author profile can't be fetched.
+        }
+      })();
+    }, [selectedPrivateAssetPackListingData]);
 
     const publicAssetPackAuthors: ?Array<Author> = React.useMemo(
       () =>
         openedAssetPack && authors && openedAssetPack.authors
           ? openedAssetPack.authors
-              .map(author => {
+              .map((author) => {
                 return authors.find(({ name }) => name === author.name);
               })
               .filter(Boolean)
@@ -677,7 +638,7 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
       () =>
         openedAssetPack && licenses && openedAssetPack.licenses
           ? openedAssetPack.licenses
-              .map(license => {
+              .map((license) => {
                 return licenses.find(({ name }) => name === license.name);
               })
               .filter(Boolean)
@@ -792,8 +753,8 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                       openedAssetPack.thumbnailUrl
                         ? openedAssetPack.thumbnailUrl
                         : openedAssetPack.previewImageUrls
-                        ? openedAssetPack.previewImageUrls[0]
-                        : ''
+                          ? openedAssetPack.previewImageUrls[0]
+                          : ''
                     }
                     alt={`Preview image of asset pack ${openedAssetPack.name}`}
                   />
@@ -802,23 +763,26 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
               )}
               <Column noMargin alignItems="flex-start" expand>
                 <Text size="bold-title">{openedAssetPack.name}</Text>
-                {!!publicAssetPackAuthors && publicAssetPackAuthors.length > 0 && (
-                  <Text size="body" displayInlineAsSpan>
-                    <Trans>by</Trans>{' '}
-                    {publicAssetPackAuthors.map((author, index) => (
-                      <React.Fragment key={author.name}>
-                        {index > 0 && <>, </>}
-                        <Link
-                          key={author.name}
-                          href={author.website}
-                          onClick={() => Window.openExternalURL(author.website)}
-                        >
-                          {author.name}
-                        </Link>
-                      </React.Fragment>
-                    ))}
-                  </Text>
-                )}
+                {!!publicAssetPackAuthors &&
+                  publicAssetPackAuthors.length > 0 && (
+                    <Text size="body" displayInlineAsSpan>
+                      <Trans>by</Trans>{' '}
+                      {publicAssetPackAuthors.map((author, index) => (
+                        <React.Fragment key={author.name}>
+                          {index > 0 && <>, </>}
+                          <Link
+                            key={author.name}
+                            href={author.website}
+                            onClick={() =>
+                              Window.openExternalURL(author.website)
+                            }
+                          >
+                            {author.name}
+                          </Link>
+                        </React.Fragment>
+                      ))}
+                    </Text>
+                  )}
 
                 {!!publicAssetPackLicenses &&
                   publicAssetPackLicenses.length > 0 && (
@@ -877,9 +841,11 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
                             !currentPage
                           )
                             return;
-                          const assetPackListingData = allPrivateAssetPackListingDatas.find(
-                            listingData => listingData.id === openedAssetPack.id
-                          );
+                          const assetPackListingData =
+                            allPrivateAssetPackListingDatas.find(
+                              (listingData) =>
+                                listingData.id === openedAssetPack.id
+                            );
                           if (!assetPackListingData) return;
                           onPrivateAssetPackSelection(assetPackListingData, {
                             forceProductPage: true,
@@ -950,21 +916,23 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             assetPack={openedAssetPack}
           />
         ) : null}
-        {// loading is finished.
-        assetTiles &&
-          // No assets to show.
-          !assetTiles.length &&
-          // No bundles to show.
-          !allBundlePackTiles.length &&
-          // No packs to show.
-          !allStandAlonePackTiles.length &&
-          // no templates to show.
-          !gameTemplateTiles.length &&
-          (!openedAssetPack ||
-            !openedAssetPack.content ||
-            // It's not an audio pack.
-            !isAssetPackAudioOnly(openedAssetPack)) &&
-          noResultComponent}
+        {
+          // loading is finished.
+          assetTiles &&
+            // No assets to show.
+            !assetTiles.length &&
+            // No bundles to show.
+            !allBundlePackTiles.length &&
+            // No packs to show.
+            !allStandAlonePackTiles.length &&
+            // no templates to show.
+            !gameTemplateTiles.length &&
+            (!openedAssetPack ||
+              !openedAssetPack.content ||
+              // It's not an audio pack.
+              !isAssetPackAudioOnly(openedAssetPack)) &&
+            noResultComponent
+        }
         {onPrivateAssetPackSelection &&
           onPrivateGameTemplateSelection &&
           openAuthorPublicProfileDialog &&
@@ -972,12 +940,12 @@ const AssetsList = React.forwardRef<Props, AssetsListInterface>(
             <PublicProfileDialog
               userId={authorPublicProfile.id}
               onClose={() => setOpenAuthorPublicProfileDialog(false)}
-              onAssetPackOpen={assetPackListingData => {
+              onAssetPackOpen={(assetPackListingData) => {
                 onPrivateAssetPackSelection(assetPackListingData);
                 setOpenAuthorPublicProfileDialog(false);
                 setAuthorPublicProfile(null);
               }}
-              onGameTemplateOpen={gameTemplateListingData => {
+              onGameTemplateOpen={(gameTemplateListingData) => {
                 onPrivateGameTemplateSelection(gameTemplateListingData);
                 setOpenAuthorPublicProfileDialog(false);
                 setAuthorPublicProfile(null);

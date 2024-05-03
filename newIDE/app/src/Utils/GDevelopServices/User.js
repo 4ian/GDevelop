@@ -55,7 +55,7 @@ export type UserSurvey = {|
     | 'videoGame'
     | 'interactiveContent'
     | 'appOrTool'
-    | 'seriousGame'
+    | 'seriousGame',
   >,
   workingTeam?: Array<'alone' | 'onePlus' | 'team'>,
   painPoints?: Array<
@@ -63,7 +63,7 @@ export type UserSurvey = {|
     | 'lackSound'
     | 'lackMarketing'
     | 'inAppMonetization'
-    | 'externalIntegration'
+    | 'externalIntegration',
   >,
   painPointsInput?: string,
   targetDate?: Array<
@@ -72,7 +72,7 @@ export type UserSurvey = {|
     | '3To5Months'
     | '6MonthsPlus'
     | '1Year'
-    | 'noDeadline'
+    | 'noDeadline',
   >,
   gameDevelopmentExperience?: Array<'none' | 'someNoCode' | 'someCode'>,
   targetPlatform?: Array<
@@ -84,7 +84,7 @@ export type UserSurvey = {|
     | 'client'
     | 'personal'
     | 'console'
-    | 'other'
+    | 'other',
   >,
 |};
 
@@ -167,7 +167,7 @@ export const searchCreatorPublicProfilesByUsername = (
         type: 'creator',
       },
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserBadges = async (id: string): Promise<Array<Badge>> => {
@@ -292,7 +292,7 @@ export const listRecommendations = async (
 };
 
 export const listDefaultRecommendations = async (): Promise<
-  Array<Recommendation>
+  Array<Recommendation>,
 > => {
   const response = await client.get(`/recommendation`);
   return response.data;
@@ -361,7 +361,7 @@ export const syncDiscordUsername = async (
 };
 
 export const getUserCommentQualityRatingsLeaderboards = async (): Promise<
-  Array<UserLeaderboard>
+  Array<UserLeaderboard>,
 > => {
   const response = await client.get(
     '/user-comment-quality-ratings-leaderboard?leaderboardRegionName=global'

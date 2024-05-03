@@ -53,7 +53,7 @@ type Props = {|
   loading?: boolean,
 |};
 
-const getTextStyle = disabled => (disabled ? { opacity: 0.4 } : undefined);
+const getTextStyle = (disabled) => (disabled ? { opacity: 0.4 } : undefined);
 
 const InAppTutorialPhaseCard = ({
   progress,
@@ -85,10 +85,10 @@ const InAppTutorialPhaseCard = ({
                 backgroundColor: locked
                   ? gdevelopTheme.paper.backgroundColor.light
                   : disabled
-                  ? gdevelopTheme.palette.type === 'dark'
-                    ? '#4F28CD'
-                    : '#9979F1'
-                  : '#7046EC',
+                    ? gdevelopTheme.palette.type === 'dark'
+                      ? '#4F28CD'
+                      : '#9979F1'
+                    : '#7046EC',
               }}
             >
               {locked ? (

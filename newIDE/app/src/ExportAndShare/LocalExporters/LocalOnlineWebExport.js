@@ -51,7 +51,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   onlineBuildType: 'web-build',
@@ -155,7 +155,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     outputFile: CompressionOutput
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadLocalFile(
         outputFile,
         uploadOptions,

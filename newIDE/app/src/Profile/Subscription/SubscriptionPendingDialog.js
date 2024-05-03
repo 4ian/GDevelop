@@ -57,38 +57,32 @@ export default function SubscriptionPendingDialog({
   const [isLoading, setIsLoading] = React.useState(false);
   const { values: preferences } = React.useContext(PreferencesContext);
 
-  const onEdit = React.useCallback(
-    async () => {
-      if (!authenticatedUser || !authenticatedUser.profile) return;
-      if (!discordUsername) return;
-      setIsLoading(true);
-      try {
-        await authenticatedUser.onEditProfile(
-          {
-            discordUsername,
-          },
-          preferences
-        );
-      } catch (error) {
-        console.error('Error while editing profile:', error);
-        // Ignore errors, we will let the user retry in their profile.
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [authenticatedUser, discordUsername, preferences]
-  );
+  const onEdit = React.useCallback(async () => {
+    if (!authenticatedUser || !authenticatedUser.profile) return;
+    if (!discordUsername) return;
+    setIsLoading(true);
+    try {
+      await authenticatedUser.onEditProfile(
+        {
+          discordUsername,
+        },
+        preferences
+      );
+    } catch (error) {
+      console.error('Error while editing profile:', error);
+      // Ignore errors, we will let the user retry in their profile.
+    } finally {
+      setIsLoading(false);
+    }
+  }, [authenticatedUser, discordUsername, preferences]);
 
-  const onFinish = React.useCallback(
-    async () => {
-      // If the user has edited their Discord username, send it to the server before closing.
-      if (!!discordUsername) {
-        await onEdit();
-      }
-      onClose();
-    },
-    [onClose, onEdit, discordUsername]
-  );
+  const onFinish = React.useCallback(async () => {
+    // If the user has edited their Discord username, send it to the server before closing.
+    if (!!discordUsername) {
+      await onEdit();
+    }
+    onClose();
+  }, [onClose, onEdit, discordUsername]);
 
   return (
     <I18n>

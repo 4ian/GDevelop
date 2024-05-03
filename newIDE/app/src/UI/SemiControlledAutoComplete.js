@@ -46,8 +46,8 @@ export type DataSource = Array<Option>;
 
 type Props = {|
   value: string,
-  onChange: string => void,
-  onChoose?: string => void,
+  onChange: (string) => void,
+  onChoose?: (string) => void,
   dataSource: DataSource,
 
   id?: ?string,
@@ -107,42 +107,43 @@ const useStyles = makeStyles({
   },
 });
 
-const makeRenderItem = (i18n: I18nType) => (
-  option: Option,
-  state: Object
-): React.Node => {
-  if (option.type && option.type === 'separator') {
+const makeRenderItem =
+  (i18n: I18nType) =>
+  (option: Option, state: Object): React.Node => {
+    if (option.type && option.type === 'separator') {
+      return (
+        <ListItem
+          divider
+          disableGutters
+          component={'div'}
+          style={autocompleteStyles.listItem}
+        />
+      );
+    }
+
+    const value = option.translatableValue
+      ? i18n._(option.translatableValue)
+      : option.value;
     return (
       <ListItem
-        divider
-        disableGutters
+        dense={true}
         component={'div'}
         style={autocompleteStyles.listItem}
-      />
+      >
+        {option.renderIcon && (
+          <ListItemIcon>{option.renderIcon()}</ListItemIcon>
+        )}
+        <ListItemText
+          style={autocompleteStyles.listItemText}
+          primary={
+            <div title={value} style={textEllipsisStyle}>
+              {value}
+            </div>
+          }
+        />
+      </ListItem>
     );
-  }
-
-  const value = option.translatableValue
-    ? i18n._(option.translatableValue)
-    : option.value;
-  return (
-    <ListItem
-      dense={true}
-      component={'div'}
-      style={autocompleteStyles.listItem}
-    >
-      {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
-      <ListItemText
-        style={autocompleteStyles.listItemText}
-        primary={
-          <div title={value} style={textEllipsisStyle}>
-            {value}
-          </div>
-        }
-      />
-    </ListItem>
-  );
-};
+  };
 
 const isOptionDisabled = (option: Option) =>
   option.type === 'separator' ? true : false;
@@ -153,7 +154,7 @@ const filterFunction = (
   value: string
 ): DataSource => {
   const lowercaseInputValue = value.toLowerCase();
-  const optionList = options.filter(option => {
+  const optionList = options.filter((option) => {
     if (option.type === 'separator') return true;
     if (!option.text) return true;
     return option.text.toLowerCase().indexOf(lowercaseInputValue) !== -1;
@@ -161,7 +162,7 @@ const filterFunction = (
 
   if (
     !optionList.filter(
-      option =>
+      (option) =>
         option.type !== 'separator' &&
         (option.value || option.translatableValue)
     ).length
@@ -255,7 +256,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const classes = useStyles();
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       const inputElement = input.current;
       if (inputElement) {
         inputElement.focus();
@@ -323,12 +324,9 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               filterFunction(options, state, currentInputValue)
             }
             id={props.id}
-            renderInput={params => {
-              const {
-                InputProps,
-                inputProps,
-                ...otherStylingProps
-              } = getDefaultStylingProps(params, props);
+            renderInput={(params) => {
+              const { InputProps, inputProps, ...otherStylingProps } =
+                getDefaultStylingProps(params, props);
               return (
                 <TextField
                   color="secondary"

@@ -87,18 +87,12 @@ describe('ResourceUtils', () => {
     expect(project.getResourcesManager().hasResource('Audio1')).toBe(true);
 
     // Verify files have not changed:
-    expect(
-      project
-        .getResourcesManager()
-        .getResource('Image1')
-        .getFile()
-    ).toBe('fake-image1.png');
-    expect(
-      project
-        .getResourcesManager()
-        .getResource('Audio1')
-        .getFile()
-    ).toBe('fake-audio1.mp3');
+    expect(project.getResourcesManager().getResource('Image1').getFile()).toBe(
+      'fake-image1.png'
+    );
+    expect(project.getResourcesManager().getResource('Audio1').getFile()).toBe(
+      'fake-audio1.mp3'
+    );
 
     // Verify renaming was done in objects and in events.
     expect(

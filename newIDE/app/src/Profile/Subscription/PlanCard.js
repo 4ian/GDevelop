@@ -284,12 +284,14 @@ export const getPlanIcon = ({
 const getYearlyDiscountDisplayText = (
   subscriptionPlanWithPricingSystems: SubscriptionPlanWithPricingSystems
 ): string | null => {
-  const monthlyPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
-    pricingSystem => pricingSystem.period === 'month'
-  );
-  const yearlyPricingSystem = subscriptionPlanWithPricingSystems.pricingSystems.find(
-    pricingSystem => pricingSystem.period === 'year'
-  );
+  const monthlyPricingSystem =
+    subscriptionPlanWithPricingSystems.pricingSystems.find(
+      (pricingSystem) => pricingSystem.period === 'month'
+    );
+  const yearlyPricingSystem =
+    subscriptionPlanWithPricingSystems.pricingSystems.find(
+      (pricingSystem) => pricingSystem.period === 'year'
+    );
   if (!monthlyPricingSystem || !yearlyPricingSystem) return null;
 
   return (
@@ -321,13 +323,14 @@ const PlanCard = (props: Props) => {
     subscriptionPlan: props.subscriptionPlanWithPricingSystems,
     logoSize: 25,
   });
-  const mainPricingSystem = props.subscriptionPlanWithPricingSystems.pricingSystems.find(
-    pricingSystem => pricingSystem.period === props.periodToDisplay
-  );
+  const mainPricingSystem =
+    props.subscriptionPlanWithPricingSystems.pricingSystems.find(
+      (pricingSystem) => pricingSystem.period === props.periodToDisplay
+    );
   const otherPricingSystem =
     props.periodToDisplay === 'year'
       ? props.subscriptionPlanWithPricingSystems.pricingSystems.find(
-          pricingSystem => pricingSystem.period === 'month'
+          (pricingSystem) => pricingSystem.period === 'month'
         )
       : null;
 

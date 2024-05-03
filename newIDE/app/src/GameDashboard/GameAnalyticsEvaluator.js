@@ -356,7 +356,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   let onlyFullyDefinedPlayersSum = 0;
   let playedDurationSumInMinutes = 0;
 
-  metrics.forEach(metric => {
+  metrics.forEach((metric) => {
     const d0SessionsDurationTotal =
       metric.sessions && metric.sessions.d0SessionsDurationTotal !== null
         ? metric.sessions.d0SessionsDurationTotal
@@ -472,7 +472,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
       },
     },
     overTime: metrics
-      .map(metric => {
+      .map((metric) => {
         const d0SessionsDurationTotal =
           metric.sessions && metric.sessions.d0SessionsDurationTotal !== null
             ? metric.sessions.d0SessionsDurationTotal
@@ -589,18 +589,19 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
             d0PlayersBelow600s,
             d0Players
           ),
-          from900sToInfinityPlayersPercent: evaluatePlayersBetweenDurationPercent(
-            d0Players,
-            d0PlayersBelow900s,
-            d0Players
-          ),
+          from900sToInfinityPlayersPercent:
+            evaluatePlayersBetweenDurationPercent(
+              d0Players,
+              d0PlayersBelow900s,
+              d0Players
+            ),
         };
       })
       .sort((a, b) => a.timestamp - b.timestamp),
     overPlayedDuration: [
       { duration: 0, playersCount: onlyFullyDefinedPlayersSum },
     ].concat(
-      Object.keys(durationIndexes).map(name => {
+      Object.keys(durationIndexes).map((name) => {
         const durationIndex = durationIndexes[name];
         return {
           duration: durationValues[durationIndex],
@@ -640,7 +641,7 @@ export const buildChartData = (
     monthChartData: evaluateChartData(
       filledGameRollingMetrics
         .slice(0, 30)
-        .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
+        .map((metric) => ({ ...metric, startDate: null }: MergedGameMetrics))
     ),
   };
 };

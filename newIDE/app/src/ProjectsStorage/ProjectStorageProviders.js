@@ -46,12 +46,15 @@ const computeDefaultConfiguration = (
   appArguments: AppArguments
 ): InitialStorageProviderAndFileMetadata => {
   const candidates = storageProviders
-    .map(currentStorageProvider => {
+    .map((currentStorageProvider) => {
       return {
         currentStorageProvider,
-        initialFileMetadataToOpen: currentStorageProvider.getFileMetadataFromAppArguments
-          ? currentStorageProvider.getFileMetadataFromAppArguments(appArguments)
-          : null,
+        initialFileMetadataToOpen:
+          currentStorageProvider.getFileMetadataFromAppArguments
+            ? currentStorageProvider.getFileMetadataFromAppArguments(
+                appArguments
+              )
+            : null,
       };
     })
     .filter(({ initialFileMetadataToOpen }) => !!initialFileMetadataToOpen);
@@ -72,15 +75,12 @@ const computeDefaultConfiguration = (
 };
 
 const ProjectStorageProviders = (props: Props) => {
-  const storageProviderOperations = React.useRef<?StorageProviderOperations>(
-    null
-  );
-  const storageProviderResourceOperations = React.useRef<?ResourcesActionsMenuBuilder>(
-    null
-  );
-  const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
-    null
-  );
+  const storageProviderOperations =
+    React.useRef<?StorageProviderOperations>(null);
+  const storageProviderResourceOperations =
+    React.useRef<?ResourcesActionsMenuBuilder>(null);
+  const [renderDialog, setRenderDialog] =
+    React.useState<?() => React.Node>(null);
   const defaultConfiguration = computeDefaultConfiguration(
     props.defaultStorageProvider,
     props.storageProviders,
@@ -110,13 +110,12 @@ const ProjectStorageProviders = (props: Props) => {
         if (!storageProviderOperations.current) {
           currentStorageProvider.current = emptyStorageProvider;
           storageProviderResourceOperations.current = null;
-          storageProviderOperations.current = emptyStorageProvider.createOperations(
-            {
+          storageProviderOperations.current =
+            emptyStorageProvider.createOperations({
               setDialog,
               closeDialog,
               authenticatedUser,
-            }
-          );
+            });
         }
         return storageProviderOperations.current;
       }
@@ -130,13 +129,12 @@ const ProjectStorageProviders = (props: Props) => {
         return storageProviderOperations.current;
       }
 
-      const storageProviderOperationsToUse = newStorageProvider.createOperations(
-        {
+      const storageProviderOperationsToUse =
+        newStorageProvider.createOperations({
           setDialog,
           closeDialog,
           authenticatedUser,
-        }
-      );
+        });
 
       // If the storage provider is unable to open a project, we won't keep it, we just
       // return it for a one time usage (example: DownloadFileStorageProvider).
@@ -144,9 +142,10 @@ const ProjectStorageProviders = (props: Props) => {
       if (keepForNextOperations) {
         currentStorageProvider.current = newStorageProvider;
         storageProviderOperations.current = storageProviderOperationsToUse;
-        storageProviderResourceOperations.current = newStorageProvider.createResourceOperations
-          ? newStorageProvider.createResourceOperations({ authenticatedUser })
-          : null;
+        storageProviderResourceOperations.current =
+          newStorageProvider.createResourceOperations
+            ? newStorageProvider.createResourceOperations({ authenticatedUser })
+            : null;
       }
 
       return storageProviderOperationsToUse;
@@ -165,21 +164,19 @@ const ProjectStorageProviders = (props: Props) => {
   // Some storage providers might need the current authenticated user
   // to create their operations. This effect makes sure operations are always
   // up to date with the current authenticated user.
-  React.useEffect(
-    () => {
-      const { current: storageProvider } = currentStorageProvider;
-      if (!storageProvider) return;
-      storageProviderOperations.current = storageProvider.createOperations({
-        setDialog,
-        closeDialog,
-        authenticatedUser,
-      });
-      storageProviderResourceOperations.current = storageProvider.createResourceOperations
+  React.useEffect(() => {
+    const { current: storageProvider } = currentStorageProvider;
+    if (!storageProvider) return;
+    storageProviderOperations.current = storageProvider.createOperations({
+      setDialog,
+      closeDialog,
+      authenticatedUser,
+    });
+    storageProviderResourceOperations.current =
+      storageProvider.createResourceOperations
         ? storageProvider.createResourceOperations({ authenticatedUser })
         : null;
-    },
-    [authenticatedUser, setDialog, closeDialog]
-  );
+  }, [authenticatedUser, setDialog, closeDialog]);
 
   return (
     <React.Fragment>

@@ -55,7 +55,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
   PreparedExporter,
   ExportOutput,
   ResourcesDownloadOutput,
-  CompressionOutput
+  CompressionOutput,
 > = {
   name: exportPipelineName,
   onlineBuildType: 'cordova-ios-build',
@@ -78,7 +78,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: props => <SetupExportHeader {...props} />,
+  renderHeader: (props) => <SetupExportHeader {...props} />,
 
   shouldSuggestBumpingVersionNumber: () => true,
 
@@ -141,7 +141,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
     return downloadUrlFilesToBlobFiles({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -163,7 +163,7 @@ export const browserOnlineCordovaIosExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadBlobFile(
         blobFile,
         uploadOptions,

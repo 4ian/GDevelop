@@ -19,12 +19,10 @@ import TypeCursorSelect from '../../UI/CustomSvgIcons/TypeCursorSelect';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LayerField(props, ref) {
-    const field = React.useRef<?(
-      | GenericExpressionField
-      | SelectFieldInterface
-    )>(null);
+    const field =
+      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
 
-    const focus: FieldFocusFunction = options => {
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -35,14 +33,14 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     // The list is not kept with a memo because layers could be changed by
     // another component without this one to know.
     const layerNames = layout
-      ? mapFor(0, layout.getLayersCount(), i => {
+      ? mapFor(0, layout.getLayersCount(), (i) => {
           const layer = layout.getLayerAt(i);
           return layer.getName();
         })
       : [];
 
     const isCurrentValueInLayersList = !!layerNames.find(
-      layerName => `"${layerName}"` === props.value
+      (layerName) => `"${layerName}"` === props.value
     );
 
     // If the current value is not in the list of layers, display an expression field.
@@ -70,7 +68,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = layerNames.map(layerName => {
+    const selectOptions = layerNames.map((layerName) => {
       const isBaseLayer = layerName === '';
       return (
         <SelectOption
@@ -121,7 +119,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={style =>
+        renderButton={(style) =>
           props.scope.eventsFunctionsExtension ? null : isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

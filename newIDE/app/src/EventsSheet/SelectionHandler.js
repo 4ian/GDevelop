@@ -97,9 +97,9 @@ export const getSelectedTopMostOnlyEventContexts = (
     selection.selectedEvents
   );
 
-  return selectedEventContexts.filter(eventContext => {
+  return selectedEventContexts.filter((eventContext) => {
     const isContainedInsideAnotherSelectedEvent = selectedEventContexts.some(
-      otherSelectedEventContext => {
+      (otherSelectedEventContext) => {
         if (otherSelectedEventContext === eventContext) return false;
 
         if (otherSelectedEventContext.event.canHaveSubEvents()) {
@@ -120,9 +120,8 @@ export const getSelectedTopMostOnlyEventContexts = (
 export const getLastSelectedTopMostOnlyEventContext = (
   selection: SelectionState
 ): EventContext | null => {
-  const selectedTopMostOnlyEventContexts = getSelectedTopMostOnlyEventContexts(
-    selection
-  );
+  const selectedTopMostOnlyEventContexts =
+    getSelectedTopMostOnlyEventContexts(selection);
   return selectedTopMostOnlyEventContexts.length
     ? selectedTopMostOnlyEventContexts[
         selectedTopMostOnlyEventContexts.length - 1
@@ -195,7 +194,7 @@ export const isEventSelected = (
   event: Object
 ): boolean => {
   return selection.selectedEvents.some(
-    selectedEventContext => selectedEventContext.event.ptr === event.ptr
+    (selectedEventContext) => selectedEventContext.event.ptr === event.ptr
   );
 };
 
@@ -204,7 +203,7 @@ export const isInstructionSelected = (
   instruction: gdInstruction
 ): boolean => {
   return selection.selectedInstructions.some(
-    selectedInstructionContext =>
+    (selectedInstructionContext) =>
       selectedInstructionContext.instruction.ptr === instruction.ptr
   );
 };
@@ -214,7 +213,7 @@ export const isInstructionsListSelected = (
   instructionsList: gdInstructionsList
 ): boolean => {
   return selection.selectedInstructionsLists.some(
-    selectedInstructionsList =>
+    (selectedInstructionsList) =>
       selectedInstructionsList.instrsList.ptr === instructionsList.ptr
   );
 };
@@ -230,9 +229,11 @@ export const hasInstructionSelected = (selection: SelectionState): boolean => {
 export const hasSelectedAtLeastOneCondition = (
   selection: SelectionState
 ): boolean => {
-  return getSelectedInstructionsContexts(selection).some(instructionContext => {
-    return instructionContext.isCondition;
-  });
+  return getSelectedInstructionsContexts(selection).some(
+    (instructionContext) => {
+      return instructionContext.isCondition;
+    }
+  );
 };
 
 export const hasInstructionsListSelected = (
@@ -311,7 +312,7 @@ export const selectEventsAfterHistoryChange = (
 ) => {
   let newSelection = getInitialSelection();
 
-  eventContexts.forEach(eventContext => {
+  eventContexts.forEach((eventContext) => {
     newSelection.selectedEvents.push(eventContext);
   });
 

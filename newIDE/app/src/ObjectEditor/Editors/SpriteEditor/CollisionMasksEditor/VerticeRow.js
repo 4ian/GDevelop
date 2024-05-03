@@ -55,11 +55,11 @@ const VerticeRow = ({
           type="number"
           step={0.5}
           id="vertice-x"
-          onChange={value => {
+          onChange={(value) => {
             const valueAsNumber = parseFloat(value);
             if (!isNaN(valueAsNumber)) props.onChangeVerticeX(valueAsNumber);
           }}
-          onBlur={event => {
+          onBlur={(event) => {
             props.onChangeVerticeX(parseFloat(event.currentTarget.value) || 0);
           }}
         />
@@ -76,11 +76,11 @@ const VerticeRow = ({
           type="number"
           step={0.5}
           id="vertice-y"
-          onChange={value => {
+          onChange={(value) => {
             const valueAsNumber = parseFloat(value);
             if (!isNaN(valueAsNumber)) props.onChangeVerticeY(valueAsNumber);
           }}
-          onBlur={event => {
+          onBlur={(event) => {
             props.onChangeVerticeY(parseFloat(event.currentTarget.value) || 0);
           }}
         />

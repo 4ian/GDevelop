@@ -51,7 +51,7 @@ export const selectLanguageOrLocale = (
 ): string => {
   const translationRatioThreshold = 0.7;
   const languageMetadata = LocalesMetadata.filter(
-    localeMetadata => localeMetadata.languageCode === languageOrLocale
+    (localeMetadata) => localeMetadata.languageCode === languageOrLocale
   );
   // If we have a good-enough translation for the exact language or locale, we use it.
   if (languageMetadata.length > 0) {
@@ -70,7 +70,7 @@ export const selectLanguageOrLocale = (
   const language = getLanguageOnlyFromLanguageOrLocale(languageOrLocale);
   if (language) {
     // Find the language corresponding locales ordered by translation ratio.
-    const localeCandidates = LocalesMetadata.filter(localeMetadata =>
+    const localeCandidates = LocalesMetadata.filter((localeMetadata) =>
       localeMetadata.languageCode.startsWith(language)
     ).sort((a, b) => (a.translationRatio > b.translationRatio ? -1 : 1));
 

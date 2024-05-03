@@ -44,7 +44,7 @@ type Props = {|
   openedGame: ?Game,
   setOpenedGame: (?Game) => void,
   currentTab: GameDetailsTab,
-  setCurrentTab: GameDetailsTab => void,
+  setCurrentTab: (GameDetailsTab) => void,
 |};
 
 const ManageSection = ({
@@ -58,11 +58,8 @@ const ManageSection = ({
   setCurrentTab,
 }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const {
-    profile,
-    onOpenCreateAccountDialog,
-    onOpenLoginDialog,
-  } = authenticatedUser;
+  const { profile, onOpenCreateAccountDialog, onOpenLoginDialog } =
+    authenticatedUser;
 
   React.useEffect(
     () => {
@@ -73,13 +70,10 @@ const ManageSection = ({
     []
   );
 
-  const onBack = React.useCallback(
-    () => {
-      setCurrentTab('details');
-      setOpenedGame(null);
-    },
-    [setCurrentTab, setOpenedGame]
-  );
+  const onBack = React.useCallback(() => {
+    setCurrentTab('details');
+    setOpenedGame(null);
+  }, [setCurrentTab, setOpenedGame]);
 
   if (openedGame) {
     return (

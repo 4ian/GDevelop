@@ -26,41 +26,33 @@ type UseGetUserSigningCredentialsOutput = {|
 export const useGetUserSigningCredentials = (
   authenticatedUser: AuthenticatedUser
 ): UseGetUserSigningCredentialsOutput => {
-  const [
-    signingCredentials,
-    setSigningCredentials,
-  ] = React.useState<Array<SigningCredential> | null>(null);
+  const [signingCredentials, setSigningCredentials] =
+    React.useState<Array<SigningCredential> | null>(null);
   const [error, setError] = React.useState<Error | null>(null);
 
   const userId = authenticatedUser.profile
     ? authenticatedUser.profile.id
     : null;
 
-  const onRefreshSigningCredentials = React.useCallback(
-    async () => {
-      if (!userId) return;
+  const onRefreshSigningCredentials = React.useCallback(async () => {
+    if (!userId) return;
 
-      try {
-        setError(null);
-        const signingCredentials = await getUserSigningCredentials(
-          authenticatedUser.getAuthorizationHeader,
-          userId
-        );
-        setSigningCredentials(signingCredentials);
-      } catch (error) {
-        console.error('Unable to load signing credentials:', error);
-        setError(error);
-      }
-    },
-    [authenticatedUser.getAuthorizationHeader, userId]
-  );
+    try {
+      setError(null);
+      const signingCredentials = await getUserSigningCredentials(
+        authenticatedUser.getAuthorizationHeader,
+        userId
+      );
+      setSigningCredentials(signingCredentials);
+    } catch (error) {
+      console.error('Unable to load signing credentials:', error);
+      setError(error);
+    }
+  }, [authenticatedUser.getAuthorizationHeader, userId]);
 
-  React.useEffect(
-    () => {
-      onRefreshSigningCredentials();
-    },
-    [onRefreshSigningCredentials]
-  );
+  React.useEffect(() => {
+    onRefreshSigningCredentials();
+  }, [onRefreshSigningCredentials]);
 
   return {
     signingCredentials,
@@ -84,9 +76,8 @@ export const SigningCredentialsDialog = ({
   error,
   onRefreshSigningCredentials,
 }: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<string>(
-    'apple-certificate'
-  );
+  const [currentTab, setCurrentTab] =
+    React.useState<string>('apple-certificate');
   const [
     createIosSigningCredentialsOpenWithTab,
     setCreateIosSigningCredentialsOpenWithTab,

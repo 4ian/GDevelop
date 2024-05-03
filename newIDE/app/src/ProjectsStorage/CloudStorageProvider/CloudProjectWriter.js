@@ -75,90 +75,90 @@ const zipProjectAndCommitVersion = async ({
   return newVersion;
 };
 
-export const generateOnSaveProject = (
-  authenticatedUser: AuthenticatedUser
-) => async (
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  options?: {| previousVersion?: string, restoredFromVersionId?: string |}
-) => {
-  const cloudProjectId = fileMetadata.fileIdentifier;
-  const gameId = project.getProjectUuid();
-  const now = Date.now();
+export const generateOnSaveProject =
+  (authenticatedUser: AuthenticatedUser) =>
+  async (
+    project: gdProject,
+    fileMetadata: FileMetadata,
+    options?: {| previousVersion?: string, restoredFromVersionId?: string |}
+  ) => {
+    const cloudProjectId = fileMetadata.fileIdentifier;
+    const gameId = project.getProjectUuid();
+    const now = Date.now();
 
-  if (!fileMetadata.gameId) {
-    console.info('Game id was never set, updating the cloud project.');
-    try {
-      await updateCloudProject(authenticatedUser, cloudProjectId, {
-        gameId,
-      });
-    } catch (error) {
-      console.error('Could not update cloud project with gameId', error);
-      // Do not throw, as this is not a blocking error.
+    if (!fileMetadata.gameId) {
+      console.info('Game id was never set, updating the cloud project.');
+      try {
+        await updateCloudProject(authenticatedUser, cloudProjectId, {
+          gameId,
+        });
+      } catch (error) {
+        console.error('Could not update cloud project with gameId', error);
+        // Do not throw, as this is not a blocking error.
+      }
     }
-  }
-  const newVersion = await zipProjectAndCommitVersion({
-    authenticatedUser,
-    project,
-    cloudProjectId,
-    options,
-  });
-
-  const newFileMetadata: FileMetadata = {
-    ...fileMetadata,
-    gameId,
-    // lastModifiedDate is set here even though it will be set by backend services.
-    // Regarding the list of cloud projects in the build section, it should not have
-    // an impact since the 2 dates are not used for the same purpose.
-    // But it's better to have an up-to-date current file metadata (used by the version
-    // history to know when to refresh the most recent version).
-    lastModifiedDate: now,
-  };
-  if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
-
-  // Save the version being modified in the file metadata, so that it can be
-  // used when saving to compare with the last version of the project, and
-  // raise a conflict warning if different.
-  newFileMetadata.version = newVersion;
-  return {
-    wasSaved: true,
-    fileMetadata: newFileMetadata,
-  };
-};
-
-export const generateOnChangeProjectProperty = (
-  authenticatedUser: AuthenticatedUser
-) => async (
-  project: gdProject,
-  fileMetadata: FileMetadata,
-  properties: {| name?: string, gameId?: string |}
-): Promise<null | {| version: string, lastModifiedDate: number |}> => {
-  if (!authenticatedUser.authenticated) return null;
-  try {
-    await updateCloudProject(
-      authenticatedUser,
-      fileMetadata.fileIdentifier,
-      properties
-    );
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
       project,
-      cloudProjectId: fileMetadata.fileIdentifier,
+      cloudProjectId,
+      options,
     });
-    if (!newVersion) {
-      throw new Error("Couldn't save project following property update.");
-    }
 
-    return { version: newVersion, lastModifiedDate: Date.now() };
-  } catch (error) {
-    // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
-    console.warn(
-      'An error occurred while changing cloud project name. Ignoring.',
-      error
-    );
-    return null;
-  }
-};
+    const newFileMetadata: FileMetadata = {
+      ...fileMetadata,
+      gameId,
+      // lastModifiedDate is set here even though it will be set by backend services.
+      // Regarding the list of cloud projects in the build section, it should not have
+      // an impact since the 2 dates are not used for the same purpose.
+      // But it's better to have an up-to-date current file metadata (used by the version
+      // history to know when to refresh the most recent version).
+      lastModifiedDate: now,
+    };
+    if (!newVersion) return { wasSaved: false, fileMetadata: newFileMetadata };
+
+    // Save the version being modified in the file metadata, so that it can be
+    // used when saving to compare with the last version of the project, and
+    // raise a conflict warning if different.
+    newFileMetadata.version = newVersion;
+    return {
+      wasSaved: true,
+      fileMetadata: newFileMetadata,
+    };
+  };
+
+export const generateOnChangeProjectProperty =
+  (authenticatedUser: AuthenticatedUser) =>
+  async (
+    project: gdProject,
+    fileMetadata: FileMetadata,
+    properties: {| name?: string, gameId?: string |}
+  ): Promise<null | {| version: string, lastModifiedDate: number |}> => {
+    if (!authenticatedUser.authenticated) return null;
+    try {
+      await updateCloudProject(
+        authenticatedUser,
+        fileMetadata.fileIdentifier,
+        properties
+      );
+      const newVersion = await zipProjectAndCommitVersion({
+        authenticatedUser,
+        project,
+        cloudProjectId: fileMetadata.fileIdentifier,
+      });
+      if (!newVersion) {
+        throw new Error("Couldn't save project following property update.");
+      }
+
+      return { version: newVersion, lastModifiedDate: Date.now() };
+    } catch (error) {
+      // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
+      console.warn(
+        'An error occurred while changing cloud project name. Ignoring.',
+        error
+      );
+      return null;
+    }
+  };
 
 export const getWriteErrorMessage = (
   error: Error | $AxiosError<any>
@@ -173,117 +173,121 @@ export const getWriteErrorMessage = (
   return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
-export const generateOnChooseSaveProjectAsLocation = ({
-  authenticatedUser,
-  setDialog,
-  closeDialog,
-}: {|
-  authenticatedUser: AuthenticatedUser,
-  setDialog: (() => React.Node) => void,
-  closeDialog: () => void,
-|}) => async ({
-  project,
-  fileMetadata,
-}: {|
-  project: gdProject,
-  fileMetadata: ?FileMetadata,
-|}): Promise<{|
-  saveAsLocation: ?SaveAsLocation,
-|}> => {
-  if (!authenticatedUser.authenticated) {
-    return { saveAsLocation: null };
-  }
+export const generateOnChooseSaveProjectAsLocation =
+  ({
+    authenticatedUser,
+    setDialog,
+    closeDialog,
+  }: {|
+    authenticatedUser: AuthenticatedUser,
+    setDialog: (() => React.Node) => void,
+    closeDialog: () => void,
+  |}) =>
+  async ({
+    project,
+    fileMetadata,
+  }: {|
+    project: gdProject,
+    fileMetadata: ?FileMetadata,
+  |}): Promise<{|
+    saveAsLocation: ?SaveAsLocation,
+  |}> => {
+    if (!authenticatedUser.authenticated) {
+      return { saveAsLocation: null };
+    }
 
-  const name = await new Promise(resolve => {
-    setDialog(() => (
-      <CloudSaveAsDialog
-        onCancel={() => {
-          closeDialog();
-          resolve(null);
-        }}
-        nameSuggestion={project.getName()}
-        onSave={(newName: string) => {
-          closeDialog();
-          resolve(newName);
-        }}
-      />
-    ));
-  });
-
-  if (!name) return { saveAsLocation: null }; // Save was cancelled.
-
-  return {
-    saveAsLocation: {
-      name,
-    },
-  };
-};
-
-export const generateOnSaveProjectAs = (
-  authenticatedUser: AuthenticatedUser,
-  setDialog: (() => React.Node) => void,
-  closeDialog: () => void
-) => async (
-  project: gdProject,
-  saveAsLocation: ?SaveAsLocation,
-  options: {|
-    onStartSaving: () => void,
-    onMoveResources: ({|
-      newFileMetadata: FileMetadata,
-    |}) => Promise<void>,
-  |}
-) => {
-  if (!saveAsLocation)
-    throw new Error('A location was not chosen before saving as.');
-  const { name, gameId } = saveAsLocation;
-  if (!name) throw new Error('A name was not chosen before saving as.');
-  if (!authenticatedUser.authenticated) {
-    return { wasSaved: false, fileMetadata: null };
-  }
-  options.onStartSaving();
-
-  try {
-    // Create a new cloud project.
-    const cloudProject = await createCloudProject(authenticatedUser, {
-      name,
-      gameId,
+    const name = await new Promise((resolve) => {
+      setDialog(() => (
+        <CloudSaveAsDialog
+          onCancel={() => {
+            closeDialog();
+            resolve(null);
+          }}
+          nameSuggestion={project.getName()}
+          onSave={(newName: string) => {
+            closeDialog();
+            resolve(newName);
+          }}
+        />
+      ));
     });
-    if (!cloudProject)
-      throw new Error('No cloud project was returned from creation api call.');
-    const cloudProjectId = cloudProject.id;
 
-    const fileMetadata: FileMetadata = {
-      fileIdentifier: cloudProjectId,
-      gameId,
-    };
-
-    // Move the resources to the new project.
-    await options.onMoveResources({ newFileMetadata: fileMetadata });
-
-    // Commit the changes to the newly created cloud project.
-    await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
-    const newVersion = await zipProjectAndCommitVersion({
-      authenticatedUser,
-      project,
-      cloudProjectId,
-    });
-    if (!newVersion)
-      throw new Error('No version id was returned from committing api call.');
-
-    // Save the version being modified in the file metadata, so that it can be
-    // used when saving to compare with the last version of the project, and
-    // raise a conflict warning if different.
-    fileMetadata.version = newVersion;
+    if (!name) return { saveAsLocation: null }; // Save was cancelled.
 
     return {
-      wasSaved: true,
-      fileMetadata,
+      saveAsLocation: {
+        name,
+      },
     };
-  } catch (error) {
-    console.error('An error occurred while creating a cloud project', error);
-    throw error;
-  }
-};
+  };
+
+export const generateOnSaveProjectAs =
+  (
+    authenticatedUser: AuthenticatedUser,
+    setDialog: (() => React.Node) => void,
+    closeDialog: () => void
+  ) =>
+  async (
+    project: gdProject,
+    saveAsLocation: ?SaveAsLocation,
+    options: {|
+      onStartSaving: () => void,
+      onMoveResources: ({| newFileMetadata: FileMetadata |}) => Promise<void>,
+    |}
+  ) => {
+    if (!saveAsLocation)
+      throw new Error('A location was not chosen before saving as.');
+    const { name, gameId } = saveAsLocation;
+    if (!name) throw new Error('A name was not chosen before saving as.');
+    if (!authenticatedUser.authenticated) {
+      return { wasSaved: false, fileMetadata: null };
+    }
+    options.onStartSaving();
+
+    try {
+      // Create a new cloud project.
+      const cloudProject = await createCloudProject(authenticatedUser, {
+        name,
+        gameId,
+      });
+      if (!cloudProject)
+        throw new Error(
+          'No cloud project was returned from creation api call.'
+        );
+      const cloudProjectId = cloudProject.id;
+
+      const fileMetadata: FileMetadata = {
+        fileIdentifier: cloudProjectId,
+        gameId,
+      };
+
+      // Move the resources to the new project.
+      await options.onMoveResources({ newFileMetadata: fileMetadata });
+
+      // Commit the changes to the newly created cloud project.
+      await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
+      const newVersion = await zipProjectAndCommitVersion({
+        authenticatedUser,
+        project,
+        cloudProjectId,
+      });
+      if (!newVersion)
+        throw new Error('No version id was returned from committing api call.');
+
+      // Save the version being modified in the file metadata, so that it can be
+      // used when saving to compare with the last version of the project, and
+      // raise a conflict warning if different.
+      fileMetadata.version = newVersion;
+
+      return {
+        wasSaved: true,
+        fileMetadata,
+      };
+    } catch (error) {
+      console.error('An error occurred while creating a cloud project', error);
+      throw error;
+    }
+  };
 
 export const getProjectLocation = ({
   projectName,

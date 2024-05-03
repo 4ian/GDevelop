@@ -4,7 +4,7 @@ const gd = global.gd;
 
 describe('AnimationImportHelper', () => {
   const createResources = (filePaths: Array<string>): Array<gdResource> =>
-    filePaths.map(filePath => {
+    filePaths.map((filePath) => {
       const resource = new gd.ImageResource();
       resource.setName(filePath);
       resource.setFile(filePath);
@@ -30,7 +30,7 @@ describe('AnimationImportHelper', () => {
     animationName: string
   ): Array<string> | null => {
     const frames = resourcesByAnimations.get(animationName);
-    return frames ? frames.map(resource => resource.getFile()) : null;
+    return frames ? frames.map((resource) => resource.getFile()) : null;
   };
 
   it('can handle empty resource lists', () => {

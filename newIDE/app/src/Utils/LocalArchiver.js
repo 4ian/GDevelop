@@ -36,15 +36,16 @@ export const archiveLocalFolder = ({
         const roundFileSizeInMb = Math.round(fileSize / (1000 * 1000));
         reject(
           new Error(
-            `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${sizeLimit /
-              (1000 * 1000)} MB.`
+            `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${
+              sizeLimit / (1000 * 1000)
+            } MB.`
           )
         );
       }
       resolve(outputFilename);
     });
 
-    archive.on('error', err => {
+    archive.on('error', (err) => {
       reject(err);
     });
 

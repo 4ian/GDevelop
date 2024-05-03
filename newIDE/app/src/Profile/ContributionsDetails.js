@@ -76,7 +76,7 @@ export const ExamplesAccordion = ({
           </EmptyMessage>
         ) : (
           <Column>
-            {examples.map(example => (
+            {examples.map((example) => (
               <ContributionLine
                 key={example.name}
                 shortDescription={example.shortDescription}
@@ -127,7 +127,7 @@ export const ExtensionsAccordion = ({
           </EmptyMessage>
         ) : (
           <Column>
-            {extensions.map(extension => (
+            {extensions.map((extension) => (
               <ContributionLine
                 key={extension.name}
                 shortDescription={extension.shortDescription}
@@ -162,61 +162,46 @@ type Props = {|
 |};
 
 const ContributionDetails = ({ userId }: Props) => {
-  const [
-    extensions,
-    setExtensions,
-  ] = React.useState<?Array<ExtensionShortHeader>>(null);
-  const [examples, setExamples] = React.useState<?Array<ExampleShortHeader>>(
-    null
-  );
+  const [extensions, setExtensions] =
+    React.useState<?Array<ExtensionShortHeader>>(null);
+  const [examples, setExamples] =
+    React.useState<?Array<ExampleShortHeader>>(null);
   const [extensionError, setExtensionError] = React.useState<?Error>(null);
   const [exampleError, setExampleError] = React.useState<?Error>(null);
 
-  const fetchUserExtensions = React.useCallback(
-    () => {
-      (async () => {
-        if (!userId) return;
-        try {
-          const extensions = await getUserExtensionShortHeaders(userId);
-          setExtensions(extensions);
-        } catch (error) {
-          console.error('Error while loading extensions:', error);
-          setExtensionError(error);
-        }
-      })();
-    },
-    [userId]
-  );
+  const fetchUserExtensions = React.useCallback(() => {
+    (async () => {
+      if (!userId) return;
+      try {
+        const extensions = await getUserExtensionShortHeaders(userId);
+        setExtensions(extensions);
+      } catch (error) {
+        console.error('Error while loading extensions:', error);
+        setExtensionError(error);
+      }
+    })();
+  }, [userId]);
 
-  React.useEffect(
-    () => {
-      fetchUserExtensions();
-    },
-    [fetchUserExtensions]
-  );
+  React.useEffect(() => {
+    fetchUserExtensions();
+  }, [fetchUserExtensions]);
 
-  const fetchUserExamples = React.useCallback(
-    () => {
-      (async () => {
-        if (!userId) return;
-        try {
-          const examples = await getUserExampleShortHeaders(userId);
-          setExamples(examples);
-        } catch (error) {
-          console.error('Error while loading examples:', error);
-          setExampleError(error);
-        }
-      })();
-    },
-    [userId]
-  );
+  const fetchUserExamples = React.useCallback(() => {
+    (async () => {
+      if (!userId) return;
+      try {
+        const examples = await getUserExampleShortHeaders(userId);
+        setExamples(examples);
+      } catch (error) {
+        console.error('Error while loading examples:', error);
+        setExampleError(error);
+      }
+    })();
+  }, [userId]);
 
-  React.useEffect(
-    () => {
-      fetchUserExamples();
-    },
-    [fetchUserExamples]
-  );
+  React.useEffect(() => {
+    fetchUserExamples();
+  }, [fetchUserExamples]);
 
   return (
     <Column noMargin>

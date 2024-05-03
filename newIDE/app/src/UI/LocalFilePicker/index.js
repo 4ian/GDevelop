@@ -26,7 +26,7 @@ const styles = {
 
 type Props = {|
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   title: string,
   message: string,
   defaultPath?: string,

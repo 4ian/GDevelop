@@ -15,7 +15,7 @@ export function PopoverButton({ children }: Props) {
   return (
     <React.Fragment>
       <button
-        onClick={event => {
+        onClick={(event) => {
           setButtonElement(event.target);
         }}
       >

@@ -165,51 +165,45 @@ const ImagePreview = ({
     })
   );
 
-  const getZoomFactorToFitImage = React.useCallback(
-    () => {
-      if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
-        return 1;
-      }
-      const zoomFactor = Math.min(
-        containerWidth / imageWidth,
-        containerHeight / imageHeight
-      );
-      let zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
-      if (zoomFactorWithMargins > 1) {
-        zoomFactorWithMargins = Math.floor(zoomFactorWithMargins);
-      }
-      return zoomFactorWithMargins;
-    },
-    [
-      imageWidth,
-      imageHeight,
-      containerHeight,
-      containerWidth,
-      displaySpacedView,
-    ]
-  );
+  const getZoomFactorToFitImage = React.useCallback(() => {
+    if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
+      return 1;
+    }
+    const zoomFactor = Math.min(
+      containerWidth / imageWidth,
+      containerHeight / imageHeight
+    );
+    let zoomFactorWithMargins = zoomFactor * (displaySpacedView ? 0.7 : 0.95);
+    if (zoomFactorWithMargins > 1) {
+      zoomFactorWithMargins = Math.floor(zoomFactorWithMargins);
+    }
+    return zoomFactorWithMargins;
+  }, [
+    imageWidth,
+    imageHeight,
+    containerHeight,
+    containerWidth,
+    displaySpacedView,
+  ]);
 
-  const adaptZoomFactorToImage = React.useCallback(
-    () => {
-      if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
-        return false;
-      }
-      const zoomFactorWithMargins = getZoomFactorToFitImage();
-      setZoomState({
-        factor: zoomFactorWithMargins,
-        xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
-        yOffset: (containerHeight - imageHeight * zoomFactorWithMargins) / 2,
-      });
-      return true;
-    },
-    [
-      imageWidth,
-      imageHeight,
-      containerHeight,
-      containerWidth,
-      getZoomFactorToFitImage,
-    ]
-  );
+  const adaptZoomFactorToImage = React.useCallback(() => {
+    if (!imageWidth || !imageHeight || !containerHeight || !containerWidth) {
+      return false;
+    }
+    const zoomFactorWithMargins = getZoomFactorToFitImage();
+    setZoomState({
+      factor: zoomFactorWithMargins,
+      xOffset: (containerWidth - imageWidth * zoomFactorWithMargins) / 2,
+      yOffset: (containerHeight - imageHeight * zoomFactorWithMargins) / 2,
+    });
+    return true;
+  }, [
+    imageWidth,
+    imageHeight,
+    containerHeight,
+    containerWidth,
+    getZoomFactorToFitImage,
+  ]);
 
   const clampZoomFactor = React.useCallback(
     (zoom: number) => {
@@ -228,7 +222,7 @@ const ImagePreview = ({
         imageZoomFactor * imageZoomFactorMultiplier
       );
       if (zoomState.factor !== newFactor) {
-        setZoomState(zoomState => ({
+        setZoomState((zoomState) => ({
           xOffset:
             zoomState.xOffset +
             (point[0] - zoomState.xOffset) * (1 - newFactor / zoomState.factor),
@@ -244,7 +238,7 @@ const ImagePreview = ({
 
   const zoomAroundPointTo = React.useCallback(
     async (factor: number, point: [number, number]) => {
-      setZoomState(zoomState => ({
+      setZoomState((zoomState) => ({
         xOffset:
           zoomState.xOffset +
           (point[0] - zoomState.xOffset) * (1 - factor / zoomState.factor),
@@ -269,7 +263,7 @@ const ImagePreview = ({
           clientY - containerRect.top,
         ]);
       } else {
-        setZoomState(zoomState => ({
+        setZoomState((zoomState) => ({
           ...zoomState,
           xOffset: zoomState.xOffset - deltaX / 4,
           yOffset: zoomState.yOffset - deltaY / 4,
@@ -286,14 +280,10 @@ const ImagePreview = ({
 
         event.preventDefault();
         event.stopPropagation();
-        const {
-          clientX: touch1clientX,
-          clientY: touch1clientY,
-        } = event.touches[0];
-        const {
-          clientX: touch2clientX,
-          clientY: touch2clientY,
-        } = event.touches[1];
+        const { clientX: touch1clientX, clientY: touch1clientY } =
+          event.touches[0];
+        const { clientX: touch2clientX, clientY: touch2clientY } =
+          event.touches[1];
         const newDistance = getDistanceBetweenPoints(
           { x: touch1clientX, y: touch1clientY },
           { x: touch2clientX, y: touch2clientY }
@@ -309,7 +299,7 @@ const ImagePreview = ({
           }
         );
         if (previousDoubleTouchInfo.current) {
-          setZoomState(zoomState => ({
+          setZoomState((zoomState) => ({
             ...zoomState,
             xOffset:
               zoomState.xOffset +
@@ -346,7 +336,7 @@ const ImagePreview = ({
 
       if (previousSingleTouchCoordinates.current) {
         const [previousX, previousY] = previousSingleTouchCoordinates.current;
-        setZoomState(zoomState => ({
+        setZoomState((zoomState) => ({
           ...zoomState,
           xOffset: zoomState.xOffset + (clientX - previousX),
           yOffset: zoomState.yOffset + (clientY - previousY),
@@ -360,31 +350,25 @@ const ImagePreview = ({
   // Add event listener with `passive: false` in order to be able to prevent
   // the default behavior when swiping from left to right on a trackpad that
   // triggers a back navigation.
-  React.useEffect(
-    () => {
-      if (deactivateControls) return;
-      if (containerRef.current) {
-        containerRef.current.addEventListener('wheel', handleWheel, {
-          passive: false,
-        });
-        return () => {
-          containerRef.current &&
-            containerRef.current.removeEventListener('wheel', handleWheel, {
-              passive: false,
-            });
-        };
-      }
-    },
-    [handleWheel, deactivateControls]
-  );
+  React.useEffect(() => {
+    if (deactivateControls) return;
+    if (containerRef.current) {
+      containerRef.current.addEventListener('wheel', handleWheel, {
+        passive: false,
+      });
+      return () => {
+        containerRef.current &&
+          containerRef.current.removeEventListener('wheel', handleWheel, {
+            passive: false,
+          });
+      };
+    }
+  }, [handleWheel, deactivateControls]);
 
   // Reset ref to adapt zoom when image changes
-  React.useEffect(
-    () => {
-      hasZoomBeenAdaptedToImageRef.current = false;
-    },
-    [imageResourceSource]
-  );
+  React.useEffect(() => {
+    hasZoomBeenAdaptedToImageRef.current = false;
+  }, [imageResourceSource]);
 
   const containerCenter = React.useMemo(
     () => [(containerWidth || 0) / 2, (containerHeight || 0) / 2],
@@ -394,17 +378,14 @@ const ImagePreview = ({
   // A change of adaptZoomFactorToImage means a change in one of its dependencies,
   // so it means the container or image size has changed and we should try to adapt
   // the zoom factor to the image.
-  React.useEffect(
-    () => {
-      if (hasZoomBeenAdaptedToImageRef.current) {
-        // Do not adapt zoom to image if a zoom as been provided in the props
-        // or if the zoom has already been adapted.
-        return;
-      }
-      hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
-    },
-    [adaptZoomFactorToImage]
-  );
+  React.useEffect(() => {
+    if (hasZoomBeenAdaptedToImageRef.current) {
+      // Do not adapt zoom to image if a zoom as been provided in the props
+      // or if the zoom has already been adapted.
+      return;
+    }
+    hasZoomBeenAdaptedToImageRef.current = adaptZoomFactorToImage();
+  }, [adaptZoomFactorToImage]);
 
   const handleImageLoaded = React.useCallback(
     (e: any) => {
@@ -462,7 +443,7 @@ const ImagePreview = ({
         const [previousX, previousY] = previousPointerCoordinates.current;
         const newPosition = [event.clientX, event.clientY];
         previousPointerCoordinates.current = newPosition;
-        setZoomState(zoomState => ({
+        setZoomState((zoomState) => ({
           ...zoomState,
           xOffset: zoomState.xOffset + (newPosition[0] - previousX),
           yOffset: zoomState.yOffset + (newPosition[1] - previousY),
@@ -535,7 +516,7 @@ const ImagePreview = ({
   return (
     <Measure
       bounds
-      onResize={contentRect => {
+      onResize={(contentRect) => {
         setContainerWidth(contentRect.bounds.width);
         setContainerHeight(contentRect.bounds.height);
       }}
@@ -563,7 +544,7 @@ const ImagePreview = ({
                     )}
                     step={1 / 16}
                     value={Math.log2(imageZoomFactor)}
-                    onChange={value => {
+                    onChange={(value) => {
                       zoomAroundPointTo(Math.pow(2, value), containerCenter);
                     }}
                   />
@@ -603,7 +584,7 @@ const ImagePreview = ({
                   overflow: containerLoaded ? 'unset' : 'hidden',
                   ...forcedCursorStyle,
                 }}
-                ref={ref => {
+                ref={(ref) => {
                   measureRef(ref);
                   containerRef.current = ref;
                 }}

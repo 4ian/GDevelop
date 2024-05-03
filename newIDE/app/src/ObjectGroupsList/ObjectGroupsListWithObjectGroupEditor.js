@@ -35,7 +35,7 @@ type State = {|
  */
 export default class ObjectGroupsListWithObjectGroupEditor extends React.Component<
   Props,
-  State
+  State,
 > {
   state = {
     editedGroup: null,

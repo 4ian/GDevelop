@@ -49,7 +49,7 @@ const isURL = (filename: string) => {
 export default ({
   internalName: 'Cloud',
   name: t`GDevelop Cloud`,
-  renderIcon: props => <Cloud fontSize={props.size} />,
+  renderIcon: (props) => <Cloud fontSize={props.size} />,
   hiddenInOpenDialog: true,
   needUserAuthentication: true,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
@@ -67,9 +67,8 @@ export default ({
   renderNewProjectSaveAsLocationChooser: renderNewProjectSaveAsLocationChooser,
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
-    onEnsureCanAccessResources: generateOnEnsureCanAccessResources(
-      authenticatedUser
-    ),
+    onEnsureCanAccessResources:
+      generateOnEnsureCanAccessResources(authenticatedUser),
     onSaveProject: generateOnSaveProject(authenticatedUser),
     onChooseSaveProjectAsLocation: generateOnChooseSaveProjectAsLocation({
       authenticatedUser,
@@ -102,10 +101,8 @@ export default ({
       // the user and ask them if they want to overwrite the changes.
       const cloudProjectId = fileMetadata.fileIdentifier;
       const openedProjectVersion = fileMetadata.version;
-      const cloudProject: ?CloudProjectWithUserAccessInfo = await getCloudProject(
-        authenticatedUser,
-        cloudProjectId
-      );
+      const cloudProject: ?CloudProjectWithUserAccessInfo =
+        await getCloudProject(authenticatedUser, cloudProjectId);
       if (!cloudProject) {
         await actions.showAlert({
           title: t`Unable to save the project`,

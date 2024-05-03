@@ -121,7 +121,7 @@ type ListItemProps = {|
 
 export type ListItemRefType = any; // Should be a material-ui ListItem
 
-const useStylesForGreyedListItem = makeStyles(theme => {
+const useStylesForGreyedListItem = makeStyles((theme) => {
   return createStyles({
     root: { color: theme.palette.text.secondary },
   });
@@ -138,14 +138,11 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
     const classes = useStylesForGreyedListItem();
 
-    const openContextMenu = React.useCallback(
-      () => {
-        if (elementWithMenu.current) {
-          elementWithMenu.current.open();
-        }
-      },
-      [elementWithMenu]
-    );
+    const openContextMenu = React.useCallback(() => {
+      if (elementWithMenu.current) {
+        elementWithMenu.current.open();
+      }
+    }, [elementWithMenu]);
     const longTouchForContextMenuProps = useLongTouch(openContextMenu);
 
     const renderListItemSecondaryAction = () => {

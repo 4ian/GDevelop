@@ -133,10 +133,10 @@ const useProgressiveReveal = <T>({
 }: {|
   list: Array<T>,
   numberPerPage: number,
-|}): {|
+|}): ({|
   displayedList: Array<T>,
   onShowMore: () => void,
-|} => {
+|}) => {
   const [pageCount, setPageCount] = React.useState(1);
   const onShowMore = useDebounce(() => {
     setPageCount(pageCount + 1);
@@ -157,10 +157,10 @@ type Props = {|
   publicAssetPacks: PublicAssetPacks,
   privateAssetPackListingDatas: Array<PrivateAssetPackListingData>,
   privateGameTemplateListingDatas: Array<PrivateGameTemplateListingData>,
-  onPublicAssetPackSelection: PublicAssetPack => void,
-  onPrivateAssetPackSelection: PrivateAssetPackListingData => void,
-  onPrivateGameTemplateSelection: PrivateGameTemplateListingData => void,
-  onCategorySelection: string => void,
+  onPublicAssetPackSelection: (PublicAssetPack) => void,
+  onPrivateAssetPackSelection: (PrivateAssetPackListingData) => void,
+  onPrivateGameTemplateSelection: (PrivateGameTemplateListingData) => void,
+  onCategorySelection: (string) => void,
   openedShopCategory: string | null,
   hideGameTemplates?: boolean,
   displayPromotions?: boolean,
@@ -185,12 +185,8 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
     ref
   ) => {
     const { windowSize, isLandscape } = useResponsiveWindowSize();
-    const {
-      receivedAssetPacks,
-      receivedGameTemplates,
-      badges,
-      achievements,
-    } = React.useContext(AuthenticatedUserContext);
+    const { receivedAssetPacks, receivedGameTemplates, badges, achievements } =
+      React.useContext(AuthenticatedUserContext);
 
     const scrollView = React.useRef<?ScrollViewInterface>(null);
     React.useImperativeHandle(ref, () => ({
@@ -241,7 +237,7 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
 
     const starterPacksTiles: Array<React.Node> = starterPacks
       .filter(
-        assetPack =>
+        (assetPack) =>
           !openedShopCategory ||
           assetPack.categories.includes(openedShopCategory)
       )
@@ -253,110 +249,104 @@ export const AssetsHome = React.forwardRef<Props, AssetsHomeInterface>(
         />
       ));
 
-    const { allStandAloneTiles, allBundleTiles } = React.useMemo(
-      () => {
-        const privateAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
-        const privateAssetPackBundleTiles: Array<React.Node> = [];
-        const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
+    const { allStandAloneTiles, allBundleTiles } = React.useMemo(() => {
+      const privateAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackStandAloneTiles: Array<React.Node> = [];
+      const privateAssetPackBundleTiles: Array<React.Node> = [];
+      const privateOwnedAssetPackBundleTiles: Array<React.Node> = [];
 
-        privateAssetPackListingDatas
-          .filter(
-            assetPackListingData =>
-              !openedShopCategory ||
-              assetPackListingData.categories.includes(openedShopCategory)
-          )
-          .forEach(assetPackListingData => {
-            const isPackOwned =
-              !!receivedAssetPacks &&
-              !!receivedAssetPacks.find(
-                pack => pack.id === assetPackListingData.id
-              );
-            const tile = (
-              <PrivateAssetPackTile
-                assetPackListingData={assetPackListingData}
-                onSelect={() => {
-                  onPrivateAssetPackSelection(assetPackListingData);
-                }}
-                owned={isPackOwned}
-                key={assetPackListingData.id}
-              />
+      privateAssetPackListingDatas
+        .filter(
+          (assetPackListingData) =>
+            !openedShopCategory ||
+            assetPackListingData.categories.includes(openedShopCategory)
+        )
+        .forEach((assetPackListingData) => {
+          const isPackOwned =
+            !!receivedAssetPacks &&
+            !!receivedAssetPacks.find(
+              (pack) => pack.id === assetPackListingData.id
             );
-            if (
-              assetPackListingData.includedListableProductIds &&
-              !!assetPackListingData.includedListableProductIds.length
-            ) {
-              if (isPackOwned) {
-                privateOwnedAssetPackBundleTiles.push(tile);
-              } else {
-                privateAssetPackBundleTiles.push(tile);
-              }
-            } else {
-              if (isPackOwned) {
-                privateOwnedAssetPackStandAloneTiles.push(tile);
-              } else {
-                privateAssetPackStandAloneTiles.push(tile);
-              }
-            }
-          });
-
-        const allBundleTiles = [
-          ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
-          ...privateAssetPackBundleTiles,
-        ];
-
-        const allStandAloneTiles = [
-          ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
-          ...mergeArraysPerGroup(
-            privateAssetPackStandAloneTiles,
-            starterPacksTiles,
-            2,
-            1
-          ),
-        ];
-
-        return { allStandAloneTiles, allBundleTiles };
-      },
-      [
-        privateAssetPackListingDatas,
-        openedShopCategory,
-        onPrivateAssetPackSelection,
-        starterPacksTiles,
-        receivedAssetPacks,
-      ]
-    );
-
-    const gameTemplateTiles = React.useMemo(
-      () => {
-        // Only show game templates if the category is not set or is set to "game-template".
-        return privateGameTemplateListingDatas
-          .filter(
-            privateGameTemplateListingData =>
-              !openedShopCategory || openedShopCategory === 'game-template'
-          )
-          .map((privateGameTemplateListingData, index) => (
-            <PrivateGameTemplateTile
-              privateGameTemplateListingData={privateGameTemplateListingData}
+          const tile = (
+            <PrivateAssetPackTile
+              assetPackListingData={assetPackListingData}
               onSelect={() => {
-                onPrivateGameTemplateSelection(privateGameTemplateListingData);
+                onPrivateAssetPackSelection(assetPackListingData);
               }}
-              owned={
-                !!receivedGameTemplates &&
-                !!receivedGameTemplates.find(
-                  pack => pack.id === privateGameTemplateListingData.id
-                )
-              }
-              key={privateGameTemplateListingData.id}
+              owned={isPackOwned}
+              key={assetPackListingData.id}
             />
-          ));
-      },
-      [
-        privateGameTemplateListingDatas,
-        openedShopCategory,
-        onPrivateGameTemplateSelection,
-        receivedGameTemplates,
-      ]
-    );
+          );
+          if (
+            assetPackListingData.includedListableProductIds &&
+            !!assetPackListingData.includedListableProductIds.length
+          ) {
+            if (isPackOwned) {
+              privateOwnedAssetPackBundleTiles.push(tile);
+            } else {
+              privateAssetPackBundleTiles.push(tile);
+            }
+          } else {
+            if (isPackOwned) {
+              privateOwnedAssetPackStandAloneTiles.push(tile);
+            } else {
+              privateAssetPackStandAloneTiles.push(tile);
+            }
+          }
+        });
+
+      const allBundleTiles = [
+        ...privateOwnedAssetPackBundleTiles, // Display owned bundles first.
+        ...privateAssetPackBundleTiles,
+      ];
+
+      const allStandAloneTiles = [
+        ...privateOwnedAssetPackStandAloneTiles, // Display owned packs first.
+        ...mergeArraysPerGroup(
+          privateAssetPackStandAloneTiles,
+          starterPacksTiles,
+          2,
+          1
+        ),
+      ];
+
+      return { allStandAloneTiles, allBundleTiles };
+    }, [
+      privateAssetPackListingDatas,
+      openedShopCategory,
+      onPrivateAssetPackSelection,
+      starterPacksTiles,
+      receivedAssetPacks,
+    ]);
+
+    const gameTemplateTiles = React.useMemo(() => {
+      // Only show game templates if the category is not set or is set to "game-template".
+      return privateGameTemplateListingDatas
+        .filter(
+          (privateGameTemplateListingData) =>
+            !openedShopCategory || openedShopCategory === 'game-template'
+        )
+        .map((privateGameTemplateListingData, index) => (
+          <PrivateGameTemplateTile
+            privateGameTemplateListingData={privateGameTemplateListingData}
+            onSelect={() => {
+              onPrivateGameTemplateSelection(privateGameTemplateListingData);
+            }}
+            owned={
+              !!receivedGameTemplates &&
+              !!receivedGameTemplates.find(
+                (pack) => pack.id === privateGameTemplateListingData.id
+              )
+            }
+            key={privateGameTemplateListingData.id}
+          />
+        ));
+    }, [
+      privateGameTemplateListingDatas,
+      openedShopCategory,
+      onPrivateGameTemplateSelection,
+      receivedGameTemplates,
+    ]);
 
     const {
       displayedList: displayedStandAloneTiles,

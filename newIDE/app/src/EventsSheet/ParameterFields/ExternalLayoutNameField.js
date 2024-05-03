@@ -18,11 +18,9 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ExternalLayoutNameField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?(
-      | GenericExpressionField
-      | SelectFieldInterface
-    )>(null);
-    const focus: FieldFocusFunction = options => {
+    const field =
+      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
+    const focus: FieldFocusFunction = (options) => {
       if (field.current) field.current.focus(options);
     };
     React.useImperativeHandle(ref, () => ({
@@ -30,12 +28,12 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     }));
 
     const externalLayoutNames = props.project
-      ? enumerateExternalLayouts(props.project).map(externalLayout =>
+      ? enumerateExternalLayouts(props.project).map((externalLayout) =>
           externalLayout.getName()
         )
       : [];
     const isCurrentValueInLayoutsList = !!externalLayoutNames.find(
-      layoutName => `"${layoutName}"` === props.value
+      (layoutName) => `"${layoutName}"` === props.value
     );
 
     // If the current value is not in the list of layouts, display an expression field.
@@ -60,7 +58,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
-    const selectOptions = externalLayoutNames.map(layoutName => (
+    const selectOptions = externalLayoutNames.map((layoutName) => (
       <SelectOption
         key={layoutName}
         value={`"${layoutName}"`}
@@ -108,7 +106,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
             />
           )
         }
-        renderButton={style =>
+        renderButton={(style) =>
           isExpressionField ? (
             <FlatButton
               id="switch-expression-select"

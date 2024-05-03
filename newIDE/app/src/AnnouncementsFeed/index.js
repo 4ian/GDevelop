@@ -27,7 +27,7 @@ const styles = {
 };
 
 const useStylesForClickableContainer = () =>
-  makeStyles(theme =>
+  makeStyles((theme) =>
     createStyles({
       root: {
         '&:hover': {
@@ -54,11 +54,8 @@ export const AnnouncementsFeed = ({
   addMargins,
   hideLoader,
 }: AnnouncementsFeedProps) => {
-  const {
-    announcements,
-    error,
-    fetchAnnouncementsAndPromotions,
-  } = React.useContext(AnnouncementsFeedContext);
+  const { announcements, error, fetchAnnouncementsAndPromotions } =
+    React.useContext(AnnouncementsFeedContext);
   const { values, showAnnouncement } = React.useContext(PreferencesContext);
   const { navigateToRoute } = React.useContext(RouterContext);
   const { isMobile } = useResponsiveWindowSize();
@@ -79,11 +76,11 @@ export const AnnouncementsFeed = ({
   }
 
   const properLevelAnnouncements = level
-    ? announcements.filter(announcement => announcement.level === level)
+    ? announcements.filter((announcement) => announcement.level === level)
     : announcements;
 
   const displayedAnnouncements = canClose
-    ? properLevelAnnouncements.filter(announcement => {
+    ? properLevelAnnouncements.filter((announcement) => {
         return !values.hiddenAnnouncements[announcement.id];
       })
     : properLevelAnnouncements;
@@ -115,12 +112,12 @@ export const AnnouncementsFeed = ({
                           desktopRouteNavigationParams.params
                         )
                     : mobileRouteNavigationParams && isMobile
-                    ? () =>
-                        navigateToRoute(
-                          mobileRouteNavigationParams.route,
-                          mobileRouteNavigationParams.params
-                        )
-                    : undefined;
+                      ? () =>
+                          navigateToRoute(
+                            mobileRouteNavigationParams.route,
+                            mobileRouteNavigationParams.params
+                          )
+                      : undefined;
 
                 return (
                   <AlertMessage

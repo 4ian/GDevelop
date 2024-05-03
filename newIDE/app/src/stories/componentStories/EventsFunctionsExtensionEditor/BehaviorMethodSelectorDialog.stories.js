@@ -20,7 +20,7 @@ export const Default = () => (
       <BehaviorMethodSelectorDialog
         eventsBasedBehavior={testProject.testEventsBasedBehavior}
         onCancel={() => action('Cancel')}
-        onChoose={parameters => action('Choose function type', parameters)}
+        onChoose={(parameters) => action('Choose function type', parameters)}
       />
     )}
   </I18n>

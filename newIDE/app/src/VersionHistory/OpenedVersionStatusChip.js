@@ -26,7 +26,7 @@ const styles = {
   },
 };
 
-const useStylesCloseIconButton = makeStyles(theme =>
+const useStylesCloseIconButton = makeStyles((theme) =>
   createStyles({
     root: {
       borderRadius: 3,

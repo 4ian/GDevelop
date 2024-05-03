@@ -9,7 +9,7 @@ export const getInstancesInLayoutForObject = (
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
-  instanceGetter.invoke = instancePtr => {
+  instanceGetter.invoke = (instancePtr) => {
     // $FlowFixMe - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
       instancePtr,
@@ -33,7 +33,7 @@ export const getInstancesInLayoutForLayer = (
   const objectInstances = [];
   const instanceGetter = new gd.InitialInstanceJSFunctor();
   // $FlowFixMe - invoke is not writable
-  instanceGetter.invoke = instancePtr => {
+  instanceGetter.invoke = (instancePtr) => {
     // $FlowFixMe - wrapPointer is not exposed
     const instance: gdInitialInstance = gd.wrapPointer(
       instancePtr,

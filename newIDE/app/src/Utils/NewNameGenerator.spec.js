@@ -7,19 +7,19 @@ describe('NewNameGenerator', () => {
     describe('with prefix', () => {
       it('should return the name with the given prefix if it is already used', () => {
         expect(
-          newNameGenerator('Object', text => text === 'Object', 'CopyOf')
+          newNameGenerator('Object', (text) => text === 'Object', 'CopyOf')
         ).toEqual('CopyOfObject');
       });
       it('should return the name with the given prefix if the name contains a number suffix', () => {
         expect(
-          newNameGenerator('Object2', text => text === 'Object2', 'CopyOf')
+          newNameGenerator('Object2', (text) => text === 'Object2', 'CopyOf')
         ).toEqual('CopyOfObject2');
       });
       it('should return the prefix and the name with a 3 as a suffix if the 2 suffix is already used', () => {
         expect(
           newNameGenerator(
             'Object',
-            text =>
+            (text) =>
               text === 'Object' ||
               text === 'CopyOfObject' ||
               text === 'CopyOfObject2',
@@ -33,7 +33,7 @@ describe('NewNameGenerator', () => {
         expect(newNameGenerator('Object', () => false)).toEqual('Object');
       });
       it('should return the name with a 2 as a suffix if it is already used', () => {
-        expect(newNameGenerator('Object', text => text === 'Object')).toEqual(
+        expect(newNameGenerator('Object', (text) => text === 'Object')).toEqual(
           'Object2'
         );
       });
@@ -41,7 +41,7 @@ describe('NewNameGenerator', () => {
         expect(
           newNameGenerator(
             'Object',
-            text => text === 'Object' || text === 'Object2'
+            (text) => text === 'Object' || text === 'Object2'
           )
         ).toEqual('Object3');
       });
@@ -50,7 +50,7 @@ describe('NewNameGenerator', () => {
         expect(
           newNameGenerator(
             'Object2',
-            text => text === 'Object' || text === 'Object2'
+            (text) => text === 'Object' || text === 'Object2'
           )
         ).toEqual('Object3');
       });

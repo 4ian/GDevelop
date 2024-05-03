@@ -32,7 +32,7 @@ export const ErrorLoadingAnalytics = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(500)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -50,7 +50,7 @@ export const MissingAnalytics = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(404)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -68,7 +68,7 @@ export const WithPartialAnalytics = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -86,7 +86,7 @@ export const WithAnalytics = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsFor364Days)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -104,7 +104,7 @@ export const WithAnalyticsWithMissingNewMetrics = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithUndefinedDurationMetrics)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -122,7 +122,7 @@ export const WithAnalyticsOnlyFor19Days = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithOnly19Days)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -140,7 +140,7 @@ export const WithAnalyticsWithHoles = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithHoles)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -158,7 +158,7 @@ export const WithAnalyticsOnlyFor1Day = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsWithOnly1Day)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });
@@ -176,7 +176,7 @@ export const WithAnalyticsLongLoading = () => {
     .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
     .reply(200, gameRollingMetricsFor364Days)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

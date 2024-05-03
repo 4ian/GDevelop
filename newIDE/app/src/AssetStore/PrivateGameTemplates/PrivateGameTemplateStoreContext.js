@@ -40,9 +40,9 @@ type PrivateGameTemplateStoreState = {|
   shop: {
     privateGameTemplateListingDatasSearchResults: ?Array<PrivateGameTemplateListingData>,
     searchText: string,
-    setSearchText: string => void,
+    setSearchText: (string) => void,
     filtersState: FiltersState,
-    setInitialGameTemplateUserFriendlySlug: string => void,
+    setInitialGameTemplateUserFriendlySlug: (string) => void,
   },
   exampleStore: {
     privateGameTemplateListingDatasSearchResults: ?Array<{|
@@ -50,48 +50,50 @@ type PrivateGameTemplateStoreState = {|
       matches: SearchMatch[],
     |}>,
     searchText: string,
-    setSearchText: string => void,
+    setSearchText: (string) => void,
     filtersState: FiltersState,
   },
 |};
 
-export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState = {
-  gameTemplateFilters: null,
-  fetchGameTemplates: () => {},
-  privateGameTemplateListingDatas: null,
-  error: null,
-  shop: {
-    privateGameTemplateListingDatasSearchResults: null,
-    searchText: '',
-    setSearchText: () => {},
-    filtersState: {
-      chosenFilters: new Set(),
-      addFilter: () => {},
-      removeFilter: () => {},
-      chosenCategory: null,
-      setChosenCategory: () => {},
+export const initialPrivateGameTemplateStoreState: PrivateGameTemplateStoreState =
+  {
+    gameTemplateFilters: null,
+    fetchGameTemplates: () => {},
+    privateGameTemplateListingDatas: null,
+    error: null,
+    shop: {
+      privateGameTemplateListingDatasSearchResults: null,
+      searchText: '',
+      setSearchText: () => {},
+      filtersState: {
+        chosenFilters: new Set(),
+        addFilter: () => {},
+        removeFilter: () => {},
+        chosenCategory: null,
+        setChosenCategory: () => {},
+      },
+      setInitialGameTemplateUserFriendlySlug: (
+        initialGameTemplateUserFriendlySlug: string
+      ) => {},
     },
-    setInitialGameTemplateUserFriendlySlug: (
-      initialGameTemplateUserFriendlySlug: string
-    ) => {},
-  },
-  exampleStore: {
-    privateGameTemplateListingDatasSearchResults: null,
-    searchText: '',
-    setSearchText: () => {},
-    filtersState: {
-      chosenFilters: new Set(),
-      addFilter: () => {},
-      removeFilter: () => {},
-      chosenCategory: null,
-      setChosenCategory: () => {},
+    exampleStore: {
+      privateGameTemplateListingDatasSearchResults: null,
+      searchText: '',
+      setSearchText: () => {},
+      filtersState: {
+        chosenFilters: new Set(),
+        addFilter: () => {},
+        removeFilter: () => {},
+        chosenCategory: null,
+        setChosenCategory: () => {},
+      },
     },
-  },
-};
+  };
 
-export const PrivateGameTemplateStoreContext = React.createContext<PrivateGameTemplateStoreState>(
-  initialPrivateGameTemplateStoreState
-);
+export const PrivateGameTemplateStoreContext =
+  React.createContext<PrivateGameTemplateStoreState>(
+    initialPrivateGameTemplateStoreState
+  );
 
 type PrivateGameTemplateStoreStateProviderProps = {|
   shopNavigationState: NavigationState,
@@ -102,15 +104,11 @@ export const PrivateGameTemplateStoreStateProvider = ({
   shopNavigationState,
   children,
 }: PrivateGameTemplateStoreStateProviderProps) => {
-  const [
-    gameTemplateFilters,
-    setGameTemplateFilters,
-  ] = React.useState<?Filters>(null);
+  const [gameTemplateFilters, setGameTemplateFilters] =
+    React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    privateGameTemplateListingDatas,
-    setPrivateGameTemplateListingDatas,
-  ] = React.useState<?Array<PrivateGameTemplateListingData>>(null);
+  const [privateGameTemplateListingDatas, setPrivateGameTemplateListingDatas] =
+    React.useState<?Array<PrivateGameTemplateListingData>>(null);
   const [
     initialGameTemplateUserFriendlySlug,
     setInitialGameTemplateUserFriendlySlug,
@@ -121,159 +119,145 @@ export const PrivateGameTemplateStoreStateProvider = ({
   const { showAlert } = useAlertDialog();
 
   const [shopSearchText, setShopSearchText] = React.useState(defaultSearchText);
-  const [exampleStoreSearchText, setExampleStoreSearchText] = React.useState(
-    defaultSearchText
-  );
+  const [exampleStoreSearchText, setExampleStoreSearchText] =
+    React.useState(defaultSearchText);
   const filtersStateForExampleStore = useFilters();
 
-  const fetchGameTemplates = React.useCallback(
-    () => {
-      // If the game templates are already loaded, don't load them again.
-      if (isLoading.current || privateGameTemplateListingDatas) return;
+  const fetchGameTemplates = React.useCallback(() => {
+    // If the game templates are already loaded, don't load them again.
+    if (isLoading.current || privateGameTemplateListingDatas) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const fetchedPrivateGameTemplateListingDatas = await listListedPrivateGameTemplates();
+      try {
+        const fetchedPrivateGameTemplateListingDatas =
+          await listListedPrivateGameTemplates();
 
-          console.info(
-            `Loaded ${
-              fetchedPrivateGameTemplateListingDatas
-                ? fetchedPrivateGameTemplateListingDatas.length
-                : 0
-            } game templates from the store.`
-          );
-
-          setPrivateGameTemplateListingDatas(
+        console.info(
+          `Loaded ${
             fetchedPrivateGameTemplateListingDatas
-          );
-          const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
-            (allCategories, privateGameTemplateListingData) => {
-              return allCategories.concat(
-                privateGameTemplateListingData.categories.map(category =>
-                  capitalize(category)
-                )
-              );
-            },
-            []
-          );
-          const uniqueDefaultTags = Array.from(new Set(defaultTags));
-          const gameTemplateFilters: Filters = {
-            allTags: [],
-            defaultTags: uniqueDefaultTags,
-            tagsTree: [],
-          };
-          setGameTemplateFilters(gameTemplateFilters);
-        } catch (error) {
-          console.error(
-            `Unable to load the game templates from the store:`,
-            error
-          );
-          setError(error);
-        }
+              ? fetchedPrivateGameTemplateListingDatas.length
+              : 0
+          } game templates from the store.`
+        );
 
-        isLoading.current = false;
-      })();
-    },
-    [privateGameTemplateListingDatas]
-  );
+        setPrivateGameTemplateListingDatas(
+          fetchedPrivateGameTemplateListingDatas
+        );
+        const defaultTags = fetchedPrivateGameTemplateListingDatas.reduce(
+          (allCategories, privateGameTemplateListingData) => {
+            return allCategories.concat(
+              privateGameTemplateListingData.categories.map((category) =>
+                capitalize(category)
+              )
+            );
+          },
+          []
+        );
+        const uniqueDefaultTags = Array.from(new Set(defaultTags));
+        const gameTemplateFilters: Filters = {
+          allTags: [],
+          defaultTags: uniqueDefaultTags,
+          tagsTree: [],
+        };
+        setGameTemplateFilters(gameTemplateFilters);
+      } catch (error) {
+        console.error(
+          `Unable to load the game templates from the store:`,
+          error
+        );
+        setError(error);
+      }
+
+      isLoading.current = false;
+    })();
+  }, [privateGameTemplateListingDatas]);
 
   // When the game templates are loaded,
   // open the game template with the slug that was asked to be initially loaded.
-  React.useEffect(
-    () => {
-      if (
-        !initialGameTemplateUserFriendlySlug ||
-        initialGameTemplateOpened.current
-      ) {
-        // If there is no initial game template or
-        // if the game template was already opened, don't re-open it again even
-        // if the effect run again.
+  React.useEffect(() => {
+    if (
+      !initialGameTemplateUserFriendlySlug ||
+      initialGameTemplateOpened.current
+    ) {
+      // If there is no initial game template or
+      // if the game template was already opened, don't re-open it again even
+      // if the effect run again.
+      return;
+    }
+
+    if (
+      privateGameTemplateListingDatas &&
+      initialGameTemplateUserFriendlySlug
+    ) {
+      initialGameTemplateOpened.current = true;
+
+      // Open the information page of a the game template.
+      const privateGameTemplateListingData =
+        getPrivateGameTemplateListingDataFromUserFriendlySlug({
+          privateGameTemplateListingDatas,
+          userFriendlySlug: initialGameTemplateUserFriendlySlug,
+        });
+
+      if (privateGameTemplateListingData) {
+        sendGameTemplateInformationOpened({
+          gameTemplateName: privateGameTemplateListingData.name,
+          gameTemplateId: privateGameTemplateListingData.id,
+          source: 'web-link',
+        });
+        shopNavigationState.openPrivateGameTemplateInformationPage({
+          privateGameTemplateListingData,
+          previousSearchText: shopSearchText,
+        });
+        initialGameTemplateOpened.current = false; // Allow to open the game template again if the effect run again.
+        setInitialGameTemplateUserFriendlySlug(null);
         return;
       }
 
-      if (
-        privateGameTemplateListingDatas &&
-        initialGameTemplateUserFriendlySlug
-      ) {
-        initialGameTemplateOpened.current = true;
+      showAlert({
+        title: t`Game template not found`,
+        message: t`The link to the game template you've followed seems outdated. Why not take a look at the other templates in the store?`,
+      });
+    }
+  }, [
+    privateGameTemplateListingDatas,
+    shopNavigationState,
+    showAlert,
+    initialGameTemplateUserFriendlySlug,
+    shopSearchText,
+  ]);
 
-        // Open the information page of a the game template.
-        const privateGameTemplateListingData = getPrivateGameTemplateListingDataFromUserFriendlySlug(
-          {
-            privateGameTemplateListingDatas,
-            userFriendlySlug: initialGameTemplateUserFriendlySlug,
-          }
-        );
+  React.useEffect(() => {
+    if (isLoading.current) return;
 
-        if (privateGameTemplateListingData) {
-          sendGameTemplateInformationOpened({
-            gameTemplateName: privateGameTemplateListingData.name,
-            gameTemplateId: privateGameTemplateListingData.id,
-            source: 'web-link',
-          });
-          shopNavigationState.openPrivateGameTemplateInformationPage({
-            privateGameTemplateListingData,
-            previousSearchText: shopSearchText,
-          });
-          initialGameTemplateOpened.current = false; // Allow to open the game template again if the effect run again.
-          setInitialGameTemplateUserFriendlySlug(null);
-          return;
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching game templates from the store...');
+      fetchGameTemplates();
+    }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
+    return () => clearTimeout(timeoutId);
+  }, [fetchGameTemplates]);
+
+  const privateGameTemplateListingDatasById = React.useMemo(() => {
+    if (!privateGameTemplateListingDatas) {
+      return null;
+    }
+    const privateGameTemplateListingDatasById = {};
+    privateGameTemplateListingDatas.forEach(
+      (privateGameTemplateListingData) => {
+        const id = privateGameTemplateListingData.id;
+        if (privateGameTemplateListingDatasById[id]) {
+          console.warn(
+            `Multiple private game templates with the same id: ${id}`
+          );
         }
-
-        showAlert({
-          title: t`Game template not found`,
-          message: t`The link to the game template you've followed seems outdated. Why not take a look at the other templates in the store?`,
-        });
+        privateGameTemplateListingDatasById[id] =
+          privateGameTemplateListingData;
       }
-    },
-    [
-      privateGameTemplateListingDatas,
-      shopNavigationState,
-      showAlert,
-      initialGameTemplateUserFriendlySlug,
-      shopSearchText,
-    ]
-  );
-
-  React.useEffect(
-    () => {
-      if (isLoading.current) return;
-
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching game templates from the store...');
-        fetchGameTemplates();
-      }, PRIVATE_GAME_TEMPLATES_FETCH_TIMEOUT);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchGameTemplates]
-  );
-
-  const privateGameTemplateListingDatasById = React.useMemo(
-    () => {
-      if (!privateGameTemplateListingDatas) {
-        return null;
-      }
-      const privateGameTemplateListingDatasById = {};
-      privateGameTemplateListingDatas.forEach(
-        privateGameTemplateListingData => {
-          const id = privateGameTemplateListingData.id;
-          if (privateGameTemplateListingDatasById[id]) {
-            console.warn(
-              `Multiple private game templates with the same id: ${id}`
-            );
-          }
-          privateGameTemplateListingDatasById[
-            id
-          ] = privateGameTemplateListingData;
-        }
-      );
-      return privateGameTemplateListingDatasById;
-    },
-    [privateGameTemplateListingDatas]
-  );
+    );
+    return privateGameTemplateListingDatasById;
+  }, [privateGameTemplateListingDatas]);
 
   const currentPage = shopNavigationState.getCurrentPage();
 
@@ -289,13 +273,14 @@ export const PrivateGameTemplateStoreStateProvider = ({
     shuffleResults: false,
   });
 
-  const privateGameTemplateListingDatasSearchResultsForShop: ?Array<PrivateGameTemplateListingData> = useSearchItem(
-    privateGameTemplateListingDatasById,
-    getPrivateGameTemplateListingDataSearchTerms,
-    shopSearchText,
-    currentPage.filtersState.chosenCategory,
-    currentPage.filtersState.chosenFilters
-  );
+  const privateGameTemplateListingDatasSearchResultsForShop: ?Array<PrivateGameTemplateListingData> =
+    useSearchItem(
+      privateGameTemplateListingDatasById,
+      getPrivateGameTemplateListingDataSearchTerms,
+      shopSearchText,
+      currentPage.filtersState.chosenCategory,
+      currentPage.filtersState.chosenFilters
+    );
 
   const PrivateGameTemplateStoreState = React.useMemo(
     () => ({
@@ -304,14 +289,16 @@ export const PrivateGameTemplateStoreStateProvider = ({
       gameTemplateFilters,
       fetchGameTemplates,
       shop: {
-        privateGameTemplateListingDatasSearchResults: privateGameTemplateListingDatasSearchResultsForShop,
+        privateGameTemplateListingDatasSearchResults:
+          privateGameTemplateListingDatasSearchResultsForShop,
         searchText: shopSearchText,
         setSearchText: setShopSearchText,
         filtersState: currentPage.filtersState,
         setInitialGameTemplateUserFriendlySlug,
       },
       exampleStore: {
-        privateGameTemplateListingDatasSearchResults: privateGameTemplateListingDatasSearchResultsForExampleStore,
+        privateGameTemplateListingDatasSearchResults:
+          privateGameTemplateListingDatasSearchResultsForExampleStore,
         searchText: exampleStoreSearchText,
         setSearchText: setExampleStoreSearchText,
         filtersState: filtersStateForExampleStore,

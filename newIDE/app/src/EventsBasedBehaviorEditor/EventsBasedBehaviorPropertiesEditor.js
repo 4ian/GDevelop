@@ -64,9 +64,9 @@ export const usePropertyOverridingAlertDialog = () => {
   return async (existingPropertyNames: Array<string>): Promise<boolean> => {
     return await showConfirmation({
       title: t`Existing properties`,
-      message: t`These properties already exist:${'\n\n - ' +
-        existingPropertyNames.join('\n\n - ') +
-        '\n\n'}Do you want to replace them?`,
+      message: t`These properties already exist:${
+        '\n\n - ' + existingPropertyNames.join('\n\n - ') + '\n\n'
+      }Do you want to replace them?`,
       confirmButtonLabel: t`Replace`,
       dismissButtonLabel: t`Omit`,
     });
@@ -92,11 +92,12 @@ const getValidatedPropertyName = (
 ): string => {
   const safeAndUniqueNewName = newNameGenerator(
     gd.Project.getSafeName(newName),
-    tentativeNewName => {
+    (tentativeNewName) => {
       if (
         properties.has(tentativeNewName) ||
         // The name of a property cannot be "name" or "type", as they are used by GDevelop internally.
-        (tentativeNewName === 'name' || tentativeNewName === 'type')
+        tentativeNewName === 'name' ||
+        tentativeNewName === 'type'
       ) {
         return true;
       }
@@ -116,26 +117,21 @@ const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
 export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
   const { properties, onPropertiesUpdated, onEventsFunctionsAdded } = props;
   const scrollView = React.useRef<?ScrollViewInterface>(null);
-  const [
-    justAddedPropertyName,
-    setJustAddedPropertyName,
-  ] = React.useState<?string>(null);
+  const [justAddedPropertyName, setJustAddedPropertyName] =
+    React.useState<?string>(null);
   const justAddedPropertyElement = React.useRef<?any>(null);
 
-  React.useEffect(
-    () => {
-      if (
-        scrollView.current &&
-        justAddedPropertyElement.current &&
-        justAddedPropertyName
-      ) {
-        scrollView.current.scrollTo(justAddedPropertyElement.current);
-        setJustAddedPropertyName(null);
-        justAddedPropertyElement.current = null;
-      }
-    },
-    [justAddedPropertyName]
-  );
+  React.useEffect(() => {
+    if (
+      scrollView.current &&
+      justAddedPropertyElement.current &&
+      justAddedPropertyName
+    ) {
+      scrollView.current.scrollTo(justAddedPropertyElement.current);
+      setJustAddedPropertyName(null);
+      justAddedPropertyElement.current = null;
+    }
+  }, [justAddedPropertyName]);
 
   const draggedProperty = React.useRef<?gdNamedPropertyDescriptor>(null);
 
@@ -145,19 +141,16 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
 
   const forceUpdate = useForceUpdate();
 
-  const addProperty = React.useCallback(
-    () => {
-      const newName = newNameGenerator('Property', name =>
-        properties.has(name)
-      );
-      const property = properties.insertNew(newName, properties.getCount());
-      property.setType('Number');
-      forceUpdate();
-      onPropertiesUpdated && onPropertiesUpdated();
-      setJustAddedPropertyName(newName);
-    },
-    [forceUpdate, onPropertiesUpdated, properties]
-  );
+  const addProperty = React.useCallback(() => {
+    const newName = newNameGenerator('Property', (name) =>
+      properties.has(name)
+    );
+    const property = properties.insertNew(newName, properties.getCount());
+    property.setType('Number');
+    forceUpdate();
+    onPropertiesUpdated && onPropertiesUpdated();
+    setJustAddedPropertyName(newName);
+  }, [forceUpdate, onPropertiesUpdated, properties]);
 
   const _removeProperty = React.useCallback(
     (name: string) => {
@@ -182,7 +175,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
   );
 
   const pasteProperties = React.useCallback(
-    async propertyInsertionIndex => {
+    async (propertyInsertionIndex) => {
       const clipboardContent = Clipboard.get(PROPERTIES_CLIPBOARD_KIND);
       const propertyContents = SafeExtractor.extractArray(clipboardContent);
       if (!propertyContents) return;
@@ -195,7 +188,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
         name: string,
         serializedProperty: string,
       }> = [];
-      propertyContents.forEach(propertyContent => {
+      propertyContents.forEach((propertyContent) => {
         const name = SafeExtractor.extractStringProperty(
           propertyContent,
           'name'
@@ -229,7 +222,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
       let shouldOverrideProperties = false;
       if (existingNamedProperties.length > 0) {
         shouldOverrideProperties = await showPropertyOverridingConfirmation(
-          existingNamedProperties.map(namedProperty => namedProperty.name)
+          existingNamedProperties.map((namedProperty) => namedProperty.name)
         );
 
         if (shouldOverrideProperties) {
@@ -260,12 +253,9 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     ]
   );
 
-  const pastePropertiesAtTheEnd = React.useCallback(
-    async () => {
-      await pasteProperties(properties.getCount());
-    },
-    [properties, pasteProperties]
-  );
+  const pastePropertiesAtTheEnd = React.useCallback(async () => {
+    await pasteProperties(properties.getCount());
+  }, [properties, pasteProperties]);
 
   const pastePropertiesBefore = React.useCallback(
     async (property: gdNamedPropertyDescriptor) => {
@@ -308,7 +298,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
           property.getValue()
         );
         const vectorString = new gd.VectorString();
-        newExtraInfo.forEach(item => vectorString.push_back(item));
+        newExtraInfo.forEach((item) => vectorString.push_back(item));
         property.setExtraInfo(vectorString);
         vectorString.delete();
         property.setValue(newExtraInfo[defaultValueIndex] || '');
@@ -318,18 +308,15 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
     [forceUpdate]
   );
 
-  const _getPropertyGroupNames = React.useCallback(
-    (): Array<string> => {
-      const groupNames = new Set<string>();
-      for (let i = 0; i < properties.size(); i++) {
-        const property = properties.at(i);
-        const group = property.getGroup() || '';
-        groupNames.add(group);
-      }
-      return [...groupNames].sort((a, b) => a.localeCompare(b));
-    },
-    [properties]
-  );
+  const _getPropertyGroupNames = React.useCallback((): Array<string> => {
+    const groupNames = new Set<string>();
+    for (let i = 0; i < properties.size(); i++) {
+      const property = properties.at(i);
+      const group = property.getGroup() || '';
+      groupNames.add(group);
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  }, [properties]);
 
   const setHidden = React.useCallback(
     (property: gdNamedPropertyDescriptor, enable: boolean) => {
@@ -428,15 +415,16 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           commitOnBlur
                                           translatableHintText={t`Enter the property name`}
                                           value={property.getName()}
-                                          onChange={newName => {
+                                          onChange={(newName) => {
                                             if (newName === property.getName())
                                               return;
 
-                                            const validatedNewName = getValidatedPropertyName(
-                                              i18n,
-                                              properties,
-                                              newName
-                                            );
+                                            const validatedNewName =
+                                              getValidatedPropertyName(
+                                                i18n,
+                                                properties,
+                                                newName
+                                              );
                                             props.onRenameProperty(
                                               property.getName(),
                                               validatedNewName
@@ -460,10 +448,10 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             property.isHidden()
                                               ? 'Hidden'
                                               : property.isDeprecated()
-                                              ? 'Deprecated'
-                                              : property.isAdvanced()
-                                              ? 'Advanced'
-                                              : 'Visible'
+                                                ? 'Deprecated'
+                                                : property.isAdvanced()
+                                                  ? 'Advanced'
+                                                  : 'Visible'
                                           }
                                           onChange={(e, i, value: string) => {
                                             if (value === 'Hidden') {
@@ -529,7 +517,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           label: i18n._(t`Paste`),
                                           click: () =>
                                             pastePropertiesBefore(property),
-                                          enabled: isClipboardContainingProperties,
+                                          enabled:
+                                            isClipboardContainingProperties,
                                         },
                                         { type: 'separator' },
                                         {
@@ -557,10 +546,11 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             );
                                             onEventsFunctionsAdded();
                                           },
-                                          enabled: gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
-                                            props.eventsBasedBehavior,
-                                            property
-                                          ),
+                                          enabled:
+                                            gd.PropertyFunctionGenerator.canGenerateGetterAndSetter(
+                                              props.eventsBasedBehavior,
+                                              property
+                                            ),
                                         },
                                       ]}
                                     />
@@ -641,13 +631,15 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             {mapFor(
                                               0,
                                               gd.MeasurementUnit.getDefaultMeasurementUnitsCount(),
-                                              i => {
-                                                const measurementUnit = gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
-                                                  i
-                                                );
-                                                const unitShortLabel = getMeasurementUnitShortLabel(
-                                                  measurementUnit
-                                                );
+                                              (i) => {
+                                                const measurementUnit =
+                                                  gd.MeasurementUnit.getDefaultMeasurementUnitAtIndex(
+                                                    i
+                                                  );
+                                                const unitShortLabel =
+                                                  getMeasurementUnitShortLabel(
+                                                    measurementUnit
+                                                  );
                                                 const label =
                                                   measurementUnit.getLabel() +
                                                   (unitShortLabel.length > 0
@@ -680,7 +672,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                                 : 'ABC'
                                             }
                                             value={property.getValue()}
-                                            onChange={newValue => {
+                                            onChange={(newValue) => {
                                               property.setValue(newValue);
                                               forceUpdate();
                                               props.onPropertiesUpdated &&
@@ -733,7 +725,8 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             }
                                             onChange={(newValue: string) => {
                                               // Change the type of the required behavior.
-                                              const extraInfo = property.getExtraInfo();
+                                              const extraInfo =
+                                                property.getExtraInfo();
                                               if (extraInfo.size() === 0) {
                                                 extraInfo.push_back(newValue);
                                               } else {
@@ -754,7 +747,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                             disableAlpha
                                             fullWidth
                                             color={property.getValue()}
-                                            onChange={color => {
+                                            onChange={(color) => {
                                               property.setValue(color);
                                               forceUpdate();
                                               props.onPropertiesUpdated &&
@@ -807,7 +800,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           translatableHintText={t`Make the purpose of the property easy to understand`}
                                           floatingLabelFixed
                                           value={property.getLabel()}
-                                          onChange={text => {
+                                          onChange={(text) => {
                                             property.setLabel(text);
                                             forceUpdate();
                                           }}
@@ -820,14 +813,14 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                           hintText={t`Leave it empty to use the default group`}
                                           fullWidth
                                           value={property.getGroup()}
-                                          onChange={text => {
+                                          onChange={(text) => {
                                             property.setGroup(text);
                                             forceUpdate();
                                             props.onPropertiesUpdated &&
                                               props.onPropertiesUpdated();
                                           }}
                                           dataSource={_getPropertyGroupNames().map(
-                                            name => ({
+                                            (name) => ({
                                               text: name,
                                               value: name,
                                             })
@@ -843,7 +836,7 @@ export default function EventsBasedBehaviorPropertiesEditor(props: Props) {
                                         translatableHintText={t`Optionally, explain the purpose of the property in more details`}
                                         floatingLabelFixed
                                         value={property.getDescription()}
-                                        onChange={text => {
+                                        onChange={(text) => {
                                           property.setDescription(text);
                                           forceUpdate();
                                         }}

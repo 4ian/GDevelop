@@ -91,7 +91,7 @@ const ProductLicenseOptionContent = ({
 
 // Styles to give the impression of pressing an element.
 const useStylesForButtonBase = (selected: boolean) =>
-  makeStyles(theme =>
+  makeStyles((theme) =>
     createStyles({
       root: {
         outline: selected
@@ -167,7 +167,7 @@ const ProductLicenseOptionButton = ({
 
 type Props = {|
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   product: PrivateGameTemplateListingData | PrivateAssetPackListingData,
   ownedLicense: ?string,
   disabled?: boolean,
@@ -192,12 +192,9 @@ const ProductLicenseOptions = ({
   const productLicenses =
     productType === 'game-template' ? gameTemplateLicenses : assetPackLicenses;
 
-  React.useEffect(
-    () => {
-      fetchProductLicenses({ productType });
-    },
-    [fetchProductLicenses, productType]
-  );
+  React.useEffect(() => {
+    fetchProductLicenses({ productType });
+  }, [fetchProductLicenses, productType]);
 
   if (error) {
     return (
@@ -216,9 +213,9 @@ const ProductLicenseOptions = ({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
-          {productLicenses.map(license => {
+          {productLicenses.map((license) => {
             const productPriceForLicense = product.prices.find(
-              price => price.usageType === license.id
+              (price) => price.usageType === license.id
             );
             if (!productPriceForLicense) return null;
             return (
@@ -266,7 +263,9 @@ export const OwnedProductLicense = ({
     return null;
   }
 
-  const license = productLicenses.find(license => license.id === ownedLicense);
+  const license = productLicenses.find(
+    (license) => license.id === ownedLicense
+  );
   if (!license) return null;
 
   return (

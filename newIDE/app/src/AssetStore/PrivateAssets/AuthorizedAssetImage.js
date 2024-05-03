@@ -28,21 +28,18 @@ const AuthorizedAssetImage = ({
   );
   const tries = React.useRef(0);
 
-  React.useEffect(
-    () => {
-      // Avoid triggering a new request if the image is already loaded.
-      // This can happen if it was loaded with a previous token, and
-      // A new token is fetched for another image.
-      if (isImageLoaded) return;
+  React.useEffect(() => {
+    // Avoid triggering a new request if the image is already loaded.
+    // This can happen if it was loaded with a previous token, and
+    // A new token is fetched for another image.
+    if (isImageLoaded) return;
 
-      if (!authorizationToken) {
-        updateAuthorizationToken();
-      } else {
-        setAuthorizedUrl(createProductAuthorizedUrl(url, authorizationToken));
-      }
-    },
-    [authorizationToken, updateAuthorizationToken, url, isImageLoaded]
-  );
+    if (!authorizationToken) {
+      updateAuthorizationToken();
+    } else {
+      setAuthorizedUrl(createProductAuthorizedUrl(url, authorizationToken));
+    }
+  }, [authorizationToken, updateAuthorizationToken, url, isImageLoaded]);
 
   const onFetchingError = () => {
     console.warn('Error while fetching authorized image');
@@ -64,14 +61,11 @@ const AuthorizedAssetImage = ({
 
   // Ensure the loading status is reset when the URL changes,
   // this can happen when used inside an animation preview.
-  React.useEffect(
-    () => {
-      if (url) {
-        setIsImageLoaded(false);
-      }
-    },
-    [url]
-  );
+  React.useEffect(() => {
+    if (url) {
+      setIsImageLoaded(false);
+    }
+  }, [url]);
 
   return (
     <>

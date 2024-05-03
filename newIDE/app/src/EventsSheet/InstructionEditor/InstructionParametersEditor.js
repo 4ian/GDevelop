@@ -100,7 +100,7 @@ const isParameterVisible = (
 
 const InstructionParametersEditor = React.forwardRef<
   Props,
-  InstructionParametersEditorInterface
+  InstructionParametersEditorInterface,
 >(
   (
     {
@@ -128,7 +128,7 @@ const InstructionParametersEditor = React.forwardRef<
     const forceUpdate = useForceUpdate();
 
     const focus: FieldFocusFunction = React.useCallback(
-      options => {
+      (options) => {
         // Verify that there is a field to focus.
         if (
           getVisibleParametersCount(
@@ -162,12 +162,12 @@ const InstructionParametersEditor = React.forwardRef<
         ? getObjectParameterIndex(instructionMetadata)
         : -1;
 
-      return mapFor(0, instructionMetadata.getParametersCount(), i => {
+      return mapFor(0, instructionMetadata.getParametersCount(), (i) => {
         if (!instructionMetadata) return false;
         const parameterMetadata = instructionMetadata.getParameter(i);
 
         return isParameterVisible(parameterMetadata, i, objectParameterIndex);
-      }).filter(isVisible => isVisible).length;
+      }).filter((isVisible) => isVisible).length;
     };
 
     const openExtension = (i18n: I18nType) => {
@@ -200,17 +200,14 @@ const InstructionParametersEditor = React.forwardRef<
       return <div style={{ ...styles.emptyContainer, ...style }} />;
     };
 
-    React.useEffect(
-      () => {
-        if (focusOnMount) {
-          const timeoutId = setTimeout(() => {
-            focus();
-          }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
-          return () => clearTimeout(timeoutId);
-        }
-      },
-      [focus, focusOnMount]
-    );
+    React.useEffect(() => {
+      if (focusOnMount) {
+        const timeoutId = setTimeout(() => {
+          focus();
+        }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
+        return () => clearTimeout(timeoutId);
+      }
+    }, [focus, focusOnMount]);
 
     const instructionType = instruction.getType();
     const instructionMetadata = getInstructionMetadata({
@@ -221,9 +218,8 @@ const InstructionParametersEditor = React.forwardRef<
     if (!instructionMetadata) return renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
-    const instructionExtraInformation = getExtraInstructionInformation(
-      instructionType
-    );
+    const instructionExtraInformation =
+      getExtraInstructionInformation(instructionType);
     const tutorialIds = getInstructionTutorialIds(instructionType);
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
@@ -286,7 +282,7 @@ const InstructionParametersEditor = React.forwardRef<
               {tutorialIds.length ? (
                 <Line>
                   <ColumnStackLayout expand>
-                    {tutorialIds.map(tutorialId => (
+                    {tutorialIds.map((tutorialId) => (
                       <DismissableTutorialMessage
                         key={tutorialId}
                         tutorialId={tutorialId}
@@ -302,10 +298,9 @@ const InstructionParametersEditor = React.forwardRef<
                 id="instruction-parameters-container"
               >
                 <ColumnStackLayout noMargin>
-                  {mapFor(0, instructionMetadata.getParametersCount(), i => {
-                    const parameterMetadata = instructionMetadata.getParameter(
-                      i
-                    );
+                  {mapFor(0, instructionMetadata.getParametersCount(), (i) => {
+                    const parameterMetadata =
+                      instructionMetadata.getParameter(i);
                     if (
                       !isParameterVisible(
                         parameterMetadata,
@@ -316,9 +311,10 @@ const InstructionParametersEditor = React.forwardRef<
                       return null;
 
                     const parameterMetadataType = parameterMetadata.getType();
-                    const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                      parameterMetadataType
-                    );
+                    const ParameterComponent =
+                      ParameterRenderingService.getParameterComponent(
+                        parameterMetadataType
+                      );
 
                     // Track the field count on screen, to affect the ref to the
                     // first visible field.
@@ -333,7 +329,7 @@ const InstructionParametersEditor = React.forwardRef<
                         parameterMetadata={parameterMetadata}
                         parameterIndex={i}
                         value={instruction.getParameter(i).getPlainString()}
-                        onChange={value => {
+                        onChange={(value) => {
                           if (
                             instruction.getParameter(i).getPlainString() !==
                             value
@@ -350,7 +346,7 @@ const InstructionParametersEditor = React.forwardRef<
                         key={i}
                         parameterRenderingService={ParameterRenderingService}
                         resourceManagementProps={resourceManagementProps}
-                        ref={field => {
+                        ref={(field) => {
                           if (isFirstVisibleParameterField) {
                             firstVisibleField.current = field;
                           }

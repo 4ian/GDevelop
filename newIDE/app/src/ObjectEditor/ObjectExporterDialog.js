@@ -66,31 +66,28 @@ export const downloadResourcesAsBlobs = async ({
 
   const resourcesManager = project.getResourcesManager();
   const resourcesToFetchAndUpload = resourceNames
-    .map(
-      (resourceName: string): ?ResourceToFetch => {
-        const resource = resourcesManager.getResource(resourceName);
-        const resourceFile = ResourcesLoader.getResourceFullUrl(
-          project,
-          resourceName,
-          {}
-        );
-        return {
-          resource,
-          url: resourceFile,
-          filename: extractDecodedFilenameFromProjectResourceUrl(resourceFile),
-        };
-      }
-    )
+    .map((resourceName: string): ?ResourceToFetch => {
+      const resource = resourcesManager.getResource(resourceName);
+      const resourceFile = ResourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        {}
+      );
+      return {
+        resource,
+        url: resourceFile,
+        filename: extractDecodedFilenameFromProjectResourceUrl(resourceFile),
+      };
+    })
     .filter(Boolean);
 
-  const downloadedBlobsAndResources: Array<
-    ItemResult<ResourceToFetch>
-  > = await downloadUrlsToBlobs({
-    urlContainers: resourcesToFetchAndUpload,
-    onProgress: (count, total) => {
-      onProgress(count, total * 2);
-    },
-  });
+  const downloadedBlobsAndResources: Array<ItemResult<ResourceToFetch>> =
+    await downloadUrlsToBlobs({
+      urlContainers: resourcesToFetchAndUpload,
+      onProgress: (count, total) => {
+        onProgress(count, total * 2);
+      },
+    });
 
   downloadedBlobsAndResources.forEach(({ item, error, blob }) => {
     const { resource } = item;
@@ -126,7 +123,7 @@ const enumerateAllObjects = (
   allObjects: Array<EnumeratedObject>
 ) => {
   if (objectTreeItem.isFolder()) {
-    mapFor(0, objectTreeItem.getChildrenCount(), i => {
+    mapFor(0, objectTreeItem.getChildrenCount(), (i) => {
       enumerateAllObjects(
         objectTreeItem.getChildAt(i),
         folderPath + objectTreeItem.getFolderName() + '/',
@@ -144,7 +141,7 @@ const enumerateAllObjectsOfScene = (
   allObjects: Array<EnumeratedObject>
 ) => {
   const objectTreeItem = scene.getRootFolder();
-  mapFor(0, objectTreeItem.getChildrenCount(), i => {
+  mapFor(0, objectTreeItem.getChildrenCount(), (i) => {
     enumerateAllObjects(objectTreeItem.getChildAt(i), folderPath, allObjects);
   });
 };
@@ -218,46 +215,42 @@ type Props = {|
 |};
 
 const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
-  const [
-    zippedSceneAssetsBlob,
-    setZippedSceneAssetsBlob,
-  ] = React.useState<?Blob>(null);
+  const [zippedSceneAssetsBlob, setZippedSceneAssetsBlob] =
+    React.useState<?Blob>(null);
   const {
     ensureProcessIsDone: ensureDownloadResourcesAsBlobsIsDone,
     renderProcessDialog,
-  } = useGenericRetryableProcessWithProgress<DownloadResourcesAsBlobsOptionsWithoutProgress>(
-    {
-      onDoProcess: React.useCallback(
-        (options, onProgress) =>
-          downloadResourcesAsBlobs({ ...options, onProgress }),
-        []
-      ),
-    }
-  );
-  React.useEffect(
-    () => {
-      (async () => {
-        setZippedSceneAssetsBlob(null);
+  } =
+    useGenericRetryableProcessWithProgress<DownloadResourcesAsBlobsOptionsWithoutProgress>(
+      {
+        onDoProcess: React.useCallback(
+          (options, onProgress) =>
+            downloadResourcesAsBlobs({ ...options, onProgress }),
+          []
+        ),
+      }
+    );
+  React.useEffect(() => {
+    (async () => {
+      setZippedSceneAssetsBlob(null);
 
-        const enumeratedObjects: Array<EnumeratedObject> = [];
-        enumerateAllObjectsOfScene(scene, '', enumeratedObjects);
-        enumeratedObjects.filter(
-          ({ object }) => !excludedObjectType.includes(object.getType())
-        );
-        const zippedLayerAssetsBlob = await zipAssets(
-          project,
-          enumeratedObjects,
-          ensureDownloadResourcesAsBlobsIsDone
-        );
-        setZippedSceneAssetsBlob(zippedLayerAssetsBlob);
-      })();
+      const enumeratedObjects: Array<EnumeratedObject> = [];
+      enumerateAllObjectsOfScene(scene, '', enumeratedObjects);
+      enumeratedObjects.filter(
+        ({ object }) => !excludedObjectType.includes(object.getType())
+      );
+      const zippedLayerAssetsBlob = await zipAssets(
+        project,
+        enumeratedObjects,
+        ensureDownloadResourcesAsBlobsIsDone
+      );
+      setZippedSceneAssetsBlob(zippedLayerAssetsBlob);
+    })();
 
-      return () => {
-        setZippedSceneAssetsBlob(null);
-      };
-    },
-    [project, ensureDownloadResourcesAsBlobsIsDone, scene]
-  );
+    return () => {
+      setZippedSceneAssetsBlob(null);
+    };
+  }, [project, ensureDownloadResourcesAsBlobsIsDone, scene]);
 
   return (
     <Dialog
@@ -296,7 +289,7 @@ const ObjectExporterDialog = ({ project, layout: scene, onClose }: Props) => {
         <Column alignItems="center">
           {zippedSceneAssetsBlob ? (
             <BlobDownloadUrlHolder blob={zippedSceneAssetsBlob}>
-              {blobDownloadUrl => (
+              {(blobDownloadUrl) => (
                 <RaisedButton
                   icon={<Upload />}
                   primary

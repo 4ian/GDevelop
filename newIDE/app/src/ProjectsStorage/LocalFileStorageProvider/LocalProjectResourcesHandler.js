@@ -80,7 +80,7 @@ export const scanForNewResources = async ({
 
   const allExtensions = [
     ...extensions,
-    ...extensions.map(extension => extension.toUpperCase()),
+    ...extensions.map((extension) => extension.toUpperCase()),
   ];
 
   try {
@@ -95,7 +95,7 @@ export const scanForNewResources = async ({
     });
 
     const filesToCheck = new gd.VectorString();
-    allFiles.forEach(filePath =>
+    allFiles.forEach((filePath) =>
       filesToCheck.push_back(path.relative(projectPath, filePath))
     );
     const filePathsNotInResources = project
@@ -104,7 +104,7 @@ export const scanForNewResources = async ({
     filesToCheck.delete();
 
     mapVector(filePathsNotInResources, (relativeFilePath: string) => {
-      const resourceName = newNameGenerator(relativeFilePath, name =>
+      const resourceName = newNameGenerator(relativeFilePath, (name) =>
         resourcesManager.hasResource(name)
       );
 
@@ -134,11 +134,11 @@ export const removeAllResourcesWithInvalidPath = ({
   const removedResourceNames = resourcesManager
     .getAllResourceNames()
     .toJSArray()
-    .filter(resourceName => {
+    .filter((resourceName) => {
       return getResourceFilePathStatus(project, resourceName) === 'error';
     });
 
-  removedResourceNames.forEach(resourceName => {
+  removedResourceNames.forEach((resourceName) => {
     resourcesManager.removeResource(resourceName);
     console.info('Removed due to invalid path: ' + resourceName);
   });

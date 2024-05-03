@@ -55,50 +55,48 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
     const resourcesManager = project.getResourcesManager();
     const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
     return allResourceNames
-      .map(
-        (resourceName: string): ?ResourceToFetchAndUpload => {
-          const resource = resourcesManager.getResource(resourceName);
-          const resourceFile = resource.getFile();
+      .map((resourceName: string): ?ResourceToFetchAndUpload => {
+        const resource = resourcesManager.getResource(resourceName);
+        const resourceFile = resource.getFile();
 
-          if (isURL(resourceFile)) {
-            if (isProductAuthorizedResourceUrl(resourceFile)) {
-              // This is a file that is temporarily accessible thanks to a token,
-              // so it should be downloaded and stored in the Cloud resources.
-              const filenameWithExtension = extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
+        if (isURL(resourceFile)) {
+          if (isProductAuthorizedResourceUrl(resourceFile)) {
+            // This is a file that is temporarily accessible thanks to a token,
+            // so it should be downloaded and stored in the Cloud resources.
+            const filenameWithExtension =
+              extractDecodedFilenameWithExtensionFromProductAuthorizedUrl(
                 resourceFile
               );
-              return {
-                resource,
-                url: resourceFile,
-                filename: filenameWithExtension,
-              };
-            } else if (isBlobURL(resourceFile)) {
-              // This is a Blob URL which is surely a reference to a
-              // resource that was just edited. It will be fetched and uploaded.
-              const { extension } = parseLocalFilePathOrExtensionFromMetadata(
-                resource
-              );
-              return {
-                resource,
-                url: resourceFile,
-                filename: sanitizeFilename(
-                  resource.getName() + (extension || '')
-                ),
-              };
-            } else {
-              // Public URL resource: nothing to do.
-              return null;
-            }
+            return {
+              resource,
+              url: resourceFile,
+              filename: filenameWithExtension,
+            };
+          } else if (isBlobURL(resourceFile)) {
+            // This is a Blob URL which is surely a reference to a
+            // resource that was just edited. It will be fetched and uploaded.
+            const { extension } =
+              parseLocalFilePathOrExtensionFromMetadata(resource);
+            return {
+              resource,
+              url: resourceFile,
+              filename: sanitizeFilename(
+                resource.getName() + (extension || '')
+              ),
+            };
           } else {
-            // Local resource: unsupported.
-            result.erroredResources.push({
-              resourceName: resource.getName(),
-              error: new Error('Unsupported relative file.'),
-            });
+            // Public URL resource: nothing to do.
             return null;
           }
+        } else {
+          // Local resource: unsupported.
+          result.erroredResources.push({
+            resourceName: resource.getName(),
+            error: new Error('Unsupported relative file.'),
+          });
+          return null;
         }
-      )
+      })
       .filter(Boolean);
   };
 
@@ -107,7 +105,7 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
   // Download all the project resources as blob (much like what is done during an export).
   const downloadedBlobsAndResourcesToUpload: Array<
-    ItemResult<ResourceToFetchAndUpload>
+    ItemResult<ResourceToFetchAndUpload>,
   > = await downloadUrlsToBlobs({
     urlContainers: resourcesToFetchAndUpload,
     onProgress: (count, total) => {
@@ -128,14 +126,15 @@ export const moveUrlResourcesToCloudFilesIfPrivate = async ({
 
   // Upload the files just downloaded, for the new project.
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
-  const uploadedProjectResourceFiles: UploadedProjectResourceFiles = await uploadProjectResourceFiles(
-    authenticatedUser,
-    cloudProjectId,
-    downloadedFilesAndResourcesToUpload.map(({ file }) => file),
-    (count, total) => {
-      onProgress(total + count, total * 2);
-    }
-  );
+  const uploadedProjectResourceFiles: UploadedProjectResourceFiles =
+    await uploadProjectResourceFiles(
+      authenticatedUser,
+      cloudProjectId,
+      downloadedFilesAndResourcesToUpload.map(({ file }) => file),
+      (count, total) => {
+        onProgress(total + count, total * 2);
+      }
+    );
 
   // Update resources with the newly created URLs.
   uploadedProjectResourceFiles.forEach(({ url, error }, index) => {

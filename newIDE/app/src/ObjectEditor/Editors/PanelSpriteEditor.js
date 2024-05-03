@@ -11,7 +11,7 @@ const gd = global.gd;
 
 export default class PanelSpriteEditor extends React.Component<
   EditorProps,
-  void
+  void,
 > {
   render() {
     const {
@@ -21,9 +21,8 @@ export default class PanelSpriteEditor extends React.Component<
       objectName,
       renderObjectNameField,
     } = this.props;
-    const panelSpriteConfiguration = gd.asPanelSpriteConfiguration(
-      objectConfiguration
-    );
+    const panelSpriteConfiguration =
+      gd.asPanelSpriteConfiguration(objectConfiguration);
 
     return (
       <ColumnStackLayout noMargin>
@@ -34,7 +33,7 @@ export default class PanelSpriteEditor extends React.Component<
           resourceKind="image"
           resourceName={panelSpriteConfiguration.getTexture()}
           defaultNewResourceName={objectName}
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             panelSpriteConfiguration.setTexture(resourceName);
             this.forceUpdate();
           }}
@@ -59,7 +58,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getTopMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setTopMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -70,7 +69,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getBottomMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setBottomMargin(
                 parseInt(value, 10) || 0
               );
@@ -85,7 +84,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getLeftMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setLeftMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -96,7 +95,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getRightMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setRightMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -109,7 +108,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getWidth()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -120,7 +119,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteConfiguration.getHeight()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteConfiguration.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

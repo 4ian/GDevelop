@@ -69,10 +69,9 @@ const formatParameterTypesString = (
   enumeratedExpressionMetadata: EnumeratedInstructionOrExpressionMetadata
 ) => {
   return getVisibleParameterTypes(enumeratedExpressionMetadata)
-    .map(type => {
-      const userFriendlyName = parameterRenderingService.getUserFriendlyTypeName(
-        type
-      );
+    .map((type) => {
+      const userFriendlyName =
+        parameterRenderingService.getUserFriendlyTypeName(type);
 
       return userFriendlyName ? i18n._(userFriendlyName) : type;
     })
@@ -103,7 +102,7 @@ const AutocompletionRow = React.forwardRef(
     return (
       <ButtonBase
         style={styles.button}
-        onPointerDown={e =>
+        onPointerDown={(e) =>
           // Prevent default behavior that gives the focus to the button and makes
           // the field lose focus, hence closing the autocompletion displayer.
           e.preventDefault()
@@ -230,14 +229,11 @@ export default function ExpressionAutocompletionsDisplayer({
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
   );
-  React.useEffect(
-    () => {
-      if (scrollView.current && selectedAutocompletionElement.current) {
-        scrollView.current.scrollTo(selectedAutocompletionElement.current);
-      }
-    },
-    [scrollView, selectedAutocompletionElement, selectedCompletionIndex]
-  );
+  React.useEffect(() => {
+    if (scrollView.current && selectedAutocompletionElement.current) {
+      scrollView.current.scrollTo(selectedAutocompletionElement.current);
+    }
+  }, [scrollView, selectedAutocompletionElement, selectedCompletionIndex]);
 
   if (expressionAutocompletions.length === 0) return null;
 
@@ -270,13 +266,14 @@ export default function ExpressionAutocompletionsDisplayer({
                     ? selectedAutocompletionElement
                     : undefined;
 
-                  const parametersLabel = expressionAutocompletion.enumeratedExpressionMetadata
-                    ? formatParameterTypesString(
-                        parameterRenderingService,
-                        i18n,
-                        expressionAutocompletion.enumeratedExpressionMetadata
-                      )
-                    : null;
+                  const parametersLabel =
+                    expressionAutocompletion.enumeratedExpressionMetadata
+                      ? formatParameterTypesString(
+                          parameterRenderingService,
+                          i18n,
+                          expressionAutocompletion.enumeratedExpressionMetadata
+                        )
+                      : null;
 
                   const label = expressionAutocompletion.completion;
                   const iconSrc =
@@ -284,20 +281,21 @@ export default function ExpressionAutocompletionsDisplayer({
                       ? expressionAutocompletion.enumeratedExpressionMetadata
                           .iconFilename
                       : expressionAutocompletion.kind === 'Object'
-                      ? project && expressionAutocompletion.objectConfiguration
-                        ? ObjectsRenderingService.getThumbnail(
-                            project,
-                            expressionAutocompletion.objectConfiguration
-                          )
-                        : 'res/types/object.png'
-                      : expressionAutocompletion.kind === 'Behavior'
-                      ? project && expressionAutocompletion.behaviorType
-                        ? gd.MetadataProvider.getBehaviorMetadata(
-                            project.getCurrentPlatform(),
-                            expressionAutocompletion.behaviorType
-                          ).getIconFilename()
-                        : 'res/types/behavior.png'
-                      : null;
+                        ? project &&
+                          expressionAutocompletion.objectConfiguration
+                          ? ObjectsRenderingService.getThumbnail(
+                              project,
+                              expressionAutocompletion.objectConfiguration
+                            )
+                          : 'res/types/object.png'
+                        : expressionAutocompletion.kind === 'Behavior'
+                          ? project && expressionAutocompletion.behaviorType
+                            ? gd.MetadataProvider.getBehaviorMetadata(
+                                project.getCurrentPlatform(),
+                                expressionAutocompletion.behaviorType
+                              ).getIconFilename()
+                            : 'res/types/behavior.png'
+                          : null;
 
                   const IconComponent =
                     expressionAutocompletion.kind === 'Variable'
@@ -305,20 +303,20 @@ export default function ExpressionAutocompletionsDisplayer({
                           expressionAutocompletion.variableType
                         ]
                       : expressionAutocompletion.kind === 'Property'
-                      ? getTypeToIcon(
-                          gd.ValueTypeMetadata.getPrimitiveValueType(
-                            gd.ValueTypeMetadata.convertPropertyTypeToValueType(
-                              expressionAutocompletion.propertyType
+                        ? getTypeToIcon(
+                            gd.ValueTypeMetadata.getPrimitiveValueType(
+                              gd.ValueTypeMetadata.convertPropertyTypeToValueType(
+                                expressionAutocompletion.propertyType
+                              )
                             )
                           )
-                        )
-                      : expressionAutocompletion.kind === 'Parameter'
-                      ? getTypeToIcon(
-                          gd.ValueTypeMetadata.getPrimitiveValueType(
-                            expressionAutocompletion.parameterType
-                          )
-                        )
-                      : null;
+                        : expressionAutocompletion.kind === 'Parameter'
+                          ? getTypeToIcon(
+                              gd.ValueTypeMetadata.getPrimitiveValueType(
+                                expressionAutocompletion.parameterType
+                              )
+                            )
+                          : null;
                   const icon = IconComponent ? (
                     <IconComponent style={autocompletionIconSizeStyle} />
                   ) : null;

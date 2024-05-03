@@ -21,7 +21,7 @@ export type RouteArguments = { [RouteKey]: string };
 export type Router = {|
   routeArguments: RouteArguments,
   removeRouteArguments: (RouteKey[]) => void,
-  addRouteArguments: RouteArguments => void,
+  addRouteArguments: (RouteArguments) => void,
   navigateToRoute: (route: Route, additionalArgument?: RouteArguments) => void,
 |};
 
@@ -53,9 +53,9 @@ export const RouterContextProvider = ({ children }: Props) => {
       // $FlowFixMe - Assume that the arguments are always valid.
       Window.removeArguments(argumentsToRemove);
       // Update the state accordingly, based on the previous state.
-      setRouteArguments(oldArguments => {
+      setRouteArguments((oldArguments) => {
         const newArguments = { ...oldArguments };
-        argumentsToRemove.forEach(argument => {
+        argumentsToRemove.forEach((argument) => {
           delete newArguments[argument];
         });
         return newArguments;
@@ -70,7 +70,7 @@ export const RouterContextProvider = ({ children }: Props) => {
       // $FlowFixMe - Assume that the arguments are always valid.
       Window.addArguments(argumentsToAdd);
       // Update the state accordingly, based on the previous state.
-      setRouteArguments(oldArguments => ({
+      setRouteArguments((oldArguments) => ({
         ...oldArguments,
         ...argumentsToAdd,
       }));

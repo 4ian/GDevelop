@@ -147,13 +147,10 @@ const userPublicProfilesByIds = {
 };
 
 export const Default = () => {
-  const [versions, setVersions] = React.useState<ExpandedCloudProjectVersion[]>(
-    initialVersions
-  );
-  const [
-    openedVersionStatus,
-    setOpenedVersionStatus,
-  ] = React.useState<?OpenedVersionStatus>(null);
+  const [versions, setVersions] =
+    React.useState<ExpandedCloudProjectVersion[]>(initialVersions);
+  const [openedVersionStatus, setOpenedVersionStatus] =
+    React.useState<?OpenedVersionStatus>(null);
   const projectServiceMock = new MockAdapter(userApiAxiosClient, {
     delayResponse: 1000,
   });
@@ -173,28 +170,22 @@ export const Default = () => {
     [latestVersion.id]
   );
 
-  const onSaveCurrentlyOpenedVersion = React.useCallback(
-    async () => {
-      if (!openedVersionStatus) return;
-      setOpenedVersionStatus({ ...openedVersionStatus, status: 'saving' });
-      await delay(2000);
+  const onSaveCurrentlyOpenedVersion = React.useCallback(async () => {
+    if (!openedVersionStatus) return;
+    setOpenedVersionStatus({ ...openedVersionStatus, status: 'saving' });
+    await delay(2000);
 
-      setOpenedVersionStatus(null);
-    },
-    [openedVersionStatus]
-  );
+    setOpenedVersionStatus(null);
+  }, [openedVersionStatus]);
 
-  const onAddChanges = React.useCallback(
-    () => {
-      if (!openedVersionStatus) return;
-      if (!openedVersionStatus) return;
-      setOpenedVersionStatus({
-        ...openedVersionStatus,
-        status: 'unsavedChanges',
-      });
-    },
-    [openedVersionStatus]
-  );
+  const onAddChanges = React.useCallback(() => {
+    if (!openedVersionStatus) return;
+    if (!openedVersionStatus) return;
+    setOpenedVersionStatus({
+      ...openedVersionStatus,
+      status: 'unsavedChanges',
+    });
+  }, [openedVersionStatus]);
 
   const onRenameVersion = async (
     version: ExpandedCloudProjectVersion,
@@ -202,9 +193,11 @@ export const Default = () => {
   ) => {
     await delay(1500);
     const newVersions = [...versions];
-    const index = newVersions.findIndex(version_ => version_.id === version.id);
+    const index = newVersions.findIndex(
+      (version_) => version_.id === version.id
+    );
     newVersions.splice(index, 1, { ...version, label: label || undefined });
-    newVersions.forEach(version_ => {
+    newVersions.forEach((version_) => {
       if (
         version_.restoredFromVersion &&
         version_.restoredFromVersion.id === version.id
@@ -230,13 +223,13 @@ export const Default = () => {
     setOpenedVersionStatus(null);
   };
 
-  const canLoadMore = versions.every(version => version.previousVersion);
+  const canLoadMore = versions.every((version) => version.previousVersion);
 
   projectServiceMock
     .onGet(`${GDevelopUserApi.baseUrl}/user-public-profile`)
     .reply(200, userPublicProfilesByIds)
     .onAny()
-    .reply(config => {
+    .reply((config) => {
       console.error(`Unexpected call to ${config.url} (${config.method})`);
       return [504, null];
     });

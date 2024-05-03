@@ -145,7 +145,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           onBehaviorEdited={this._reloadExtensionMetadata}
           onObjectEdited={this._reloadExtensionMetadata}
           onFunctionEdited={this._reloadExtensionMetadata}
-          ref={editor => (this.editor = editor)}
+          ref={(editor) => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />
       </div>

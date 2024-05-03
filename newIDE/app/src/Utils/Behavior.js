@@ -9,7 +9,7 @@ export const hasBehaviorWithType = (object: gdObject, type: string) =>
     .getAllBehaviorNames()
     .toJSArray()
     .filter(
-      behaviorName => object.getBehavior(behaviorName).getTypeName() === type
+      (behaviorName) => object.getBehavior(behaviorName).getTypeName() === type
     ).length;
 
 export const addBehaviorToObject = (
@@ -26,7 +26,7 @@ export const addBehaviorToObject = (
     if (!answer) return false;
   }
 
-  const name = newNameGenerator(defaultName, name =>
+  const name = newNameGenerator(defaultName, (name) =>
     object.hasBehaviorNamed(name)
   );
   gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
@@ -42,4 +42,4 @@ export const listObjectBehaviorsTypes = (object: gdObject): Array<string> =>
   object
     .getAllBehaviorNames()
     .toJSArray()
-    .map(behaviorName => object.getBehavior(behaviorName).getTypeName());
+    .map((behaviorName) => object.getBehavior(behaviorName).getTypeName());

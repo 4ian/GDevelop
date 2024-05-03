@@ -62,23 +62,23 @@ export const useResponsiveWindowSize = (): {
         isLandscape,
       }
     : window.innerWidth < sizeThresholds.medium
-    ? {
-        windowSize: 'medium',
-        isMobile: false,
-        isMediumScreen: true,
-        isLandscape,
-      }
-    : window.innerWidth < sizeThresholds.large
-    ? {
-        windowSize: 'large',
-        isMobile: false,
-        isMediumScreen: false,
-        isLandscape,
-      }
-    : {
-        windowSize: 'xlarge',
-        isMobile: false,
-        isMediumScreen: false,
-        isLandscape,
-      };
+      ? {
+          windowSize: 'medium',
+          isMobile: false,
+          isMediumScreen: true,
+          isLandscape,
+        }
+      : window.innerWidth < sizeThresholds.large
+        ? {
+            windowSize: 'large',
+            isMobile: false,
+            isMediumScreen: false,
+            isLandscape,
+          }
+        : {
+            windowSize: 'xlarge',
+            isMobile: false,
+            isMediumScreen: false,
+            isLandscape,
+          };
 };

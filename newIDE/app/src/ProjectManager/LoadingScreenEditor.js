@@ -80,8 +80,10 @@ export const LoadingScreenEditor = ({
   /** Remember the settings chosen by users when they are forced to a value */
   const timeSettings = React.useRef<TimeSettings>({
     minDuration: loadingScreen.getMinDuration(),
-    logoAndProgressFadeInDuration: loadingScreen.getLogoAndProgressFadeInDuration(),
-    logoAndProgressLogoFadeInDelay: loadingScreen.getLogoAndProgressLogoFadeInDelay(),
+    logoAndProgressFadeInDuration:
+      loadingScreen.getLogoAndProgressFadeInDuration(),
+    logoAndProgressLogoFadeInDelay:
+      loadingScreen.getLogoAndProgressLogoFadeInDelay(),
   });
 
   return (
@@ -123,7 +125,8 @@ export const LoadingScreenEditor = ({
                   floatingLabelText={<Trans>GDevelop logo style</Trans>}
                   value={loadingScreen.getGDevelopLogoStyle()}
                   onChange={(e, i, newGdevelopLogoStyle: string) => {
-                    const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
+                    const currentGDevelopLogoStyle =
+                      loadingScreen.getGDevelopLogoStyle();
                     if (currentGDevelopLogoStyle === newGdevelopLogoStyle)
                       return;
                     loadingScreen.setGDevelopLogoStyle(newGdevelopLogoStyle);
@@ -217,14 +220,15 @@ export const LoadingScreenEditor = ({
                   }
                   value={watermark.getPlacement()}
                   onChange={(e, i, newPlacement: string) => {
-                    const currentGDevelopLogoStyle = loadingScreen.getGDevelopLogoStyle();
+                    const currentGDevelopLogoStyle =
+                      loadingScreen.getGDevelopLogoStyle();
                     if (currentGDevelopLogoStyle === newPlacement) return;
                     watermark.setPlacement(newPlacement);
                     onUpdate();
                   }}
                   disabled={!watermark.isGDevelopWatermarkShown()}
                 >
-                  {watermarkPlacementOptions.map(option => (
+                  {watermarkPlacementOptions.map((option) => (
                     <SelectOption
                       key={option.value}
                       value={option.value}
@@ -259,8 +263,9 @@ export const LoadingScreenEditor = ({
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
               defaultNewResourceName={'LoadingScreenBackground'}
-              onChange={newResourceName => {
-                const currentResourceName = loadingScreen.getBackgroundImageResourceName();
+              onChange={(newResourceName) => {
+                const currentResourceName =
+                  loadingScreen.getBackgroundImageResourceName();
                 if (currentResourceName === newResourceName) return;
                 loadingScreen.setBackgroundImageResourceName(newResourceName);
                 onUpdate();
@@ -273,8 +278,9 @@ export const LoadingScreenEditor = ({
               floatingLabelText={<Trans>Background color</Trans>}
               disableAlpha
               color={hexNumberToRGBString(loadingScreen.getBackgroundColor())}
-              onChange={newColor => {
-                const currentBackgroundColor = loadingScreen.getBackgroundColor();
+              onChange={(newColor) => {
+                const currentBackgroundColor =
+                  loadingScreen.getBackgroundColor();
                 const newBackgroundColor = rgbStringToHexNumber(newColor);
                 if (currentBackgroundColor === newBackgroundColor) return;
                 loadingScreen.setBackgroundColor(newBackgroundColor);
@@ -289,8 +295,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getBackgroundFadeInDuration()}
-              onChange={newValue => {
-                const currentBackgroundFadeInDuration = loadingScreen.getBackgroundFadeInDuration();
+              onChange={(newValue) => {
+                const currentBackgroundFadeInDuration =
+                  loadingScreen.getBackgroundFadeInDuration();
                 const newBackgroundFadeInDuration = Math.max(
                   0,
                   parseFloat(newValue)
@@ -324,8 +331,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMinWidth()}
-              onChange={newValue => {
-                const currentProgressBarMinWidth = loadingScreen.getProgressBarMinWidth();
+              onChange={(newValue) => {
+                const currentProgressBarMinWidth =
+                  loadingScreen.getProgressBarMinWidth();
                 const newProgressBarMinWidth = Math.max(
                   0,
                   parseFloat(newValue)
@@ -343,8 +351,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarWidthPercent()}
-              onChange={newValue => {
-                const currentProgressBarWidthPercent = loadingScreen.getProgressBarWidthPercent();
+              onChange={(newValue) => {
+                const currentProgressBarWidthPercent =
+                  loadingScreen.getProgressBarWidthPercent();
                 const newProgressBarWidthPercent = Math.min(
                   100,
                   Math.max(1, parseFloat(newValue))
@@ -367,8 +376,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMaxWidth()}
-              onChange={newValue => {
-                const currentProgressBarMaxWidth = loadingScreen.getProgressBarMaxWidth();
+              onChange={(newValue) => {
+                const currentProgressBarMaxWidth =
+                  loadingScreen.getProgressBarMaxWidth();
                 const newProgressBarMaxWidth = Math.max(
                   0,
                   parseFloat(newValue)
@@ -388,8 +398,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarHeight()}
-              onChange={newValue => {
-                const currentProgressBarHeight = loadingScreen.getProgressBarHeight();
+              onChange={(newValue) => {
+                const currentProgressBarHeight =
+                  loadingScreen.getProgressBarHeight();
                 const newProgressBarHeight = Math.max(1, parseFloat(newValue));
                 if (currentProgressBarHeight === newProgressBarHeight) {
                   return;
@@ -404,8 +415,9 @@ export const LoadingScreenEditor = ({
               floatingLabelText={<Trans>Progress bar color</Trans>}
               disableAlpha
               color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
-              onChange={newColor => {
-                const currentProgressBarColor = loadingScreen.getProgressBarColor();
+              onChange={(newColor) => {
+                const currentProgressBarColor =
+                  loadingScreen.getProgressBarColor();
                 const newProgressBarColor = rgbStringToHexNumber(newColor);
                 if (currentProgressBarColor === newProgressBarColor) {
                   return;
@@ -426,7 +438,7 @@ export const LoadingScreenEditor = ({
             fullWidth
             type="number"
             value={'' + loadingScreen.getMinDuration()}
-            onChange={newValue => {
+            onChange={(newValue) => {
               const newMinDuration = Math.max(0, parseFloat(newValue));
               if (
                 newMinDuration < forcedLogo.minDuration &&
@@ -463,7 +475,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
-              onChange={newValue => {
+              onChange={(newValue) => {
                 const newLogoAndProgressLogoFadeInDelay = Math.max(
                   0,
                   parseFloat(newValue)
@@ -479,7 +491,8 @@ export const LoadingScreenEditor = ({
                   // watermark is hidden, we don't allow it if they have no subscription.
                   return;
                 }
-                const currentLogoAndProgressLogoFadeInDelay = loadingScreen.getLogoAndProgressLogoFadeInDelay();
+                const currentLogoAndProgressLogoFadeInDelay =
+                  loadingScreen.getLogoAndProgressLogoFadeInDelay();
                 if (
                   currentLogoAndProgressLogoFadeInDelay ===
                   newLogoAndProgressLogoFadeInDelay
@@ -488,7 +501,8 @@ export const LoadingScreenEditor = ({
                 loadingScreen.setLogoAndProgressLogoFadeInDelay(
                   newLogoAndProgressLogoFadeInDelay
                 );
-                timeSettings.current.logoAndProgressLogoFadeInDelay = newLogoAndProgressLogoFadeInDelay;
+                timeSettings.current.logoAndProgressLogoFadeInDelay =
+                  newLogoAndProgressLogoFadeInDelay;
                 onUpdate();
               }}
             />
@@ -504,7 +518,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
-              onChange={newValue => {
+              onChange={(newValue) => {
                 const newLogoAndProgressFadeInDuration = Math.max(
                   0,
                   parseFloat(newValue)
@@ -520,7 +534,8 @@ export const LoadingScreenEditor = ({
                   // watermark is hidden, we don't allow it if they have no subscription.
                   return;
                 }
-                const currentLogoAndProgressFadeInDuration = loadingScreen.getLogoAndProgressFadeInDuration();
+                const currentLogoAndProgressFadeInDuration =
+                  loadingScreen.getLogoAndProgressFadeInDuration();
                 if (
                   currentLogoAndProgressFadeInDuration ===
                   newLogoAndProgressFadeInDuration
@@ -529,7 +544,8 @@ export const LoadingScreenEditor = ({
                 loadingScreen.setLogoAndProgressFadeInDuration(
                   newLogoAndProgressFadeInDuration
                 );
-                timeSettings.current.logoAndProgressFadeInDuration = newLogoAndProgressFadeInDuration;
+                timeSettings.current.logoAndProgressFadeInDuration =
+                  newLogoAndProgressFadeInDuration;
                 onUpdate();
               }}
             />

@@ -2,6 +2,7 @@ const liveServer = require('live-server');
 const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const { getAvailablePort } = require('./Utils/AvailablePortFinder');
 
+/** @type {import("live-server").LiveServerParams} */
 let currentServerParams = null;
 
 module.exports = {
@@ -27,6 +28,19 @@ module.exports = {
           // the hot-reloading built into the game engine is what should
           // be used - and the user can still reload manually on its browser.
           watch: [],
+          middleware: [
+            // Disable caching, as it can lead to older generated code being served
+            function noCache(_, res, next) {
+              res.setHeader('Surrogate-Control', 'no-store');
+              res.setHeader(
+                'Cache-Control',
+                'no-store, no-cache, must-revalidate, proxy-revalidate'
+              );
+              res.setHeader('Expires', '0');
+
+              next();
+            },
+          ],
         };
         liveServer.start(currentServerParams);
         onDone(null, currentServerParams);

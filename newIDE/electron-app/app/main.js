@@ -295,7 +295,10 @@ app.on('ready', function() {
     log.info('Received event to server folder with options=', options);
 
     serveFolder(options, (err, serverParams) => {
-      event.sender.send('serve-folder-done', err, serverParams);
+      // Using JSON to copy the config strips unserializable properties
+      // (like middleware functions) automatically.
+      const configCopy = JSON.parse(JSON.stringify(serverParams));
+      event.sender.send('serve-folder-done', err, configCopy);
     });
   });
 

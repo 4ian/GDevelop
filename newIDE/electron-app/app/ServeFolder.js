@@ -30,6 +30,8 @@ module.exports = {
           watch: [],
           middleware: [
             // Disable caching, as it can lead to older generated code being served
+            // in case preview files are proxied through a CDN (see 
+            // https://github.com/4ian/GDevelop/pull/6553 for example)
             function noCache(_, res, next) {
               res.setHeader('Surrogate-Control', 'no-store');
               res.setHeader(

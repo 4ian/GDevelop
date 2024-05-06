@@ -74,5 +74,17 @@ namespace gdjs {
     isPaused(): boolean {
       return this._paused;
     }
+
+    getNetworkSyncData(): TimerNetworkSyncData {
+      return {
+        time: this._time,
+        paused: this._paused,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: TimerNetworkSyncData) {
+      this._time = syncData.time;
+      this._paused = syncData.paused;
+    }
   }
 }

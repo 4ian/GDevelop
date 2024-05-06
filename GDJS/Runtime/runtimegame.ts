@@ -1214,5 +1214,18 @@ namespace gdjs {
         ? Object.keys(this._embeddedResourcesMappings.get(resourceName)!)
         : [];
     }
+
+    getNetworkSyncData(): GameNetworkSyncData {
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+      return {
+        var: variablesNetworkSyncData,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: GameNetworkSyncData) {
+      if (syncData.var) {
+        this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+    }
   }
 }

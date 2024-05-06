@@ -58,6 +58,56 @@ namespace gdjs {
   export type ParticleEmitterObjectData = ObjectData &
     ParticleEmitterObjectDataType;
 
+  export type ParticleEmitterObjectNetworkSyncDataType = {
+    // Technically, all attributes can change at runtime, so we sync as many as possible.
+    // TODO: ensure we only send props that change to optimize the sync.
+    // dirty attributes are not synced, they are defined by the update method if the value has changed.
+    // Particle Rotation Speed
+    prms: number;
+    prmx: number;
+    // Max Particles Count
+    mpc: number;
+    // Additive Rendering
+    addr: boolean;
+    // Angle
+    angb: number;
+    // Force
+    formin: number;
+    formax: number;
+    // Zone Radius
+    zr: number;
+    // Life Time
+    ltmin: number;
+    ltmax: number;
+    // Gravity
+    gravx: number;
+    gravy: number;
+    // Color
+    colr1: number;
+    colr2: number;
+    colg1: number;
+    colg2: number;
+    colb1: number;
+    colb2: number;
+    // Size
+    size1: number;
+    size2: number;
+    // Alpha
+    alp1: number;
+    alp2: number;
+    // Flow
+    flow: number;
+    // Tank
+    tank: number;
+    // Texture
+    text: string;
+    // Pause
+    paused: boolean;
+  };
+
+  export type ParticleEmitterObjectNetworkSyncData = ObjectNetworkSyncData &
+    ParticleEmitterObjectNetworkSyncDataType;
+
   /**
    * Displays particles.
    */
@@ -325,11 +375,152 @@ namespace gdjs {
 
         // Consider every state dirty as the renderer was just re-created, so it needs
         // to be repositioned, angle updated, etc...
-        this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
-        this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
-        this._alphaDirty = this._flowDirty = this._tankDirty = this._textureDirty = true;
+        this._posDirty =
+          this._angleDirty =
+          this._forceDirty =
+          this._zoneRadiusDirty =
+            true;
+        this._lifeTimeDirty =
+          this._gravityDirty =
+          this._colorDirty =
+          this._sizeDirty =
+            true;
+        this._alphaDirty =
+          this._flowDirty =
+          this._tankDirty =
+          this._textureDirty =
+            true;
       }
       return true;
+    }
+
+    getObjectNetworkSyncData(): ParticleEmitterObjectNetworkSyncData {
+      return {
+        ...super.getObjectNetworkSyncData(),
+        prms: this.particleRotationMinSpeed,
+        prmx: this.particleRotationMaxSpeed,
+        mpc: this.maxParticlesCount,
+        addr: this.additiveRendering,
+        angb: this.angleB,
+        formin: this.forceMin,
+        formax: this.forceMax,
+        zr: this.zoneRadius,
+        ltmin: this.lifeTimeMin,
+        ltmax: this.lifeTimeMax,
+        gravx: this.gravityX,
+        gravy: this.gravityY,
+        colr1: this.colorR1,
+        colr2: this.colorR2,
+        colg1: this.colorG1,
+        colg2: this.colorG2,
+        colb1: this.colorB1,
+        colb2: this.colorB2,
+        size1: this.size1,
+        size2: this.size2,
+        alp1: this.alpha1,
+        alp2: this.alpha2,
+        flow: this.flow,
+        tank: this.tank,
+        text: this.texture,
+        paused: this._isEmissionPaused,
+      };
+    }
+
+    updateFromObjectNetworkSyncData(
+      syncData: ParticleEmitterObjectNetworkSyncData
+    ): void {
+      super.updateFromObjectNetworkSyncData(syncData);
+      if (syncData.x !== undefined) {
+        this.setX(syncData.x);
+      }
+      if (syncData.y !== undefined) {
+        this.setY(syncData.y);
+      }
+      if (syncData.a !== undefined) {
+        this.setAngle(syncData.a);
+      }
+      if (syncData.prms !== undefined) {
+        this.setParticleRotationMinSpeed(syncData.prms);
+      }
+      if (syncData.prmx !== undefined) {
+        this.setParticleRotationMaxSpeed(syncData.prmx);
+      }
+      if (syncData.mpc !== undefined) {
+        this.setMaxParticlesCount(syncData.mpc);
+      }
+      if (syncData.addr !== undefined) {
+        this.setAdditiveRendering(syncData.addr);
+      }
+      if (syncData.angb !== undefined) {
+        this.setEmitterAngleB(syncData.angb);
+      }
+      if (syncData.formin !== undefined) {
+        this.setEmitterForceMin(syncData.formin);
+      }
+      if (syncData.formax !== undefined) {
+        this.setEmitterForceMax(syncData.formax);
+      }
+      if (syncData.zr !== undefined) {
+        this.setZoneRadius(syncData.zr);
+      }
+      if (syncData.ltmin !== undefined) {
+        this.setParticleLifeTimeMin(syncData.ltmin);
+      }
+      if (syncData.ltmax !== undefined) {
+        this.setParticleLifeTimeMax(syncData.ltmax);
+      }
+      if (syncData.gravx !== undefined) {
+        this.setParticleGravityX(syncData.gravx);
+      }
+      if (syncData.gravy !== undefined) {
+        this.setParticleGravityY(syncData.gravy);
+      }
+      if (syncData.colr1 !== undefined) {
+        this.setParticleRed1(syncData.colr1);
+      }
+      if (syncData.colr2 !== undefined) {
+        this.setParticleRed2(syncData.colr2);
+      }
+      if (syncData.colg1 !== undefined) {
+        this.setParticleGreen1(syncData.colg1);
+      }
+      if (syncData.colg2 !== undefined) {
+        this.setParticleGreen2(syncData.colg2);
+      }
+      if (syncData.colb1 !== undefined) {
+        this.setParticleBlue1(syncData.colb1);
+      }
+      if (syncData.colb2 !== undefined) {
+        this.setParticleBlue2(syncData.colb2);
+      }
+      if (syncData.size1 !== undefined) {
+        this.setParticleSize1(syncData.size1);
+      }
+      if (syncData.size2 !== undefined) {
+        this.setParticleSize2(syncData.size2);
+      }
+      if (syncData.alp1 !== undefined) {
+        this.setParticleAlpha1(syncData.alp1);
+      }
+      if (syncData.alp2 !== undefined) {
+        this.setParticleAlpha2(syncData.alp2);
+      }
+      if (syncData.flow !== undefined) {
+        this.setFlow(syncData.flow);
+      }
+      if (syncData.tank !== undefined) {
+        this.setTank(syncData.tank);
+      }
+      if (syncData.text !== undefined) {
+        this.setTexture(syncData.text, this.getRuntimeScene());
+      }
+      if (syncData.paused !== undefined) {
+        if (syncData.paused) {
+          this.stopEmission();
+        } else {
+          this.startEmission();
+        }
+      }
     }
 
     update(instanceContainer: gdjs.RuntimeInstanceContainer): void {
@@ -389,10 +580,25 @@ namespace gdjs {
       if (this._textureDirty) {
         this._renderer.setTextureName(this.texture, instanceContainer);
       }
-      this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
-      this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
-      this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
-      this._additiveRenderingDirty = this._maxParticlesCountDirty = this._particleRotationSpeedDirty = false;
+      this._posDirty =
+        this._angleDirty =
+        this._forceDirty =
+        this._zoneRadiusDirty =
+          false;
+      this._lifeTimeDirty =
+        this._gravityDirty =
+        this._colorDirty =
+        this._sizeDirty =
+          false;
+      this._alphaDirty =
+        this._flowDirty =
+        this._textureDirty =
+        this._tankDirty =
+          false;
+      this._additiveRenderingDirty =
+        this._maxParticlesCountDirty =
+        this._particleRotationSpeedDirty =
+          false;
       this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
         this.destroyWhenNoParticles &&

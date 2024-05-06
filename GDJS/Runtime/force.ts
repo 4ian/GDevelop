@@ -148,7 +148,7 @@ namespace gdjs {
       this._multiplier = multiplier;
     }
 
-    getNetworkSyncData() {
+    getNetworkSyncData(): ForceNetworkSyncData {
       return {
         x: this._x,
         y: this._y,
@@ -158,7 +158,7 @@ namespace gdjs {
       };
     }
 
-    updateFromNetworkSyncData(syncData: any) {
+    updateFromNetworkSyncData(syncData: ForceNetworkSyncData) {
       this._x = syncData.x;
       this._y = syncData.y;
       this._angle = syncData.a;

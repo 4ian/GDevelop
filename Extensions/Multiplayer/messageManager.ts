@@ -68,6 +68,18 @@ namespace gdjs {
     } = {};
     let _lastClockReceivedByInstance: { [instanceId: string]: number } = {};
 
+    // The number of times per second the scene data should be synchronized.
+    let sceneSyncDataTickRate = 1;
+    let lastSceneSyncTimestamp = 0;
+    let lastSentSceneSyncData: LayoutNetworkSyncData = {};
+    let numberOfForcedSceneUpdates = 0;
+
+    // The number of times per second the game data should be synchronized.
+    let gameSyncDataTickRate = 1;
+    let lastGameSyncTimestamp = 0;
+    let lastSentGameSyncData: GameNetworkSyncData = {};
+    let numberOfForcedGameUpdates = 0;
+
     export const addExpectedMessageAcknowledgement = ({
       originalMessageName,
       originalData,
@@ -213,7 +225,7 @@ namespace gdjs {
       // If we know the position of the object, we can try to find the closest instance not synchronized yet.
       if (!instance && instanceX !== undefined && instanceY !== undefined) {
         logger.info(
-          `instance not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
+          `instance ${objectName} ${instanceNetworkId} not found with network ID, trying to find it with position ${instanceX}/${instanceY}.`
         );
         // Instance not found, it must be a new object.
         // 2 cases :
@@ -229,7 +241,7 @@ namespace gdjs {
             instance.hasBehavior('MultiplayerObject') && !instance.networkId
         );
         logger.info(
-          `Found ${instancesWithoutNetworkId.length} instances for object ${objectName} with behavior MultiplayerObject and no network ID.`
+          `Found ${instancesWithoutNetworkId.length} instances for object ${objectName} ${instanceNetworkId} with behavior MultiplayerObject and no network ID.`
         );
         if (instancesWithoutNetworkId.length > 0) {
           // Find the instance that is the closest to the position of the object created by the other player.
@@ -248,6 +260,10 @@ namespace gdjs {
               distance: Infinity,
             }
           ).instance;
+
+          logger.info(
+            `Found closest instance for object ${objectName} ${instanceNetworkId} with behavior MultiplayerObject and no network ID.`
+          );
 
           instance = closestInstance;
           instance.networkId = instanceNetworkId;
@@ -323,10 +339,10 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
-      const objectMessageNamesArray = Array.from(p2pMessagesMap.keys());
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
       // When we receive ownership change messages, update the ownership of the objects in the scene.
-      const objectOwnershipChangeMessageNames = objectMessageNamesArray.filter(
+      const objectOwnershipChangeMessageNames = messageNamesArray.filter(
         (messageName) => messageName.startsWith(changeOwnerMessageNamePrefix)
       );
       objectOwnershipChangeMessageNames.forEach((messageName) => {
@@ -467,11 +483,11 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
-      const objectMessageNamesArray = Array.from(p2pMessagesMap.keys());
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
 
       // When we receive update messages, update the objects in the scene.
-      const objectUpdateMessageNames = objectMessageNamesArray.filter(
-        (messageName) => messageName.startsWith(updateObjectMessageNamePrefix)
+      const objectUpdateMessageNames = messageNamesArray.filter((messageName) =>
+        messageName.startsWith(updateObjectMessageNamePrefix)
       );
       objectUpdateMessageNames.forEach((messageName) => {
         if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
@@ -598,9 +614,9 @@ namespace gdjs {
 
     export const handleAcknowledgeMessages = () => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
-      const objectMessageNamesArray = Array.from(p2pMessagesMap.keys());
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
       // When we receive acknowledgement messages, save it in the extension, to avoid sending the message again.
-      const acknowledgedMessageNames = objectMessageNamesArray.filter(
+      const acknowledgedMessageNames = messageNamesArray.filter(
         isMessageAcknowledgement
       );
       acknowledgedMessageNames.forEach((messageName) => {
@@ -628,18 +644,12 @@ namespace gdjs {
             if (!expectedMessageAcknowledgements[messageName]) {
               // This should not happen, but if we receive an acknowledgment for a message we did not expect, let's not error
               // and just clear that message.
-              logger.error(
-                `Received acknowledgment for message ${messageName} that was not expected.`
-              );
               message.popData();
               return;
             }
             if (!expectedMessageAcknowledgements[messageName][messageSender]) {
               // This should not happen, but if we receive an acknowledgment from a sender we did not expect, let's not error
               // and just clear that message.
-              logger.error(
-                `Received acknowledgment for message ${messageName} from ${messageSender} that was not expected.`
-              );
               message.popData();
               return;
             }
@@ -822,8 +832,8 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
-      const objectMessageNamesArray = Array.from(p2pMessagesMap.keys());
-      const destroyObjectMessageNames = objectMessageNamesArray.filter(
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const destroyObjectMessageNames = messageNamesArray.filter(
         (messageName) => messageName.startsWith(destroyObjectMessageNamePrefix)
       );
       destroyObjectMessageNames.forEach((messageName) => {
@@ -1017,8 +1027,8 @@ namespace gdjs {
 
     export const handleCustomMessages = (): void => {
       const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
-      const customMessageNamesArray = Array.from(p2pMessagesMap.keys());
-      const customMessageNames = customMessageNamesArray.filter((messageName) =>
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const customMessageNames = messageNamesArray.filter((messageName) =>
         messageName.startsWith(customMessageNamePrefix)
       );
       customMessageNames.forEach((messageName) => {
@@ -1079,6 +1089,218 @@ namespace gdjs {
               );
               sendDataTo(peerId, messageName, data);
             }
+          }
+        }
+      });
+    };
+
+    const updateSceneMessageNamePrefix = '#updateScene';
+    export const createUpdateSceneMessage = ({
+      sceneNetworkSyncData,
+    }: {
+      sceneNetworkSyncData: LayoutNetworkSyncData;
+    }): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: `${updateSceneMessageNamePrefix}`,
+        messageData: sceneNetworkSyncData,
+      };
+    };
+
+    const isSceneDifferentFromLastSync = (
+      sceneSyncData: LayoutNetworkSyncData
+    ) => {
+      if (!sceneSyncData.var) {
+        return false;
+      }
+      if (!lastSentSceneSyncData.var) {
+        return true;
+      }
+      // Compare the json of the scene sync data to know if it has changed.
+      // Not the most efficient way, but it's good enough for now.
+      const haveVariableSyncDataChanged =
+        JSON.stringify(sceneSyncData.var) !==
+        JSON.stringify(lastSentSceneSyncData.var);
+
+      if (haveVariableSyncDataChanged) {
+        console.info(
+          'scene data has changed',
+          sceneSyncData,
+          lastSentSceneSyncData
+        );
+      }
+
+      return haveVariableSyncDataChanged;
+    };
+
+    const hasSceneBeenSyncedRecently = () => {
+      return (
+        getTimeNow() - lastSceneSyncTimestamp < 1000 / sceneSyncDataTickRate
+      );
+    };
+
+    export const handleUpdateSceneMessages = (
+      runtimeScene: gdjs.RuntimeScene
+    ): void => {
+      // Only the server (/player 1) synchronizes the scene state.
+      if (gdjs.multiplayer.playerPositionInLobby !== 1) {
+        return;
+      }
+      const sceneNetworkSyncData = runtimeScene.getNetworkSyncData();
+      const isSceneSyncDataDifferent =
+        isSceneDifferentFromLastSync(sceneNetworkSyncData);
+      const shouldSyncScene =
+        !hasSceneBeenSyncedRecently() ||
+        isSceneSyncDataDifferent ||
+        numberOfForcedSceneUpdates > 0;
+
+      if (isSceneSyncDataDifferent) {
+        numberOfForcedSceneUpdates = 3;
+      }
+
+      if (shouldSyncScene) {
+        const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+        const { messageName, messageData } = createUpdateSceneMessage({
+          sceneNetworkSyncData,
+        });
+
+        for (const peerId of connectedPeerIds) {
+          sendDataTo(peerId, messageName, messageData);
+        }
+
+        lastSceneSyncTimestamp = getTimeNow();
+        lastSentSceneSyncData = sceneNetworkSyncData;
+        numberOfForcedSceneUpdates = Math.max(
+          numberOfForcedSceneUpdates - 1,
+          0
+        );
+      }
+    };
+
+    export const handleSceneUpdatedMessages = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const updateSceneMessageNames = messageNamesArray.filter((messageName) =>
+        messageName.startsWith(updateSceneMessageNamePrefix)
+      );
+      updateSceneMessageNames.forEach((messageName) => {
+        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+          if (data && messageSender) {
+            logger.info(
+              `Received message ${messageName} with data ${JSON.stringify(
+                data
+              )}.`
+            );
+
+            runtimeScene.updateFromNetworkSyncData(data);
+          }
+        }
+      });
+    };
+
+    const updateGameMessageNamePrefix = '#updateGame';
+    export const createUpdateGameMessage = ({
+      gameNetworkSyncData,
+    }: {
+      gameNetworkSyncData: GameNetworkSyncData;
+    }): {
+      messageName: string;
+      messageData: any;
+    } => {
+      return {
+        messageName: `${updateGameMessageNamePrefix}`,
+        messageData: gameNetworkSyncData,
+      };
+    };
+    const isGameDifferentFromLastSync = (gameSyncData: GameNetworkSyncData) => {
+      if (!gameSyncData.var) {
+        return false;
+      }
+      if (!lastSentGameSyncData.var) {
+        return true;
+      }
+      // Compare the json of the game sync data to know if it has changed.
+      // Not the most efficient way, but it's good enough for now.
+      const haveVariableSyncDataChanged =
+        JSON.stringify(gameSyncData.var) !==
+        JSON.stringify(lastSentGameSyncData.var);
+
+      if (haveVariableSyncDataChanged) {
+        console.info(
+          'game data has changed',
+          gameSyncData,
+          lastSentGameSyncData
+        );
+      }
+
+      return haveVariableSyncDataChanged;
+    };
+
+    const hasGameBeenSyncedRecently = () => {
+      return getTimeNow() - lastGameSyncTimestamp < 1000 / gameSyncDataTickRate;
+    };
+
+    export const handleUpdateGameMessages = (
+      runtimeScene: gdjs.RuntimeScene
+    ): void => {
+      // Only the server (/player 1) synchronizes the global state.
+      if (gdjs.multiplayer.playerPositionInLobby !== 1) {
+        return;
+      }
+      const gameNetworkSyncData = runtimeScene.getGame().getNetworkSyncData();
+      const isGameSyncDataDifferent =
+        isGameDifferentFromLastSync(gameNetworkSyncData);
+      const shouldSyncGame =
+        !hasGameBeenSyncedRecently() ||
+        isGameSyncDataDifferent ||
+        numberOfForcedGameUpdates > 0;
+
+      if (isGameSyncDataDifferent) {
+        numberOfForcedGameUpdates = 3;
+      }
+
+      if (shouldSyncGame) {
+        const connectedPeerIds = gdjs.evtTools.p2p.getAllPeers();
+        const { messageName, messageData } = createUpdateGameMessage({
+          gameNetworkSyncData,
+        });
+
+        for (const peerId of connectedPeerIds) {
+          sendDataTo(peerId, messageName, messageData);
+        }
+
+        lastGameSyncTimestamp = getTimeNow();
+        lastSentGameSyncData = gameNetworkSyncData;
+        numberOfForcedGameUpdates = Math.max(numberOfForcedGameUpdates - 1, 0);
+      }
+    };
+
+    export const handleGameUpdatedMessages = (
+      runtimeScene: gdjs.RuntimeScene
+    ) => {
+      const p2pMessagesMap = gdjs.evtTools.p2p.getEvents();
+      const messageNamesArray = Array.from(p2pMessagesMap.keys());
+      const updateGameMessageNames = messageNamesArray.filter((messageName) =>
+        messageName.startsWith(updateGameMessageNamePrefix)
+      );
+      updateGameMessageNames.forEach((messageName) => {
+        if (gdjs.evtTools.p2p.onEvent(messageName, true)) {
+          const data = JSON.parse(gdjs.evtTools.p2p.getEventData(messageName));
+          const messageSender = gdjs.evtTools.p2p.getEventSender(messageName);
+          if (data && messageSender) {
+            logger.info(
+              `Received message ${messageName} with data ${JSON.stringify(
+                data
+              )}.`
+            );
+
+            runtimeScene.getGame().updateFromNetworkSyncData(data);
           }
         }
       });

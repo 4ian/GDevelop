@@ -472,8 +472,11 @@ namespace gdjs {
         ].getNetworkSyncData();
       }
 
-      if (this.getName() === 'BlueBunny') {
-        console.log('sending hidden ' + this.hidden);
+      const timersNetworkSyncData = {};
+      for (const timerName in this._timers.items) {
+        timersNetworkSyncData[timerName] = this._timers.items[
+          timerName
+        ].getNetworkSyncData();
       }
 
       return {
@@ -488,6 +491,7 @@ namespace gdjs {
         beh: behaviorNetworkSyncData,
         var: variablesNetworkSyncData,
         eff: effectsNetworkSyncData,
+        tim: timersNetworkSyncData,
       };
     }
 
@@ -499,9 +503,6 @@ namespace gdjs {
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
     updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
-      if (this.getName() === 'BlueBunny') {
-        console.log('received hidden ' + networkSyncData.hid);
-      }
       this.setPosition(networkSyncData.x, networkSyncData.y);
       this.setZOrder(networkSyncData.z);
       this.setAngle(networkSyncData.a);
@@ -543,6 +544,18 @@ namespace gdjs {
           const effect = this._rendererEffects[effectName];
           if (effect) {
             effect.updateFromNetworkSyncData(effectNetworkSyncData);
+          }
+        }
+      }
+
+      // If timers are synchronized, update them.
+      // TODO: If a timer is removed, also remove it from the object?
+      if (networkSyncData.tim) {
+        for (const timerName in networkSyncData.tim) {
+          const timerNetworkSyncData = networkSyncData.tim[timerName];
+          const timer = this._timers.get(timerName);
+          if (timer) {
+            timer.updateFromNetworkSyncData(timerNetworkSyncData);
           }
         }
       }

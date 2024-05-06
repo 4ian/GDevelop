@@ -762,6 +762,19 @@ namespace gdjs {
     sceneJustResumed(): boolean {
       return this._isJustResumed;
     }
+
+    getNetworkSyncData(): LayoutNetworkSyncData {
+      const variablesNetworkSyncData = this._variables.getNetworkSyncData();
+      return {
+        var: variablesNetworkSyncData,
+      };
+    }
+
+    updateFromNetworkSyncData(syncData: LayoutNetworkSyncData) {
+      if (syncData.var) {
+        this._variables.updateFromNetworkSyncData(syncData.var);
+      }
+    }
   }
 
   //The flags to describe the change request by a scene:

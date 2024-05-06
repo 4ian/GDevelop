@@ -22,7 +22,7 @@ namespace gdjs {
     // The last time the variables have been synchronized.
     _lastVariablesSyncTimestamp: number = 0;
     // The number of times per second the variables should be synchronized.
-    _variablesTickRate: number = 2;
+    _variablesTickRate: number = 1;
     // The last data sent to synchronize the variables.
     _lastSentVariableSyncData: VariableSyncData[] | undefined;
     // When we know that the variables have been updated, we can force sending them
@@ -33,7 +33,7 @@ namespace gdjs {
     // The last time the effects have been synchronized.
     _lastEffectsSyncTimestamp: number = 0;
     // The number of times per second the effects should be synchronized.
-    _effectsTickRate: number = 2;
+    _effectsTickRate: number = 1;
     // The last data sent to synchronize the effects.
     _lastSentEffectSyncData:
       | { [effectName: string]: EffectSyncData }
@@ -157,11 +157,11 @@ namespace gdjs {
         JSON.stringify(this._lastSentVariableSyncData);
 
       if (haveVariableSyncDataChanged) {
-        console.info(
-          'variables have changed',
-          variablesSyncData,
-          this._lastSentVariableSyncData
-        );
+        // console.info(
+        //   'variables have changed',
+        //   variablesSyncData,
+        //   this._lastSentVariableSyncData
+        // );
       }
 
       return haveVariableSyncDataChanged;
@@ -265,13 +265,13 @@ namespace gdjs {
         updateMessageData
       );
 
-      this.logToConsole(
-        `Synchronizing object ${this.owner.getName()} (instance ${
-          this.owner.networkId
-        }) with player ${this._playerNumber} and data ${JSON.stringify(
-          objectNetworkSyncData
-        )}`
-      );
+      // this.logToConsole(
+      //   `Synchronizing object ${this.owner.getName()} (instance ${
+      //     this.owner.networkId
+      //   }) with player ${this._playerNumber} and data ${JSON.stringify(
+      //     objectNetworkSyncData
+      //   )}`
+      // );
 
       const now = this._getTimeNow();
 
@@ -370,7 +370,9 @@ namespace gdjs {
 
     setPlayerObjectOwnership(newPlayerNumber: number) {
       logger.info(
-        `Setting ownership of object ${this.owner.getName()} to player ${newPlayerNumber}.`
+        `Setting ownership of object ${this.owner.getName()} (networkId: ${
+          this.owner.networkId
+        } to player ${newPlayerNumber}.`
       );
       if (newPlayerNumber < 0) {
         console.error(
@@ -438,6 +440,7 @@ namespace gdjs {
           });
         }
 
+        console.info('Sending change owner message', messageName);
         this.sendDataToPeersWithIncreasedClock(messageName, messageData);
       }
 

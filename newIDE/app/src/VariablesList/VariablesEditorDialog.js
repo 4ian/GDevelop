@@ -133,7 +133,6 @@ const VariablesEditorDialog = ({
           // which does not have an impact on the rest of the project.
         } else {
           const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-            project,
             originalContentSerializedElement,
             variablesContainer
           );

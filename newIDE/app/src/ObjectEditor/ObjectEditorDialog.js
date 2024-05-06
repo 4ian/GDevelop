@@ -104,7 +104,6 @@ const InnerDialog = (props: InnerDialogProps) => {
     props.onApply();
 
     const changeset = gd.WholeProjectRefactorer.computeChangesetForVariablesContainer(
-      props.project,
       getOriginalContentSerializedElement().getChild('variables'),
       props.object.getVariables()
     );

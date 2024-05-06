@@ -140,7 +140,6 @@ void WholeProjectRefactorer::EnsureObjectEventsFunctionsProperParameters(
 
 VariablesChangeset
 WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-    gd::Project &project,
     const gd::SerializerElement &oldSerializedVariablesContainer,
     const gd::VariablesContainer &newVariablesContainer) {
   gd::VariablesChangeset changeset;

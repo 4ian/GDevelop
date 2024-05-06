@@ -203,7 +203,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                                   "RenamedGlobalVariableFromASharedName");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project,
             originalSerializedProjectVariables,
             project.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
@@ -214,7 +213,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                                   "MyRenamedSceneStructureVariable");
     changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedLayoutVariables, layout1.GetVariables());
+            originalSerializedLayoutVariables, layout1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, layout1.GetVariables(), changeset);
 
@@ -224,7 +223,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                                   "MyRenamedObjectStructureVariable");
     changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project,
             originalSerializedObject1Variables,
             object1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
@@ -436,7 +434,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
                                   "MyRenamedObjectStructureVariable");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project,
             originalSerializedObject1Variables,
             object1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
@@ -668,7 +665,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     project.GetVariables().Remove("SharedVariableName");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project,
             originalSerializedProjectVariables,
             project.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
@@ -678,7 +674,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     layout1.GetVariables().Remove("MySceneStructureVariable");
     changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedLayoutVariables, layout1.GetVariables());
+            originalSerializedLayoutVariables, layout1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
         project, layout1.GetVariables(), changeset);
 
@@ -686,7 +682,6 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     object1.GetVariables().Remove("MyObjectStructureVariable");
     changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project,
             originalSerializedObject1Variables,
             object1.GetVariables());
     gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
@@ -763,7 +758,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     scene.GetVariables().Get("MySceneVariable").SetString("Hello");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedVariables, scene.GetVariables());
+            originalSerializedVariables, scene.GetVariables());
 
     REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
             changeset.typeChangedVariableNames.end());
@@ -808,7 +803,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     scene.GetVariables().Get("MySceneVariable").GetChild("MyChild").SetString("Hello");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedVariables, scene.GetVariables());
+            originalSerializedVariables, scene.GetVariables());
 
     REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
             changeset.typeChangedVariableNames.end());
@@ -853,7 +848,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     object.GetVariables().Get("MyObjectVariable").SetString("Hello");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedVariables, object.GetVariables());
+            originalSerializedVariables, object.GetVariables());
 
     REQUIRE(changeset.typeChangedVariableNames.find("MyObjectVariable") !=
             changeset.typeChangedVariableNames.end());
@@ -904,7 +899,7 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
         .SetString("Hello");
     auto changeset =
         gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
-            project, originalSerializedVariables, object.GetVariables());
+            originalSerializedVariables, object.GetVariables());
 
     REQUIRE(changeset.typeChangedVariableNames.find("MyObjectVariable") !=
             changeset.typeChangedVariableNames.end());

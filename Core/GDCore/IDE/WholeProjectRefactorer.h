@@ -70,7 +70,6 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Compute the changes made on the variables of a variable container.
    */
   static VariablesChangeset ComputeChangesetForVariablesContainer(
-    gd::Project &project,
     const gd::SerializerElement &oldSerializedVariablesContainer,
     const gd::VariablesContainer &newVariablesContainer);
 

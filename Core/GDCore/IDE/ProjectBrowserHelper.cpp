@@ -148,12 +148,6 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     gd::ArbitraryEventsWorker &worker) {
     // Add (free) events functions
     for (auto &&eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      gd::ObjectsContainer globalObjectsAndGroups;
-      gd::ObjectsContainer objectsAndGroups;
-      gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-          project, eventsFunctionsExtension, *eventsFunction,
-          globalObjectsAndGroups, objectsAndGroups);
-
       worker.Launch(eventsFunction->GetEvents());
     }
 
@@ -236,12 +230,6 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::ArbitraryEventsWorker &worker) {
   auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
   for (auto &&eventsFunction : objectEventsFunctions.GetInternalVector()) {
-    gd::ObjectsContainer globalObjectsAndGroups;
-    gd::ObjectsContainer objectsAndGroups;
-    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-        project, eventsBasedObject, *eventsFunction, globalObjectsAndGroups,
-        objectsAndGroups);
-
     worker.Launch(eventsFunction->GetEvents());
   }
 }

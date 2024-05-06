@@ -127,18 +127,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project,
-      functionsContainer,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
-
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddParameters(
-      eventsFunction.GetParametersForEvents(functionsContainer));
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForFreeEventsFunction(
+          project, functionsContainer, eventsFunction, globalObjectsAndGroups,
+          objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -174,22 +166,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-      project,
-      eventsBasedBehavior,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
-
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedBehavior.GetSharedPropertyDescriptors());
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedBehavior.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
-      eventsBasedBehavior.GetEventsFunctions()));
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForBehaviorEventsFunction(
+          project, eventsBasedBehavior, eventsFunction, globalObjectsAndGroups,
+          objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -252,20 +232,10 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     bool compilationForRuntime) {
   gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-      project,
-      eventsBasedObject,
-      eventsFunction,
-      globalObjectsAndGroups,
-      objectsAndGroups);
-
-  gd::ProjectScopedContainers projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(
-          globalObjectsAndGroups, objectsAndGroups);
-  projectScopedContainers.AddPropertiesContainer(
-      eventsBasedObject.GetPropertyDescriptors());
-  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
-      eventsBasedObject.GetEventsFunctions()));
+  auto projectScopedContainers = gd::ProjectScopedContainers::
+      MakeNewProjectScopedContainersForObjectEventsFunction(
+          project, eventsBasedObject, eventsFunction, globalObjectsAndGroups,
+          objectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);

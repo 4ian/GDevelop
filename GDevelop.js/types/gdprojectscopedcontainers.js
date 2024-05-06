@@ -2,6 +2,9 @@
 declare class gdProjectScopedContainers {
   static makeNewProjectScopedContainersForProjectAndLayout(project: gdProject, layout: gdLayout): gdProjectScopedContainers;
   static makeNewProjectScopedContainersFor(globalObjectsContainer: gdObjectsContainer, objectsContainer: gdObjectsContainer): gdProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: gdProject, eventsFunctionsContainer: gdEventsFunctionsContainer, eventsFunction: gdEventsFunction, globalObjectsContainers: gdObjectsContainer, objectsContainers: gdObjectsContainer): gdProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: gdProject, eventsBasedBehavior: gdEventsBasedBehavior, eventsFunction: gdEventsFunction, globalObjectsContainers: gdObjectsContainer, objectsContainers: gdObjectsContainer): gdProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: gdProject, eventsBasedObject: gdEventsBasedObject, eventsFunction: gdEventsFunction, globalObjectsContainers: gdObjectsContainer, objectsContainers: gdObjectsContainer): gdProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: gdProjectScopedContainers, event: gdBaseEvent): gdProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: gdPropertiesContainer): gdProjectScopedContainers;
   addParameters(parameters: gdVectorParameterMetadata): gdProjectScopedContainers;

@@ -2,7 +2,6 @@
 #include <set>
 
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
-#include "GDCore/Events/Event.h"
 #include "ObjectsContainersList.h"
 #include "PropertiesContainersList.h"
 #include "VariablesContainersList.h"
@@ -14,6 +13,11 @@ class ObjectsContainersList;
 class VariablesContainersList;
 class PropertiesContainersList;
 class NamedPropertyDescriptor;
+class BaseEvent;
+class EventsFunctionsContainer;
+class EventsFunction;
+class EventsBasedBehavior;
+class EventsBasedObject;
 }  // namespace gd
 
 namespace gd {
@@ -63,6 +67,30 @@ class ProjectScopedContainers {
 
     return projectScopedContainers;
   };
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForFreeEventsFunction(
+      const gd::Project &project,
+      const gd::EventsFunctionsContainer &eventsFunctionsContainer,
+      const gd::EventsFunction& eventsFunction,
+      gd::ObjectsContainer &globalObjectsContainers,
+      gd::ObjectsContainer &objectsContainers);
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForBehaviorEventsFunction(
+      const gd::Project &project,
+      const gd::EventsBasedBehavior &eventsBasedBehavior,
+      const gd::EventsFunction &eventsFunction,
+      gd::ObjectsContainer &globalObjectsContainers,
+      gd::ObjectsContainer &objectsContainers);
+
+  static ProjectScopedContainers
+  MakeNewProjectScopedContainersForObjectEventsFunction(
+      const gd::Project &project,
+      const gd::EventsBasedObject &eventsBasedObject,
+      const gd::EventsFunction &eventsFunction,
+      gd::ObjectsContainer &globalObjectsContainers,
+      gd::ObjectsContainer &objectsContainers);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersWithLocalVariables(

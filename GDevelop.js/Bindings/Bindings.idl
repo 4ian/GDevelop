@@ -653,6 +653,24 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
         [Const, Ref] ObjectsContainer globalObjectsContainer,
         [Const, Ref] ObjectsContainer objectsContainer);
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForFreeEventsFunction(
+      [Const, Ref] Project project,
+      [Const, Ref] EventsFunctionsContainer eventsFunctionsContainer,
+      [Const, Ref] EventsFunction eventsFunction,
+      [Ref] ObjectsContainer globalObjectsContainers,
+      [Ref] ObjectsContainer objectsContainers);
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
+      [Const, Ref] Project project,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const, Ref] EventsFunction eventsFunction,
+      [Ref] ObjectsContainer globalObjectsContainers,
+      [Ref] ObjectsContainer objectsContainers);
+  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
+      [Const, Ref] Project project,
+      [Const, Ref] EventsBasedObject eventsBasedObject,
+      [Const, Ref] EventsFunction eventsFunction,
+      [Ref] ObjectsContainer globalObjectsContainers,
+      [Ref] ObjectsContainer objectsContainers);
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersWithLocalVariables(
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const, Ref] BaseEvent event);

@@ -595,6 +595,9 @@ export class ObjectsContainersList extends EmscriptenObject {
 export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
   static makeNewProjectScopedContainersFor(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;

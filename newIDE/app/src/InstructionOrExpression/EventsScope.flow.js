@@ -48,44 +48,40 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
-    } else {
-      projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersFor(
-        this._globalObjectsContainer,
-        this._objectsContainer
-      );
-
+    } else if (eventsFunction) {
       if (eventsBasedBehavior) {
-        projectScopedContainers.addPropertiesContainer(
-          eventsBasedBehavior.getSharedPropertyDescriptors()
+        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
+          project,
+          eventsBasedBehavior,
+          eventsFunction,
+          this._globalObjectsContainer,
+          this._objectsContainer
         );
-        projectScopedContainers.addPropertiesContainer(
-          eventsBasedBehavior.getPropertyDescriptors()
+      } else if (eventsBasedObject) {
+        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
+          project,
+          eventsBasedObject,
+          eventsFunction,
+          this._globalObjectsContainer,
+          this._objectsContainer
+        );
+      } else if (eventsFunctionsExtension) {
+        projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
+          project,
+          eventsFunctionsExtension,
+          eventsFunction,
+          this._globalObjectsContainer,
+          this._objectsContainer
+        );
+      } else {
+        throw new Error(
+          'Called `ProjectScopedContainers.get` with an eventsFunction but without eventsBasedBehavior, eventsBasedObject or eventsFunctionsExtension'
         );
       }
-
-      if (eventsBasedObject) {
-        projectScopedContainers.addPropertiesContainer(
-          eventsBasedObject.getPropertyDescriptors()
-        );
-      }
-
-      if (eventsFunction) {
-        const eventsFunctionsContainer =
-          (eventsBasedObject && eventsBasedObject.getEventsFunctions()) ||
-          (eventsBasedBehavior && eventsBasedBehavior.getEventsFunctions()) ||
-          eventsFunctionsExtension ||
-          null;
-
-        if (eventsFunctionsContainer) {
-          projectScopedContainers.addParameters(
-            eventsFunction.getParametersForEvents(eventsFunctionsContainer)
-          );
-        } else {
-          throw new Error(
-            'Called `ProjectScopedContainers.get` with an eventsFunction but without eventsBasedBehavior, eventsBasedObject or eventsFunctionsExtension'
-          );
-        }
-      }
+    } else {
+      throw new Error(
+        'Called `ProjectScopedContainers.get` without a layout or an eventsFunction'
+      );
     }
     for (const event of this._eventPath) {
       projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersWithLocalVariables(

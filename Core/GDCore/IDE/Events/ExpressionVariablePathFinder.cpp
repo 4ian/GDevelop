@@ -13,6 +13,51 @@ namespace gd {
  * \brief Find the pre-scoped container of legacy variables or the object name
  * from the function call node.
  */
+class GD_CORE_API ExpressionLiteralFinder : public ExpressionParser2NodeWorker {
+public:
+  virtual ~ExpressionLiteralFinder(){};
+
+  gd::String literalValue;
+
+  ExpressionLiteralFinder() : literalValue(""){};
+
+protected:
+  void OnVisitSubExpressionNode(SubExpressionNode &node) override {}
+  void OnVisitOperatorNode(OperatorNode &node) override {}
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode &node) override {}
+  void OnVisitNumberNode(NumberNode &node) override {
+    literalValue = node.number;
+  }
+  void OnVisitTextNode(TextNode &node) override { literalValue = node.text; }
+  void OnVisitVariableNode(VariableNode &node) override {}
+  void OnVisitVariableAccessorNode(VariableAccessorNode &node) override {}
+  void OnVisitIdentifierNode(IdentifierNode &node) override {}
+  void OnVisitEmptyNode(EmptyNode &node) override {}
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode &node) override {}
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode &node) override {}
+  void OnVisitFunctionCallNode(FunctionCallNode &functionCall) override {}
+};
+
+void ExpressionVariablePathFinder::OnVisitVariableBracketAccessorNode(
+    VariableBracketAccessorNode &node) {
+  // Try to find a literal accessor or add a child with an empty name, which
+  // will be interpreted as "take the first child/item of the structure/array".
+  gd::ExpressionLiteralFinder expressionLiteralFinder;
+  if (node.expression) {
+    node.expression->Visit(expressionLiteralFinder);
+  }
+  childVariableNames.push_back(expressionLiteralFinder.literalValue);
+
+  if (node.child && &node != lastNodeToCheck) {
+    node.child->Visit(*this);
+  }
+}
+
+/**
+ * \brief Find the pre-scoped container of legacy variables or the object name
+ * from the function call node.
+ */
 class GD_CORE_API ExpressionVariableContextFinder
     : public ExpressionParser2NodeWorker {
  public:

@@ -55,8 +55,7 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer ||
-        typeFinder.bailOutBecauseBracketsAccessor) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
@@ -76,8 +75,7 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer ||
-        typeFinder.bailOutBecauseBracketsAccessor) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
@@ -104,8 +102,10 @@ class GD_CORE_API ExpressionVariablePathFinder
         lastNodeToCheck(lastNodeToCheck_),
         variablesContainer(nullptr),
         variableName(""),
-        bailOutBecauseEmptyVariableName(false),
-        bailOutBecauseBracketsAccessor(false) {};
+        bailOutBecauseEmptyVariableName(false) {};
+
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override;
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
   void OnVisitOperatorNode(OperatorNode& node) override {}
@@ -144,14 +144,6 @@ class GD_CORE_API ExpressionVariablePathFinder
   }
   void OnVisitEmptyNode(EmptyNode& node) override {}
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
-  void OnVisitVariableBracketAccessorNode(
-      VariableBracketAccessorNode& node) override {
-    // Add a child with an empty name, which will be interpreted as
-    // "take the first child/item of the structure/array".
-    childVariableNames.push_back("");
-    bailOutBecauseBracketsAccessor = true;
-    if (node.child && &node != lastNodeToCheck) node.child->Visit(*this);
-  }
   void OnVisitFunctionCallNode(FunctionCallNode& functionCall) override {}
 
   void FindVariableFor(const gd::String& identifier, gd::String* childIdentifier = nullptr) {
@@ -357,7 +349,6 @@ class GD_CORE_API ExpressionVariablePathFinder
   gd::String variableName;
   std::vector<gd::String> childVariableNames;
   bool bailOutBecauseEmptyVariableName;
-  bool bailOutBecauseBracketsAccessor;
 };
 
 }  // namespace gd

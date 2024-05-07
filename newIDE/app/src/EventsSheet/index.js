@@ -2113,11 +2113,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         editedVariable: null,
                       })
                     }
-                    onApply={() =>
+                    onApply={() => {
                       this.setState({
                         editedVariable: null,
-                      })
-                    }
+                      });
+                      if (this._eventsTree)
+                        this._eventsTree.forceEventsUpdate();
+                    }}
                     tabs={[
                       {
                         id: 'local-variables',

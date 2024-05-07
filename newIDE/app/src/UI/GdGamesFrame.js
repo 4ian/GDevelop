@@ -10,11 +10,13 @@ import {
   type PrivateGameTemplateListingData,
   type PrivateAssetPackListingData,
 } from '../Utils/GDevelopServices/Shop';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 
 export type GdGamesMessageEventData = $ReadOnly<{
   id?: string | any,
   privateAssetPackListingData?: PrivateAssetPackListingData,
   privateGameTemplateListingData?: PrivateGameTemplateListingData,
+  exampleShortHeader?: ExampleShortHeader,
 }>;
 
 type Props = {|

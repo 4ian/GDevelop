@@ -32,15 +32,16 @@ export const getInstructionListItemKey = (
       : ''
   }-${instruction.type}`;
 
-export const getInstructionListItemValue = (instructionType: string) => {
+export const getInstructionListItemValue = (instructionType: string) =>
+  `instruction-value-${getInstructionType(instructionType)}`;
+
+export const getInstructionType = (instructionType: string) => {
   const switchableVariableInstructionIdentifier = gd.VariableInstructionSwitcher.getSwitchableVariableInstructionIdentifier(
     instructionType
   );
-  return `instruction-value-${
-    switchableVariableInstructionIdentifier.length > 0
-      ? switchableVariableInstructionIdentifier
-      : instructionType
-  }`;
+  return switchableVariableInstructionIdentifier.length > 0
+    ? switchableVariableInstructionIdentifier
+    : instructionType;
 };
 
 export const getSubheaderListItemKey = (subheader: string) =>

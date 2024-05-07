@@ -180,7 +180,7 @@ WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
       }
 
       const auto &oldVariable = oldVariablesContainer.Get(oldName);
-      if (gd::WholeProjectRefactorer::HasAnyVariableTypeChanged(variable, oldVariable)) {
+      if (gd::WholeProjectRefactorer::HasAnyVariableTypeChanged(oldVariable, variable)) {
         changeset.typeChangedVariableNames.insert(variableName);
       }
 

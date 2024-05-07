@@ -55,7 +55,8 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer ||
+        typeFinder.bailOutBecauseBracketsAccessor) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
@@ -75,7 +76,8 @@ class GD_CORE_API ExpressionVariablePathFinder
         platform, projectScopedContainers, parameterType, objName);
     node.Visit(typeFinder);
 
-    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer) {
+    if (typeFinder.variableName.empty() || !typeFinder.variablesContainer ||
+        typeFinder.bailOutBecauseBracketsAccessor) {
       return gd::Variable::Unknown;
     }
     auto *variable = typeFinder.WalkUntilLastChild(
@@ -102,7 +104,8 @@ class GD_CORE_API ExpressionVariablePathFinder
         lastNodeToCheck(lastNodeToCheck_),
         variablesContainer(nullptr),
         variableName(""),
-        bailOutBecauseEmptyVariableName(false) {};
+        bailOutBecauseEmptyVariableName(false),
+        bailOutBecauseBracketsAccessor(false) {};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {}
   void OnVisitOperatorNode(OperatorNode& node) override {}
@@ -146,6 +149,7 @@ class GD_CORE_API ExpressionVariablePathFinder
     // Add a child with an empty name, which will be interpreted as
     // "take the first child/item of the structure/array".
     childVariableNames.push_back("");
+    bailOutBecauseBracketsAccessor = true;
     if (node.child && &node != lastNodeToCheck) node.child->Visit(*this);
   }
   void OnVisitFunctionCallNode(FunctionCallNode& functionCall) override {}
@@ -353,6 +357,7 @@ class GD_CORE_API ExpressionVariablePathFinder
   gd::String variableName;
   std::vector<gd::String> childVariableNames;
   bool bailOutBecauseEmptyVariableName;
+  bool bailOutBecauseBracketsAccessor;
 };
 
 }  // namespace gd

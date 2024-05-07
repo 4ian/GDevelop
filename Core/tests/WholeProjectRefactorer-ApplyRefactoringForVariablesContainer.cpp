@@ -815,6 +815,51 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
   }
 
+  SECTION("Must not change the instruction type of wrong children when the expression contains brackets (scene)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &scene = project.InsertNewLayout("Scene", 0);
+    auto &variable = scene.GetVariables().InsertNew("MySceneVariable");
+    auto &childVariable = variable.GetChild("MyChild");
+    childVariable.GetChild("KeyA").SetValue(123);
+    childVariable.GetChild("KeyB").SetValue(123);
+
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(scene.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MySceneVariable.MyChild[\"KeyB\"]"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    scene.GetVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    scene.GetVariables().SerializeTo(originalSerializedVariables);
+
+    scene.GetVariables().Get("MySceneVariable").GetChild("MyChild").GetChild("KeyA").SetString("Hello");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, scene.GetVariables());
+
+    REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
+            changeset.typeChangedVariableNames.end());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, scene.GetVariables(), changeset);
+
+    // Check the the action has changed to follow the variable type.
+    REQUIRE(event.GetActions()[0].GetType() == "SetNumberVariable");
+  }
+
   SECTION("Can change the instruction type of variable occurrences (object)") {
     gd::Project project;
     gd::Platform platform;

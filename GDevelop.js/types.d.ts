@@ -2163,6 +2163,8 @@ export class EventsFunctionsExtension extends EmscriptenObject {
   addDependency(): DependencyMetadata;
   removeDependencyAt(index: number): void;
   getAllDependencies(): VectorDependencyMetadata;
+  getGlobalVariables(): VariablesContainer;
+  getSceneVariables(): VariablesContainer;
   getEventsBasedBehaviors(): EventsBasedBehaviorsList;
   getEventsBasedObjects(): EventsBasedObjectsList;
   serializeTo(element: SerializerElement): void;

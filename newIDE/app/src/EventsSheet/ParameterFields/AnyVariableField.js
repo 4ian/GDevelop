@@ -33,7 +33,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       onInstructionTypeChanged,
       projectScopedContainersAccessor,
     } = props;
-    const { layout } = scope;
+    const { layout, eventsFunctionsExtension } = scope;
 
     const enumerateGlobalAndSceneVariables = React.useCallback(
       () =>
@@ -57,6 +57,21 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
         );
       },
       [projectScopedContainersAccessor]
+    );
+
+    const onVariableEditorApply = React.useCallback(
+      (selectedVariableName: string | null) => {
+        if (
+          selectedVariableName &&
+          selectedVariableName.startsWith(props.value)
+        ) {
+          props.onChange(selectedVariableName);
+        }
+        setEditorOpen(false);
+        if (onInstructionTypeChanged) onInstructionTypeChanged();
+        if (field.current) field.current.updateAutocompletions();
+      },
+      []
     );
 
     const isGlobal = !!(
@@ -93,23 +108,28 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
           }
           onInstructionTypeChanged={onInstructionTypeChanged}
         />
-        {editorOpen && layout && project && (
+        {editorOpen && project && layout && (
           <GlobalAndSceneVariablesDialog
+            globalVariables={project.getVariables()}
+            sceneVariables={layout.getVariables()}
             project={project}
             layout={layout}
             open
             onCancel={() => setEditorOpen(false)}
-            onApply={(selectedVariableName: string | null) => {
-              if (
-                selectedVariableName &&
-                selectedVariableName.startsWith(props.value)
-              ) {
-                props.onChange(selectedVariableName);
-              }
-              setEditorOpen(false);
-              if (onInstructionTypeChanged) onInstructionTypeChanged();
-              if (field.current) field.current.updateAutocompletions();
-            }}
+            onApply={onVariableEditorApply}
+            isGlobalTabInitiallyOpen={isGlobal}
+            initiallySelectedVariableName={props.value}
+            preventRefactoringToDeleteInstructions
+          />
+        )}
+        {editorOpen && project && eventsFunctionsExtension && (
+          <GlobalAndSceneVariablesDialog
+            globalVariables={eventsFunctionsExtension.getGlobalVariables()}
+            sceneVariables={eventsFunctionsExtension.getSceneVariables()}
+            project={project}
+            open
+            onCancel={() => setEditorOpen(false)}
+            onApply={onVariableEditorApply}
             isGlobalTabInitiallyOpen={isGlobal}
             initiallySelectedVariableName={props.value}
             preventRefactoringToDeleteInstructions

@@ -15,7 +15,9 @@ namespace gd {
 
 EventsFunctionsExtension::EventsFunctionsExtension() :
     gd::EventsFunctionsContainer(
-        gd::EventsFunctionsContainer::FunctionOwner::Extension) {}
+        gd::EventsFunctionsContainer::FunctionOwner::Extension),
+      globalVariables(gd::VariablesContainer::SourceType::Global),
+      sceneVariables(gd::VariablesContainer::SourceType::Scene) {}
 
 EventsFunctionsExtension::EventsFunctionsExtension(
     const EventsFunctionsExtension& other) :
@@ -48,6 +50,8 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   EventsFunctionsContainer::Init(other);
   eventsBasedBehaviors = other.eventsBasedBehaviors;
   eventsBasedObjects = other.eventsBasedObjects;
+  globalVariables = other.GetGlobalVariables();
+  sceneVariables = other.GetSceneVariables();
 }
 
 void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
@@ -81,6 +85,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   dependenciesElement.ConsiderAsArray();
   for (auto& dependency : dependencies)
     SerializeDependencyTo(dependency, dependenciesElement.AddChild(""));
+
+  GetGlobalVariables().SerializeTo(element.AddChild("globalVariables"));
+  GetSceneVariables().SerializeTo(element.AddChild("sceneVariables"));
 
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
@@ -147,6 +154,9 @@ void EventsFunctionsExtension::UnserializeExtensionDeclarationFrom(
   for (size_t i = 0; i < dependenciesElement.GetChildrenCount(); ++i)
     dependencies.push_back(
         UnserializeDependencyFrom(dependenciesElement.GetChild(i)));
+  
+  globalVariables.UnserializeFrom(element.GetChild("globalVariables"));
+  sceneVariables.UnserializeFrom(element.GetChild("sceneVariables"));
 
   // Only unserialize behaviors and objects names.
   // As event based objects can contains objects using CustomBehavior and/or

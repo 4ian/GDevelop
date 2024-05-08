@@ -2832,6 +2832,9 @@ interface EventsFunctionsExtension {
     void RemoveDependencyAt(unsigned long index);
     [Ref] VectorDependencyMetadata GetAllDependencies();
 
+    [Ref] VariablesContainer GetGlobalVariables();
+    [Ref] VariablesContainer GetSceneVariables();
+
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
     [Ref] EventsBasedObjectsList GetEventsBasedObjects();
 

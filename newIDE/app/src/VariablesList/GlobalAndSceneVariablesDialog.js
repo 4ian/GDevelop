@@ -7,8 +7,10 @@ import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   open: boolean,
+  globalVariables: gdVariablesContainer,
+  sceneVariables: gdVariablesContainer,
   project: gdProject,
-  layout: gdLayout,
+  layout?: ?gdLayout,
   onApply: (selectedVariableName: string | null) => void,
   onCancel: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
@@ -22,6 +24,8 @@ type Props = {|
 |};
 
 const GlobalAndSceneVariablesDialog = ({
+  globalVariables,
+  sceneVariables,
   project,
   layout,
   open,
@@ -34,21 +38,25 @@ const GlobalAndSceneVariablesDialog = ({
 }: Props) => {
   const onComputeAllSceneVariableNames = React.useCallback(
     () =>
-      EventsRootVariablesFinder.findAllLayoutVariables(
-        project.getCurrentPlatform(),
-        project,
-        layout
-      ),
+      layout
+        ? EventsRootVariablesFinder.findAllLayoutVariables(
+            project.getCurrentPlatform(),
+            project,
+            layout
+          )
+        : [],
     [layout, project]
   );
 
   const onComputeAllGlobalVariableNames = React.useCallback(
     () =>
-      EventsRootVariablesFinder.findAllGlobalVariables(
-        project.getCurrentPlatform(),
-        project
-      ),
-    [project]
+      layout
+        ? EventsRootVariablesFinder.findAllGlobalVariables(
+            project.getCurrentPlatform(),
+            project
+          )
+        : [],
+    [layout, project]
   );
 
   const tabs = React.useMemo(
@@ -57,7 +65,7 @@ const GlobalAndSceneVariablesDialog = ({
         {
           id: 'scene-variables',
           label: <Trans>Scene variables</Trans>,
-          variablesContainer: layout.getVariables(),
+          variablesContainer: sceneVariables,
           emptyPlaceholderTitle: <Trans>Add your first scene variable</Trans>,
           emptyPlaceholderDescription: (
             <Trans>
@@ -69,7 +77,7 @@ const GlobalAndSceneVariablesDialog = ({
         {
           id: 'global-variables',
           label: <Trans>Global variables</Trans>,
-          variablesContainer: project.getVariables(),
+          variablesContainer: globalVariables,
           emptyPlaceholderTitle: <Trans>Add your first global variable</Trans>,
           emptyPlaceholderDescription: (
             <Trans>
@@ -80,10 +88,10 @@ const GlobalAndSceneVariablesDialog = ({
         },
       ].filter(Boolean),
     [
-      layout,
+      sceneVariables,
       onComputeAllGlobalVariableNames,
       onComputeAllSceneVariableNames,
-      project,
+      globalVariables,
     ]
   );
 
@@ -93,7 +101,13 @@ const GlobalAndSceneVariablesDialog = ({
       open={open}
       onCancel={onCancel}
       onApply={onApply}
-      title={<Trans>{layout.getName()} variables</Trans>}
+      title={
+        layout ? (
+          <Trans>{layout.getName()} variables</Trans>
+        ) : (
+          <Trans>Extension variables</Trans>
+        )
+      }
       tabs={tabs}
       initiallyOpenTabId={
         isGlobalTabInitiallyOpen ? 'global-variables' : 'scene-variables'

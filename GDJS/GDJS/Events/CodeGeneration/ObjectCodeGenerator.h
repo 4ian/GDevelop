@@ -34,7 +34,7 @@ class ObjectCodeGenerator {
    * object.
    */
   gd::String GenerateRuntimeObjectCompleteCode(
-      const gd::String& extensionName,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& objectMethodMangledNames,

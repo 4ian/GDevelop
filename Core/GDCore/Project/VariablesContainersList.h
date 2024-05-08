@@ -8,6 +8,7 @@ class Project;
 class Layout;
 class VariablesContainer;
 class Variable;
+class EventsFunctionsExtension;
 }  // namespace gd
 
 namespace gd {
@@ -30,10 +31,17 @@ class GD_CORE_API VariablesContainersList {
   MakeNewVariablesContainersListForProjectAndLayout(const gd::Project& project,
                                                     const gd::Layout& layout);
 
+  static VariablesContainersList
+  MakeNewVariablesContainersListForEventsFunctionsExtension(
+      const gd::EventsFunctionsExtension &extension);
+
   static VariablesContainersList MakeNewVariablesContainersListPushing(
       const VariablesContainersList &variablesContainersList,
       const gd::VariablesContainer &variablesContainer);
 
+  /**
+   * @deprecated Use another method for an explicit context instead.
+   */
   static VariablesContainersList MakeNewEmptyVariablesContainersList();
 
   /**

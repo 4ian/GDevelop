@@ -14,7 +14,7 @@ class VariablesContainersList;
 class PropertiesContainersList;
 class NamedPropertyDescriptor;
 class BaseEvent;
-class EventsFunctionsContainer;
+class EventsFunctionsExtension;
 class EventsFunction;
 class EventsBasedBehavior;
 class EventsBasedObject;
@@ -74,13 +74,14 @@ class ProjectScopedContainers {
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForFreeEventsFunction(
       const gd::Project &project,
-      const gd::EventsFunctionsContainer &eventsFunctionsContainer,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& parameterObjectsContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForBehaviorEventsFunction(
       const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       const gd::EventsFunction &eventsFunction,
       gd::ObjectsContainer &parameterObjectsContainer);
@@ -88,6 +89,7 @@ class ProjectScopedContainers {
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForObjectEventsFunction(
       const gd::Project &project,
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension,
       const gd::EventsBasedObject &eventsBasedObject,
       const gd::EventsFunction &eventsFunction,
       gd::ObjectsContainer &parameterObjectsContainer);

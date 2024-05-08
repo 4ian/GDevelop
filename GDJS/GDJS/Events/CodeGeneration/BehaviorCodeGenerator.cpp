@@ -15,7 +15,7 @@ gd::String BehaviorCodeGenerator::doStepPreEventsFunctionName =
     "doStepPreEvents";
 
 gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
-    const gd::String& extensionName,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::String& codeNamespace,
     const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
@@ -94,6 +94,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
       runtimeBehaviorMethodsCode +=
           EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
               project,
+              eventsFunctionsExtension,
               eventsBasedBehavior,
               *eventsFunction,
               methodCodeNamespace,
@@ -139,7 +140,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
   };
 
   return GenerateRuntimeBehaviorTemplateCode(
-      extensionName,
+      eventsFunctionsExtension.GetName(),
       eventsBasedBehavior,
       codeNamespace,
       generateInitializePropertiesCode,

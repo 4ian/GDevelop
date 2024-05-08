@@ -45,10 +45,15 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
-    } else if (eventsFunction && this._parameterObjectsContainer) {
+    } else if (
+      eventsFunctionsExtension &&
+      eventsFunction &&
+      this._parameterObjectsContainer
+    ) {
       if (eventsBasedBehavior) {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
           project,
+          eventsFunctionsExtension,
           eventsBasedBehavior,
           eventsFunction,
           this._parameterObjectsContainer
@@ -56,20 +61,17 @@ export class ProjectScopedContainersAccessor {
       } else if (eventsBasedObject) {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
           project,
+          eventsFunctionsExtension,
           eventsBasedObject,
           eventsFunction,
           this._parameterObjectsContainer
         );
-      } else if (eventsFunctionsExtension) {
+      } else {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
           project,
           eventsFunctionsExtension,
           eventsFunction,
           this._parameterObjectsContainer
-        );
-      } else {
-        throw new Error(
-          'Called `ProjectScopedContainers.get` with an eventsFunction but without eventsBasedBehavior, eventsBasedObject or eventsFunctionsExtension'
         );
       }
     } else {

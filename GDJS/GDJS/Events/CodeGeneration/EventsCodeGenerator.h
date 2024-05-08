@@ -57,7 +57,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * Generate JavaScript for executing events of an events based function.
    *
    * \param project Project used.
-   * \param functionsContainer The container of the compiled event function.
+   * \param eventsFunctionsExtension The container of the compiled event function.
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
@@ -68,7 +68,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateEventsFunctionCode(
       gd::Project& project,
-      const gd::EventsFunctionsContainer& functionsContainer,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       std::set<gd::String>& includeFiles,
@@ -94,6 +94,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateBehaviorEventsFunctionCode(
       gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
@@ -126,6 +127,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateObjectEventsFunctionCode(
       gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,

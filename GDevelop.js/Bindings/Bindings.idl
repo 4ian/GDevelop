@@ -649,18 +649,20 @@ interface ProjectScopedContainers {
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForFreeEventsFunction(
         [Const, Ref] Project project,
-      [Const, Ref] EventsFunctionsContainer eventsFunctionsContainer,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
         [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer);
 
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
         [Const, Ref] Project project,
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
         [Const, Ref] EventsBasedObject eventsBasedObject,
         [Const, Ref] EventsFunction eventsFunction,
         [Ref] ObjectsContainer parameterObjectsContainer);
@@ -3452,7 +3454,13 @@ interface LayoutCodeGenerator {
 [Prefix="gdjs::"]
 interface BehaviorCodeGenerator {
     void BehaviorCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode(
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+        [Const] DOMString codeNamespace,
+        [Const, Ref] MapStringString behaviorMethodMangledNames,
+        [Ref] SetString includes,
+        boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetBehaviorPropertyToggleFunctionName([Const] DOMString propertyName);
@@ -3464,7 +3472,13 @@ interface BehaviorCodeGenerator {
 [Prefix="gdjs::"]
 interface ObjectCodeGenerator {
     void ObjectCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateRuntimeObjectCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedObject eventsBasedObject, [Const] DOMString codeNamespace, [Const, Ref] MapStringString objectMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateRuntimeObjectCompleteCode(
+        [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const] DOMString codeNamespace,
+        [Const, Ref] MapStringString objectMethodMangledNames,
+        [Ref] SetString includes,
+        boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GetObjectPropertyGetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertySetterName([Const] DOMString propertyName);
     [Const, Value] DOMString STATIC_GetObjectPropertyToggleFunctionName([Const] DOMString propertyName);

@@ -35,7 +35,7 @@ class BehaviorCodeGenerator {
    * behavior.
    */
   gd::String GenerateRuntimeBehaviorCompleteCode(
-      const gd::String& extensionName,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& behaviorMethodMangledNames,

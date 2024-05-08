@@ -203,7 +203,8 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
 }
 
 void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-    gd::Project &project, const gd::EventsBasedBehavior &eventsBasedBehavior,
+    gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedBehavior &eventsBasedBehavior,
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
   for (auto &&eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
@@ -211,7 +212,7 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     gd::ObjectsContainer parameterObjectsContainers;
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForBehaviorEventsFunction(
-            project, eventsBasedBehavior,
+            project, eventsFunctionsExtension, eventsBasedBehavior,
             *eventsFunction, parameterObjectsContainers);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
@@ -228,7 +229,9 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
 }
 
 void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
-    gd::Project &project, const gd::EventsBasedObject &eventsBasedObject,
+    gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
+    const gd::EventsBasedObject &eventsBasedObject,
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
   for (auto &&eventsFunction : objectEventsFunctions.GetInternalVector()) {
@@ -236,7 +239,7 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::ObjectsContainer parameterObjectsContainers;
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForObjectEventsFunction(
-            project, eventsBasedObject,
+            project, eventsFunctionsExtension, eventsBasedObject,
             *eventsFunction, parameterObjectsContainers);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);

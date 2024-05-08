@@ -592,9 +592,9 @@ export class ObjectsContainersList extends EmscriptenObject {
 
 export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
@@ -2664,7 +2664,7 @@ export class LayoutCodeGenerator extends EmscriptenObject {
 
 export class BehaviorCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeBehaviorCompleteCode(extensionName: string, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeBehaviorCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedBehavior: EventsBasedBehavior, codeNamespace: string, behaviorMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getBehaviorPropertyGetterName(propertyName: string): string;
   static getBehaviorPropertySetterName(propertyName: string): string;
   static getBehaviorPropertyToggleFunctionName(propertyName: string): string;
@@ -2675,7 +2675,7 @@ export class BehaviorCodeGenerator extends EmscriptenObject {
 
 export class ObjectCodeGenerator extends EmscriptenObject {
   constructor(project: Project);
-  generateRuntimeObjectCompleteCode(extensionName: string, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
+  generateRuntimeObjectCompleteCode(eventsFunctionsExtension: EventsFunctionsExtension, eventsBasedObject: EventsBasedObject, codeNamespace: string, objectMethodMangledNames: MapStringString, includes: SetString, compilationForRuntime: boolean): string;
   static getObjectPropertyGetterName(propertyName: string): string;
   static getObjectPropertySetterName(propertyName: string): string;
   static getObjectPropertyToggleFunctionName(propertyName: string): string;

@@ -11,29 +11,29 @@ namespace gd {
 
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
-    const gd::Project &project,
-      const gd::EventsFunctionsContainer &eventsFunctionsContainer,
+    const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer) {
 
   gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-      project, eventsFunctionsContainer, eventsFunction, parameterObjectsContainer);
+      project, eventsFunctionsExtension, eventsFunction, parameterObjectsContainer);
 
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(
           parameterObjectsContainer),
-      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      VariablesContainersList::
+          MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
   projectScopedContainers.AddParameters(
-      eventsFunction.GetParametersForEvents(eventsFunctionsContainer));
+      eventsFunction.GetParametersForEvents(eventsFunctionsExtension));
 
   return projectScopedContainers;
 };
 
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction(
-    const gd::Project &project,
+    const gd::Project &project, const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer) {
@@ -47,7 +47,8 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(
           parameterObjectsContainer),
-      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      VariablesContainersList::
+          MakeNewVariablesContainersListForEventsFunctionsExtension(eventsFunctionsExtension),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
   projectScopedContainers.AddPropertiesContainer(
@@ -63,6 +64,7 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
     const gd::Project &project,
+    const gd::EventsFunctionsExtension &eventsFunctionsExtension,
     const gd::EventsBasedObject &eventsBasedObject,
     const gd::EventsFunction &eventsFunction,
     gd::ObjectsContainer &parameterObjectsContainer) {
@@ -73,7 +75,9 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
   ProjectScopedContainers projectScopedContainers(
       ObjectsContainersList::MakeNewObjectsContainersListForContainer(
           parameterObjectsContainer),
-      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      VariablesContainersList::
+          MakeNewVariablesContainersListForEventsFunctionsExtension(
+              eventsFunctionsExtension),
       PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
 
   projectScopedContainers.AddPropertiesContainer(

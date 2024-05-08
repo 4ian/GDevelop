@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef EVENTSCODEGENERATOR_H
-#define EVENTSCODEGENERATOR_H
+#pragma once
+
 #include <set>
 #include <string>
 #include <vector>
@@ -461,4 +461,3 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 };
 
 }  // namespace gdjs
-#endif  // EVENTSCODEGENERATOR_H

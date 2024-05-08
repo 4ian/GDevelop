@@ -56,6 +56,9 @@ class ProjectScopedContainers {
     return projectScopedContainers;
   }
 
+  /**
+   * @deprecated Use another method for an explicit context instead.
+   */
   static ProjectScopedContainers MakeNewProjectScopedContainersFor(
       const gd::ObjectsContainer &globalObjectsContainers,
       const gd::ObjectsContainer &objectsContainers) {
@@ -73,24 +76,21 @@ class ProjectScopedContainers {
       const gd::Project &project,
       const gd::EventsFunctionsContainer &eventsFunctionsContainer,
       const gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer &globalObjectsContainers,
-      gd::ObjectsContainer &objectsContainers);
+      gd::ObjectsContainer& parameterObjectsContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForBehaviorEventsFunction(
       const gd::Project &project,
       const gd::EventsBasedBehavior &eventsBasedBehavior,
       const gd::EventsFunction &eventsFunction,
-      gd::ObjectsContainer &globalObjectsContainers,
-      gd::ObjectsContainer &objectsContainers);
+      gd::ObjectsContainer &parameterObjectsContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersForObjectEventsFunction(
       const gd::Project &project,
       const gd::EventsBasedObject &eventsBasedObject,
       const gd::EventsFunction &eventsFunction,
-      gd::ObjectsContainer &globalObjectsContainers,
-      gd::ObjectsContainer &objectsContainers);
+      gd::ObjectsContainer &parameterObjectsContainer);
 
   static ProjectScopedContainers
   MakeNewProjectScopedContainersWithLocalVariables(

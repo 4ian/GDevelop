@@ -170,12 +170,11 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     gd::ArbitraryEventsWorkerWithContext &worker) {
     // Add (free) events functions
     for (auto &&eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-      gd::ObjectsContainer globalObjectsAndGroups;
-      gd::ObjectsContainer objectsAndGroups;
+      gd::ObjectsContainer parameterObjectsContainer;
       auto projectScopedContainers = gd::ProjectScopedContainers::
           MakeNewProjectScopedContainersForFreeEventsFunction(
               project, eventsFunctionsExtension, *eventsFunction,
-              globalObjectsAndGroups, objectsAndGroups);
+              parameterObjectsContainer);
 
       worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
     }
@@ -208,12 +207,12 @@ void ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
   for (auto &&eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-    gd::ObjectsContainer globalObjectsAndGroups;
-    gd::ObjectsContainer objectsAndGroups;
+
+    gd::ObjectsContainer parameterObjectsContainers;
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForBehaviorEventsFunction(
-            project, eventsBasedBehavior, *eventsFunction,
-            globalObjectsAndGroups, objectsAndGroups);
+            project, eventsBasedBehavior,
+            *eventsFunction, parameterObjectsContainers);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }
@@ -233,12 +232,12 @@ void ProjectBrowserHelper::ExposeEventsBasedObjectEvents(
     gd::ArbitraryEventsWorkerWithContext &worker) {
   auto &objectEventsFunctions = eventsBasedObject.GetEventsFunctions();
   for (auto &&eventsFunction : objectEventsFunctions.GetInternalVector()) {
-    gd::ObjectsContainer globalObjectsAndGroups;
-    gd::ObjectsContainer objectsAndGroups;
+
+    gd::ObjectsContainer parameterObjectsContainers;
     auto projectScopedContainers = gd::ProjectScopedContainers::
         MakeNewProjectScopedContainersForObjectEventsFunction(
-            project, eventsBasedObject, *eventsFunction, globalObjectsAndGroups,
-            objectsAndGroups);
+            project, eventsBasedObject,
+            *eventsFunction, parameterObjectsContainers);
 
     worker.Launch(eventsFunction->GetEvents(), projectScopedContainers);
   }

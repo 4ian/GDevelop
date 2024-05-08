@@ -145,7 +145,6 @@ declare class libGDevelop {
   ValueTypeMetadata: Class<gdValueTypeMetadata>;
   VectorParameterMetadata: Class<gdVectorParameterMetadata>;
   ParameterMetadataTools: Class<gdParameterMetadataTools>;
-  EventsFunctionTools: Class<gdEventsFunctionTools>;
   ObjectMetadata: Class<gdObjectMetadata>;
   BehaviorMetadata: Class<gdBehaviorMetadata>;
   EffectMetadata: Class<gdEffectMetadata>;

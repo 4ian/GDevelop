@@ -22,12 +22,7 @@ void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
     const gd::Project& project,
     const gd::EventsFunctionsContainer functionContainer,
     const gd::EventsFunction& eventsFunction,
-    gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
-  // Functions don't have access to objects from the "outer" scope.
-  outputGlobalObjectsContainer.GetObjects().clear();
-  outputGlobalObjectsContainer.GetObjectGroups().Clear();
-
   // Functions scope for objects is defined according
   // to parameters
   outputObjectsContainer.GetObjects().clear();
@@ -45,13 +40,11 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
     const gd::Project& project,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction& eventsFunction,
-    gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
   // The context is build the same way as free function...
   FreeEventsFunctionToObjectsContainer(project,
                                        eventsBasedBehavior.GetEventsFunctions(),
                                        eventsFunction,
-                                       outputGlobalObjectsContainer,
                                        outputObjectsContainer);
 
   // ...and has an "Object" by convention...
@@ -83,13 +76,11 @@ void EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
     const gd::Project& project,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::EventsFunction& eventsFunction,
-    gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
   // The context is build the same way as free function...
   FreeEventsFunctionToObjectsContainer(project,
                                        eventsBasedObject.GetEventsFunctions(),
                                        eventsFunction,
-                                       outputGlobalObjectsContainer,
                                        outputObjectsContainer);
 
   // TODO EBO Use a constant instead a hard coded value "Object".

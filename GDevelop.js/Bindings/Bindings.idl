@@ -327,10 +327,6 @@ interface VariablesContainer {
 };
 
 interface VariablesContainersList {
-  [Value] VariablesContainersList STATIC_MakeNewVariablesContainersListForProjectAndLayout(
-        [Const, Ref] Project project,
-        [Const, Ref] Layout layout);
-  [Value] VariablesContainersList STATIC_MakeNewEmptyVariablesContainersList();
   boolean Has([Const] DOMString name);
   [Const, Ref] Variable Get([Const] DOMString name);
   [Const, Ref] VariablesContainer GetVariablesContainerFromVariableName([Const] DOMString variableName);
@@ -650,27 +646,25 @@ interface ProjectScopedContainers {
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForProjectAndLayout(
         [Const, Ref] Project project,
         [Const, Ref] Layout layout);
-  [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersFor(
-        [Const, Ref] ObjectsContainer globalObjectsContainer,
-        [Const, Ref] ObjectsContainer objectsContainer);
+
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForFreeEventsFunction(
-      [Const, Ref] Project project,
+        [Const, Ref] Project project,
       [Const, Ref] EventsFunctionsContainer eventsFunctionsContainer,
-      [Const, Ref] EventsFunction eventsFunction,
-      [Ref] ObjectsContainer globalObjectsContainers,
-      [Ref] ObjectsContainer objectsContainers);
+        [Const, Ref] EventsFunction eventsFunction,
+        [Ref] ObjectsContainer parameterObjectsContainer);
+
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction(
-      [Const, Ref] Project project,
-      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
-      [Const, Ref] EventsFunction eventsFunction,
-      [Ref] ObjectsContainer globalObjectsContainers,
-      [Ref] ObjectsContainer objectsContainers);
+        [Const, Ref] Project project,
+        [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+        [Const, Ref] EventsFunction eventsFunction,
+        [Ref] ObjectsContainer parameterObjectsContainer);
+
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersForObjectEventsFunction(
-      [Const, Ref] Project project,
-      [Const, Ref] EventsBasedObject eventsBasedObject,
-      [Const, Ref] EventsFunction eventsFunction,
-      [Ref] ObjectsContainer globalObjectsContainers,
-      [Ref] ObjectsContainer objectsContainers);
+        [Const, Ref] Project project,
+        [Const, Ref] EventsBasedObject eventsBasedObject,
+        [Const, Ref] EventsFunction eventsFunction,
+        [Ref] ObjectsContainer parameterObjectsContainer);
+
   [Value] ProjectScopedContainers STATIC_MakeNewProjectScopedContainersWithLocalVariables(
         [Const, Ref] ProjectScopedContainers projectScopedContainers,
         [Const, Ref] BaseEvent event);
@@ -1714,12 +1708,6 @@ interface VectorParameterMetadata {
 interface ParameterMetadataTools {
     void STATIC_ParametersToObjectsContainer([Ref] Project project, [Const, Ref] VectorParameterMetadata parameters, [Ref] ObjectsContainer outputObjectsContainer);
     unsigned long STATIC_GetObjectParameterIndexFor([Const, Ref] VectorParameterMetadata parameters, unsigned long parameterIndex);
-};
-
-interface EventsFunctionTools {
-    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunctionsContainer functionsContainer, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
-    void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
-    void STATIC_ObjectEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedObject eventsBasedObject, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
 
 interface ObjectMetadata {

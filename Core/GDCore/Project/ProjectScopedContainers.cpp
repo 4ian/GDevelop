@@ -14,35 +14,48 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
     const gd::Project &project,
       const gd::EventsFunctionsContainer &eventsFunctionsContainer,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &globalObjectsContainers,
-    gd::ObjectsContainer &objectsContainers) {
+    gd::ObjectsContainer &parameterObjectsContainer) {
 
-    gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-        project, eventsFunctionsContainer, eventsFunction,
-        globalObjectsContainers, objectsContainers);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainers, objectsContainers);
-    projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(eventsFunctionsContainer));
+  gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
+      project, eventsFunctionsContainer, eventsFunction, parameterObjectsContainer);
+
+  ProjectScopedContainers projectScopedContainers(
+      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+          parameterObjectsContainer),
+      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+  projectScopedContainers.AddParameters(
+      eventsFunction.GetParametersForEvents(eventsFunctionsContainer));
 
   return projectScopedContainers;
-}
+};
 
 ProjectScopedContainers
 ProjectScopedContainers::MakeNewProjectScopedContainersForBehaviorEventsFunction(
     const gd::Project &project,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &globalObjectsContainers,
-    gd::ObjectsContainer &objectsContainers) {
+    gd::ObjectsContainer &parameterObjectsContainer) {
 
-    gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-        project, eventsBasedBehavior, eventsFunction, globalObjectsContainers,
-        objectsContainers);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainers, objectsContainers);
-    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetSharedPropertyDescriptors());
-    projectScopedContainers.AddPropertiesContainer(eventsBasedBehavior.GetPropertyDescriptors());
-    projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(eventsBasedBehavior.GetEventsFunctions()));
+  gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
+      project,
+      eventsBasedBehavior,
+      eventsFunction,
+      parameterObjectsContainer);
+
+  ProjectScopedContainers projectScopedContainers(
+      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+          parameterObjectsContainer),
+      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedBehavior.GetSharedPropertyDescriptors());
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedBehavior.GetPropertyDescriptors());
+  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
+      eventsBasedBehavior.GetEventsFunctions()));
 
   return projectScopedContainers;
 }
@@ -52,16 +65,21 @@ ProjectScopedContainers::MakeNewProjectScopedContainersForObjectEventsFunction(
     const gd::Project &project,
     const gd::EventsBasedObject &eventsBasedObject,
     const gd::EventsFunction &eventsFunction,
-    gd::ObjectsContainer &globalObjectsContainers,
-    gd::ObjectsContainer &objectsContainers) {
+    gd::ObjectsContainer &parameterObjectsContainer) {
 
-    gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
-        project, eventsBasedObject, eventsFunction, globalObjectsContainers,
-        objectsContainers);
-    auto projectScopedContainers =
-      gd::ProjectScopedContainers::MakeNewProjectScopedContainersFor(globalObjectsContainers, objectsContainers);
-    projectScopedContainers.AddPropertiesContainer(eventsBasedObject.GetPropertyDescriptors());
-    projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(eventsBasedObject.GetEventsFunctions()));
+  gd::EventsFunctionTools::ObjectEventsFunctionToObjectsContainer(
+      project, eventsBasedObject, eventsFunction, parameterObjectsContainer);
+
+  ProjectScopedContainers projectScopedContainers(
+      ObjectsContainersList::MakeNewObjectsContainersListForContainer(
+          parameterObjectsContainer),
+      VariablesContainersList::MakeNewEmptyVariablesContainersList(),
+      PropertiesContainersList::MakeNewEmptyPropertiesContainersList());
+
+  projectScopedContainers.AddPropertiesContainer(
+      eventsBasedObject.GetPropertyDescriptors());
+  projectScopedContainers.AddParameters(eventsFunction.GetParametersForEvents(
+      eventsBasedObject.GetEventsFunctions()));
 
   return projectScopedContainers;
 }

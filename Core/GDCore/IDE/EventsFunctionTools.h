@@ -3,11 +3,11 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
-#ifndef EventsFunctionTools_H
-#define EventsFunctionTools_H
+#pragma once 
+
 #include <vector>
 #include "GDCore/String.h"
+
 namespace gd {
 class Project;
 class EventsFunctionsContainer;
@@ -37,8 +37,8 @@ class GD_CORE_API EventsFunctionTools {
       const gd::Project& project,
       const gd::EventsFunctionsContainer functionContainer,
       const gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);
+
   /**
    * \brief Given a behavior events function, initialize the given objects container
    * with objects described in the events function parameters, in
@@ -52,8 +52,8 @@ class GD_CORE_API EventsFunctionTools {
       const gd::Project& project,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);
+
   /**
    * \brief Given a parent-object events function, initialize the given objects container
    * with objects described in the events function parameters, in
@@ -67,10 +67,6 @@ class GD_CORE_API EventsFunctionTools {
       const gd::Project& project,
       const gd::EventsBasedObject& eventsBasedObject,
       const gd::EventsFunction& eventsFunction,
-      gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);
 };
 }  // namespace gd
-
-#endif  // EventsFunctionTools_H
-#endif

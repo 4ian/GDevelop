@@ -27,7 +27,7 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
-  eventsFunctionsExtension?: gdEventsFunctionsExtension,
+  eventsFunctionsExtension?: ?gdEventsFunctionsExtension,
   objectType: string,
   objectBehaviorsTypes: Array<string>,
   open: boolean,

@@ -27,6 +27,7 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/PropertiesContainer.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
@@ -125,12 +126,10 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
-  auto projectScopedContainers = gd::ProjectScopedContainers::
-      MakeNewProjectScopedContainersForFreeEventsFunction(
-          project, functionsContainer, eventsFunction, globalObjectsAndGroups,
-          objectsAndGroups);
+  gd::ObjectsContainer parameterObjectsAndGroups;
+  auto projectScopedContainers =
+      gd::ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
+              project, functionsContainer, eventsFunction, parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -164,12 +163,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& preludeCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
+
+  gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
-          project, eventsBasedBehavior, eventsFunction, globalObjectsAndGroups,
-          objectsAndGroups);
+          project, eventsBasedBehavior,
+          eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -230,12 +229,12 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     const gd::String& endingCode,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  gd::ObjectsContainer globalObjectsAndGroups;
-  gd::ObjectsContainer objectsAndGroups;
+
+  gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
-          project, eventsBasedObject, eventsFunction, globalObjectsAndGroups,
-          objectsAndGroups);
+          project, eventsBasedObject,
+          eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);

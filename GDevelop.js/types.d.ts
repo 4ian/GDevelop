@@ -318,8 +318,6 @@ export class VariablesContainer extends EmscriptenObject {
 }
 
 export class VariablesContainersList extends EmscriptenObject {
-  static makeNewVariablesContainersListForProjectAndLayout(project: Project, layout: Layout): VariablesContainersList;
-  static makeNewEmptyVariablesContainersList(): VariablesContainersList;
   has(name: string): boolean;
   get(name: string): Variable;
   getVariablesContainerFromVariableName(variableName: string): VariablesContainer;
@@ -594,10 +592,9 @@ export class ObjectsContainersList extends EmscriptenObject {
 
 export class ProjectScopedContainers extends EmscriptenObject {
   static makeNewProjectScopedContainersForProjectAndLayout(project: Project, layout: Layout): ProjectScopedContainers;
-  static makeNewProjectScopedContainersFor(globalObjectsContainer: ObjectsContainer, objectsContainer: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
-  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, globalObjectsContainers: ObjectsContainer, objectsContainers: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForFreeEventsFunction(project: Project, eventsFunctionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForBehaviorEventsFunction(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
+  static makeNewProjectScopedContainersForObjectEventsFunction(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, parameterObjectsContainer: ObjectsContainer): ProjectScopedContainers;
   static makeNewProjectScopedContainersWithLocalVariables(projectScopedContainers: ProjectScopedContainers, event: BaseEvent): ProjectScopedContainers;
   addPropertiesContainer(propertiesContainer: PropertiesContainer): ProjectScopedContainers;
   addParameters(parameters: VectorParameterMetadata): ProjectScopedContainers;
@@ -1448,12 +1445,6 @@ export class VectorParameterMetadata extends EmscriptenObject {
 export class ParameterMetadataTools extends EmscriptenObject {
   static parametersToObjectsContainer(project: Project, parameters: VectorParameterMetadata, outputObjectsContainer: ObjectsContainer): void;
   static getObjectParameterIndexFor(parameters: VectorParameterMetadata, parameterIndex: number): number;
-}
-
-export class EventsFunctionTools extends EmscriptenObject {
-  static freeEventsFunctionToObjectsContainer(project: Project, functionsContainer: EventsFunctionsContainer, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  static behaviorEventsFunctionToObjectsContainer(project: Project, eventsBasedBehavior: EventsBasedBehavior, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
-  static objectEventsFunctionToObjectsContainer(project: Project, eventsBasedObject: EventsBasedObject, eventsFunction: EventsFunction, outputGlobalObjectsContainer: ObjectsContainer, outputObjectsContainer: ObjectsContainer): void;
 }
 
 export class ObjectMetadata extends EmscriptenObject {

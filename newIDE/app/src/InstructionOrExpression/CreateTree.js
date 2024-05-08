@@ -91,4 +91,7 @@ export const findInTree = <T: Object>(
   instructionTreeNode: TreeNode<T>,
   instructionType: ?string
 ): ?Array<string> =>
-  doFindInTree(instructionTreeNode, getInstructionType(instructionType));
+  doFindInTree(
+    instructionTreeNode,
+    instructionType && getInstructionType(instructionType)
+  );

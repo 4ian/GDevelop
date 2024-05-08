@@ -911,18 +911,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     {
       project,
       layout: testLayout,
-    },
-    project,
-    testLayout
+    }
   );
 
   const emptySceneProjectScopedContainersAccessor = new ProjectScopedContainersAccessor(
     {
       project,
       layout: emptyLayout,
-    },
-    project,
-    emptyLayout
+    }
   );
 
   return {

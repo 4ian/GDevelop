@@ -41,9 +41,7 @@ export const setupFunctionFromEvents = ({
 
   // Analyze events...
   const projectScopedContainers = new ProjectScopedContainersAccessor(
-    scope,
-    globalObjectsContainer,
-    objectsContainer
+    scope
   ).get();
   const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
     gd.JsPlatform.get()

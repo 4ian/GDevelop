@@ -3,16 +3,19 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDJS_BEHAVIORCODEGENERATOR_H
-#define GDJS_BEHAVIORCODEGENERATOR_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
 
+#include "GDCore/Project/Project.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+
 namespace gd {
 class NamedPropertyDescriptor;
+class EventsBasedBehavior;
 }
 
 namespace gdjs {
@@ -166,4 +169,3 @@ class BehaviorCodeGenerator {
 };
 
 }  // namespace gdjs
-#endif  // GDJS_BEHAVIORCODEGENERATOR_H

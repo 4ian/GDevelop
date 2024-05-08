@@ -9,7 +9,7 @@ export type EventsScope = {|
   project: gdProject,
   layout?: ?gdLayout,
   externalEvents?: ?gdExternalEvents,
-  eventsFunctionsExtension?: gdEventsFunctionsExtension,
+  eventsFunctionsExtension?: ?gdEventsFunctionsExtension,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsBasedObject?: ?gdEventsBasedObject,
   eventsFunction?: ?gdEventsFunction,
@@ -17,19 +17,16 @@ export type EventsScope = {|
 
 export class ProjectScopedContainersAccessor {
   _scope: EventsScope;
-  _globalObjectsContainer: gdObjectsContainer;
-  _objectsContainer: gdObjectsContainer;
+  _parameterObjectsContainer: gdObjectsContainer | null;
   _eventPath: Array<gdBaseEvent>;
 
   constructor(
     scope: EventsScope,
-    globalObjectsContainer: gdObjectsContainer,
-    objectsContainer: gdObjectsContainer,
+    parameterObjectsContainer: gdObjectsContainer | null = null,
     eventPath: Array<gdBaseEvent> = []
   ) {
     this._scope = scope;
-    this._globalObjectsContainer = globalObjectsContainer;
-    this._objectsContainer = objectsContainer;
+    this._parameterObjectsContainer = parameterObjectsContainer;
     this._eventPath = eventPath;
   }
 
@@ -48,30 +45,27 @@ export class ProjectScopedContainersAccessor {
         project,
         layout
       );
-    } else if (eventsFunction) {
+    } else if (eventsFunction && this._parameterObjectsContainer) {
       if (eventsBasedBehavior) {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForBehaviorEventsFunction(
           project,
           eventsBasedBehavior,
           eventsFunction,
-          this._globalObjectsContainer,
-          this._objectsContainer
+          this._parameterObjectsContainer
         );
       } else if (eventsBasedObject) {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForObjectEventsFunction(
           project,
           eventsBasedObject,
           eventsFunction,
-          this._globalObjectsContainer,
-          this._objectsContainer
+          this._parameterObjectsContainer
         );
       } else if (eventsFunctionsExtension) {
         projectScopedContainers = gd.ProjectScopedContainers.makeNewProjectScopedContainersForFreeEventsFunction(
           project,
           eventsFunctionsExtension,
           eventsFunction,
-          this._globalObjectsContainer,
-          this._objectsContainer
+          this._parameterObjectsContainer
         );
       } else {
         throw new Error(
@@ -80,7 +74,7 @@ export class ProjectScopedContainersAccessor {
       }
     } else {
       throw new Error(
-        'Called `ProjectScopedContainers.get` without a layout or an eventsFunction'
+        'Called `ProjectScopedContainers.get` without a layout or an eventsFunction and eventsFunctionsExtension'
       );
     }
     for (const event of this._eventPath) {
@@ -96,8 +90,7 @@ export class ProjectScopedContainersAccessor {
   makeNewProjectScopedContainersWithLocalVariables(event: gdBaseEvent) {
     return new ProjectScopedContainersAccessor(
       this._scope,
-      this._globalObjectsContainer,
-      this._objectsContainer,
+      this._parameterObjectsContainer,
       [...this._eventPath, event]
     );
   }

@@ -84,9 +84,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
       layout,
     };
     const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      scope,
-      project,
-      layout
+      scope
     );
 
     return (

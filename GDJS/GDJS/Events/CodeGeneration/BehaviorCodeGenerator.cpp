@@ -6,6 +6,8 @@
 #include "BehaviorCodeGenerator.h"
 
 #include "EventsCodeGenerator.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 
 namespace gdjs {
 

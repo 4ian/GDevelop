@@ -3,16 +3,18 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDJS_OBJECTCODEGENERATOR_H
-#define GDJS_OBJECTCODEGENERATOR_H
+#pragma once
+
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/Project.h"
+
 namespace gd {
 class NamedPropertyDescriptor;
+class EventsBasedObject;
 }
 
 namespace gdjs {
@@ -117,4 +119,3 @@ class ObjectCodeGenerator {
 };
 
 }  // namespace gdjs
-#endif  // GDJS_OBJECTCODEGENERATOR_H

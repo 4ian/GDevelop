@@ -183,7 +183,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             globalObjectsContainer={project}
             objectsContainer={layout}
             projectScopedContainersAccessor={
-              new ProjectScopedContainersAccessor(scope, project, layout)
+              new ProjectScopedContainersAccessor(scope)
             }
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}

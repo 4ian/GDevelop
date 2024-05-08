@@ -559,10 +559,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless
-#define STATIC_MakeNewVariablesContainersListForProjectAndLayout \
-  MakeNewVariablesContainersListForProjectAndLayout
-#define STATIC_MakeNewEmptyVariablesContainersList \
-  MakeNewEmptyVariablesContainersList
 #define STATIC_MakeNewObjectsContainersListForProjectAndLayout \
   MakeNewObjectsContainersListForProjectAndLayout
 #define STATIC_MakeNewObjectsContainersListForContainers \
@@ -581,6 +577,12 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   MakeNewProjectScopedContainersForObjectEventsFunction
 #define STATIC_MakeNewProjectScopedContainersWithLocalVariables \
   MakeNewProjectScopedContainersWithLocalVariables
+#define STATIC_MakeNewProjectScopedContainersForFreeEventsFunction \
+  MakeNewProjectScopedContainersForFreeEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForBehaviorEventsFunction \
+  MakeNewProjectScopedContainersForBehaviorEventsFunction
+#define STATIC_MakeNewProjectScopedContainersForObjectEventsFunction \
+  MakeNewProjectScopedContainersForObjectEventsFunction
 
 #define STATIC_GetExtensionAndBehaviorMetadata GetExtensionAndBehaviorMetadata
 #define STATIC_GetExtensionAndObjectMetadata GetExtensionAndObjectMetadata
@@ -698,12 +700,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FoldAll FoldAll
 #define STATIC_UnfoldToLevel UnfoldToLevel
 
-#define STATIC_FreeEventsFunctionToObjectsContainer \
-  FreeEventsFunctionToObjectsContainer
-#define STATIC_BehaviorEventsFunctionToObjectsContainer \
-  BehaviorEventsFunctionToObjectsContainer
-#define STATIC_ObjectEventsFunctionToObjectsContainer \
-  ObjectEventsFunctionToObjectsContainer
 #define STATIC_ParametersToObjectsContainer ParametersToObjectsContainer
 #define STATIC_GetObjectParameterIndexFor GetObjectParameterIndexFor
 

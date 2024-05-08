@@ -129,6 +129,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   // (like ObjectGroupsList) because objects "ptr" changed.
   _globalObjectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
   _objectsContainer: gdObjectsContainer = new gd.ObjectsContainer();
+  _projectScopedContainersAccessor: ProjectScopedContainersAccessor | null = null;
 
   componentDidMount() {
     if (this.props.initiallyFocusedFunctionName) {
@@ -155,37 +156,28 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedObject: ?gdEventsBasedObject,
     eventsFunctionsExtension: ?gdEventsFunctionsExtension
   ) => {
-    // Initialize this "context" of objects with the function
-    // (as done during code generation).
-    if (eventsBasedBehavior) {
-      gd.EventsFunctionTools.behaviorEventsFunctionToObjectsContainer(
-        project,
-        eventsBasedBehavior,
-        eventsFunction,
-        this._globalObjectsContainer,
-        this._objectsContainer
-      );
-    } else if (eventsBasedObject) {
-      gd.EventsFunctionTools.objectEventsFunctionToObjectsContainer(
-        project,
-        eventsBasedObject,
-        eventsFunction,
-        this._globalObjectsContainer,
-        this._objectsContainer
-      );
-    } else if (eventsFunctionsExtension) {
-      gd.EventsFunctionTools.freeEventsFunctionToObjectsContainer(
-        project,
-        eventsFunctionsExtension,
-        eventsFunction,
-        this._globalObjectsContainer,
-        this._objectsContainer
-      );
-    } else {
+    if (
+      !eventsFunctionsExtension &&
+      !eventsBasedBehavior &&
+      !eventsBasedObject
+    ) {
       throw new Error(
         'No extension, behavior or object was specified when loading a function'
       );
     }
+    const scope = {
+      project,
+      layout: null,
+      externalEvents: null,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
+      eventsBasedObject,
+      eventsFunction,
+    };
+    this._projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
+      scope,
+      this._objectsContainer
+    );
   };
 
   updateToolbar = () => {
@@ -1131,11 +1123,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       eventsBasedObject: selectedEventsBasedObject,
       eventsFunction: selectedEventsFunction,
     };
-    const projectScopedContainersAccessor = new ProjectScopedContainersAccessor(
-      scope,
-      this._globalObjectsContainer,
-      this._objectsContainer
-    );
 
     const selectedEventsBasedEntity =
       selectedEventsBasedBehavior || selectedEventsBasedObject;
@@ -1221,6 +1208,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         toolbarControls: [],
         renderEditor: () =>
           selectedEventsFunction &&
+          this._projectScopedContainersAccessor &&
           this._globalObjectsContainer &&
           this._objectsContainer ? (
             <Background>
@@ -1232,7 +1220,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 globalObjectsContainer={this._globalObjectsContainer}
                 objectsContainer={this._objectsContainer}
                 projectScopedContainersAccessor={
-                  projectScopedContainersAccessor
+                  this._projectScopedContainersAccessor
                 }
                 events={selectedEventsFunction.getEvents()}
                 onOpenExternalEvents={() => {}}

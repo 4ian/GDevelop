@@ -37,6 +37,9 @@ class GD_CORE_API ObjectsContainersList {
       const gd::ObjectsContainer& globalObjectsContainer,
       const gd::ObjectsContainer& objectsContainer);
 
+  static ObjectsContainersList MakeNewObjectsContainersListForContainer(
+      const gd::ObjectsContainer& objectsContainer);
+
   /**
    * \brief Check if the specified object or group exists.
    */

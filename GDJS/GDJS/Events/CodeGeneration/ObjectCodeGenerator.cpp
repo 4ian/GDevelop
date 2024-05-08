@@ -6,6 +6,8 @@
 #include "ObjectCodeGenerator.h"
 
 #include "EventsCodeGenerator.h"
+#include "GDCore/Project/EventsBasedObject.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 
 namespace gdjs {
 

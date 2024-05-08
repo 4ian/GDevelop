@@ -121,7 +121,7 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
-    const gd::EventsFunctionsContainer& functionsContainer,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -129,7 +129,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ObjectsContainer parameterObjectsAndGroups;
   auto projectScopedContainers =
       gd::ProjectScopedContainers::MakeNewProjectScopedContainersForFreeEventsFunction(
-              project, functionsContainer, eventsFunction, parameterObjectsAndGroups);
+              project, eventsFunctionsExtension, eventsFunction, parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
   codeGenerator.SetCodeNamespace(codeNamespace);
@@ -139,9 +139,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          eventsFunction.GetParametersForEvents(functionsContainer), 0, true),
+          eventsFunction.GetParametersForEvents(eventsFunctionsExtension), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParametersForEvents(functionsContainer),
+          eventsFunction.GetParametersForEvents(eventsFunctionsExtension),
           "runtimeScene.getOnceTriggers()",
           eventsFunction.IsAsync()),
       eventsFunction.GetEvents(),
@@ -155,6 +155,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
@@ -167,7 +168,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForBehaviorEventsFunction(
-          project, eventsBasedBehavior,
+          project, eventsFunctionsExtension, eventsBasedBehavior,
           eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
@@ -220,6 +221,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
     gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
     const gd::EventsFunction& eventsFunction,
     const gd::String& codeNamespace,
@@ -233,7 +235,7 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   gd::ObjectsContainer parameterObjectsContainers;
   auto projectScopedContainers = gd::ProjectScopedContainers::
       MakeNewProjectScopedContainersForObjectEventsFunction(
-          project, eventsBasedObject,
+          project, eventsFunctionsExtension, eventsBasedObject,
           eventsFunction, parameterObjectsContainers);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);

@@ -5,6 +5,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 
 namespace gd {
 
@@ -18,6 +19,14 @@ VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
   variablesContainersList.Push(project.GetVariables());
   variablesContainersList.Push(layout.GetVariables());
   variablesContainersList.firstLocalVariableContainerIndex = 2;
+  return variablesContainersList;
+}
+
+VariablesContainersList
+VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtension(
+    const gd::EventsFunctionsExtension &extension) {
+  // TODO Add the extension variable container.
+  VariablesContainersList variablesContainersList;
   return variablesContainersList;
 }
 

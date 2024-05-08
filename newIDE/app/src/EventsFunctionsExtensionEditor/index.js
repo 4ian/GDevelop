@@ -1424,6 +1424,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         </ResponsiveWindowMeasurer>
         {editOptionsDialogOpen && (
           <OptionsEditorDialog
+            project={project}
             eventsFunctionsExtension={eventsFunctionsExtension}
             open
             onClose={() => this._editOptions(false)}

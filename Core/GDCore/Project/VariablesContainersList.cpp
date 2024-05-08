@@ -25,8 +25,10 @@ VariablesContainersList::MakeNewVariablesContainersListForProjectAndLayout(
 VariablesContainersList
 VariablesContainersList::MakeNewVariablesContainersListForEventsFunctionsExtension(
     const gd::EventsFunctionsExtension &extension) {
-  // TODO Add the extension variable container.
   VariablesContainersList variablesContainersList;
+  variablesContainersList.Push(extension.GetGlobalVariables());
+  variablesContainersList.Push(extension.GetSceneVariables());
+  variablesContainersList.firstLocalVariableContainerIndex = 2;
   return variablesContainersList;
 }
 

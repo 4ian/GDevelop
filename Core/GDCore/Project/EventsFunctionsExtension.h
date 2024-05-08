@@ -3,8 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EVENTSFUNCTIONEXTENSION_H
-#define GDCORE_EVENTSFUNCTIONEXTENSION_H
+#pragma once
 
 #include <vector>
 
@@ -12,6 +11,7 @@
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsBasedObject.h"
 #include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
@@ -216,6 +216,37 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
 
   ///@}
 
+  /** \name Variable management
+   * Members functions related to layout variables management.
+   */
+  ///@{
+
+  /**
+   * Return the scene variables of the extension.
+   */
+  inline const gd::VariablesContainer& GetGlobalVariables() const {
+    return globalVariables;
+  }
+
+  /**
+   * Return the scene variables of the extension.
+   */
+  inline gd::VariablesContainer& GetGlobalVariables() { return globalVariables; }
+
+  /**
+   * Return the global variables of the extension.
+   */
+  inline const gd::VariablesContainer& GetSceneVariables() const {
+    return sceneVariables;
+  }
+
+  /**
+   * Return the global variables of the extension.
+   */
+  inline gd::VariablesContainer& GetSceneVariables() { return sceneVariables; }
+
+  ///@}
+
   /** \name Serialization
    */
   ///@{
@@ -298,8 +329,9 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
   gd::SerializableWithNameList<EventsBasedObject> eventsBasedObjects;
   std::vector<gd::DependencyMetadata> dependencies;
+  
+  gd::VariablesContainer globalVariables;
+  gd::VariablesContainer sceneVariables;
 };
 
 }  // namespace gd
-
-#endif  // GDCORE_EVENTSFUNCTIONEXTENSION_H

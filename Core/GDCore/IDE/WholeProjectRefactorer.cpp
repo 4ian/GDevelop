@@ -254,7 +254,7 @@ void WholeProjectRefactorer::UpdateExtensionNameInEventsBasedBehavior(
     gd::EventsBasedBehavior &eventsBasedBehavior,
     const gd::String &sourceExtensionName) {
   const EventBasedBehaviorBrowser eventBasedBehaviorExposer(
-      eventsBasedBehavior);
+      eventsFunctionsExtension, eventsBasedBehavior);
   WholeProjectRefactorer::RenameEventsFunctionsExtension(
       project, eventsFunctionsExtension, sourceExtensionName,
       eventsFunctionsExtension.GetName(), eventBasedBehaviorExposer);
@@ -770,7 +770,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
                                               oldPropertyName, newPropertyName);
 
     gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-        project, eventsBasedBehavior, behaviorRenamer);
+        project, eventsFunctionsExtension, eventsBasedBehavior, behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
     // their related actions/conditions/expressions. Rename these.
@@ -840,7 +840,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehaviorSharedProperty(
                                               oldPropertyName, newPropertyName);
 
     gd::ProjectBrowserHelper::ExposeEventsBasedBehaviorEvents(
-        project, eventsBasedBehavior, behaviorRenamer);
+        project, eventsFunctionsExtension, eventsBasedBehavior, behaviorRenamer);
   } else {
     // Properties that represent primitive values will be used through
     // their related actions/conditions/expressions. Rename these.

@@ -384,7 +384,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MySpriteObject.MyObjectVariableStructure["Can be anything, so will pick the first child"].|'
+            'MySpriteObject.MyObjectVariableStructure["Can be anything" + ", so will" + " pick the first child"].|'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -397,7 +397,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MySpriteObject.MyObjectVariableStructure|["Can be anything, so will pick the first child"].'
+            'MySpriteObject.MyObjectVariableStructure|["Can be anything" + ", so will" + " pick the first child"].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -450,7 +450,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MySpriteObject.MyObjectVariableStructure.Child2Array[42].|'
+            'MySpriteObject.MyObjectVariableStructure.Child2Array[40 + 2].|'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -463,7 +463,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MySpriteObject.MyObjectVariableStructure.Child2Array|[42].'
+            'MySpriteObject.MyObjectVariableStructure.Child2Array|[40 + 2].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -475,7 +475,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MySpriteObject.MyObjectVariableStructure|.Child2Array[42].'
+            'MySpriteObject.MyObjectVariableStructure|.Child2Array[40 + 2].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -656,7 +656,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'GroupOfSpriteObjects.MyObjectVariableStructure["Can be anything, so will pick the first child"].|'
+            'GroupOfSpriteObjects.MyObjectVariableStructure["Can be anything" + ", so will" + " pick the first child"].|'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -669,7 +669,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'GroupOfSpriteObjects.MyObjectVariableStructure|["Can be anything, so will pick the first child"].'
+            'GroupOfSpriteObjects.MyObjectVariableStructure|["Can be anything" + ", so will" + " pick the first child"].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -722,7 +722,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'GroupOfSpriteObjects.MyObjectVariableStructure.Child2Array[42].|'
+            'GroupOfSpriteObjects.MyObjectVariableStructure.Child2Array[40 + 2].|'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -735,7 +735,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'GroupOfSpriteObjects.MyObjectVariableStructure.Child2Array|[42].'
+            'GroupOfSpriteObjects.MyObjectVariableStructure.Child2Array|[40 + 2].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -747,7 +747,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'GroupOfSpriteObjects.MyObjectVariableStructure|.Child2Array[42].'
+            'GroupOfSpriteObjects.MyObjectVariableStructure|.Child2Array[40 + 2].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -912,7 +912,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MyVariableStructure["Can be anything, so will pick the first child"].|'
+            'MyVariableStructure["Can be anything" + ", so will" + " pick the first child"].|'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -925,7 +925,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         expect(
           testCompletions(
             'number',
-            'MyVariableStructure|["Can be anything, so will pick the first child"].'
+            'MyVariableStructure|["Can be anything" + ", so will" + " pick the first child"].'
           )
         ).toMatchInlineSnapshot(`
           [
@@ -975,7 +975,7 @@ describe('gd.ExpressionCompletionFinder', function () {
       test('Structure, 3 levels (array bracket notation)', () => {
         // Complete with the children of the first item of the array:
         expect(
-          testCompletions('number', 'MyVariableStructure.Child2Array[42].|')
+          testCompletions('number', 'MyVariableStructure.Child2Array[40 + 2].|')
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 2, no prefix, Child2ArrayItem0Child1, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -985,7 +985,7 @@ describe('gd.ExpressionCompletionFinder', function () {
         `);
         // Completion of the previous variables, if we move the cursor back:
         expect(
-          testCompletions('number', 'MyVariableStructure.Child2Array|[42].')
+          testCompletions('number', 'MyVariableStructure.Child2Array|[40 + 2].')
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 4, no prefix, Child1Structure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",
@@ -994,7 +994,7 @@ describe('gd.ExpressionCompletionFinder', function () {
           ]
         `);
         expect(
-          testCompletions('number', 'MyVariableStructure|.Child2Array[42].')
+          testCompletions('number', 'MyVariableStructure|.Child2Array[40 + 2].')
         ).toMatchInlineSnapshot(`
           [
             "{ 3, no type, 4, no prefix, MyVariableStructure, no object name, no behavior name, non-exact, not last parameter, no parameter metadata, no object configuration }",

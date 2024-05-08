@@ -29,8 +29,11 @@ namespace gd {
  */
 class GD_CORE_API EventBasedBehaviorBrowser : public ProjectBrowser {
 public:
-  EventBasedBehaviorBrowser(gd::EventsBasedBehavior &eventsBasedBehavior_)
-      : eventsBasedBehavior(eventsBasedBehavior_) {}
+  EventBasedBehaviorBrowser(
+      const gd::EventsFunctionsExtension &eventsFunctionsExtension_,
+      gd::EventsBasedBehavior &eventsBasedBehavior_)
+      : eventsFunctionsExtension(eventsFunctionsExtension_),
+        eventsBasedBehavior(eventsBasedBehavior_) {}
 
   /**
    * \brief Call the specified worker on all events of the event-based
@@ -48,7 +51,7 @@ public:
    * This should be the preferred way to traverse all the events of an event-based behavior.
    */
   void
-  ExposeEvents(gd::Project &project,
+  ExposeEvents(gd::Project &project, 
                gd::ArbitraryEventsWorkerWithContext &worker) const override;
 
   /**
@@ -80,6 +83,7 @@ public:
                          gd::ArbitraryBehaviorSharedDataWorker &worker) const override;
 
 private:
+  const gd::EventsFunctionsExtension &eventsFunctionsExtension;
   gd::EventsBasedBehavior &eventsBasedBehavior;
 };
 

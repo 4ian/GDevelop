@@ -183,13 +183,13 @@ void ProjectBrowserHelper::ExposeEventsFunctionsExtensionEvents(
     for (auto &&eventsBasedBehavior :
          eventsFunctionsExtension.GetEventsBasedBehaviors()
              .GetInternalVector()) {
-      ExposeEventsBasedBehaviorEvents(project, *eventsBasedBehavior, worker);
+      ExposeEventsBasedBehaviorEvents(project, eventsFunctionsExtension, *eventsBasedBehavior, worker);
     }
 
     // Add (object) events functions
     for (auto &&eventsBasedObject :
          eventsFunctionsExtension.GetEventsBasedObjects().GetInternalVector()) {
-      ExposeEventsBasedObjectEvents(project, *eventsBasedObject, worker);
+      ExposeEventsBasedObjectEvents(project, eventsFunctionsExtension, *eventsBasedObject, worker);
     }
 }
 

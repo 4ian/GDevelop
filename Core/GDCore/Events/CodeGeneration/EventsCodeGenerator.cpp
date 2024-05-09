@@ -586,6 +586,12 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   return actionCode;
 }
 
+gd::String EventsCodeGenerator::GenerateLocalVariablesStackAccessor() {
+  return (HasProjectAndLayout() ? GetCodeNamespace()
+                                : "eventsFunctionContext") +
+         ".localVariables";
+}
+
 const EventsCodeGenerator::CallbackDescriptor
 EventsCodeGenerator::GenerateCallback(
     const gd::String& callbackID,
@@ -611,11 +617,9 @@ EventsCodeGenerator::GenerateCallback(
   }
 
   gd::String restoreLocalVariablesCode;
-  if (HasProjectAndLayout()) {
-    restoreLocalVariablesCode +=
-        "asyncObjectsList.restoreLocalVariablesContainers(" +
-        GetCodeNamespace() + ".localVariables);\n";
-  }
+  restoreLocalVariablesCode +=
+      "asyncObjectsList.restoreLocalVariablesContainers(" +
+      GenerateLocalVariablesStackAccessor() + ");\n";
 
   // Compose the callback function and add outside main
   const gd::String actionsDeclarationsCode =

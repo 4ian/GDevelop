@@ -520,6 +520,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  _behaviorNamesMap: {\n" +
          behaviorNamesMap +
          "},\n"
+         // The local variables stack:
+         "  localVariables: [],\n"
          // Function that will be used to query objects, when a new object list
          // is needed by events. We assume it's used a lot by the events
          // generated code, so we cache the arrays in a map.
@@ -1297,7 +1299,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       std::size_t localVariablesIndex =
           variablesContainersList.GetLocalVariablesContainerPosition(
               variablesContainer);
-      output = GetCodeNamespace() + ".localVariables[" +
+      output = GenerateLocalVariablesStackAccessor() + "[" +
                 gd::String::From(localVariablesIndex) + "]";
     } else if (sourceType ==
                 gd::VariablesContainer::SourceType::ExtensionGlobal) {

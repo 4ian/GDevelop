@@ -488,6 +488,11 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::String& lhs,
       const gd::String& rhs);
 
+  /**
+   * \brief Generate the code to access the local variables stack.
+   */
+  virtual gd::String GenerateLocalVariablesStackAccessor();
+
  protected:
   virtual const gd::String GenerateRelationalOperatorCodes(
       const gd::String& operatorString);

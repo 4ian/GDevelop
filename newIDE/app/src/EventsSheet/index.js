@@ -883,9 +883,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         {
           label: i18n._(t`Add Local Variable`),
           click: () => this.addLocalVariable(),
-          enabled:
-            this._selectionCanHaveLocalVariables() &&
-            !this.props.scope.eventsFunctionsExtension,
+          enabled: this._selectionCanHaveLocalVariables(),
           accelerator: getShortcutDisplayName(
             this.props.shortcutMap['ADD_LOCAL_VARIABLE']
           ),

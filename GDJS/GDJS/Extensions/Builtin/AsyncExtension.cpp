@@ -50,14 +50,9 @@ AsyncExtension::AsyncExtension() {
                   "gdjs.LongLivedObjectsList.from(parentAsyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
 
-        if (codeGenerator.HasProjectAndLayout()) {
-          asyncContextBuilder +=
-              "asyncObjectsList.backupLocalVariablesContainers(" +
-              codeGenerator.GetCodeNamespace() + ".localVariables);\n";
-        }
-        else {
-          asyncContextBuilder += "// Unsupported local variables in functions.\n";
-        }
+        asyncContextBuilder +=
+            "asyncObjectsList.backupLocalVariablesContainers(" +
+            codeGenerator.GenerateLocalVariablesStackAccessor() + ");\n";
 
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {

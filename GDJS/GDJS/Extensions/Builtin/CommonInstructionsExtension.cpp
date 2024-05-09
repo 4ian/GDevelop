@@ -131,14 +131,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         gd::String localVariablesInitializationCode = "";
         if (event_.HasVariables()) {
-          if (codeGenerator.HasProjectAndLayout()) {
-            GenerateLocalVariablesInitializationCode(
-                event_.GetVariables(), codeGenerator,
-                localVariablesInitializationCode);
-          } else {
-            localVariablesInitializationCode =
-                "// Unsupported local variables in functions.\n";
-          }
+          GenerateLocalVariablesInitializationCode(
+              event_.GetVariables(), codeGenerator,
+              localVariablesInitializationCode);
         }
 
         gd::String conditionsCode = codeGenerator.GenerateConditionsListCode(
@@ -173,12 +168,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         if (event_.HasVariables()) {
-          if (codeGenerator.HasProjectAndLayout()) {
-            outputCode +=
-                codeGenerator.GetCodeNamespace() + ".localVariables.pop();\n";
-          } else {
-            outputCode += "// Unsupported local variables in functions.\n";
-          }
+          outputCode += codeGenerator.GenerateLocalVariablesStackAccessor() +
+                        ".pop();\n";
         }
 
         return outputCode;
@@ -883,8 +874,8 @@ void CommonInstructionsExtension::GenerateLocalVariablesInitializationCode(
             ", variable);\n";
     code += "}\n";
   }
-  code +=
-      codeGenerator.GetCodeNamespace() + ".localVariables.push(variables);\n";
+  code += codeGenerator.GenerateLocalVariablesStackAccessor() +
+          ".push(variables);\n";
   code += "}\n";
 }
 

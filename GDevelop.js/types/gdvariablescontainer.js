@@ -5,6 +5,8 @@ declare class gdVariablesContainer {
   static Scene: 2;
   static Object: 3;
   static Local: 4;
+  static ExtensionGlobal: 5;
+  static Extension: 6;
   constructor(): void;
   constructor(sourceType: VariablesContainer_SourceType): void;
   getSourceType(): VariablesContainer_SourceType;

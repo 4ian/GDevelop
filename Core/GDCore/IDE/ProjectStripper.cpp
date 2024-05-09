@@ -30,14 +30,18 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
     project.GetLayout(i).GetEvents().Clear();
   }
 
-  // Keep the EventsBasedObject object list because it's useful for the Runtime
+  // Keep:
+  // - the EventsBasedObject object list because it's useful for the Runtime
   // to create the child-object.
+  // - the globalVariables and sceneVariables
   for (unsigned int extensionIndex = 0;
        extensionIndex < project.GetEventsFunctionsExtensionsCount();
        ++extensionIndex) {
     auto &extension = project.GetEventsFunctionsExtension(extensionIndex);
     auto &eventsBasedObjects = extension.GetEventsBasedObjects();
-    if (eventsBasedObjects.size() == 0) {
+    if (eventsBasedObjects.size() == 0 &&
+        extension.GetGlobalVariables().Count() == 0 &&
+        extension.GetSceneVariables().Count() == 0) {
       project.RemoveEventsFunctionsExtension(extension.GetName());
       extensionIndex--;
       continue;
@@ -51,6 +55,11 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
       eventsBasedObject.GetPropertyDescriptors().GetInternalVector().clear();
     }
     extension.GetEventsBasedBehaviors().Clear();
+    std::size_t functionCount = extension.GetEventsFunctionsCount();
+    for (std::size_t i = 0; i < functionCount; i++)
+    {
+      extension.RemoveEventsFunction(extension.GetEventsFunction(0).GetName());
+    }
   }
 }
 

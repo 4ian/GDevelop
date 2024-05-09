@@ -75,6 +75,7 @@ namespace gdjs {
   export class RuntimeGame {
     _resourcesLoader: gdjs.ResourceLoader;
     _variables: VariablesContainer;
+    _variablesByExtensionName: Map<string, gdjs.VariablesContainer>;
     _data: ProjectData;
     _eventsBasedObjectDatas: Map<String, EventsBasedObjectData>;
     _effectsManager: EffectsManager;
@@ -144,6 +145,18 @@ namespace gdjs {
     constructor(data: ProjectData, options?: RuntimeGameOptions) {
       this._options = options || {};
       this._variables = new gdjs.VariablesContainer(data.variables);
+      this._variablesByExtensionName = new Map<
+        string,
+        gdjs.VariablesContainer
+      >();
+      for (const extensionData of data.eventsFunctionsExtensions) {
+        if (extensionData.globalVariables.length > 0) {
+          this._variablesByExtensionName.set(
+            extensionData.name,
+            new gdjs.VariablesContainer(extensionData.globalVariables)
+          );
+        }
+      }
       this._data = data;
 
       this._resourcesLoader = new gdjs.ResourceLoader(
@@ -258,6 +271,15 @@ namespace gdjs {
     }
 
     /**
+     * Get the extension's global variables.
+     * @param extensionName The extension name.
+     * @returns The extension's global variables.
+     */
+    getVariablesForExtension(extensionName: string) {
+      return this._variablesByExtensionName.get(extensionName) || null;
+    }
+
+    /**
      * Get the gdjs.SoundManager of the RuntimeGame.
      * @return The sound manager.
      */
@@ -368,19 +390,20 @@ namespace gdjs {
      * @param sceneName The name of the scene. If not defined, the first scene will be returned.
      * @return The data associated to the scene.
      */
-    getSceneData(sceneName?: string): LayoutData | null {
-      let scene: LayoutData | null = null;
+    getSceneData(sceneName?: string): LayoutAndExtensionsData | null {
       for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
-        const sceneData = this._data.layouts[i];
+        const sceneData = this._data.layouts[i] as LayoutAndExtensionsData;
         if (sceneName === undefined || sceneData.name === sceneName) {
-          scene = sceneData;
-          break;
+          if (!sceneData.usedExtensionsWithVariablesData) {
+            sceneData.usedExtensionsWithVariablesData = this._data.eventsFunctionsExtensions.filter(
+              (extensionData) => extensionData.sceneVariables.length > 0
+            );
+          }
+          return sceneData;
         }
       }
-      if (scene === null) {
-        logger.error('The game has no scene called "' + sceneName + '"');
-      }
-      return scene;
+      logger.error('The game has no scene called "' + sceneName + '"');
+      return null;
     }
 
     /**
@@ -390,15 +413,13 @@ namespace gdjs {
      * @return true if the scene exists. If sceneName is undefined, true if the game has a scene.
      */
     hasScene(sceneName?: string): boolean {
-      let isTrue = false;
       for (let i = 0, len = this._data.layouts.length; i < len; ++i) {
         const sceneData = this._data.layouts[i];
         if (sceneName === undefined || sceneData.name == sceneName) {
-          isTrue = true;
-          break;
+          return true;
         }
       }
-      return isTrue;
+      return false;
     }
 
     /**

@@ -122,11 +122,15 @@ export const quicklyAnalyzeVariableName = (
   return VariableNameQuickAnalyzeResults.OK;
 };
 
-const getVariableSourceIcon = (variableType: VariablesContainer_SourceType) => {
-  switch (variableType) {
+const getVariableSourceIcon = (
+  variableSourceType: VariablesContainer_SourceType
+) => {
+  switch (variableSourceType) {
     case gd.VariablesContainer.Global:
+    case gd.VariablesContainer.ExtensionGlobal:
       return GlobalIcon;
     case gd.VariablesContainer.Scene:
+    case gd.VariablesContainer.Extension:
       return SceneIcon;
     case gd.VariablesContainer.Object:
       return ObjectIcon;

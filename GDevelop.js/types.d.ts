@@ -34,6 +34,8 @@ export enum VariablesContainer_SourceType {
   Scene = 2,
   Object = 3,
   Local = 4,
+  ExtensionGlobal = 5,
+  Extension = 6,
 }
 
 export enum ObjectsContainersList_VariableExistence {

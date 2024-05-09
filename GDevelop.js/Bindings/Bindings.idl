@@ -296,7 +296,9 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::Global",
   "VariablesContainer::Scene",
   "VariablesContainer::Object",
-  "VariablesContainer::Local"
+  "VariablesContainer::Local",
+  "VariablesContainer::ExtensionGlobal",
+  "VariablesContainer::Extension"
 };
 
 interface VariablesContainer {

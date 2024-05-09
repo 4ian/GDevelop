@@ -132,6 +132,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
               project, eventsFunctionsExtension, eventsFunction, parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
+  codeGenerator.SetExtensionName(eventsFunctionsExtension.GetName());
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -1279,31 +1280,35 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == ANY_VARIABLE) {
-    if (HasProjectAndLayout()) {
-      const auto variablesContainersList =
-          GetProjectScopedContainers().GetVariablesContainersList();
-      const auto &variablesContainer =
-          variablesContainersList.GetVariablesContainerFromVariableName(
-              variableName);
-      const auto sourceType = variablesContainer.GetSourceType();
-      if (sourceType == gd::VariablesContainer::SourceType::Scene) {
-        variables = &variablesContainer;
-        output = "runtimeScene.getScene().getVariables()";
-      } else if (sourceType == gd::VariablesContainer::SourceType::Global) {
-        variables = &variablesContainer;
-        output = "runtimeScene.getGame().getVariables()";
-      } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
-        variables = &variablesContainer;
-        std::size_t localVariablesIndex =
-            variablesContainersList.GetLocalVariablesContainerPosition(
-                variablesContainer);
-        output = GetCodeNamespace() + ".localVariables[" +
-                 gd::String::From(localVariablesIndex) + "]";
-      }
-    }
-    else {
-      output = "// Unsupported unified variables in functions.";
-      output += "gdjs.VariablesContainer.badVariablesContainer";
+    const auto variablesContainersList =
+        GetProjectScopedContainers().GetVariablesContainersList();
+    const auto &variablesContainer =
+        variablesContainersList.GetVariablesContainerFromVariableName(
+            variableName);
+    const auto sourceType = variablesContainer.GetSourceType();
+    if (sourceType == gd::VariablesContainer::SourceType::Scene) {
+      variables = &variablesContainer;
+      output = "runtimeScene.getScene().getVariables()";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Global) {
+      variables = &variablesContainer;
+      output = "runtimeScene.getGame().getVariables()";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Local) {
+      variables = &variablesContainer;
+      std::size_t localVariablesIndex =
+          variablesContainersList.GetLocalVariablesContainerPosition(
+              variablesContainer);
+      output = GetCodeNamespace() + ".localVariables[" +
+                gd::String::From(localVariablesIndex) + "]";
+    } else if (sourceType ==
+                gd::VariablesContainer::SourceType::ExtensionGlobal) {
+      variables = &variablesContainer;
+      // TODO Use numbers for indexes to optimize accesses.
+      output = "runtimeScene.getGame().getVariablesForExtension(" +
+                ConvertToStringExplicit(extensionName) + ")";
+    } else if (sourceType == gd::VariablesContainer::SourceType::Extension) {
+      variables = &variablesContainer;
+      output = "runtimeScene.getScene().getVariablesForExtension(" +
+                ConvertToStringExplicit(extensionName) + ")";
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";

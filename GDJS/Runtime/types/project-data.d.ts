@@ -20,6 +20,11 @@ declare interface ProjectData {
   eventsFunctionsExtensions: EventsFunctionsExtensionData[];
 }
 
+declare interface EventsFunctionsVariablesData {
+  name: string;
+  variables: RootVariableData[];
+}
+
 /** Object containing initial properties for all objects extending {@link gdjs.RuntimeObject}. */
 declare type ObjectData = {
   /** The name of the object. During the game, objects can be queried by their name (see {@link gdjs.RuntimeScene.prototype.getObjects} for example). */
@@ -90,6 +95,12 @@ declare interface LayoutData {
 declare interface EventsFunctionsExtensionData {
   name: string;
   eventsBasedObjects: EventsBasedObjectData[];
+  globalVariables: RootVariableData[];
+  sceneVariables: RootVariableData[];
+}
+
+declare interface LayoutAndExtensionsData extends LayoutData {
+  usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
 }
 
 declare interface EventsBasedObjectData {

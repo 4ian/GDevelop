@@ -16,8 +16,8 @@ namespace gd {
 EventsFunctionsExtension::EventsFunctionsExtension() :
     gd::EventsFunctionsContainer(
         gd::EventsFunctionsContainer::FunctionOwner::Extension),
-      globalVariables(gd::VariablesContainer::SourceType::Global),
-      sceneVariables(gd::VariablesContainer::SourceType::Scene) {}
+      globalVariables(gd::VariablesContainer::SourceType::ExtensionGlobal),
+      sceneVariables(gd::VariablesContainer::SourceType::Extension) {}
 
 EventsFunctionsExtension::EventsFunctionsExtension(
     const EventsFunctionsExtension& other) :

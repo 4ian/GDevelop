@@ -141,12 +141,6 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
 
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
-      if (!codeGenerator.HasProjectAndLayout()) {
-        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
-        output += GenerateDefaultValue(type);
-        return;
-      }
-
       output += codeGenerator.GenerateGetVariable(
           node.name, gd::EventsCodeGenerator::ANY_VARIABLE, context, "");
       if (node.child) node.child->Visit(*this);
@@ -237,12 +231,6 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
         node.childIdentifierName, gd::EventsCodeGenerator::OBJECT_VARIABLE, context, node.identifierName);
       output += codeGenerator.GenerateVariableValueAs(type);
     }, [&]() {
-      if (!codeGenerator.HasProjectAndLayout()) {
-        gd::LogWarning("Tried to generate access to a variable without a project/scene - the code generator only works for global and scene variables for now.");
-        output += GenerateDefaultValue(type);
-        return;
-      }
-
       output += codeGenerator.GenerateGetVariable(
           node.identifierName, gd::EventsCodeGenerator::ANY_VARIABLE, context,
           "");

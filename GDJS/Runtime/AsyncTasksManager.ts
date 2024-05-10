@@ -93,11 +93,11 @@ namespace gdjs {
   /**
    * A task that resolves with a promise.
    */
-  export class PromiseTask extends AsyncTask {
+  export class PromiseTask<ResultType = void> extends AsyncTask {
     private isResolved: boolean = false;
-    promise: Promise<void>;
+    promise: Promise<ResultType>;
 
-    constructor(promise: Promise<void>) {
+    constructor(promise: Promise<ResultType>) {
       super();
       this.promise = promise
         .catch((error) => {
@@ -107,9 +107,14 @@ If you are using JavaScript promises in an asynchronous action, make sure to add
 Otherwise, report this as a bug on the GDevelop forums!
 ${error ? 'The following error was thrown: ' + error : ''}`
           );
+
+          // @ts-ignore
+          return undefined as ResultType;
         })
-        .then(() => {
+        .then((result) => {
           this.isResolved = true;
+
+          return result;
         });
     }
 

@@ -5,18 +5,25 @@ namespace gdjs {
       platform,
       isGameRegistered,
     }: {
-      platform: 'cordova' | 'electron' | 'web';
+      platform:
+        | 'cordova'
+        | 'cordova-websocket'
+        | 'electron'
+        | 'web-iframe'
+        | 'web';
       isGameRegistered: boolean;
     }) =>
       isGameRegistered
         ? {
             title: 'Logging in...',
             text1:
-              platform === 'cordova'
+              platform === 'cordova' || platform === 'cordova-websocket'
                 ? "One moment, we're opening a window for you to log in."
                 : "One moment, we're opening a new page with your web browser for you to log in.",
             text2:
-              'If the window did not open, please check your pop-up blocker and click the button below to try again.',
+              platform === 'cordova' || platform === 'cordova-websocket'
+                ? ''
+                : 'If the window did not open, please check your pop-up blocker and click the button below to try again.',
           }
         : {
             title: 'Publish your game!',
@@ -166,9 +173,14 @@ namespace gdjs {
      */
     export const addAuthenticationTextsToLoadingContainer = (
       loaderContainer: HTMLDivElement,
-      platform,
-      isGameRegistered,
-      wikiOpenAction
+      platform:
+        | 'cordova'
+        | 'cordova-websocket'
+        | 'electron'
+        | 'web-iframe'
+        | 'web',
+      isGameRegistered: boolean,
+      wikiOpenAction: (() => void) | null
     ) => {
       const textContainer: HTMLDivElement = document.createElement('div');
       textContainer.id = 'authentication-container-texts';

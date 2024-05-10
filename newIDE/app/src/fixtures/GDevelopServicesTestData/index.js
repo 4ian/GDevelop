@@ -2361,6 +2361,7 @@ export const limitsForNoSubscriptionUser: Limits = {
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'NONE',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
   },
   quotas: {
@@ -2404,6 +2405,7 @@ export const limitsForSilverUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'BASIC',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
   },
   quotas: {
@@ -2447,6 +2449,7 @@ export const limitsForGoldUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
   },
   quotas: {
@@ -2490,6 +2493,7 @@ export const limitsForTeacherUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
     privateTutorials: {
       allowedIdPrefixes: ['education-curriculum-'],
@@ -2541,6 +2545,7 @@ export const limitsForStudentUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
     classrooms: {
       hidePlayTab: true,
@@ -2589,6 +2594,7 @@ export const limitsForStartupUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: true,
+      canDisableLoginInLeaderboard: true,
     },
   },
   quotas: {
@@ -2632,6 +2638,7 @@ export const limitsForBusinessUser: Limits = {
       canMaximumCountPerGameBeIncreased: false,
       themeCustomizationCapabilities: 'FULL',
       canUseCustomCss: true,
+      canDisableLoginInLeaderboard: true,
     },
   },
   quotas: {
@@ -2675,6 +2682,7 @@ export const limitsReached: Limits = {
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'BASIC',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
   },
   quotas: {
@@ -2718,6 +2726,7 @@ export const limitsForNoSubscriptionUserWithCredits: Limits = {
       canMaximumCountPerGameBeIncreased: true,
       themeCustomizationCapabilities: 'NONE',
       canUseCustomCss: false,
+      canDisableLoginInLeaderboard: false,
     },
   },
   quotas: {

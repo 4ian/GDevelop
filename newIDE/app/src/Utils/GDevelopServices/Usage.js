@@ -69,6 +69,7 @@ export type Capabilities = {|
     canMaximumCountPerGameBeIncreased: boolean,
     themeCustomizationCapabilities: 'NONE' | 'BASIC' | 'FULL',
     canUseCustomCss: boolean,
+    canDisableLoginInLeaderboard: boolean,
   },
   privateTutorials?: {
     allowedIdPrefixes: Array<string>,

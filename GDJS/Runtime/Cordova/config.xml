@@ -12,6 +12,10 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+
+    <!-- Allow iframes on iOS like leaderboards, including those in development that are not served via https. -->
+    <allow-navigation href="*" />
+
     <platform name="android">
         <allow-intent href="market:*" />
 

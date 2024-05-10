@@ -653,11 +653,15 @@ namespace gdjs {
       this.callbacks.delete(runtimeObject);
     }
 
-    restoreLocalVariablesContainers(variablesContainers: Array<gdjs.VariablesContainer>): void {
+    restoreLocalVariablesContainers(
+      variablesContainers: Array<gdjs.VariablesContainer>
+    ): void {
       gdjs.copyArray(this.localVariablesContainers, variablesContainers);
     }
 
-    backupLocalVariablesContainers(variablesContainers: Array<gdjs.VariablesContainer>): void {
+    backupLocalVariablesContainers(
+      variablesContainers: Array<gdjs.VariablesContainer>
+    ): void {
       gdjs.copyArray(variablesContainers, this.localVariablesContainers);
     }
   }

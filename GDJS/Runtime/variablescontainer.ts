@@ -217,7 +217,7 @@ namespace gdjs {
       add: function () {
         return;
       },
-      declare: function () {
+      _declare: function () {
         return;
       },
       initFrom: function () {

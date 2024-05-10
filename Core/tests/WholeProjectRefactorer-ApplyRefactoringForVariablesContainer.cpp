@@ -770,6 +770,49 @@ TEST_CASE("WholeProjectRefactorer::ApplyRefactoringForVariablesContainer",
     REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
   }
 
+  SECTION("Can change the instruction type of variable occurrences (function)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    auto &extension = project.InsertNewEventsFunctionsExtension("Extension", 0);
+    extension.GetSceneVariables().InsertNew("MySceneVariable").SetValue(123);
+
+    auto &function = extension.InsertNewEventsFunction("MyFunction", 0);
+    gd::StandardEvent &event =
+        dynamic_cast<gd::StandardEvent &>(function.GetEvents().InsertNewEvent(
+            project, "BuiltinCommonInstructions::Standard"));
+
+    {
+      gd::Instruction action;
+      action.SetType("SetNumberVariable");
+      action.SetParametersCount(3);
+      action.SetParameter(0, gd::Expression("MySceneVariable"));
+      action.SetParameter(1, gd::Expression("="));
+      action.SetParameter(2, gd::Expression("123"));
+      event.GetActions().Insert(action);
+    }
+
+    // Do the changes and launch the refactoring.
+    extension.GetSceneVariables().ResetPersistentUuid();
+    gd::SerializerElement originalSerializedVariables;
+    extension.GetSceneVariables().SerializeTo(originalSerializedVariables);
+
+    extension.GetSceneVariables().Get("MySceneVariable").SetString("Hello");
+    auto changeset =
+        gd::WholeProjectRefactorer::ComputeChangesetForVariablesContainer(
+            originalSerializedVariables, extension.GetSceneVariables());
+
+    REQUIRE(changeset.typeChangedVariableNames.find("MySceneVariable") !=
+            changeset.typeChangedVariableNames.end());
+
+    gd::WholeProjectRefactorer::ApplyRefactoringForVariablesContainer(
+        project, extension.GetSceneVariables(), changeset);
+
+    // Check the the action has changed to follow the variable type.
+    REQUIRE(event.GetActions()[0].GetType() == "SetStringVariable");
+  }
+
   SECTION("Can change the instruction type of child-variable occurrences (scene)") {
     gd::Project project;
     gd::Platform platform;

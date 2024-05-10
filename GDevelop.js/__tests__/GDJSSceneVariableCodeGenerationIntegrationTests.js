@@ -489,7 +489,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     expect(runtimeScene.getVariables().get('MyVariable').getAsNumber()).toBe(1);
   });
 
-  // TODO Move this tests with legacy ones.
+  // TODO Move this test with legacy ones.
   it('can generate a VariableChildCount expression for an undeclared variable', function () {
     scene.getVariables().insertNew('MyVariable', 0).setValue(0);
     const runtimeScene = generateAndRunActionsForLayout(
@@ -514,5 +514,70 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       }
     );
     expect(runtimeScene.getVariables().get('MyVariable').getAsNumber()).toBe(1);
+  });
+
+  it('can generate a child existence condition that is true', function () {
+    scene
+      .getVariables()
+      .insertNew('MyStructureVariable', 0)
+      .getChild('MyChild')
+      .setValue(123);
+    const runtimeScene = generateAndRunVariableAffectationWithConditions([
+      {
+        type: { inverted: false, value: 'VariableChildExists2' },
+        parameters: ['MyStructureVariable', '"MyChild"'],
+      },
+    ]);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+  });
+
+  it('can generate a child removing action', function () {
+    const variable = scene.getVariables().insertNew('MyStructureVariable', 0);
+    variable.getChild('MyChildA').setValue(123);
+    variable.getChild('MyChildB').setValue(456);
+    const runtimeScene = generateAndRunActionsForLayout([
+      {
+        type: { value: 'RemoveVariableChild' },
+        parameters: ['MyStructureVariable', '"MyChildA"'],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('MyStructureVariable')
+        .hasChild('MyChildA')
+    ).toBe(false);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('MyStructureVariable')
+        .hasChild('MyChildB')
+    ).toBe(true);
+  });
+
+  it('can generate a children clearing action', function () {
+    const variable = scene.getVariables().insertNew('MyStructureVariable', 0);
+    variable.getChild('MyChildA').setValue(123);
+    variable.getChild('MyChildB').setValue(123);
+    const runtimeScene = generateAndRunActionsForLayout([
+      {
+        type: { value: 'ClearVariableChildren' },
+        parameters: ['MyStructureVariable'],
+      },
+    ]);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('MyStructureVariable')
+        .hasChild('MyChildA')
+    ).toBe(false);
+    expect(
+      runtimeScene
+        .getVariables()
+        .get('MyStructureVariable')
+        .hasChild('MyChildB')
+    ).toBe(false);
   });
 });

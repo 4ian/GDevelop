@@ -183,6 +183,10 @@ class Variable {
     return Object.keys(this._children).length;
   }
 
+  hasChild(childName) {
+    return !!this._children[childName];
+  }
+
   castTo() {}
 
   isPrimitive() {
@@ -191,6 +195,10 @@ class Variable {
 
   getType() {
     return this.isPrimitive() ? 'number' : 'structure';
+  }
+
+  removeChild(childName) {
+    delete this._children[childName];
   }
 
   clearChildren() {
@@ -894,6 +902,12 @@ function makeMinimalGDJSMock(options) {
             array.pushVariableCopy(variable),
           valuePush: (array, value) => array.pushValue(value),
           getVariableChildCount: (variable) => variable.getChildrenCount(),
+          variableChildExists: (variable, childName) =>
+            variable.hasChild(childName),
+          variableRemoveChild: (variable, childName) =>
+            variable.removeChild(childName),
+          variableClearChildren: (variable) =>
+            variable.clearChildren(),
         },
         object: {
           createObjectOnScene,

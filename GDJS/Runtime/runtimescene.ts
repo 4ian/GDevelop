@@ -140,11 +140,13 @@ namespace gdjs {
 
       // Load variables
       this._variables = new gdjs.VariablesContainer(sceneData.variables);
-      for (const extensionData of sceneData.usedExtensionsWithVariablesData) {
-        this._variablesByExtensionName.set(
-          extensionData.name,
-          new gdjs.VariablesContainer(extensionData.sceneVariables)
-        );
+      if (sceneData.usedExtensionsWithVariablesData) {
+        for (const extensionData of sceneData.usedExtensionsWithVariablesData) {
+          this._variablesByExtensionName.set(
+            extensionData.name,
+            new gdjs.VariablesContainer(extensionData.sceneVariables)
+          );
+        }
       }
 
       //Cache the initial shared data of the behaviors

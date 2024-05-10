@@ -682,10 +682,25 @@ class RuntimeGame {
     this._variablesContainer = new VariablesContainer(
       gameData && gameData.variables
     );
+    this._variablesByExtensionName = new Map();
+    if (gameData) {
+      for (const extensionData of gameData.eventsFunctionsExtensions) {
+        if (extensionData.globalVariables.length > 0) {
+          this._variablesByExtensionName.set(
+            extensionData.name,
+            new VariablesContainer(extensionData.globalVariables)
+          );
+        }
+      }
+    }
   }
 
   getVariables() {
     return this._variablesContainer;
+  }
+  
+  getVariablesForExtension(extensionName) {
+    return this._variablesByExtensionName.get(extensionName) || null;
   }
 }
 
@@ -696,6 +711,16 @@ class RuntimeScene {
     this._variablesContainer = new VariablesContainer(
       sceneData && sceneData.variables
     );
+    this._variablesByExtensionName = new Map();
+    if (sceneData && sceneData.usedExtensionsWithVariablesData) {
+      for (const extensionData of sceneData.usedExtensionsWithVariablesData) {
+        this._variablesByExtensionName.set(
+          extensionData.name,
+          new VariablesContainer(extensionData.sceneVariables)
+        );
+      }
+    }
+
     this._onceTriggers = new OnceTriggers();
     this._asyncTasksManager = new FakeAsyncTasksManager();
 
@@ -758,6 +783,10 @@ class RuntimeScene {
 
   getVariables() {
     return this._variablesContainer;
+  }
+
+  getVariablesForExtension(extensionName) {
+    return this._variablesByExtensionName.get(extensionName) || null;
   }
 
   getOnceTriggers() {
@@ -883,6 +912,10 @@ function makeMinimalGDJSMock(options) {
   const behaviorCtors = {};
   const customObjectsCtors = {};
   let runtimeScenePreEventsCallbacks = [];
+  if (options && options.gameData && options.sceneData) {
+    options.sceneData.usedExtensionsWithVariablesData =
+      options.gameData.eventsFunctionsExtensions;
+  }
   const runtimeGame = new RuntimeGame(options && options.gameData);
   const runtimeScene = new RuntimeScene(
     options && options.sceneData,

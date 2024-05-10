@@ -1,6 +1,5 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const {
-  generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
   generateCompiledEventsForSerializedEventsBasedExtension,
 } = require('../TestUtils/CodeGenerationHelpers.js');

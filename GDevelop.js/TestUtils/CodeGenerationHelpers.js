@@ -12,12 +12,38 @@ function generateCompiledEventsForEventsFunction(
   eventsFunction,
   logCode = false
 ) {
+  const extension = new gd.EventsFunctionsExtension();
+  const runCompiledEventsFunction = generateCompiledEventsForEventsFunctionWithContext(
+    gd,
+    project,
+    extension,
+    eventsFunction,
+    logCode
+  );
+  extension.delete();
+  return runCompiledEventsFunction;
+}
+
+/**
+ * Generate the code from events (using GDJS platform)
+ * and create a JavaScript function that runs it.
+ *
+ * The JavaScript function must be called with the `runtimeScene` to be used.
+ * In this context, GDJS game engine does not exist, so you must pass a mock
+ * to it to validate that the events are working properly.
+ */
+function generateCompiledEventsForEventsFunctionWithContext(
+  gd,
+  project,
+  extension,
+  eventsFunction,
+  logCode = false
+) {
   const namespace = 'functionNamespace';
   const eventsFunctionsExtensionCodeGenerator =
     new gd.EventsFunctionsExtensionCodeGenerator(project);
 
   const includeFiles = new gd.SetString();
-  const extension = new gd.EventsFunctionsExtension();
   const code =
     eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
       extension,
@@ -28,7 +54,6 @@ function generateCompiledEventsForEventsFunction(
     );
 
   eventsFunctionsExtensionCodeGenerator.delete();
-  extension.delete();
   includeFiles.delete();
 
   if (logCode) console.log(code);
@@ -310,6 +335,70 @@ function generateCompiledEventsFromSerializedEvents(
 }
 
 /**
+ * Helper to create compiled events from serialized events, creating a project and the events function.
+ * @param {*} gd
+ * @param {gdEventsFunctionExtension} extension
+ * @param {gdSerializerElement} eventsSerializerElement
+ * @param {{parameterTypes: {[name: string]: string}, groups: {[name: string]: string[]}, logCode: boolean}?} configuration
+ * @returns
+ */
+function generateCompiledEventsFunctionFromSerializedEvents(
+  gd,
+  extension,
+  eventsSerializerElement,
+  configuration
+) {
+  const project = new gd.ProjectHelper.createNewGDJSProject();
+  const eventsFunction = new gd.EventsFunction();
+  eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
+
+  if (configuration) {
+    const { parameterTypes, groups } = configuration;
+    if (groups) {
+      for (const groupName in groups) {
+        if (Object.hasOwnProperty.call(groups, groupName)) {
+          const objectsNames = groups[groupName];
+
+          const group = eventsFunction
+            .getObjectGroups()
+            .insertNew(groupName, 0);
+          for (const objectName of objectsNames) {
+            group.addObject(objectName);
+          }
+        }
+      }
+    }
+
+    if (parameterTypes) {
+      for (const parameterName in parameterTypes) {
+        if (Object.hasOwnProperty.call(parameterTypes, parameterName)) {
+          const parameterType = parameterTypes[parameterName];
+
+          const parameter = new gd.ParameterMetadata();
+          parameter.setType(parameterType);
+          parameter.setName(parameterName);
+          eventsFunction.getParameters().push_back(parameter);
+          parameter.delete();
+        }
+      }
+    }
+  }
+
+  const runCompiledEvents = generateCompiledEventsForEventsFunctionWithContext(
+    gd,
+    project,
+    extension,
+    eventsFunction,
+    configuration && configuration.logCode
+  );
+
+  eventsFunction.delete();
+  project.delete();
+
+  return runCompiledEvents;
+}
+
+/**
  * Generate a function to run the compiled events of a layout.
  */
 function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
@@ -342,6 +431,7 @@ function generateCompiledEventsForLayout(gd, project, layout, logCode = false) {
 module.exports = {
   generateCompiledEventsForEventsFunction,
   generateCompiledEventsFromSerializedEvents,
+  generateCompiledEventsFunctionFromSerializedEvents,
   generateCompiledEventsForSerializedEventsBasedExtension,
   generateCompiledEventsForLayout,
 };

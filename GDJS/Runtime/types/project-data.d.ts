@@ -100,7 +100,7 @@ declare interface EventsFunctionsExtensionData {
 }
 
 declare interface LayoutAndExtensionsData extends LayoutData {
-  usedExtensionsWithVariablesData: EventsFunctionsExtensionData[];
+  usedExtensionsWithVariablesData?: ?EventsFunctionsExtensionData[];
 }
 
 declare interface EventsBasedObjectData {

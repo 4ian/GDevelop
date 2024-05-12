@@ -15,8 +15,8 @@ export declare namespace PixiTileMapHelper {
   function parseAtlas(
     tileMap: TileMapFileContent,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.Texture | null,
+    getTexture: (textureName: string) => PIXI.Texture
   ): TileTextureCache | null;
   /**
    * Re-renders the tile map whenever its rendering settings have been changed

@@ -132,7 +132,7 @@ export class TileMapManager {
       tileSetJsonResourceName: string,
       callback: (tileMapFileContent: TileMapFileContent | null) => void
     ) => void,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
+    getTexture: (textureName: string) => PIXI.Texture,
     atlasImageResourceName: string,
     tileMapJsonResourceName: string,
     tileSetJsonResourceName: string,

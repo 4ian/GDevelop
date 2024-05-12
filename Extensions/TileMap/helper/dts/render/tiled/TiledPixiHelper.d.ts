@@ -13,8 +13,8 @@ export declare namespace TiledPixiHelper {
   function parseAtlas(
     tileMap: TiledTileMap,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.Texture | null,
+    getTexture: (textureName: string) => PIXI.Texture
   ): TileTextureCache | null;
 }
 //# sourceMappingURL=TiledPixiHelper.d.ts.map

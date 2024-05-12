@@ -23,8 +23,8 @@ export namespace PixiTileMapHelper {
   export function parseAtlas(
     tileMap: TileMapFileContent,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.Texture | null,
+    getTexture: (textureName: string) => PIXI.Texture
   ): TileTextureCache | null {
     if (tileMap.kind === "ldtk") {
       return LDtkPixiHelper.parseAtlas(

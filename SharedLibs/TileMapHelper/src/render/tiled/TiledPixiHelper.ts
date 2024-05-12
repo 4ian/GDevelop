@@ -15,8 +15,8 @@ export namespace TiledPixiHelper {
   export function parseAtlas(
     tileMap: TiledTileMap,
     levelIndex: number,
-    atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
-    getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
+    atlasTexture: PIXI.Texture | null,
+    getTexture: (textureName: string) => PIXI.Texture
   ): TileTextureCache | null {
     if (!tileMap.tiledversion) {
       console.warn(
@@ -99,7 +99,7 @@ export namespace TiledPixiHelper {
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-        const texture = new PIXI.Texture(atlasTexture!, rect);
+        const texture = new PIXI.Texture(atlasTexture!.baseTexture, rect);
 
         textureCache.setTexture(tileId, texture);
       } catch (error) {

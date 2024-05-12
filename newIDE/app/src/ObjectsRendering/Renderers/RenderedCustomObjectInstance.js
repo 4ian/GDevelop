@@ -45,7 +45,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     associatedObjectConfiguration: gdObjectConfiguration,
     pixiContainer: PIXI.Container,
     threeGroup: THREE.Group,
-    pixiResourcesLoader: Class<PixiResourcesLoader>
+    pixiResourcesLoader: PixiResourcesLoader
   ) {
     super(
       project,
@@ -175,7 +175,7 @@ export default class RenderedCustomObjectInstance extends Rendered3DInstance
     if (this.childrenRenderedInstances.length === 0) {
       // Show a placeholder.
       this._pixiObject = new PIXI.Sprite(
-        PixiResourcesLoader.getInvalidPIXITexture()
+        this._pixiResourcesLoader.getInvalidPIXITexture()
       );
       this._pixiContainer.addChild(this._pixiObject);
     }

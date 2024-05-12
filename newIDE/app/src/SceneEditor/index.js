@@ -38,7 +38,7 @@ import {
   getHistoryInitialState,
   saveToHistory,
 } from '../Utils/History';
-import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import { pixiResourcesLoader } from '../ObjectsRendering/PixiResourcesLoader';
 import {
   type ObjectWithContext,
   type GroupWithContext,
@@ -236,7 +236,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         // through the RenderedInstance's, triggering crashes. So the scene rendering
         // is paused during this period.
         editorDisplay.startSceneRendering(false);
-        await PixiResourcesLoader.reloadResource(project, resourceName);
+        await pixiResourcesLoader.reloadResource(project, resourceName);
 
         editorDisplay.forceUpdateObjectsList();
 
@@ -1610,12 +1610,14 @@ export default class SceneEditor extends React.Component<Props, State> {
       .toJSArray();
     resourcesInUse.delete();
 
-    PixiResourcesLoader.loadTextures(project, objectResourceNames).then(() => {
-      if (this.editorDisplay)
-        this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
-          object.getName()
-        );
-    });
+    pixiResourcesLoader
+      .reloadResources(project, objectResourceNames)
+      .then(() => {
+        if (this.editorDisplay)
+          this.editorDisplay.instancesHandlers.resetInstanceRenderersFor(
+            object.getName()
+          );
+      });
   };
 
   render() {

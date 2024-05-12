@@ -25,7 +25,7 @@ import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndD
 import { DragHandleIcon } from '../../UI/DragHandle';
 import DropIndicator from '../../UI/SortableVirtualizedItemList/DropIndicator';
 import GDevelopThemeContext from '../../UI/Theme/GDevelopThemeContext';
-import PixiResourcesLoader from '../../ObjectsRendering/PixiResourcesLoader';
+import { pixiResourcesLoader } from '../../ObjectsRendering/PixiResourcesLoader';
 import useAlertDialog from '../../UI/Alert/useAlertDialog';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils';
@@ -155,7 +155,7 @@ const Model3DEditor = ({
   const [gltf, setGltf] = React.useState<GLTF | null>(null);
   const loadGltf = React.useCallback(
     async (modelResourceName: string) => {
-      const newModel3d = await PixiResourcesLoader.get3DModel(
+      const newModel3d = await pixiResourcesLoader.get3DModel(
         project,
         modelResourceName
       );

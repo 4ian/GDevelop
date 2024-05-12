@@ -15,7 +15,7 @@ export default function makeRenderer(iconPath: string) {
       instance: gdInitialInstance,
       associatedObjectConfiguration: gdObjectConfiguration,
       pixiContainer: PIXI.Container,
-      pixiResourcesLoader: Class<PixiResourcesLoader>
+      pixiResourcesLoader: PixiResourcesLoader
     ) {
       super(
         project,

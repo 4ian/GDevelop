@@ -10,7 +10,7 @@ import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
 import RenderedCustomObjectInstance from './Renderers/RenderedCustomObjectInstance';
 import RenderedSprite3DInstance from './Renderers/RenderedSprite3DInstance';
-import PixiResourcesLoader from './PixiResourcesLoader';
+import { pixiResourcesLoader } from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
 import Rendered3DInstance from './Renderers/Rendered3DInstance';
@@ -90,7 +90,7 @@ const ObjectsRenderingService = {
         associatedObjectConfiguration,
         pixiContainer,
         threeGroup,
-        PixiResourcesLoader
+        pixiResourcesLoader
       );
     } else if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](
@@ -99,7 +99,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader
+        pixiResourcesLoader
       );
     else {
       if (project.hasEventsBasedObject(objectType)) {
@@ -116,7 +116,7 @@ const ObjectsRenderingService = {
             associatedObjectConfiguration,
             pixiContainer,
             threeGroup,
-            PixiResourcesLoader
+            pixiResourcesLoader
           );
         } else {
           return new RenderedCustomObjectInstance(
@@ -126,7 +126,7 @@ const ObjectsRenderingService = {
             associatedObjectConfiguration,
             pixiContainer,
             threeGroup,
-            PixiResourcesLoader
+            pixiResourcesLoader
           );
         }
       }
@@ -140,7 +140,7 @@ const ObjectsRenderingService = {
         instance,
         associatedObjectConfiguration,
         pixiContainer,
-        PixiResourcesLoader
+        pixiResourcesLoader
       );
     }
   },

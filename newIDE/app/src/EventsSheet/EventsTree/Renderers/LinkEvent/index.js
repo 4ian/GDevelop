@@ -24,7 +24,6 @@ import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys
 import ShareExternal from '../../../../UI/CustomSvgIcons/ShareExternal';
 import Warning from '../../../../UI/CustomSvgIcons/Warning';
 import Tooltip from '@material-ui/core/Tooltip';
-import GDevelopThemeContext from '../../../../UI/Theme/GDevelopThemeContext';
 
 const gd: libGDevelop = global.gd;
 

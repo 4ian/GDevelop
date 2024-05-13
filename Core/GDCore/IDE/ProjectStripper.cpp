@@ -55,11 +55,7 @@ void GD_CORE_API ProjectStripper::StripProjectForExport(gd::Project &project) {
       eventsBasedObject.GetPropertyDescriptors().GetInternalVector().clear();
     }
     extension.GetEventsBasedBehaviors().Clear();
-    std::size_t functionCount = extension.GetEventsFunctionsCount();
-    for (std::size_t i = 0; i < functionCount; i++)
-    {
-      extension.RemoveEventsFunction(extension.GetEventsFunction(0).GetName());
-    }
+    extension.ClearEventsFunctions();
   }
 }
 

@@ -354,19 +354,19 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runtimeScene = generateAndRunEventsForLayout([
       {
         type: 'BuiltinCommonInstructions::Standard',
-        variables: [{ name: 'MyLocalVariable', type: 'number', value: 789 }],
+        variables: [{ name: 'MyVariable', type: 'number', value: 789 }],
         conditions: [],
         actions: [],
         events: [
           {
             type: 'BuiltinCommonInstructions::Standard',
             variables: [
-              { name: 'MyLocalVariable', type: 'number', value: 147 },
+              { name: 'MyVariable', type: 'number', value: 147 },
             ],
             conditions: [
               {
                 type: { inverted: false, value: 'NumberVariable' },
-                parameters: ['MyLocalVariable', '=', '147'],
+                parameters: ['MyVariable', '=', '147'],
               },
             ],
             actions: [

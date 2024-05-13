@@ -222,26 +222,30 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   ///@{
 
   /**
-   * Return the scene variables of the extension.
+   * Return the global variables of the extension (variables scoped to the
+   * entire game lifetime).
    */
   inline const gd::VariablesContainer& GetGlobalVariables() const {
     return globalVariables;
   }
 
   /**
-   * Return the scene variables of the extension.
+   * Return the global variables of the extension (variables scoped to the
+   * entire game lifetime).
    */
   inline gd::VariablesContainer& GetGlobalVariables() { return globalVariables; }
 
   /**
-   * Return the global variables of the extension.
+   * Return the global variables of the extension (variables scoped to the
+   * lifetime of a scene).
    */
   inline const gd::VariablesContainer& GetSceneVariables() const {
     return sceneVariables;
   }
 
   /**
-   * Return the global variables of the extension.
+   * Return the global variables of the extension (variables scoped to the
+   * lifetime of a scene).
    */
   inline gd::VariablesContainer& GetSceneVariables() { return sceneVariables; }
 

@@ -1307,7 +1307,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       // TODO Use numbers for indexes to optimize accesses.
       output = "runtimeScene.getGame().getVariablesForExtension(" +
                 ConvertToStringExplicit(extensionName) + ")";
-    } else if (sourceType == gd::VariablesContainer::SourceType::Extension) {
+    } else if (sourceType == gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
       output = "runtimeScene.getScene().getVariablesForExtension(" +
                 ConvertToStringExplicit(extensionName) + ")";

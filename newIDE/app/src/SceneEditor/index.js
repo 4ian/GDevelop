@@ -14,6 +14,7 @@ import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialo
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
+import ExtractAsExternalLayoutDialog from './ExtractAsExternalLayoutDialog';
 import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import MosaicEditorsDisplayToolbar from './MosaicEditorsDisplay/Toolbar';
 import SwipeableDrawerEditorsDisplayToolbar from './SwipeableDrawerEditorsDisplay/Toolbar';
@@ -130,6 +131,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   newObjectInstanceSceneCoordinates: ?[number, number],
   invisibleLayerOnWhichInstancesHaveJustBeenAdded: string | null,
+  extractAsExternalLayoutDialogOpen: boolean,
 
   editedGroup: ?gdObjectGroup,
 
@@ -179,6 +181,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
+      extractAsExternalLayoutDialogOpen: false,
 
       instancesEditorSettings: props.getInitialInstancesEditorSettings(),
       history: getHistoryInitialState(props.initialInstances, {
@@ -1325,7 +1328,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       { type: 'separator' },
       {
         label: i18n._(t`Extract as an external layout`),
-        click: () => this.extractAsExternalLayout(i18n),
+        click: () => this.setState({ extractAsExternalLayoutDialogOpen: true }),
         enabled: hasSelectedInstances,
       },
       {
@@ -1558,16 +1561,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.forceUpdatePropertiesEditor();
   };
 
-  extractAsExternalLayout = (i18n: I18nType) => {
+  extractAsExternalLayout = (chosenName: string) => {
     const { project, layout, onExtractAsExternalLayout } = this.props;
 
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const newName = newNameGenerator(
-      i18n._(t`Untitled external layout`),
-      name => project.hasExternalLayoutNamed(name)
+    const newName = newNameGenerator(chosenName, name =>
+      project.hasExternalLayoutNamed(name)
     );
     const newExternalLayout = project.insertNewExternalLayout(
       newName,
@@ -1586,6 +1588,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
 
     this.deleteSelection();
+
+    this.setState({ extractAsExternalLayoutDialogOpen: false });
 
     onExtractAsExternalLayout(newName);
   };
@@ -2009,6 +2013,22 @@ export default class SceneEditor extends React.Component<Props, State> {
               <I18n>
                 {({ i18n }) => (
                   <React.Fragment>
+                    {this.state.extractAsExternalLayoutDialogOpen && (
+                      <ExtractAsExternalLayoutDialog
+                        suggestedName={newNameGenerator(
+                          i18n._(t`${layout.getName()} part`),
+                          name => project.hasExternalLayoutNamed(name)
+                        )}
+                        onCancel={() =>
+                          this.setState({
+                            extractAsExternalLayoutDialogOpen: false,
+                          })
+                        }
+                        onApply={chosenName =>
+                          this.extractAsExternalLayout(chosenName)
+                        }
+                      />
+                    )}
                     <DismissableInfoBar
                       show={this.state.showAdditionalWorkInfoBar}
                       identifier={this.state.additionalWorkInfoBar.identifier}

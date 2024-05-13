@@ -1880,6 +1880,10 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const onExtractAsExternalLayout = (name: string) => {
+    openExternalLayout(name);
+  };
+
   const _onProjectItemModified = () => {
     if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
     forceUpdate();
@@ -3285,6 +3289,7 @@ const MainFrame = (props: Props) => {
                       cb(true);
                     },
                     openBehaviorEvents: openBehaviorEvents,
+                    onExtractAsExternalLayout: onExtractAsExternalLayout,
                   })}
                 </ErrorBoundary>
               </CommandsContextScopedProvider>

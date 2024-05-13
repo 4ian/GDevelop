@@ -70,6 +70,7 @@ import {
   registerOnResourceExternallyChangedCallback,
   unregisterOnResourceExternallyChangedCallback,
 } from '../MainFrame/ResourcesWatcher';
+import { unserializeFromJSObject } from '../Utils/Serializer';
 
 const gd: libGDevelop = global.gd;
 
@@ -106,6 +107,7 @@ type Props = {|
   unsavedChanges?: ?UnsavedChanges,
   canInstallPrivateAsset: () => boolean,
   openBehaviorEvents: (extensionName: string, behaviorName: string) => void,
+  onExtractAsExternalLayout: (name: string) => void,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -1322,6 +1324,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
+        label: i18n._(t`Extract as an external layout`),
+        click: () => this.extractAsExternalLayout(i18n),
+        enabled: hasSelectedInstances,
+      },
+      {
         label: i18n._(t`Show/Hide instance properties`),
         click: () => this.toggleProperties(),
         enabled: hasSelectedInstances,
@@ -1549,6 +1556,38 @@ export default class SceneEditor extends React.Component<Props, State> {
       layersLocks: null,
     });
     this.forceUpdatePropertiesEditor();
+  };
+
+  extractAsExternalLayout = (i18n: I18nType) => {
+    const { project, layout, onExtractAsExternalLayout } = this.props;
+
+    const serializedSelection = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => serializeToJSObject(instance));
+
+    const newName = newNameGenerator(
+      i18n._(t`Untitled external layout`),
+      name => project.hasExternalLayoutNamed(name)
+    );
+    const newExternalLayout = project.insertNewExternalLayout(
+      newName,
+      project.getExternalLayoutsCount()
+    );
+    newExternalLayout.setAssociatedLayout(layout.getName());
+
+    for (const serializedInstance of serializedSelection) {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      newExternalLayout
+        .getInitialInstances()
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+    }
+
+    this.deleteSelection();
+
+    onExtractAsExternalLayout(newName);
   };
 
   onSelectAllInstancesOfObjectInLayout = (objectName: string) => {

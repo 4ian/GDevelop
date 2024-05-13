@@ -298,7 +298,7 @@ enum VariablesContainer_SourceType {
   "VariablesContainer::Object",
   "VariablesContainer::Local",
   "VariablesContainer::ExtensionGlobal",
-  "VariablesContainer::Extension"
+  "VariablesContainer::ExtensionScene"
 };
 
 interface VariablesContainer {

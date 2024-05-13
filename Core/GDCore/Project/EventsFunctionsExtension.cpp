@@ -17,7 +17,7 @@ EventsFunctionsExtension::EventsFunctionsExtension() :
     gd::EventsFunctionsContainer(
         gd::EventsFunctionsContainer::FunctionOwner::Extension),
       globalVariables(gd::VariablesContainer::SourceType::ExtensionGlobal),
-      sceneVariables(gd::VariablesContainer::SourceType::Extension) {}
+      sceneVariables(gd::VariablesContainer::SourceType::ExtensionScene) {}
 
 EventsFunctionsExtension::EventsFunctionsExtension(
     const EventsFunctionsExtension& other) :

@@ -130,7 +130,7 @@ const getVariableSourceIcon = (
     case gd.VariablesContainer.ExtensionGlobal:
       return GlobalIcon;
     case gd.VariablesContainer.Scene:
-    case gd.VariablesContainer.Extension:
+    case gd.VariablesContainer.ExtensionScene:
       return SceneIcon;
     case gd.VariablesContainer.Object:
       return ObjectIcon;

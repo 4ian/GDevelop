@@ -137,7 +137,7 @@ type VariablesContainer_SourceType = 0 | 1 | 2 | 3 | 4 | 5 | 6`
         '  static Object: 3;',
         '  static Local: 4;',
         '  static ExtensionGlobal: 5;',
-        '  static Extension: 6;',
+        '  static ExtensionScene: 6;',
       ].join('\n'),
       'types/gdvariablescontainer.js'
     );

@@ -24,12 +24,13 @@ export const splittedProjectFolderNames = [
   'eventsFunctionsExtensions',
 ];
 
-const deleteExistingFilesFromDirs = (projectPath: string) => {
+const deleteExistingFilesFromDirs = (
+  project: gdProject,
+  projectPath: string
+) => {
   const entries = fs.readdirSync(projectPath);
-  return new Promise((resolve, reject) => {
-    //Project file
-    if (entries.length === 1) resolve();
 
+  if (project.isFolderProject()) {
     //If multiFile enabled in settings and directories exist!
     entries.forEach(entry => {
       let dirPath = projectPath.concat('\\', entry);
@@ -40,14 +41,15 @@ const deleteExistingFilesFromDirs = (projectPath: string) => {
         const filenames = fs.readdirSync(dirPath);
         filenames.forEach(file => {
           let result = dirPath.concat('\\', file);
-          fs.unlink(result, err => {
-            if (err) return reject(err);
-          });
+          try {
+            fs.unlinkSync(result);
+          } catch (e) {
+            throw new Error(`Unable to remove file ${file}: ${e.message}`);
+          }
         });
       }
     });
-    resolve();
-  });
+  }
 };
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
@@ -145,7 +147,7 @@ const writeProjectFiles = (
   }
 };
 
-export const onSaveProject = (
+export const onSaveProject = async (
   project: gdProject,
   fileMetadata: FileMetadata
 ): Promise<{|
@@ -169,14 +171,19 @@ export const onSaveProject = (
 
   const projectPath = path.dirname(filePath);
 
-  deleteExistingFilesFromDirs(projectPath).catch(err => {
-    console.error('Unable to delete files in the project:', err);
-    throw err;
-  });
+  try {
+    deleteExistingFilesFromDirs(project, projectPath);
+  } catch (e) {
+    return Promise.reject(
+      'Unable to clean project folder before saving project'
+    );
+  }
 
-  return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return { wasSaved: true, fileMetadata: newFileMetadata }; // Save was properly done
-  });
+  await writeProjectFiles(project, filePath, projectPath);
+  return {
+    wasSaved: true,
+    fileMetadata: newFileMetadata,
+  };
 };
 
 export const onChooseSaveProjectAsLocation = async ({

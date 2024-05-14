@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import {
-  enumerateLayouts,
   enumerateExternalEvents,
 } from '../../../../ProjectManager/EnumerateProjectItems';
 import SemiControlledAutoComplete, {
@@ -17,16 +16,29 @@ const getList = (
     return [];
   }
 
-  const externalEvents = enumerateExternalEvents(project)
-    .filter(
-      externalEvents =>
-        externalEvents.getName() !== currentExternalEventName &&
-        externalEvents.getAssociatedLayout() === currentSceneName
-    )
-    .map(externalEvents => ({
+  const currentSceneExternalEvents = [];
+  const otherScenesExternalEvents = [];
+  for (const externalEvents of enumerateExternalEvents(project)) {
+    if (externalEvents.getName() === currentExternalEventName) {
+      continue;
+    }
+    if (externalEvents.getAssociatedLayout() === currentSceneName) {
+      currentSceneExternalEvents.push(externalEvents);
+    } else {
+      otherScenesExternalEvents.push(externalEvents);
+    }
+  }
+  const externalEvents = [
+    ...currentSceneExternalEvents.map(externalEvents => ({
       text: externalEvents.getName(),
       value: externalEvents.getName(),
-    }));
+    })),
+    { type: 'separator' },
+    ...otherScenesExternalEvents.map(externalEvents => ({
+      text: externalEvents.getName(),
+      value: externalEvents.getName(),
+    })),
+  ];
 
   return externalEvents;
 };

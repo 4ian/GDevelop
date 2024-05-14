@@ -211,9 +211,9 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                               <Text size="body">
                                 <Trans>
                                   These external events are owned by another
-                                  scene. Ensure the same variables are declared
-                                  in each scenes, otherwise conditions and
-                                  actions related to them won't work.
+                                  scene. Ensure that this scene has the
+                                  variables and objects used in the external
+                                  events.
                                 </Trans>
                               </Text>
                             </Column>

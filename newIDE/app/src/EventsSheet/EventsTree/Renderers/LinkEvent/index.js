@@ -15,6 +15,7 @@ import {
   disabledText,
   icon,
   instructionWarningParameter,
+  instructionInvalidParameter,
 } from '../../ClassNames';
 import InlinePopover from '../../../InlinePopover';
 import ExternalEventsAutoComplete from './ExternalEventsAutoComplete';
@@ -141,6 +142,15 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     );
   };
 
+  isInvalidLink = (target: string): boolean => {
+    const { project } = this.props.scope;
+    return (
+      target.length > 0 &&
+      !project.hasExternalEventsNamed(target) &&
+      !project.hasLayoutNamed(target)
+    );
+  };
+
   render() {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
@@ -178,7 +188,15 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                     }}
                     tabIndex={0}
                   >
-                    {this.isLinkedToWrongLayout(target) ? (
+                    {this.isInvalidLink(target) ? (
+                      <span
+                        className={classNames({
+                          [instructionInvalidParameter]: true,
+                        })}
+                      >
+                        {target}
+                      </span>
+                    ) : this.isLinkedToWrongLayout(target) ? (
                       <span
                         className={classNames({
                           [instructionWarningParameter]: true,

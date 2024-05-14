@@ -246,6 +246,10 @@
   color: var(--event-sheet-instruction-parameter-warning-color);
   text-decoration:  var(--event-sheet-instruction-parameter-warning-color) underline wavy;
 }
+.gd-events-sheet .link-container .instruction-invalid-parameter {
+  color: var(--event-sheet-instruction-parameter-error-color);
+  text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
+}
 
 .gd-events-sheet .link-container .selectable {
   color: var(--event-sheet-link-selectable-link-color);

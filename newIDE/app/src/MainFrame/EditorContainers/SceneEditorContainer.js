@@ -108,6 +108,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         isActive={isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
         openBehaviorEvents={this.props.openBehaviorEvents}
+        onExtractAsExternalLayout={this.props.onExtractAsExternalLayout}
       />
     );
   }

@@ -1146,7 +1146,7 @@ const ProjectManager = React.forwardRef<Props, ProjectManagerInterface>(
                 return [
                   new PlaceHolderTreeViewItem(
                     externalLayoutEmptyPlaceholderId,
-                    i18n._(t`Start by adding new a external layout.`)
+                    i18n._(t`Start by adding a new external layout.`)
                   ),
                 ];
               }

@@ -293,15 +293,13 @@ function generateCompiledEventsFromSerializedEvents(
     const { parameterTypes, groups } = configuration;
     if (groups) {
       for (const groupName in groups) {
-        if (Object.hasOwnProperty.call(groups, groupName)) {
-          const objectsNames = groups[groupName];
+        const objectsNames = groups[groupName];
 
-          const group = eventsFunction
-            .getObjectGroups()
-            .insertNew(groupName, 0);
-          for (const objectName of objectsNames) {
-            group.addObject(objectName);
-          }
+        const group = eventsFunction
+          .getObjectGroups()
+          .insertNew(groupName, 0);
+        for (const objectName of objectsNames) {
+          group.addObject(objectName);
         }
       }
     }
@@ -356,15 +354,13 @@ function generateCompiledEventsFunctionFromSerializedEvents(
     const { parameterTypes, groups } = configuration;
     if (groups) {
       for (const groupName in groups) {
-        if (Object.hasOwnProperty.call(groups, groupName)) {
-          const objectsNames = groups[groupName];
+        const objectsNames = groups[groupName];
 
-          const group = eventsFunction
-            .getObjectGroups()
-            .insertNew(groupName, 0);
-          for (const objectName of objectsNames) {
-            group.addObject(objectName);
-          }
+        const group = eventsFunction
+          .getObjectGroups()
+          .insertNew(groupName, 0);
+        for (const objectName of objectsNames) {
+          group.addObject(objectName);
         }
       }
     }

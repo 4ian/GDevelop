@@ -32,6 +32,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       instruction,
       onInstructionTypeChanged,
       projectScopedContainersAccessor,
+      onChange,
+      value,
     } = props;
     const { layout, eventsFunctionsExtension } = scope;
 
@@ -61,17 +63,16 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const onVariableEditorApply = React.useCallback(
       (selectedVariableName: string | null) => {
-        if (
-          selectedVariableName &&
-          selectedVariableName.startsWith(props.value)
-        ) {
-          props.onChange(selectedVariableName);
+        if (selectedVariableName && selectedVariableName.startsWith(value)) {
+          onChange(selectedVariableName);
         }
         setEditorOpen(false);
+        // The variable editor may have refactor the events for a variable type
+        // change which may have change the currently edited instruction type.
         if (onInstructionTypeChanged) onInstructionTypeChanged();
         if (field.current) field.current.updateAutocompletions();
       },
-      []
+      [onChange, onInstructionTypeChanged, value]
     );
 
     const isGlobal = !!(

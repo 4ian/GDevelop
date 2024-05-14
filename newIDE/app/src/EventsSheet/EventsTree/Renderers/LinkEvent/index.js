@@ -13,6 +13,8 @@ import {
   selectableArea,
   linkContainer,
   disabledText,
+  icon,
+  instructionWarningParameter,
 } from '../../ClassNames';
 import InlinePopover from '../../../InlinePopover';
 import ExternalEventsAutoComplete from './ExternalEventsAutoComplete';
@@ -20,6 +22,11 @@ import { showWarningBox } from '../../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from '../EventRenderer';
 import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 import ShareExternal from '../../../../UI/CustomSvgIcons/ShareExternal';
+import Warning from '../../../../UI/CustomSvgIcons/Warning';
+import Tooltip from '@material-ui/core/Tooltip';
+import { Column } from '../../../../UI/Grid';
+import Text from '../../../../UI/Text';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -124,6 +131,16 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     });
   };
 
+  isLinkedToWrongLayout = (target: string): boolean => {
+    const { project, layout } = this.props.scope;
+    return (
+      !!layout &&
+      project.hasExternalEventsNamed(target) &&
+      project.getExternalEvents(target).getAssociatedLayout() !==
+        layout.getName()
+    );
+  };
+
   render() {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
@@ -161,8 +178,41 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                     }}
                     tabIndex={0}
                   >
-                    {target || (
-                      <Trans>{`<Enter the name of external events>`}</Trans>
+                    {this.isLinkedToWrongLayout(target) ? (
+                      <span
+                        className={classNames({
+                          [instructionWarningParameter]: true,
+                        })}
+                      >
+                        <Tooltip
+                          title={
+                            <Column noMargin>
+                              <Text size="sub-title">
+                                {<Trans>Owned by another scene</Trans>}
+                              </Text>
+                              <Text size="body">
+                                <Trans>
+                                  These external events are owned by another
+                                  scene. Ensure the same variables are declared
+                                  in each scenes, otherwise conditions and
+                                  actions related to them won't work.
+                                </Trans>
+                              </Text>
+                            </Column>
+                          }
+                        >
+                          <Warning
+                            className={classNames({
+                              [icon]: true,
+                            })}
+                          />
+                        </Tooltip>
+                        {target}
+                      </span>
+                    ) : (
+                      target || (
+                        <Trans>{`<Enter the name of external events>`}</Trans>
+                      )
                     )}
                   </i>{' '}
                 </>

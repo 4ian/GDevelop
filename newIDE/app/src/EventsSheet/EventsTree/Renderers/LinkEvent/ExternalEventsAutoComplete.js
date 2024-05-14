@@ -19,21 +19,16 @@ const getList = (
 
   const externalEvents = enumerateExternalEvents(project)
     .filter(
-      externalEvents => externalEvents.getName() !== currentExternalEventName
+      externalEvents =>
+        externalEvents.getName() !== currentExternalEventName &&
+        externalEvents.getAssociatedLayout() === currentSceneName
     )
     .map(externalEvents => ({
       text: externalEvents.getName(),
       value: externalEvents.getName(),
     }));
 
-  const layouts = enumerateLayouts(project)
-    .filter(layout => layout.getName() !== currentSceneName)
-    .map(layout => ({
-      text: layout.getName(),
-      value: layout.getName(),
-    }));
-
-  return [...externalEvents, { type: 'separator' }, ...layouts];
+  return externalEvents;
 };
 
 type Props = {|

@@ -3,11 +3,14 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
     const runtimeGame = gdjs.getPixiRuntimeGame();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
-      layers: [{ name: '', visibility: true, effects: [] }],
-      variables: [],
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
+      sceneData: {
+        layers: [{ name: '', visibility: true, effects: [] }],
+        variables: [],
+        behaviorsSharedData: [],
+        objects: [],
+        instances: [],
+      },
+      usedExtensionsWithVariablesData: [],
     });
     runtimeScene._timeManager.getElapsedTime = function () {
       return (1 / 60) * 1000;

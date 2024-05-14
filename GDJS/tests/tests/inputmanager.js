@@ -5,13 +5,13 @@
 describe('gdjs.InputManager', () => {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({
+  runtimeScene.loadFromScene({sceneData: {
     layers: [{ name: '', visibility: true, effects: [] }],
     variables: [],
     behaviorsSharedData: [],
     objects: [],
     instances: [],
-  });
+  }, usedExtensionsWithVariablesData: []});
   const inputManager = runtimeScene.getGame().getInputManager();
   const inputTools = gdjs.evtTools.input;
 
@@ -351,13 +351,13 @@ describe('gdjs.InputManager', () => {
 describe('gdjs.RuntimeObject.cursorOnObject', () => {
   const runtimeGame = gdjs.getPixiRuntimeGame();
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({
+  runtimeScene.loadFromScene({sceneData: {
     layers: [{ name: '', visibility: true, effects: [] }],
     variables: [],
     behaviorsSharedData: [],
     objects: [],
     instances: [],
-  });
+  }, usedExtensionsWithVariablesData: []});
 
   var object = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',

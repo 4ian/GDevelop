@@ -116,11 +116,15 @@ namespace gdjs {
      * @param sceneData An object containing the scene data.
      * @see gdjs.RuntimeGame#getSceneData
      */
-    loadFromScene(sceneData: LayoutAndExtensionsData | null) {
-      if (!sceneData) {
+    loadFromScene(sceneAndExtensionsData: SceneAndExtensionsData | null) {
+      if (!sceneAndExtensionsData) {
         logger.error('loadFromScene was called without a scene');
         return;
       }
+      const {
+        sceneData,
+        usedExtensionsWithVariablesData,
+      } = sceneAndExtensionsData;
 
       if (this._isLoaded) {
         this.unloadScene();
@@ -140,13 +144,11 @@ namespace gdjs {
 
       // Load variables
       this._variables = new gdjs.VariablesContainer(sceneData.variables);
-      if (sceneData.usedExtensionsWithVariablesData) {
-        for (const extensionData of sceneData.usedExtensionsWithVariablesData) {
-          this._variablesByExtensionName.set(
-            extensionData.name,
-            new gdjs.VariablesContainer(extensionData.sceneVariables)
-          );
-        }
+      for (const extensionData of usedExtensionsWithVariablesData) {
+        this._variablesByExtensionName.set(
+          extensionData.name,
+          new gdjs.VariablesContainer(extensionData.sceneVariables)
+        );
       }
 
       //Cache the initial shared data of the behaviors

@@ -132,7 +132,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
               project, eventsFunctionsExtension, eventsFunction, parameterObjectsAndGroups);
 
   EventsCodeGenerator codeGenerator(projectScopedContainers);
-  codeGenerator.SetExtensionName(eventsFunctionsExtension.GetName());
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -142,9 +141,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
           eventsFunction.GetParametersForEvents(eventsFunctionsExtension), 0, true),
       codeGenerator.GenerateFreeEventsFunctionContext(
-          eventsFunction.GetParametersForEvents(eventsFunctionsExtension),
-          "runtimeScene.getOnceTriggers()",
-          eventsFunction.IsAsync()),
+          eventsFunctionsExtension,
+          eventsFunction,
+          "runtimeScene.getOnceTriggers()"),
       eventsFunction.GetEvents(),
       "",
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction));
@@ -192,11 +191,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
       // as a parameter called "Behavior".
       "var Behavior = this.name;\n" +
       codeGenerator.GenerateBehaviorEventsFunctionContext(
+          eventsFunctionsExtension,
           eventsBasedBehavior,
-          eventsFunction.GetParametersForEvents(
-              eventsBasedBehavior.GetEventsFunctions()),
+          eventsFunction,
           onceTriggersVariable,
-          eventsFunction.IsAsync(),
           // Pass the names of the parameters considered as the current
           // object and behavior parameters:
           "Object",
@@ -269,11 +267,10 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionCode(
   }
 
   fullPreludeCode += codeGenerator.GenerateObjectEventsFunctionContext(
+      eventsFunctionsExtension,
       eventsBasedObject,
-      eventsFunction.GetParametersForEvents(
-          eventsBasedObject.GetEventsFunctions()),
+      eventsFunction,
       onceTriggersVariable,
-      eventsFunction.IsAsync(),
       // Pass the names of the parameters considered as the current
       // object and behavior parameters:
       "Object");
@@ -324,25 +321,26 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 }
 
 gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
-    const vector<gd::ParameterMetadata>& parameters,
-    const gd::String& onceTriggersVariable,
-    bool isAsync) {
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& onceTriggersVariable) {
   gd::String objectsGettersMap;
   gd::String objectArraysMap;
   gd::String behaviorNamesMap;
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsFunctionsExtension,
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
-                                       behaviorNamesMap,
-                                       isAsync);
+                                       behaviorNamesMap);
 }
 
 gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
-    bool isAsync,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
   // See the comment at the start of the GenerateEventsFunctionContext function
@@ -388,21 +386,22 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
     }
   }
 
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsBasedBehavior.GetEventsFunctions(),
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
                                        behaviorNamesMap,
-                                       isAsync,
                                        thisObjectName,
                                        thisBehaviorName);
 }
 
 gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedObject& eventsBasedObject,
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
-    bool isAsync,
     const gd::String& thisObjectName) {
   // See the comment at the start of the GenerateEventsFunctionContext function
 
@@ -433,24 +432,30 @@ gd::String EventsCodeGenerator::GenerateObjectEventsFunctionContext(
     }
   }
 
-  return GenerateEventsFunctionContext(parameters,
+  return GenerateEventsFunctionContext(eventsFunctionsExtension,
+                                       eventsBasedObject.GetEventsFunctions(),
+                                       eventsFunction,
                                        onceTriggersVariable,
                                        objectsGettersMap,
                                        objectArraysMap,
                                        behaviorNamesMap,
-                                       isAsync,
                                        thisObjectName);
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
-    const vector<gd::ParameterMetadata>& parameters,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsFunctionsContainer& eventsFunctionsContainer,
+    const gd::EventsFunction& eventsFunction,
     const gd::String& onceTriggersVariable,
     gd::String& objectsGettersMap,
     gd::String& objectArraysMap,
     gd::String& behaviorNamesMap,
-    bool isAsync,
     const gd::String& thisObjectName,
     const gd::String& thisBehaviorName) {
+  const auto& extensionName = eventsFunctionsExtension.GetName();
+  const auto &parameters = eventsFunction.GetParametersForEvents(
+      eventsFunctionsContainer);
+
   // When running in the context of a function generated from events, we
   // need some indirection to deal with objects, behaviors and parameters in
   // general:
@@ -504,7 +509,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   }
 
   const gd::String async =
-      isAsync ? "  task: new gdjs.ManuallyResolvableTask(),\n" : "";
+      eventsFunction.IsAsync() ? "  task: new gdjs.ManuallyResolvableTask(),\n" : "";
 
   return gd::String("var eventsFunctionContext = {\n") +
          // The async task, if there is one
@@ -520,6 +525,12 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  _behaviorNamesMap: {\n" +
          behaviorNamesMap +
          "},\n"
+         "  globalVariablesForExtension: "
+         "runtimeScene.getGame().getVariablesForExtension(" +
+         ConvertToStringExplicit(extensionName) + "),\n" +
+         "  sceneVariablesForExtension: "
+         "runtimeScene.getVariablesForExtension(" +
+         ConvertToStringExplicit(extensionName) + "),\n" +
          // The local variables stack:
          "  localVariables: [],\n"
          // Function that will be used to query objects, when a new object list
@@ -1304,13 +1315,10 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
     } else if (sourceType ==
                 gd::VariablesContainer::SourceType::ExtensionGlobal) {
       variables = &variablesContainer;
-      // TODO Use numbers for indexes to optimize accesses.
-      output = "runtimeScene.getGame().getVariablesForExtension(" +
-                ConvertToStringExplicit(extensionName) + ")";
+      output = "eventsFunctionContext.globalVariablesForExtension";
     } else if (sourceType == gd::VariablesContainer::SourceType::ExtensionScene) {
       variables = &variablesContainer;
-      output = "runtimeScene.getScene().getVariablesForExtension(" +
-                ConvertToStringExplicit(extensionName) + ")";
+      output = "eventsFunctionContext.sceneVariablesForExtension";
     }
   } else if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getScene().getVariables()";

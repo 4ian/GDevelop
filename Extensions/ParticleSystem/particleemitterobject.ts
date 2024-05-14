@@ -375,21 +375,9 @@ namespace gdjs {
 
         // Consider every state dirty as the renderer was just re-created, so it needs
         // to be repositioned, angle updated, etc...
-        this._posDirty =
-          this._angleDirty =
-          this._forceDirty =
-          this._zoneRadiusDirty =
-            true;
-        this._lifeTimeDirty =
-          this._gravityDirty =
-          this._colorDirty =
-          this._sizeDirty =
-            true;
-        this._alphaDirty =
-          this._flowDirty =
-          this._tankDirty =
-          this._textureDirty =
-            true;
+        this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
+        this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
+        this._alphaDirty = this._flowDirty = this._tankDirty = this._textureDirty = true;
       }
       return true;
     }
@@ -580,25 +568,10 @@ namespace gdjs {
       if (this._textureDirty) {
         this._renderer.setTextureName(this.texture, instanceContainer);
       }
-      this._posDirty =
-        this._angleDirty =
-        this._forceDirty =
-        this._zoneRadiusDirty =
-          false;
-      this._lifeTimeDirty =
-        this._gravityDirty =
-        this._colorDirty =
-        this._sizeDirty =
-          false;
-      this._alphaDirty =
-        this._flowDirty =
-        this._textureDirty =
-        this._tankDirty =
-          false;
-      this._additiveRenderingDirty =
-        this._maxParticlesCountDirty =
-        this._particleRotationSpeedDirty =
-          false;
+      this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
+      this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
+      this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
+      this._additiveRenderingDirty = this._maxParticlesCountDirty = this._particleRotationSpeedDirty = false;
       this._renderer.update(this.getElapsedTime() / 1000.0);
       if (
         this.destroyWhenNoParticles &&

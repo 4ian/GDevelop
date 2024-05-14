@@ -120,12 +120,24 @@ namespace gdjs {
 
     updateFromObjectNetworkSyncData(newNetworkSyncData: SpriteNetworkSyncData) {
       super.updateFromObjectNetworkSyncData(newNetworkSyncData);
-      this.flipX(newNetworkSyncData.ifx);
-      this.flipY(newNetworkSyncData.ify);
-      this.setScaleX(Math.abs(newNetworkSyncData.sx));
-      this.setScaleY(Math.abs(newNetworkSyncData.sy));
-      this.setOpacity(newNetworkSyncData.op);
-      this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
+      if (newNetworkSyncData.ifx !== undefined) {
+        this.flipX(newNetworkSyncData.ifx);
+      }
+      if (newNetworkSyncData.ify !== undefined) {
+        this.flipY(newNetworkSyncData.ify);
+      }
+      if (newNetworkSyncData.sx !== undefined) {
+        this.setScaleX(Math.abs(newNetworkSyncData.sx));
+      }
+      if (newNetworkSyncData.sy !== undefined) {
+        this.setScaleY(Math.abs(newNetworkSyncData.sy));
+      }
+      if (newNetworkSyncData.op !== undefined) {
+        this.setOpacity(newNetworkSyncData.op);
+      }
+      if (newNetworkSyncData.anim) {
+        this._animator.updateFromObjectNetworkSyncData(newNetworkSyncData.anim);
+      }
       this.invalidateHitboxes();
     }
 

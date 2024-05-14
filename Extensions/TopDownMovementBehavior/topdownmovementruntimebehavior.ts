@@ -58,8 +58,9 @@ namespace gdjs {
     private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
     private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
-    private _topDownMovementHooks: Array<gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook> =
-      [];
+    private _topDownMovementHooks: Array<
+      gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHook
+    > = [];
 
     constructor(
       instanceContainer: gdjs.RuntimeInstanceContainer,
@@ -194,20 +195,17 @@ namespace gdjs {
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
       if (viewpoint === 'PixelIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            Math.atan(0.5)
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.atan(0.5)
+        );
       } else if (viewpoint === 'TrueIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            Math.PI / 6
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.PI / 6
+        );
       } else if (viewpoint === 'CustomIsometry') {
-        this._basisTransformation =
-          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-            (customIsometryAngle * Math.PI) / 180
-          );
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          (customIsometryAngle * Math.PI) / 180
+        );
       } else {
         this._basisTransformation = null;
       }
@@ -664,8 +662,7 @@ namespace gdjs {
 
     // This should be a static attribute but it's not possible because of
     // declaration order.
-    export const _topDownMovementHookContext =
-      new gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHookContext();
+    export const _topDownMovementHookContext = new gdjs.TopDownMovementRuntimeBehavior.TopDownMovementHookContext();
 
     /**
      * Allow extensions relying on the top-down movement to customize its
@@ -694,8 +691,7 @@ namespace gdjs {
     }
 
     export class IsometryTransformation
-      implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation
-    {
+      implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation {
       private _screen: float[][];
 
       /**

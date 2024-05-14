@@ -503,24 +503,40 @@ namespace gdjs {
      * @returns true if the object was updated, false if it could not (i.e: network sync is not supported).
      */
     updateFromObjectNetworkSyncData(networkSyncData: ObjectNetworkSyncData) {
-      this.setPosition(networkSyncData.x, networkSyncData.y);
-      this.setZOrder(networkSyncData.z);
-      this.setAngle(networkSyncData.a);
-      if (this.hidden !== networkSyncData.hid) {
+      if (networkSyncData.x !== undefined || networkSyncData.y !== undefined) {
+        this.setPosition(networkSyncData.x, networkSyncData.y);
+      }
+
+      if (networkSyncData.z !== undefined) {
+        this.setZOrder(networkSyncData.z);
+      }
+      if (networkSyncData.a !== undefined) {
+        this.setAngle(networkSyncData.a);
+      }
+      if (
+        networkSyncData.hid !== undefined &&
+        this.hidden !== networkSyncData.hid
+      ) {
         this.hide(networkSyncData.hid);
       }
 
-      // Force clear all forces and reapply them, using the garbage collector to recycle forces.
-      // Is that efficient?
-      this.clearForces();
-      for (let i = 0, len = networkSyncData.if.length; i < len; ++i) {
-        const forceData = networkSyncData.if[i];
-        const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
-        recycledOrNewForce.updateFromNetworkSyncData(forceData);
-        this._instantForces.push(recycledOrNewForce);
+      if (networkSyncData.if) {
+        // Force clear all forces and reapply them, using the garbage collector to recycle forces.
+        // Is that efficient?
+        this.clearForces();
+        for (let i = 0, len = networkSyncData.if.length; i < len; ++i) {
+          const forceData = networkSyncData.if[i];
+          const recycledOrNewForce = RuntimeObject.forcesGarbage.pop() as gdjs.Force;
+          recycledOrNewForce.updateFromNetworkSyncData(forceData);
+          this._instantForces.push(recycledOrNewForce);
+        }
       }
-      this._permanentForceX = networkSyncData.pfx;
-      this._permanentForceY = networkSyncData.pfy;
+      if (networkSyncData.pfx !== undefined) {
+        this._permanentForceX = networkSyncData.pfx;
+      }
+      if (networkSyncData.pfy !== undefined) {
+        this._permanentForceY = networkSyncData.pfy;
+      }
 
       // Loop through all behaviors and update them.
       for (const behaviorName in networkSyncData.beh) {

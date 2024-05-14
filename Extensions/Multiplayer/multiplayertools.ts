@@ -70,9 +70,9 @@ namespace gdjs {
       // return 'https://gd.games.wronglink';
 
       const isDev = runtimeGame.isUsingGDevelopDevelopmentEnvironment();
-      // const baseUrl = "https://gd.games";
+      const baseUrl = 'https://gd.games';
       // Uncomment to test locally:
-      const baseUrl = 'http://localhost:4000';
+      // const baseUrl = 'http://localhost:4000';
 
       const url = new URL(
         `${baseUrl}/games/${gameId}/lobbies${_lobbyId ? `/${_lobbyId}` : ''}`
@@ -396,8 +396,9 @@ namespace gdjs {
       _websocket.onclose = () => {
         logger.info('Disconnected from the lobby.');
 
-        const lobbiesIframe =
-          multiplayerComponents.getLobbiesIframe(runtimeScene);
+        const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+          runtimeScene
+        );
 
         if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
           logger.error(
@@ -448,14 +449,14 @@ namespace gdjs {
       playerToken: string;
     }) {
       // When the connectionId is received, initialise PeerJS so players can connect to each others afterwards.
-      // gdjs.evtTools.p2p.useDefaultBrokerServer();
-      gdjs.evtTools.p2p.useCustomBrokerServer(
-        'gdevelop-services.uc.r.appspot.com',
-        80,
-        '/',
-        '',
-        false
-      );
+      gdjs.evtTools.p2p.useDefaultBrokerServer();
+      // gdjs.evtTools.p2p.useCustomBrokerServer(
+      //   'gdevelop-services.uc.r.appspot.com',
+      //   80,
+      //   '/',
+      //   '',
+      //   false
+      // );
 
       _connectionId = connectionId;
       playerPositionInLobby = positionInLobby;
@@ -463,8 +464,9 @@ namespace gdjs {
       _lobbyId = lobbyId;
 
       // Then we inform the lobbies window that the player has joined.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.error(
@@ -484,8 +486,8 @@ namespace gdjs {
         },
         // Specify the origin to avoid leaking the playerToken.
         // Replace with '*' to test locally.
-        // 'https://gd.games'
-        '*'
+        'https://gd.games'
+        // '*'
       );
     };
 
@@ -571,8 +573,9 @@ namespace gdjs {
 
       // If the player is in the lobby, tell the lobbies window that the lobby has been updated,
       // as well as the player position.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.info('The lobbies iframe is not opened, not sending message.');
@@ -597,8 +600,9 @@ namespace gdjs {
       }
 
       // Just pass along the message to the iframe so that it can display the countdown.
-      const lobbiesIframe =
-        multiplayerComponents.getLobbiesIframe(runtimeScene);
+      const lobbiesIframe = multiplayerComponents.getLobbiesIframe(
+        runtimeScene
+      );
 
       if (!lobbiesIframe || !lobbiesIframe.contentWindow) {
         logger.info('The lobbies iframe is not opened, not sending message.');
@@ -931,8 +935,9 @@ namespace gdjs {
     export const isLobbiesWindowOpen = function (
       runtimeScene: gdjs.RuntimeScene
     ): boolean {
-      const lobbiesRootContainer =
-        multiplayerComponents.getLobbiesRootContainer(runtimeScene);
+      const lobbiesRootContainer = multiplayerComponents.getLobbiesRootContainer(
+        runtimeScene
+      );
       return !!lobbiesRootContainer;
     };
 

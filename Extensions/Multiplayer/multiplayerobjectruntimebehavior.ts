@@ -14,10 +14,20 @@ namespace gdjs {
     // If 0, then the object is not owned by any player, so the server is the owner.
     _playerNumber: number = 0;
     // The last time the object has been synchronized.
-    // This is to avoid synchronizing the object too often, see _objectTickRate.
+    // This is to avoid synchronizing the object too often, see _objectMaxTickRate.
     _lastObjectSyncTimestamp: number = 0;
-    // The number of times per second the object should be synchronized.
-    _objectTickRate: number = 60;
+    // The number of times per second the object should be synchronized if it keeps changing.
+    _objectMaxTickRate: number = 60;
+
+    // The last time the basic object info has been synchronized.
+    _lastBasicObjectSyncTimestamp: number = 0;
+    // The number of times per second the object basic info should be synchronized when it doesn't change.
+    _objectBasicInfoTickRate: number = 5;
+    // The last data sent to synchronize the basic info of the object.
+    _lastSentBasicObjectSyncData: BasicObjectNetworkSyncData | undefined;
+    // When we know that the basic info of the object has been updated, we can force sending them
+    // on the max tickrate for a number of times to ensure they are received, without the need of an acknowledgment.
+    _numberOfForcedBasicObjectUpdates: number = 0;
 
     // The last time the variables have been synchronized.
     _lastVariablesSyncTimestamp: number = 0;
@@ -89,9 +99,8 @@ namespace gdjs {
       }
     }
 
-    isOwnerOrServer() {
-      const currentPlayerNumber =
-        gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+    isOwnerAsPlayerOrServer() {
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
 
       const isOwnerOfObject =
         currentPlayerNumber === this._playerNumber || // Player as owner.
@@ -100,10 +109,17 @@ namespace gdjs {
       return isOwnerOfObject;
     }
 
-    hasObjectBeenSyncedRecently() {
+    hasObjectBeenSyncedWithinMaxRate() {
       return (
         this._getTimeNow() - this._lastObjectSyncTimestamp <
-        1000 / this._objectTickRate
+        1000 / this._objectMaxTickRate
+      );
+    }
+
+    hasObjectBasicInfoBeenSyncedRecently() {
+      return (
+        this._getTimeNow() - this._lastBasicObjectSyncTimestamp <
+        1000 / this._objectBasicInfoTickRate
       );
     }
 
@@ -145,6 +161,22 @@ namespace gdjs {
       return this.owner.networkId;
     }
 
+    isBasicObjectNetworkSyncDataDifferentFromLastSync(
+      basicObjectNetworkSyncData: BasicObjectNetworkSyncData
+    ) {
+      if (!this._lastSentBasicObjectSyncData) {
+        return true;
+      }
+
+      // Compare the json of the basicObjectNetworkSyncData to check if they are different.
+      // This is not the most efficient way to do it, but it's simple and should work.
+      const haveBasicObjectNetworkSyncDataChanged =
+        JSON.stringify(basicObjectNetworkSyncData) !==
+        JSON.stringify(this._lastSentBasicObjectSyncData);
+
+      return haveBasicObjectNetworkSyncDataChanged;
+    }
+
     areVariablesDifferentFromLastSync(variablesSyncData: VariableSyncData[]) {
       if (!this._lastSentVariableSyncData) {
         return true;
@@ -155,14 +187,6 @@ namespace gdjs {
       const haveVariableSyncDataChanged =
         JSON.stringify(variablesSyncData) !==
         JSON.stringify(this._lastSentVariableSyncData);
-
-      if (haveVariableSyncDataChanged) {
-        // console.info(
-        //   'variables have changed',
-        //   variablesSyncData,
-        //   this._lastSentVariableSyncData
-        // );
-      }
 
       return haveVariableSyncDataChanged;
     }
@@ -206,12 +230,13 @@ namespace gdjs {
     }
 
     doStepPostEvents() {
-      if (!this.isOwnerOrServer()) {
+      if (!this.isOwnerAsPlayerOrServer()) {
         return;
       }
 
-      // If the object has been synchronized recently, then return.
-      if (this.hasObjectBeenSyncedRecently()) {
+      // If the object has been synchronized recently at the max rate, then return.
+      // This is to avoid sending data on every frame, which would be too much.
+      if (this.hasObjectBeenSyncedWithinMaxRate()) {
         return;
       }
 
@@ -224,6 +249,31 @@ namespace gdjs {
       const instanceNetworkId = this.getOrCreateInstanceNetworkId();
       const objectName = this.owner.getName();
       const objectNetworkSyncData = this.owner.getObjectNetworkSyncData();
+
+      const areBasicObjectNetworkSyncDataDifferent = this.isBasicObjectNetworkSyncDataDifferentFromLastSync(
+        {
+          x: objectNetworkSyncData.x,
+          y: objectNetworkSyncData.y,
+          z: objectNetworkSyncData.z,
+          a: objectNetworkSyncData.a,
+          hid: objectNetworkSyncData.hid,
+          if: objectNetworkSyncData.if,
+          pfx: objectNetworkSyncData.pfx,
+          pfy: objectNetworkSyncData.pfy,
+        }
+      );
+      const shouldSyncObjectBasicInfo =
+        !this.hasObjectBasicInfoBeenSyncedRecently() ||
+        areBasicObjectNetworkSyncDataDifferent ||
+        this._numberOfForcedBasicObjectUpdates > 0;
+      if (areBasicObjectNetworkSyncDataDifferent) {
+        this._numberOfForcedBasicObjectUpdates = 3;
+      }
+      if (!shouldSyncObjectBasicInfo) {
+        // If the basic info has not changed, assume we don't need to sync the whole object data at a high rate.
+        // TODO: allow sending the variables, behaviors and effects still?
+        return;
+      }
 
       const areVariablesDifferent =
         objectNetworkSyncData.var &&
@@ -253,33 +303,41 @@ namespace gdjs {
         delete objectNetworkSyncData.eff;
       }
 
-      const { messageName: updateMessageName, messageData: updateMessageData } =
-        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-          objectOwner: this._playerNumber,
-          objectName,
-          instanceNetworkId,
-          objectNetworkSyncData,
-        });
+      const {
+        messageName: updateMessageName,
+        messageData: updateMessageData,
+      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+        objectNetworkSyncData,
+      });
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
       );
 
-      // this.logToConsole(
-      //   `Synchronizing object ${this.owner.getName()} (instance ${
-      //     this.owner.networkId
-      //   }) with player ${this._playerNumber} and data ${JSON.stringify(
-      //     objectNetworkSyncData
-      //   )}`
-      // );
-
       const now = this._getTimeNow();
 
       this._lastObjectSyncTimestamp = now;
+      if (shouldSyncObjectBasicInfo) {
+        this._lastBasicObjectSyncTimestamp = now;
+        this._lastSentBasicObjectSyncData = {
+          x: objectNetworkSyncData.x,
+          y: objectNetworkSyncData.y,
+          z: objectNetworkSyncData.z,
+          a: objectNetworkSyncData.a,
+          hid: objectNetworkSyncData.hid,
+          if: objectNetworkSyncData.if,
+          pfx: objectNetworkSyncData.pfx,
+          pfy: objectNetworkSyncData.pfy,
+        };
+        this._numberOfForcedBasicObjectUpdates = Math.max(
+          this._numberOfForcedBasicObjectUpdates - 1,
+          0
+        );
+      }
       if (shouldSyncVariables) {
-        // if (this.owner.getName() === 'Player1') {
-        //   console.info('variables have been synced', objectNetworkSyncData.var);
-        // }
         this._lastVariablesSyncTimestamp = now;
         this._lastSentVariableSyncData = objectNetworkSyncData.var;
         this._numberOfForcedVariablesUpdates = Math.max(
@@ -304,7 +362,7 @@ namespace gdjs {
         this._destroyInstanceTimeoutId = null;
       }
 
-      if (!this.isOwnerOrServer()) {
+      if (!this.isOwnerAsPlayerOrServer()) {
         return;
       }
 
@@ -322,13 +380,15 @@ namespace gdjs {
       logger.info(
         `Sending a final update for object ${objectName} (instance ${instanceNetworkId}) before it is destroyed.`
       );
-      const { messageName: updateMessageName, messageData: updateMessageData } =
-        gdjs.multiplayerMessageManager.createUpdateObjectMessage({
-          objectOwner: this._playerNumber,
-          objectName,
-          instanceNetworkId,
-          objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
-        });
+      const {
+        messageName: updateMessageName,
+        messageData: updateMessageData,
+      } = gdjs.multiplayerMessageManager.createUpdateObjectMessage({
+        objectOwner: this._playerNumber,
+        objectName,
+        instanceNetworkId,
+        objectNetworkSyncData: this.owner.getObjectNetworkSyncData(),
+      });
       this.sendDataToPeersWithIncreasedClock(
         updateMessageName,
         updateMessageData
@@ -348,10 +408,9 @@ namespace gdjs {
         objectName,
         instanceNetworkId,
       });
-      const destroyedMessageName =
-        gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
-          destroyMessageName
-        );
+      const destroyedMessageName = gdjs.multiplayerMessageManager.createObjectDestroyedMessageNameFromDestroyMessage(
+        destroyMessageName
+      );
       gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
         originalMessageName: destroyMessageName,
         originalData: {
@@ -399,23 +458,24 @@ namespace gdjs {
         }
       }
 
-      const currentPlayerNumber =
-        gdjs.multiplayer.getCurrentPlayerPositionInLobby();
+      const currentPlayerNumber = gdjs.multiplayer.getCurrentPlayerPositionInLobby();
       const objectName = this.owner.getName();
 
       if (instanceNetworkId) {
         // When changing the ownership of an object with a networkId, we send a message to the server to ensure it is aware of the change,
         // and can either accept it and broadcast it to other players, or reject it and do nothing with it.
         // We expect an acknowledgment from the server, if not, we will retry and eventually revert the ownership.
-        const { messageName, messageData } =
-          gdjs.multiplayerMessageManager.createChangeOwnerMessage({
-            objectOwner: this._playerNumber,
-            objectName,
-            instanceNetworkId,
-            newObjectOwner: newPlayerNumber,
-            instanceX: this.owner.getX(),
-            instanceY: this.owner.getY(),
-          });
+        const {
+          messageName,
+          messageData,
+        } = gdjs.multiplayerMessageManager.createChangeOwnerMessage({
+          objectOwner: this._playerNumber,
+          objectName,
+          instanceNetworkId,
+          newObjectOwner: newPlayerNumber,
+          instanceX: this.owner.getX(),
+          instanceY: this.owner.getY(),
+        });
         // Before sending the changeOwner message, if we are becoming the new owner,
         // we want to ensure this message is acknowledged, by everyone we're connected to.
         // If we are player 1, we are connected to everyone, so we expect an acknowledgment from everyone.
@@ -423,10 +483,9 @@ namespace gdjs {
         // In both cases, this represents the list of peers the current user is connected to.
         if (newPlayerNumber === currentPlayerNumber) {
           const otherPeerIds = gdjs.evtTools.p2p.getAllPeers();
-          const changeOwnerAcknowledgedMessageName =
-            gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
-              messageName
-            );
+          const changeOwnerAcknowledgedMessageName = gdjs.multiplayerMessageManager.createObjectOwnerChangedMessageNameFromChangeOwnerMessage(
+            messageName
+          );
           gdjs.multiplayerMessageManager.addExpectedMessageAcknowledgement({
             originalMessageName: messageName,
             originalData: {
